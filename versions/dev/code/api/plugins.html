@@ -506,6 +506,20 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_classes">
+<span class="sig-name descname"><span class="pre">get_all_plugin_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.base_input_plugin.InputPlugin"><span class="pre">InputPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.base_proc_plugin.ProcPlugin"><span class="pre">ProcPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.base_output_plugin.OutputPlugin"><span class="pre">OutputPlugin</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_classes" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of all registered plugin classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list with all the Plugin classes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[type[<a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin">InputPlugin</a> | <a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin">ProcPlugin</a> | <a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin">OutputPlugin</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names">
 <span class="sig-name descname"><span class="pre">get_all_plugin_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names" title="Link to this definition">#</a></dt>
 <dd><p>Get a list of all the plugin names currently registered.</p>
@@ -521,16 +535,9 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugins">
-<span class="sig-name descname"><span class="pre">get_all_plugins</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugins" title="Link to this definition">#</a></dt>
-<dd><p>Get a list of all plugins.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A list with all the Plugin classes.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">get_all_plugins</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugins" title="Link to this definition">#</a></dt>
+<dd><p>Old alias for <cite>get_all_plugin_classes</cite>.</p>
+<p>Warning: this method is deprecated. Please use <cite>get_all_plugin_classes</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -552,7 +559,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name">
-<span class="sig-name descname"><span class="pre">get_plugin_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.base_input_plugin.InputPlugin"><span class="pre">InputPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.base_proc_plugin.ProcPlugin"><span class="pre">ProcPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.base_output_plugin.OutputPlugin"><span class="pre">OutputPlugin</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_plugin_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.base_input_plugin.InputPlugin"><span class="pre">InputPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.base_proc_plugin.ProcPlugin"><span class="pre">ProcPlugin</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.base_output_plugin.OutputPlugin"><span class="pre">OutputPlugin</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="Link to this definition">#</a></dt>
 <dd><p>Get a plugin by its class name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -562,7 +569,7 @@ name is encountered. If False, these plugins will be skipped.</p></li>
 <dd class="field-even"><p><strong>plugin</strong> – The Plugin class.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin">InputPlugin</a> | <a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin">ProcPlugin</a> | <a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin">OutputPlugin</a></p>
+<dd class="field-odd"><p>type[<a class="reference internal" href="#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin">InputPlugin</a> | <a class="reference internal" href="#pydidas.plugins.ProcPlugin" title="pydidas.plugins.ProcPlugin">ProcPlugin</a> | <a class="reference internal" href="#pydidas.plugins.OutputPlugin" title="pydidas.plugins.OutputPlugin">OutputPlugin</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1379,15 +1386,15 @@ label.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">pyFAIintegrationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">pyFAIintegrationBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase" title="Link to this definition">#</a></dt>
 <dd><p>Provide basic functionality for the concrete integration plugins.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask">
-<span class="sig-name descname"><span class="pre">check_and_set_custom_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check_and_set_custom_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.check_and_set_custom_mask" title="Link to this definition">#</a></dt>
 <dd><p>Check the kwargs for a custom mask and set it, if available.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments.</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – Any keyword arguments.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1408,7 +1415,7 @@ label.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.execute">
-<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.execute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.execute" title="Link to this definition">#</a></dt>
 <dd><p>To be implemented by the concrete subclass.</p>
 </dd></dl>
 
@@ -1416,9 +1423,10 @@ label.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_deg">
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_in_deg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_deg" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in degree.</p>
-<p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the tuple with both values is returned.
-Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
+<p>If the <cite>use_azimuthal_range</cite> parameter is True and both the lower and
+upper range limits are larger than zero, the tuple with both values
+is returned. Otherwise, the return is None which corresponds to
+pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in degrees.</p>
@@ -1433,9 +1441,10 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_rad">
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_in_rad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_in_rad" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in radians.</p>
-<p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the tuple with both values is returned.
-Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
+<p>If the <cite>use_azimuthal_range</cite> parameter is True and both the lower and
+upper range limits are larger than zero, the tuple with both values
+is returned. Otherwise, the return is None which corresponds to
+pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration in radian.</p>
@@ -1450,10 +1459,11 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native">
 <span class="sig-name descname"><span class="pre">get_azimuthal_range_native</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_azimuthal_range_native" title="Link to this definition">#</a></dt>
 <dd><p>Get the azimuthal range from the Parameters in native units.</p>
-<p>If use_azimuthal_range is True and both the lower and upper range
-limits are larger than zero, the tuple with both values is returned.
-Otherwise, the return is the full circle which encompasses (-180, 180)
-if the integration discontinuity is located at pi, and (0, 360) otherwise.</p>
+<p>If the <cite>use_azimuthal_range</cite> parameter is True and both the lower and
+upper range limits are larger than zero, the tuple with both values
+is returned.  Otherwise, the return is the full circle which
+encompasses (-180, 180) if the integration discontinuity is located
+at pi, and (0, 360) otherwise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The azimuthal range for the pyFAI integration.</p>
@@ -1466,7 +1476,7 @@ if the integration discontinuity is located at pi, and (0, 360) otherwise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_parameter_config_widget">
-<span class="sig-name descname"><span class="pre">get_parameter_config_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QWidget</span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_parameter_config_widget" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_parameter_config_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">QWidget</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_parameter_config_widget" title="Link to this definition">#</a></dt>
 <dd><p>Get the unique configuration widget associated with this Plugin.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1499,9 +1509,10 @@ if the integration discontinuity is located at pi, and (0, 360) otherwise.</p>
 <dt class="sig sig-object py" id="pydidas.plugins.pyFAIintegrationBase.get_radial_range">
 <span class="sig-name descname"><span class="pre">get_radial_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.get_radial_range" title="Link to this definition">#</a></dt>
 <dd><p>Get the radial range from the Parameters.</p>
-<p>If use_radial_range is True and both the lower and upper range limits
-are larger than zero, the tuple with both values is returned.
-Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
+<p>If the <cite>use_azimuthal_range</cite> parameter is True and both the lower and
+upper range limits are larger than zero, the tuple with both values
+is returned. Otherwise, the return is None which corresponds to
+pyFAI auto ranges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The radial range for the pyFAI integration.</p>
@@ -1528,14 +1539,11 @@ Otherwise, the return is None which corresponds to pyFAI auto ranges.</p>
 <span class="sig-name descname"><span class="pre">is_range_valid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.plugins.pyFAIintegrationBase.is_range_valid" title="Link to this definition">#</a></dt>
 <dd><p>Check whether the plugin’s range is valid.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>azi_range</strong> (<em>tuple</em>) – The azimuthal range.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether the range is valid or not.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag whether the range is valid or not.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1616,6 +1624,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.check_and_register_class"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.check_and_register_class</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.clear_collection"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.clear_collection</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.find_and_register_plugins</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_classes"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.get_all_plugin_classes</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.get_all_plugin_names</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugins"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.get_all_plugins</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugins_of_type"><code class="docutils literal notranslate"><span class="pre">PluginRegistry.get_all_plugins_of_type</span></code></a></li>

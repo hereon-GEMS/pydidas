@@ -491,6 +491,36 @@ and if yes, it will call some updates.</p>
 <dd><p>Import data to the workflow results.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.set_displayed_data">
+<span class="sig-name descname"><span class="pre">set_displayed_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.set_displayed_data" title="Link to this definition">#</a></dt>
+<dd><p>Set the data to display.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>update</strong> (<em>bool</em>) – Flag to update the data without updating the DataViewer metadata.
+The default is False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.update_choices_of_selected_results">
+<span class="sig-name descname"><span class="pre">update_choices_of_selected_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.update_choices_of_selected_results" title="Link to this definition">#</a></dt>
+<dd><p>Update the choices of the selected results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.update_displayed_data">
+<span class="sig-name descname"><span class="pre">update_displayed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.update_displayed_data" title="Link to this definition">#</a></dt>
+<dd><p>Update the data to display</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.ViewResultsFrame.update_export_setting_visibility">
+<span class="sig-name descname"><span class="pre">update_export_setting_visibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.ViewResultsFrame.update_export_setting_visibility" title="Link to this definition">#</a></dt>
+<dd><p>Update the enabled state of the export buttons based on available results.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -637,12 +667,6 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">build_view_results_mixin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Build the widgets required for the ViewResultsMixin functionality.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">changeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>
 <dd></dd></dl>
 
@@ -713,12 +737,6 @@ subclasses full control over args and kwargs.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Connect all the required signals for the frame.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">connect_view_results_mixin_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Connect all required Qt slots and signals.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1236,8 +1254,9 @@ implementation are valid kwargs.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span></dt>
 <dd><p>Export the state of the Frame for saving.</p>
+<p>This method adds an export for the frame’s app.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -2013,13 +2032,13 @@ callable.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">q_settings_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Real</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Integral</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<span class="sig-name descname"><span class="pre">q_settings_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Integral</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">Real</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
 <dd><p>Get the value from a QSetting key.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The QSetting reference key.</p></li>
-<li><p><strong>dtype</strong> (<em>Integral</em><em> | </em><em>Real</em><em> | </em><em>Type</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – A return datatype. If not None, the output will be returned as
+<li><p><strong>dtype</strong> (<em>type</em><em>[</em><em>Integral</em><em>] </em><em>| </em><em>type</em><em>[</em><em>Real</em><em>] </em><em>| </em><em>Type</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – A return datatype. If not None, the output will be returned as
 dtype(value), otherwise, the generic string/int will be returned. The
 default is None.</p></li>
 <li><p><strong>default</strong> (<em>Any</em><em>, </em><em>optional</em>) – The default value which is returned if the key defaults to None. The
@@ -2140,14 +2159,12 @@ referenced by param_key or dtype, if given.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Restore the frame’s state from stored information.</p>
-<p>The default implementation in the BaseFrame will update all Parameters
-(and associated widgets) and restore the visibility of all widgets. If the
-frame has not yet been built, the state information is only stored internally
-and not yet applied. It will be applied at the next frame activation.</p>
+<p>The BaseFrameWithApp implementation will update the associated App
+and then call the BaseFrame’s method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – A dictionary with ‘params’ and ‘visibility’ keys and the respective
-information for both.</p>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – A dictionary with ‘params’, ‘app’ and ‘visibility’ keys and the
+respective information for all.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3016,6 +3033,10 @@ parameter referenced with &lt;key&gt;.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.connect_signals"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.connect_signals</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.frame_activated"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.frame_activated</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.import_data_to_workflow_results"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.import_data_to_workflow_results</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.set_displayed_data"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.set_displayed_data</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.update_choices_of_selected_results"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.update_choices_of_selected_results</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.update_displayed_data"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.update_displayed_data</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.ViewResultsFrame.update_export_setting_visibility"><code class="docutils literal notranslate"><span class="pre">ViewResultsFrame.update_export_setting_visibility</span></code></a></li>
 </ul>
 </li>
 </ul>

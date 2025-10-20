@@ -981,15 +981,54 @@ through the SingletonObject.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">PydidasWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindowMixIn</span></code></p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">PydidasWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a></p>
 <p>The PydidasWindow is a standalone BaseFrame with a persistent geometry.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QCloseEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Overload the closeEvent to store the window’s geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QCloseEvent</em>) – The closing event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.export_window_state">
+<span class="sig-name descname"><span class="pre">export_window_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.export_window_state" title="Link to this definition">#</a></dt>
+<dd><p>Get the state of the window for exporting.</p>
+<p>The generic PydidasWindow method will return the geometry and
+visibility. If windows need to export more information, they need
+to reimplement this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The dictionary with the window state.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.open_help">
 <span class="sig-name descname"><span class="pre">open_help</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.open_help" title="Link to this definition">#</a></dt>
 <dd><p>Open the help in a browser.</p>
 <p>This slot will check whether a helpfile exists for the current frame and open
 the respective helpfile if it exits or the main documentation if it does not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasWindow.restore_window_state">
+<span class="sig-name descname"><span class="pre">restore_window_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasWindow.restore_window_state" title="Link to this definition">#</a></dt>
+<dd><p>Restore the window state from saved information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – The dictionary with the state information.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1099,7 +1138,10 @@ the respective helpfile if it exits or the main documentation if it does not.</p
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow"><code class="docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">PydidasWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow.export_window_state"><code class="docutils literal notranslate"><span class="pre">PydidasWindow.export_window_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow.open_help"><code class="docutils literal notranslate"><span class="pre">PydidasWindow.open_help</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow.restore_window_state"><code class="docutils literal notranslate"><span class="pre">PydidasWindow.restore_window_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasWindow.show"><code class="docutils literal notranslate"><span class="pre">PydidasWindow.show</span></code></a></li>
 </ul>
 </li>

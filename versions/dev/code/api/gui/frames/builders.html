@@ -541,25 +541,6 @@ without any connections and functionality.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.QuickIntegrationFrameBuilder">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">QuickIntegrationFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder" title="Link to this definition">#</a></dt>
-<dd><p>The QuickIntegrationFrameBuilder can be used to populate the QuickIntegrationFrame
-with widgets.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">populate_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame" title="Link to this definition">#</a></dt>
-<dd><p>Populate the given frame with widgets.</p>
-<p>Note: This method is reliant upon passing the correct type of frame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<em>pydidas.gui.frames.QuickIntegrationFrame</em>) – The frame to be populated.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.builders.UtilitiesFrameBuilder">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">UtilitiesFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder" title="Link to this definition">#</a></dt>
 <dd><p>Create all widgets and initialize their state.</p>
@@ -632,24 +613,6 @@ with widgets.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>QtWidgets.QSplitter</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.get_WorkflowRunFrame_build_config">
-<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">get_WorkflowRunFrame_build_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.gui.frames.builders.get_WorkflowRunFrame_build_config" title="Link to this definition">#</a></dt>
-<dd><p>Return the build configuration for the ViewResultsFrame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The ViewResultsFrame instance.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The build configuration in form of a list. Each list entry consists of the
-widget creation method name, the method arguments and the method keywords.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[list[str, tuple[str], dict]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -750,10 +713,6 @@ widget creation method name, the method arguments and the method</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.ImageMathFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">ImageMathFrameBuilder.populate_frame</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder"><code class="docutils literal notranslate"><span class="pre">QuickIntegrationFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.QuickIntegrationFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">QuickIntegrationFrameBuilder.populate_frame</span></code></a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder.build_frame</span></code></a></li>
 </ul>
@@ -764,7 +723,6 @@ widget creation method name, the method arguments and the method</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.column_width_factor"><code class="docutils literal notranslate"><span class="pre">column_width_factor</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.create_splitter"><code class="docutils literal notranslate"><span class="pre">create_splitter</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.get_WorkflowRunFrame_build_config"><code class="docutils literal notranslate"><span class="pre">get_WorkflowRunFrame_build_config</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.get_WorkflowTestFrame_build_config"><code class="docutils literal notranslate"><span class="pre">get_WorkflowTestFrame_build_config</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.scan_frame_build_config"><code class="docutils literal notranslate"><span class="pre">scan_frame_build_config</span></code></a></li>
 </ul>

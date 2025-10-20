@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
+from numbers import Real
 from pathlib import Path
 from typing import Any, Self
 
@@ -378,7 +379,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         )
 
     def set_beamcenter_from_fit2d_params(
-        self, center_x: float, center_y: float, det_dist: float, **kwargs: Any
+        self, center_x: Real, center_y: Real, det_dist: Real, **kwargs: Any
     ):
         """
         Set the beamcenter in detector pixel coordinates.
@@ -395,18 +396,18 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        center_x : float
+        center_x : Real
             The position of the x beam center in pixels.
-        center_y : float
+        center_y : Real
             The position of the y beam center in pixels.
-        det_dist : float
+        det_dist : Real
             The distance between sample and detector beam center in meters.
         **kwargs : Any
             Supported keyword arguments are:
 
-            tilt : float, optional
+            tilt : Real, optional
                 The tilt of the detector, given in rotation unit. The default is 0.
-            tilt_plane: float, optional
+            tilt_plane: Real, optional
                 The rotation of the tile plane of the detector, given in rot unit. The
                 default is 0.
             rot_unit : str, optional

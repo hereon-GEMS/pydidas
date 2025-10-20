@@ -165,9 +165,10 @@ class DefineDiffractionExpFrame(BaseFrame):
         Open a dialog to select a detector.
         """
         dialog = DetectorSelectorDialog()
-        dialog.exec_()
-        _det = dialog.selectedDetector()
-        self.update_detector_params(_det, show_warning=False)
+        _return = dialog.exec_()
+        if _return == QtWidgets.QDialog.Accepted:
+            _det = dialog.selectedDetector()
+            self.update_detector_params(_det, show_warning=False)
 
     def copy_all_from_pyfai(self):
         """

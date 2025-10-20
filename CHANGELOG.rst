@@ -80,7 +80,8 @@ Bugfixes
 - Fixed an issue where the PydidasPlot2D would reset the canvas size on data reload.
 - Fixed an issue when importing geometries from Fit2D which did not correct for 
   the flipped image orientation.
-
+- Fixed an issue in the DefineDiffractionExpFrame where the detector dialogue 
+  selection was accepted also on cancel.
 
 
 v25.05.16

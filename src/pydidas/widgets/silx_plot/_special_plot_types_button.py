@@ -28,7 +28,7 @@ __all__ = ["SpecialPlotTypesButton"]
 
 
 from functools import partial
-from typing import Literal
+from typing import TYPE_CHECKING, Callable, Literal, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -37,12 +37,19 @@ from silx.gui.plot.PlotToolButtons import PlotToolButton
 from pydidas.resources import icons
 
 
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
+
+
 class SpecialPlotTypesButton(PlotToolButton):
     """
     Tool button to change the plot type of the original data.
+
+    This allows to display the data in different representations, e.g.
+    a Kratky plot for SAXS data.
     """
 
-    CHOICES = {
+    PLOT_TYPE = {
         ("generic", "icon"): icons.get_pydidas_qt_icon("silx_plot_type_generic.png"),
         ("generic", "state"): "Generic f(x) = y",
         ("generic", "action"): "Plot generic data",
@@ -52,14 +59,50 @@ class SpecialPlotTypesButton(PlotToolButton):
     }
     sig_new_plot_type = QtCore.Signal(str)
 
-    def __init__(self, parent=None, plot=None):
+    def __init__(
+        self,
+        parent: QtWidgets.QWidget | None = None,
+        plot: Union["PydidasPlot1D", None] = None,
+    ):
         PlotToolButton.__init__(self, parent=parent, plot=plot)
         self.__define_actions_and_create_menu()
         self._current_yfunc = self.func_generic
         self._current_ylabel = self.label_generic
 
+    def __define_actions_and_create_menu(self):
+        """Define the required actions and create the button menu."""
+        menu = QtWidgets.QMenu(self)
+
+        for _key in ["generic", "kratky"]:
+            _action = QtWidgets.QAction(
+                self.PLOT_TYPE[_key, "icon"], self.PLOT_TYPE[_key, "action"], self
+            )
+            _action.triggered.connect(partial(self.set_plot_type, _key))
+            _action.setIconVisibleInMenu(True)
+            menu.addAction(_action)
+
+        self.setMenu(menu)
+        self.set_plot_type("generic")
+        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
+    @QtCore.Slot()
+    def set_plot_type(self, plot_type: Literal["generic", "kratky"]):
+        """
+        Set the coordinate system associated with the given name.
+
+        Parameters
+        ----------
+        plot_type: Literal["generic", "kratky"]
+            The descriptive name of the plot type.
+        """
+        self.setIcon(self.PLOT_TYPE[plot_type, "icon"])
+        self.setToolTip(self.PLOT_TYPE[plot_type, "state"])
+        self._current_yfunc = getattr(self, f"func_{plot_type}")
+        self._current_ylabel = getattr(self, f"label_{plot_type}")
+        self.sig_new_plot_type.emit(plot_type)
+
     @staticmethod
-    def func_generic(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def func_generic(x: np.ndarray, y: np.ndarray) -> np.ndarray:  # noqa ARG001
         """
         The generic function which returns the identity for y.
 
@@ -78,7 +121,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         return y
 
     @staticmethod
-    def label_generic(xlabel: str, xunit: str, ylabel: str, yunit: str) -> str:
+    def label_generic(xlabel: str, xunit: str, ylabel: str, yunit: str) -> str:  # noqa ARG001
         """
         Get the generic y label.
 
@@ -98,7 +141,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         str
             The new y label.
         """
-        return ylabel + (" / " + yunit if len(yunit) > 0 else "")
+        return ylabel + (" / " + yunit if yunit else "")
 
     @staticmethod
     def func_kratky(x: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -128,91 +171,45 @@ class SpecialPlotTypesButton(PlotToolButton):
         ----------
         xlabel : str
             The original x label.
+        xunit : str
+            The original x unit name.
         ylabel :
             The original y label.
+        yunit : str
+            The original y unit name.
 
         Returns
         -------
         str
             The new y label.
         """
-        _label = f"{ylabel} * {xlabel}^2"
-        _unit = f"{yunit} * {xunit}^2"
+        _label = ylabel
+        if xlabel:
+            _label = f"{_label} * {xlabel}^2" if _label else f"{xlabel}^2"
+        _unit = yunit
+        if xunit:
+            _unit += f"{_unit} * {xunit}^2" if _unit else f"{xunit}^2"
         return _label + (f" / ({_unit})" if len(_unit) > 0 else "")
 
     @property
-    def plot_yfunc(self) -> object:
+    def plot_yfunc(self) -> Callable:
         """
         Return the function for mapping the input data to the plot type.
 
         Returns
         -------
-        object
+        Callable
             The function which maps the input date to the chosen output.
         """
         return self._current_yfunc
 
-    def plot_ylabel(self) -> object:
+    def plot_ylabel(self) -> Callable:
         """
         Return the function for mapping the input data to the plot type.
 
         Returns
         -------
-        object
+        Callable
             The function which maps the input date to the chosen output.
         """
         return self._current_ylabel
-
-    def __define_actions_and_create_menu(self):
-        """
-        Define the required actions and create the button menu.
-        """
-        generic_action = self._create_action("generic")
-        generic_action.triggered.connect(partial(self.set_plot_type, "generic"))
-        generic_action.setIconVisibleInMenu(True)
-
-        kratky_action = self._create_action("kratky")
-        kratky_action.triggered.connect(partial(self.set_plot_type, "kratky"))
-        kratky_action.setIconVisibleInMenu(True)
-
-        menu = QtWidgets.QMenu(self)
-        menu.addAction(generic_action)
-        menu.addAction(kratky_action)
-
-        self.setMenu(menu)
-        self.set_plot_type("generic")
-        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-
-    def _create_action(self, plot_type: str) -> QtWidgets.QAction:
-        """
-        Create the action for the given plot type.
-
-        Parameters
-        ----------
-        plot_type : str
-            The label for the plot type.
-
-        Returns
-        -------
-        QtWidgets.QAction :
-            The action to select the given plot type.
-        """
-        _icon = self.CHOICES[plot_type, "icon"]
-        _text = self.CHOICES[plot_type, "action"]
-        return QtWidgets.QAction(_icon, _text, self)
-
-    @QtCore.Slot()
-    def set_plot_type(self, plot_type: Literal["generic", "kratky"]):
-        """
-        Set the coordinate system associated with the given name.
-
-        Parameters
-        ----------
-        plot_type: Literal["generic", "kratky"]
-            The descriptive name of the plot type.
-        """
-        self.setIcon(self.CHOICES[plot_type, "icon"])
-        self.setToolTip(self.CHOICES[plot_type, "state"])
-        self._current_yfunc = getattr(self, f"func_{plot_type}")
-        self._current_ylabel = getattr(self, f"label_{plot_type}")
-        self.sig_new_plot_type.emit(plot_type)

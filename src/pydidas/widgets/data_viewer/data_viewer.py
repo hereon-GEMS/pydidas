@@ -32,8 +32,6 @@ from functools import partial
 import h5py
 import numpy as np
 from qtpy import QtCore, QtWidgets
-from silx.gui.data.DataViewer import DataSelection
-from silx.gui.data.DataViews import DataInfo, _RawView
 from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
@@ -41,16 +39,14 @@ from pydidas.widgets.data_viewer import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import GENERIC_AXIS_SELECTOR_CHOICES
 from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,
-    DATA_VIEW_REFS,
-    DATA_VIEW_TITLES,
+    DataViewConfig,
 )
-from pydidas.widgets.silx_plot import PydidasPlot2D
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
 
 
-DATASET_TOO_LARGE_ERROR = (
+_DATASET_TOO_LARGE_ERROR = (
     "The dataset is too large to display. Please check the dataset or "
     "increase the data buffer size in the global settings."
 )
@@ -72,15 +68,12 @@ class DataViewer(WidgetWithParameterCollection):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
         self._data = None
-        self._metadata_updated = False
-        self._title = None
+        self._h5node = None
         self._active_view = None
         self._button_group = QtWidgets.QButtonGroup()
-        self._view_objects = {
-            _key: DATA_VIEW_CONFIG[_key]["view"](None)
-            for _key in DATA_VIEW_CONFIG.keys()
-        }
-        self.__use_multilines = kwargs.get("multiline_layout", False)
+        self._view_config = DATA_VIEW_CONFIG["view-table"]
+        self._config["multiline_layout"] = kwargs.get("multiline_layout", False)
+        self._config["plot_title"] = None
         self._plot2d_config = {
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
@@ -101,35 +94,37 @@ class DataViewer(WidgetWithParameterCollection):
         )
         self.add_any_widget(
             "axes_selector",
-            AxesSelector(multiline_layout=self.__use_multilines),
+            AxesSelector(multiline_layout=self._config["multiline_layout"]),
             gridPos=(1, 0, 1, 1),
             parent_widget="view_container",
             visible=False,
         )
         self._widgets["axes_selector"].sig_new_slicing.connect(self._update_view)
-        self.create_empty_widget("container_for_buttons", gridPos=(-1, 0, 1, 1))
-        for _id, _view in DATA_VIEW_CONFIG.items():
+        self.create_empty_widget(
+            "container_for_buttons", gridPos=(-1, 0, 1, 1), visible=False
+        )
+        for _ref, _view in DATA_VIEW_CONFIG.items():
             self.create_button(
-                f"button_{_id}",
-                _view["title"],
+                f"button_{_ref}",
+                _view.title,
                 checkable=True,
                 gridPos=(0, -1, 1, 1),
-                icon=f"pydidas::{_view['ref']}.svg",
+                icon=f"pydidas::{_ref}.svg",
                 parent_widget="container_for_buttons",
-                clicked=partial(self._select_view, _id),
+                clicked=partial(self._select_view, _ref),
             )
-            self._button_group.addButton(self._widgets[f"button_{_id}"], _id)
+            self._button_group.addButton(self._widgets[f"button_{_ref}"], _view.id)
         self.layout().setColumnStretch(0, 1)
         self.layout().setRowStretch(0, 1)
 
     @property
-    def active_dims(self) -> tuple[int]:
+    def active_dims(self) -> tuple[int, ...]:
         """
         Get the active dimensions.
 
         Returns
         -------
-        tuple[int]
+        tuple[int, ...]
             The active dimensions.
         """
         _active_dims = tuple(
@@ -183,97 +178,85 @@ class DataViewer(WidgetWithParameterCollection):
         """
         return self._data is not None
 
-    @QtCore.Slot(int)
-    def _select_view(self, view_id: int):
+    @QtCore.Slot(str)
+    def _select_view(self, view_key: str):
         """Select the view to display"""
-        self._widgets["axes_selector"].setVisible(self._data is not None)
+        self._view_config: DataViewConfig = DATA_VIEW_CONFIG[view_key]
+        _ax_selector: AxesSelector = self._widgets["axes_selector"]
+        _ax_selector.setVisible(
+            self._data is not None and self._view_config.use_axes_selector
+        )
         self._widgets["view_stack"].setVisible(self._data is not None)
-        self._active_view = view_id
-        self.__create_view_widgets_if_required(view_id)
-        self._widgets["view_stack"].setCurrentWidget(self._widgets[f"view_{view_id}"])
-        self._widgets["axes_selector"].setVisible(
-            DATA_VIEW_CONFIG[view_id]["use_axes_selector"]
-        )
-        if DATA_VIEW_CONFIG[view_id]["use_axes_selector"]:
-            self._widgets["axes_selector"]._allow_less_dims = (
-                DATA_VIEW_REFS["view-table"] == view_id
-            )
-            self._widgets["axes_selector"].define_additional_choices(
-                DATA_VIEW_CONFIG[view_id]["additional choices"]
-            )
-        self._update_view(view_id)
+        self._active_view = view_key
+        self.__create_view_widget_if_required(view_key)
+        self._widgets["view_stack"].setCurrentWidget(self._widgets[view_key])
+        if self._view_config.use_axes_selector:
+            _ax_selector.allow_fewer_dims = self._view_config.allow_fewer_dims
+            _ax_selector.define_additional_choices(self._view_config.additional_choices)
+        self.__update_ax_selector_for_h5py_data()
+        self._update_view(view_key)
 
-    def __create_view_widgets_if_required(self, view_id: int):
+    def __create_view_widget_if_required(self, view_key: str):
         """Create the widgets for the selected view, if required"""
-        if f"view_{view_id}" in self._widgets:
+        if view_key in self._widgets:
             return
-        _view_config = DATA_VIEW_CONFIG[view_id]
-        self.create_empty_widget(f"view_{view_id}", parent_widget=None)
-        self._widgets[f"view_{view_id}"].layout().setRowStretch(0, 1)
-        self._widgets["view_stack"].addWidget(self._widgets[f"view_{view_id}"])
-        _vis_widget = self._view_objects[view_id].getWidget()
-        self.add_any_widget(
-            f"view_{view_id}_vis",
-            _vis_widget,
-            parent_widget=f"view_{view_id}",
-        )
-        if isinstance(_vis_widget, PydidasPlot2D):
-            if self._plot2d_config["diffraction_exp"] is not None:
-                _vis_widget._config["diffraction_exp"] = self._plot2d_config[
-                    "diffraction_exp"
-                ]
-            if self._plot2d_config["use_data_info_action"]:
-                _vis_widget._config["use_data_info_action"] = True
-                _vis_widget._add_data_info_action()
-                _vis_widget.sig_get_more_info_for_data.connect(
-                    self.sig_plot2d_get_more_info_for_data
-                )
+        _cfg_kwargs = self._plot2d_config if view_key == "view-image" else {}
+        self._widgets[view_key] = self._view_config.widget(parent=None, **_cfg_kwargs)
+        self._widgets["view_stack"].addWidget(self._widgets[view_key])
+        if view_key == "view-image":
+            self._widgets[view_key].sig_get_more_info_for_data.connect(
+                self.sig_plot2d_get_more_info_for_data
+            )
+
+    def __update_ax_selector_for_h5py_data(self):
+        """Update the axis selector if the data is a h5py dataset with chunking"""
+        if isinstance(self._data, h5py.Dataset):
+            _ax_selector: AxesSelector = self._widgets["axes_selector"]
+            if self._data.chunks is not None:
+                _sorted_chunking_dims = list(np.asarray(self._data.chunks).argsort())
+                _used_index_dims = _sorted_chunking_dims[: -_ax_selector.n_choices]
+            else:
+                _used_index_dims = list(range(self._data.ndim - _ax_selector.n_choices))
+            _ax_selector.assign_index_use_to_dims(_used_index_dims)
 
     @QtCore.Slot()
-    def _update_view(self, view_id: int | None = None):
+    def _update_view(self, view_key: str | None = None):
         """
         Update the selected view with the current data.
 
         Parameters
         ----------
-        view_id : int
-            The id of the view to update
+        view_key : str | None
+            The key of the view to update. If None, the currently active view
+            will be updated.
         """
-        if view_id is None:
+        if view_key is None:
             if self._active_view is None:
                 return
-            view_id = self._active_view
-        if self._button_group.checkedButton() != self._widgets[f"button_{view_id}"]:
-            self._widgets[f"button_{view_id}"].click()
-        _view = self._view_objects[view_id]
-        if not self._metadata_updated:
-            self._widgets["axes_selector"].set_metadata_from_dataset(self._data)
-            self._metadata_updated = True
-        if DATA_VIEW_CONFIG[view_id]["use_axes_selector"]:
+            view_key = self._active_view
+        _view = self._widgets[view_key]
+        if self._button_group.checkedButton() != self._widgets[f"button_{view_key}"]:
+            with QtCore.QSignalBlocker(self._widgets[f"button_{view_key}"]):
+                self._widgets[f"button_{view_key}"].click()
+        if view_key == "view-h5" and self._h5node is not None:
+            _view.display_data(self._h5node)
+            return
+        if self._view_config.use_axes_selector:
             _ax_selector = self._widgets["axes_selector"]
-            _data = self._data[*_ax_selector.current_slice].squeeze()
-            _display_selection = _ax_selector.current_display_selection
+            _data = self._data[_ax_selector.current_slice].squeeze()
             if _ax_selector.transpose_required:
                 _data = _data.T
         else:
             _data = self._data
-        self._view_objects[view_id].setData(_data)
-        if DATA_VIEW_CONFIG[view_id]["ref"] in [
-            "view-image",
-            "view-curve",
-            "view-curve-group",
-        ]:
-            _view.getWidget().setGraphTitle(self._title)
-        if isinstance(_view, _RawView):
-            _data_selection = DataSelection(None, None, None, None)
-            _matching_views = _view.getMatchingViews(_data, DataInfo(_data))
-            _best_view = _view._SelectOneDataView__getBestView(_data, DataInfo(_data))
-            _view._SelectOneDataView__currentView = _best_view
-            _view.select()
-            _view.setData(_data)
+        if not isinstance(_data, Dataset):
+            _data = Dataset(_data)
+        _view.display_data(_data, title=self._config["plot_title"])
 
     def set_data(
-        self, data: H5Node | h5py.Dataset | np.ndarray | None, title: str | None = None
+        self,
+        data: H5Node | h5py.Dataset | np.ndarray | None,
+        title: str | None = None,
+        h5node: H5Node | None = None,
     ):
         """
         Set the data to display
@@ -285,55 +268,96 @@ class DataViewer(WidgetWithParameterCollection):
             Dataset object.
         title : str | None, optional
             The title of the data. If None, the title will not be updated.
+        h5node : H5Node | None, optional
+            The H5Node associated with the data. If provided, metadata about
+            the data can be read from the H5Node.
         """
+        self._widgets["container_for_buttons"].setVisible(data is not None)
+        # Remove the data reference from the h5 view:
+        if "view-h5" in self._widgets:
+            self._widgets["view-h5"].setData(None)
         if data is None:
+            if self._active_view is not None:
+                self._widgets[self._active_view].clear()
             return
-        self._import_data(data)
+        if isinstance(data, H5Node):
+            h5node = data
+        # if isinstance(h5node, H5Node):
+        self._h5node = h5node
         if title is not None:
-            self._title = title
-        for _id, _view in DATA_VIEW_CONFIG.items():
-            self._widgets[f"button_{_id}"].setVisible(_view["min_dims"] <= data.ndim)
-        self._widgets[f"button_{DATA_VIEW_REFS['view-h5']}"].setVisible(False)
-        _preferred_view = self._data.metadata.get("preferred_view", None)
-        if _preferred_view is not None:
-            self._select_view(DATA_VIEW_TITLES[_preferred_view])
-        elif self._data.ndim == 0 or self._data.size == 1:
-            self._select_view(DATA_VIEW_TITLES["Table"])
-        elif self._data.ndim == 1:
-            self._select_view(DATA_VIEW_TITLES["Curve"])
-        elif self._data.ndim >= 2 and self._active_view is None:
-            self._select_view(DATA_VIEW_TITLES["Image"])
-        else:
-            self._update_view()
+            self._config["plot_title"] = title
+        self._import_data(data)
+        self._update_widgets_from_data()
+        self._set_new_view()
 
-    def _import_data(self, data: H5Node | h5py.Dataset | np.ndarray):
+    # Set up an alias for plotting
+    plot_data = set_data
+
+    def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray):
         """
-        Import the data to a Dataset object.
+        Store an internal reference to the imported data.
 
         Parameters
         ----------
-        data : H5Node | h5py.Dataset | np.ndarray
+        data : Dataset | H5Node | h5py.Dataset | np.ndarray
             The data to import.
         """
-        _buffersize = self.q_settings_get("global/data_buffer_size", dtype=float)
+        _buffer_size = self.q_settings_get("global/data_buffer_size", dtype=float)
         if isinstance(data, h5py.Dataset):
-            # TODO: Implement the loading of HDF5 datasets
-            raise NotImplementedError("HDF5 datasets are not supported yet.")
+            pass
         elif isinstance(data, H5Node):
-            # TODO: Implement the loading of HDF5 nodes
-            raise NotImplementedError("HDF5 nodes are not supported yet.")
+            data = data.h5py_object
         elif isinstance(data, np.ndarray):
-            if data.nbytes > _buffersize * 1e6:
-                raise UserConfigError(DATASET_TOO_LARGE_ERROR)
+            if data.nbytes > _buffer_size * 1e6:
+                raise UserConfigError(_DATASET_TOO_LARGE_ERROR)
             if not isinstance(data, Dataset):
                 data = Dataset(data)
-            self._data = data
-            self._metadata_updated = False
         else:
             raise UserConfigError(
-                "The data to display must be a numpy array, a h5py dataset or a "
+                "The data to display must be a numpy array, a h5py.Dataset or a "
                 "H5Node object."
             )
+        self._data = data
+
+    def _update_widgets_from_data(self):
+        """Update the widgets based on the current data."""
+        for _ref, _view in DATA_VIEW_CONFIG.items():
+            self._widgets[f"button_{_ref}"].setVisible(
+                _view.min_dims <= self._data.ndim
+            )
+        self._widgets["button_view-h5"].setVisible(self._h5node is not None)
+        # reset the view if the data dimensionality is too low for the current view
+        if (
+            self._active_view is not None
+            and self._data.ndim < self._view_config.min_dims
+        ):
+            self._active_view = None
+            self._widgets["axes_selector"].define_additional_choices("")
+        self._widgets["axes_selector"].set_metadata_from_dataset(self._data)
+
+    def _set_new_view(self):
+        """Set or update the current view."""
+        _preferred_view: str | None = (
+            self._data.metadata.get("preferred_view", None)
+            if isinstance(self._data, Dataset)
+            else None
+        )
+        if _preferred_view is not None:
+            self._select_view(_preferred_view)
+        elif self._data.ndim == 0 or self._data.size == 1:
+            self._select_view("view-table")
+        elif (
+            self._data.ndim >= self._view_config.min_dims
+            and self._active_view is not None
+        ):
+            self.__update_ax_selector_for_h5py_data()
+            self._update_view()
+        elif self._data.ndim == 1:
+            self._select_view("view-curve")
+        elif self._data.ndim >= 2 and self._active_view is None:
+            self._select_view("view-image")
+        else:
+            self._update_view()
 
     def update_data(self, data: np.ndarray, title: str | None = None):
         """
@@ -347,7 +371,7 @@ class DataViewer(WidgetWithParameterCollection):
             The title of the data. If None, the title will not be updated.
         """
         if title is not None:
-            self._title = title
+            self._config["plot_title"] = title
         if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
             raise UserConfigError(
                 "Can only update data if both the stored data and the new data"

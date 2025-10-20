@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasPositionInfo"]
 
 
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 from qtpy import QtCore
@@ -54,7 +54,7 @@ class PydidasPositionInfo(PositionInfo):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are:
 
             converters : Union[list[tuple[str, Callable]], None], optional
@@ -67,7 +67,7 @@ class PydidasPositionInfo(PositionInfo):
                 The associated plot instance. The default is None
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PositionInfo.__init__(
             self,
             plot=kwargs.get("plot", None),
@@ -81,15 +81,15 @@ class PydidasPositionInfo(PositionInfo):
         self._cs_name = "cartesian"
         self._cs_x_unit = "px"
         self._cs_y_unit = "px"
-        self._beam_center = (0, 0, 0.1)
-        self._pixelsize = (100e-6, 100e-6)
+        self._beam_center: tuple[float, float, float] = (0, 0, 0.1)
+        self._pixelsize: tuple[float, float] = (100e-6, 100e-6)
         self.update_coordinate_labels()
         self.update_exp_setup_params()
 
     @QtCore.Slot(str)
     def new_coordinate_system(
         self, cs_name: Literal["cartesian", "r_chi", "q_chi", "2theta_chi"]
-    ):
+    ) -> None:
         """
         Receive the signal that a new coordinate system has been selected and
         update the internal reference.
@@ -104,7 +104,7 @@ class PydidasPositionInfo(PositionInfo):
         self._cs_y_unit = AX_LABELS[cs_name][3]
         self.update_coordinate_labels()
 
-    def update_coordinate_labels(self):
+    def update_coordinate_labels(self) -> None:
         """
         Update the position info widget coordinate labels based on the stored units.
         """
@@ -113,7 +113,7 @@ class PydidasPositionInfo(PositionInfo):
         self._x_widget.setText(f"<b>{_x_text}:</b>")
         self._y_widget.setText(f"<b>{_y_text}:</b>")
 
-    def update_coordinate_units(self, x_unit: str, y_unit: str):
+    def update_coordinate_units(self, x_unit: str, y_unit: str) -> None:
         """
         Update the coordinate units in the PositionInfo widget.
 
@@ -129,12 +129,12 @@ class PydidasPositionInfo(PositionInfo):
         self.update_coordinate_labels()
 
     @QtCore.Slot()
-    def update_exp_setup_params(self):
+    def update_exp_setup_params(self) -> None:
         """
         Update beamcenter and detector distance from the DiffractionExperiment.
         """
         try:
-            _f2dgeo = self._EXP.as_fit2d_geometry_values()
+            _fit2d_geo = self._EXP.as_fit2d_geometry_values()
         except UserConfigError:
             self._plotRef().enable_cs_transform(False)
             return
@@ -143,12 +143,12 @@ class PydidasPositionInfo(PositionInfo):
             self._EXP.get_param_value("detector_pxsizey") * 1e-6,
         )
         self._beam_center = (
-            _f2dgeo["center_y"],
-            _f2dgeo["center_x"],
-            _f2dgeo["det_dist"] * 1e-3,
+            _fit2d_geo["center_y"],
+            _fit2d_geo["center_x"],
+            _fit2d_geo["det_dist"] * 1e-3,
         )
 
-    def _plotEvent(self, event: dict):
+    def _plotEvent(self, event: dict) -> None:
         """
         Handle events from the Plot.
 
@@ -164,7 +164,8 @@ class PydidasPositionInfo(PositionInfo):
             _x_pix, _y_pix = event["xpixel"], event["ypixel"]
             self._updateStatusBar(_coord1, _coord2, _x_pix, _y_pix)
 
-    def pixel_to_cs_cartesian(self, x_pix: float, y_pix: float) -> tuple[float, float]:
+    @staticmethod
+    def pixel_to_cs_cartesian(x_pix: float, y_pix: float) -> tuple[float, float]:
         """
         Convert a position in pixels to a position in cartesian data coordinates.
 
@@ -177,10 +178,10 @@ class PydidasPositionInfo(PositionInfo):
 
         Returns
         -------
-        tuple
+        tuple[float, float]
             The tuple with the cartesian x,y coordinates.
         """
-        return (x_pix, y_pix)
+        return x_pix, y_pix
 
     def pixel_to_cs_r_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
@@ -195,12 +196,15 @@ class PydidasPositionInfo(PositionInfo):
 
         Returns
         -------
-        tuple
+        tuple[float, float]
             The tuple with the polar r, chi coordinates.
         """
-        _pos = 1e3 * Point(
-            (x_pix - self._beam_center[1]) * self._pixelsize[0],
-            (y_pix - self._beam_center[0]) * self._pixelsize[1],
+        _pos = (
+            Point(
+                (x_pix - self._beam_center[1]) * self._pixelsize[0],
+                (y_pix - self._beam_center[0]) * self._pixelsize[1],
+            )
+            * 1e3
         )
         return _pos.r, _pos.chi_deg
 
@@ -217,7 +221,7 @@ class PydidasPositionInfo(PositionInfo):
 
         Returns
         -------
-        tuple
+        tuple[float, float]
             The tuple with the polar 2-theta, chi coordinates.
         """
         _x_rel = (x_pix - self._beam_center[1]) * self._pixelsize[0]
@@ -225,7 +229,7 @@ class PydidasPositionInfo(PositionInfo):
         _r = (_x_rel**2 + _y_rel**2) ** 0.5
         _2theta = np.arctan(_r / self._beam_center[2]) * 180 / np.pi
         _chi = Point(_x_rel, _y_rel).chi_deg
-        return (_2theta, _chi)
+        return _2theta, _chi
 
     def pixel_to_cs_q_chi(self, x_pix: float, y_pix: float) -> tuple[float, float]:
         """
@@ -240,10 +244,10 @@ class PydidasPositionInfo(PositionInfo):
 
         Returns
         -------
-        tuple
+        tuple[float, float]
             The tuple with the polar q, chi coordinates.
         """
         _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
         _2theta, _chi = self.pixel_to_cs_2theta_chi(x_pix, y_pix)
         _q = (4 * np.pi / _lambda) * np.sin(_2theta * np.pi / 180 / 2) * 1e-9
-        return (_q, _chi)
+        return _q, _chi

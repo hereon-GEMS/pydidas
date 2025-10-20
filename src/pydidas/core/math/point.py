@@ -27,17 +27,18 @@ __status__ = "Production"
 __all__ = ["Point", "PointFromPolar"]
 
 
+import warnings
 from dataclasses import dataclass
-from numbers import Real
-from typing import Any
+from numbers import Integral, Real
+from typing import Any, Union
 
 import numpy as np
 
 
 @dataclass
 class Point:
-    x: float
-    y: float
+    x: Real
+    y: Real
 
     """
     A Point class representing a point in 2D space.
@@ -68,25 +69,81 @@ class Point:
             and all(isinstance(coord, Real) for coord in item)
         )
 
-    def __init__(self, x: float | tuple[float, float], y: float = None) -> None:
+    def __init__(self, x: Real, y: Real = None) -> None:
         """
         Construct a Point object.
 
-        The point can be initialized with either two float values for x and y coordinates,
-        or a tuple of two floats. The class supports basic arithmetic operations such as
-        addition, subtraction, multiplication by a scalar, and division by a scalar.
+        The point can be initialized with either two float values for x and y
+        coordinates, or a tuple of two floats. The class supports basic arithmetic
+        operations such as addition, subtraction, multiplication by a scalar,
+        and division by a scalar.
         """
 
         if isinstance(x, tuple) and self._valid_input(x):
-            self.x, self.y = x
-        elif isinstance(x, Real) and isinstance(y, Real):
-            self.x, self.y = x, y
-        else:
+            x, y = x
+            warnings.warn(
+                "Initializing Point with a tuple is deprecated, please use "
+                "two Real values instead.",
+                DeprecationWarning,
+            )
+        elif not (isinstance(x, Real) and isinstance(y, Real)):
             raise TypeError(
                 "Point must be initialized with two floats or a 2-tuple of floats."
             )
-        self.x = float(self.x)
-        self.y = float(self.y)
+        self._x = float(x)
+        self._y = float(y)
+
+    @property
+    def x(self) -> float:
+        """
+        Get the x coordinate of the Point.
+
+        Returns
+        -------
+        float
+            The x coordinate of the point.
+        """
+        return self._x
+
+    @x.setter
+    def x(self, value: Real) -> None:
+        """
+        Set the x coordinate of the Point.
+
+        Parameters
+        ----------
+        value : Real
+            The new x coordinate.
+        """
+        if not isinstance(value, Real):
+            raise TypeError("x coordinate must be a real number.")
+        self._x = float(value)
+
+    @property
+    def y(self) -> float:
+        """
+        Get the y coordinate of the Point.
+
+        Returns
+        -------
+        float
+            The y coordinate of the point.
+        """
+        return self._y
+
+    @y.setter
+    def y(self, value: Real) -> None:
+        """
+        Set the y coordinate of the Point.
+
+        Parameters
+        ----------
+        value : Real
+            The new y coordinate.
+        """
+        if not isinstance(value, Real):
+            raise TypeError("y coordinate must be a real number.")
+        self._y = float(value)
 
     def __call__(self) -> tuple[float, float]:
         """
@@ -97,7 +154,7 @@ class Point:
         tuple[float, float]
             The x and y coordinates of the point.
         """
-        return self.x, self.y
+        return self._x, self._y
 
     def __len__(self) -> int:
         """Return the number of dimensions of the Point."""
@@ -105,32 +162,35 @@ class Point:
 
     def __iter__(self):
         """Iterate over the coordinates of the Point."""
-        yield self.x
-        yield self.y
+        yield self._x
+        yield self._y
 
-    def __getitem__(self, index: int) -> float:
+    def __getitem__(self, obj: int | slice) -> float | tuple[float, float]:
         """
-        Get the coordinate at the specified index.
+        Get the item of the Point at the specified index or slice.
 
         Parameters
         ----------
-        index : int
-            The index of the coordinate to retrieve (0 for x, 1 for y).
+        obj: : Integral | slice
+            The index of the coordinate to retrieve (0 for x, 1 for y) or any
+            valid python slice object.
 
         Returns
         -------
-        float
+        float | tuple[float, float]
             The coordinate at the specified index.
 
         Raises
         ------
         IndexError
-            If the index is not 0 or 1.
+            If the index is not 0, 1 or a slice.
         """
-        if index == 0:
-            return self.x
-        elif index == 1:
-            return self.y
+        if obj == 0:
+            return self._x
+        elif obj == 1:
+            return self._y
+        elif isinstance(obj, slice):
+            return tuple(self)[obj]
         else:
             raise IndexError("Index must be 0 or 1.")
 
@@ -149,16 +209,16 @@ class Point:
             True if the item is either equal to x or y coordinates.
         """
         return isinstance(item, Real) and (
-            np.isclose(item, self.x) or np.isclose(item, self.y)
+            np.isclose(item, self._x) or np.isclose(item, self._y)
         )
 
-    def __add__(self, other) -> "Point":
+    def __add__(self, other: Union["Point", tuple[Real, Real]]) -> "Point":
         """
         Add another Point or a tuple to this Point.
 
         Parameters
         ----------
-        other : Point or tuple[float, float]
+        other : Point | tuple[Real, Real]
             The point or tuple to add.
 
         Returns
@@ -166,17 +226,9 @@ class Point:
         Point
             A new Point with the summed coordinates.
         """
-        if isinstance(other, Point):
-            return Point(self.x + other.x, self.y + other.y)
-        elif (
-            isinstance(other, tuple)
-            and len(other) == 2
-            and isinstance(other[0], Real)
-            and isinstance(other[1], Real)
-        ):
-            return Point(self.x + other[0], self.y + other[1])
-        else:
+        if not self._valid_input(other):
             raise TypeError("Can only add another Point or a tuple of two floats.")
+        return Point(self.x + other[0], self.y + other[1])
 
     __iadd__ = __add__
     __radd__ = __add__
@@ -195,17 +247,9 @@ class Point:
         Point
             A new Point with the subtracted coordinates.
         """
-        if isinstance(other, Point):
-            return Point(self.x - other.x, self.y - other.y)
-        elif (
-            isinstance(other, tuple)
-            and len(other) == 2
-            and isinstance(other[0], Real)
-            and isinstance(other[1], Real)
-        ):
-            return Point(self.x - other[0], self.y - other[1])
-        else:
+        if not self._valid_input(other):
             raise TypeError("Can only subtract another Point or a tuple of two floats.")
+        return Point(self.x - other[0], self.y - other[1])
 
     __isub__ = __sub__
     __rsub__ = __sub__
@@ -225,7 +269,7 @@ class Point:
             A new Point with the multiplied coordinates.
         """
         if isinstance(other, Real):
-            return Point(self.x * other, self.y * other)
+            return Point(self._x * other, self._y * other)  # noqa
         else:
             raise TypeError("Can only multiply a Point by a scalar number.")
 
@@ -246,12 +290,11 @@ class Point:
         Point
             A new Point with the divided coordinates.
         """
-        if isinstance(other, Real):
-            if other == 0:
-                raise ZeroDivisionError("Cannot divide by zero.")
-            return Point(self.x / other, self.y / other)
-        else:
+        if not isinstance(other, Real):
             raise TypeError("Can only divide a Point by a scalar number.")
+        if other == 0:
+            raise ZeroDivisionError("Cannot divide by zero.")
+        return Point(self.x / other, self.y / other)  # noqa
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -267,16 +310,9 @@ class Point:
         bool
             True if the points are equal, False otherwise.
         """
-        if isinstance(other, Point):
-            return self.x == other.x and self.y == other.y
-        elif (
-            isinstance(other, tuple)
-            and len(other) == 2
-            and isinstance(other[0], Real)
-            and isinstance(other[1], Real)
-        ):
-            return self.x == other[0] and self.y == other[1]
-        return False
+        if not self._valid_input(other):
+            return False
+        return self._x == other[0] and self._y == other[1]
 
     @property
     def r(self) -> float:
@@ -298,15 +334,10 @@ class Point:
         Returns
         -------
         float
-            The angle of the point in radians.
+            The angle of the point in radians in the interval [0, 2 pi).
         """
-        if self.x == 0 and self.y > 0:
-            return np.pi / 2
-        elif self.x == 0 and self.y < 0:
-            return 3 * np.pi / 2
-        else:
-            angle = np.arctan2(self.y, self.x)
-            return np.mod(angle, 2 * np.pi)
+        _angle = np.arctan2(self.y, self.x)
+        return np.mod(_angle, 2 * np.pi)
 
     angle = theta
     chi = theta
@@ -357,16 +388,16 @@ class Point:
         state : dict
             A dictionary containing the state of the Point.
         """
-        self.x = state["x"]
-        self.y = state["y"]
+        self._x = state["x"]
+        self._y = state["y"]
 
-    def rounded(self, decimals: int = 6) -> "Point":
+    def rounded(self, decimals: Integral = 6) -> "Point":
         """
         Return a new Point with coordinates rounded to the specified number of decimals.
 
         Parameters
         ----------
-        decimals : int, optional
+        decimals : Integral, optional
             The number of decimal places to round to (default is 6).
 
         Returns
@@ -377,15 +408,15 @@ class Point:
         return Point(round(self.x, decimals), round(self.y, decimals))
 
 
-def PointFromPolar(r: float, theta: float) -> Point:  # noqa C0103
+def PointFromPolar(r: Real, theta: Real) -> Point:  # noqa C0103
     """
     Create a Point from polar coordinates.
 
     Parameters
     ----------
-    r : float
+    r : Real
         The radius.
-    theta : float
+    theta : Real
         The angle in radians.
 
     Returns

@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CreateWidgetsMixIn"]
 
+
 from pathlib import Path
 from typing import Any
 
@@ -59,7 +60,7 @@ class CreateWidgetsMixIn:
     layout.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs: Any):
         self._widgets = {}
         self.__index_unreferenced = 0
         check_pydidas_qapp_instance()
@@ -416,6 +417,8 @@ class CreateWidgetsMixIn:
         TypeError
             If the reference "ref" is not of type string.
         """
+        if "widget" in kwargs and isinstance(kwargs["widget"], str):
+            kwargs["widget"] = self._widgets[kwargs["widget"]]
         if hasattr(widget_class, "init_kwargs"):
             _init_kwargs = {}
             for _key in widget_class.init_kwargs:

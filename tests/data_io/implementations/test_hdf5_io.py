@@ -58,8 +58,6 @@ def config(temp_path):
         data_unit="hbar / lightyear",
     )
     with h5py.File(fname, "w") as _file:
-        _file["test/path/res"] = data
-        _file["entry/data/data"] = data[data_slice]
         _file["data"] = np.arange(10)
         for _path in ["test/path/res", "entry/data/data"]:
             _local_data = data if _path == "test/path/res" else data[data_slice]
@@ -100,6 +98,17 @@ def test_import_from_file__w_metadata(config):
         assert np.allclose(_data.axis_ranges[_ax], _ref_data.axis_ranges[_ax])
     assert _data.data_label == config["data"].data_label
     assert _data.data_unit == config["data"].data_unit
+
+
+def test_import_from_file__w_metadata__from_axis_1(config):
+    _data = Hdf5Io.import_from_file(config["fname"], dataset="entry/data/axis_1")
+    _ref_data = config["data"][config["data_slice"]].axis_ranges[1]
+    assert np.allclose(_data, _ref_data)
+    assert _data.axis_labels == {0: ""}
+    assert _data.axis_units == {0: ""}
+    assert np.all(_data.axis_ranges[0] == np.arange(_data.size))
+    assert _data.data_label == config["data"].axis_labels[1]
+    assert _data.data_unit == config["data"].axis_units[1]
 
 
 def test_import_from_file__w_metadata_from_root(config):
@@ -238,12 +247,19 @@ def test_import_from_file__group_instead_of_dataset(config):
     }
 
 
-def test_import_from_file__w_legacy_data(config):
+@pytest.mark.parametrize("dataset", ["entry/data/data", "entry/data/axis_1_repr"])
+def test_import_from_file__w_legacy_data(config, dataset):
     _ref = config["data"].copy()
-    Hdf5Io.export_to_file(config["path"] / "w_legacy_data.h5", _ref)
+    Hdf5Io.export_to_file(config["path"] / "w_legacy_data.h5", _ref, overwrite=True)
     with h5py.File(config["path"] / "w_legacy_data.h5", "r+") as _file:
         for _i in range(_ref.ndim):
-            del _file[f"entry/data/axis_{_i}"]
+            _file.move(
+                f"entry/data/axis_{_i}",
+                f"entry/data/axis_{_i}_repr",
+            )
+            # _file["entry/data"].attrs["axes"] = [
+            #     f"axis_{_i}_repr" for _i in range(_ref.ndim)
+            # ]
             _file["entry/data/"].create_group(f"axis_{_i}")
             _file[f"entry/data/axis_{_i}"].create_dataset(
                 "range", data=_ref.axis_ranges[_i]
@@ -257,13 +273,21 @@ def test_import_from_file__w_legacy_data(config):
         # deliberately remove a label
         del _file["entry/data/axis_0/label"]
     _data = Hdf5Io.import_from_file(
-        config["path"] / "w_legacy_data.h5", import_metadata=True
+        config["path"] / "w_legacy_data.h5", import_metadata=True, dataset=dataset
     )
-    assert np.allclose(_data, _ref)
-    for _i in range(_ref.ndim):
-        assert np.allclose(_data.axis_ranges[_i], _ref.axis_ranges[_i])
-        assert _data.axis_units[_i] == _ref.axis_units[_i]
-        assert _data.axis_labels[_i] == ("" if _i == 0 else _ref.axis_labels[_i])
+    _data_ref = _ref if dataset == "entry/data/data" else _ref.axis_ranges[1]
+    assert np.allclose(_data, _data_ref)
+    if dataset == "entry/data/data":
+        for _i in range(_data_ref.ndim):
+            assert np.allclose(_data.axis_ranges[_i], _ref.axis_ranges[_i])
+            assert _data.axis_units[_i] == _ref.axis_units[_i]
+            assert _data.axis_labels[_i] == ("" if _i == 0 else _ref.axis_labels[_i])
+    elif dataset == "entry/data/axis_1":
+        assert _data.data_label == _ref.axis_labels[1]
+        assert _data.data_unit == _ref.axis_units[1]
+        assert _data.axis_labels == {0: ""}
+        assert _data.axis_units == {0: ""}
+        assert np.allclose(_data.axis_ranges[0], np.arange(_data.size))
 
 
 def test_export_to_file__wrong_structure(config):

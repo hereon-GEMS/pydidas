@@ -58,10 +58,10 @@ class ChangeCanvasToData(PlotAction):
     dimensions.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
             icon=icons.get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
             text="Change Canvas to data shape",
             tooltip="Change the canvas shape to match the data aspect ratio.",
@@ -70,7 +70,7 @@ class ChangeCanvasToData(PlotAction):
             parent=kwargs.get("parent", None),
         )
 
-    def _actionTriggered(self, checked: bool = False):
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
         """
         Trigger the "change canvas to data" action.
 
@@ -85,12 +85,12 @@ class ChangeCanvasToData(PlotAction):
             return
         _plot_data_aspect = (
             1
-            if self.plot._backend.ax.get_aspect() == "auto"
-            else self.plot._backend.ax.get_aspect()
+            if self.plot._backend.ax.get_aspect() == "auto"  # noqa W0212
+            else self.plot._backend.ax.get_aspect()  # noqa W0212
         )
         _data_aspect = (_range.x[1] - _range.x[0]) / (_range.y[1] - _range.y[0])
-        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)
-        self.plot._backend.ax.set_anchor("C")
+        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)  # noqa W0212
+        self.plot._backend.ax.set_anchor("C")  # noqa W0212
         self.plot.resetZoom()
         # for some reason, need to call resetZoom twice to match data to the new canvas
         self.plot.resetZoom()
@@ -102,10 +102,10 @@ class ExpandCanvas(PlotAction):
     size allowed by the widget.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
             icon=icons.get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
             text="Maximize canvas size",
             tooltip="Maximize the canvas size.",
@@ -114,7 +114,7 @@ class ExpandCanvas(PlotAction):
             parent=kwargs.get("parent", None),
         )
 
-    def _actionTriggered(self, checked=False):
+    def _actionTriggered(self, checked=False) -> None:  # noqa
         """
         Trigger the "expand canvas" action.
 
@@ -124,7 +124,7 @@ class ExpandCanvas(PlotAction):
             Silx flag for a checked action. The default is False.
         """
         self.plot.setKeepDataAspectRatio(False)
-        self.plot._backend.ax.set_box_aspect(None)
+        self.plot._backend.ax.set_box_aspect(None)  # noqa W0212
         self.plot.resetZoom()
 
 
@@ -147,10 +147,10 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
             The default is None.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
             icons.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
             "Autoscale colormap to mean +/- 3 std",
             tooltip="Autoscale colormap to mean +/- 3 std",
@@ -161,7 +161,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked=False):
+    def _actionTriggered(self, checked=False) -> None:  # noqa C0103
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()
         else:
@@ -193,7 +193,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     ----------
     plot : silx.gui.plot.PlotWidget
         The associated plot widget.
-    **kwargs:
+    **kwargs : Any
         Supported keyword arguments are:
 
         parent : Union[None, QObject], optional
@@ -204,10 +204,10 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             The default is None.
     """
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: Any):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
             icon=icons.get_pydidas_qt_icon("silx_crop_histogram.png"),
             text="Crop colormap histogram outliers",
             tooltip="Crop the colormap's histogram outliers",
@@ -218,7 +218,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked=False):
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()
         else:
@@ -228,7 +228,6 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             return
         _colormap = image.getColormap()
         _cmap_limit_low, _cmap_limit_high = calculate_histogram_limits(image.getData())
-
         _colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
 
 
@@ -240,6 +239,8 @@ class PydidasLoadImageAction(QtWidgets.QAction):
 
     Parameters
     ----------
+    parent : QtWidgets.QWidget | None
+        The parent widget. The default is None.
     caption : str, optional
         The caption string for the file dialog. The default is 'Select image file.'
     ref : str, optional
@@ -247,7 +248,12 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         The default is None.
     """
 
-    def __init__(self, parent, caption="Select image file", ref=None):
+    def __init__(
+        self,
+        parent: QtWidgets.QWidget | None,
+        caption: str = "Select image file",
+        ref: str | None = None,
+    ) -> None:
         QtWidgets.QAction.__init__(self, parent)
         self.triggered.connect(self.__execute)
         self._dialog = PydidasFileDialog()
@@ -258,7 +264,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         self.setText("Use pydidas file dialog")
 
     @QtCore.Slot()
-    def __execute(self):
+    def __execute(self) -> None:
         """
         Execute the dialog and select a filename.
         """
@@ -273,7 +279,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
                 _image = _image.mean(axis=0)
             if _image.ndim != 2:
                 raise UserConfigError("The input data is not a 2D image.")
-            self.parent()._setValue(filename=_filename, data=_image)
+            self.parent()._setValue(filename=_filename, data=_image)  # noqa W0212
 
 
 class PydidasGetDataInfoAction(PlotAction):
@@ -283,10 +289,10 @@ class PydidasGetDataInfoAction(PlotAction):
 
     sig_show_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, plot: PydidasPlot2d, **kwargs: dict):
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
             icon=icons.get_pydidas_qt_icon("silx_get_data_info.png"),
             text="Show information of scan point",
             tooltip=(
@@ -298,7 +304,7 @@ class PydidasGetDataInfoAction(PlotAction):
         )
 
     @QtCore.Slot()
-    def _actionTriggered(self):
+    def _actionTriggered(self) -> None:  # noqa C0103
         """
         Execute the action and pick a mouse click.
         """
@@ -306,7 +312,7 @@ class PydidasGetDataInfoAction(PlotAction):
         self.setEnabled(False)
 
     @QtCore.Slot(dict)
-    def __process_event(self, event):
+    def __process_event(self, event: dict[str, Any]) -> None:
         """
         Process the event. If a mouse button click was detected, show a popup.
         """

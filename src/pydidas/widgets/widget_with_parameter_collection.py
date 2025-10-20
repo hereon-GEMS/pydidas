@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["WidgetWithParameterCollection"]
 
 
+from typing import Any
+
 from qtpy import QtWidgets
 
 from pydidas.core import (
@@ -54,7 +56,7 @@ class WidgetWithParameterCollection(
 
     init_kwargs = ["parent"]
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self.params = ParameterCollection()
         self._config = {}
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))

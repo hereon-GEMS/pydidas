@@ -106,7 +106,6 @@ class Hdf5Io(IoBase):
             kwargs["dataset"] = kwargs.pop("dset")
         dataset = kwargs.get("dataset", "entry/data/data")
         auto_squeeze = kwargs.get("auto_squeeze", True)
-
         with (
             CatchFileErrors(filename),
             h5py.File(filename, "r") as _h5file,
@@ -128,9 +127,8 @@ class Hdf5Io(IoBase):
             )
             if kwargs.get("import_metadata", True):
                 cls._update_dataset_metadata(_data, _h5file, dataset, _indices)
-                # TODO: deprecate the axes group reading from legacy export results
+                # TODO [future]: deprecate the axes group reading from legacy results
                 cls.__read_legacy_metadata(_data, _h5file, dataset, _indices)
-
             if auto_squeeze:
                 _data = squeeze(_data)
             cls._data = _data
@@ -157,40 +155,43 @@ class Hdf5Io(IoBase):
         slicing_indices : tuple[slice]
             The slicing indices used on the loaded data.
         """
-        _data_group_name = os.path.dirname(dataset)
-        _root = os.path.dirname(_data_group_name)
-        _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
-        if _root == "":
+        if dataset.count("/") < 2:
+            # this means the dataset is not a valid NXdata structure
             return
+        _data_group_name, _dset_name = dataset.rsplit("/", 1)
+        _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         _data_group = h5file[_data_group_name]
-        _axes_names = _data_group.attrs.get("axes", [])
-        _valid_metadata_axes = []
+        if not _data_group.attrs.get("NX_class", "") == "NXdata":
+            return
         try:
-            for _item_idx, _name in enumerate(_axes_names):
+            data.data_unit = h5file[dataset].attrs.get("units", "")
+            _signal_name = _data_group.attrs.get("signal", "data")
+            if _dset_name != _signal_name:
+                data.data_label = h5file[dataset].attrs.get("long_name", "")
+                data.metadata = data.metadata | {"valid_metadata": [0]}
+                return
+            _valid_metadata_axes = []
+            for _item_idx, _name in enumerate(_data_group.attrs.get("axes", [])):
                 _name = _name if isinstance(_name, str) else _name.decode()
                 _idx = _data_group.attrs.get(f"{_name}_indices", [_item_idx])[0]
-                if isinstance(_data_group[_name], h5py.Dataset):
-                    _range = _data_group[_name][_slicers.get(_idx, slice(None))]
+                _axis_ds = _data_group[_name]
+                if isinstance(_axis_ds, h5py.Dataset):
+                    _range = _axis_ds[_slicers.get(_idx, slice(None))]
                     data.update_axis_range(_idx, _range)
-                    _unit = _data_group[_name].attrs.get("units", "")
-                    _label = _data_group[_name].attrs.get("long_name", _name)
-                    # TODO : deprecate check for unit in label from legacy files
+                    _unit = _axis_ds.attrs.get("units", "")
+                    _label = _axis_ds.attrs.get("long_name", _name)
+                    # TODO [future]: deprecate check for legacy file information
                     if _unit and _unit in _label:
                         _label = _label.replace(f" / {_unit}", "")
                     data.update_axis_label(_idx, _label)
-                    data.update_axis_unit(
-                        _idx, _data_group[_name].attrs.get("units", "")
-                    )
+                    data.update_axis_unit(_idx, _axis_ds.attrs.get("units", ""))
                     _valid_metadata_axes.append(_idx)
-            data.data_label = _data_group.attrs.get("title", "")
-            if not data.data_label:
-                data.data_label = _data_group.attrs.get("signal", "")
-            data.data_unit = h5file[dataset].attrs.get("units", "")
-            data.metadata = data.metadata | {"valid_metadata": _valid_metadata_axes}
+            data.data_label = _data_group.attrs.get("title", _signal_name)
+            data.metadata = {**data.metadata, "valid_metadata": _valid_metadata_axes}
         except (ValueError, KeyError):
             raise FileReadError(
-                "The HDF5 file is not NeXus compliant and the metadata. Please load "
-                "the data without metadata import and/or check the file."
+                "The HDF5 file is not NeXus compliant and the metadata is incomplete. "
+                "Please load the data without metadata import and/or check the file."
             )
 
     @staticmethod
@@ -211,20 +212,25 @@ class Hdf5Io(IoBase):
         slicing_indices : tuple[slice]
             The slicing indices used on the loaded data.
         """
-        _data_group_name = os.path.dirname(dataset)
-        _root = os.path.dirname(_data_group_name)
-        if _root == "":
+        if dataset.count("/") < 2:
+            # this means the dataset is not a valid NXentry / NXdata structure
             return
+        _data_group_name, _dset_name = dataset.rsplit("/", 1)
+        if _dset_name.startswith("axis_"):
+            return
+        _root = os.path.dirname(_data_group_name)
         _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         _metadata = data.metadata
         _valid_metadata = _metadata.pop("valid_metadata", [])
         data.metadata = _metadata
-        _items = {_key: _item for _key, _item in h5file[_data_group_name].items()}
-        _axes_to_check = [_i for _i in range(data.ndim) if _i not in _valid_metadata]
-        for _ax in _axes_to_check:
-            _curr_ax = f"axis_{_ax}"
-            if _curr_ax not in _items:
-                continue
+        _group = h5file[_data_group_name]
+        _group_items = [_k for _k, _v in _group.items() if isinstance(_v, h5py.Group)]
+        _axes_to_check = {
+            _i: f"axis_{_i}"
+            for _i in range(data.ndim)
+            if (_i not in _valid_metadata and f"axis_{_i}" in _group_items)
+        }
+        for _idx, _curr_ax in _axes_to_check.items():
             _ax_items = {
                 _key: _item
                 for _key, _item in h5file[f"{_data_group_name}/{_curr_ax}"].items()
@@ -233,12 +239,12 @@ class Hdf5Io(IoBase):
                 if _key not in _ax_items:
                     continue
                 _val = (
-                    _ax_items[_key][_slicers.get(_ax, slice(None))]
+                    _ax_items[_key][_slicers.get(_idx, slice(None))]
                     if _key == "range"
                     else _ax_items[_key][()].decode()
                 )
                 _meth = getattr(data, f"update_axis_{_key}")
-                _meth(_ax, _val if _val is not None else "None")
+                _meth(_idx, _val if _val is not None else "None")
         for _key in ["data_label", "data_unit"]:
             if _key in h5file[_root] and getattr(data, _key) == "":
                 setattr(data, _key, h5file[_root][_key][()].decode())

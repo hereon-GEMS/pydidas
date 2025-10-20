@@ -32,12 +32,12 @@ from typing import Any
 from qtpy import QtGui, QtWidgets
 
 from pydidas.core.constants import POLICY_EXP_EXP
+from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.selection import (
     DirectoryExplorer,
     Hdf5DatasetSelector,
     RawMetadataSelector,
 )
-from pydidas.widgets.silx_plot import SilxDataViewer
 
 
 DATA_BROWSING_FRAME_BUILD_CONFIG: list[str, tuple[Any], dict[str, Any]] = [
@@ -149,8 +149,8 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[str, tuple[Any], dict[str, Any]] = [
         },
     ],
     [
-        "add_any_widget",
-        ("viewer", SilxDataViewer()),
+        "create_any_widget",
+        ("viewer", DataViewer),
         {"gridPos": (-1, 1, 1, 2), "parent_widget": "viewer_and_filename"},
     ],
 ]

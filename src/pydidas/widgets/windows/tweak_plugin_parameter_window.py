@@ -29,19 +29,22 @@ __all__ = ["TweakPluginParameterWindow"]
 
 
 import copy
+from typing import Any
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
+from pydidas.core import Dataset
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from pydidas.core.utils import ShowBusyMouse
+from pydidas.plugins import BasePlugin
+from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.parameter_config import (
     ParameterEditCanvas,
 )
 from pydidas.widgets.plugin_config_widgets import EditPluginParametersWidget
 from pydidas.widgets.scroll_area import ScrollArea
-from pydidas.widgets.silx_plot import PydidasPlotStack
 from pydidas.widgets.windows.show_detailed_plugin_results_window import (
     ShowDetailedPluginResultsWindow,
 )
@@ -49,7 +52,7 @@ from pydidas.widgets.windows.show_detailed_plugin_results_window import (
 
 class TweakPluginParameterWindow(PydidasWindow):
     """
-    Window to to modify Plugin Parameters on the fly and inspect results.
+    Window to modify Plugin Parameters on the fly and inspect results.
 
     The TweakPluginParameterWindow displays detailed plugin results in combination
     with all Plugin Parameters to allow running the Plugin with different values.
@@ -60,11 +63,11 @@ class TweakPluginParameterWindow(PydidasWindow):
     sig_new_params = QtCore.Signal(int)
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         PydidasWindow.__init__(self, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
         self.__qtapp = QtWidgets.QApplication.instance()
-        self._config = self._config | {
+        self._config: dict[str, Any] = self._config | {
             "initial_results": None,
             "detailed_results": None,
             "current_results": None,
@@ -89,7 +92,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.create_any_widget(
             "config_scroll_area",
             ScrollArea,
-            minimumHeight=500,
+            minimumHeight=750,
             resize_to_widget_width=True,
             widget=self._widgets["config_area"],
         )
@@ -128,7 +131,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         )
         self.create_any_widget(
             "plot",
-            PydidasPlotStack,
+            DataViewer,
             gridPos=(1, 1, 1, 1),
         )
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
@@ -147,14 +150,16 @@ class TweakPluginParameterWindow(PydidasWindow):
         """
         self._widgets["config_scroll_area"].force_width_from_size_hint()
 
-    def tweak_plugin(self, plugin, results):
+    def tweak_plugin(self, plugin: BasePlugin, results: Dataset):
         """
         Tweak the selected plugin.
 
         Parameters
         ----------
-        plugin : pydidas.plugins.BasePlugin
-            The plugin instance to be tweaked.
+        plugin : BasePlugin
+            The plugin to be tweaked.
+        results : Dataset
+            The results obtained with the current plugin parameters.
         """
         self._widgets["config_scroll_area"].adjustSize()
         self._config["accept_changes"] = False
@@ -164,8 +169,8 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["plugin_param_edit"].configure_plugin(
             plugin.node_id, plugin, allow_restore_defaults=False
         )
-        self._widgets["plot"].plot_data(
-            results, title=f"{self.__plugin.plugin_name} results", replace=True
+        self._widgets["plot"].set_data(
+            results, title=f"{self.__plugin.plugin_name} results"
         )
         self.__process_detailed_results()
 
@@ -209,8 +214,8 @@ class TweakPluginParameterWindow(PydidasWindow):
             _kwargs = self.__plugin._config["input_kwargs"].copy()
             self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
-            self._widgets["plot"].plot_data(
-                _res, title=f"{self.__plugin.plugin_name} results", replace=True
+            self._widgets["plot"].set_data(
+                _res, title=f"{self.__plugin.plugin_name} results"
             )
 
             self.__process_detailed_results()
@@ -240,13 +245,13 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.sig_closed.emit()
 
     @QtCore.Slot()
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent):
         """
         Handle the close event and discard any possible changes.
 
         Parameters
         ----------
-        event : QtCore.QEvent
+        event : QtGui.QCloseEvent
             The closing event.
         """
         if not self._config["accept_changes"]:

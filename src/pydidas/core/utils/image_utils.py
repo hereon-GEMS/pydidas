@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["calculate_histogram_limits"]
 
 
-from numbers import Real
+from numbers import Integral, Real
 
 import numpy as np
 
@@ -39,8 +39,8 @@ __NUM_BINS = 32768
 
 __ERROR_MSG = (
     "Internal error: Numpy cannot create a histogram for the data. Please "
-    "use manual scaling for this dataset. Probably reason: The data values are "
-    "all equal."
+    "use manual scaling for this dataset. \nProbable reason: The data values are "
+    "all equal or very close to one another."
 )
 
 
@@ -58,9 +58,6 @@ def calculate_histogram_limits(data: np.ndarray) -> tuple:
     tuple[float, float]
         A tuple with the low and high limits for the histogram display
     """
-    _data_min = data.min()
-    _data_max = data.max()
-
     _qsettings = PydidasQsettings()
 
     _threshold_low = _qsettings.value(
@@ -76,6 +73,10 @@ def calculate_histogram_limits(data: np.ndarray) -> tuple:
     _cmap_limit_low = None
     _cmap_limit_high = None
     _filtered_data = data[np.isfinite(data)]
+    _data_min = _filtered_data.min()
+    _data_max = _filtered_data.max()
+    if _filtered_data.dtype.itemsize <= 4 or isinstance(_filtered_data.dtype, Integral):
+        _filtered_data = _filtered_data.astype(np.float64)
     if _threshold_high < 1:
         _cmap_limit_high = __calc_upper_limit(_filtered_data, _threshold_high)
     if _threshold_low > 0:
@@ -120,6 +121,8 @@ def __calc_upper_limit(data: np.ndarray, threshold_high: float) -> float:
     else:
         _bin_index_low = np.max(_valid_bins, initial=0) + 1
         _new_range = (_edges[_bin_index_low], _edges[_bin_index_low + 1])
+        if _new_range[1] - _new_range[0] <= 1e-2:
+            _new_range = np.asarray(_new_range, dtype=np.float64)
         _offset = _cumcounts[_bin_index_low - 1]
     try:
         _counts_new, _edges_fine = np.histogram(data, bins=__NUM_BINS, range=_new_range)

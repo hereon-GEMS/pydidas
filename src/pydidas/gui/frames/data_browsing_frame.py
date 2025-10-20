@@ -32,9 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import h5py
-import numpy as np
 from qtpy import QtCore
-from silx.gui.data.DataViews import IMAGE_MODE, PLOT1D_MODE, RAW_MODE
 from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
@@ -53,8 +51,7 @@ from pydidas.core.utils import (
     get_extension,
     get_hdf5_metadata,
 )
-from pydidas.data_io import IoManager, import_data
-from pydidas.data_io.implementations.ascii_io import AsciiIo
+from pydidas.data_io import IoManager, import_data, read_metadata
 from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     DATA_BROWSING_FRAME_BUILD_CONFIG,
     create_splitter,
@@ -181,7 +178,7 @@ class DataBrowsingFrame(BaseFrame):
         if self.__metadata_window is not None:
             self.__metadata_window.hide()
         self.__current_filename = filename
-        self._widgets["viewer"].setData(None)
+        self._widgets["viewer"].set_data(None)
         self._widgets["filename"].setText(self.__current_filename)
         self._widgets["ascii_widgets"].setVisible(_is_ascii)
 
@@ -195,14 +192,7 @@ class DataBrowsingFrame(BaseFrame):
             self.__display_dataset(_data)
 
     def __open_hdf5_file(self):
-        """
-        Process the input file and check whether it is a hdf5 file.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the hdf5 file to open.
-        """
+        """Process the input file and check whether it is a hdf5 file."""
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
@@ -226,7 +216,9 @@ class DataBrowsingFrame(BaseFrame):
             self.__current_filename = None
             raise FileReadError(catcher.exception_message)
 
-    def __display_dataset(self, data: Dataset | H5Node):
+    def __display_dataset(
+        self, data: Dataset | H5Node, h5node: H5Node = None, title: str | None = None
+    ):
         """
         Display the data in the viewer widget.
 
@@ -234,20 +226,13 @@ class DataBrowsingFrame(BaseFrame):
         ----------
         data : Dataset | H5Node
             The data to display.
+        h5node : H5Node | None
+            The H5Node if the data is from a hdf5 file.
+        title : str | None
+            The title to display in the viewer window.
         """
-        self._widgets["viewer"].setData(data)
-        if isinstance(data, (np.ndarray, H5Node, h5py.Dataset)):
-            _shape = data.shape
-        else:
-            raise TypeError("Data type not supported.")
-        _target_mode = (
-            PLOT1D_MODE
-            if len(_shape) == 1
-            else (IMAGE_MODE if len(_shape) >= 2 else RAW_MODE)
-        )
-        _current_mode = self._widgets["viewer"].displayMode()
-        if _target_mode != _current_mode:
-            self._widgets["viewer"].setDisplayMode(_target_mode)
+        title = Path(self.__current_filename).name if title is None else title
+        self._widgets["viewer"].set_data(data, title=title, h5node=h5node)
 
     @QtCore.Slot(str)
     def __display_hdf5_dataset(self, dataset: str):
@@ -260,29 +245,30 @@ class DataBrowsingFrame(BaseFrame):
             The key of the dataset to display.
         """
         if dataset == "":
-            self._widgets["viewer"].setData(None)
+            self._widgets["viewer"].set_data(None)
             return
         _max_size = self.q_settings_get("global/data_buffer_hdf5_max_size", dtype=int)
         _nbytes = get_hdf5_metadata(self.__current_filename, "nbytes", dset=dataset)
         _size_mb = int(_nbytes) / 1_048_576
-        if _size_mb > _max_size:
-            try:
-                _item = Hdf5Item(
-                    text=dataset,
-                    obj=self.__open_file[dataset],
-                    parent=self.__hdf5node,
-                    openedPath=self.__current_filename,
-                )
-                _data = H5Node(_item)
-            except KeyError:
-                self._widgets["viewer"].setData(None)
-                raise FileReadError(
-                    f"Dataset `{dataset}` could not be read from the file "
-                    f"`{Path(self.__current_filename).name}`."
-                )
-        else:
+        _fpath = Path(self.__current_filename).name
+        try:
+            _item = Hdf5Item(
+                text=dataset,
+                obj=self.__open_file[dataset],
+                parent=self.__hdf5node,
+                openedPath=self.__current_filename,
+            )
+            _h5node = H5Node(_item)
+        except KeyError:
+            self._widgets["viewer"].set_data(None)
+            raise FileReadError(
+                f"Dataset `{dataset}` could not be read from the file `{_fpath}`."
+            )
+        if _size_mb <= _max_size:
             _data = import_data(self.__current_filename, dataset=dataset)
-        self.__display_dataset(_data)
+        else:
+            _data = _h5node
+        self.__display_dataset(_data, h5node=_h5node, title=_fpath + "::" + dataset)
 
     @QtCore.Slot(object)
     def __display_raw_data(self, kwargs: dict):
@@ -309,14 +295,7 @@ class DataBrowsingFrame(BaseFrame):
         self.__browser_window.open_file(self.__current_filename)
 
     def __open_ascii_file(self):
-        """
-        Import ASCII raw data.
-
-        Parameters
-        ----------
-        use_x_col : str
-            The new value for the xcol parameter. This can be "None" or an integer.
-        """
+        """Import ASCII raw data."""
         if self.__current_filename is None:
             return
         _ascii_data = import_data(self.__current_filename, x_column=False)
@@ -357,9 +336,9 @@ class DataBrowsingFrame(BaseFrame):
         """
         Display the metadata of the current file in a message box.
         """
-        if self.__current_filename is None or self._widgets["viewer"].data() is None:
+        if self.__current_filename is None or not self._widgets["viewer"].data_is_set:
             return
-        _metadata = AsciiIo.read_metadata_from_file(self.__current_filename)
+        _metadata = read_metadata(self.__current_filename)
         _str_repr = formatted_str_repr_of_dict(_metadata)
         if self.__metadata_window is None:
             self.__create_metadata_window()

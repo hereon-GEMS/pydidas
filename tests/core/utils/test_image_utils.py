@@ -50,11 +50,19 @@ def test_calculate_histogram_limits__wrong_limits(standard_qsettings):
 
 
 @pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])
-def test_calculate_histogram_limits__simple(standard_qsettings, offset):
-    raw_data = np.arange(100**2)
+@pytest.mark.parametrize("use_nans", [False, True])
+@pytest.mark.parametrize("dtype", [np.float32, np.float64, np.int32, np.int64])
+def test_calculate_histogram_limits__simple(
+    standard_qsettings, offset, use_nans, dtype
+):
+    if use_nans and np.issubdtype(dtype, np.integer):
+        return  # NaNs not possible in integer arrays
+    raw_data = 1.0 * np.arange(100**2)
     standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
     standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
-    data = raw_data + offset
+    data = (raw_data + offset).astype(dtype)
+    if use_nans:
+        data[500:550] = np.nan
     low, high = calculate_histogram_limits(data)
     assert abs(low - (500 + offset)) < 25
     assert abs(high - (9500 + offset)) < 25
@@ -113,14 +121,28 @@ def test_calculate_histogram_limits__only_high_lim_very_low(standard_qsettings):
     assert high < 500
 
 
-def test_calculate_histogram_limits__constant_arr_values(standard_qsettings):
-    raw_data = np.ones(100**2)
+@pytest.mark.parametrize("use_nans", [False, True])
+def test_calculate_histogram_limits__constant_arr_values(standard_qsettings, use_nans):
+    raw_data = 1.0 * np.ones(100**2)
+    if use_nans:
+        raw_data[50:60] = np.nan
     standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
     standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
     data = raw_data
     low, high = calculate_histogram_limits(data)
     assert abs(low - 1) < 1e-4
     assert abs(high - 1) < 1e-4
+
+
+def test_calculate_histogram_limits__32bit_data_w_little_variations(standard_qsettings):
+    standard_qsettings.set_value("user/histogram_outlier_fraction_low", 0.05)
+    standard_qsettings.set_value("user/histogram_outlier_fraction_high", 0.05)
+
+    rng = np.random.default_rng()
+    data = rng.normal(5.5, 0.002, 2000).astype(np.float32)
+    low, high = calculate_histogram_limits(data)
+    assert 5.45 < low < 5.5
+    assert 5.5 < high < 5.55
 
 
 @pytest.mark.parametrize("offset", [0, -500, -5e4, 12000, 120000])

@@ -32,6 +32,7 @@ import logging
 import multiprocessing as mp
 import os
 import time
+from pathlib import Path
 from typing import List
 
 from qtpy import QtCore
@@ -83,12 +84,27 @@ def get_logging_dir() -> str:
     str
         The path to the pydidas module.
     """
-    _docs_path = QtCore.QStandardPaths.standardLocations(
+    _docs_dir = QtCore.QStandardPaths.standardLocations(
         QtCore.QStandardPaths.DocumentsLocation
     )[0]
     if os.sep == "\\":
-        _docs_path = _docs_path.replace("/", "\\")
-    _log_path = os.path.join(_docs_path, "pydidas", VERSION)
+        _docs_dir = _docs_dir.replace("/", "\\")
+    if not Path(_docs_dir).is_dir():
+        _docs_dir = os.path.expanduser("~")
+    if not Path(_docs_dir).is_dir():
+        from pydidas.core.pydidas_q_settings import PydidasQsettings
+
+        _docs_dir = PydidasQsettings().value("user/custom_logging_dir", str)
+    if not Path(_docs_dir).is_dir():
+        from pydidas.core.exceptions import UserConfigError
+
+        raise UserConfigError(
+            "Could not determine a valid logging directory. If the system default is "
+            "not valid, please set a custom logging directory in the user settings "
+            f"{VERSION}/user/custom_logging_dir."
+        )
+
+    _log_path = os.path.join(_docs_dir, "pydidas", VERSION)
     if not os.path.exists(_log_path):
         os.makedirs(_log_path)
     return _log_path

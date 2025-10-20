@@ -122,6 +122,7 @@ class BaseFrame(
             with ShowBusyMouse():
                 _state = self._config.pop("state")
                 self.restore_state(_state)
+        self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
             self.sig_this_frame_activated.emit()
 

@@ -38,20 +38,19 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import UserConfigError
 from pydidas.core.utils import ShowBusyMouse, pydidas_logger
 from pydidas.gui.frames.builders import (
-    get_WorkflowRunFrame_build_config,
+    WORKFLOW_RUN_FRAME_BUILD_CONFIG,
 )
-from pydidas.gui.mixins import ViewResultsMixin
+from pydidas.gui.frames.view_results_frame import ViewResultsFrame
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets.dialogues import WarningBox
-from pydidas.widgets.framework import BaseFrameWithApp
-from pydidas.workflow import WorkflowTree
+from pydidas.workflow import WorkflowResults, WorkflowTree
 
 
 TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
+class WorkflowRunFrame(ViewResultsFrame):
     """
     A widget for running the ExecuteWorkflowApp and visualizing the results.
     """
@@ -63,47 +62,45 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     sig_processing_running = QtCore.Signal(bool)
 
     def __init__(self, **kwargs: Any):
-        self._EXP = DiffractionExperimentContext()
-        self._SCAN = ScanContext()
-        self._TREE = WorkflowTree()
-        BaseFrameWithApp.__init__(self, **kwargs)
-        ViewResultsMixin.__init__(self)
-        _global_plot_update_time = self.q_settings_get(
+        kwargs["enable_app"] = True
+        kwargs["enable_export"] = True
+        kwargs["enable_import"] = False
+        kwargs["diffraction_exp"] = DiffractionExperimentContext()
+        kwargs["scan"] = ScanContext()
+        kwargs["processing_tree"] = WorkflowTree()
+        kwargs["workflow_results"] = WorkflowResults()
+        ViewResultsFrame.__init__(self, **kwargs)
+        self._config["data_use_timeline"] = False
+        self._config["plot_last_update"] = 0
+        self._config["plot_update_time"] = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
-        self._config.update(
-            {
-                "data_use_timeline": False,
-                "plot_last_update": 0,
-                "plot_update_time": _global_plot_update_time,
-                "source_hash": self._RESULTS.source_hash,
-            }
-        )
-        self._axlabels = lambda i: ""
+        self._config["source_hash"] = self._RESULTS.source_hash
         self._app = ExecuteWorkflowApp()
-        self.set_default_params()
         self.add_params(self._app.params)
 
     def build_frame(self):
         """
         Populate the frame with widgets.
         """
-        for _method, _args, _kwargs in get_WorkflowRunFrame_build_config(self):
+        super().build_frame()
+        self._widgets["title"].setText("Run full workflow processing")
+        for _method, _args, _kwargs in WORKFLOW_RUN_FRAME_BUILD_CONFIG:
             _method = getattr(self, _method)
             _method(*_args, **_kwargs)
         self.__update_autosave_widget_visibility()
-        self.build_view_results_mixin()
+        self._widgets["export_container"].setVisible(False)
 
     def connect_signals(self):
         """
         Connect all required Qt slots and signals.
         """
+        super().connect_signals()
         self.param_widgets["autosave_results"].sig_value_changed.connect(
             self.__update_autosave_widget_visibility
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
-        self.connect_view_results_mixin_signals()
 
     def _verify_result_shapes_uptodate(self):
         """
@@ -124,51 +121,34 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         Clear the selected results entries.
         """
         self._widgets["result_table"].remove_all_rows()
+        self._widgets["label_select_header"].setVisible(False)
         self._widgets["data_viewer"].setVisible(False)
-
-    @QtCore.Slot(int)
-    def frame_activated(self, index: int):
-        """
-        Received a signal that a new frame has been selected.
-
-        This method checks whether the selected frame is the current class
-        and if yes, it will call some updates.
-
-        Parameters
-        ----------
-        index : int
-            The index of the newly activated frame.
-        """
-        super().frame_activated(index)
-        self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
         """
         Abort the execution of the AppRunner.
         """
         self._widgets["but_abort"].setEnabled(False)
-        if self._runner is not None:
-            with ShowBusyMouse():
-                logger.debug("WorkflowRunFrame: Sending stop signal")
-                self._runner.requestInterruption()
-                _t0 = time.time()
-                while self._runner is not None:
-                    if time.time() - _t0 > 5:
-                        raise UserConfigError(
-                            "Timeout while waiting for AppRunner to abort workflow "
-                            "execution. Please consider restarting pydidas before "
-                            "processing a workflow again."
-                        )
-                        break
-                    time.sleep(0.02)
-                    QtWidgets.QApplication.instance().processEvents()
+        if self._runner is None:
+            return
+        with ShowBusyMouse():
+            logger.debug("WorkflowRunFrame: Sending stop signal")
+            self._runner.requestInterruption()
+            _t0 = time.time()
+            while self._runner is not None:
+                if time.time() - _t0 > 5:
+                    raise UserConfigError(
+                        "Timeout while waiting for AppRunner to abort workflow "
+                        "execution. Please consider restarting pydidas before "
+                        "processing a workflow again."
+                    )
+                time.sleep(0.02)
+                QtWidgets.QApplication.instance().processEvents()
         self.set_status("Aborted processing of full workflow.")
 
     @QtCore.Slot()
     def __execute(self):
-        """
-        Execute the Application in the chosen type (GUI or command line).
-        """
+        """Execute the Application in the chosen type (GUI or command line)."""
         logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
         self._selected_new_node(-1)
@@ -185,13 +165,11 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         if not self.get_param_value("autosave_results"):
             return
         _path = self.get_param_value("autosave_directory")
-        if _path.is_dir():
-            _items = [_item for _item in _path.iterdir()]
-            if len(_items) > 0:
-                raise UserConfigError(
-                    "The selected directory for autosaving of results is not empty.\n"
-                    "Please select another directory or remove the existing files."
-                )
+        if _path.is_dir() and any(_path.iterdir()):
+            raise UserConfigError(
+                "The selected directory for autosaving of results is not empty.\n"
+                "Please select another directory or remove the existing files."
+            )
 
     def _run_app(self):
         """
@@ -203,7 +181,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
-        self._config["last_update"] = time.time()
+        self._config["plot_last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
         logger.debug("WorkflowRunFrame: Starting AppRunner")
         self._runner = AppRunner(self._app)
@@ -235,14 +213,13 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
                 "Empty WorkflowTree",
                 "The WorkflowTree is empty. Workflow processing has not been started.",
             )
-            return False
-        return True
+        return TREE.root is not None
 
     def _prepare_app_run(self):
         """
         Do preparations for running the ExecuteWorkflowApp.
 
-        This methods sets the required attributes both for serial and
+        This method sets the required attributes both for serial and
         parallel running of the app.
         """
         self.set_status("Started processing of full workflow.")
@@ -311,7 +288,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     def __set_proc_widget_visibility_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
-        procesing
+        processing
 
         Parameters
         ----------
@@ -326,7 +303,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
-        self._config["enable_export"] = not running
+        self._config["export_available"] = not running
         for _key in [
             "saving_format",
             "squeeze_empty_dims",
@@ -340,7 +317,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
     def __update_autosave_widget_visibility(self):
         """
         Update the visibility of the autosave widgets based on the selection
-        of the autosae_results Parameter.
+        of the autosave_results Parameter.
         """
         _vis = self.get_param_value("autosave_results")
         for _key in ["autosave_directory", "autosave_format"]:

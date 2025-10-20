@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with utiltities for the data_viewer.
+Module with utilities for the data_viewer.
 """
 
 __author__ = "Malte Storm"
@@ -26,16 +26,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "DATA_VIEW_CONFIG",
-    "DATA_VIEW_TITLES",
-    "DATA_VIEW_REFS",
+    "DataViewConfig",
     "invalid_range_str",
-    "get_data_axis_header_creation_args",
-    "get_data_axis_widget_creation_args",
+    "DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG",
+    "DATA_AXIS_SELECTOR_BUILD_CONFIG",
 ]
 
 
+from dataclasses import dataclass
+from typing import Any
+
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.data.DataViews import _Hdf5View, _RawView
+from qtpy.QtWidgets import QWidget
 
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
@@ -43,58 +45,74 @@ from pydidas.core.constants import (
     QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
     QT_REG_EXP_POS_INT_RANGE_VALIDATOR,
 )
-from pydidas.widgets.factory import SquareButton
-from pydidas.widgets.silx_plot._data_views import (
-    Pydidas_Plot1dGroupView,
-    Pydidas_Plot1dView,
-    Pydidas_Plot2dView,
+from pydidas.widgets.data_viewer.silx_subclasses import (
+    PydidasArrayTableWidget,
+    PydidasHdf5TableView,
 )
+from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.silx_plot import PydidasPlot1D, PydidasPlot2D
+
+
+@dataclass(frozen=True)
+class DataViewConfig:
+    id: int
+    title: str
+    ref: str
+    widget: type[QWidget]
+    use_axes_selector: bool
+    additional_choices: str | None
+    min_dims: int
+    allow_fewer_dims: bool = False
 
 
 DATA_VIEW_CONFIG = {
-    0: {
-        "title": "Hdf5",
-        "ref": "view-h5",
-        "view": _Hdf5View,
-        "use_axes_selector": False,
-        "additional choices": None,
-        "min_dims": 1,
-    },
-    1: {
-        "title": "Curve",
-        "ref": "view-curve",
-        "view": Pydidas_Plot1dView,
-        "use_axes_selector": True,
-        "additional choices": "use as curve x",
-        "min_dims": 1,
-    },
-    2: {
-        "title": "Curve group",
-        "ref": "view-curve-group",
-        "view": Pydidas_Plot1dGroupView,
-        "use_axes_selector": True,
-        "additional choices": "show all curves;;use as curves' x",
-        "min_dims": 2,
-    },
-    3: {
-        "title": "Image",
-        "ref": "view-image",
-        "view": Pydidas_Plot2dView,
-        "use_axes_selector": True,
-        "additional choices": "use as image y;;use as image x",
-        "min_dims": 2,
-    },
-    4: {
-        "title": "Table",
-        "ref": "view-table",
-        "view": _RawView,
-        "use_axes_selector": True,
-        "additional choices": "use as table x;;use as table y",
-        "min_dims": 0,
-    },
+    "view-h5": DataViewConfig(
+        id=0,
+        title="Hdf5",
+        ref="view-h5",
+        widget=PydidasHdf5TableView,
+        use_axes_selector=False,
+        additional_choices=None,
+        min_dims=1,
+    ),
+    "view-curve": DataViewConfig(
+        id=1,
+        title="Curve",
+        ref="view-curve",
+        widget=PydidasPlot1D,
+        use_axes_selector=True,
+        additional_choices="use as curve x",
+        min_dims=1,
+    ),
+    "view-curve-group": DataViewConfig(
+        id=2,
+        title="Curve group",
+        ref="view-curve-group",
+        widget=PydidasPlot1D,
+        use_axes_selector=True,
+        additional_choices="show all curves;;use as curves' x",
+        min_dims=2,
+    ),
+    "view-image": DataViewConfig(
+        id=3,
+        title="Image",
+        ref="view-image",
+        widget=PydidasPlot2D,
+        use_axes_selector=True,
+        additional_choices="use as image y;;use as image x",
+        min_dims=2,
+    ),
+    "view-table": DataViewConfig(
+        id=4,
+        title="Table",
+        ref="view-table",
+        widget=PydidasArrayTableWidget,
+        use_axes_selector=True,
+        additional_choices="use as table x;;use as table y",
+        min_dims=0,
+        allow_fewer_dims=True,
+    ),
 }
-DATA_VIEW_TITLES = {_value["title"]: _key for _key, _value in DATA_VIEW_CONFIG.items()}
-DATA_VIEW_REFS = {_value["ref"]: _key for _key, _value in DATA_VIEW_CONFIG.items()}
 
 
 def invalid_range_str(input_range: str) -> str:
@@ -118,14 +136,16 @@ def invalid_range_str(input_range: str) -> str:
     )
 
 
-def get_data_axis_header_creation_args(
+def DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
     axis_index: int, multiline: bool
-) -> list[str, list, dict]:
+) -> list[str, list[Any], dict[str, Any]]:
     """
     Get the arguments required to create all necessary widgets in the header.
 
     Parameters
     ----------
+    axis_index : int
+        The index of the axis.
     multiline : bool
         If True, return parameters for a multiline layout.
 
@@ -164,26 +184,11 @@ def get_data_axis_header_creation_args(
     ]
 
 
-def get_data_axis_widget_creation_args(
+def DATA_AXIS_SELECTOR_BUILD_CONFIG(
     multiline: bool,
-) -> list[str, list, dict]:
+) -> list[str, tuple[Any], dict[str, Any]]:
     """
-    Get the arguments required to create all necessary widgets.
-
-    Parameters
-    ----------
-    multiline : bool
-        If True, return parameters for a multiline layout.
-
-    Returns
-    -------
-    list[str, list, dict]
-        The arguments to create all necessary widgets. The format for each
-        element is:
-
-        - The method name to call.
-        - The arguments for the method.
-        - The keyword arguments for the method.
+    Get the arguments required to create all necessary widgets in the axis selector.
     """
     return [
         [
@@ -197,9 +202,6 @@ def get_data_axis_widget_creation_args(
                     "select range by indices",
                     "select range by data values",
                 ],
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "visible": False,
             },
         ],
@@ -209,9 +211,6 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 48,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "visible": False,
             },
         ],
@@ -221,9 +220,6 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 25,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "toolTip": (
                     "Enter the start and end index separated by a colon. Please note that "
                     "contrary to Python slicing, the end index is included in the "
@@ -239,9 +235,6 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 25,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "toolTip": (
                     "Enter the first and last data point to be included, separated by a "
                     "colon. Please note that contrary to Python slicing, the final data "
@@ -257,31 +250,18 @@ def get_data_axis_widget_creation_args(
             {
                 "gridPos": (0, -1, 1, 1),
                 "minimumWidth": 100,
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "sizePolicy": POLICY_EXP_FIX,
             },
         ],
         [
             "add_any_widget",
             ["button_start", SquareButton(icon="mdi::skip-backward")],
-            {
-                "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
-            },
+            {"gridPos": (0, -1, 1, 1)},
         ],
         [
             "add_any_widget",
             ["button_backward", SquareButton(icon="mdi::step-backward")],
-            {
-                "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
-            },
+            {"gridPos": (0, -1, 1, 1)},
         ],
         [
             "create_lineedit",
@@ -289,9 +269,6 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 10,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "text": "0",
                 "validator": QtGui.QIntValidator(),
             },
@@ -302,9 +279,6 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 10 if multiline else 15,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "text": "0.0",
                 "validator": QtGui.QDoubleValidator(),
                 "visible": False,
@@ -316,30 +290,17 @@ def get_data_axis_widget_creation_args(
             {
                 "font_metric_width_factor": 8 if multiline else 12,
                 "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
                 "visible": False,
             },
         ],
         [
             "add_any_widget",
             ["button_forward", SquareButton(icon="mdi::step-forward")],
-            {
-                "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
-            },
+            {"gridPos": (0, -1, 1, 1)},
         ],
         [
             "add_any_widget",
             ["button_end", SquareButton(icon="mdi::skip-forward")],
-            {
-                "gridPos": (0, -1, 1, 1),
-                "parent_widget": "point_selection_container"
-                if multiline
-                else "::self::",
-            },
+            {"gridPos": (0, -1, 1, 1)},
         ],
     ]

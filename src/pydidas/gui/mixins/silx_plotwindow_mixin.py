@@ -57,7 +57,7 @@ class SilxPlotWindowMixIn:
         self, shape: tuple, xrange_target: tuple, yrange_target: tuple
     ):
         """
-        Setup the required configuration to map the data to the demanded
+        Set up the required configuration to map the data to the demanded
         range and set the aspect to have square pixels.
 
         Parameters
@@ -138,7 +138,7 @@ class SilxPlotWindowMixIn:
             warnings.warn(
                 "Backend is not Matplotlib QT backend. Image "
                 "aspects will not be equal.",
-                TypeError,
+                Warning,
             )
             return
         _old_aspect = _backend.ax.get_aspect()
@@ -150,7 +150,7 @@ class SilxPlotWindowMixIn:
 
     def show_image_in_plot(self, image):
         """
-        Show the composite image in the Viewwer.
+        Show the composite image in the Viewer.
         """
         self._widgets["plot_window"].setVisible(True)
         self._widgets["plot_window"].addImage(

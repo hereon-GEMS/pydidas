@@ -418,7 +418,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
     def get_plugin_by_name(
         self, name: str
-    ) -> Type[InputPlugin | ProcPlugin | OutputPlugin]:
+    ) -> type[InputPlugin | ProcPlugin | OutputPlugin]:
         """
         Get a plugin by its class name.
 
@@ -429,7 +429,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
         Returns
         -------
-        plugin : InputPlugin | ProcPlugin | OutputPlugin
+        plugin : type[InputPlugin | ProcPlugin | OutputPlugin]
             The Plugin class.
         """
         self.verify_is_initialized()
@@ -439,17 +439,34 @@ class PluginRegistry(ObjectWithParameterCollection):
             return self._plugin_basic_types[name]
         raise KeyError(f"No plugin with name `{name}` has been registered!")
 
-    def get_all_plugins(self) -> list[Type[BasePlugin]]:
+    def get_all_plugin_classes(
+        self,
+    ) -> list[type[InputPlugin | ProcPlugin | OutputPlugin]]:
         """
-        Get a list of all plugins.
+        Get a list of all registered plugin classes.
 
         Returns
         -------
-        list
+        list[type[InputPlugin | ProcPlugin | OutputPlugin]]
             A list with all the Plugin classes.
         """
         self.verify_is_initialized()
         return list(self.plugins.values())
+
+    def get_all_plugins(self):
+        """
+        Old alias for `get_all_plugin_classes`.
+
+        Warning: this method is deprecated. Please use `get_all_plugin_classes`.
+        """
+        warnings.warn(
+            (
+                "The `get_all_plugins` method is deprecated and has been replaced by "
+                "`get_all_plugin_classes`."
+            ),
+            DeprecationWarning,
+        )
+        return self.get_all_plugin_classes()
 
     def get_all_plugins_of_type(
         self, plugin_type: Literal["base", "input", "proc", "output"]

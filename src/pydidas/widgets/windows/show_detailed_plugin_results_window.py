@@ -27,9 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
+from pydidas.core import UserConfigError
 from pydidas.core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.widgets.framework import PydidasWindow
@@ -45,7 +47,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
 
-    def __init__(self, results=None, **kwargs):
+    def __init__(self, results=None, **kwargs: Any):
         PydidasWindow.__init__(self, title="Detailed plugin results", **kwargs)
         self._config["n_plots"] = 0
         self._results = results
@@ -154,7 +156,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 self._widgets[f"plot_{_index}"].setVisible(
                     _index < self._config["n_plots"]
                 )
-                self._widgets[f"plot_{_index}"].clear_plots()
+                self._widgets[f"plot_{_index}"].clear_plot()
 
     def __create_necessary_plots(self):
         """
@@ -206,13 +208,13 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self._widgets["metadata_label"].setVisible(_has_metadata)
         self.__plot_results(key)
 
-    def __plot_results(self, key):
+    def __plot_results(self, key: str | None):
         """
         Plot the provided results.
 
         Parameters
         ----------
-        key : Union[str, None]
+        key : str | None
             The key to find the specific results.
         """
         _point_result = self._results[key]
@@ -222,12 +224,16 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         for _item in _point_result.get("items", []):
             _i_plot = _item["plot"]
             _data = _item["data"]
+            if _data.ndim not in [1, 2]:
+                raise UserConfigError(
+                    "Only 1D and 2d data can be plotted in this window."
+                )
             _plot_kwargs = {
                 _key: _val
                 for _key, _val in _item.items()
                 if _key in ["symbol", "linewidth", "linestyle"]
             }
-            self._widgets[f"plot_{_i_plot}"].plot_data(
+            self._widgets[f"plot_{_i_plot}"].plot_pydidas_dataset(
                 _data,
                 title=_titles.get(_i_plot, ""),
                 legend=_item.get("label", ""),
@@ -241,7 +247,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         Clear all items from all plots.
         """
         for _index in range(self._config["n_plots"]):
-            self._widgets[f"plot_{_index}"].clear_plots()
+            self._widgets[f"plot_{_index}"].clear_plot()
 
     def closeEvent(self, event):
         """

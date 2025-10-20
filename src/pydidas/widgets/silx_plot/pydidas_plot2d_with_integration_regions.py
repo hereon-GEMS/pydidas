@@ -30,9 +30,12 @@ __status__ = "Production"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
 
+from typing import Any
+
 import numpy as np
 from qtpy import QtCore
 
+from pydidas.core import UserConfigError
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.math import (
     Point,
@@ -43,8 +46,8 @@ from pydidas.core.math import (
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
-cos_phi = np.cos(np.linspace(0, 2 * np.pi, num=145))
-sin_phi = np.sin(np.linspace(0, 2 * np.pi, num=145))
+_COS_PHI_ARR = np.cos(np.linspace(0, 2 * np.pi, num=145))
+_SIN_PHI_ARR = np.sin(np.linspace(0, 2 * np.pi, num=145))
 
 
 class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
@@ -54,40 +57,15 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     sig_new_point_selected = QtCore.Signal(float, float)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasPlot2D.__init__(self, **kwargs)
-        self._config["overlay_color"] = kwargs.get(
-            "overlay_color", PYDIDAS_COLORS["orange"]
+        self._config["marker_color"] = kwargs.get(
+            "marker_color", PYDIDAS_COLORS["orange"]
         )
         self._config["roi_active"] = False
-        self._process_exp_update()
         self.sigPlotSignal.connect(self._process_plot_signal)
-        self._config["diffraction_exp"].sig_params_changed.connect(
-            self._process_exp_update
-        )
 
-    @property
-    def det_corner_points(self) -> PointList:
-        """
-        Get a list of the detector corner points.
-        """
-        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
-        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _points = PointList()
-        _points.append(Point(0, 0))
-        _points.append(Point(0, _ny))
-        _points.append(Point(_nx, _ny))
-        _points.append(Point(_nx, 0))
-        return _points
-
-    @QtCore.Slot()
-    def _process_exp_update(self):
-        """
-        Process updates of the DiffractionExperiment.
-        """
-        self._config["beamcenter"] = self._config["diffraction_exp"].beamcenter
-
-    def set_marker_color(self, color: str):
+    def set_marker_color(self, color: str) -> None:
         """
         Set the new marker color.
 
@@ -96,14 +74,18 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         color : str
             The marker color name.
         """
-        self._config["overlay_color"] = PYDIDAS_COLORS[color]
+        if color not in PYDIDAS_COLORS:
+            raise UserConfigError(
+                f"The selected color `{color}` is not a valid color name."
+            )
+        self._config["marker_color"] = PYDIDAS_COLORS[color]
 
     def draw_circle(
         self,
         radius: float,
         legend: str,
         center: Point | None = None,
-    ):
+    ) -> None:
         """
         Draw a circle with the given radius and store it as the given legend.
 
@@ -117,18 +99,20 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             The center of the circle. If None, this defaults to the
             DiffractionExperiment beamcenter. The default is None.
         """
-        _center = self._config["beamcenter"] if center is None else center
+        _center = (
+            self._config["diffraction_exp"].beamcenter if center is None else center
+        )
         self.addShape(
-            radius * cos_phi + _center.x,
-            radius * sin_phi + _center.y,
+            radius * _COS_PHI_ARR + _center.x,
+            radius * _SIN_PHI_ARR + _center.y,
             legend=legend,
-            color=self._config["overlay_color"],
+            color=self._config["marker_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
         )
 
-    def draw_line_from_beamcenter(self, chi: float, legend: str):
+    def draw_line_from_beamcenter(self, chi: float, legend: str) -> None:
         """
         Draw a line from the beamcenter in the direction given by the angle chi.
 
@@ -139,10 +123,9 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         legend : str
             The reference legend entry for this line.
         """
-        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
-        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _center = self._config["beamcenter"]
-        _intersects = ray_intersects_with_detector(_center, chi, (_ny, _nx))
+        _shape = self._config["diffraction_exp"].det_shape
+        _center = self._config["diffraction_exp"].beamcenter
+        _intersects: PointList = ray_intersects_with_detector(_center, chi, _shape)
         if len(_intersects) == 0:
             return
         if len(_intersects) == 1:
@@ -152,7 +135,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _intersects.yarr,
             legend=legend,
             shape="polylines",
-            color=self._config["overlay_color"],
+            color=self._config["marker_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
@@ -162,7 +145,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         self,
         radial: tuple[float, float] | None,
         azimuthal: tuple[float, float] | None,
-    ):
+    ) -> None:
         """
         Draw the given integration region.
 
@@ -179,25 +162,25 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             if np.mod(azimuthal, 2 * np.pi).std() < 1e-6:
                 azimuthal = None
         if radial is None and azimuthal is None:
-            _points = self.det_corner_points
+            _points = self._config["diffraction_exp"].det_corners
         elif radial is not None:
-            _points = self._handle_radial_region(radial, azimuthal)
-        else:
-            _points = self._handle_azimuthal_region(azimuthal)
+            _points = self._calculate_points_for_radial_region(radial, azimuthal)
+        else:  # radial is None and azimuthal is not None:
+            _points = self._calculate_points_for_azimuthal_slice(azimuthal)
         self.addShape(
             _points.xarr,
             _points.yarr,
             legend="roi",
-            color=self._config["overlay_color"],
+            color=self._config["marker_color"],
             linewidth=2.0,
         )
         self._config["roi_active"] = True
 
-    def _handle_radial_region(
+    def _calculate_points_for_radial_region(
         self, radial: tuple[float, float], azimuthal: None | tuple[float, float]
     ) -> PointList:
         """
-        Handle the radial region drawing logic.
+        Calculate the points for bounding a radial integration region.
 
         Parameters
         ----------
@@ -212,7 +195,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         points : PointList
             The coordinates of the radial integration region.
         """
-        _center = self._config["beamcenter"]
+        _center = self._config["diffraction_exp"].beamcenter
         _phi = (
             np.linspace(0, 2 * np.pi, num=145)
             if azimuthal is None
@@ -226,9 +209,11 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         _points.append(_center + PointFromPolar(radial[0], _phi[0]))
         return _points
 
-    def _handle_azimuthal_region(self, azimuthal: tuple[float, float]) -> PointList:
+    def _calculate_points_for_azimuthal_slice(
+        self, azimuthal: tuple[float, float]
+    ) -> PointList:
         """
-        Handle the azimuthal region drawing logic.
+        Calculate the points to draw an azimuthal slice from the beamcenter.
 
         Parameters
         ----------
@@ -241,9 +226,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             A list of Point objects representing the corners of the azimuthal
             integration region on the detector.
         """
-        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
-        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
-        _center = self._config["beamcenter"]
+        _ny, _nx = self._config["diffraction_exp"].det_shape
+        _center = self._config["diffraction_exp"].beamcenter
         _center_on_det = 0 <= _center.x <= _nx and 0 <= _center.y <= _ny
 
         _intersects0 = ray_intersects_with_detector(_center, azimuthal[0], (_ny, _nx))
@@ -253,14 +237,14 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _points.insert(0, _center)
             _points.append(_center)
             return _points
-        # center off detector
+        # else center off detector:
         _points = PointList()
         if len(_intersects0) == 0 and len(_intersects1) == 0:
             # no intersections, i.e. either full detector or no point on
             # detector in roi
             _chi_det = (Point(_nx / 2, _ny / 2) - _center).chi
             if azimuthal[0] < _chi_det < azimuthal[1]:
-                _points.extend(self.det_corner_points)
+                _points.extend(self._config["diffraction_exp"].det_corners)
             else:
                 self.remove_plot_items("roi")  # noqa E1101
         elif len(_intersects0) == 2 and len(_intersects1) == 2:
@@ -293,8 +277,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         PointList
             A list of Point objects representing the corner points between the start
         """
-        _nx = self._config["diffraction_exp"].get_param_value("detector_npixx")
-        _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
+        _ny, _nx = self._config["diffraction_exp"].det_shape
         _points = PointList([startpoint])
         while True:
             if _points[-1].y == 0:
@@ -317,13 +300,13 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         return _points
 
     @QtCore.Slot(dict)
-    def _process_plot_signal(self, event_dict: dict):
+    def _process_plot_signal(self, event_dict: dict[str, Any]) -> None:
         """
         Process events from the plot and filter and process mouse clicks.
 
         Parameters
         ----------
-        event_dict : dict
+        event_dict : dict[str, Any]
             The silx event dictionary.
         """
         if (

@@ -27,8 +27,11 @@ __status__ = "Production"
 __all__ = ["AxesSelector"]
 
 
+from typing import Any
+
+import h5py
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import POLICY_EXP_FIX
@@ -59,7 +62,7 @@ class AxesSelector(WidgetWithParameterCollection):
     sig_new_slicing = QtCore.Signal()
     sig_new_slicing_str_repr = QtCore.Signal(str, str)
 
-    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
         self._axis_widgets = {}
         self._data_shape = ()
@@ -71,7 +74,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self._current_transpose_required = None
 
         self._multiline_layout = kwargs.get("multiline_layout", False)
-        self._allow_less_dims = kwargs.get("allow_less_dims", False)
+        self._allow_fewer_dims = kwargs.get("allow_fewer_dims", False)
         self.layout().setColumnStretch(0, 1)
         self.create_spacer("final_spacer", gridPos=(0, 1, 1, 1), fixedWidth=5)
 
@@ -126,9 +129,29 @@ class AxesSelector(WidgetWithParameterCollection):
         )
 
     @property
-    def current_slice(self) -> list[slice]:
-        """The current slicing."""
-        return self._current_slice
+    def current_slice(self) -> tuple[slice]:
+        """The current slicing as a tuple."""
+        return tuple(self._current_slice)
+
+    @property
+    def additional_choices(self) -> list[str]:
+        """The additional choices defined for the display selection."""
+        return self._additional_choices[:]
+
+    @property
+    def n_choices(self) -> int:
+        """The number of additional choices defined for the display selection."""
+        return len(self._additional_choices)
+
+    @property
+    def allow_fewer_dims(self) -> bool:
+        """Flag to allow fewer dimensions in the data than additional choices."""
+        return self._allow_fewer_dims
+
+    @allow_fewer_dims.setter
+    def allow_fewer_dims(self, value: bool):
+        """Set the flag to allow fewer dimensions in the data than additional choices."""
+        self._allow_fewer_dims = value
 
     def set_data_shape(self, shape: tuple[int], update_axwidgets: bool = True):
         """
@@ -201,7 +224,7 @@ class AxesSelector(WidgetWithParameterCollection):
         ----------
         axis : int
             The axis index.
-        data_range : np.ndarray, optional
+        data_range : np.ndarray | None
             The data range for the axis. Set to None, if no metadata for the
             range is available.
         label : str, optional
@@ -221,33 +244,43 @@ class AxesSelector(WidgetWithParameterCollection):
             data_range, label, unit, npoints=npoints, ndim=self.filtered_data_ndim
         )
 
-    def set_metadata_from_dataset(self, dataset: Dataset):
+    def set_metadata_from_dataset(self, dataset: Dataset | h5py.Dataset):
         """
         Set the metadata from a pydidas Dataset.
 
         Parameters
         ----------
-        dataset : Dataset
+        dataset : Dataset | h5py.Dataset
             The dataset to get the metadata from.
         """
-        if not isinstance(dataset, Dataset):
+        if not isinstance(dataset, (Dataset, h5py.Dataset)):
+            try:
+                _type = f"`<{dataset.__module__}.{dataset.__class__.__name__}>`"
+            except AttributeError:
+                _type = f"`<{dataset.__class__.__name__}>`"
             raise UserConfigError(
                 "Invalid dataset: The given object is not a pydidas Dataset but "
-                f"`{type(dataset)}`. \nAlternatively, please set the metadata "
-                "manually using the `set_axis_metadata` method."
+                f"{_type}.\nAlternatively, please set the metadata manually using the "
+                "`set_axis_metadata` method."
             )
-        if dataset.ndim < len(self._additional_choices) and not self._allow_less_dims:
+        if dataset.ndim < len(self._additional_choices) and not self._allow_fewer_dims:
             raise UserConfigError(
                 "The dataset has less dimensions than required for the display. "
                 "Please change the dataset or how to display the dataset."
             )
         self.set_data_shape(dataset.shape, update_axwidgets=False)
         for _dim in range(self._data_ndim):
-            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
-                self._axis_widgets[_dim].set_axis_metadata(
+            if isinstance(dataset, h5py.Dataset):
+                _args = (np.arange(dataset.shape[_dim]), "", "")
+            elif isinstance(dataset, Dataset):
+                _args = (
                     dataset.axis_ranges[_dim],
                     dataset.axis_labels[_dim],
                     dataset.axis_units[_dim],
+                )
+            with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                self._axis_widgets[_dim].set_axis_metadata(
+                    *_args,  # noqa -- args is always set due to isinstance check above
                     ndim=self.filtered_data_ndim,
                 )
         self._verify_additional_choices_selected(-1, block_signals=True)
@@ -265,7 +298,7 @@ class AxesSelector(WidgetWithParameterCollection):
             The additional choices.
         """
         self._additional_choices_str = choices
-        self._additional_choices = choices.split(";;")
+        self._additional_choices = choices.split(";;") if choices else []
         for _dim, _axwidget in self._axis_widgets.items():
             with QtCore.QSignalBlocker(_axwidget):
                 _axwidget.define_additional_choices(choices)
@@ -339,11 +372,36 @@ class AxesSelector(WidgetWithParameterCollection):
             if (
                 _dim != ignore_ax
                 and _axwidget.display_choice in GENERIC_AXIS_SELECTOR_CHOICES
+                and _dim < self._data_ndim
                 and self._data_shape[_dim] > 1
             ):
                 with QtCore.QSignalBlocker(_axwidget):
                     _axwidget.display_choice = choice
                 break
+
+    def assign_index_use_to_dims(self, dims: list[int]):
+        """
+        Assign the "slice at index" choice to the given dimensions.
+
+        Parameters
+        ----------
+        dims : list[int]
+            The dimensions to assign the "slice at index" choice to.
+        """
+        if len(dims) + len(self._additional_choices) != self.filtered_data_ndim:
+            raise UserConfigError(
+                "The number of given dimensions and additional choices does not match "
+                "the number of dimensions in the data."
+            )
+        _choices_to_use = self._additional_choices[:]
+        for _dim in range(self.filtered_data_ndim):
+            if _dim in self._axis_widgets:
+                with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
+                    if _dim in dims:
+                        self._axis_widgets[_dim].display_choice = "slice at index"
+                    else:
+                        self._axis_widgets[_dim].display_choice = _choices_to_use.pop(0)
+        self.process_new_slicing(block_signals=True)
 
     @QtCore.Slot(int, str)
     def _process_new_display_choice(self, axis: int, choice: str):
@@ -403,7 +461,7 @@ class AxesSelector(WidgetWithParameterCollection):
         self.sig_new_slicing.emit()
         self.sig_new_slicing_str_repr.emit(self.current_slice_str, _curr_selection)
 
-    def closeEvent(self, event: QtCore.QEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent):
         """Close the widget and delete Children"""
         for _dim in self._axis_widgets:
             self._axis_widgets[_dim].deleteLater()

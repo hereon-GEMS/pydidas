@@ -31,7 +31,7 @@ __all__ = ["pyFAIintegrationBase"]
 import multiprocessing as mp
 import os
 import pathlib
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 from pyFAI.integrator.azimuthal import AzimuthalIntegrator
@@ -61,7 +61,7 @@ OCL = OpenCL()
 PI_STR = ASCII_TO_UNI["pi"]
 
 
-class pyFAIintegrationBase(ProcPlugin):
+class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
     """
     Provide basic functionality for the concrete integration plugins.
     """
@@ -91,7 +91,7 @@ class pyFAIintegrationBase(ProcPlugin):
     has_unique_parameter_config_widget = True
     advanced_parameters = ["correct_solid_angle", "polarization_factor"]
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: tuple, **kwargs: Any):
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._ai = None
@@ -166,9 +166,10 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in radians.
 
-        If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the tuple with both values is returned.
-        Otherwise, the return is None which corresponds to pyFAI auto ranges.
+        If the `use_azimuthal_range` parameter is True and both the lower and
+        upper range limits are larger than zero, the tuple with both values
+        is returned. Otherwise, the return is None which corresponds to
+        pyFAI auto ranges.
 
         Returns
         -------
@@ -185,9 +186,10 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in degree.
 
-        If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the tuple with both values is returned.
-        Otherwise, the return is None which corresponds to pyFAI auto ranges.
+        If the `use_azimuthal_range` parameter is True and both the lower and
+        upper range limits are larger than zero, the tuple with both values
+        is returned. Otherwise, the return is None which corresponds to
+        pyFAI auto ranges.
 
         Returns
         -------
@@ -204,10 +206,11 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in native units.
 
-        If use_azimuthal_range is True and both the lower and upper range
-        limits are larger than zero, the tuple with both values is returned.
-        Otherwise, the return is the full circle which encompasses (-180, 180)
-        if the integration discontinuity is located at pi, and (0, 360) otherwise.
+        If the `use_azimuthal_range` parameter is True and both the lower and
+        upper range limits are larger than zero, the tuple with both values
+        is returned.  Otherwise, the return is the full circle which
+        encompasses (-180, 180) if the integration discontinuity is located
+        at pi, and (0, 360) otherwise.
 
         Returns
         -------
@@ -305,11 +308,6 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Check whether the plugin's range is valid.
 
-        Parameters
-        ----------
-        azi_range : tuple
-            The azimuthal range.
-
         Returns
         -------
         bool
@@ -330,7 +328,7 @@ class pyFAIintegrationBase(ProcPlugin):
             return _low < _high <= np.pi + 1e-7
         return 0 <= _low <= _high <= 2 * np.pi + 1e-7
 
-    def get_pyFAI_unit_from_param(self, param_name: str) -> str:
+    def get_pyFAI_unit_from_param(self, param_name: str) -> str:  # noqa C0103
         """
         Get the unit of the Parameter called param_name in pyFAI notation.
 
@@ -346,13 +344,13 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
 
-    def check_and_set_custom_mask(self, **kwargs: dict):
+    def check_and_set_custom_mask(self, **kwargs: Any):
         """
         Check the kwargs for a custom mask and set it, if available.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments.
         """
         _mask = kwargs.get("custom_mask", None)
@@ -375,7 +373,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Parameters
         ----------
-        mask : ndarray, optional
+        mask : ndarray | None, optional
             The custom mask to be checked. If None, the stored default mask is used.
         """
         if self._ai is None:
@@ -388,11 +386,11 @@ class pyFAIintegrationBase(ProcPlugin):
                 f"Mask shape: {_mask_shape}."
             )
 
-    def execute(self, data: np.ndarray, **kwargs: dict):
+    def execute(self, data: np.ndarray, **kwargs: Any):
         """To be implemented by the concrete subclass."""
         raise NotImplementedError
 
-    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
+    def get_parameter_config_widget(self) -> type[QtWidgets.QWidget]:
         """
         Get the unique configuration widget associated with this Plugin.
 
@@ -409,9 +407,10 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the radial range from the Parameters.
 
-        If use_radial_range is True and both the lower and upper range limits
-        are larger than zero, the tuple with both values is returned.
-        Otherwise, the return is None which corresponds to pyFAI auto ranges.
+        If the `use_azimuthal_range` parameter is True and both the lower and
+        upper range limits are larger than zero, the tuple with both values
+        is returned. Otherwise, the return is None which corresponds to
+        pyFAI auto ranges.
 
         Returns
         -------
@@ -422,7 +421,7 @@ class pyFAIintegrationBase(ProcPlugin):
             _lower = self.get_param_value("rad_range_lower")
             _upper = self.get_param_value("rad_range_upper")
             if 0 <= _lower < _upper:
-                return (_lower, _upper)
+                return _lower, _upper
             logger.warning(
                 "Warning: Radial range was not correct and has been ignored."
             )

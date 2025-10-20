@@ -736,11 +736,12 @@ class ProcessingResults(ObjectWithParameterCollection):
             + "".join(
                 (
                     f"Axis #{_dim:02d} {_print_info['axis_types'][_dim]}:\n"
+                    f"  Label: {_label}\n"
                     f"  N points: {_print_info['axis_points'][_dim]}\n"
                     f"  Range: {_print_info['axis_ranges'][_dim]} "
                     f"{_print_info['axis_units'][_dim]}\n"
                 )
-                for _dim, _ in enumerate(_print_info["axis_labels"])
+                for _dim, _label in enumerate(_print_info["axis_labels"])
             )
         )
         if self._composites[node_id].size == 1:

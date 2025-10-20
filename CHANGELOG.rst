@@ -40,6 +40,7 @@ Improvements
   fio files.
 - Added ASCII1dProfileLoader plugin to import 1d data from various ASCII formats 
   (csv, txt, fio, dat)
+- Added direct support for h5py.Datasets to the DataViewer
 
 
 Bugfixes
@@ -68,6 +69,15 @@ Bugfixes
 - Fixed an issue where the pyfai-calib2.ini file was not localized correctly on Unix 
   systems.
 - Fixed an issue with InputPlugins for 1-dimensional data in the GUI.
+- Fixed an issue with the AxesSelector when switching between Datasets of different 
+  dimensionality in the TableView.
+- Fixed an issue with the ShowInformationForResult when the input file was not 
+  available at the original path.
+- Fixed an issue when the QStandardPaths.DocumentsLocation is not available (e.g. on
+  a disconnected network drive)
+- Fixed an issue in the histogram calculation for 32bit data with only small 
+  differences in their values
+- Fixed an issue where the PydidasPlot2D would reset the canvas size on data reload.
 
 
 v25.05.16

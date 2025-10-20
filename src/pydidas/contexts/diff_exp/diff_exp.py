@@ -44,7 +44,7 @@ from pydidas.core import (
     get_generic_param_collection,
 )
 from pydidas.core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
-from pydidas.core.math import Point
+from pydidas.core.math import Point, PointList
 from pydidas.core.utils import NoPrint
 
 
@@ -237,6 +237,15 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             # If the shape has changed, reset the detector name to keep consistency.
             self.set_param_value("detector_name", "Custom Detector")
         self.sig_params_changed.emit()
+
+    @property
+    def det_corners(self) -> PointList:
+        """
+        Get a list of the detector corner points.
+        """
+        _nx = self.get_param_value("detector_npixx")
+        _ny = self.get_param_value("detector_npixy")
+        return PointList([Point(0, 0), Point(0, _ny), Point(_nx, _ny), Point(_nx, 0)])
 
     def as_pyfai_geometry(self) -> Geometry:
         """

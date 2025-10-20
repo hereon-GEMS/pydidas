@@ -54,18 +54,21 @@ def gui_excepthook(exc_type, exception, trace):
     exception : Exception
         The exception itself.
     trace : traceback object
-        The trace of where the exception occured.
+        The trace of where the exception occurred.
     """
     _app = PydidasQApplication.instance()
 
     if exc_type in (UserConfigError, FileReadError):
-        # need to select the splitting char explicitly because used ' and " chars
-        # will alter the representation.
-        _split_char = repr(exception)[16 if exc_type is UserConfigError else 14]
+        _exc_repr = (
+            repr(exception)
+            .removeprefix("UserConfigError(")
+            .removeprefix("FileReadError(")
+            .removesuffix(")")
+            .strip("\"'")
+        )
         _title = (
             "Configuration Error" if exc_type is UserConfigError else "File read error"
         )
-        _exc_repr = repr(exception).split(_split_char)[1]
         _app.sig_gui_exception_occurred.emit()
         _ = PydidasExceptionMessageBox(text=_exc_repr, title=_title).exec_()
         return

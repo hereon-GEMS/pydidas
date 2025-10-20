@@ -935,7 +935,7 @@ class Dataset(ndarray):
         return _new
 
     @property
-    def shape(self) -> tuple[int]:
+    def shape(self) -> tuple[int, ...]:
         """
         Get the shape of the array.
 
@@ -947,7 +947,7 @@ class Dataset(ndarray):
         return ndarray.shape.__get__(self)
 
     @shape.setter
-    def shape(self, shape: tuple[int]):
+    def shape(self, shape: tuple[int, ...]):
         """
         Set the shape of the array.
 

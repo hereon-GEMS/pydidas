@@ -104,10 +104,10 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         self.create_label(
             "label_note",
             (
-                "Note that Fit2D flips the detector images horizontally\n"
+                "Note that Fit2D inverts the detector image along the vertical (y) axis\n"
                 "on loading. Therefore, the beamcenter pixel coordinates in\n"
                 "Fit2D do not directly correspond to those in pyFAI.\n"
-                "The pyFAI beamcenter-y coordinate is thus calculated as \n"
+                "The pyFAI beamcenter-y coordinate is thus calculated as\n"
                 "(detector_pixels_y - beamcenter_y_from_Fit2D)."
             ),
             bold=True,

@@ -408,7 +408,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             tilt : Real, optional
                 The tilt of the detector, given in rotation unit. The default is 0.
             tilt_plane: Real, optional
-                The rotation of the tile plane of the detector, given in rot unit. The
+                The rotation of the tilt plane of the detector, given in rot unit. The
                 default is 0.
             rot_unit : str, optional
                 The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.

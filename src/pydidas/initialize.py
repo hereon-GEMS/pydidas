@@ -33,8 +33,10 @@ __all__ = [
 
 
 import logging
+import multiprocessing as mp
 import os
 import sys
+import warnings
 from pathlib import Path
 
 from qtpy import QtCore
@@ -57,6 +59,18 @@ def configure_pyFAI():
     """
     Configure pyFAI to be used with pydidas.
     """
+    # Set the mp start method to spawn to prevent issues as described here
+    # https://github.com/silx-kit/pyFAI/issues/1652
+    if mp.get_start_method() != "spawn":
+        try:
+            mp.set_start_method("spawn", force=True)
+        except RuntimeError:
+            warnings.warn(
+                "Could not set the multiprocessing Process startup method to 'spawn'. "
+                "Multiprocessing with OpenGL will not work in Unix-based systems. "
+                "To solve this issue, restart the kernel and import pydidas before "
+                "starting any multiprocessing."
+            )
     for _key in [QStandardPaths.AppDataLocation, QStandardPaths.ConfigLocation]:
         _path = Path(QStandardPaths.writableLocation(_key))
         for _directory in [_path, _path.parent, _path.parents[1]]:

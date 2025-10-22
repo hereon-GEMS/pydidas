@@ -491,6 +491,14 @@ class QuickIntegrationFrame(BaseFrame):
         _center = self._EXP.beamcenter
         self.set_param_value_and_widget("beamcenter_x", _center.x)
         self.set_param_value_and_widget("beamcenter_y", _center.y)
+        _det_name = self._EXP.get_param_value("detector_name")
+        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._EXP.det_shape, [])
+        if _det_name not in _det_models:
+            _matches = [_name for _name in _det_models if _det_name in _name]
+            _det_name = _matches[0] if len(_matches) == 1 else "Custom detector"
+        with QtCore.QSignalBlocker(self.param_widgets["detector_model"]):
+            self.param_widgets["detector_model"].set_value(_det_name)
+            self.set_param_value("detector_model", _det_name)
         self._bc_controller.manual_beamcenter_update()
 
     def _import_diffraction_exp(self) -> None:

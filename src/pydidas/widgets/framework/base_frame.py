@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFrame"]
 
+from numbers import Integral
 
 from qtpy import QtCore, QtWidgets
 
@@ -97,7 +98,7 @@ class BaseFrame(
         self._config = {"built": False}
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: int):
+    def frame_activated(self, index: Integral):
         """
         Received signal that frame has been activated.
 
@@ -108,7 +109,7 @@ class BaseFrame(
 
         Parameters
         ----------
-        index : int
+        index : Integral
             The index of the activated frame.
         """
         if index == self.frame_index and not self._config["built"]:

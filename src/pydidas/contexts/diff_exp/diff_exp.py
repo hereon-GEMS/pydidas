@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
+from numbers import Real
 from pathlib import Path
 from typing import Any, Self
 
@@ -378,7 +379,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         )
 
     def set_beamcenter_from_fit2d_params(
-        self, center_x: float, center_y: float, det_dist: float, **kwargs: dict
+        self, center_x: Real, center_y: Real, det_dist: Real, **kwargs: Any
     ):
         """
         Set the beamcenter in detector pixel coordinates.
@@ -390,33 +391,43 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         R_pyfai = R_3(rot_beam) * R_2(-rot_x) * R_1(-rot_y)
 
-        Note that rot_x and rot_y directors are left-handed (i.e. inverted.)
+        Note that rot_x and rot_y directions are left-handed (i.e. inverted) and that
+        the image geometry of Fit2D (flipped horizontally) is assumed by default.
 
         Parameters
         ----------
-        center_x : float
+        center_x : Real
             The position of the x beam center in pixels.
-        center_y : float
+        center_y : Real
             The position of the y beam center in pixels.
-        det_dist : float
+        det_dist : Real
             The distance between sample and detector beam center in meters.
-        **kwargs: dict
+        **kwargs : Any
             Supported keyword arguments are:
 
-            tilt : float, optional
+            tilt : Real, optional
                 The tilt of the detector, given in rotation unit. The default is 0.
-            tilt_plane: float, optional
-                The rotation of the tile plane of the detector, given in rot unit. The
+            tilt_plane: Real, optional
+                The rotation of the tilt plane of the detector, given in rot unit. The
                 default is 0.
             rot_unit : str, optional
                 The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.
                 The default is degree.
+            fit2d_image_orientation : bool, optional
+                Flag to indicate whether the Fit2D image orientation (images flipped
+                horizontally) has been used for the calculation of the input parameters.
+                The default is True
         """
         _tilt = kwargs.get("tilt", 0)
         _tilt_plane = kwargs.get("tilt_plane", 0)
+        _fit2d_image_orientation = kwargs.get("fit2d_image_orientation", True)
         if kwargs.get("rot_unit", "degree") == "rad":
             _tilt = _tilt * 180 / np.pi
             _tilt_plane = _tilt_plane * 180 / np.pi
+        if _fit2d_image_orientation:
+            center_y = self.get_param_value("detector_npixy") - center_y
+            _tilt = -_tilt
+            _tilt_plane = 180 - _tilt_plane
         with NoPrint():
             _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(  # noqa E0602
                 dict(

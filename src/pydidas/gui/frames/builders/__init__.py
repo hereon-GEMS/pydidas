@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The gui.frames.builders sub-package includes builders for all GUI frame classes.
+The builders sub-package includes build configs and builders for all GUI frame classes.
 
 The builders to create and arrange the widgets have been separated simply for
 improved code organisation. They will create the user interface "shells"
@@ -32,7 +32,6 @@ __status__ = "Production"
 
 from .composite_creator_frame_builder import *
 from .data_browsing_frame_builder import *
-from .define_diffraction_exp_frame_builder import *
 from .define_scan_frame_builder import *
 from .image_math_frame_builder import *
 from .quick_integration_frame_builder import *
@@ -47,7 +46,6 @@ __all__ = (
     composite_creator_frame_builder.__all__
     + data_browsing_frame_builder.__all__
     + image_math_frame_builder.__all__
-    + define_diffraction_exp_frame_builder.__all__
     + define_scan_frame_builder.__all__
     + sin_square_chi_results_frame_builder.__all__
     + quick_integration_frame_builder.__all__
@@ -62,7 +60,6 @@ del (
     composite_creator_frame_builder,
     data_browsing_frame_builder,
     image_math_frame_builder,
-    define_diffraction_exp_frame_builder,
     define_scan_frame_builder,
     quick_integration_frame_builder,
     sin_square_chi_results_frame_builder,

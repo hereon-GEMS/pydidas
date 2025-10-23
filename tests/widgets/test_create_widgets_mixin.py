@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,7 +36,7 @@ from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 from pydidas_qtcore import PydidasQApplication
 
 
-class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
+class _TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
     def __init__(self, *args, parent=None, **kwargs):
         super().__init__(parent)
         self.hash = hash(self)
@@ -66,7 +66,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def tearDown(self): ...
 
     def get_widget(self, layout=QtWidgets.QGridLayout):
-        _w = TestWidget()
+        _w = _TestWidget()
         if layout is not None:
             _w.setLayout(layout())
         self.widgets.append(_w)
@@ -106,20 +106,20 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         _nwidget = 4
         obj = self.get_widget()
         for i in range(_nwidget):
-            _w = TestWidget()
+            _w = _TestWidget()
             obj.layout().addWidget(_w, i, 0, 1, 1)
         _grid_pos = get_grid_pos(obj, gridPos=_gridPos)
         self.assertEqual(_grid_pos, (_nwidget,) + _gridPos[1:])
 
     def testget_widget_layout_args_no_layout(self):
-        obj = TestWidget()
+        obj = _TestWidget()
         with self.assertRaises(PydidasGuiError):
             get_widget_layout_args(obj)
 
     def test_get_widget_layout_box(self):
         _stretch = 1.3
         _alignment = "random"
-        obj = TestWidget()
+        obj = _TestWidget()
         obj.setLayout(QtWidgets.QVBoxLayout())
         items = get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [_stretch, _alignment])
@@ -127,21 +127,21 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def test_get_widget_layout_stacked(self):
         _stretch = 1.3
         _alignment = "random"
-        obj = TestWidget()
+        obj = _TestWidget()
         obj.setLayout(QtWidgets.QStackedLayout())
         items = get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [])
 
     def test_get_widget_layout_grid_no_alignment(self):
         _gridPos = (2, 7, 5, 3)
-        obj = TestWidget()
+        obj = _TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
         items = get_widget_layout_args(obj, gridPos=_gridPos, alignment=None)
         self.assertEqual(items, [*_gridPos])
 
     def test_get_widget_layout_grid(self):
         _gridPos = (2, 7, 5, 3)
-        obj = TestWidget()
+        obj = _TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
         items = get_widget_layout_args(obj, gridPos=_gridPos)
         self.assertEqual(items, [*_gridPos])
@@ -152,7 +152,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         self.assertEqual(_grid_pos, (0, 0, 1, 1))
 
     def test_init(self):
-        obj = TestWidget()
+        obj = _TestWidget()
         self.assertIsInstance(obj, CreateWidgetsMixIn)
         self.assertTrue(hasattr(obj, "_widgets"))
 
@@ -211,27 +211,27 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_create_widget__with_layout_args(self):
         obj = self.get_widget()
-        obj.create_any_widget("ref", TestWidget, layout_kwargs={})
+        obj.create_any_widget("ref", _TestWidget, layout_kwargs={})
         self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__plain(self):
         obj = self.get_widget()
-        obj.create_any_widget("ref", TestWidget)
+        obj.create_any_widget("ref", _TestWidget)
         self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__wrong_ref(self):
         obj = self.get_widget()
         with self.assertRaises(TypeError):
-            obj.create_any_widget(12, TestWidget)
+            obj.create_any_widget(12, _TestWidget)
 
     def test_add_any_widget__wrong_ref(self):
         obj = self.get_widget()
         with self.assertRaises(TypeError):
-            obj.add_any_widget(12, TestWidget())
+            obj.add_any_widget(12, _TestWidget())
 
     def test_add_any_widget__plain(self):
         obj = self.get_widget()
-        obj.add_any_widget("ref", TestWidget(), layout_kwargs={})
+        obj.add_any_widget("ref", _TestWidget(), layout_kwargs={})
         self.assertTrue("ref" in obj._widgets)
 
 

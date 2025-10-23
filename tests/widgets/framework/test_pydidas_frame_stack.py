@@ -35,7 +35,7 @@ from pydidas.widgets.framework import BaseFrame, PydidasFrameStack
 from pydidas_qtcore import PydidasQApplication
 
 
-class TestWidget(BaseFrame):
+class _TestWidget(BaseFrame):
     ref_name = ""
     title = ""
     menu_icon = None
@@ -78,7 +78,7 @@ class TestPydidasFrameStack(unittest.TestCase):
         stack = PydidasFrameStack()
         stack.reset()
         for i in range(4):
-            w = TestWidget()
+            w = _TestWidget()
             stack.register_frame(w)
             self.frames.append(w)
         return stack
@@ -92,13 +92,13 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def test_register_frame(self):
         stack = PydidasFrameStack()
-        w = TestWidget()
+        w = _TestWidget()
         stack.register_frame(w)
         assert stack.widget(0) == w
 
     def test_register_frame_duplicate(self):
         stack = PydidasFrameStack()
-        w = TestWidget()
+        w = _TestWidget()
         stack.register_frame(w)
         with self.assertRaises(KeyError):
             stack.register_frame(w)
@@ -141,7 +141,7 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def test_removeWidget_widget_not_registered(self):
         stack = self.create_stack()
-        w = TestWidget()
+        w = _TestWidget()
         with self.assertRaises(KeyError):
             stack.removeWidget(w)
 
@@ -156,7 +156,7 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def test_addWidget(self):
         stack = self.create_stack()
-        w = TestWidget()
+        w = _TestWidget()
         with self.assertRaises(NotImplementedError):
             stack.addWidget(w)
 
@@ -173,7 +173,7 @@ class TestPydidasFrameStack(unittest.TestCase):
 
     def test_is_registered_wrong_widget(self):
         stack = self.create_stack()
-        self.assertFalse(stack.is_registered(TestWidget()))
+        self.assertFalse(stack.is_registered(_TestWidget()))
 
 
 if __name__ == "__main__":

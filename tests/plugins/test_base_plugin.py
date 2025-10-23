@@ -43,7 +43,7 @@ from pydidas.unittest_objects import create_plugin_class
 EXP = DiffractionExperimentContext()
 
 
-class TestLinkedObject:
+class _TestLinkedObject:
     def __init__(self, params):
         self.params = params
 
@@ -259,7 +259,7 @@ class TestBasePlugin(unittest.TestCase):
     def test_copy__with_linked_object(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         obj = plugin()
-        obj.dummy = TestLinkedObject(obj.params)
+        obj.dummy = _TestLinkedObject(obj.params)
         obj.set_param_value("label", "Test 12423536")
         self.assertEqual(
             obj.dummy.get_param_value("label"), obj.get_param_value("label")

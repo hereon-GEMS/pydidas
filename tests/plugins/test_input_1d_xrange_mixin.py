@@ -45,7 +45,7 @@ _DUMMY_SHAPE_1d = (145,)
 _CUSTOM_XRANGE = np.arange(_DUMMY_SHAPE_1d[0]) * _X_DELTA + _X_OFFSET
 
 
-class TestInputPlugin(Input1dXRangeMixin, InputPlugin):
+class _TestInputPlugin(Input1dXRangeMixin, InputPlugin):
     output_data_label = "Test data"
     output_data_unit = "some counts"
 
@@ -72,7 +72,7 @@ def setup_scan():
 
 
 def test__creation():
-    plugin = TestInputPlugin()
+    plugin = _TestInputPlugin()
     assert plugin.base_output_data_dim == 1
     assert plugin.has_unique_parameter_config_widget
     for key in ["use_custom_xscale", "x0_offset", "x_delta", "x_label", "x_unit"]:
@@ -81,7 +81,7 @@ def test__creation():
 
 
 def test_pre_execute__no_input(setup_scan):
-    plugin = TestInputPlugin()
+    plugin = _TestInputPlugin()
     plugin.pre_execute()
     assert plugin._config["xrange"] is None
     assert plugin._config["pre_executed"]
@@ -95,7 +95,7 @@ def test_execute(setup_scan, ordinal, frame_indices, custom_xscale, handling):
     _ref_range = _CUSTOM_XRANGE if custom_xscale else np.arange(_DUMMY_SHAPE_1d[0])
     SCAN.set_param_value("scan_multi_frame_handling", handling)
     SCAN.set_param_value("scan_frames_per_point", frame_indices)
-    plugin = TestInputPlugin()
+    plugin = _TestInputPlugin()
     plugin.set_param_value("use_custom_xscale", custom_xscale)
     plugin.set_param_value("x0_offset", _X_OFFSET)
     plugin.set_param_value("x_delta", _X_DELTA)
@@ -127,7 +127,7 @@ def test_execute(setup_scan, ordinal, frame_indices, custom_xscale, handling):
 
 
 def test_get_parameter_config_widget():
-    plugin = TestInputPlugin()
+    plugin = _TestInputPlugin()
     _widget = plugin.get_parameter_config_widget()
     assert _widget == PluginConfigWidgetWithCustomXscale
 

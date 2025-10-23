@@ -619,3 +619,36 @@ class DirectorySpyApp(BaseApp):
             The metadata.
         """
         return self.__current_metadata
+
+    def deleteLater(self):
+        """
+        Delete the instance of the DirectorySpyApp.
+        """
+        self.__del__()
+        super().deleteLater()
+
+    def __del__(self):
+        """
+        Delete the DirectorySpyApp.
+        """
+        self.close_shared_arrays_and_memory()
+
+    def close_shared_arrays_and_memory(self):
+        """
+        Close (and unlink) the shared memory buffers.
+
+        Note that only the manager app should unlink the shared memory buffers.
+        """
+        self._shared_array = None
+        while self._config["shared_memory"]:
+            _key, _buffer = self._config["shared_memory"].popitem()
+            _buffer.close()
+            if not self.clone_mode:
+                try:
+                    _buffer.unlink()
+                except FileNotFoundError:
+                    logger.error(
+                        "Error while unlinking shared memory buffers from app: %s %s "
+                        % (_buffer, self)
+                    )
+                    pass

@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = ["BaseApp"]
 
 
-import multiprocessing as mp
 from copy import copy
+from multiprocessing.managers import SyncManager
 from pathlib import Path
 from typing import Optional, Self
 
@@ -89,7 +89,7 @@ class BaseApp(ObjectWithParameterCollection):
 
         This method is called by the Qt event loop to delete the app instance.
         """
-        if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
+        if isinstance(self._mp_manager_instance, SyncManager):
             self._mp_manager_instance.shutdown()
         super().deleteLater()
 

@@ -29,6 +29,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from multiprocessing import managers
 
 import yaml
 from qtpy import QtWidgets
@@ -215,6 +216,19 @@ class TestBaseApp(unittest.TestCase):
         BaseApp.parse_func = dummy
         app = BaseApp()
         self.assertEqual(dummy(None), app.parse_func())
+
+    def test_deleteLater__no_manager(self):
+        app = BaseApp()
+        app.deleteLater()
+        # assert nothing, just check no error occurs
+
+    def test_deleteLater__with_manager(self):
+        _mgr = mp.Manager()
+        app = BaseApp()
+        app._mp_manager_instance = _mgr
+        app._locals = {"lock": _mgr.Lock(), "shared_dict": _mgr.dict()}
+        app.deleteLater()
+        self.assertEqual(app._mp_manager_instance._state.value, managers.State.SHUTDOWN)
 
 
 if __name__ == "__main__":

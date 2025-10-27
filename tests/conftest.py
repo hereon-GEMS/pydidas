@@ -36,6 +36,11 @@ import pytest
 
 @pytest.fixture(scope="session", autouse=True)
 def temp_path():
+    """
+    The temporary path fixture for tests needing a temp directory.
+
+    This fixture creates a single temporary directory for the entire test session.
+    """
     _path = Path(tempfile.mkdtemp())
     yield _path
     shutil.rmtree(_path)
@@ -43,6 +48,11 @@ def temp_path():
 
 @pytest.fixture
 def empty_temp_path():
+    """
+    The temporary path fixture for tests needing an empty temp directory.
+
+    This fixture creates a new temporary directory for each test function.
+    """
     _path = Path(tempfile.mkdtemp())
     yield _path
     shutil.rmtree(_path)

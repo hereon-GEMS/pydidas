@@ -45,10 +45,10 @@ class _TestClass(QtCore.QObject):
 
     def __init__(self):
         super().__init__()
-        self.reveived_signals = []
+        self.received_signals = []
 
     def get_progress(self, obj):
-        self.reveived_signals.append(obj)
+        self.received_signals.append(obj)
 
     def send_progress(self, progress):
         self.signal.emit(progress)

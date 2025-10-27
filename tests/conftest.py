@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the TiffIo class for importing and exporting tiff data.
+The conftest module for pytest fixtures used across multiple test modules.
 """
 
 __author__ = "Malte Storm"
@@ -36,6 +36,13 @@ import pytest
 
 @pytest.fixture(scope="session", autouse=True)
 def temp_path():
+    _path = Path(tempfile.mkdtemp())
+    yield _path
+    shutil.rmtree(_path)
+
+
+@pytest.fixture
+def empty_temp_path():
     _path = Path(tempfile.mkdtemp())
     yield _path
     shutil.rmtree(_path)

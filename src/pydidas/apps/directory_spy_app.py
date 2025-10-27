@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
+
 import glob
 import multiprocessing as mp
 import os
@@ -226,6 +227,8 @@ class DirectorySpyApp(BaseApp):
         """
         self._config["path"] = self.get_param_value("directory_path", dtype=str)
         if self.get_param_value("scan_for_all"):
+            self._config["glob_pattern"] = "*"
+            self._fname = lambda x: ""
             return
         _pattern_str = self.get_param_value("filename_pattern", dtype=str)
         _strs = _pattern_str.split("#")
@@ -631,24 +634,6 @@ class DirectorySpyApp(BaseApp):
         """
         Delete the DirectorySpyApp.
         """
-        self.close_shared_arrays_and_memory()
-
-    def close_shared_arrays_and_memory(self):
-        """
-        Close (and unlink) the shared memory buffers.
-
-        Note that only the manager app should unlink the shared memory buffers.
-        """
-        self._shared_array = None
-        while self._config["shared_memory"]:
-            _key, _buffer = self._config["shared_memory"].popitem()
-            _buffer.close()
-            if not self.clone_mode:
-                try:
-                    _buffer.unlink()
-                except FileNotFoundError:
-                    logger.error(
-                        "Error while unlinking shared memory buffers from app: %s %s "
-                        % (_buffer, self)
-                    )
-                    pass
+        if not self.clone_mode:
+            for _key in self._config["shared_memory"]:
+                self._config["shared_memory"][_key] = None

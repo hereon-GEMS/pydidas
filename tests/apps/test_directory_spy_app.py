@@ -35,7 +35,6 @@ import numpy as np
 import pytest
 
 from pydidas.apps.directory_spy_app import DirectorySpyApp
-from pydidas.apps.parsers import directory_spy_app_parser
 from pydidas.core import FileReadError, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 
@@ -89,7 +88,6 @@ def mask() -> np.ndarray:
 
 @pytest.fixture
 def app(empty_temp_path):
-    DirectorySpyApp.parse_func = directory_spy_app_parser
     app = DirectorySpyApp()
     app.set_param_value("scan_for_all", False)
     app.set_param_value("directory_path", empty_temp_path)
@@ -108,6 +106,14 @@ def mask_file(mask, empty_temp_path):
     return _mask_fname
 
 
+@pytest.fixture
+def dummy_parse_func():
+    original = DirectorySpyApp.parse_func
+    DirectorySpyApp.parse_func = lambda x: {"scan_for_all": True}
+    yield
+    DirectorySpyApp.parse_func = original
+
+
 def test_creation():
     app = DirectorySpyApp()
     assert isinstance(app, DirectorySpyApp)
@@ -120,8 +126,7 @@ def test_creation_with_args():
     assert app.get_param_value("scan_for_all")
 
 
-def test_creation_with_cmdargs():
-    DirectorySpyApp.parse_func = lambda x: {"scan_for_all": True}
+def test_creation_with_cmdargs(dummy_parse_func):
     app = DirectorySpyApp()
     assert app.get_param_value("scan_for_all")
 

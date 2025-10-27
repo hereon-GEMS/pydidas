@@ -627,13 +627,18 @@ class DirectorySpyApp(BaseApp):
         """
         Delete the instance of the DirectorySpyApp.
         """
-        self.__del__()
+        self.cleanup()
         super().deleteLater()
 
     def __del__(self):
         """
         Delete the DirectorySpyApp.
         """
+        self.cleanup()
+        super().__del__()
+
+    def cleanup(self):
+        """Cleanup the DirectorySpyApp."""
         if not self.clone_mode:
             for _key in self._config["shared_memory"]:
                 self._config["shared_memory"][_key] = None

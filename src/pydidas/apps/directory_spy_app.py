@@ -635,7 +635,6 @@ class DirectorySpyApp(BaseApp):
         Delete the DirectorySpyApp.
         """
         self.cleanup()
-        super().__del__()
 
     def cleanup(self):
         """Cleanup the DirectorySpyApp."""

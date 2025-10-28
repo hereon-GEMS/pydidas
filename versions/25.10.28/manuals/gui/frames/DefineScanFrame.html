@@ -1,0 +1,790 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Define scan frame &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=cc772b7d"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/gui/frames/DefineScanFrame';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Workflow edit frame" href="WorkflowEditFrame.html" />
+    <link rel="prev" title="Define diffraction experiment" href="DefineDiffractionExpFrame.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.10.28" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../commandline_start.html">Command line manuals</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../graphical_user_interface.html">Graphical user interface</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../menu.html">The menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../editing_parameters.html">Editing Parameters in the GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../silx/plots.html">Plots</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="frames_main.html">Frames</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="DataBrowsingFrame.html">Data browsing frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PyfaiCalibFrame.html">pyFAI calibration frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DefineDiffractionExpFrame.html">Define diffraction experiment</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Define scan frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkflowEditFrame.html">Workflow edit frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkflowTestFrame.html">Workflow test frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WorkflowRunFrame.html">Run full workflow frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ViewResultsFrame.html">View workflow results frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="UtilitiesFrame.html">Utilities frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="DirectorySpyFrame.html">Directory spy frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="QuickIntegrationFrame.html">Quick Integration frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ImageMathFrame.html">Image math frame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SinSquareChiResultsFrame.html">Sin square chi results visualization frame</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../windows/windows_main.html">Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../recipes/pydidas_processing.html">Using the pydidas processing pipeline</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../manuals_main.html" class="nav-link">User manuals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../graphical_user_interface.html" class="nav-link">Graphical user interface</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="frames_main.html" class="nav-link">Frames</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Define scan frame</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="define-scan-frame">
+<span id="id1"></span><h1>Define scan frame<a class="headerlink" href="#define-scan-frame" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#control-buttons" id="id2">Control buttons</a></p>
+<ul>
+<li><p><a class="reference internal" href="#import-scan-settings" id="id3">Import scan settings</a></p></li>
+<li><p><a class="reference internal" href="#import-scan-settings-from-beamline-metadata-files" id="id4">Import scan settings from beamline metadata files</a></p></li>
+<li><p><a class="reference internal" href="#reset-parameters" id="id5">Reset Parameters</a></p></li>
+<li><p><a class="reference internal" href="#export-scan-settings" id="id6">Export scan settings</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#scan-dimension-explanation" id="id7">Scan dimension explanation</a></p></li>
+<li><p><a class="reference internal" href="#global-parameters" id="id8">Global Parameters</a></p></li>
+<li><p><a class="reference internal" href="#configuring-a-scan-dimension" id="id9">Configuring a scan dimension</a></p></li>
+<li><p><a class="reference internal" href="#list-of-all-scancontext-parameters" id="id10">List of all ScanContext Parameters</a></p></li>
+</ul>
+</nav>
+<p>The <em>Scan setup</em> frame is a graphical interface to configure the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
+which holds information about the scan setup.</p>
+<p>The frame only holds the configuration widgets for its Parameters as well as
+some buttons for convenience functionality.</p>
+<a class="reference internal image-reference" href="../../../_images/overview1.png"><img alt="../../../_images/overview1.png" class="align-center" src="../../../_images/overview1.png" style="width: 600px;" />
+</a>
+<section id="control-buttons">
+<h2>Control buttons<a class="headerlink" href="#control-buttons" title="Link to this heading">#</a></h2>
+<section id="import-scan-settings">
+<h3>Import scan settings<a class="headerlink" href="#import-scan-settings" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/import.png" class="align-left" src="../../../_images/import.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The Scan settings can be imported from files written by pydidas. Clicking the
+corresponding button will open a selection dialogue to pick the file with the
+stored settings. File extensions will be pre-selected based on the available
+importers.</p>
+</section>
+<section id="import-scan-settings-from-beamline-metadata-files">
+<h3>Import scan settings from beamline metadata files<a class="headerlink" href="#import-scan-settings-from-beamline-metadata-files" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/import_bl_file.png" class="align-left" src="../../../_images/import_bl_file.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>A second option for importing scan settings is to use beamline metadata files.
+These files are created by beamline software and contain information about the
+scan setup. The button will open a file selection dialogue to pick the file with
+the stored settings. File extensions will be pre-selected based on the available
+importers.</p>
+<p>If you are unsure how to proceed for your specific beamline metadata files,
+please discuss with your local beamline support.</p>
+<p>If you are missing a specific beamline metadata importer, please contact the
+development team by raising a
+<a class="reference external" href="https://github.com/hereon-GEMS/pydidas/issues">GitHub issue</a>.</p>
+</section>
+<section id="reset-parameters">
+<h3>Reset Parameters<a class="headerlink" href="#reset-parameters" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/reset.png" class="align-left" src="../../../_images/reset.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The “Reset all scan settings” button allows the user to change all Parameters
+back to their default values.</p>
+</section>
+<section id="export-scan-settings">
+<h3>Export scan settings<a class="headerlink" href="#export-scan-settings" title="Link to this heading">#</a></h3>
+<img alt="../../../_images/export1.png" class="align-left" src="../../../_images/export1.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>At the bottom of the Frame, the export button allows users to export the current
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
+Parameters to a file. This button will open a filename dialogue.</p>
+</section>
+</section>
+<section id="scan-dimension-explanation">
+<h2>Scan dimension explanation<a class="headerlink" href="#scan-dimension-explanation" title="Link to this heading">#</a></h2>
+<img alt="../../../_images/more_dim_info.png" class="align-left" src="../../../_images/more_dim_info.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The scan dimension explanation section gives detailed information about the
+ordering of scan scan dimensions. The <em>slowest</em> scan dimension is dimension no.
+0 and the fastest is the last scan dimension. This ordering corresponds to how
+the scan must be performed algorithmically. The button opens a window with an
+in-depth explanation, including images.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The detailed explanation for the scan dimensions can be found at
+<a class="reference external" href="../../global/scan/dimension_help.html">Explanations of Scan dimensions</a>.</p>
+</div>
+</section>
+<section id="global-parameters">
+<h2>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading">#</a></h2>
+<img alt="../../../_images/globals.png" class="align-left" src="../../../_images/globals.png" />
+<p>Here, <em>global</em> refers to general scan Parameters in contrast to Parameters for
+a specific scan dimension. The scan dimensionality defines the number of used
+dimensions (and also shows or hides the corresponding widgets for the selected
+dimensions). The scan title is used as reference in titles and captions.</p>
+<p>The base directory and scan name pattern are used for <a class="reference internal" href="../../../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> to define the raw data source. The starting index
+defines the number of the first data file.</p>
+<p>For a detailed description of each Parameter, please refer to the
+<a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of ScanContext Parameters</span></a> found at the bottom of
+this page.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The detailed explanation for the scan file naming pattern are given in
+<a class="reference external" href="../../global/scan/file_naming_help.html">Explanations of Scan file naming</a>.</p>
+<p>The detailed explanation for multi-frame handling are given in
+<a class="reference external" href="../../global/scan/multi_frame_help.html">Explanations of Scan multi-frame handling</a>.</p>
+</div>
+</section>
+<section id="configuring-a-scan-dimension">
+<h2>Configuring a scan dimension<a class="headerlink" href="#configuring-a-scan-dimension" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Following the python nomenclature, the first index is 0 (zero) and so forth.</p>
+</div>
+<img alt="../../../_images/dimension.png" class="align-left" src="../../../_images/dimension.png" />
+<p>The configuration for each scan dimension is the same, and dimension #1 is shown
+only exemplarily.</p>
+<p>At the top, next to the name, are two small buttons with up and down arrows
+which allow to move the given scan dimension up or down in the list to change
+the order. Only reasonable arrows are shown, for example the first scan
+dimension cannot be further moved upwards.</p>
+<p>Each scan dimension has one mandatory field which is the number of scan points.
+This number determines the layout of the data in pydidas. The other information
+is metadata which is used to determine labels and axis ranges (for plots and
+export metadata) but which has no further relevance. The name of the scan
+dimension corresponds to the label. The unit is also used to label the
+dimension range.</p>
+<p>The range of each scan dimension is determined by the number of points
+<span class="math notranslate nohighlight">\(N\)</span>, the step width <span class="math notranslate nohighlight">\(\Delta x\)</span> between two points and the offset
+<span class="math notranslate nohighlight">\(x_0\)</span>. The full range is thus</p>
+<div class="math notranslate nohighlight">
+\[x_0,\ x_0 + \Delta x,\ x_0 + 2 * \Delta x,\ ...,\ x_0 + (N - 1) * \Delta x.\]</div>
+<span class="target" id="scan-context-params"></span></section>
+<section id="list-of-all-scancontext-parameters">
+<h2>List of all ScanContext Parameters<a class="headerlink" href="#list-of-all-scancontext-parameters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_title (type: str, default: , unit: )</dt><dd><p>The scan name or title. This is used exclusively for reference in result
+exporters.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_base_directory (type: Path, default: , unit: )</dt><dd><p>The absolute path of the base directory in which to find this scan. Note that
+individual plugins may automatically discover and use subdirectories. Please
+refer to the specific InputPlugin in use for more information.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_name_pattern (type: Path, default: , unit: )</dt><dd><p>The pattern used for naming scan (files). Use hashes ‘#’ for wildcards which
+will be filled in with numbers for the various files. Note that individual
+plugins may use this Parameter for either directory or file names. Please refer
+to the specific InputPlugin in use for more information.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>pattern_number_offset (type: int, default: 0, unit: )</dt><dd><p>The first number in the pattern to be used in processing. This number will be
+applied as offset in the scan naming pattern to identify the respective filename
+for scan points. For example, if the first file is named <cite>scan_0001.h5</cite>, the
+offset should be set to 1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>pattern_number_delta (type: int, default: 1, unit: )</dt><dd><p>The difference in the index between two consecutive pattern points. A value of 1
+would mean that each index is processed in the pattern whereas a value of n
+would mean that only every n-th index (e.g. filename) is processed.For example,
+a value of 3 would process the files with the names <cite>scan_0000.h5</cite>,
+<cite>scan_0003.h5</cite>, <cite>scan_0006.h5</cite> etc.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>frame_indices_per_scan_point (type: int, default: 1, unit: )</dt><dd><p>The number of frame indices (in frames) between two scan points. A value of 1
+would increment the image index by 1 for each scan point whereas a value of n
+corresponds to only using every n-th index. For example, a value of 3 frame
+indices per scan point process the frame 0 for scan point 0, frame 3 for scan
+point 1 etc.Please note that the index stepping refers to the frames, not the
+filenames. In the case of container files (e.g. hdf5), the index stepping will
+skip process every n-th frame, not every n-th file.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_multi_frame_handling (type: str, default: Average, unit: )</dt><dd><p>Define the handling of images if multiple images were acquired per scan point.
+If all individual images should be kept, please set the scan multiplicity to 1
+and add an additional dimension with the multiplicity to the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_frames_per_point (type: int, default: 1, unit: )</dt><dd><p>The number of frames to process at <em>each</em> scan point. The default of <cite>1</cite>
+corresponds to one image per scan point. Please note that the value for the
+points. If this setting is used for <cite>averaging</cite> images, please reduce the number
+of scan points correspondingly.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The following Parameters exist for each scan dimension, i.e. scan_dim{i}_label
+stands for scan_dim0_label, scan_dim1_label, scan_dim2_label,
+scan_dim3_label. For clarity, only the generic form is described here.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>scan_dim{i}_label (type: str, default: “”)</dt><dd><p>The axis name for scan direction <em>{i}</em>. This information will only be used
+for labelling.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim{i}_n_points (type: int, default: 0)</dt><dd><p>The number of scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim{i}_delta (type: float, default: 1)</dt><dd><p>The step width between two scan points in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim{i}_offset (type: float, default: 0)</dt><dd><p>The coordinate offset of the movement in scan direction <em>{i}</em> (i.e. the
+counter / motor position for scan step #0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>scan_dim{i}_unit (type: str, default: “”)</dt><dd><p>The unit of the movement / steps / offset in scan direction <em>{i}</em>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="DefineDiffractionExpFrame.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Define diffraction experiment</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="WorkflowEditFrame.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Workflow edit frame</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-buttons">Control buttons</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-scan-settings">Import scan settings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#import-scan-settings-from-beamline-metadata-files">Import scan settings from beamline metadata files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reset-parameters">Reset Parameters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-scan-settings">Export scan settings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scan-dimension-explanation">Scan dimension explanation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-parameters">Global Parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-a-scan-dimension">Configuring a scan dimension</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-all-scancontext-parameters">List of all ScanContext Parameters</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/gui/frames/DefineScanFrame.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/manuals/gui/frames/DefineScanFrame.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

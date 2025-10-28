@@ -1,0 +1,676 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The widgets.selection sub-package &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=cc772b7d"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/selection';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.silx_plot sub-package" href="silx_plot.html" />
+    <link rel="prev" title="The widgets.parameter_config sub-package" href="parameter_config.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="25.10.28" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The widgets.selection sub-package</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pydidas.widgets.selection">
+<span id="the-widgets-selection-sub-package"></span><h1>The widgets.selection sub-package<a class="headerlink" href="#module-pydidas.widgets.selection" title="Link to this heading">#</a></h1>
+<p>Package with widgets which allow the selection of a specific element.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.DirectoryExplorer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">DirectoryExplorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.DirectoryExplorer" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
+<p>The DirectoryExplorer is an implementation of a QTreeView widget with a
+file system model to display the contents of directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keywords are any keywords that are supported by QTreeView
+as well as:</p>
+<dl class="simple">
+<dt>parent<span class="classifier">Union[QWidget, None], optional</span></dt><dd><p>The parent widget, if applicable. The default is None.</p>
+</dd>
+<dt>current_path<span class="classifier">str, optional</span></dt><dd><p>The default path in the file system. The default is ‘’.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.DirectoryExplorer.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSize</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.DirectoryExplorer.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Overload the generic sizeHint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The updated size hint.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_key_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
+<p>A compound widget to select datasets in Hdf5 files.</p>
+<p>The Hdf5DatasetSelector is a compound widget which allows to select
+a hdf5 dataset key and the frame number. By convention, the first
+dimension of an n-dimensional (n &gt;= 3) dataset is the frame number. Any
+2-dimensional datasets will be interpreted as single frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_key_filters</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A dictionary with dataset keys to be filtered from the list
+of displayed datasets. Entries must be in the format
+{&lt;Key to filter&gt;: &lt;Descriptive text for checkbox&gt;}.
+The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. See below for supported arguments.</p></li>
+<li><p><strong>**QtAttribute</strong> (<em>depends on the attribute</em>) – Any Qt attributes which are supported by the generic QWidget. Use the
+Qt attribute name with a lowercase first character. Examples are
+<code class="docutils literal notranslate"><span class="pre">fixedWidth</span></code>, <code class="docutils literal notranslate"><span class="pre">fixedHeight</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear" title="Link to this definition">#</a></dt>
+<dd><p>Clear all entries for the widget.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.dataset">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dataset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dataset" title="Link to this definition">#</a></dt>
+<dd><p>Get the currently selected dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset">
+<span class="sig-name descname"><span class="pre">display_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Select a dataset from the drop-down list.</p>
+<p>This internal method is called by the Qt event system if the QComBoBox
+text has changed to notify the main program that the user has selected
+a different dataset to be visualized. This method also updates the
+accepted frame range for the sliders.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.new_filename">
+<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
+<dd><p>Process the new filename.</p>
+<p>If the new filename has a suffix associated with hdf5 files,
+show the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The full file system path to the new file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.RawMetadataSelector">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">RawMetadataSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.RawMetadataSelector" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
+<p>A compound widget to select metadata in raw image files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. In addition to all QAttributes supported
+by QWidget, see below for supported arguments:</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.RawMetadataSelector.new_filename">
+<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.RawMetadataSelector.new_filename" title="Link to this definition">#</a></dt>
+<dd><p>Process the new filename.</p>
+<p>If the new filename has a suffix associated with raw files,
+show the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The full file system path to the new file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="parameter_config.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The widgets.parameter_config sub-package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="silx_plot.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The widgets.silx_plot sub-package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.DirectoryExplorer"><code class="docutils literal notranslate"><span class="pre">DirectoryExplorer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.DirectoryExplorer.sizeHint"><code class="docutils literal notranslate"><span class="pre">DirectoryExplorer.sizeHint</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.clear</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.display_dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.new_filename</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.RawMetadataSelector"><code class="docutils literal notranslate"><span class="pre">RawMetadataSelector</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.RawMetadataSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">RawMetadataSelector.new_filename</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/widgets/selection.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/code/api/widgets/selection.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -27,9 +27,7 @@ __status__ = "Production"
 __all__ = ["start_pydidas_gui"]
 
 
-import multiprocessing as mp
 import signal
-import warnings
 from pathlib import Path
 from typing import Type
 
@@ -123,16 +121,6 @@ def _prepare_interpreter():
     Prepare the interpreter for the pydidas GUI.
     """
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    if mp.get_start_method() != "spawn":
-        try:
-            mp.set_start_method("spawn", force=True)
-        except RuntimeError:
-            warnings.warn(
-                "Could not set the multiprocessing Process startup method to 'spawn'. "
-                "Multiprocessing with OpenGL will not work in Unix-based systems. "
-                "To solve this issue, restart the kernel and import pydidas before "
-                "starting any multiprocessing."
-            )
 
 
 def _check_frames(frames: tuple[BaseFrame]):

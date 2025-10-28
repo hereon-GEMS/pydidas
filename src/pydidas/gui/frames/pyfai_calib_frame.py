@@ -50,12 +50,19 @@ from pydidas.contexts import DiffractionExperimentContext, DiffractionExperiment
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
+from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.silx_plot import actions
 
 
 EXP = DiffractionExperimentContext()
+_ILLEGAL_DET_STR = (
+    "The detector configuration was illegal or no detector has been selelcted and "
+    "the detector has been reset.\n\n"
+    "Please repeat the selection and check that all a detector has been selected "
+    "and all necessary detector parameters have been entered."
+)
 
 
 class _List(PydidasWidgetMixin, QtWidgets.QListWidget):
@@ -253,6 +260,23 @@ class PyfaiCalibFrame(BaseFrame):
         self._tasks[4]._update_context_button.clicked.connect(
             self._update_pydidas_diffraction_exp_context
         )
+        # TODO: Remove when issue fixed in pyFAI latest release
+        self._tasks[0]._customDetector.clicked.disconnect()
+        self._tasks[0]._customDetector.clicked.connect(
+            self._ExperimentTask__customDetector
+        )
+
+    def _ExperimentTask__customDetector(self):
+        """
+        Wrap the custom detector button to catch illegal entries.
+
+        This is a temporary workaround for an issue in pyFAI which raises
+        an AttributeError when the detector configuration is illegal.
+        """
+        try:
+            self._tasks[0]._ExperimentTask__customDetector()
+        except AttributeError:
+            WarningBox("Detector configuration error", _ILLEGAL_DET_STR)
 
     def finalize_ui(self):
         """

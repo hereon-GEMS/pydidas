@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
+
 import glob
 import multiprocessing as mp
 import os
@@ -226,6 +227,8 @@ class DirectorySpyApp(BaseApp):
         """
         self._config["path"] = self.get_param_value("directory_path", dtype=str)
         if self.get_param_value("scan_for_all"):
+            self._config["glob_pattern"] = "*"
+            self._fname = lambda x: ""
             return
         _pattern_str = self.get_param_value("filename_pattern", dtype=str)
         _strs = _pattern_str.split("#")
@@ -619,3 +622,22 @@ class DirectorySpyApp(BaseApp):
             The metadata.
         """
         return self.__current_metadata
+
+    def deleteLater(self):
+        """
+        Delete the instance of the DirectorySpyApp.
+        """
+        self.cleanup()
+        super().deleteLater()
+
+    def __del__(self):
+        """
+        Delete the DirectorySpyApp.
+        """
+        self.cleanup()
+
+    def cleanup(self):
+        """Cleanup the DirectorySpyApp."""
+        if not self.clone_mode:
+            for _key in self._config["shared_memory"]:
+                self._config["shared_memory"][_key] = None

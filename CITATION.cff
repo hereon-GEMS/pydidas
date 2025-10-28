@@ -26,8 +26,8 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2025-05-16
-version: 25.05.16
+date-released: 2025-10-28
+version: 25.10.28
 funding:
   - funder: Deutsche Forschungsgemeinschaft (DFG)
     grant: 460248799

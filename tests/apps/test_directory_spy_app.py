@@ -27,636 +27,513 @@ __status__ = "Production"
 import multiprocessing as mp
 import os
 import random
-import shutil
-import tempfile
 import time
-import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
+import pytest
 
 from pydidas.apps.directory_spy_app import DirectorySpyApp
-from pydidas.apps.parsers import directory_spy_app_parser
 from pydidas.core import FileReadError, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 
 
-class TestDirectorySpyApp(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._pname = "test_12345_#####_suffix.npy"
-        _full_path = os.path.join(self._path, self._pname)
-        self._glob_str = self._pname.replace("#####", "*")
-        self._full_glob_str = _full_path.replace("#####", "*")
-        self._shape = (20, 20)
-        self._mask = np.asarray(
-            [
-                random.choice([True, False])
-                for _ in range(self._shape[0] * self._shape[1])
-            ]
-        ).reshape(self._shape)
+_FNAME_PATTERN = "test_12345_#####_suffix.npy"
+_FNAME_GLOB_STR = _FNAME_PATTERN.replace("#####", "*")
+_IMG_SHAPE = (20, 20)
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
-        DirectorySpyApp.parse_func = directory_spy_app_parser
 
-    def get_test_image(self, shape=None):
-        if shape is None:
-            shape = self._shape
-        return np.random.random(shape)
+def _glob_pattern(path: os.PathLike) -> str:
+    _full_path = os.path.join(str(path), _FNAME_PATTERN)
+    return _full_path.replace("#####", "*")
 
-    def create_pattern_files(self, pattern=None, n=20):
-        if pattern is None:
-            pattern = self._pname
-        _len_pattern = pattern.count("#")
-        pattern = pattern.replace("#" * _len_pattern, "{:0" + str(_len_pattern) + "d}")
-        _names = []
-        for _index in range(n):
-            _data = np.random.random(self._shape)
-            _fpath = os.path.join(self._path, pattern.format(_index))
-            np.save(_fpath, _data)
-            _names.append(_fpath)
-            time.sleep(0.005)
-        return _names
 
-    def create_temp_mask_file(self):
-        self._mask_fname = os.path.join(self._path, "mask.npy")
-        np.save(self._mask_fname, self._mask)
+def random_image(shape=None):
+    if shape is None:
+        shape = _IMG_SHAPE
+    return np.random.random(shape)
 
-    def create_default_app(self):
-        app = DirectorySpyApp()
-        app.set_param_value("scan_for_all", False)
-        app.set_param_value("directory_path", self._path)
-        app.set_param_value("filename_pattern", "names_with_###_patterns.tif")
-        app.prepare_run()
-        app._det_mask = np.zeros(self._shape)
-        return app
 
-    def create_hdf5_image(self):
-        _fname = self.create_pattern_files(n=1)[0].replace("npy", "h5")
-        _dset = "/entry/nodata/data"
-        _n = 42
-        _data = np.zeros((_n,) + self._shape)
-        with h5py.File(_fname, "w") as f:
-            f[_dset] = _data
-        return _fname, _dset, _data.shape
+def create_pattern_files(path: Path, pattern=None, n=20) -> list[Path]:
+    pattern = pattern or _FNAME_PATTERN
+    _len_pattern = pattern.count("#")
+    pattern = pattern.replace("#" * _len_pattern, "{:0" + str(_len_pattern) + "d}")
+    _names = []
+    for _index in range(n):
+        _data = np.random.random(_IMG_SHAPE)
+        _fpath = path / pattern.format(_index)
+        np.save(_fpath, _data)
+        _names.append(str(_fpath))
+        time.sleep(0.005)
+    return _names
 
-    def test_creation(self):
-        app = DirectorySpyApp()
-        self.assertIsInstance(app, DirectorySpyApp)
 
-    def test_testcase_create_pattern_files(self):
-        _name = "something_432_####_666.npy"
-        _n = 25
-        _names = self.create_pattern_files(_name, _n)
-        for _index in range(_n):
-            _fname = os.path.join(self._path, _name.replace("####", f"{_index:04d}"))
-            self.assertTrue(os.path.isfile(_fname))
-            self.assertEqual(_fname, _names[_index])
+def create_hdf5_image(path: Path):
+    _fname = path / _FNAME_PATTERN.replace("#####", "00000").replace("npy", "h5")
+    _dset = "/entry/nodata/data"
+    _n = 42
+    _data = np.zeros((_n,) + _IMG_SHAPE)
+    with h5py.File(_fname, "w") as f:
+        f[_dset] = _data
+    return _fname, _dset, _data.shape
 
-    def test_creation_with_args(self):
-        _scan_for_all = get_generic_parameter("scan_for_all")
-        _scan_for_all.value = True
-        app = DirectorySpyApp(_scan_for_all)
-        self.assertTrue(app.get_param_value("scan_for_all"))
 
-    def test_creation_with_cmdargs(self):
-        DirectorySpyApp.parse_func = lambda x: {"scan_for_all": True}
-        app = DirectorySpyApp()
-        self.assertTrue(app.get_param_value("scan_for_all"))
+@pytest.fixture(scope="module")
+def mask() -> np.ndarray:
+    return np.asarray(
+        [random.choice([True, False]) for _ in range(_IMG_SHAPE[0] * _IMG_SHAPE[1])]
+    ).reshape(_IMG_SHAPE)
 
-    def test_reset_runtime_vars(self):
-        app = DirectorySpyApp()
-        app._shared_array = 42
-        app._index = np.pi
-        app.reset_runtime_vars()
-        self.assertIsNone(app._shared_array)
-        self.assertEqual(app._index, -1)
 
-    def test_apply_mask__no_mask(self):
-        _param = get_generic_parameter("use_detector_mask")
-        _param.value = False
-        _image = self.get_test_image()
-        app = DirectorySpyApp(_param)
-        app._det_mask = None
-        _new_image = app._apply_mask(_image)
-        self.assertTrue(np.allclose(_image, _new_image))
+@pytest.fixture
+def app(empty_temp_path):
+    app = DirectorySpyApp()
+    app.set_param_value("scan_for_all", False)
+    app.set_param_value("directory_path", empty_temp_path)
+    app.set_param_value("use_detector_mask", False)
+    app.set_param_value("filename_pattern", _FNAME_PATTERN)
+    app.prepare_run()
+    app._det_mask = np.zeros(_IMG_SHAPE)
+    yield app
+    del app
 
-    def test_apply_mask__with_mask(self):
-        _val = 42
-        app = DirectorySpyApp()
-        app._det_mask = self._mask
-        app.set_param_value("detector_mask_val", _val)
-        _image = self.get_test_image()
-        _new_image = app._apply_mask(_image)
-        self.assertTrue(np.allclose(_new_image[self._mask], _val))
 
-    def test_get_detector_mask__no_mask(self):
-        _param = get_generic_parameter("use_detector_mask")
-        _param.value = False
-        app = DirectorySpyApp(_param)
-        _mask = app._get_detector_mask()
-        self.assertIsNone(_mask)
+@pytest.fixture
+def mask_file(mask, empty_temp_path):
+    _mask_fname = empty_temp_path / "mask.npy"
+    np.save(_mask_fname, mask)
+    return _mask_fname
 
-    def test_get_detector_mask__with_mask(self):
-        self.create_temp_mask_file()
-        app = DirectorySpyApp()
-        app.set_param_value("use_detector_mask", True)
-        app.set_param_value("detector_mask_file", self._mask_fname)
-        _mask = app._get_detector_mask()
-        self.assertTrue((_mask == self._mask).all())
 
-    def test_define_path_and_name__scan_for_all(self):
-        app = DirectorySpyApp()
-        app.set_param_value("scan_for_all", True)
-        app.set_param_value("directory_path", self._path)
-        app.define_path_and_name()
-        self.assertEqual(self._path, app._config["path"])
-        self.assertEqual(app._fname(0), "")
+@pytest.fixture
+def dummy_parse_func():
+    original = DirectorySpyApp.parse_func
+    DirectorySpyApp.parse_func = lambda x: {"scan_for_all": True}
+    yield
+    DirectorySpyApp.parse_func = original
 
-    def test_find_current_index__missing_inbetween(self):
-        _num = 21
-        _names = self.create_pattern_files(n=_num)
-        os.remove(_names[-3])
-        os.remove(_names[-7])
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._DirectorySpyApp__find_current_index()
-        self.assertEqual(app._index, _num - 1)
 
-    def test_find_current_index__missing_at_start(self):
-        _num = 21
-        _names = self.create_pattern_files(n=_num)
-        for _ in range(4):
-            _name = _names.pop(0)
-            os.remove(_name)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._DirectorySpyApp__find_current_index()
-        self.assertEqual(app._index, 20)
+def test_creation():
+    app = DirectorySpyApp()
+    assert isinstance(app, DirectorySpyApp)
 
-    def test_find_current_index__simple(self):
-        _num = 21
-        _ = self.create_pattern_files(n=_num)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._DirectorySpyApp__find_current_index()
-        self.assertEqual(app._index, _num - 1)
 
-    def test_find_current_index__empty(self):
-        app = DirectorySpyApp()
-        app._index = None
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = "*"
-        app._DirectorySpyApp__find_current_index()
-        self.assertEqual(app._index, -1)
+def test_creation_with_args():
+    _scan_for_all = get_generic_parameter("scan_for_all")
+    _scan_for_all.value = True
+    app = DirectorySpyApp(_scan_for_all)
+    assert app.get_param_value("scan_for_all")
 
-    def test_find_latest_file_of_pattern__empty(self):
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertIsNone(app._config["latest_file"])
-        self.assertIsNone(app._config["2nd_latest_file"])
-        self.assertFalse(_ret)
 
-    def test_find_latest_file_of_pattern__single_file(self):
-        _names = self.create_pattern_files(n=1)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertEqual(app._config["latest_file"], _names[0])
-        self.assertIsNone(app._config["2nd_latest_file"])
-        self.assertTrue(_ret)
+def test_creation_with_cmdargs(dummy_parse_func):
+    app = DirectorySpyApp()
+    assert app.get_param_value("scan_for_all")
 
-    def test_find_latest_file_of_pattern__multiple_files(self):
-        _names = self.create_pattern_files(n=32)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertEqual(app._config["latest_file"], _names[-1])
-        self.assertEqual(app._config["2nd_latest_file"], _names[-2])
-        self.assertTrue(_ret)
 
-    def test_find_latest_file_of_pattern__multiple_files_not_starting_with_0(self):
-        _names = self.create_pattern_files(n=32)
-        for _ in range(4):
-            _name = _names.pop(0)
-            os.remove(_name)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertEqual(app._config["latest_file"], _names[-1])
-        self.assertEqual(app._config["2nd_latest_file"], _names[-2])
-        self.assertTrue(_ret)
+def test_reset_runtime_vars(app):
+    app._shared_array = 42
+    app._index = np.pi
+    app.reset_runtime_vars()
+    assert app._shared_array is None
+    assert app._index == -1
 
-    def test_find_latest_file_of_pattern__same_files_again(self):
-        _ = self.create_pattern_files(n=32)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertFalse(_ret)
 
-    def test_find_latest_file_of_pattern__same_files_with_changed_size(self):
-        _names = self.create_pattern_files(n=32)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertFalse(_ret)
-        with open(_names[-1], "w") as f:
-            f.write("other content")
-        _ret = app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertTrue(_ret)
+def test_apply_mask__no_mask(app):
+    _image = random_image()
+    _new_image = app._apply_mask(_image)
+    assert np.allclose(_image, _new_image)
 
-    def test_find_latest_file_of_pattern__missing_files(self):
-        _index = 12
-        _names = self.create_pattern_files(n=32)
+
+def test_apply_mask__with_mask(app, mask):
+    _val = 42
+    app._det_mask = mask
+    app.set_param_value("detector_mask_val", _val)
+    _image = random_image()
+    _new_image = app._apply_mask(_image)
+    assert np.allclose(_new_image[mask], _val)
+
+
+def test_get_detector_mask__no_mask(app):
+    app.set_param_value("use_detector_mask", False)
+    _mask = app._get_detector_mask()
+    assert _mask is None
+
+
+def test_get_detector_mask__with_mask(app, mask, mask_file):
+    app.set_param_value("use_detector_mask", True)
+    app.set_param_value("detector_mask_file", mask_file)
+    _mask = app._get_detector_mask()
+    assert np.allclose(_mask, mask)
+
+
+def test_define_path_and_name__scan_for_all(empty_temp_path, app):
+    app.set_param_value("scan_for_all", True)
+    app.set_param_value("filename_pattern", "")
+    app.define_path_and_name()
+    assert empty_temp_path == Path(app._config["path"])
+    assert app._fname(0) == ""
+
+
+@pytest.mark.parametrize("missing_indices", [[3, 7], [0, 1, 2, 3], []])
+def test_find_current_index__missing_inbetween(empty_temp_path, app, missing_indices):
+    _num = 21
+    _names = create_pattern_files(empty_temp_path, n=_num)
+    for _index in missing_indices:
         os.remove(_names[_index])
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        app._config["glob_pattern"] = self._glob_str
-        app._fname = lambda x: self._full_glob_str.replace("*", "{:05d}").format(x)
-        app._DirectorySpyApp__check_for_new_file_of_pattern()
-        self.assertEqual(app._config["latest_file"], _names[_index - 1])
-        self.assertEqual(app._config["2nd_latest_file"], _names[_index - 2])
+    app._config["path"] = str(empty_temp_path)
+    app._config["glob_pattern"] = _FNAME_GLOB_STR
+    app._DirectorySpyApp__find_current_index()
+    assert app._index == _num - 1
 
-    def test_find_latest_file__empty(self):
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertIsNone(app._config["latest_file"])
-        self.assertIsNone(app._config["2nd_latest_file"])
-        self.assertFalse(_ret)
 
-    def test_find_latest_file__no_files_but_dirs(self):
-        os.makedirs(os.path.join(self._path, "dir1"))
-        os.makedirs(os.path.join(self._path, "dir2"))
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertIsNone(app._config["latest_file"])
-        self.assertIsNone(app._config["2nd_latest_file"])
-        self.assertFalse(_ret)
+def test_find_current_index__empty(empty_temp_path, app):
+    app._index = None
+    app._config["path"] = str(empty_temp_path)
+    app._config["glob_pattern"] = "*"
+    app._DirectorySpyApp__find_current_index()
+    assert app._index == -1
 
-    def test_find_latest_file_single_file(self):
-        _names = self.create_pattern_files(n=1)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertEqual(app._config["latest_file"], _names[0])
-        self.assertIsNone(app._config["2nd_latest_file"])
-        self.assertTrue(_ret)
 
-    def test_find_latest_file__multiple_files(self):
-        _names = self.create_pattern_files(n=32)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertEqual(app._config["latest_file"], _names[-1])
-        self.assertEqual(app._config["2nd_latest_file"], _names[-2])
-        self.assertTrue(_ret)
+def test_find_latest_file_of_pattern__empty(empty_temp_path, app):
+    app.define_path_and_name()
+    _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert app._config["latest_file"] is None
+    assert app._config["2nd_latest_file"] is None
+    assert not _check_result
 
-    def test_find_latest_file__same_files_again(self):
-        _ = self.create_pattern_files(n=32)
-        app = DirectorySpyApp()
-        app._config["path"] = self._path
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertTrue(_ret)
-        _ret = app._DirectorySpyApp__check_for_new_file()
-        self.assertFalse(_ret)
 
-    def test_initialize_shared_memory(self):
-        app = DirectorySpyApp()
-        app.initialize_shared_memory()
-        for _key in ["flag", "width", "height"]:
-            self.assertIsInstance(
-                app._config["shared_memory"][_key], mp.sharedctypes.Synchronized
-            )
-        self.assertIsInstance(
-            app._config["shared_memory"]["array"], mp.sharedctypes.SynchronizedArray
+@pytest.mark.parametrize("n_files, start_n", [(1, 0), (20, 0), (20, 5)])
+def test_find_latest_file_of_pattern_w_files(empty_temp_path, app, n_files, start_n):
+    app.define_path_and_name()
+    _names = create_pattern_files(empty_temp_path, n=n_files)
+    for _ in range(start_n):
+        _name = _names.pop(0)
+        os.remove(_name)
+    _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert app._config["latest_file"] == _names[-1]
+    if n_files == 1:
+        assert app._config["2nd_latest_file"] is None
+    else:
+        assert app._config["2nd_latest_file"] == _names[-2]
+    assert _check_result
+
+
+def test_find_latest_file_of_pattern__repeated_calls(empty_temp_path, app):
+    app.define_path_and_name()
+    _names = create_pattern_files(empty_temp_path, n=12)
+    _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert _check_result
+    _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert not _check_result
+    # modify the latest file and check that it is detected as new:
+    with open(_names[-1], "w") as f:
+        f.write("other content")
+    _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert _check_result
+
+
+def test_find_latest_file_of_pattern__missing_file(empty_temp_path, app):
+    app.define_path_and_name()
+    _names = create_pattern_files(empty_temp_path, n=20)
+    _index = 12
+    os.remove(_names[_index])
+    app.define_path_and_name()
+    app._DirectorySpyApp__check_for_new_file_of_pattern()
+    assert app._config["latest_file"] == _names[_index - 1]
+    assert app._config["2nd_latest_file"] == _names[_index - 2]
+
+
+@pytest.mark.parametrize("w_dirs", [True, False])
+def test_find_latest_file__empty(empty_temp_path, app, w_dirs):
+    if w_dirs:
+        (empty_temp_path / "dir1").mkdir()
+        (empty_temp_path / "dir2").mkdir()
+    app.define_path_and_name()
+    _check_result = app._DirectorySpyApp__check_for_new_file()
+    assert app._config["latest_file"] is None
+    assert app._config["2nd_latest_file"] is None
+    assert not _check_result
+
+
+@pytest.mark.parametrize("n_files", [1, 20])
+def test_find_latest_file__w_files(empty_temp_path, app, n_files):
+    _names = create_pattern_files(empty_temp_path, n=n_files)
+    app.define_path_and_name()
+    _check_result = app._DirectorySpyApp__check_for_new_file()
+    assert app._config["latest_file"] == _names[n_files - 1]
+    if n_files == 1:
+        assert app._config["2nd_latest_file"] is None
+    else:
+        assert app._config["2nd_latest_file"] == _names[-2]
+    assert _check_result
+    # check that a second call returns False:
+    _check_result = app._DirectorySpyApp__check_for_new_file()
+    assert not _check_result
+
+
+def test_initialize_shared_memory(app):
+    app.initialize_shared_memory()
+    for _key in ["flag", "width", "height"]:
+        assert isinstance(
+            app._config["shared_memory"][_key], mp.sharedctypes.Synchronized
+        )
+    assert isinstance(
+        app._config["shared_memory"]["array"], mp.sharedctypes.SynchronizedArray
+    )
+
+
+def test_initialize_arrays_from_shared_memory(app):
+    app.initialize_shared_memory()
+    app._DirectorySpyApp__initialize_array_from_shared_memory()
+    assert isinstance(app._shared_array, np.ndarray)
+    assert app._shared_array.shape == (10000, 10000)
+
+
+def test_load_bg_file__simple(empty_temp_path, app):
+    _fname = create_pattern_files(empty_temp_path, n=1)[0]
+    _data = np.load(_fname)
+    app.set_param_value("bg_file", _fname)
+    app._load_bg_file()
+    assert np.allclose(_data, app._bg_image)
+
+
+def test_load_bg_file__no_such_file(empty_temp_path, app):
+    app.set_param_value("bg_file", empty_temp_path / "no_such_file.npy")
+    with pytest.raises(UserConfigError):
+        app._load_bg_file()
+
+
+def test_load_bg_file__hdf5file(empty_temp_path, app):
+    _fname = empty_temp_path / "hdf5_bg_file.h5"
+    _data = random_image()
+    _dset = "entry/other/bg/data"
+    with h5py.File(_fname, "w") as f:
+        f[_dset] = _data[None, :, :]
+    app = DirectorySpyApp()
+    app.set_param_value("bg_file", _fname)
+    app.set_param_value("bg_hdf5_key", _dset)
+    app._load_bg_file()
+    assert np.allclose(_data, app._bg_image)
+
+
+def test_load_bg_file__wrong_shape(empty_temp_path, app):
+    _fname = empty_temp_path / "3d_bg_file.np"
+    np.save(_fname, np.zeros((10, 10, 10)))
+    app.set_param_value("bg_file", _fname)
+    with pytest.raises(UserConfigError):
+        app._load_bg_file()
+
+
+def test_define_path_and_name__with_scan_for_all(empty_temp_path, app):
+    app.set_param_value("scan_for_all", True)
+    app.define_path_and_name()
+    assert app._config["path"] == str(empty_temp_path)
+
+
+def test_define_path_and_name__with_pattern_no_wildcard(empty_temp_path, app):
+    _pattern = empty_temp_path / "names_with_no_pattern123.tif"
+    app.set_param_value("filename_pattern", _pattern)
+    with pytest.raises(UserConfigError):
+        app.define_path_and_name()
+
+
+def test_define_path_and_name__with_pattern_multiple_wildcard(empty_temp_path, app):
+    _pattern = empty_temp_path / "names_with_###_patterns_###.tif"
+    app.set_param_value("filename_pattern", _pattern)
+    with pytest.raises(UserConfigError):
+        app.define_path_and_name()
+
+
+def test_define_path_and_name__with_pattern_correct(empty_temp_path, app):
+    _pattern = str(app.get_param_value("filename_pattern"))
+    app.define_path_and_name()
+    assert app._config["glob_pattern"] == _pattern.replace("#####", "*")
+    assert app._fname(42) == os.path.join(app._config["path"], _pattern).replace(
+        "#####", "00042"
+    )
+    assert app._config["path"] == str(empty_temp_path)
+
+
+def test_multiprocessing_carryon(app):
+    app.prepare_run()
+    assert not app.multiprocessing_carryon()
+
+
+def test_prepare_run__master(empty_temp_path, app):
+    app.prepare_run()
+    assert app._fname(42) != ""
+    assert app._config["path"] == str(empty_temp_path)
+    assert isinstance(app._shared_array, np.ndarray)
+    assert app._shared_array.shape == (10000, 10000)
+
+
+def test_prepare_run__as_clone(app):
+    app.prepare_run()
+    app_clone = app.copy(clone_mode=True)
+    app_clone.prepare_run()
+    for _key in ["flag", "width", "height", "array"]:
+        assert (
+            app._config["shared_memory"][_key]
+            == app_clone._config["shared_memory"][_key]
         )
 
-    def test_initialize_arrays_from_shared_memory(self):
-        app = DirectorySpyApp()
-        app.initialize_shared_memory()
-        app._DirectorySpyApp__initialize_array_from_shared_memory()
-        self.assertIsInstance(app._shared_array, np.ndarray)
-        self.assertEqual(app._shared_array.shape, (10000, 10000))
 
-    def test_load_bg_file__simple(self):
-        _fname = self.create_pattern_files(n=1)[0]
-        _data = np.load(_fname)
-        app = DirectorySpyApp()
-        app.set_param_value("bg_file", _fname)
-        app._det_mask = np.zeros(self._shape)
-        app._load_bg_file()
-        self.assertTrue((_data == app._bg_image).all())
+def test_multiprocessing_pre_run(empty_temp_path, app):
+    app.multiprocessing_pre_run()
+    # these tests are the same as for the prepare_run method:
+    assert app._fname(42) != ""
+    assert app._config["path"] == str(empty_temp_path)
+    assert isinstance(app._shared_array, np.ndarray)
+    assert app._shared_array.shape == (10000, 10000)
 
-    def test_load_bg_file__no_such_file(self):
-        _fname = self.create_pattern_files(n=1)[0]
-        os.remove(_fname)
-        app = DirectorySpyApp()
-        app.set_param_value("bg_file", _fname)
-        with self.assertRaises(UserConfigError):
-            app._load_bg_file()
 
-    def test_load_bg_file__hdf5file(self):
-        _fname = self.create_pattern_files(n=1)[0]
-        _data = np.load(_fname)
-        _dset = "entry/nodata/data"
-        with h5py.File(_fname.replace("npy", "h5"), "w") as f:
-            f[_dset] = _data[None, :, :]
-        app = DirectorySpyApp()
-        app.set_param_value("bg_file", _fname.replace("npy", "h5"))
-        app.set_param_value("bg_hdf5_key", _dset)
-        app._det_mask = np.zeros(self._shape)
-        app._load_bg_file()
-        self.assertTrue((_data == app._bg_image).all())
+def test_multiprocessing_post_run(app):
+    app.multiprocessing_post_run()
+    # assert does not raise an Exception
 
-    def test_load_bg_file__wrong_shape(self):
-        _fname = self.create_pattern_files(n=1)[0]
-        np.save(_fname, np.zeros((10, 10, 10)))
-        app = DirectorySpyApp()
-        app.set_param_value("bg_file", _fname)
-        with self.assertRaises(UserConfigError):
-            app._load_bg_file()
 
-    def test_define_path_and_name__with_scan_for_all(self):
-        app = DirectorySpyApp()
-        app.set_param_value("scan_for_all", True)
-        app.set_param_value("directory_path", self._path)
-        app.define_path_and_name()
-        self.assertEqual(app._config["path"], self._path)
+def test_multiprocessing_get_tasks(app):
+    assert app.multiprocessing_get_tasks() == []
 
-    def test_define_path_and_name__with_pattern_no_wildcard(self):
-        app = DirectorySpyApp()
-        app.set_param_value("scan_for_all", False)
-        _pattern = os.path.join(self._path, "names_with_no_pattern123.tif")
-        app.set_param_value("filename_pattern", _pattern)
-        with self.assertRaises(UserConfigError):
-            app.define_path_and_name()
 
-    def test_define_path_and_name__with_pattern_multiple_wildcard(self):
-        app = DirectorySpyApp()
-        app.set_param_value("scan_for_all", False)
-        _pattern = os.path.join(self._path, "names_with_###_patterns_###.tif")
-        app.set_param_value("filename_pattern", _pattern)
-        with self.assertRaises(UserConfigError):
-            app.define_path_and_name()
+def test_multiprocessing_pre_cycle(app):
+    app.multiprocessing_pre_cycle(0)
+    # assert does not raise an Exception
 
-    def test_define_path_and_name__with_pattern_correct(self):
-        app = self.create_default_app()
-        _pattern = str(app.get_param_value("filename_pattern"))
-        app.define_path_and_name()
-        self.assertEqual(app._config["glob_pattern"], _pattern.replace("###", "*"))
-        self.assertEqual(
-            app._fname(42),
-            os.path.join(app._config["path"], _pattern).replace("###", "042"),
-        )
-        self.assertEqual(app._config["path"], self._path)
 
-    def test_multiprocessing_carryon(self):
-        app = self.create_default_app()
-        app.prepare_run()
-        self.assertFalse(app.multiprocessing_carryon())
+def test_update_hdf5_metadata(empty_temp_path, app):
+    _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
+    app.set_param_value("hdf5_key", _dset)
+    app._DirectorySpyApp__update_hdf5_metadata(_fname)
+    _meta = app._DirectorySpyApp__read_image_meta
+    assert _meta["indices"] == (_shape[0] - 1,)
+    assert _meta["dataset"] == _dset
 
-    def test_prepare_run__master(self):
-        app = self.create_default_app()
-        app.prepare_run()
-        self.assertIsNotNone(app._fname(42))
-        self.assertEqual(app._config["path"], self._path)
-        self.assertIsInstance(app._shared_array, np.ndarray)
-        self.assertEqual(app._shared_array.shape, (10000, 10000))
 
-    def test_prepare_run__as_clone(self):
-        app = self.create_default_app()
-        app.prepare_run()
-        app_clone = app.copy(clone_mode=True)
-        app_clone.prepare_run()
-        for _key in ["flag", "width", "height", "array"]:
-            self.assertEqual(
-                app._config["shared_memory"][_key],
-                app_clone._config["shared_memory"][_key],
-            )
+@pytest.mark.parametrize("axis", [1, 2, None])
+def test_update_hdf5_metadata__w_slice_ax(empty_temp_path, app, axis):
+    _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
+    app.set_param_value("hdf5_key", _dset)
+    app.set_param_value("hdf5_slicing_axis", axis)
+    app._DirectorySpyApp__update_hdf5_metadata(_fname)
+    _meta = app._DirectorySpyApp__read_image_meta
+    _indices_ref = None if axis is None else (None,) * axis + (_shape[1] - 1,)
+    assert _meta["indices"] == _indices_ref
+    assert _meta["dataset"] == _dset
 
-    def test_multiprocessing_pre_run(self):
-        app = self.create_default_app()
-        app.multiprocessing_pre_run()
-        # these tests are the same as for the prepare_run method:
-        self.assertIsNotNone(app._fname(42))
-        self.assertEqual(app._config["path"], self._path)
-        self.assertIsInstance(app._shared_array, np.ndarray)
-        self.assertEqual(app._shared_array.shape, (10000, 10000))
 
-    def test_multiprocessing_post_run(self):
-        app = self.create_default_app()
-        app.multiprocessing_post_run()
-        # assert does not raise an Exception
+def test_get_image__simple_image(empty_temp_path, app):
+    _fname = create_pattern_files(empty_temp_path, n=1)[0]
+    _data = np.load(_fname)
+    _image = app.get_image(_fname)
+    assert np.allclose(_data, _image)
 
-    def test_multiprocessing_get_tasks(self):
-        app = self.create_default_app()
-        self.assertEqual(app.multiprocessing_get_tasks(), [])
 
-    def test_multiprocessing_pre_cycle(self):
-        app = self.create_default_app()
-        app.multiprocessing_pre_cycle(0)
-        # assert does not raise an Exception
+def test_get_image__high_dim_image(empty_temp_path, app):
+    _fname = create_pattern_files(empty_temp_path, n=1)[0]
+    np.save(_fname, np.zeros((10, 10, 10)))
+    with pytest.raises(UserConfigError):
+        app.get_image(_fname)
 
-    def test_update_hdf5_metadata(self):
-        _fname, _dset, _shape = self.create_hdf5_image()
-        app = self.create_default_app()
-        app.set_param_value("hdf5_key", _dset)
-        app._DirectorySpyApp__update_hdf5_metadata(_fname)
-        _meta = app._DirectorySpyApp__read_image_meta
-        self.assertEqual(_meta["indices"], (_shape[0] - 1,))
-        self.assertEqual(_meta["dataset"], _dset)
 
-    def test_update_hdf5_metadata__w_slice_ax(self):
-        _fname, _dset, _shape = self.create_hdf5_image()
-        app = self.create_default_app()
-        for _ax in [1, 2]:
-            with self.subTest(axis=_ax):
-                app.set_param_value("hdf5_key", _dset)
-                app.set_param_value("hdf5_slicing_axis", _ax)
-                app._DirectorySpyApp__update_hdf5_metadata(_fname)
-                _meta = app._DirectorySpyApp__read_image_meta
-                self.assertEqual(_meta["indices"], (None,) * _ax + (_shape[1] - 1,))
-                self.assertEqual(_meta["dataset"], _dset)
+def test_get_image__hdf5_image(empty_temp_path, app):
+    _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
+    app.set_param_value("hdf5_key", _dset)
+    with h5py.File(_fname, "r") as f:
+        _data = f[_dset][()]
+    _image = app.get_image(_fname)
+    assert np.allclose(_data[-1], _image)
 
-    def test_update_hdf5_metadata__no_slice_ax(self):
-        _fname, _dset, _shape = self.create_hdf5_image()
-        app = self.create_default_app()
-        app.set_param_value("hdf5_key", _dset)
-        app.set_param_value("hdf5_slicing_axis", None)
-        app._DirectorySpyApp__update_hdf5_metadata(_fname)
-        _meta = app._DirectorySpyApp__read_image_meta
-        self.assertEqual(_meta["indices"], None)
-        self.assertEqual(_meta["dataset"], _dset)
 
-    def test_get_image__simple_image(self):
-        app = self.create_default_app()
-        _fname = self.create_pattern_files(n=1)[0]
-        _data = np.load(_fname)
-        _image = app.get_image(_fname)
-        self.assertTrue((_data == _image).all())
+def test_store_image_in_shared_memory(app):
+    app.prepare_run()
+    _height, _width = 42, 27
+    _image = np.random.random((_height, _width))
+    app._DirectorySpyApp__store_image_in_shared_memory(_image)
+    assert app._config["shared_memory"]["width"].value == _width
+    assert app._config["shared_memory"]["height"].value == _height
+    assert np.allclose(app._shared_array[:_height, :_width], _image)
 
-    def test_get_image__high_dim_image(self):
-        app = self.create_default_app()
-        _fname = self.create_pattern_files(n=1)[0]
-        np.save(_fname, np.zeros((10, 10, 10)))
-        with self.assertRaises(UserConfigError):
-            app.get_image(_fname)
 
-    def test_get_image__hdf5_image(self):
-        _fname, _dset, _shape = self.create_hdf5_image()
-        app = self.create_default_app()
-        app.set_param_value("hdf5_key", _dset)
-        with h5py.File(_fname, "r") as f:
-            _data = f[_dset][()]
-        _image = app.get_image(_fname)
-        self.assertTrue((_data[-1] == _image).all())
+def test_multiprocessing_func__no_files(app):
+    with pytest.raises(UserConfigError):
+        app.multiprocessing_func(None)
 
-    def test_store_image_in_shared_memory(self):
-        app = self.create_default_app()
-        app.prepare_run()
-        _width = 27
-        _height = 42
-        _image = np.random.random((_height, _width))
-        app._DirectorySpyApp__store_image_in_shared_memory(_image)
-        self.assertEqual(app._config["shared_memory"]["width"].value, _width)
-        self.assertEqual(app._config["shared_memory"]["height"].value, _height)
-        self.assertTrue(np.allclose(app._shared_array[:_height, :_width], _image))
 
-    def test_multiprocessing_func__no_files(self):
-        app = self.create_default_app()
-        with self.assertRaises(UserConfigError):
-            app.multiprocessing_func(None)
-
-    def test_multiprocessing_func__last_file_not_readable(self):
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app._config["latest_file"] = _names[1]
-        app._config["2nd_latest_file"] = _names[0]
-        with open(_names[1], "w") as f:
+@pytest.mark.parametrize("unreadable", [[], [1], [0, 1]])
+def test_multiprocessing_func(empty_temp_path, app, unreadable):
+    _names = create_pattern_files(empty_temp_path, n=2)
+    app._config["latest_file"] = _names[1]
+    app._config["2nd_latest_file"] = _names[0]
+    for _i in unreadable:
+        with open(_names[_i], "w") as f:
             f.write("no image file")
-        _index, _fname = app.multiprocessing_func(None)
-        self.assertEqual(_fname, _names[0])
-        self.assertEqual(app._config["shared_memory"]["width"].value, self._shape[1])
-        self.assertEqual(app._config["shared_memory"]["height"].value, self._shape[0])
-        self.assertTrue(
-            np.allclose(
-                app._shared_array[: self._shape[0], : self._shape[1]],
-                np.load(_names[0]),
-            )
-        )
-
-    def test_multiprocessing_func__both_files_not_readable(self):
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app._config["latest_file"] = _names[1]
-        app._config["2nd_latest_file"] = _names[0]
-        for _name in _names:
-            with open(_name, "w") as f:
-                f.write("no image file")
-        with self.assertRaises(FileReadError):
+    if unreadable == [0, 1]:
+        with pytest.raises(FileReadError):
             app.multiprocessing_func(None)
-
-    def test_multiprocessing_func__both_files_readable(self):
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app._config["latest_file"] = _names[1]
-        app._config["2nd_latest_file"] = _names[0]
+    else:
+        _iref = 0 if 1 in unreadable else 1
         _index, _fname = app.multiprocessing_func(None)
-        self.assertEqual(_fname, _names[1])
-        self.assertEqual(app._config["shared_memory"]["width"].value, self._shape[1])
-        self.assertEqual(app._config["shared_memory"]["height"].value, self._shape[0])
-        self.assertTrue(
-            np.allclose(
-                app._shared_array[: self._shape[0], : self._shape[1]],
-                np.load(_names[1]),
-            )
+        assert _fname == _names[_iref]
+        assert app._config["shared_memory"]["width"].value == _IMG_SHAPE[1]
+        assert app._config["shared_memory"]["height"].value == _IMG_SHAPE[0]
+        assert np.allclose(
+            app._shared_array[: _IMG_SHAPE[0], : _IMG_SHAPE[1]],
+            np.load(_names[_iref]),
         )
 
-    def test_multiprocessing_func__with_mask(self):
-        _names = self.create_pattern_files(n=2)
-        self.create_temp_mask_file()
-        app = self.create_default_app()
-        app._det_mask = self._mask
-        app._config["latest_file"] = _names[1]
-        _index, _fname = app.multiprocessing_func(None)
-        _arr = app._shared_array[: self._shape[0], : self._shape[1]]
-        self.assertTrue((_arr[self._mask] == 0).all())
 
-    def test_multiprocessing_func__with_bg_file(self):
-        _bg = np.ones(self._shape)
-        _bg_fname = os.path.join(self._path, "bg.npy")
-        np.save(_bg_fname, _bg)
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app.set_param_value("use_bg_file", True)
-        app.set_param_value("use_detector_mask", False)
-        app.set_param_value("bg_file", _bg_fname)
-        app._config["latest_file"] = _names[1]
-        app.prepare_run()
-        app._det_mask = self._mask
-        _index, _fname = app.multiprocessing_func(None)
-        _arr = app._shared_array[: self._shape[0], : self._shape[1]]
-        self.assertTrue((_arr[self._mask] <= 0).all())
+def test_multiprocessing_func__with_mask(empty_temp_path, app, mask_file, mask):
+    _names = create_pattern_files(empty_temp_path, n=2)
+    _mask_val = 42.1
+    app.set_param_value("use_detector_mask", True)
+    app.set_param_value("detector_mask_file", mask_file)
+    app.set_param_value("detector_mask_val", _mask_val)
+    app.prepare_run()
+    app._config["latest_file"] = _names[1]
+    _index, _fname = app.multiprocessing_func(None)
+    _arr = app._shared_array[: _IMG_SHAPE[0], : _IMG_SHAPE[1]]
+    assert np.allclose(_arr[mask], _mask_val)
 
-    def test_multiprocessing_func__with_disabled_bg_file(self):
-        _bg = np.ones(self._shape)
-        _bg_fname = os.path.join(self._path, "bg.npy")
-        np.save(_bg_fname, _bg)
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app.set_param_value("bg_file", _bg_fname)
-        app._config["latest_file"] = _names[1]
-        _index, _fname = app.multiprocessing_func(None)
-        _arr = app._shared_array[: self._shape[0], : self._shape[1]]
-        self.assertTrue((_arr[self._mask] >= 0).all())
 
-    def test_multiprocessing_store_results(self):
-        _names = self.create_pattern_files(n=2)
-        app = self.create_default_app()
-        app._config["latest_file"] = _names[1]
-        app._config["2nd_latest_file"] = _names[0]
-        _index, _fname = app.multiprocessing_func(None)
-        app.multiprocessing_store_results(_index, _fname)
-        self.assertTrue(
-            np.allclose(app._DirectorySpyApp__current_image, np.load(_names[1]))
-        )
-        self.assertEqual(app._DirectorySpyApp__current_fname, _names[1])
+def test_multiprocessing_func__with_bg_file(empty_temp_path, app):
+    _bg = np.ones(_IMG_SHAPE)
+    _bg_fname = empty_temp_path / "bg.npy"
+    np.save(_bg_fname, _bg)
+    _names = create_pattern_files(empty_temp_path, n=2)
+    app.set_param_value("use_bg_file", True)
+    app.set_param_value("use_detector_mask", False)
+    app.set_param_value("bg_file", _bg_fname)
+    app._config["latest_file"] = _names[1]
+    app.prepare_run()
+    _ref = np.load(_names[1]) - _bg
+    _index, _fname = app.multiprocessing_func(None)
+    _arr = app._shared_array[: _IMG_SHAPE[0], : _IMG_SHAPE[1]]
+    assert np.allclose(_arr, _ref)
 
-    def test_image_property(self):
-        app = self.create_default_app()
-        _data = np.random.random(self._shape)
-        app._DirectorySpyApp__current_image = _data
-        self.assertTrue(np.allclose(app.image, _data))
 
-    def test_filename_property(self):
-        _name = get_random_string(12)
-        app = self.create_default_app()
-        app._DirectorySpyApp__current_fname = _name
-        self.assertEqual(_name, app.filename)
+def test_multiprocessing_store_results(empty_temp_path, app):
+    _names = create_pattern_files(empty_temp_path, n=2)
+    app._config["latest_file"] = _names[1]
+    app._config["2nd_latest_file"] = _names[0]
+    _index, _fname = app.multiprocessing_func(None)
+    app.multiprocessing_store_results(_index, _fname)
+    assert np.allclose(app._DirectorySpyApp__current_image, np.load(_names[1]))
+    assert app._DirectorySpyApp__current_fname == _names[1]
+
+
+def test_image_property(app):
+    _data = np.random.random(_IMG_SHAPE)
+    app._DirectorySpyApp__current_image = _data
+    assert np.allclose(app.image, _data)
+
+
+def test_filename_property(app):
+    _name = get_random_string(12)
+    app._DirectorySpyApp__current_fname = _name
+    assert _name == app.filename
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main()

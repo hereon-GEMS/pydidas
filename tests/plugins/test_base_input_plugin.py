@@ -47,7 +47,7 @@ _DUMMY_SHAPE_1d = (145,)
 SCAN = ScanContext()
 
 
-class TestInputPlugin(InputPlugin):
+class _TestInputPlugin(InputPlugin):
     output_data_label = "Test data"
     output_data_unit = "some counts"
 
@@ -184,7 +184,7 @@ def test_get_filename(offset, delta, frame_index, images_per_file, reset_scan):
     _input_fname = "test_name_{index:03d}.h5"
     SCAN.set_param_value("pattern_number_offset", offset)
     SCAN.set_param_value("pattern_number_delta", delta)
-    plugin = TestInputPlugin(filename=_input_fname)
+    plugin = _TestInputPlugin(filename=_input_fname)
     plugin.set_param_value("_counted_images_per_file", images_per_file)
     _fname = plugin.get_filename(frame_index)
     _target_index = (frame_index // images_per_file) * delta + offset
@@ -196,7 +196,7 @@ def test_input_available__file_exists_and_readable(temp_dir_w_file, ext, reset_s
     _data = np.zeros((10, 10))
     _fname = temp_dir_w_file / f"test_dummy.{ext}"
     export_data(_fname, _data, overwrite=True)
-    plugin = TestInputPlugin(filename=_fname)
+    plugin = _TestInputPlugin(filename=_fname)
     plugin.pre_execute()
     assert plugin.input_available(5)
 
@@ -206,7 +206,7 @@ def test_input_available__file_exists_w_no_data(temp_dir_w_file, ext, reset_scan
     _fname = temp_dir_w_file / f"test_empty_dummy.{ext}"
     with open(_fname, "wb") as f:
         f.write(b"")
-    plugin = TestInputPlugin(filename=_fname)
+    plugin = _TestInputPlugin(filename=_fname)
     plugin.get_frame = plugin.read_frame
     plugin.pre_execute()
     assert not plugin.input_available(5)
@@ -230,7 +230,7 @@ def test_execute__single(reset_scan, ordinal, multi_frame, i_per_point, output_d
     SCAN.set_param_value("scan_frames_per_point", 1)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
-    plugin = TestInputPlugin(ndim=output_dim)
+    plugin = _TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
     assert _data.shape == (_DUMMY_SHAPE if output_dim == 2 else _DUMMY_SHAPE_1d)
@@ -249,7 +249,7 @@ def test_execute__multiple_frames(
     SCAN.set_param_value("scan_frames_per_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", multi_frame)
-    plugin = TestInputPlugin(ndim=output_dim)
+    plugin = _TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
     _ref = plugin.get_frame(ordinal)[0].property_dict
@@ -284,7 +284,7 @@ def test_execute__multiple_frame_stack(
     SCAN.set_param_value("scan_frames_per_point", n_frames)
     SCAN.set_param_value("frame_indices_per_scan_point", i_per_point)
     SCAN.set_param_value("scan_multi_frame_handling", "Stack")
-    plugin = TestInputPlugin(ndim=output_dim)
+    plugin = _TestInputPlugin(ndim=output_dim)
     plugin.pre_execute()
     _data, _ = plugin.execute(ordinal)
     _ref = plugin.get_frame(ordinal)[0].property_dict
@@ -306,7 +306,7 @@ def test_execute__multiple_frame_stack(
 
 
 def test_copy():
-    plugin = TestInputPlugin()
+    plugin = _TestInputPlugin()
     copy = plugin.copy()
     assert plugin._SCAN == SCAN
     assert copy._SCAN == SCAN

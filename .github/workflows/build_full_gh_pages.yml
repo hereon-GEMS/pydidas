@@ -25,6 +25,8 @@ concurrency:
 jobs:
   create_docs:
     runs-on: ubuntu-latest
+    outputs:
+        publish_gh_pages: ${{ steps.check_gh_pages_publish.outputs.PUBLISH_GH_PAGES }}
     env:
       CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
       CI_COMMIT_AUTHOR: Continuous Integration
@@ -59,18 +61,25 @@ jobs:
         git checkout gh-pages-version-snapshots -- stable_version.txt
         echo "STABLE_VERSION=$(cat stable_version.txt)" >> $GITHUB_OUTPUT
         rm stable_version.txt
-    - name: Exit on push to master if version differs (i.e. new release)
-      id: exit_on_master_push_w_new_release
-      if: ${{ startsWith(github.ref, 'refs/heads/') }}
+    # Check if the version was incremented on master branch. If yes, set a flag
+    # to build the docs only without publishing to gh-pages.
+    # Publication will happen for both the dev and the new release version when
+    # the pipeline is triggered by the new tag.
+    - name: Check Github page publishing
+      id: check_gh_pages_publish
       run: |
         STABLE_VERSION="${{ steps.fetch_stable_version.outputs.STABLE_VERSION }}"
         THIS_VERSION=$(grep '^__version__' src/pydidas/version.py | \
         awk -F'"' '{print $2}')
-        if [[ "$STABLE_VERSION" != "$THIS_VERSION" ]]; then
-          echo "The version was incremented and a master branch commit was detected. \
-          The documentation will only be updated for the newly released \
-          version." >> $GITHUB_STEP_SUMMARY
-          exit 0
+        echo "This version: $THIS_VERSION"
+        echo "Stable version: $STABLE_VERSION"
+        echo "The github.ref is: ${{ github.ref }}"
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "PUBLISH_GH_PAGES=true" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.ref }}" == refs/heads/* && "$STABLE_VERSION" == "$THIS_VERSION" ]]; then
+          echo "PUBLISH_GH_PAGES=true" >> $GITHUB_OUTPUT
+        else
+          echo "PUBLISH_GH_PAGES=false" >> $GITHUB_OUTPUT
         fi
     - name: Extract version
       id: extract_version
@@ -90,7 +99,7 @@ jobs:
       run: |
         STABLE_VERSION="${{ steps.fetch_stable_version.outputs.STABLE_VERSION }}"
         THIS_VERSION="${{ steps.extract_version.outputs.THIS_VERSION }}"
-        if [[ "$STABLE_VERSION" != "$THIS_VERSION" ]]; then
+        if [[ "$STABLE_VERSION" == "$THIS_VERSION" ]]; then
           echo "The pydidas.version for the new git tag is the same as the stable \
           version. Please update the version in pydidas" >> $GITHUB_STEP_SUMMARY
           exit 1
@@ -153,6 +162,7 @@ jobs:
 
   deploy_docs:
     needs: create_docs
+    if: ${{ needs.create_docs.outputs.publish_gh_pages == 'true' }}
     permissions:
       pages: write
       id-token: write

@@ -1,9 +1,13 @@
 [
     {
-        "name": "latest release (25.05.16)",
-        "version": "25.05.16",
-        "url": "https://hereon-gems.github.io/pydidas/versions/25.05.16/",
+        "name": "latest release (25.10.28)",
+        "version": "25.10.28",
+        "url": "https://hereon-gems.github.io/pydidas/versions/25.10.28/",
         "preferred": true
+    },
+    {
+        "version": "25.05.16",
+        "url": "https://hereon-gems.github.io/pydidas/versions/25.05.16/"
     },
     {
         "version": "25.04.08",

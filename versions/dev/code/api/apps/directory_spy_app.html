@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=89eb8f5e"></script>
+    <script src="../../../_static/documentation_options.js?v=cc772b7d"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"25.05.16"';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"25.10.28"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="ExecuteWorkflowApp" href="execute_workflow_app.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="25.05.16" />
+  <meta name="docsearch:version" content="25.10.28" />
   </head>
   
   
@@ -529,6 +529,12 @@ subclasses full control over args and kwargs.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.cleanup" title="Link to this definition">#</a></dt>
+<dd><p>Cleanup the DirectorySpyApp.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
@@ -574,8 +580,7 @@ attributes marked in the classes clone_mode attribute.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.deleteLater">
 <span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.deleteLater" title="Link to this definition">#</a></dt>
-<dd><p>Overwrite the deleteLater method to ensure proper cleanup.</p>
-<p>This method is called by the Qt event loop to delete the app instance.</p>
+<dd><p>Delete the instance of the DirectorySpyApp.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1184,6 +1189,7 @@ the Parameter.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.add_param"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.add_param</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.add_params"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.add_params</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.cleanup"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.cleanup</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.copy"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.deepcopy"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.deepcopy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.define_path_and_name"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.define_path_and_name</span></code></a></li>

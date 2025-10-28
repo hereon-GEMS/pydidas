@@ -57,12 +57,11 @@ class ParameterWidgetsMixIn:
 
     def create_param_widget(self, param: Parameter | str, **kwargs: Any):
         """
-        Add a name label and input widget for a specific parameter to the
-        widget.
+        Add a name label and input widget for a specific parameter to the widget.
 
         Parameters
         ----------
-        param : Parameter |str
+        param : Parameter | str
             A Parameter class instance.
         **kwargs : Any
             Optional keyword arguments. Supported keys are:

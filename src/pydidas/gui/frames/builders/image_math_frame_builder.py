@@ -193,7 +193,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.add_any_widget(
             "file_selector",
-            misc.SelectImageFrameWidget(
+            misc.SelectDataFrameWidget(
                 *cls._frame.params.values(),
                 import_reference="ImageMathFrame__image_import",
             ),

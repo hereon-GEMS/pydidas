@@ -30,14 +30,14 @@ __status__ = "Production"
 from .line_edit_with_icon import *
 from .points_for_beamcenter_widget import *
 from .read_only_text_widget import *
-from .select_image_frame_widget import *
+from .select_data_frame_widget import *
 from .show_integration_roi_params_widget import *
 
 
 __all__ = (
     line_edit_with_icon.__all__
     + points_for_beamcenter_widget.__all__
-    + select_image_frame_widget.__all__
+    + select_data_frame_widget.__all__
     + show_integration_roi_params_widget.__all__
     + read_only_text_widget.__all__
 )
@@ -45,7 +45,7 @@ __all__ = (
 del (
     line_edit_with_icon,
     points_for_beamcenter_widget,
-    select_image_frame_widget,
+    select_data_frame_widget,
     show_integration_roi_params_widget,
     read_only_text_widget,
 )

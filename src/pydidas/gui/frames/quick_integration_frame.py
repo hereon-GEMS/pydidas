@@ -69,10 +69,6 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_pxsize",
         "beamcenter_x",
         "beamcenter_y",
-        "filename",
-        "hdf5_key",
-        "hdf5_frame",
-        "hdf5_slicing_axis",
         "overlay_color",
         "integration_direction",
         "azi_npoint",
@@ -80,7 +76,6 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_model",
     )
     params_not_to_restore = [
-        "filename",
         "integration_direction",
         "azi_npoint",
         "rad_npoint",
@@ -125,8 +120,6 @@ class QuickIntegrationFrame(BaseFrame):
                 _kwargs["diffraction_exp"] = self._EXP
             if "input_beamcenter_points" in _args:
                 _args = _args + (self._widgets["input_plot"],)
-            if "file_selector" in _args:
-                _args += tuple(self.params.values())
             if "roi_selector" in _args:
                 _kwargs["plugin"] = self._plugins["generic"]
             getattr(self, _method)(*_args, **_kwargs)
@@ -201,25 +194,6 @@ class QuickIntegrationFrame(BaseFrame):
         self.param_widgets["detector_mask_file"].sig_new_value.connect(
             self._new_mask_file_selection
         )
-
-    def finalize_ui(self) -> None:
-        """
-        Finalizes the UI and restore the SelectImageFrameWidgets params.
-        """
-        self._widgets["file_selector"].restore_param_widgets()
-
-    def restore_state(self, state: dict[str, Any]) -> None:
-        """
-        Restore the GUI state.
-
-        Parameters
-        ----------
-        state : dict
-            The frame's state dictionary.
-        """
-        BaseFrame.restore_state(self, state)
-        if self._config["built"]:
-            self._widgets["file_selector"].restore_param_widgets()
 
     @QtCore.Slot(str, dict)
     def open_image(self, filename: str | Path, open_image_kwargs: dict) -> None:

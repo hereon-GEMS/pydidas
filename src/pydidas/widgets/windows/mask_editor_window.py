@@ -36,7 +36,7 @@ from pydidas.core.utils import update_size_policy
 from pydidas.data_io import import_data
 from pydidas.widgets import parameter_config, silx_plot
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import SelectImageFrameWidget
+from pydidas.widgets.misc import SelectDataFrameWidget
 
 
 class MaskEditorWindow(PydidasWindow):
@@ -73,7 +73,7 @@ class MaskEditorWindow(PydidasWindow):
         )
         self.add_any_widget(
             "file_selector",
-            SelectImageFrameWidget(*self.params.values()),
+            SelectDataFrameWidget(),
             font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["param_frame"],
         )

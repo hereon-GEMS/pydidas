@@ -39,7 +39,7 @@ from pydidas.data_io import import_data
 from pydidas.widgets.controllers import ManuallySetIntegrationRoiController
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
+from pydidas.widgets.misc import SelectDataFrameWidget, ShowIntegrationRoiParamsWidget
 from pydidas.widgets.scroll_area import ScrollArea
 from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
@@ -137,10 +137,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         )
         self.add_any_widget(
             "file_selector",
-            SelectImageFrameWidget(
-                *self.params.values(),
-                import_reference="SelectIntegrationRegion__import",
-            ),
+            SelectDataFrameWidget(import_reference="SelectIntegrationRegion__import"),
             parent_widget=self._widgets["left_container"],
         )
 

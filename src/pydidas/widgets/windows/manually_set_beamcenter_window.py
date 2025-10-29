@@ -40,7 +40,7 @@ from pydidas.data_io import import_data
 from pydidas.widgets.controllers import ManuallySetBeamcenterController
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import PointsForBeamcenterWidget, SelectImageFrameWidget
+from pydidas.widgets.misc import PointsForBeamcenterWidget, SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
@@ -124,7 +124,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
 
         self.add_any_widget(
             "image_selection",
-            SelectImageFrameWidget(
+            SelectDataFrameWidget(
                 *self.get_params(
                     "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
                 ),

@@ -136,25 +136,6 @@ class ImageMathFrame(BaseFrame):
         )
         self._widgets["but_export"].clicked.connect(self._export_image)
 
-    def finalize_ui(self):
-        """
-        Finalizes the UI and restore the SelectImageFrameWidgets params.
-        """
-        self._widgets["file_selector"].restore_param_widgets()
-
-    def restore_state(self, state: dict):
-        """
-        Restore the GUI state.
-
-        Parameters
-        ----------
-        state : dict
-            The frame's state dictionary.
-        """
-        BaseFrame.restore_state(self, state)
-        if self._config["built"]:
-            self._widgets["file_selector"].restore_param_widgets()
-
     @QtCore.Slot(str, dict)
     def open_image(self, filename: str, open_kwargs: dict):
         """

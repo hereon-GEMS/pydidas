@@ -55,7 +55,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     A widget to select a data point on a specific axis.
     """
 
-    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["multiline_layout"]
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["multiline"]
 
     sig_new_slicing = QtCore.Signal(int, str)
     sig_display_choice_changed = QtCore.Signal(int, str)

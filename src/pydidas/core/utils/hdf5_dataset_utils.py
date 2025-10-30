@@ -478,7 +478,7 @@ def create_nx_entry_groups(
         _group = parent[group_name]
         if _group.attrs.get("NX_class", "") != group_type:
             raise ValueError(
-                f"Error when creating the group {group_name}: The group already exists"
+                f"Error when creating the group {group_name}: The group already exists "
                 f"but is not of specified type {group_type} (existing group: "
                 f"{_group.attrs.get('NX_class')})."
             )

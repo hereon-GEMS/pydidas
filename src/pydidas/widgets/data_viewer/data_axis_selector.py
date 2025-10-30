@@ -55,7 +55,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     A widget to select a data point on a specific axis.
     """
 
-    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["multiline"]
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + [
+        "multiline",
+        "allow_axis_use_modification",
+    ]
 
     sig_new_slicing = QtCore.Signal(int, str)
     sig_display_choice_changed = QtCore.Signal(int, str)
@@ -76,6 +79,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._all_choices = ["slice at index"]
         self._stored_configs = {}
         self._use_multiline = kwargs.get("multiline", False)
+        self._allow_ax_use_mod = kwargs.get("allow_axis_use_modification", True)
         self._last_slicing_at_index = True
         self._create_widgets()
         self._connect_signals()
@@ -104,6 +108,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 _nitems = self.layout().count()
                 _column = self.layout().getItemPosition(_nitems - 1)[1]
                 self.layout().setColumnStretch(_column, 8)
+        self._widgets["combo_axis_use"].setVisible(self._allow_ax_use_mod)
 
     def _connect_signals(self):
         """
@@ -228,6 +233,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         unit: str = "",
         npoints: int | None = None,
         ndim: int | None = None,
+        dim_label: str | None = None,
     ):
         """
         Set the metadata for the axis.
@@ -246,6 +252,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ndim : int, optional
             The number of dimensions in the data. This is only required if the
             generic choices should be hidden.
+        dim_label : str, optional
+            The label for the dimension. If given, this will override the
+            generic label of "Dim {index}".
         """
         if data_range is None:
             if npoints is None:
@@ -261,10 +270,11 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         _max_length = 20 if not self._use_multiline else 45
         if len(self._data_label) > _max_length:
             self._data_label = self._data_label[: _max_length - 4] + " ..."
-        self._widgets["label_axis"].setText(
-            f"Dim {self._axis_index}"
-            + (f" ({self._data_label})" if len(self._data_label) > 0 else "")
-        )
+        if not dim_label:
+            dim_label = f"Dim {self._axis_index}" + (
+                f" ({self._data_label})" if len(self._data_label) > 0 else ""
+            )
+        self._widgets["label_axis"].setText(dim_label)
         self._widgets["label_unit"].setText(
             f" [{self._data_unit}]" if len(self._data_unit) > 0 else ""
         )
@@ -343,6 +353,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 and _ax_use in GENERIC_AXIS_SELECTOR_CHOICES
             ):
                 self._move_to_index(_slice.start)
+                self._move_to_index(_slice.start)
             else:
                 self._current_slice = _slice
                 self._widgets["edit_range_index"].setText(
@@ -392,7 +403,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             _range_selection == "select range by data values" and _show_range
         )
         self._widgets["label_single_point"].setVisible(self.npoints == 1)
-        self._widgets["combo_axis_use"].setVisible(self.npoints > 1)
+        self._widgets["combo_axis_use"].setVisible(
+            self.npoints > 1 and self._allow_ax_use_mod
+        )
         self._update_slice_from_choice(use_selection)
         self.sig_display_choice_changed.emit(self._axis_index, use_selection)
 

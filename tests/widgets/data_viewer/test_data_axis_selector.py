@@ -52,7 +52,8 @@ def app():
 def selector(request):
     _kwargs = getattr(request, "param", {})
     index = _kwargs.get("index", 0)
-    _selector = DataAxisSelector(index)
+    _ax_use = _kwargs.get("allow_axis_use_modification", True)
+    _selector = DataAxisSelector(index, allow_axis_use_modification=_ax_use)
     yield _selector
     _selector.deleteLater()
 
@@ -79,13 +80,20 @@ def _get_spy_results(spy):
         return [spy[i] for i in range(len(spy))]
 
 
+@pytest.mark.parametrize(
+    "selector",
+    [{"allow_axis_use_modification": True}, {"allow_axis_use_modification": False}],
+    indirect=True,
+)
 def test_init(selector):
+    selector.show()
     assert selector._data_range is None
     assert selector._data_unit == ""
     assert selector._data_label == ""
     assert selector._current_slice == slice(0, 1)
     for _widget in ["label_axis", "combo_axis_use"]:
         assert isinstance(selector._widgets[_widget], QtWidgets.QWidget)
+    assert selector._widgets["combo_axis_use"].isVisible() == selector._allow_ax_use_mod
 
 
 def test_npoints(selector):
@@ -121,14 +129,18 @@ def test_current_slice(selector):
     assert selector.current_slice == slice(0, 1)
 
 
-def test_set_axis_metadata(selector, data_range):
+@pytest.mark.parametrize("dim_label", [None, "Custom label"])
+def test_set_axis_metadata(selector, data_range, dim_label):
     unit = "m"
     label = "Distance"
-    selector.set_axis_metadata(data_range, label, unit)
+    selector.set_axis_metadata(data_range, label, unit, dim_label=dim_label)
     assert np.array_equal(selector._data_range, _DATA_RANGE)
     assert selector._data_label == label
     assert selector._data_unit == unit
     assert selector._stored_configs == {}
+    assert selector._widgets["label_axis"].text() == (
+        dim_label if dim_label is not None else f"Dim 0 ({label})"
+    )
 
 
 def test_set_axis_metadata__update_range(selector):

@@ -237,6 +237,35 @@ def test_define_additional_choices__w_ndim_set(selector, data_range, ndims):
 
 
 @pytest.mark.parametrize(
+    "choice, value, expected_index",
+    [
+        ["slice at index", -3, 0],
+        ["slice at index", _N_POINTS // 2, _N_POINTS // 2],
+        ["slice at index", _N_POINTS + 2, _N_POINTS - 1],
+        ["slice at data value", _DATA_RANGE.min() - 2, 0],
+        ["slice at data value", _DATA_RANGE[_N_POINTS // 2], _N_POINTS // 2],
+        ["slice at data value", _DATA_RANGE.max() + 2, _N_POINTS - 1],
+    ],
+)
+def test_set_to_value(
+    selector, data_range, choice, value, expected_index, spy_new_slicing
+):
+    selector.show()
+    selector.set_axis_metadata(data_range, "dummy", "unit")
+    selector.display_choice = choice
+    selector.set_to_value(value)
+    _slicing_res = _get_spy_results(spy_new_slicing)
+    assert len(_slicing_res) == 0
+    assert selector._widgets["slider"].sliderPosition() == expected_index
+    if choice == "slice at index":
+        assert selector._widgets["edit_index"].text() == str(expected_index)
+    elif choice == "slice at data value":
+        assert (
+            selector._widgets["edit_data"].text() == f"{data_range[expected_index]:.4f}"
+        )
+
+
+@pytest.mark.parametrize(
     "config",
     [
         ("slice at index", "use full axis", slice(4, 5)),

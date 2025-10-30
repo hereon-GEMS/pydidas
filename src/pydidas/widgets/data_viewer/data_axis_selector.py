@@ -29,6 +29,7 @@ __all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
 
 
 from functools import partial
+from numbers import Integral, Real
 from typing import Any
 
 import numpy as np
@@ -340,6 +341,30 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         if choices in self._stored_configs:
             self._restore_old_config(choices)
 
+    def set_to_value(self, value: Integral | Real):
+        """
+        Set the current index / data value to the input value.
+
+        Parameters
+        ----------
+        value : Integral | Real
+            The index or data value to set.
+        """
+        if self.display_choice == "slice at index":
+            _index = max(0, min(self._npoints - 1, int(value)))
+        elif self.display_choice == "slice at data value":
+            if self._data_range is None:
+                raise UserConfigError(
+                    "Cannot set to data value when no data range is defined."
+                )
+            _index = np.argmin(np.abs(self._data_range - float(value)))
+        else:
+            raise UserConfigError(
+                "Cannot set to value when a range-selecting display choice is used."
+            )
+        with QtCore.QSignalBlocker(self):
+            self._move_to_index(_index)
+
     def _restore_old_config(self, choices: str):
         """
         Restore the configuration, based on the available choices.
@@ -352,7 +377,6 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 _slice.stop - _slice.start == 1
                 and _ax_use in GENERIC_AXIS_SELECTOR_CHOICES
             ):
-                self._move_to_index(_slice.start)
                 self._move_to_index(_slice.start)
             else:
                 self._current_slice = _slice

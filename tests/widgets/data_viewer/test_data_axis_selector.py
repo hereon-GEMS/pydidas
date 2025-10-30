@@ -85,6 +85,7 @@ def _get_spy_results(spy):
     [{"allow_axis_use_modification": True}, {"allow_axis_use_modification": False}],
     indirect=True,
 )
+@pytest.mark.gui
 def test_init(selector):
     selector.show()
     assert selector._data_range is None
@@ -96,33 +97,39 @@ def test_init(selector):
     assert selector._widgets["combo_axis_use"].isVisible() == selector._allow_ax_use_mod
 
 
+@pytest.mark.gui
 def test_npoints(selector):
     selector._npoints = 42
     assert selector.npoints == 42
 
 
+@pytest.mark.gui
 def test_available_choices(selector):
     assert selector.available_choices == ["slice at index"]
 
 
+@pytest.mark.gui
 def test_display_choice(selector):
     selector.define_additional_choices("choice1;;choice2")
     selector._widgets["combo_axis_use"].setCurrentText("choice2")
     assert selector.display_choice == "choice2"
 
 
+@pytest.mark.gui
 def test_display_choice_setter(selector):
     selector.define_additional_choices("choice1;;choice2")
     selector.display_choice = "choice1"
     assert selector._widgets["combo_axis_use"].currentText() == "choice1"
 
 
+@pytest.mark.gui
 def test_display_choice_setter__invalid(selector):
     selector.define_additional_choices("choice1;;choice2")
     with pytest.raises(ValueError):
         selector.display_choice = "choice3"
 
 
+@pytest.mark.gui
 def test_current_slice(selector):
     selector._current_slice = slice(4, 6)
     selector.set_axis_metadata(np.arange(10), "dummy", "unit")
@@ -130,6 +137,7 @@ def test_current_slice(selector):
 
 
 @pytest.mark.parametrize("dim_label", [None, "Custom label"])
+@pytest.mark.gui
 def test_set_axis_metadata(selector, data_range, dim_label):
     unit = "m"
     label = "Distance"
@@ -143,6 +151,7 @@ def test_set_axis_metadata(selector, data_range, dim_label):
     )
 
 
+@pytest.mark.gui
 def test_set_axis_metadata__update_range(selector):
     _range1 = np.arange(12)
     _range2 = np.arange(25)
@@ -153,6 +162,7 @@ def test_set_axis_metadata__update_range(selector):
     assert selector.current_slice == slice(0, _range2.size)
 
 
+@pytest.mark.gui
 def test_set_axis_metadata__len_1(selector):
     selector.show()
     _range1 = np.arange(1)
@@ -166,6 +176,7 @@ def test_set_axis_metadata__len_1(selector):
     assert not selector._widgets["combo_axis_use"].isVisible()
 
 
+@pytest.mark.gui
 def test_set_axis_metadata__w_choices(selector):
     _range1 = np.arange(5)
     selector.define_additional_choices("choice1;;choice2")
@@ -176,11 +187,13 @@ def test_set_axis_metadata__w_choices(selector):
     assert selector.isEnabled()
 
 
+@pytest.mark.gui
 def test_set_axis_metadata__no_data_range_no_npoints(selector):
     with pytest.raises(ValueError):
         selector.set_axis_metadata(None, "distance", "m")
 
 
+@pytest.mark.gui
 def test_set_axis_metadata__no_data_range(selector):
     selector.set_axis_metadata(None, "distance", "m", npoints=42)
     assert selector._npoints == 42
@@ -190,6 +203,7 @@ def test_set_axis_metadata__no_data_range(selector):
     assert selector._stored_configs == {}
 
 
+@pytest.mark.gui
 def test_define_additional_choices(selector):
     choices = "choice1;;choice2"
     selector.define_additional_choices(choices)
@@ -205,6 +219,7 @@ def test_define_additional_choices(selector):
     assert combo_items == expected_choices
 
 
+@pytest.mark.gui
 def test_define_additional_choices__w_data_range_set(selector, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     choices = "choice1;;choice2"
@@ -221,6 +236,7 @@ def test_define_additional_choices__w_data_range_set(selector, data_range):
 @pytest.mark.parametrize(
     "ndims", [[None, True], [1, False], [2, False], [3, True], [4, True]]
 )
+@pytest.mark.gui
 def test_define_additional_choices__w_ndim_set(selector, data_range, ndims):
     _ndim, _expected_generic_choices = ndims
     selector.set_axis_metadata(data_range, "dummy", "unit", ndim=_ndim)
@@ -247,6 +263,7 @@ def test_define_additional_choices__w_ndim_set(selector, data_range, ndims):
         ["slice at data value", _DATA_RANGE.max() + 2, _N_POINTS - 1],
     ],
 )
+@pytest.mark.gui
 def test_set_to_value(
     selector, data_range, choice, value, expected_index, spy_new_slicing
 ):
@@ -275,6 +292,7 @@ def test_set_to_value(
         ("choice1", "select range by data values", slice(2, 8)),
     ],
 )
+@pytest.mark.gui
 def test_restore_old_config(selector, data_range, config, spy_new_slicing):
     _key, _range_choice, _slice = config
     selector.set_axis_metadata(data_range, "dummy", "unit")
@@ -290,6 +308,7 @@ def test_restore_old_config(selector, data_range, config, spy_new_slicing):
 @pytest.mark.parametrize(
     "choice", GENERIC_AXIS_SELECTOR_CHOICES + ["choice1", "choice2"]
 )
+@pytest.mark.gui
 def test_handle_new_axis_use(
     selector, data_range, choice, slicing_choice, spy_display_choice, spy_new_slicing
 ):
@@ -319,6 +338,7 @@ def test_handle_new_axis_use(
 
 
 @pytest.mark.parametrize("selector", [{"index": 7}], indirect=True)
+@pytest.mark.gui
 def test_slider_changed(selector, data_range, spy_new_slicing):
     _pos = 5
     selector.show()
@@ -333,6 +353,7 @@ def test_slider_changed(selector, data_range, spy_new_slicing):
 
 @pytest.mark.parametrize("selector", [{"index": 6}], indirect=True)
 @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
+@pytest.mark.gui
 def test_manual_index_changed(selector, data_range, spy_new_slicing, case):
     _range_index = np.mod(case[1], data_range.size)
     _input = _range_index + case[0]
@@ -349,6 +370,7 @@ def test_manual_index_changed(selector, data_range, spy_new_slicing, case):
 
 @pytest.mark.parametrize("selector", [{"index": 42}], indirect=True)
 @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
+@pytest.mark.gui
 def test_manual_data_value_changed(selector, data_range, spy_new_slicing, case):
     _range_index = np.mod(case[1], data_range.size)
     _expectation = data_range[_range_index]
@@ -366,6 +388,7 @@ def test_manual_data_value_changed(selector, data_range, spy_new_slicing, case):
     assert _results[0] == [42, f"{_range_index}:{_range_index + 1}"]
 
 
+@pytest.mark.gui
 def test_move_to_index__no_change(selector, data_range, spy_new_slicing):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._current_slice = slice(7, 8)
@@ -374,6 +397,7 @@ def test_move_to_index__no_change(selector, data_range, spy_new_slicing):
     assert _results == []
 
 
+@pytest.mark.gui
 def test_move_to_index__with_custom_choice(selector, data_range, spy_new_slicing):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1")
@@ -383,6 +407,7 @@ def test_move_to_index__with_custom_choice(selector, data_range, spy_new_slicing
 
 
 @pytest.mark.parametrize("selector", [{"index": 12}], indirect=True)
+@pytest.mark.gui
 def test_move_to_index(selector, data_range, spy_new_slicing):
     _index = 7
     selector.set_axis_metadata(data_range, "dummy", "unit")
@@ -395,6 +420,7 @@ def test_move_to_index(selector, data_range, spy_new_slicing):
 
 
 @pytest.mark.parametrize("testcase", [["slice at index", 3, 4]])  # ["choice1", 0, 12],
+@pytest.mark.gui
 def test__slice_after_changing_selection(selector, testcase):
     choice, start, stop = testcase
     selector.set_axis_metadata(None, npoints=12)
@@ -412,6 +438,7 @@ def test__slice_after_changing_selection(selector, testcase):
     "axis_range_selection",
     ["use full axis", "select range by indices", "select range by data values"],
 )
+@pytest.mark.gui
 def test_handle_range_selection(selector, data_range, axis_range_selection):
     selector.define_additional_choices("choice1;;choice2")
     selector.set_axis_metadata(data_range, "dummy", "unit")
@@ -435,6 +462,7 @@ def test_handle_range_selection(selector, data_range, axis_range_selection):
         ["9:24", 9, 20],
     ],
 )
+@pytest.mark.gui
 def test_handle_new_index_range_selection__correct_input(
     selector, input, spy_new_slicing, data_range
 ):
@@ -452,6 +480,7 @@ def test_handle_new_index_range_selection__correct_input(
 
 
 @pytest.mark.parametrize("input", ["0:", "", ":-3", "a:5"])
+@pytest.mark.gui
 def test_handle_new_index_range_selection__incorrect_input(
     selector, input, spy_new_slicing, data_range
 ):
@@ -470,6 +499,7 @@ def test_handle_new_index_range_selection__incorrect_input(
         [f"{_DATA_RANGE[9] - 0.05}:{_DATA_RANGE[19] + 12} ", 9, 20],
     ],
 )
+@pytest.mark.gui
 def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["edit_range_data"].setText(input[0])
@@ -486,6 +516,7 @@ def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_
 
 
 @pytest.mark.parametrize("input", ["0.0:", "", ":-3.", "a:5"])
+@pytest.mark.gui
 def test_handle_new_data_range_selection__incorrect_input(
     selector, input, spy_new_slicing, data_range
 ):
@@ -495,6 +526,7 @@ def test_handle_new_data_range_selection__incorrect_input(
         selector._handle_new_data_range_selection()
 
 
+@pytest.mark.gui
 def test_update_slice_from_non_generic_choice__no_data_range_set(selector, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1;;choice2")

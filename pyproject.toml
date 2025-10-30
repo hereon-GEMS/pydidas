@@ -99,9 +99,10 @@ max-complexity = 12
 "app_processor_.py" = ["C901"]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not slow'"
+addopts = "-m 'not slow and not gui'"
 markers = [
     "slow: mark test as slow to run only when '-m slow' is specified",
+    "gui: mark test as GUI test to run only when '-m gui' is specified",
 ]
 filterwarnings = [
     "ignore:Mean of empty slice",

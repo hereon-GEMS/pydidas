@@ -236,6 +236,9 @@ class QuickIntegrationFrame(BaseFrame):
         ]:
             self._widgets[_key].setVisible(is_valid)
         self.toggle_param_widget_visibility("detector_model", is_valid)
+        self._widgets["res_plot"].set_data(None)
+        if not is_valid:
+            self._widgets["input_plot"].clear_plot()
 
     def _update_detector_model(self) -> None:
         """Update the detector model selection based on the input image shape."""

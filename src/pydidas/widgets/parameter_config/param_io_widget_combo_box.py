@@ -138,7 +138,12 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
 
-    def update_choices(self, new_choices: Sequence[Any], selection: str | None = None):
+    def update_choices(
+        self,
+        new_choices: Sequence[Any],
+        selection: str | None = None,
+        emit_signal: bool = True,
+    ) -> None:
         """
         Update the choices of the BaseParamIoWidget in place.
 
@@ -153,6 +158,9 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         selection : str, optional
             The selection to be set after the update. If None, the first
             choice will be selected. Default is None.
+        emit_signal : bool, optional
+            If True, a signal will be emitted after updating the choices.
+            The default is True.
         """
         with QtCore.QSignalBlocker(self):
             self.clear()
@@ -164,5 +172,6 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
                 self.set_value(selection)
             else:
                 self.set_value(new_choices[0])
+        if emit_signal:
             self.emit_signal()
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)

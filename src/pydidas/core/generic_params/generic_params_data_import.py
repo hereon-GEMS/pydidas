@@ -104,6 +104,15 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "allow_None": False,
         "tooltip": "Used only for hdf5 files: The dataset key.",
     },
+    "hdf5_key_str": {
+        "type": str,
+        "default": None,
+        "name": "Hdf5 dataset key",
+        "choices": [None],
+        "unit": "",
+        "allow_None": True,
+        "tooltip": "Used only for hdf5 files: The dataset key.",
+    },
     "hdf5_frame": {
         "type": int,
         "default": 0,
@@ -158,6 +167,21 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "dataset. For example, if the frame has the axes (frame index, x, y), "
             "the slicing axes would be 0. To use the full dataset, set the slicing "
             "axis to `None`. A `None` setting will also ignore the hdf5 frame number "
+            "Parameter."
+        ),
+    },
+    "slicing_axis": {
+        "type": int,
+        "default": 0,
+        "name": "Frame slicing axes",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The slicing axes to identify the frame by its number in the full "
+            "dataset. For example, if the frame has the axes (frame index, x, y), "
+            "the slicing axes would be 0. To use the full dataset, set the slicing "
+            "axis to `None`. A `None` setting will also ignore the frame number "
             "Parameter."
         ),
     },

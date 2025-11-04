@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasLabel"]
 
+from typing import Any
 
 from qtpy import QtWidgets
 
@@ -38,7 +39,7 @@ class PydidasLabel(PydidasWidgetMixin, QtWidgets.QLabel):
     Create a QLabel with automatic font formatting.
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         QtWidgets.QLabel.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
         if "sizePolicy" not in kwargs:

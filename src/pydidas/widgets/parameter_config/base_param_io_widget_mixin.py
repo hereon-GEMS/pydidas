@@ -52,21 +52,6 @@ FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
 FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 
-_TYPE_STRINGS = {
-    "true": True,
-    "false": False,
-    "nan": nan,
-    "none": None,
-}
-_TYPE_CONVERTERS = {
-    numbers.Integral: int,
-    numbers.Real: float,
-    pathlib.Path: pathlib.Path,
-    Hdf5key: Hdf5key,
-    ndarray: NumpyParser,
-}
-
-
 class BaseParamIoWidgetMixIn:
     """
     Base mixin class of widgets for I/O during Parameter editing.
@@ -75,18 +60,85 @@ class BaseParamIoWidgetMixIn:
     ----------
     param : Parameter
         A Parameter instance.
-    **kwargs : dict
-        Any additional kwargs.
+    **kwargs : Any
+        Any additional kwargs. Used keyword arguments are:
+
+        linebreak : bool
+            If True, the sizeHint will be increased to allow for a linebreak.
+            The default is False.
     """
 
     sig_new_value = QtCore.Signal(str)
     sig_value_changed = QtCore.Signal()
 
-    def __init__(self, param: Parameter, **kwargs: dict):
+    _SUPPORTED_TYPE_STRINGS = {"true": True, "false": False, "nan": nan, "none": None}
+    _TYPE_CONVERTERS = {
+        numbers.Integral: int,
+        numbers.Real: float,
+        pathlib.Path: pathlib.Path,
+        Hdf5key: Hdf5key,
+        ndarray: NumpyParser,
+    }
+
+    def __init__(self, param: Parameter, **kwargs: Any):
+        self._linked_param = param
         self._ptype = param.dtype
-        self._allow_None = param.allow_None
         self._old_value = None
         self.__hint_factor = 1 + int(kwargs.get("linebreak", False))
+
+    @property
+    def validator(self) -> QtGui.QValidator | None:
+        """
+        Get the widget's validator based on the Parameter's configuration.
+
+        Returns
+        -------
+        QtGui.QValidator | None
+            The validator for the widget based on the Parameter options.
+            If the Parameter has no specific validator, None is returned.
+        """
+        if self._linked_param.dtype == numbers.Integral:
+            if self._linked_param.allow_None:
+                return QT_REG_EXP_INT_VALIDATOR
+            return QtGui.QIntValidator()
+        elif self._linked_param.dtype == numbers.Real:
+            if self._linked_param.allow_None:
+                return QT_REG_EXP_FLOAT_VALIDATOR
+            return FLOAT_VALIDATOR
+        return None
+
+    def is_special_type_string(self, text: str) -> bool:
+        """
+        Check if the input string is a special type string.
+
+        Parameters
+        ----------
+        text : str
+            The input string.
+
+        Returns
+        -------
+        bool
+            True if the input string is a special type string, False otherwise.
+        """
+        return text.strip().lower() in self._SUPPORTED_TYPE_STRINGS
+
+    def type_from_string(self, text: str) -> Any:
+        """
+        Convert a string to the appropriate datatype.
+
+        Parameters
+        ----------
+        text : str
+            The input string.
+
+        Returns
+        -------
+        Any
+            The input string converted to the appropriate datatype.
+        """
+        _input = text.strip().lower()
+        return self._SUPPORTED_TYPE_STRINGS[_input]
 
     def sizeHint(self) -> QtCore.QSize:  # noqa C0103
         """
@@ -98,35 +150,6 @@ class BaseParamIoWidgetMixIn:
             The sizeHint, depending on the "linebreak" setting.
         """
         return QtCore.QSize(self.__hint_factor * GENERIC_STANDARD_WIDGET_WIDTH, 25)
-
-    def set_validator(self, param: Parameter):
-        """
-        Set the widget's validator based on the Parameter's configuration.
-
-        Note: As this class is a mixin, it does not inherit from the specific
-        QWidget class, so the validator is not defined in this class.
-        This warning is suppressed in the code by disabling the E1101 warning.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The associated Parameter.
-        """
-        if not hasattr(self, "setValidator"):
-            raise UserConfigError(
-                "The set_validator method can only be used with a QWidget "
-                "subclass that has a setValidator method."
-            )
-        if param.dtype == numbers.Integral:
-            if param.allow_None:
-                self.setValidator(QT_REG_EXP_INT_VALIDATOR)  # noqa E1101
-            else:
-                self.setValidator(QtGui.QIntValidator())  # noqa E1101
-        elif param.dtype == numbers.Real:
-            if param.allow_None:
-                self.setValidator(QT_REG_EXP_FLOAT_VALIDATOR)  # noqa E1101
-            else:
-                self.setValidator(FLOAT_VALIDATOR)  # noqa E1101
 
     def get_value_from_text(self, text: str) -> Any:
         """
@@ -143,22 +166,20 @@ class BaseParamIoWidgetMixIn:
             The text converted to the stored datatype (e.g. int, float, path)
             of the associated Parameter.
         """
-        # need to process None, True and False explicitly because bool is a subtype
-        # of int but the strings 'True' and 'False' cannot be converted to int
-        if text.lower() in _TYPE_STRINGS:
-            return _TYPE_STRINGS[text.lower()]
+        if self.is_special_type_string(text):
+            return self.type_from_string(text)
         try:
             if (
                 text == ""
-                and self._allow_None
-                and self._ptype in [numbers.Integral, numbers.Real]
+                and self._linked_param.allow_None
+                and issubclass(self._linked_param.dtype, numbers.Real)
             ):
                 return None
-            if self._ptype in _TYPE_CONVERTERS:
-                return _TYPE_CONVERTERS[self._ptype](text)  # noqa E1136
+            _converter = self._TYPE_CONVERTERS.get(self._linked_param.dtype, None)
+            if _converter is not None:
+                return _converter(text)
         except ValueError as _error:
-            _msg = str(_error)
-            _msg = _msg[0].upper() + _msg[1:]
+            _msg = str(_error).capitalize()
             raise UserConfigError(f'ValueError! {_msg} Input text was "{text}"')
         return text
 

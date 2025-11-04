@@ -84,7 +84,8 @@ def test_axis_setter__out_of_bounds(axis):
 
 def test_axis_setter__w_frame_reset():
     handler = FrameSliceHandler(shape=(3, 4), frame=3, axis=1)
-    handler.axis = 0
+    with pytest.warns(UserWarning):
+        handler.axis = 0
     assert handler.axis == 0
     assert handler.frame == 0
 

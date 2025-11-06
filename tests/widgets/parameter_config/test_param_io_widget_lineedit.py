@@ -58,8 +58,9 @@ def widget_instance(qtbot, param):
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
+    widget.setFocus()
     qtbot.add_widget(widget)
-    qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
+    qtbot.waitUntil(lambda: widget.hasFocus(), timeout=500)
     return widget
 
 
@@ -117,7 +118,6 @@ def test__editing_finished(qtbot):
 def test__lost_focus(qtbot):
     param = Parameter("test_int", int, 5, name="Test Int")
     widget = widget_instance(qtbot, param)
-    widget.setFocus()
     widget.setText("10")
     widget.clearFocus()
     assert widget.current_text == "10"

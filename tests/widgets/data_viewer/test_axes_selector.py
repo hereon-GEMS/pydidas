@@ -41,19 +41,13 @@ from pydidas_qtcore import PydidasQApplication
 _DATA = create_dataset(5, dtype=float)
 
 
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
-
-
 @pytest.fixture
 def selector(request):
     _kwargs = getattr(request, "param", {})
     _selector = AxesSelector()
     yield _selector
     _selector.deleteLater()
+    PydidasQApplication.instance().processEvents()
 
 
 @pytest.fixture

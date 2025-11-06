@@ -26,10 +26,10 @@ __status__ = "Production"
 
 import numpy as np
 import pytest
-from qtpy import QtCore, QtTest, QtWidgets
+from qtpy import QtCore, QtWidgets
 
-from pydidas import IS_QT6
 from pydidas.core import UserConfigError
+from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets.data_viewer.data_axis_selector import (
     GENERIC_AXIS_SELECTOR_CHOICES,
     DataAxisSelector,
@@ -41,43 +41,22 @@ _N_POINTS = 20
 _DATA_RANGE = 0.4 * np.arange(_N_POINTS) - 5
 
 
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
-
-
 @pytest.fixture
 def selector(request):
     _kwargs = getattr(request, "param", {})
     index = _kwargs.get("index", 0)
     _ax_use = _kwargs.get("allow_axis_use_modification", True)
     _selector = DataAxisSelector(index, allow_axis_use_modification=_ax_use)
+    _selector.spy_sig_display_changed = SignalSpy(_selector.sig_display_choice_changed)
+    _selector.spy_sig_new_slicing = SignalSpy(_selector.sig_new_slicing)
     yield _selector
     _selector.deleteLater()
+    PydidasQApplication.instance().processEvents()
 
 
 @pytest.fixture
 def data_range():
     return _DATA_RANGE.copy()
-
-
-@pytest.fixture
-def spy_display_choice(selector):
-    return QtTest.QSignalSpy(selector.sig_display_choice_changed)
-
-
-@pytest.fixture
-def spy_new_slicing(selector):
-    return QtTest.QSignalSpy(selector.sig_new_slicing)
-
-
-def _get_spy_results(spy):
-    if IS_QT6:
-        return [spy.at(i) for i in range(spy.count())]
-    else:
-        return [spy[i] for i in range(len(spy))]
 
 
 @pytest.mark.parametrize(
@@ -264,15 +243,12 @@ def test_define_additional_choices__w_ndim_set(selector, data_range, ndims):
     ],
 )
 @pytest.mark.gui
-def test_set_to_value(
-    selector, data_range, choice, value, expected_index, spy_new_slicing
-):
+def test_set_to_value(selector, data_range, choice, value, expected_index):
     selector.show()
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.display_choice = choice
     selector.set_to_value(value)
-    _slicing_res = _get_spy_results(spy_new_slicing)
-    assert len(_slicing_res) == 0
+    assert selector.spy_sig_new_slicing.n == 0
     assert selector._widgets["slider"].sliderPosition() == expected_index
     if choice == "slice at index":
         assert selector._widgets["edit_index"].text() == str(expected_index)
@@ -293,7 +269,7 @@ def test_set_to_value(
     ],
 )
 @pytest.mark.gui
-def test_restore_old_config(selector, data_range, config, spy_new_slicing):
+def test_restore_old_config(selector, data_range, config):
     _key, _range_choice, _slice = config
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1;;choice2")
@@ -309,9 +285,7 @@ def test_restore_old_config(selector, data_range, config, spy_new_slicing):
     "choice", GENERIC_AXIS_SELECTOR_CHOICES + ["choice1", "choice2"]
 )
 @pytest.mark.gui
-def test_handle_new_axis_use(
-    selector, data_range, choice, slicing_choice, spy_display_choice, spy_new_slicing
-):
+def test_handle_new_axis_use(selector, data_range, choice, slicing_choice):
     selector.show()
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1;;choice2")
@@ -329,24 +303,22 @@ def test_handle_new_axis_use(
     )
     if choice not in GENERIC_AXIS_SELECTOR_CHOICES:
         assert selector._last_slicing_at_index == (slicing_choice == "slice at index")
-    _display_res = _get_spy_results(spy_display_choice)
-    _slicing_res = _get_spy_results(spy_new_slicing)
-    assert len(_display_res) == 2
-    assert _display_res[0][1] == slicing_choice
-    assert _display_res[1][1] == choice
-    assert len(_slicing_res) == 0
+
+    assert selector.spy_sig_display_changed.n == 2
+    assert selector.spy_sig_display_changed.results[0][1] == slicing_choice
+    assert selector.spy_sig_display_changed.results[1][1] == choice
+    assert selector.spy_sig_new_slicing.n == 0
 
 
 @pytest.mark.parametrize("selector", [{"index": 7}], indirect=True)
 @pytest.mark.gui
-def test_slider_changed(selector, data_range, spy_new_slicing):
+def test_slider_changed(selector, data_range):
     _pos = 5
     selector.show()
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["slider"].setSliderPosition(_pos)
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0][0] == 7
-    assert _results[0][1] == f"{_pos}:{_pos + 1}"
+    assert selector.spy_sig_new_slicing.results[0][0] == 7
+    assert selector.spy_sig_new_slicing.results[0][1] == f"{_pos}:{_pos + 1}"
     assert selector._widgets["edit_index"].text() == str(_pos)
     assert selector._widgets["edit_data"].text() == f"{data_range[_pos]:.4f}"
 
@@ -354,7 +326,7 @@ def test_slider_changed(selector, data_range, spy_new_slicing):
 @pytest.mark.parametrize("selector", [{"index": 6}], indirect=True)
 @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
 @pytest.mark.gui
-def test_manual_index_changed(selector, data_range, spy_new_slicing, case):
+def test_manual_index_changed(selector, data_range, case):
     _range_index = np.mod(case[1], data_range.size)
     _input = _range_index + case[0]
     selector.set_axis_metadata(data_range, "dummy", "unit")
@@ -364,14 +336,16 @@ def test_manual_index_changed(selector, data_range, spy_new_slicing, case):
     assert selector._widgets["slider"].sliderPosition() == _range_index
     assert selector._widgets["edit_data"].text() == f"{data_range[_range_index]:.4f}"
     assert selector._widgets["edit_index"].text() == str(_range_index)
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0] == [6, f"{_range_index}:{_range_index + 1}"]
+    assert selector.spy_sig_new_slicing.results[0] == [
+        6,
+        f"{_range_index}:{_range_index + 1}",
+    ]
 
 
 @pytest.mark.parametrize("selector", [{"index": 42}], indirect=True)
 @pytest.mark.parametrize("case", [[-3, 0], [0, 5], [1, -1]])
 @pytest.mark.gui
-def test_manual_data_value_changed(selector, data_range, spy_new_slicing, case):
+def test_manual_data_value_changed(selector, data_range, case):
     _range_index = np.mod(case[1], data_range.size)
     _expectation = data_range[_range_index]
     _value = data_range[_range_index] + case[0]
@@ -384,21 +358,22 @@ def test_manual_data_value_changed(selector, data_range, spy_new_slicing, case):
     )
     assert selector._widgets["edit_data"].text() == f"{_expectation:.4f}"
     assert selector._widgets["edit_index"].text() == str(_range_index)
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0] == [42, f"{_range_index}:{_range_index + 1}"]
+    assert selector.spy_sig_new_slicing.results[0] == [
+        42,
+        f"{_range_index}:{_range_index + 1}",
+    ]
 
 
 @pytest.mark.gui
-def test_move_to_index__no_change(selector, data_range, spy_new_slicing):
+def test_move_to_index__no_change(selector, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._current_slice = slice(7, 8)
     selector._move_to_index(7)
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results == []
+    assert selector.spy_sig_new_slicing.results == []
 
 
 @pytest.mark.gui
-def test_move_to_index__with_custom_choice(selector, data_range, spy_new_slicing):
+def test_move_to_index__with_custom_choice(selector, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector.define_additional_choices("choice1")
     selector.display_choice = "choice1"
@@ -408,18 +383,17 @@ def test_move_to_index__with_custom_choice(selector, data_range, spy_new_slicing
 
 @pytest.mark.parametrize("selector", [{"index": 12}], indirect=True)
 @pytest.mark.gui
-def test_move_to_index(selector, data_range, spy_new_slicing):
+def test_move_to_index(selector, data_range):
     _index = 7
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._move_to_index(_index)
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0] == [12, "7:8"]
+    assert selector.spy_sig_new_slicing.results[0] == [12, "7:8"]
     assert selector._widgets["slider"].sliderPosition() == _index
     assert selector._widgets["edit_data"].text() == f"{data_range[_index]:.4f}"
     assert selector._widgets["edit_index"].text() == str(_index)
 
 
-@pytest.mark.parametrize("testcase", [["slice at index", 3, 4]])  # ["choice1", 0, 12],
+@pytest.mark.parametrize("testcase", [["slice at index", 3, 4], ["choice1", 0, 12]])
 @pytest.mark.gui
 def test__slice_after_changing_selection(selector, testcase):
     choice, start, stop = testcase
@@ -463,14 +437,11 @@ def test_handle_range_selection(selector, data_range, axis_range_selection):
     ],
 )
 @pytest.mark.gui
-def test_handle_new_index_range_selection__correct_input(
-    selector, input, spy_new_slicing, data_range
-):
+def test_handle_new_index_range_selection__correct_input(selector, input, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["edit_range_index"].setText(input[0])
     selector._handle_new_index_range_selection()
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0] == [0, f"{input[1]}:{input[2]}"]
+    assert selector.spy_sig_new_slicing.results[0] == [0, f"{input[1]}:{input[2]}"]
     assert selector._current_slice == slice(input[1], input[2])
     assert selector._widgets["edit_range_index"].text() == f"{input[1]}:{input[2] - 1}"
     assert (
@@ -481,9 +452,7 @@ def test_handle_new_index_range_selection__correct_input(
 
 @pytest.mark.parametrize("input", ["0:", "", ":-3", "a:5"])
 @pytest.mark.gui
-def test_handle_new_index_range_selection__incorrect_input(
-    selector, input, spy_new_slicing, data_range
-):
+def test_handle_new_index_range_selection__incorrect_input(selector, input, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["edit_range_index"].setText(input)
     with pytest.raises(UserConfigError):
@@ -500,12 +469,11 @@ def test_handle_new_index_range_selection__incorrect_input(
     ],
 )
 @pytest.mark.gui
-def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_range):
+def test_handle_new_data_range_selection(selector, input, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["edit_range_data"].setText(input[0])
     selector._handle_new_data_range_selection()
-    _results = _get_spy_results(spy_new_slicing)
-    assert _results[0] == [0, f"{input[1]}:{input[2]}"]
+    assert selector.spy_sig_new_slicing.results[0] == [0, f"{input[1]}:{input[2]}"]
 
     assert selector._current_slice == slice(input[1], input[2])
     assert (
@@ -517,9 +485,7 @@ def test_handle_new_data_range_selection(selector, input, spy_new_slicing, data_
 
 @pytest.mark.parametrize("input", ["0.0:", "", ":-3.", "a:5"])
 @pytest.mark.gui
-def test_handle_new_data_range_selection__incorrect_input(
-    selector, input, spy_new_slicing, data_range
-):
+def test_handle_new_data_range_selection__incorrect_input(selector, input, data_range):
     selector.set_axis_metadata(data_range, "dummy", "unit")
     selector._widgets["edit_range_data"].setText(input)
     with pytest.raises(UserConfigError):

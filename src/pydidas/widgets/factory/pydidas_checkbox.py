@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["PydidasCheckBox"]
 
 
+from typing import Any
+
 from qtpy import QtWidgets
 
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
@@ -37,7 +39,7 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
     Create a QCheckBox with automatic font formatting.
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 1)
         QtWidgets.QCheckBox.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)

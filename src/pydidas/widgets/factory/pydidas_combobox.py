@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["PydidasComboBox"]
 
 
-from typing import Self
+from typing import Any, Self
 
 from qtpy import QtCore
 from qtpy.QtWidgets import QComboBox
@@ -47,7 +47,7 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
 
     init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["items"]
 
-    def __init__(self, *args: tuple, **kwargs: dict) -> Self:
+    def __init__(self, *args: Any, **kwargs: Any) -> Self:
         self.__sizeHint = QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)
         QComboBox.__init__(self, *args)
         _items = kwargs.pop("items", None)

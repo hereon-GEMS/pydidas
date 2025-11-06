@@ -57,6 +57,11 @@ class SignalSpy(QtTest.QSignalSpy):
         return [self[i] for i in range(len(self))]
 
     @property
+    def calls(self) -> list[Any]:
+        """Alias for results."""
+        return self.results
+
+    @property
     def n(self) -> int:
         """
         Get the number of times the signal was emitted.

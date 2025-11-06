@@ -45,7 +45,7 @@ _ITERATORS = (list, set, tuple)
 _NUMBERS = [Integral, Real]
 
 
-def _get_base_class(cls: Any) -> Type | Real | Integral | None:
+def _get_base_class(cls: Type | None) -> Type | Real | Integral | None:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -55,8 +55,8 @@ def _get_base_class(cls: Any) -> Type | Real | Integral | None:
 
     Parameters
     ----------
-    cls : object
-        The concrete class.
+    cls : Type | None
+        The concrete class type or None.
 
     Returns
     -------

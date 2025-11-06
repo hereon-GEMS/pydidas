@@ -30,26 +30,18 @@ __all__ = ["BaseParamIoWidgetMixIn", "BaseParamIoWidget"]
 
 import numbers
 import pathlib
-from typing import Any
+from typing import Any, Type
 
+import numpy as np
 from numpy import nan, ndarray
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
+    FLOAT_DISPLAY_ACCURACY,
     GENERIC_STANDARD_WIDGET_WIDTH,
-    QT_REG_EXP_FLOAT_VALIDATOR,
-    QT_REG_EXP_INT_VALIDATOR,
 )
 from pydidas.core.utils import NumpyParser
-
-
-LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
-LOCAL_SETTINGS.setNumberOptions(QtCore.QLocale.RejectGroupSeparator)
-
-FLOAT_VALIDATOR = QtGui.QDoubleValidator()
-FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
-FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 
 class BaseParamIoWidgetMixIn:
@@ -72,7 +64,7 @@ class BaseParamIoWidgetMixIn:
     sig_value_changed = QtCore.Signal()
 
     _SUPPORTED_TYPE_STRINGS = {"true": True, "false": False, "nan": nan, "none": None}
-    _TYPE_CONVERTERS = {
+    _TYPE_CONVERTERS: dict[Type, Any] = {
         numbers.Integral: int,
         numbers.Real: float,
         pathlib.Path: pathlib.Path,
@@ -82,30 +74,33 @@ class BaseParamIoWidgetMixIn:
 
     def __init__(self, param: Parameter, **kwargs: Any):
         self._linked_param = param
-        self._ptype = param.dtype
         self._old_value = None
-        self.__hint_factor = 1 + int(kwargs.get("linebreak", False))
+        self.__size_hint_width_factor = 1 + int(kwargs.get("linebreak", False))
 
     @property
-    def validator(self) -> QtGui.QValidator | None:
+    def current_text(self) -> str:
         """
-        Get the widget's validator based on the Parameter's configuration.
+        Get the current value as string.
+
+        This method needs to be implemented by the subclass.
 
         Returns
         -------
-        QtGui.QValidator | None
-            The validator for the widget based on the Parameter options.
-            If the Parameter has no specific validator, None is returned.
+        str
+            The current text from the widget.
         """
-        if self._linked_param.dtype == numbers.Integral:
-            if self._linked_param.allow_None:
-                return QT_REG_EXP_INT_VALIDATOR
-            return QtGui.QIntValidator()
-        elif self._linked_param.dtype == numbers.Real:
-            if self._linked_param.allow_None:
-                return QT_REG_EXP_FLOAT_VALIDATOR
-            return FLOAT_VALIDATOR
-        return None
+        raise NotImplementedError
+
+    def update_widget_value(self, value: Any) -> None:
+        """
+        Update the widget display to show the given value.
+
+        Parameters
+        ----------
+        value : Any
+            The new value to be displayed in the widget.
+        """
+        raise NotImplementedError
 
     def is_special_type_string(self, text: str) -> bool:
         """
@@ -123,9 +118,9 @@ class BaseParamIoWidgetMixIn:
         """
         return text.strip().lower() in self._SUPPORTED_TYPE_STRINGS
 
-    def type_from_string(self, text: str) -> Any:
+    def special_type_from_string(self, text: str) -> Any:
         """
-        Convert a string to the appropriate datatype.
+        Convert a string to the associated special type.
 
         Parameters
         ----------
@@ -138,8 +133,9 @@ class BaseParamIoWidgetMixIn:
             The input string converted to the appropriate datatype.
         """
         _input = text.strip().lower()
-        return self._SUPPORTED_TYPE_STRINGS[_input]
+        return self._SUPPORTED_TYPE_STRINGS.get(_input, text)
 
+    # TODO: check if sizeHint can be removed
     def sizeHint(self) -> QtCore.QSize:  # noqa C0103
         """
         Set a large horizontal size hint to have the widget expand with big font sizes.
@@ -149,81 +145,62 @@ class BaseParamIoWidgetMixIn:
         QtCore.QSize
             The sizeHint, depending on the "linebreak" setting.
         """
-        return QtCore.QSize(self.__hint_factor * GENERIC_STANDARD_WIDGET_WIDTH, 25)
-
-    def get_value_from_text(self, text: str) -> Any:
-        """
-        Get a value from the text entry to update the Parameter value.
-
-        Parameters
-        ----------
-        text : str
-            The input string from the input field.
-
-        Returns
-        -------
-        Any
-            The text converted to the stored datatype (e.g. int, float, path)
-            of the associated Parameter.
-        """
-        if self.is_special_type_string(text):
-            return self.type_from_string(text)
-        try:
-            if (
-                text == ""
-                and self._linked_param.allow_None
-                and issubclass(self._linked_param.dtype, numbers.Real)
-            ):
-                return None
-            _converter = self._TYPE_CONVERTERS.get(self._linked_param.dtype, None)
-            if _converter is not None:
-                return _converter(text)
-        except ValueError as _error:
-            _msg = str(_error).capitalize()
-            raise UserConfigError(f'ValueError! {_msg} Input text was "{text}"')
-        return text
-
-    def emit_signal(self) -> None:
-        """
-        Emit a signal.
-
-        This base method needs to be defined by the subclass.
-
-        Raises
-        ------
-        NotImplementedError
-            If the subclass has not implemented its own emit_signal method,
-            this exception will be raised.
-        """
-        raise NotImplementedError
+        return QtCore.QSize(
+            self.__size_hint_width_factor * GENERIC_STANDARD_WIDGET_WIDTH, 25
+        )
 
     def get_value(self) -> Any:
         """
         Get the value from the input field.
 
-        This base method needs to be defined by the subclass.
-
-        Raises
-        ------
-        NotImplementedError
-            If the subclass has not implemented its own get_value method,
-            this exception will be raised.
+        Returns
+        -------
+        Any
+            The text converted to the datatype (int, float, Path) specified
+            by the linked Parameter.
         """
-        raise NotImplementedError
+        _text = self.current_text
+        if self.is_special_type_string(_text):
+            return self.special_type_from_string(_text)
+        if (
+            _text == ""
+            and self._linked_param.allow_None
+            and issubclass(self._linked_param.dtype, numbers.Real)
+        ):
+            return None
+        try:
+            _converter = self._TYPE_CONVERTERS.get(self._linked_param.dtype, None)
+            if _converter is not None:
+                return _converter(_text)  # noqa
+        except ValueError as _error:
+            _msg = str(_error).capitalize()
+            raise UserConfigError(f'ValueError! {_msg} Input text was "{_text}"')
+        # TODO : Check where required
+        # if _text == "" and _value is None:
+        #     self.update_widget(None)
+        return _text
 
-    def set_value(self, value: object) -> None:
+    def set_value(self, value: Any):
         """
         Set the input field's value.
 
-        This base method needs to be defined by the subclass.
+        This method changes the combobox selection to the specified value.
 
-        Raises
-        ------
-        NotImplementedError
-            If the subclass has not implemented its own set_value method,
-            this exception will be raised.
+        Warning: This method will *not* update the connected Parameter value.
+
+        Parameters
+        ----------
+        value : Any
+            The new value to be displayed in the widget.
         """
-        raise NotImplementedError
+        if (
+            self._linked_param.dtype == numbers.Real
+            and value is not None
+            and np.isfinite(value)
+        ):
+            value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
+        self.update_widget_value(value)
+        self.emit_signal()
 
     def set_unique_ref_name(self, name: str) -> None:
         """
@@ -239,7 +216,8 @@ class BaseParamIoWidgetMixIn:
         name : str
             The unique identifier to reference this Parameter in the QSettings.
         """
-        pass
+        if hasattr(self, "_io_dialog_config"):
+            self._io_dialog_config["qsettings_ref"] = name
 
     def update_io_directory(self, path: str) -> None:
         """
@@ -252,7 +230,8 @@ class BaseParamIoWidgetMixIn:
         path : str
             The path to the new directory.
         """
-        pass
+        if hasattr(self, "io_dialog"):
+            self.io_dialog.set_curr_dir(id(self), path)
 
     def update_choices(self, new_choices: list, selection: str | None = None) -> None:
         """
@@ -273,5 +252,25 @@ class BaseParamIoWidgetMixIn:
             "Parameter has defined choices."
         )
 
+    @QtCore.Slot()
+    def emit_signal(self, force_update: bool = False) -> None:
+        """
+        Emit a signal that the value has been edited.
 
-class BaseParamIoWidget(BaseParamIoWidgetMixIn, QtWidgets.QWidget): ...
+        Parameters
+        ----------
+        force_update : bool
+            Force an update even if the value has not changed. The default is False.
+        """
+        _cur_value = self.current_text
+        if _cur_value != self._old_value or force_update:
+            self._old_value = _cur_value
+            self.sig_new_value.emit(_cur_value)
+            self.sig_value_changed.emit()
+
+
+class BaseParamIoWidget(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
+        """Initialize the widget."""
+        QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
+        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)

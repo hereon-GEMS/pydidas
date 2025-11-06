@@ -50,6 +50,8 @@ __all__ = [
     "POLICY_EXP_FIX",
     "POLICY_FIX_FIX",
     "POLICY_MIN_MIN",
+    "LOCAL_SETTINGS",
+    "FLOAT_VALIDATOR",
 ]
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -115,6 +117,13 @@ QT_REG_EXP_FLOAT_RANGE_VALIDATOR = QtGui.QRegularExpressionValidator(
 QT_REG_EXP_RGB_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(r"#[0-9A-Fa-f]{6}")
 )
+
+LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
+LOCAL_SETTINGS.setNumberOptions(QtCore.QLocale.RejectGroupSeparator)
+
+FLOAT_VALIDATOR = QtGui.QDoubleValidator()
+FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
+FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 POLICY_FIX_EXP = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
 

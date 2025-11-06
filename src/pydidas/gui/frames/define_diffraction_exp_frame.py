@@ -48,7 +48,7 @@ from pydidas.gui.frames.builders.define_diffraction_exp_frame_build_config impor
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import critical_warning
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidget,
 )
 from pydidas.widgets.windows import (

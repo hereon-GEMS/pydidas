@@ -30,10 +30,9 @@ __all__ = ["ParamIoWidgetFile"]
 
 import os
 from pathlib import Path
-from typing import Union
+from typing import Any
 
-from numpy import nan
-from qtpy import QtGui
+from qtpy import QtCore, QtGui
 
 from pydidas.data_io import IoManager
 from pydidas.widgets.dialogues import critical_warning
@@ -50,7 +49,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     This widget includes a small button to select a filepath from a dialogue.
     """
 
-    def __init__(self, param, **kwargs):
+    def __init__(self, param, **kwargs: Any):
         """
         Set up the widget.
 
@@ -59,19 +58,16 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
 
         Parameters
         ----------
-        parent : QWidget
-            A QWidget instance.
         param : Parameter
             A Parameter instance.
-        **kwargs : dict
-            Optional keyword arguments. Supported kwargs are "width" (in pixels) for
-            the width of the I/O widget and "persistent_qsettings_ref" for the
-            persistent reference label of the open directory.
+        **kwargs : Any
+            Optional keyword arguments. Supported kwargs are
+            all kwargs of BaseParamIoWidgetMixIn.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self.setAcceptDrops(True)
         self._flag_pattern = "pattern" in param.refkey
-        self.io_dialog = PydidasFileDialog()
+        self.io_dialog = kwargs.get("io_dialog", PydidasFileDialog())
         if "directory" in param.refkey:
             self.io_dialog_call = self.io_dialog.get_existing_directory
         else:
@@ -85,7 +81,8 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             "qsettings_ref": kwargs.get("persistent_qsettings_ref"),
         }
 
-    def button_function(self):
+    @QtCore.Slot()
+    def button_function(self) -> None:
         """
         Open a dialogue to select a file.
 
@@ -97,54 +94,24 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             if self._flag_pattern:
                 self.io_dialog.set_curr_dir(id(self), _result)
                 _result = os.path.basename(_result)
-            self.setText(_result)
-            self.emit_signal()
+            self.set_value(_result)
 
-    def get_value(self) -> Path:
-        """
-        Get the current value from the QLineEdit to update the Parameter value.
-
-        Returns
-        -------
-        Path
-            The text converted to a Path to update the Parameter value.
-        """
-        text = self._io_lineedit.text().strip()
-        _value = self.get_value_from_text(text)
-        if _value in [None, True, False, nan]:
-            _value = "."
-            self._io_lineedit.setText(".")
-        return Path(_value)
-
-    def set_value(self, value: Union[str, Path]):
+    def set_value(self, value: Path | str) -> None:
         """
         Set the input field's value.
 
         This method changes the QLineEdit selection to the specified value.
         """
-        self._old_value = self.get_value()
-        self._io_lineedit.setText(f"{value}".strip())
+        super().set_value(value)
         if not self._flag_pattern and value != Path() and os.path.exists(value):
             self.io_dialog.set_curr_dir(id(self), value)
 
-    def modify_file_selection(self, list_of_choices: list):
-        """
-        Modify the file selection choices in the popup window.
-
-        Parameters
-        ----------
-        list_of_choices : list
-            The list with string entries for file selection choices in the
-            format 'NAME (*.EXT1 *.EXT2 ...)'
-        """
-        self._file_selection = ";;".join(list_of_choices)
-
-    def dragEnterEvent(self, event: QtGui.QDragEnterEvent):
+    def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         """Allow to drag files from, for example, the explorer."""
         if event.mimeData().hasFormat("text/uri-list"):
             event.acceptProposedAction()
 
-    def dropEvent(self, event: QtGui.QDropEvent):
+    def dropEvent(self, event: QtGui.QDropEvent) -> None:
         """
         Allow to drop files from, for example, the explorer.
         """
@@ -159,47 +126,17 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             critical_warning("Not a file", "Can only accept single files.")
             return
         self.set_value(_path)
-        self.emit_signal()
 
-    def set_unique_ref_name(self, name: str):
+    def update_widget_value(self, value: Any) -> None:
         """
-        Set a unique reference name to allow keeping track of the active working
-        directory.
+        Update the widget value.
 
         Parameters
         ----------
-        name : str
-            The unique identifier to reference this Parameter in the QSettings.
+        value : Any
+            The new value to set in the widget.
         """
-        self._io_dialog_config["qsettings_ref"] = name
-
-    def update_io_directory(self, path: str):
-        """
-        Update the file dialog's IO directory for the given Parameter.
-
-        Parameters
-        ----------
-        path : str
-            The path to the new directory.
-        """
-        self.io_dialog.set_curr_dir(id(self), path)
-
-    def emit_signal(self, force_update: bool = False):
-        """
-        Emit a signal that the value has been edited.
-
-        This method emits a signal that the combobox selection has been
-        changed and the Parameter value needs to be updated.
-
-        Parameters
-        ----------
-        force_update : bool
-            Force an update even if the value has not changed.
-        """
-        _curr_value = self._io_lineedit.text().strip()
-        if _curr_value != self._io_lineedit.text():
-            self._io_lineedit.setText(_curr_value)
-        if _curr_value != self._old_value or force_update:
-            self._old_value = _curr_value
-            self.sig_new_value.emit(_curr_value)
-            self.sig_value_changed.emit()
+        if value is None:
+            self._io_lineedit.setText("")
+        else:
+            self._io_lineedit.setText(f"{value}")

@@ -51,7 +51,7 @@ from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidget,
 )
 

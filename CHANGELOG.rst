@@ -5,6 +5,13 @@
 vYY.MM.DD
 =========
 
+Improvements
+------------
+
+Programmatic changes
+--------------------
+- Refactored the Parameter I/O widgets and added tests
+
 Bugfixes
 --------
 - Fixed use of tabs in the CHANGELOG.rst

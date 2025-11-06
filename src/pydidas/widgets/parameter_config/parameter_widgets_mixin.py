@@ -33,7 +33,7 @@ from typing import Any
 from qtpy import QtCore
 
 from pydidas.core import Parameter, ParameterCollection, PydidasGuiError
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidget,
 )
 from pydidas.widgets.parameter_config.parameter_widget import ParameterWidget

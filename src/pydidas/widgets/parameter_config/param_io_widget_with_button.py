@@ -36,7 +36,7 @@ from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Parameter
 from pydidas.widgets.factory import PydidasLineEdit, SquareButton
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
 )
 
@@ -50,22 +50,24 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     param : Parameter
         A Parameter instance.
     **kwargs : Any
-        Optional keyword arguments. Supported kwargs are "width" (in pixel)
-        to specify the size of the I/O field and "button_icon" to give an
-        icon for the button.
+        Optional keyword arguments. Supported kwargs are
+
+        width : int
+            The width (in pixel) to specify the size of the I/O field
+        button_icon : QtGui.QIcon
+            The icon to use for the button.
     """
 
     def __init__(self, param: Parameter, **kwargs: Any):
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        _icon = kwargs.get("button_icon", None)
+        if not isinstance(_icon, QtGui.QIcon):
+            _icon = self.style().standardIcon(QStyle.SP_DialogOpenButton)
+
         self._io_lineedit = PydidasLineEdit()
-        if not isinstance(kwargs.get("button_icon", None), QtGui.QIcon):
-            kwargs["button_icon"] = self.style().standardIcon(
-                QStyle.SP_DialogOpenButton
-            )
-        self._button = SquareButton(
-            kwargs["button_icon"], "", font_metric_height_factor=1
-        )
+        self._button = SquareButton(_icon, "", font_metric_height_factor=1)
+
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setSpacing(2)
@@ -73,71 +75,36 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         _layout.addWidget(self._button)
         self.setLayout(_layout)
 
+        self._io_lineedit.setText(f"{param.value}")
         self._button.clicked.connect(self.button_function)
         self._io_lineedit.editingFinished.connect(self.emit_signal)
         self._io_lineedit.returnPressed.connect(partial(self.emit_signal, True))
-        self._io_lineedit.setText(f"{param.value}")
 
-    def button_function(self):
+    @property
+    def current_text(self) -> str:
         """
-        Needs to be implemented by the subclass.
-        """
-        raise NotImplementedError
-
-    def emit_signal(self, force_update: bool = False):
-        """
-        Emit a signal that the value has been edited.
-
-        This method emits a signal that the combobox selection has been
-        changed and the Parameter value needs to be updated.
-
-        Parameters
-        ----------
-        force_update : bool
-            Force an update even if the value has not changed.
-        """
-        _curr_value = self._io_lineedit.text()
-        if _curr_value != self._old_value or force_update:
-            self._old_value = _curr_value
-            self.sig_new_value.emit(_curr_value)
-            self.sig_value_changed.emit()
-
-    def get_value(self) -> object:
-        """
-        Get the current value from the QLineEdit to update the Parameter value.
+        Get the text from the lineedit.
 
         Returns
         -------
         str
-            The input text.
+            The text in the lineedit.
         """
-        text = self._io_lineedit.text()
-        return self.get_value_from_text(text)
+        return self._io_lineedit.text().strip()
 
-    def set_value(self, value: object):
+    def update_widget_value(self, value: Any) -> None:
         """
-        Set the input field's value.
-
-        This method changes the combobox selection to the specified value.
+        Update the widget value.
 
         Parameters
         ----------
-        value : object
-            The value to be displayed for the Parameter.
+        value : Any
+            The new value to set in the widget.
         """
-        self._old_value = self.get_value()
         self._io_lineedit.setText(f"{value}")
 
-    def setText(self, text: object):  # noqa C0103
+    def button_function(self) -> None:
         """
-        Set the line edit text to the input.
-
-        This method will call the line edit setText method to update the
-        displayed text.
-
-        Parameters
-        ----------
-        text : object
-            Any object, the object's str representation will be used.
+        Needs to be implemented by the subclass.
         """
-        self._io_lineedit.setText(str(text))
+        raise NotImplementedError

@@ -21,7 +21,7 @@ There are no typechecks implemented in the widget and any input which is
 accepted by the Parameter is valid.
 """
 
-__author__ = "Nonni Heere"
+__author__ = ("Nonni Heere", "Malte Storm")
 __copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
@@ -29,38 +29,37 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetCheckBox"]
 
 
+from typing import Any
+
 from pydidas.core import Parameter
 from pydidas.core.utils import IS_QT6
 from pydidas.widgets.factory import PydidasCheckBox
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
 )
 
 
 class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
-    """Widgets for I/O during plugin parameter editing with boolean choices."""
+    """Widget for Parameters with True/False choices only."""
 
     @staticmethod
-    def __convert_bool(value: int | str) -> bool:
+    def __convert_to_bool(value: int | str) -> bool:
         """
-        Convert boolean strings to bool.
-
-        This conversion is necessary because boolean "0" and "1" cannot be
-        interpreted as "True" and "False" straight away.
+        Convert input to boolean.
 
         Parameters
         ----------
         value : int | str
-            The input value from the field.
+            The input value to check.
 
         Returns
         -------
         bool
             The input value, with 0/1 converted to True or False
         """
-        return value in ["1", 1]
+        return value in ["1", 1, "True", "true"]
 
-    def __init__(self, param: Parameter, **kwargs: dict):
+    def __init__(self, param: Parameter, **kwargs: Any):
         """
         Initialize the widget.
 
@@ -71,56 +70,38 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         ----------
         param : Parameter
             A Parameter instance.
-        width : int, optional
-            The width of the IOwidget.
+        **kwargs : Any
+            Supported keyword arguments are all arguments of BaseParamIoWidgetMixIn
         """
         PydidasCheckBox.__init__(self)
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
-        param.value = self.__convert_bool(param.value)
+        self.setText(param.name)
+        self.setEnabled(set(param.choices) == {True, False})
+        self.update_widget_value(param.value)
         if IS_QT6:
             self.checkStateChanged.connect(self.emit_signal)
         else:
             self.stateChanged.connect(self.emit_signal)
-        self.set_value(param.value)
-        self.setText(param.name)
-        self.setEnabled(set(param.choices) == {True, False})
 
-    def emit_signal(self):
+    @property
+    def current_text(self) -> str:
         """
-        Emit a signal that the value has been edited.
-
-        This method emits a signal that the combobox selection has been
-        changed and the Parameter value needs to be updated.
-        """
-        _cur_value = self.isChecked()
-        if _cur_value != self._old_value:
-            self._old_value = _cur_value
-            self.sig_new_value.emit("True" if _cur_value else "False")
-            self.sig_value_changed.emit()
-
-    def get_value(self) -> object:
-        """
-        Get the current value from the combobox to update the Parameter value.
+        Get the text of the checkbox.
 
         Returns
         -------
-        object
-            Bool value of the checkbox.
+        str
+            The text of the checkbox.
         """
-        return self.isChecked()
+        return "True" if self.isChecked() else "False"
 
-    def set_value(self, value: str):
+    def update_widget_value(self, value: Any) -> None:
         """
-        Check or uncheck the checkbox.
-
-        This method is used to set the checkbox value.
-
+        Update the widget value.
 
         Parameters
         ----------
-        value : str
-            The value to be set, "0" or "1".
+        value : Any
+            The new value to set in the widget.
         """
-        value = self.__convert_bool(value)
-        self._old_value = value
-        self.setChecked(value)
+        self.setChecked(self.__convert_to_bool(value))

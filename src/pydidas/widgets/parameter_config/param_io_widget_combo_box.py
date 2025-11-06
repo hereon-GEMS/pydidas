@@ -39,16 +39,16 @@ from pydidas.core.utils import (
     convert_unicode_to_ascii,
 )
 from pydidas.widgets.factory import PydidasComboBox
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
 )
 from pydidas.widgets.utilities import get_max_pixel_width_of_entries
 
 
 class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
-    """Widgets for I/O during plugin parameter editing with predefined choices."""
+    """Widget used for editing Parameter values with predefined choices."""
 
-    def __init__(self, param: Parameter, **kwargs: dict):
+    def __init__(self, param: Parameter, **kwargs: Any):
         """
         Initialize the widget.
 
@@ -59,20 +59,21 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         ----------
         param : Parameter
             A Parameter instance.
-        width : int, optional
-            The width of the IOwidget.
+        **kwargs : Any
+            Supported keyword arguments are all arguments of BaseParamIoWidgetMixIn
         """
         PydidasComboBox.__init__(self)
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        self.__items = []
         for choice in param.choices:
-            self.addItem(f"{convert_special_chars_to_unicode(str(choice))}")
-
-        self.__items = [self.itemText(i) for i in range(self.count())]
+            _display_txt = convert_special_chars_to_unicode(str(choice))
+            self.__items.append(_display_txt)
+            self.addItem(_display_txt)
+        self.update_widget_value(param.value)
         self.currentIndexChanged.connect(self.emit_signal)
-        self.set_value(param.value)
-        # self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)
 
-    def __convert_bool(self, value: object) -> object:
+    # TODO : check if obsolete due to ParamIoWidgetCheckbox
+    def __convert_bool(self, value: Any) -> Any:
         """
         Convert boolean integers to string.
 
@@ -81,12 +82,12 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
 
         Parameters
         ----------
-        value : object
-            The input value from the field. This could be any object.
+        value : Any
+            The input value from the field.
 
         Returns
         -------
-        value : any
+        value : Any
             The input value, with 0/1 converted it True or False are
             widget choices.
         """
@@ -96,45 +97,28 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             value = "True"
         return value
 
-    def emit_signal(self):
+    @property
+    def current_text(self) -> str:
         """
-        Emit a signal that the value has been edited.
-
-        This method emits a signal that the combobox selection has been
-        changed and the Parameter value needs to be updated.
-        """
-        _cur_value = convert_unicode_to_ascii(self.currentText())
-        if _cur_value != self._old_value:
-            self._old_value = _cur_value
-            self.sig_new_value.emit(_cur_value)
-            self.sig_value_changed.emit()
-
-    def get_value(self) -> object:
-        """
-        Get the current value from the combobox to update the Parameter value.
+        Get the text of the current combobox selection.
 
         Returns
         -------
-        object
-            The text converted to the required datatype (int, float, path)
-            to update the Parameter value.
+        str
+            The text of the current combobox selection.
         """
-        text = convert_unicode_to_ascii(self.currentText())
-        return self.get_value_from_text(text)
+        return convert_unicode_to_ascii(self.currentText())
 
-    def set_value(self, value: object):
+    def update_widget_value(self, value: Any) -> None:
         """
-        Set the input field's value.
-
-        This method changes the combobox selection to the specified value.
+        Update the widget value.
 
         Parameters
         ----------
-        value : object
-            The value to be set.
+        value : Any
+            The new value to set in the widget.
         """
         value = self.__convert_bool(value)
-        self._old_value = value
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
 
@@ -162,6 +146,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             If True, a signal will be emitted after updating the choices.
             The default is True.
         """
+        self._old_value = self.current_text
         with QtCore.QSignalBlocker(self):
             self.clear()
             for choice in new_choices:
@@ -169,9 +154,9 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
                 self.addItem(_itemstr)
             self.__items = [self.itemText(i) for i in range(self.count())]
             if selection is not None and selection in new_choices:
-                self.set_value(selection)
+                self.update_widget_value(selection)
             else:
-                self.set_value(new_choices[0])
+                self.update_widget_value(new_choices[0])
         if emit_signal:
             self.emit_signal()
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)

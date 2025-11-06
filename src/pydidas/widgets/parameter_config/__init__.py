@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from .parameter_edit_canvas import *
 from .parameter_widget import *
 from .parameter_widgets_mixin import *

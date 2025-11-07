@@ -40,6 +40,7 @@ from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     FLOAT_DISPLAY_ACCURACY,
     GENERIC_STANDARD_WIDGET_WIDTH,
+    POLICY_EXP_FIX,
 )
 from pydidas.core.utils import NumpyParser
 
@@ -76,6 +77,7 @@ class BaseParamIoWidgetMixIn:
         self._linked_param = param
         self._old_value = None
         self.__size_hint_width_factor = 1 + int(kwargs.get("linebreak", False))
+        self.setSizePolicy(*POLICY_EXP_FIX)
 
     @property
     def current_text(self) -> str:

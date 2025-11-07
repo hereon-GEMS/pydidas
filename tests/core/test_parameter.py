@@ -153,6 +153,15 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, unit="The_unit")
         self.assertEqual(obj.unit, "The_unit")
 
+    def test_unit__wrong_type(self):
+        obj = Parameter("Test0", int, 12, unit=42)
+        self.assertEqual(obj.unit, "42")
+
+    def test_unit__w_None(self):
+        obj = Parameter("Test0", int, 12, unit=None)
+        self.assertEqual(obj.unit, "")
+        self.assertIsInstance(obj.unit, str)
+
     def test_tooltip__int(self):
         obj = Parameter("Test0", int, 12, unit="m", value=10, tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: integer)")

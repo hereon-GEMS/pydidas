@@ -30,12 +30,13 @@ __all__ = ["ParameterWidget"]
 
 import html
 from pathlib import Path
-from typing import Any
+from typing import Any, Type
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
+    ALIGN_CENTER_LEFT,
     PARAM_WIDGET_EDIT_WIDTH,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
@@ -43,6 +44,7 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import convert_special_chars_to_unicode
 from pydidas.widgets.factory import EmptyWidget, PydidasLabel
+from pydidas.widgets.parameter_config.base_param_io_widget import BaseParamIoWidget
 from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
     ParamIoWidgetCheckBox,
 )
@@ -60,25 +62,49 @@ from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
 
 AlignLeft = QtCore.Qt.AlignLeft
 AlignVCenter = QtCore.Qt.AlignVCenter
+_BOOL_CHOICES = [{True, False}, {True}, {False}]
 
 
 class ParameterWidget(EmptyWidget):
     """
-    A combined widget to display and modify a Parameter with name, value and unit.
+    A composite widget to display and modify a Parameter with name, value and unit.
 
     This widget is a wrapper and includes labels for name and unit and the
     respective Parameter edit widget which is selected based on the Parameter
     type and choices.
 
     This is the public widget should be added to the GUI to display and modify
-    Parameters.
+    Parameters. It includes the following signals:
+
+    sig_new_value : QtCore.Signal(str)
+        Emitted when a new value is entered in the I/O widget. The new value is
+         emitted as string representation.
+    sig_value_changed : QtCore.Signal()
+        Emitted when the value in the I/O widget has changed and been accepted.
+
 
     Parameters
     ----------
     param : pydidas.core.Parameter
         The associated Parameter.
-    **kwargs : dict
-        Additional keyword arguments
+    **kwargs : Any
+        Additional keyword arguments. Supported keyword arguments are:
+
+        width_text : float
+            The relative width of the text field for the Parameter name.
+            The default is defined in
+            pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.
+        width_io : float
+            The relative width of the input widget for the Parameter value.
+            The default is defined in
+            pydidas.core.constants.PARAM_WIDGET_EDIT_WIDTH.
+        width_unit : float
+            The relative width of the text field for the Parameter unit.
+            The default is defined in
+            pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.
+        linebreak : bool
+            If True, the layout will include a linebreak between the name
+            label and the I/O widget. The default is False.
     """
 
     sig_new_value = QtCore.Signal(str)
@@ -95,28 +121,45 @@ class ParameterWidget(EmptyWidget):
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
         self.param = param
-        self._widgets = {}
+        self._widgets: dict[str, QtWidgets.QWidget] = {}
         self.__store_config_from_kwargs(kwargs)
-        self.__store_layout_args_for_widgets()
 
-        if self.param.choices is None or set(self.param.choices) not in [
-            {True, False},
-            {True},
-            {False},
-        ]:
-            self.__create_name_widget()
+        self.__create_name_widget_if_required()
         self.__create_param_io_widget()
-        if self._config["width_unit"] > 0:
-            self.__create_unit_widget()
-        self.io_widget = self._widgets["io"]
+        self.__create_unit_widget_if_required()
 
         self._widgets["io"].sig_new_value.connect(self.set_param_value)
         self._widgets["io"].sig_new_value.connect(self.sig_new_value)
         self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
 
+    @property
+    def io_widget(self) -> BaseParamIoWidget:
+        """
+        Returns the I/O widget for the Parameter.
+
+        Returns
+        -------
+        BaseParamIoWidget
+            The I/O widget for the Parameter.
+        """
+        return self._widgets["io"]
+
+    @property
+    def _param_widget_class(self) -> Type[BaseParamIoWidget]:
+        """Get the class of the Parameter I/O widget based on the Parameter."""
+        if self.param.choices:
+            if set(self.param.choices) in [{True, False}, {True}, {False}]:
+                return ParamIoWidgetCheckBox
+            return ParamIoWidgetComboBox
+        if self.param.dtype == Path:
+            return ParamIoWidgetFile
+        if self.param.dtype == Hdf5key:
+            return ParamIoWidgetHdf5Key
+        return ParamIoWidgetLineEdit
+
     def __store_config_from_kwargs(self, kwargs: dict[str, Any]):
         """
-        Get the config from the kwargs formatting options.
+        Set up the config from the kwargs formatting options.
 
         Parameters
         ----------
@@ -125,12 +168,13 @@ class ParameterWidget(EmptyWidget):
         """
         _unit_preset = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
         _text_preset = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
-        _unit_width = _unit_preset if len(self.param.unit) > 0 else 0
-        _io_width = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH) + (
-            0 if _unit_width > 0 else _unit_preset
-        )
         _linebreak = kwargs.get("linebreak", False)
-        config = {
+
+        _unit_width = _unit_preset if len(self.param.unit) > 0 else 0
+        _io_width = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH)
+        if _unit_width == 0:
+            _io_width += _unit_preset
+        self._config: dict[str, Any] = {
             "linebreak": _linebreak,
             "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
             "width_unit": _unit_width,
@@ -138,70 +182,30 @@ class ParameterWidget(EmptyWidget):
             "width_io": kwargs.get(
                 "width_io", (0.9 - _unit_width if _linebreak else _io_width)
             ),
-            "align_text": AlignVCenter | kwargs.get("halign_text", AlignLeft),
-            "align_io": AlignVCenter | kwargs.get("halign_io", AlignLeft),
-            "align_unit": AlignVCenter | kwargs.get("halign_unit", AlignLeft),
+            "layout_text": (0, 0, 1, 1 + 2 * _linebreak, ALIGN_CENTER_LEFT),
+            "layout_io": (_linebreak, 1, 1, 2 - (_unit_width > 0), ALIGN_CENTER_LEFT),
+            "layout_unit": (_linebreak, 2, 1, 1, ALIGN_CENTER_LEFT),
         }
-        self._config: dict[str, Any] = config
 
-    def __store_layout_args_for_widgets(self):
+    def __create_name_widget_if_required(self):
         """
-        Store the layout insertion arguments based on the config.
-        """
-        _linebreak = int(self._config["linebreak"])
-        _show_unit = int(self._config["width_unit"] > 0)
-        self._config["layout_text"] = (
-            0,
-            0,
-            1,
-            1 + 2 * _linebreak,
-            self._config["align_text"],
-        )
-        self._config["layout_io"] = (
-            _linebreak,
-            1,
-            1,
-            2 - _show_unit,
-            self._config["align_io"],
-        )
-        self._config["layout_unit"] = (_linebreak, 2, 1, 1, self._config["align_text"])
+        Create a widget with the Parameter's name if required.
 
-    def __create_name_widget(self):
+        In the case of a
         """
-        Create a widget with the Parameter's name.
-        """
-        self._widgets["name_label"] = PydidasLabel(
-            convert_special_chars_to_unicode(self.param.name) + ":",
-            margin=0,
-            font_metric_width_factor=(
-                None
-                if self._font_metric_width_factor is None
-                else self._config["width_text"] * self._font_metric_width_factor
-            ),
+        if self._param_widget_class == ParamIoWidgetCheckBox:
+            return
+        _display_txt = convert_special_chars_to_unicode(self.param.name) + ":"
+        if self._font_metric_width_factor is None:
+            _width_factor = None
+        else:
+            _width_factor = self._font_metric_width_factor * self._config["width_text"]
+        self._widgets["label"] = PydidasLabel(
+            _display_txt, margin=0, font_metric_width_factor=_width_factor
         )
-        self.layout().addWidget(
-            self._widgets["name_label"], *self._config["layout_text"]
-        )
+        self.layout().addWidget(self._widgets["label"], *self._config["layout_text"])
         if not self._config["linebreak"]:
             self.layout().setColumnStretch(0, int(self._config["width_text"] * 100))
-
-    def __create_unit_widget(self):
-        """
-        Create a widget with the Parameter's unit text.
-        """
-        self._widgets["unit_label"] = PydidasLabel(
-            convert_special_chars_to_unicode(self.param.unit),
-            margin=3,
-            font_metric_width_factor=(
-                None
-                if self._font_metric_width_factor is None
-                else self._config["width_unit"] * self._font_metric_width_factor
-            ),
-        )
-        self.layout().addWidget(
-            self._widgets["unit_label"], *self._config["layout_unit"]
-        )
-        self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
 
     def __create_param_io_widget(self):
         """
@@ -211,66 +215,58 @@ class ParameterWidget(EmptyWidget):
             "persistent_qsettings_ref": self._config["persistent_qsettings_ref"],
             "linebreak": self._config["linebreak"],
         }
-        if self.param.choices:
-            _class = (
-                ParamIoWidgetCheckBox
-                if set(self.param.choices) in [{True, False}, {True}, {False}]
-                else ParamIoWidgetComboBox
-            )
-            _widget = _class(self.param, **kwargs)
-        else:
-            if self.param.dtype == Path:
-                _widget = ParamIoWidgetFile(self.param, **kwargs)
-                self._config["width_unit"] = 0
-            elif self.param.dtype == Hdf5key:
-                _widget = ParamIoWidgetHdf5Key(self.param, **kwargs)
-                self._config["width_unit"] = 0
-            else:
-                _widget = ParamIoWidgetLineEdit(self.param, **kwargs)
+        self._widgets["io"] = self._param_widget_class(self.param, **kwargs)
+        if self._param_widget_class in (ParamIoWidgetFile, ParamIoWidgetHdf5Key):
+            self._config["width_unit"] = 0
         try:
-            _widget.set_value(self.param.value)
+            self._widgets["io"].set_value(self.param.value)
         except UserConfigError:
             pass
-        self._widgets["io"] = _widget
-        self._widgets["io"].setSizePolicy(*POLICY_EXP_FIX)
         self.layout().addWidget(self._widgets["io"], *self._config["layout_io"])
+        _width_col2 = int(100 * self._config["width_unit"])
+        _width_col1 = int(100 * self._config["width_io"])
+        _width_col0 = 100 - _width_col1 - _width_col2
+        self.layout().setColumnStretch(1, _width_col1)
         if self._config["linebreak"]:
             self._widgets["io_spacer"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
             self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)
-            self.layout().setColumnStretch(
-                0,
-                int(100 * (1 - self._config["width_unit"] - self._config["width_io"])),
-            )
-            self.layout().setColumnStretch(1, int(100 * self._config["width_io"]))
-            self.layout().setColumnStretch(2, int(100 * self._config["width_unit"]))
-        else:
-            self.layout().setColumnStretch(1, int(100 * self._config["width_io"]))
+            self.layout().setColumnStretch(0, _width_col0)
+            self.layout().setColumnStretch(2, _width_col2)
+
+    def __create_unit_widget_if_required(self):
+        """
+        Create a widget with the Parameter's unit text.
+        """
+        if self._config["width_unit"] == 0:
+            return
+        self._widgets["unit"] = PydidasLabel(
+            convert_special_chars_to_unicode(self.param.unit),
+            margin=3,
+            font_metric_width_factor=(
+                None
+                if self._font_metric_width_factor is None
+                else self._config["width_unit"] * self._font_metric_width_factor
+            ),
+        )
+        self.layout().addWidget(self._widgets["unit"], *self._config["layout_unit"])
+        self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
 
     @QtCore.Slot(str)
-    def __emit_io_changed(self, value: str):
-        """
-        Forward the io_changed signal from the IO widget.
-
-        Parameters
-        ----------
-        value : str
-            The value emitted by the IO widget.
-        """
-        self.sig_new_value.emit(value)
-        self.sig_value_changed.emit()
-
-    @QtCore.Slot()
-    def set_param_value(self):
+    def set_param_value(self, value_str_repr: str):
         """
         Update the Parameter value with the entry from the widget.
 
         This method tries to update the Parameter value with the entry from
         the widget. If unsuccessful, an exception box will be opened and
         the widget input will be reset to the stored Parameter value.
+
+        Parameters
+        ----------
+        value_str_repr : str
+            The new value as string representation.
         """
-        _new_value = self._widgets["io"].get_value()
         try:
-            self.param.value = _new_value
+            self.param.value = value_str_repr
         except (ValueError, UserConfigError):
             self._widgets["io"].set_value(self.param.value)
             raise

@@ -50,6 +50,7 @@ def selector(request):
     _selector.spy_sig_display_changed = SignalSpy(_selector.sig_display_choice_changed)
     _selector.spy_sig_new_slicing = SignalSpy(_selector.sig_new_slicing)
     yield _selector
+    _selector.hide()
     _selector.deleteLater()
     PydidasQApplication.instance().processEvents()
 

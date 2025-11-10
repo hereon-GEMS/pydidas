@@ -109,6 +109,18 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         """
         return convert_unicode_to_ascii(self.currentText())
 
+    @property
+    def current_choices(self) -> list[str]:
+        """
+        Get the current list of choices in the combobox.
+
+        Returns
+        -------
+        list[str]
+            The current list of choices in the combobox.
+        """
+        return [convert_unicode_to_ascii(_item) for _item in self.__items]
+
     def update_widget_value(self, value: Any) -> None:
         """
         Update the widget value.

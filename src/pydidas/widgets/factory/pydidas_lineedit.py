@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["PydidasLineEdit"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtWidgets
 
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
@@ -38,7 +40,7 @@ class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):
     Create a QLineEdit with automatic font formatting.
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: tuple, **kwargs: Any):
         if "font_metric_height_factor" not in kwargs:
             kwargs["font_metric_height_factor"] = 1
         QtWidgets.QLineEdit.__init__(self, *args)

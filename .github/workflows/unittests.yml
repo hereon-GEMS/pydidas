@@ -19,9 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
-        env:
-          - QT_API: pyqt5
-          - QT_API: pyside6
+        QT_API: ["pyqt5", "pyside6"]
+        tests: ["", "-m slow", "-m gui"]
 
     steps:
     - uses: actions/checkout@v3
@@ -29,25 +28,26 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install .
         python -m pip install pytest
     - name: Install system dependencies for PySide6
-      if: ${{ matrix.env.QT_API == 'pyside6' }}
+      if: ${{ matrix.QT_API == 'pyside6' }}
       run: |
         sudo apt-get update
         sudo apt-get install -y libegl1 libopengl0
-    - name: Run fast tests with pytest
+    - name: Run tests with pytest
       env:
-        QT_API: ${{ matrix.env.QT_API }}
+        QT_API: ${{ matrix.QT_API }}
       run: |
         export QT_QPA_PLATFORM=offscreen
-        python -m pytest
-    - name: Run slow tests with pytest
-      env:
-        QT_API: ${{ matrix.env.QT_API }}
-      run: |
-        export QT_QPA_PLATFORM=offscreen
-        python -m pytest -m slow
+        python -m pytest ${{ matrix.tests }}

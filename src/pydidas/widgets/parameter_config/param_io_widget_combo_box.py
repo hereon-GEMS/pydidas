@@ -60,10 +60,11 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         param : Parameter
             A Parameter instance.
         **kwargs : Any
-            Supported keyword arguments are all arguments of BaseParamIoWidgetMixIn
+            Supported keyword arguments are all supported arguments of the
+            PydidasComboBox.
         """
-        PydidasComboBox.__init__(self)
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        PydidasComboBox.__init__(self, **kwargs)
+        BaseParamIoWidgetMixIn.__init__(self, param)
         self.__items = []
         for choice in param.choices:
             _display_txt = convert_special_chars_to_unicode(str(choice))
@@ -71,31 +72,6 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             self.addItem(_display_txt)
         self.update_widget_value(param.value)
         self.currentIndexChanged.connect(self.emit_signal)
-
-    # TODO : check if obsolete due to ParamIoWidgetCheckbox
-    def __convert_bool(self, value: Any) -> Any:
-        """
-        Convert boolean integers to string.
-
-        This conversion is necessary because boolean "0" and "1" cannot be
-        interpreted as "True" and "False" straight away.
-
-        Parameters
-        ----------
-        value : Any
-            The input value from the field.
-
-        Returns
-        -------
-        value : Any
-            The input value, with 0/1 converted it True or False are
-            widget choices.
-        """
-        if value == 0 and "False" in self.__items:
-            value = "False"
-        elif value == 1 and "True" in self.__items:
-            value = "True"
-        return value
 
     @property
     def current_text(self) -> str:
@@ -133,6 +109,27 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         value = self.__convert_bool(value)
         _txt_repr = convert_special_chars_to_unicode(str(value))
         self.setCurrentText(_txt_repr)
+
+    def __convert_bool(self, value: Any) -> Any:
+        """
+        Convert boolean integers to string representations of True or False.
+
+        Parameters
+        ----------
+        value : Any
+            The input value from the field.
+
+        Returns
+        -------
+        value : Any
+            The input value, with 0/1 converted it True or False are
+            widget choices.
+        """
+        if value == 0 and "False" in self.__items:
+            value = "False"
+        elif value == 1 and "True" in self.__items:
+            value = "True"
+        return value
 
     def update_choices(
         self,

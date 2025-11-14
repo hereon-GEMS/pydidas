@@ -25,7 +25,9 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -33,7 +35,6 @@ from qtpy import QtCore, QtGui
 
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.unittest_objects.dummy_file_dialog import DummyFileDialog
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas_qtcore import PydidasQApplication
 
@@ -46,15 +47,23 @@ param_pattern = Parameter("file_pattern", Path, "test_##.nxs", name="File patter
 
 def widget_from_param(qtbot, param, qref=None):
     param.restore_default()
-    widget = ParamIoWidgetFile(
-        param, persistent_qsettings_ref=qref, io_dialog=DummyFileDialog()
-    )
+    widget = ParamIoWidgetFile(param, persistent_qsettings_ref=qref)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
     return widget
+
+
+def _drag_drop_args(widget, mime_data):
+    return (
+        widget.rect().center(),
+        QtCore.Qt.CopyAction,
+        mime_data,
+        QtCore.Qt.LeftButton,
+        QtCore.Qt.NoModifier,
+    )
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -84,13 +93,6 @@ def test__creation(qtbot, param, test_dir, qref):
     assert isinstance(widget, ParamIoWidgetFile)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
-    match param.refkey:
-        case "input_directory":
-            assert widget.io_dialog_call == widget.io_dialog.get_existing_directory
-        case "filename":
-            assert widget.io_dialog_call == widget.io_dialog.get_existing_filename
-        case "output_filename":
-            assert widget.io_dialog_call == widget.io_dialog.get_saving_filename
     assert widget._io_dialog_config["reference"] == id(widget)
     if qref is None:
         assert widget._io_dialog_config["qsettings_ref"] is None
@@ -98,6 +100,7 @@ def test__creation(qtbot, param, test_dir, qref):
         assert widget._io_dialog_config["qsettings_ref"] == qref
 
 
+@pytest.mark.gui
 @pytest.mark.parametrize(
     "param", [param_dir, param_existing_file, param_output_file, param_pattern]
 )
@@ -106,27 +109,24 @@ def test__creation(qtbot, param, test_dir, qref):
 def test_button_function(qtbot, test_dir, param, qref, cancel):
     param.value = Path("/initial/path")
     widget = widget_from_param(qtbot, param)
+    match param.refkey:
+        case "input_directory":
+            _ret_val = str(test_dir)
+            _f = "pydidas.widgets.file_dialog.PydidasFileDialog.get_existing_directory"
+        case "output_filename":
+            _ret_val = str(test_dir / "new_test_file.npy")
+            _f = "pydidas.widgets.file_dialog.PydidasFileDialog.get_saving_filename"
+        case _:  # filename or pattern
+            _ret_val = str(test_dir / "test_file.npy")
+            _f = "pydidas.widgets.file_dialog.PydidasFileDialog.get_existing_filename"
     if cancel:
-        widget.io_dialog.returned_selection = None
-    else:
-        match param.refkey:
-            case "input_directory":
-                widget.io_dialog.returned_selection = str(test_dir)
-            case "output_filename":
-                widget.io_dialog.returned_selection = str(
-                    test_dir / "new_test_file.npy"
-                )
-            case _:  # filename or pattern
-                widget.io_dialog.returned_selection = str(test_dir / "test_file.npy")
-    widget.button_function()
+        _ret_val = None
+    with patch(_f, return_value=_ret_val):
+        widget.button_function()
     _expected_value = (
         str(param.value)
         if cancel
-        else (
-            "test_file.npy"
-            if param.refkey == "file_pattern"
-            else widget.io_dialog.returned_selection[0]
-        )
+        else ("test_file.npy" if param.refkey == "file_pattern" else _ret_val)
     )
     assert widget.current_text == _expected_value
     assert widget.spy_new_value.n == (0 if cancel else 1)
@@ -150,29 +150,47 @@ def test_set_value(qtbot, test_dir, param, entry):
 
 
 @pytest.mark.gui
-def test_drag_and_drop_file(qtbot, test_dir):
-    def _drag_drop_args(mime_data):
-        return (
-            widget.rect().center(),
-            QtCore.Qt.CopyAction,
-            mime_data,
-            QtCore.Qt.LeftButton,
-            QtCore.Qt.NoModifier,
-        )
-
-    widget = widget_from_param(qtbot, param_existing_file)
+@pytest.mark.parametrize("mime_method", ["setUrls", "setText"])
+def test_drag_enter_event(qtbot, test_dir, mime_method):
+    widget = widget_from_param(qtbot, param_output_file)
     # Prepare mime data with a file URL
     mime_data = QtCore.QMimeData()
-    mime_data.setUrls([QtCore.QUrl.fromLocalFile(str(test_dir / "test_file.npy"))])
+    if mime_method == "setUrls":
+        mime_data.setUrls([QtCore.QUrl.fromLocalFile(str(test_dir / "test_file.npy"))])
+    elif mime_method == "setText":
+        mime_data.setText("just plain text")
     # Simulate drag enter
-    drag_enter_event = QtGui.QDragEnterEvent(*_drag_drop_args(mime_data))
-    QtCore.QCoreApplication.sendEvent(widget, drag_enter_event)
-    # Simulate drop
-    drop_event = QtGui.QDropEvent(*_drag_drop_args(mime_data))
-    QtCore.QCoreApplication.sendEvent(widget, drop_event)
-    assert Path(widget.current_text) == test_dir / "test_file.npy"
+    drag_enter_event = QtGui.QDragEnterEvent(*_drag_drop_args(widget, mime_data))
+    widget.dragEnterEvent(drag_enter_event)
+    assert drag_enter_event.isAccepted() == (mime_method == "setUrls")
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("n_files", [0, 1, 2])
+def test_drop_event(qtbot, qapp, test_dir, n_files):
+    widget = widget_from_param(qtbot, param_output_file)
+    widget.set_value(test_dir / "default_file.npy")
     assert widget.spy_new_value.n == 1
-    assert widget.spy_value_changed.n == 1
+    # Prepare mime data with a file URL
+    mime_data = QtCore.QMimeData()
+    if n_files == 0:
+        mime_data.setText("text w/o URI")
+    else:
+        urls = [
+            QtCore.QUrl.fromLocalFile(str(test_dir / f"test_file_{i}.npy"))
+            for i in range(n_files)
+        ]
+        mime_data.setUrls(urls)
+    drop_event = QtGui.QDropEvent(*_drag_drop_args(widget, mime_data))
+    drop_event.acceptProposedAction()
+    with patch("qtpy.QtWidgets.QMessageBox.exec_", return_value=None):
+        widget.dropEvent(drop_event)
+    if n_files == 1:
+        assert Path(widget.current_text) == test_dir / "test_file_0.npy"
+    else:
+        assert Path(widget.current_text) == test_dir / "default_file.npy"
+    assert widget.spy_new_value.n == (1 + (n_files == 1))
+    assert widget.spy_value_changed.n == (1 + (n_files == 1))
 
 
 @pytest.mark.gui

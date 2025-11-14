@@ -26,15 +26,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+from unittest.mock import patch
+
 import h5py
 import numpy as np
 import pytest
-from qtpy import QtWidgets
 
 from pydidas.core import get_generic_parameter
-from pydidas.core.utils import get_hdf5_populated_dataset_keys
 from pydidas.unittest_objects import SignalSpy
-from pydidas.unittest_objects.dummy_file_dialog import DummyFileDialog
 from pydidas.widgets.parameter_config.param_io_widget_hdf5key import (
     ParamIoWidgetHdf5Key,
 )
@@ -49,24 +48,9 @@ _POPULATED_KEYS = {
 }
 
 
-class _DummyHdfDialog:
-    def __init__(self, parent: QtWidgets.QWidget, filename: str):
-        self.filename = filename
-        self.parent = parent
-
-    def get_dset(self):
-        _keys = get_hdf5_populated_dataset_keys(self.filename)
-        if _keys:
-            return _keys[0]
-        raise RuntimeError("No datasets found")
-
-
 def widget_instance(qtbot, qref=None):
     widget = ParamIoWidgetHdf5Key(
-        get_generic_parameter("hdf5_key"),
-        persistent_qsettings_ref=qref,
-        io_dialog=DummyFileDialog(),
-        hdf5_io_dialog_class=_DummyHdfDialog,
+        get_generic_parameter("hdf5_key"), persistent_qsettings_ref=qref
     )
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
@@ -110,22 +94,33 @@ def test__creation(qtbot, test_dir, qref):
         assert widget._io_qsettings_ref == qref
 
 
-@pytest.mark.parametrize("cancel", [True, False])
-def test_button_function(qtbot, test_dir, cancel):
+@pytest.mark.gui
+@pytest.mark.parametrize("fname", [None, "test_file.h5"])
+@pytest.mark.parametrize("selected_dset", [None, list(_POPULATED_KEYS)[0]])
+def test_button_function(qtbot, test_dir, fname, selected_dset):
     widget = widget_instance(qtbot)
-    if cancel:
-        widget.io_dialog.returned_selection = None
-    else:
-        widget.io_dialog.returned_selection = test_dir / "test_file.h5"
-    widget.button_function()
-    if cancel:
-        assert widget.spy_new_value.n == 0
-        assert widget.spy_value_changed.n == 0
-        assert widget.current_text == "/entry/data/data"
-    else:
-        assert widget.spy_new_value.n == 1
-        assert widget.spy_value_changed.n == 1
-        assert widget.current_text == list(_POPULATED_KEYS.keys())[0]
+    if fname is not None:
+        fname = test_dir / fname
+    _entry = widget.current_text
+    with (
+        patch(
+            "pydidas.widgets.file_dialog.PydidasFileDialog.get_existing_filename",
+            return_value=fname,
+        ),
+        patch(
+            "pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.get_dset",
+            return_value=selected_dset,
+        ),
+    ):
+        widget.button_function()
+        if fname is not None and selected_dset is not None:
+            assert widget.current_text == selected_dset
+            assert widget.spy_value_changed.n == 1
+            assert widget.spy_new_value.n == 1
+        else:
+            assert widget.current_text == _entry
+            assert widget.spy_value_changed.n == 0
+            assert widget.spy_new_value.n == 0
 
 
 if __name__ == "__main__":

@@ -27,10 +27,11 @@ __status__ = "Production"
 
 
 import pytest
-from qtpy import QtCore
+from qtpy import QtCore, QtGui
 
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
+from pydidas.widgets import get_pyqt_icon_from_str
 from pydidas.widgets.parameter_config.param_io_widget_with_button import (
     ParamIoWidgetWithButton,
 )
@@ -53,6 +54,8 @@ def _cleanup():
 
 @pytest.fixture
 def widget(qtbot):
+    _standard_button_func = ParamIoWidgetWithButton.button_function
+
     def dummy_button_function(widget):
         widget.button_clicked = True
 
@@ -66,6 +69,7 @@ def widget(qtbot):
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
     yield widget
+    ParamIoWidgetWithButton.button_function = _standard_button_func
     widget.deleteLater()
 
 
@@ -78,9 +82,21 @@ def test__creation(widget):
 
 
 @pytest.mark.gui
-def test_button_function(widget):
-    widget.button_function()
-    assert widget.button_clicked
+@pytest.mark.parametrize(
+    "icon",
+    [None, get_pyqt_icon_from_str("pydidas::generic_copy"), "pydidas::generic_copy"],
+)
+def test__creation__w_icon(icon):
+    widget = ParamIoWidgetWithButton(param, button_icon=icon)
+    assert isinstance(widget, ParamIoWidgetWithButton)
+    assert isinstance(widget._button.icon(), QtGui.QIcon)
+
+
+@pytest.mark.gui
+def test_button_function():
+    widget = ParamIoWidgetWithButton(param)
+    with pytest.raises(NotImplementedError):
+        widget.button_function()
 
 
 @pytest.mark.gui

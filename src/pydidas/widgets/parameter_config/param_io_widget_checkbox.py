@@ -71,12 +71,13 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         param : Parameter
             A Parameter instance.
         **kwargs : Any
-            Supported keyword arguments are all arguments of BaseParamIoWidgetMixIn
+            Supported keyword arguments are all supported arguments of
+             PydidasCheckBox.
         """
-        PydidasCheckBox.__init__(self)
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        PydidasCheckBox.__init__(self, **kwargs)
+        BaseParamIoWidgetMixIn.__init__(self, param)
         self.setText(param.name)
-        self.setEnabled(set(param.choices) == {True, False})
+        self.setEnabled(True in param.choices and False in param.choices)
         self.update_widget_value(param.value)
         if IS_QT6:
             self.checkStateChanged.connect(self.emit_signal)

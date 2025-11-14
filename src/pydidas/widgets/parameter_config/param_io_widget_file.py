@@ -61,20 +61,13 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         param : Parameter
             A Parameter instance.
         **kwargs : Any
-            Optional keyword arguments. Supported kwargs are
-            all kwargs of BaseParamIoWidgetMixIn.
+            Supported keyword arguments are all supported arguments of
+             ParamIoWidgetWithButton.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self.setAcceptDrops(True)
         self._flag_pattern = "pattern" in param.refkey
-        self.io_dialog = kwargs.get("io_dialog", PydidasFileDialog())
-        if "directory" in param.refkey:
-            self.io_dialog_call = self.io_dialog.get_existing_directory
-        else:
-            if param.refkey.startswith("output"):
-                self.io_dialog_call = self.io_dialog.get_saving_filename
-            else:
-                self.io_dialog_call = self.io_dialog.get_existing_filename
+        self.io_dialog = PydidasFileDialog()
         self._io_dialog_config = {
             "reference": id(self),
             "formats": "All files (*.*);;" + IoManager.get_string_of_formats(),
@@ -89,12 +82,17 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        _result = self.io_dialog_call(**self._io_dialog_config)
-        if _result is not None:
+        if "directory" in self._linked_param.refkey:
+            _selection = self.io_dialog.get_existing_directory(**self._io_dialog_config)
+        elif self._linked_param.refkey.startswith("output"):
+            _selection = self.io_dialog.get_saving_filename(**self._io_dialog_config)
+        else:
+            _selection = self.io_dialog.get_existing_filename(**self._io_dialog_config)
+        if _selection is not None:
             if self._flag_pattern:
-                self.io_dialog.set_curr_dir(id(self), _result)
-                _result = os.path.basename(_result)
-            self.set_value(_result)
+                self.io_dialog.set_curr_dir(id(self), _selection)
+                _selection = os.path.basename(_selection)
+            self.set_value(_selection)
 
     def set_value(self, value: Path | str) -> None:
         """

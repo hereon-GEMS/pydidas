@@ -60,17 +60,13 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         param : Parameter
             A Parameter instance.
         **kwargs : Any
-            All keyword arguments which are supported by the BaseParamIoWidgetMixIn.
+            Supported kwargs are all kwargs of ParamIoWidgetWithButton.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self._button.setToolTip(
             "Select the dataset to use from all dataset keys in a file."
         )
-        # need to create the dialogues dynamically to allow emulation in tests
-        self.io_dialog = kwargs.get("io_dialog", PydidasFileDialog())
-        self.hdf5_io_dialog_class = kwargs.get(
-            "hdf5_io_dialog_class", Hdf5DatasetSelectionPopup
-        )
+        self.io_dialog = PydidasFileDialog()
         self._io_qsettings_ref = kwargs.get("persistent_qsettings_ref", None)
 
     def button_function(self) -> None:
@@ -86,6 +82,6 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
             default_extension="nxs",
         )
         if _result is not None:
-            dset = self.hdf5_io_dialog_class(self, _result).get_dset()
+            dset = Hdf5DatasetSelectionPopup(self, _result).get_dset()
             if dset is not None:
                 self.set_value(str(dset))

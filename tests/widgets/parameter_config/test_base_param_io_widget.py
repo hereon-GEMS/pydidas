@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import numbers
 from pathlib import Path
 from typing import Any
 
@@ -33,7 +34,7 @@ import numpy as np
 import pytest
 from numpy import nan
 
-from pydidas.core import Hdf5key, Parameter
+from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import FLOAT_DISPLAY_ACCURACY
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets import PydidasFileDialog
@@ -42,6 +43,13 @@ from pydidas_qtcore import PydidasQApplication
 
 
 class _TestBaseParamWidget(BaseParamIoWidget):
+    """
+    A test subclass of BaseParamIoWidget with minimal implementation.
+
+    The implemented methods are only for testing purposes but are required to
+    fully test the other methods of BaseParamIoWidget.
+    """
+
     def __init__(self, param, **kwargs: Any):
         super().__init__(param, **kwargs)
         self._val = param.value
@@ -72,25 +80,14 @@ def param():
 
 @pytest.fixture
 def widget(qtbot, param):
-    widget = _TestBaseParamWidget(param)
-    widget.show()
-    qtbot.add_widget(widget)
-    qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
+    widget = widget_with_param(qtbot, param)
     return widget
-
-
-@pytest.fixture
-def spy_value_changed(widget):
-    return SignalSpy(widget.sig_value_changed)
-
-
-@pytest.fixture
-def spy_new_value(widget):
-    return SignalSpy(widget.sig_new_value)
 
 
 def widget_with_param(qtbot, param):
     widget = _TestBaseParamWidget(param)
+    widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
+    widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.show()
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
@@ -103,11 +100,6 @@ def test__creation(widget):
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert isinstance(widget._linked_param, Parameter)
-
-
-@pytest.mark.gui
-def test_current_text(widget):
-    assert widget.current_text == "entry"
 
 
 @pytest.mark.gui
@@ -147,15 +139,6 @@ def test_special_type_strings__w_common_entry(widget, case, input_str):
     assert widget.special_type_from_string(input_str) == input_str
 
 
-# TODO : check if sizeHint required
-# @pytest.mark.gui
-# @pytest.mark.parametrize("linebreak", [True, False])
-# def test_size_hint_height_factor(widget, param, linebreak):
-#     widget_lb = _TestBaseParamWidget(param, linebreak=linebreak)
-#     expected_factor = 1 + int(linebreak)
-#     assert widget_lb.sizeHint().height() == 25 * expected_factor
-
-
 @pytest.mark.gui
 @pytest.mark.parametrize(
     "dtype, value, expected",
@@ -173,12 +156,39 @@ def test_special_type_strings__w_common_entry(widget, case, input_str):
 def test_get_value(qtbot, dtype, value, expected):
     param = Parameter("test", dtype, value, allow_None=value == "None")
     widget = widget_with_param(qtbot, param)
+    widget._val = str(value)
+    _result = widget.get_value()
     if expected is None or expected is np.nan:
-        assert widget.get_value() is expected
+        assert _result is expected
     elif dtype == np.ndarray:
-        np.testing.assert_array_equal(widget.get_value(), expected)
+        np.testing.assert_array_equal(_result, expected)
     else:
-        assert widget.get_value() == expected
+        assert _result == expected
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype", [str, int, float])
+def test_get_value__None_number(qtbot, dtype):
+    param = Parameter("test", dtype, "" if dtype is str else 0, allow_None=True)
+    widget = widget_with_param(qtbot, param)
+    widget._val = ""
+    print("is special:", widget.is_special_type_string(widget.current_text))
+    print("current_text:", widget.current_text == "")
+    print("allow_None:", widget._linked_param.allow_None)
+    print("dtype subclass:", issubclass(widget._linked_param.dtype, numbers.Real))
+    if dtype is str:
+        assert widget.get_value() == ""
+    else:
+        assert widget.get_value() is None
+
+
+@pytest.mark.gui
+def test_get_value__converter_error(qtbot):
+    param = Parameter("test", np.ndarray, np.arange(5))
+    widget = widget_with_param(qtbot, param)
+    widget._val = "1,, 2, 3"
+    with pytest.raises(UserConfigError):
+        widget.get_value()
 
 
 @pytest.mark.gui
@@ -203,6 +213,7 @@ def test_get_value(qtbot, dtype, value, expected):
 def test_set_value(qtbot, dtype, value, update, expected):
     param = Parameter("test", dtype, value, allow_None=None in [value, update])
     widget = widget_with_param(qtbot, param)
+    widget._val = update
     widget.set_value(update)
     if value is None or value is np.nan:
         assert param.value is value
@@ -241,21 +252,42 @@ def test_update_io_directory(widget, has_io_dialog, temp_path):
 
 
 @pytest.mark.gui
-def test_emit_signal(widget, spy_value_changed, spy_new_value):
+def test_emit_signal(widget):
     widget.update_widget_value("dummy")
-    assert spy_value_changed.n == 0
-    assert spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
+    assert widget.spy_new_value.n == 0
     widget.emit_signal()
-    assert spy_value_changed.n == 1
-    assert spy_new_value.n == 1
+    assert widget.spy_value_changed.n == 1
+    assert widget.spy_new_value.n == 1
     widget.emit_signal()
-    assert spy_value_changed.n == 1
-    assert spy_new_value.n == 1
-    assert spy_new_value.results[0] == ["dummy"]
+    assert widget.spy_value_changed.n == 1
+    assert widget.spy_new_value.n == 1
+    assert widget.spy_new_value.results[0] == ["dummy"]
     widget.emit_signal(force_update=True)
-    assert spy_value_changed.n == 2
-    assert spy_new_value.n == 2
-    assert spy_new_value.results[1] == ["dummy"]
+    assert widget.spy_value_changed.n == 2
+    assert widget.spy_new_value.n == 2
+    assert widget.spy_new_value.results[1] == ["dummy"]
+
+
+@pytest.mark.gui
+def test_current_text_property():
+    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    with pytest.raises(NotImplementedError):
+        widget.current_text
+
+
+@pytest.mark.gui
+def test_update_widget_value():
+    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    with pytest.raises(NotImplementedError):
+        widget.update_widget_value("default")
+
+
+@pytest.mark.gui
+def test_update_choices():
+    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    with pytest.raises(NotImplementedError):
+        widget.update_choices(["a", "b", "c"])
 
 
 if __name__ == "__main__":

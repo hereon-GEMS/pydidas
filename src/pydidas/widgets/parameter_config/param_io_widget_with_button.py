@@ -36,12 +36,16 @@ from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Parameter
 from pydidas.widgets.factory import PydidasLineEdit, SquareButton
+from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
 )
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
-class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
+class ParamIoWidgetWithButton(
+    BaseParamIoWidgetMixIn, PydidasWidgetMixin, QtWidgets.QWidget
+):
     """
     Widgets for Parameter I/O which includes a freely programmable button.
 
@@ -52,16 +56,17 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     **kwargs : Any
         Optional keyword arguments. Supported kwargs are
 
-        width : int
-            The width (in pixel) to specify the size of the I/O field
         button_icon : QtGui.QIcon
             The icon to use for the button.
     """
 
     def __init__(self, param: Parameter, **kwargs: Any):
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        BaseParamIoWidgetMixIn.__init__(self, param)
+        PydidasWidgetMixin.__init__(self, **kwargs)
         _icon = kwargs.get("button_icon", None)
+        if isinstance(_icon, str):
+            _icon = get_pyqt_icon_from_str(_icon)
         if not isinstance(_icon, QtGui.QIcon):
             _icon = self.style().standardIcon(QStyle.SP_DialogOpenButton)
 
@@ -74,6 +79,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         _layout.addWidget(self._io_lineedit)
         _layout.addWidget(self._button)
         self.setLayout(_layout)
+        self.setFocusProxy(self._io_lineedit)
 
         self._io_lineedit.setText(f"{param.value}")
         self._button.clicked.connect(self.button_function)

@@ -63,24 +63,16 @@ def _cleanup():
 @pytest.fixture
 def widget(qtbot, param):
     widget = ParamIoWidgetComboBox(param)
+    widget.spy_new_value = SignalSpy(widget.sig_new_value)
+    widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
     return widget
 
 
-@pytest.fixture
-def spy_value_changed(widget):
-    return SignalSpy(widget.sig_value_changed)
-
-
-@pytest.fixture
-def spy_new_value(widget):
-    return SignalSpy(widget.sig_new_value)
-
-
 @pytest.mark.gui
-def test__creation(widget, param, spy_value_changed):
+def test__creation(widget, param):
     assert isinstance(widget, ParamIoWidgetComboBox)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
@@ -89,6 +81,14 @@ def test__creation(widget, param, spy_value_changed):
     widget.setCurrentText("\u03a4")  # Tau
     assert widget.current_text == "Tau"
     assert widget.currentText() == "\u03a4"
+
+
+@pytest.mark.gui
+def test__creation__w_value_selected():
+    param = Parameter("test", str, "B", choices=["A", "B", "C"])
+    widget = ParamIoWidgetComboBox(param)
+    assert widget.current_text == "B"
+    assert widget.current_choices == param.choices
 
 
 @pytest.mark.gui
@@ -112,19 +112,27 @@ def test_update_widget_value(widget, index, new_value):
 
 
 @pytest.mark.gui
+@pytest.mark.parametrize("value", [0, 1])
+def test_update_widget_value__w_bool(widget, value):
+    widget.update_choices(["True", "False", "other"])
+    widget.update_widget_value(value)
+    assert widget.current_text == ("True" if value else "False")
+
+
+@pytest.mark.gui
 @pytest.mark.parametrize("emit_signal", [True, False])
 @pytest.mark.parametrize("selection", [None, "invalid"] + _NEW_CHOICES)
-def test_update_choices(
-    widget, emit_signal, selection, spy_value_changed, spy_new_value
-):
+def test_update_choices(widget, emit_signal, selection):
     _new_item = selection != widget.current_text
     _new_choice = selection if selection in _NEW_CHOICES else _NEW_CHOICES[0]
-    assert spy_value_changed.n == 0
+    assert widget.spy_value_changed.n == 0
+    assert widget.current_choices == _PARAM_CHOICES
     widget.update_choices(_NEW_CHOICES, selection=selection, emit_signal=emit_signal)
-    assert spy_value_changed.n == (emit_signal and _new_item)
+    assert widget.spy_value_changed.n == (emit_signal and _new_item)
     if emit_signal and _new_item:
-        assert spy_new_value.results[0] == [_new_choice]
+        assert widget.spy_new_value.results[0] == [_new_choice]
     assert widget.current_text == _new_choice
+    assert widget.current_choices == _NEW_CHOICES
 
 
 if __name__ == "__main__":

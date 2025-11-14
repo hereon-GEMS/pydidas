@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from numbers import Integral
 
 import pytest
@@ -41,11 +42,11 @@ from pydidas_qtcore import PydidasQApplication
 
 param_int = Parameter("test_int", int, 5, name="Test Int")
 param_int_w_None = Parameter(
-    "test_int_none", int, 0, name="Test Int  None", allow_none=True
+    "test_int_none", int, 0, name="Test Int  None", allow_None=True
 )
 param_float = Parameter("test_float", float, 0, name="Test Float")
 param_float_w_None = Parameter(
-    "test_float_none", float, 0.0, name="Test Float None", allow_none=True
+    "test_float_none", float, 0.0, name="Test Float None", allow_None=True
 )
 param_str = Parameter("test_str", str, "default", name="Test Str")
 

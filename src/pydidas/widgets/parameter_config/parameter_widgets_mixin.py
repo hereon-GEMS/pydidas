@@ -55,7 +55,7 @@ class ParameterWidgetsMixIn:
         if not hasattr(self, "params"):
             self.params = ParameterCollection()
 
-    def create_param_widget(self, param: Parameter | str, **kwargs: Any):
+    def create_param_widget(self, param: Parameter | str, **kwargs: Any) -> None:
         """
         Add a name label and input widget for a specific parameter to the widget.
 
@@ -69,13 +69,13 @@ class ParameterWidgetsMixIn:
             gridPos : tuple, optional
                 The grid position in the layout. The default is (-1, 0, 1, 1)
             width_text : float, optional
-                The relative width of the text field for the Parameter name. The default
-                is 0.5.
+                The relative width of the text field for the Parameter name.
+                The default is defined in
+                pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.
             width_unit : float, optional
-                The relative width of the text field for the Parameter unit. The default
-                is 0.07.
-            width_io : int, optional
-                The relative width of the input widget. The default is 0.43.
+                The relative width of the text field for the Parameter unit.
+                The default is defined in
+                pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.
             linebreak : bool, optional
                 Keyword to toggle a line break between the text label and the
                 input widget. The default is False.
@@ -104,7 +104,7 @@ class ParameterWidgetsMixIn:
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
-    def set_param_value_and_widget(self, key: str, value: object):
+    def set_param_value_and_widget(self, key: str, value: Any) -> None:
         """
         Update a parameter value both in the Parameter and the widget.
 
@@ -116,9 +116,9 @@ class ParameterWidgetsMixIn:
         ----------
         key : str
             The reference key for the Parameter.
-        value : object
+        value : Any
             The new parameter value. This must be of the same type as the
-            Parameter datatype.
+            Parameter datatype (or supported by a converter).
 
         Raises
         ------
@@ -133,7 +133,7 @@ class ParameterWidgetsMixIn:
             self.set_param_value(key, value)  # noqa E1101
             self.param_widgets[key].set_value(value)
 
-    def toggle_param_widget_visibility(self, key: str, visible: bool):
+    def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
         """
         Toggle the visibility of widgets referenced with the key.
 
@@ -156,7 +156,7 @@ class ParameterWidgetsMixIn:
             raise KeyError(f'No parameter with key "{key}" found.')
         self.param_composite_widgets[key].setVisible(visible)
 
-    def update_widget_value(self, param_key: str, value: object):
+    def update_widget_value(self, param_key: str, value: Any) -> None:
         """
         Update the value stored in a widget without changing the Parameter.
 
@@ -164,7 +164,7 @@ class ParameterWidgetsMixIn:
         ----------
         param_key : str
             The Parameter reference key.
-        value : object
+        value : Any
             The value. The type depends on the Parameter's value.
         """
-        self.param_widgets[param_key].set_value(value)
+        self.param_widgets[param_key].update_widget_value(value)

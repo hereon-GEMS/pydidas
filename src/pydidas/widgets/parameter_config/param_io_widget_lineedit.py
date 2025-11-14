@@ -56,12 +56,13 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
     param : Parameter
         A Parameter instance.
     **kwargs : Any
-        Any additional kwargs
+        Any additional kwargs. All kwargs are passed to the PydidasLineEdit
+        constructor.
     """
 
     def __init__(self, param: Parameter, **kwargs: Any):
-        PydidasLineEdit.__init__(self, parent=kwargs.get("parent", None))
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        PydidasLineEdit.__init__(self, **kwargs)
+        BaseParamIoWidgetMixIn.__init__(self, param)
         self.update_validator()
         self.setText(f"{param.value}")
         self.editingFinished.connect(self.emit_signal)
@@ -96,10 +97,12 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         if self._linked_param.dtype == numbers.Integral:
             if self._linked_param.allow_None:
                 _validator = QT_REG_EXP_INT_VALIDATOR
-            _validator = QtGui.QIntValidator()
+            else:
+                _validator = QtGui.QIntValidator()
         elif self._linked_param.dtype == numbers.Real:
             if self._linked_param.allow_None:
                 _validator = QT_REG_EXP_FLOAT_VALIDATOR
-            _validator = FLOAT_VALIDATOR
+            else:
+                _validator = FLOAT_VALIDATOR
         if _validator is not None:
             self.setValidator(_validator)

@@ -39,7 +39,6 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     FLOAT_DISPLAY_ACCURACY,
-    GENERIC_STANDARD_WIDGET_WIDTH,
     POLICY_EXP_FIX,
 )
 from pydidas.core.utils import NumpyParser
@@ -53,19 +52,13 @@ class BaseParamIoWidgetMixIn:
     ----------
     param : Parameter
         A Parameter instance.
-    **kwargs : Any
-        Any additional kwargs. Used keyword arguments are:
-
-        linebreak : bool
-            If True, the sizeHint will be increased to allow for a linebreak.
-            The default is False.
     """
 
     sig_new_value = QtCore.Signal(str)
     sig_value_changed = QtCore.Signal()
 
     _SUPPORTED_TYPE_STRINGS = {"true": True, "false": False, "nan": nan, "none": None}
-    _TYPE_CONVERTERS: dict[Type, Any] = {
+    _TYPE_CONVERTERS: dict[Type, Type | Any] = {
         numbers.Integral: int,
         numbers.Real: float,
         pathlib.Path: pathlib.Path,
@@ -73,10 +66,9 @@ class BaseParamIoWidgetMixIn:
         ndarray: NumpyParser,
     }
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter):
         self._linked_param = param
         self._old_value = None
-        self.__size_hint_width_factor = 1 + int(kwargs.get("linebreak", False))
         self.setSizePolicy(*POLICY_EXP_FIX)
 
     @property
@@ -137,20 +129,6 @@ class BaseParamIoWidgetMixIn:
         _input = text.strip().lower()
         return self._SUPPORTED_TYPE_STRINGS.get(_input, text)
 
-    # TODO: check if sizeHint can be removed
-    def sizeHint(self) -> QtCore.QSize:  # noqa C0103
-        """
-        Set a large horizontal size hint to have the widget expand with big font sizes.
-
-        Returns
-        -------
-        QtCore.QSize
-            The sizeHint, depending on the "linebreak" setting.
-        """
-        return QtCore.QSize(
-            self.__size_hint_width_factor * GENERIC_STANDARD_WIDGET_WIDTH, 25
-        )
-
     def get_value(self) -> Any:
         """
         Get the value from the input field.
@@ -177,16 +155,13 @@ class BaseParamIoWidgetMixIn:
         except ValueError as _error:
             _msg = str(_error).capitalize()
             raise UserConfigError(f'ValueError! {_msg} Input text was "{_text}"')
-        # TODO : Check where required
-        # if _text == "" and _value is None:
-        #     self.update_widget(None)
         return _text
 
     def set_value(self, value: Any):
         """
         Set the input field's value.
 
-        This method changes the combobox selection to the specified value.
+        This method changes the IO widget selection to the specified value.
 
         Warning: This method will *not* update the connected Parameter value.
 
@@ -235,7 +210,9 @@ class BaseParamIoWidgetMixIn:
         if hasattr(self, "io_dialog"):
             self.io_dialog.set_curr_dir(id(self), path)
 
-    def update_choices(self, new_choices: list, selection: str | None = None) -> None:
+    def update_choices(
+        self, new_choices: list[Any], selection: str | None = None
+    ) -> None:
         """
         Update the choices of the BaseParamIoWidget in place.
 
@@ -243,8 +220,9 @@ class BaseParamIoWidgetMixIn:
 
         Parameters
         ----------
-        new_choices : list
-            The new choices to be set.
+        new_choices : list[Any]
+            The new choices to be set. While any type is accepted, the choices
+            will be converted to strings for display.
         selection : str | None, optional
             The selection to be set after the update. If None, the first
             choice will be selected. Default is None.
@@ -272,7 +250,9 @@ class BaseParamIoWidgetMixIn:
 
 
 class BaseParamIoWidget(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
-    def __init__(self, param: Parameter, **kwargs: Any) -> None:
+    def __init__(
+        self, param: Parameter, parent: QtWidgets.QWidget | None = None, **kwargs: Any
+    ) -> None:
         """Initialize the widget."""
-        QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        QtWidgets.QWidget.__init__(self, parent=parent)
+        BaseParamIoWidgetMixIn.__init__(self, param)

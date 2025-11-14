@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["EmptyWidget"]
 
 
+from typing import Any
+
 from qtpy.QtWidgets import QGridLayout, QWidget
 
 from pydidas.core.constants import ALIGN_TOP_LEFT
@@ -47,15 +49,13 @@ class EmptyWidget(PydidasWidgetMixin, QWidget):
         "layout_column_stretches",
     ]
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         QWidget.__init__(self)
         PydidasWidgetMixin.__init__(self, **kwargs)
         if kwargs.get("init_layout", True):
             self.setLayout(QGridLayout())
             apply_qt_properties(
-                self.layout(),
-                contentsMargins=(0, 0, 0, 0),
-                alignment=ALIGN_TOP_LEFT,
+                self.layout(), alignment=ALIGN_TOP_LEFT, contentsMargins=(0, 0, 0, 0)
             )
         if "layout_column_stretches" in kwargs:
             for _key, _val in kwargs.get("layout_column_stretches").items():

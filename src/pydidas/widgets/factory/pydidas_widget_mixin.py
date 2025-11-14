@@ -28,23 +28,25 @@ __status__ = "Production"
 __all__ = ["PydidasWidgetMixin"]
 
 
-from typing import Union
+from numbers import Real
+from typing import Any
 
 from qtpy import QtCore
-from qtpy.QtWidgets import QApplication
 
+from pydidas.core import UserConfigError
 from pydidas.core.constants import (
     GENERIC_STANDARD_WIDGET_WIDTH,
     MINIMUN_WIDGET_DIMENSIONS,
 )
 from pydidas.core.utils import apply_qt_properties, update_qwidget_font
+from pydidas_qtcore import PydidasQApplication
 
 
 class PydidasWidgetMixin:
     """
     Mixin class to handle automatic font updated from the QApplication.
 
-    This class allows to use custom font settings (different sizes, bold etc) and
+    This class allows to use custom font settings (different sizes, bold etc.) and
     still update them automatically.
     """
 
@@ -59,13 +61,13 @@ class PydidasWidgetMixin:
         "underline",
     ]
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         """
         Set up the class instance of the subclassed QWidget.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Any kwargs for setting the font or other Qt parameters.
         """
         self.__font_config = {
@@ -76,15 +78,15 @@ class PydidasWidgetMixin:
         }
         self._size_hint = [
             kwargs.get("size_hint_width", GENERIC_STANDARD_WIDGET_WIDTH),
-            25,
+            MINIMUN_WIDGET_DIMENSIONS,
         ]
-        apply_qt_properties(self, **kwargs)
-        self._qtapp = QApplication.instance()
+        apply_qt_properties(self, **kwargs)  # noqa self is a QWidget from base class
+        self._qtapp = PydidasQApplication.instance()
         self.update_fontsize(self._qtapp.font_size)
         self.update_font_family(self._qtapp.font_family)
         self._minimum_width = kwargs.get("minimum_width", MINIMUN_WIDGET_DIMENSIONS)
         if True in self.__font_config.values():
-            update_qwidget_font(self, **self.__font_config)
+            update_qwidget_font(self, **self.__font_config)  # noqa (see above)
         self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
         self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
@@ -92,7 +94,7 @@ class PydidasWidgetMixin:
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self.process_new_font_metrics(*self._qtapp.font_metrics)
 
-    def sizeHint(self) -> QtCore.QSize:
+    def sizeHint(self) -> QtCore.QSize:  # noqa C0103
         """
         Set a reasonable wide sizeHint so the label takes the available space.
 
@@ -143,55 +145,58 @@ class PydidasWidgetMixin:
         font_height : float
             The font height in pixels.
         """
-        if self._font_metric_width_factor is not None:
+        if isinstance(self.font_metric_width_factor, Real):
             _width = max(
                 self._minimum_width,
-                int(self._font_metric_width_factor * font_width),
+                int(self.font_metric_width_factor * font_width),
             )
             self._size_hint[0] = _width
             self.setFixedWidth(_width)
-        if self._font_metric_height_factor is not None:
-            _margins = self.contentsMargins()
+        if isinstance(self.font_metric_height_factor, Real):
+            _margins = self.contentsMargins().top() + self.contentsMargins().bottom()
             _height = max(
                 MINIMUN_WIDGET_DIMENSIONS,
-                int(self._font_metric_height_factor * font_height)
-                + _margins.top()
-                + _margins.bottom()
-                + 6,
+                int(self.font_metric_height_factor * font_height) + _margins + 6,
             )
             self._size_hint[1] = _height
             self.setFixedHeight(_height)
 
     @property
-    def font_metric_height_factor(self) -> Union[None, float]:
+    def font_metric_height_factor(self) -> None | float:
         """
         Get the font metric height factor.
 
-        This method returns None, if the factor has not been set.
-
         Returns
         -------
-        Union[None, float]
-            The font metric height factor.
+        None | float
+            The font metric height factor. None indicates that scaling is disabled.
+            The default is None.
         """
         return self._font_metric_height_factor
 
+    # set an alias for easier access
+    fm_h = font_metric_height_factor
+
     @font_metric_height_factor.setter
-    def font_metric_height_factor(self, factor: Union[None, float]):
+    def font_metric_height_factor(self, factor: None | Real):
         """
         Set the font metric height factor.
 
         Parameters
         ----------
-        factor : Union[None, float]
+        factor : None | Real
             The new font metric height factor. None will disable scaling.
         """
-        self._font_metric_height_factor = factor
-        if factor is not None:
-            self.process_new_font_metrics(*self._qtapp.font_metrics)
+        if not isinstance(factor, (type(None), Real)):
+            raise UserConfigError(
+                "The font metric height factor must be None or a float. The given "
+                f"value was: {factor} (type: {type(factor)})."
+            )
+        self._font_metric_height_factor = factor if factor is None else float(factor)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
 
     @property
-    def font_metric_width_factor(self) -> Union[None, float]:
+    def font_metric_width_factor(self) -> None | float:
         """
         Get the font metric width factor.
 
@@ -199,21 +204,28 @@ class PydidasWidgetMixin:
 
         Returns
         -------
-        Union[None, float]
+        None | Real
             The font metric width factor.
         """
         return self._font_metric_width_factor
 
+    # set an alias for easier access
+    fm_w = font_metric_width_factor
+
     @font_metric_width_factor.setter
-    def font_metric_width_factor(self, factor: Union[None, float]):
+    def font_metric_width_factor(self, factor: None | Real):
         """
         Set the font metric width factor.
 
         Parameters
         ----------
-        factor : Union[None, float]
+        factor : None | float
             The new font metric width factor. None will disable scaling.
         """
-        self._font_metric_width_factor = factor
-        if factor is not None:
-            self.process_new_font_metrics(*self._qtapp.font_metrics)
+        if not isinstance(factor, (type(None), Real)):
+            raise UserConfigError(
+                "The font metric width factor must be None or a float. The given "
+                f"value was: {factor} (type: {type(factor)})."
+            )
+        self._font_metric_width_factor = factor if factor is None else float(factor)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)

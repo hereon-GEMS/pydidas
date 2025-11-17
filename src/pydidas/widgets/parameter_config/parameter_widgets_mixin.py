@@ -171,7 +171,7 @@ class ParameterWidgetsMixIn:
         """
         self.param_widgets[param_key].update_widget_value(value)
 
-    def set_param_value_and_choices(
+    def set_param_and_widget_value_and_choices(
         self, param_key: str, value: Any, choices: None | Sequence[Any]
     ):
         """
@@ -187,5 +187,7 @@ class ParameterWidgetsMixIn:
             The new list of choices for the Parameter. If None, the choices
             for the Parameter will be disabled.
         """
-        super().set_param_value_and_choices(param_key, value, choices)
+        # not using ParameterCollectionMixIn.set_param_value_and_choices method
+        # to have allow using this mixin independently
+        self.params[param_key].set_value_and_choices(value, choices)
         self.param_composite_widgets[param_key].update_choices_from_param()

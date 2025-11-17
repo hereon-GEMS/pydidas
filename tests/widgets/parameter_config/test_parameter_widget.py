@@ -345,5 +345,35 @@ def test_update_choices_from_param(qtbot, selection):
     assert widget.spy_value_changed.n == 0
 
 
+@pytest.mark.gui
+@pytest.mark.parametrize("selection", ["A", "B", "C"])
+def test_update_choices_from_param__no_previous_choices(qtbot, selection):
+    param = Parameter("test", str, "D")
+    widget = widget_instance(qtbot, param)
+    param.update_value_and_choices(selection, choices=["A", "B", "C"])
+    widget.update_choices_from_param()
+    qtbot.wait(5)  # wait for signal processing
+    assert isinstance(widget.io_widget, ParamIoWidgetComboBox)
+    assert widget.io_widget.current_choices == ["A", "B", "C"]
+    assert widget.display_value == selection
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("selection", ["A", "B", "C"])
+def test_update_choices_from_param__choices_removed(qtbot, selection):
+    param = Parameter("test", str, "D", choices=["D", "E", "F"])
+    widget = widget_instance(qtbot, param)
+    param.update_value_and_choices(selection, None)
+    widget.update_choices_from_param()
+    qtbot.wait(5)  # wait for signal processing
+    assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
+    assert widget.io_widget.current_choices is None
+    assert widget.display_value == selection
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
+
+
 if __name__ == "__main__":
     pytest.main([])

@@ -343,9 +343,15 @@ class ParameterWidget(EmptyWidget):
         NOTE: THIS METHOD WILL NOT UPDATE THE PARAMETER VALUE OR THE
         PARAMETER'S CHOICES. IT ONLY UPDATES THE WIDGET IN PLACE.
         """
-        try:
+        if not isinstance(self.io_widget, self._param_widget_class):
+            self.layout().removeWidget(self.io_widget)
+            self._widgets["io"].deleteLater()
+            self.__create_param_io_widget()
+            self._widgets["io"].sig_new_value.connect(self.set_param_value)
+            self._widgets["io"].sig_new_value.connect(self.sig_new_value)
+            self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
+        _choices = self.param.choices
+        if _choices is not None:
             self._widgets["io"].update_choices(
                 self.param.choices, selection=self.param.value, emit_signal=False
             )
-        except NotImplementedError:
-            pass

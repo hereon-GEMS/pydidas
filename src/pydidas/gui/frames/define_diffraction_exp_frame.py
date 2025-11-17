@@ -331,8 +331,8 @@ class DefineDiffractionExpFrame(BaseFrame):
         _center = EXP.beamcenter.rounded(3)
         self._bc_params.set_value("beamcenter_x", _center.x)
         self._bc_params.set_value("beamcenter_y", _center.y)
-        self.update_widget_value("beamcenter_x", _center.x)
-        self.update_widget_value("beamcenter_y", _center.y)
+        self.update_param_widget_value("beamcenter_x", _center.x)
+        self.update_param_widget_value("beamcenter_y", _center.y)
 
     def import_from_file(self) -> None:
         """
@@ -380,7 +380,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         if index == self.frame_index:
             if hash(self.params) != self._config["exp_hash"]:
                 for _key, _param in EXP.params.items():
-                    self.update_widget_value(_key, _param.value)
+                    self.update_param_widget_value(_key, _param.value)
                 self._config["exp_hash"] = hash(self.params)
         else:
             self._config["exp_hash"] = hash(self.params)

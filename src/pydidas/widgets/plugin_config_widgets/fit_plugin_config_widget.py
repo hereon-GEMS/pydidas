@@ -125,7 +125,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         """
         for param in self.plugin.params.values():
             if param.refkey != "fit_output":
-                self.update_widget_value(param.refkey, param.value)
+                self.update_param_widget_value(param.refkey, param.value)
             if param.refkey == "fit_output":
                 _keys = param.value.split("; ")
                 for _key in self._fit_output:

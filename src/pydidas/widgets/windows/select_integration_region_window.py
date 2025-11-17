@@ -260,7 +260,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         Overload the generic show to also update the input widgets.
         """
         for _key in self.param_widgets:
-            self.update_widget_value(_key, self.get_param_value(_key))
+            self.update_param_widget_value(_key, self.get_param_value(_key))
         self._roi_controller.update_input_widgets()
         self._roi_controller.show_plot_items("roi")
         QtWidgets.QWidget.show(self)

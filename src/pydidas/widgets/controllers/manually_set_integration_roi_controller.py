@@ -329,7 +329,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             The new value.
         """
         self._plugin.set_param_value(key, value)
-        self._editor.update_widget_value(key, value)
+        self._editor.update_param_widget_value(key, value)
 
     def _show_integration_region(self):
         """
@@ -470,10 +470,10 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         self._plugin.convert_radial_range_values(self._config["rad_unit"], new_unit)
         self._config["rad_unit"] = new_unit
-        self._editor.update_widget_value(
+        self._editor.update_param_widget_value(
             "rad_range_lower", self._plugin.get_param_value("rad_range_lower")
         )
-        self._editor.update_widget_value(
+        self._editor.update_param_widget_value(
             "rad_range_upper", self._plugin.get_param_value("rad_range_upper")
         )
 

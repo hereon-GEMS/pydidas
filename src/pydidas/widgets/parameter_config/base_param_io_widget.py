@@ -85,6 +85,20 @@ class BaseParamIoWidgetMixIn:
         """
         raise NotImplementedError
 
+    @property
+    def current_choices(self) -> list[str] | None:
+        """
+        Get the current list of choices in the widget.
+
+        This method needs to be implemented by the subclass, if required.
+
+        Returns
+        -------
+        list[str] | None
+            The current list of choices in the widget, or None if not applicable.
+        """
+        return None
+
     def update_widget_value(self, value: Any) -> None:
         """
         Update the widget display to show the given value.
@@ -214,7 +228,10 @@ class BaseParamIoWidgetMixIn:
             self.io_dialog.set_curr_dir(id(self), path)
 
     def update_choices(
-        self, new_choices: list[Any], selection: str | None = None
+        self,
+        new_choices: list[Any],
+        selection: str | None = None,
+        emit_signal: bool = True,
     ) -> None:
         """
         Update the choices of the BaseParamIoWidget in place.
@@ -229,6 +246,9 @@ class BaseParamIoWidgetMixIn:
         selection : str | None, optional
             The selection to be set after the update. If None, the first
             choice will be selected. Default is None.
+        emit_signal : bool, optional
+            Flag to toggle emitting a changed signal after updating the choices
+            (if the selection has changed). The default is True.
         """
         raise NotImplementedError(
             "The update_choices method must is only implemented if the associated "

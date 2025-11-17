@@ -310,9 +310,9 @@ class DataBrowsingFrame(BaseFrame):
                 _curr_choice = 0
         self.params["xcol"].update_value_and_choices(_curr_choice, _new_choices)
         self.param_composite_widgets["xcol"].setVisible(_ascii_data.ndim > 1)
-        with QtCore.QSignalBlocker(self.param_widgets["xcol"]):
-            self.param_widgets["xcol"].update_choices(_new_choices)
-            self.update_widget_value("xcol", _curr_choice)
+        self.param_widgets["xcol"].update_choices(
+            _new_choices, selection=_curr_choice, emit_signal=False
+        )
         self.__display_ascii_data(_curr_choice)
 
     def __display_ascii_data(self, use_x_col: str):

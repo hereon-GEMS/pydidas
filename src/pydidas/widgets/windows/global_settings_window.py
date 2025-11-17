@@ -170,7 +170,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
             self.restore_all_defaults(True)
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
-                self.update_widget_value(_param_key, _value)
+                self.update_param_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
 
     @QtCore.Slot()

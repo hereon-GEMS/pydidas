@@ -126,11 +126,12 @@ class ParameterWidgetsMixIn:
             If no parameter or widget has been registered with this key.
         """
         if key not in self.params or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
+            raise KeyError(
+                f'No parameter with the key `{key}` and associated widget is "'
+                f'"registered in this class.'
+            )
         with QtCore.QSignalBlocker(self.param_widgets[key]):
-            # The set_param_value method is expected to be defined in the
-            # class that uses this mixin:
-            self.set_param_value(key, value)  # noqa E1101
+            self.param_widgets[key].param.set_value(key, value)
             self.param_widgets[key].set_value(value)
 
     def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
@@ -156,9 +157,10 @@ class ParameterWidgetsMixIn:
             raise KeyError(f'No parameter with key "{key}" found.')
         self.param_composite_widgets[key].setVisible(visible)
 
-    def update_widget_value(self, param_key: str, value: Any) -> None:
+    def update_param_widget_value(self, param_key: str, value: Any) -> None:
         """
-        Update the value stored in a widget without changing the Parameter.
+        Update the value stored in a widget without changing the Parameter and
+        without emitting signals.
 
         Parameters
         ----------

@@ -379,12 +379,12 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """
         if new_value is None:
             new_value = self.get_param_value("cmap_nan_color").upper()
-            self.update_widget_value("cmap_nan_color", new_value)
+            self.update_param_widget_value("cmap_nan_color", new_value)
         elif isinstance(new_value, QtGui.QColor):
             new_value = new_value.name().upper()
         self.update_qsetting("cmap_nan_color", new_value)
         self._update_cmap_nan_current_color(new_value)
-        self.update_widget_value("cmap_nan_color", new_value)
+        self.update_param_widget_value("cmap_nan_color", new_value)
 
     def _update_cmap_nan_current_color(self, new_color: QtGui.QColor | str):
         """
@@ -528,7 +528,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
                 )
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
-                self.update_widget_value(_param_key, _value)
+                self.update_param_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
                 self.q_settings_set(f"user/{_param_key}", _value)
             self.process_new_fontsize_setting()

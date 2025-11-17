@@ -329,5 +329,21 @@ def test_set_value(qtbot, dtype, default, new_value):
     assert widget.spy_value_changed.n == 1
 
 
+@pytest.mark.gui
+@pytest.mark.parametrize("selection", ["A", "B", "C"])
+def test_update_choices_from_param(qtbot, selection):
+    param = Parameter("test", str, "D", choices=["D", "E", "F"])
+    widget = widget_instance(qtbot, param)
+    param.update_value_and_choices(selection, choices=["A", "B", "C"])
+    print(widget.io_widget.current_choices)
+    widget.update_choices_from_param()
+    qtbot.wait(5)  # wait for signal processing
+    assert widget.io_widget.current_choices == ["A", "B", "C"]
+    assert widget.param.choices == ["A", "B", "C"]
+    assert widget.display_value == selection
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
+
+
 if __name__ == "__main__":
     pytest.main([])

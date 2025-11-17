@@ -495,8 +495,8 @@ class QuickIntegrationFrame(BaseFrame):
                 if _key in self.param_widgets:
                     self.param_widgets[_key].set_value(_param.value)
         _center = self._EXP.beamcenter
-        self.update_widget_value("beamcenter_x", np.round(_center.x, 3))
-        self.update_widget_value("beamcenter_y", np.round(_center.y, 3))
+        self.update_param_widget_value("beamcenter_x", np.round(_center.x, 3))
+        self.update_param_widget_value("beamcenter_y", np.round(_center.y, 3))
 
     @QtCore.Slot()
     def _run_integration(self) -> None:

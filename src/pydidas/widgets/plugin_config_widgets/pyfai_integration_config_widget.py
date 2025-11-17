@@ -146,7 +146,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         Update the configuration fields of the plugin.
         """
         for param in self.plugin.params.values():
-            self.update_widget_value(param.refkey, param.value)
+            self.update_param_widget_value(param.refkey, param.value)
         self._toggle_azimuthal_ranges_visibility(
             self.plugin.get_param_value("azi_use_range")
         )

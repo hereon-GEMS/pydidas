@@ -335,3 +335,17 @@ class ParameterWidget(EmptyWidget):
             The new value to be set.
         """
         self._widgets["io"].set_value(value)
+
+    def update_choices_from_param(self) -> None:
+        """
+        Update the choices of the Parameter's widget from the Parameter.
+
+        NOTE: THIS METHOD WILL NOT UPDATE THE PARAMETER VALUE OR THE
+        PARAMETER'S CHOICES. IT ONLY UPDATES THE WIDGET IN PLACE.
+        """
+        try:
+            self._widgets["io"].update_choices(
+                self.param.choices, selection=self.param.value, emit_signal=False
+            )
+        except NotImplementedError:
+            pass

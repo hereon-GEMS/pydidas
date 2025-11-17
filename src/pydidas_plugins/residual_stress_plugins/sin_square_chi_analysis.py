@@ -175,7 +175,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         self.params = ParameterCollection(
             *(self.params[_key] for _key in _PARAM_KEY_ORDER)
         )
-        self.params["keep_results"].update_value_and_choices(1, [1])
+        self.set_param_value_and_choices("keep_results", 1, [1])
         self._fit_slice: slice | None = None
         self._details: dict = {}
         self._figure: plt.Figure | None = None

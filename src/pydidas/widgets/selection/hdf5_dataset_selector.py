@@ -219,7 +219,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         if len(_datasets) == 0:
             _datasets = [""]
         _param_widget = self.param_widgets["dataset"]
-        self.params["dataset"].update_value_and_choices(_datasets[0], _datasets)
+        self.set_param_value_and_choices("dataset", _datasets[0], _datasets)
         _param_widget.update_choices(_datasets)
         _param_widget.view().setMinimumWidth(
             get_max_pixel_width_of_entries(_datasets) + 50

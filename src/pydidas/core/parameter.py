@@ -640,7 +640,7 @@ class Parameter:
         new_range = (float(new_range[0]), float(new_range[1]))
         self.__meta["range"] = new_range
 
-    def update_value_and_choices(self, value: Any, choices: None | Sequence[Any]):
+    def set_value_and_choices(self, value: Any, choices: None | Sequence[Any]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 

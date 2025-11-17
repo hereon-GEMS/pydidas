@@ -281,7 +281,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             for _key, _val in self.__current_results._config["plugin_names"].items()
             if StoreSinSquareChiData.plugin_name in _val
         } | {"no selection": -1}
-        self.params["selected_sin_square_chi_node"].update_value_and_choices(
+        self.set_param_value_and_choices(
+            "selected_sin_square_chi_node",
             list(self._sin_square_chi_node_keys)[0],
             list(self._sin_square_chi_node_keys),
         )
@@ -293,7 +294,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             for _key, _val in self.__current_results._config["plugin_names"].items()
             if StoreSinTwoChiData.plugin_name in _val
         } | {"no selection": -1}
-        self.params["selected_sin_2chi_node"].update_value_and_choices(
+        self.set_param_value_and_choices(
+            "selected_sin_2chi_node",
             list(self._sin_2chi_node_keys)[0],
             list(self._sin_2chi_node_keys),
         )

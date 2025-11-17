@@ -11,6 +11,8 @@ Improvements
 Programmatic changes
 --------------------
 - Refactored the Parameter I/O widgets and added tests
+- Overhauled the ParameterCollectionMixin and removed unused methods.
+-
 
 Bugfixes
 --------
@@ -812,7 +814,7 @@ Improvements
       and 2D plots and allows to plot data using a single interface.
     - Moved the CompositeCreator frame from the main toolbar menu to the 
       utilities.
-    - Added an 'update_value_and_choices' method to the Parameter to change the 
+    - Added an 'update_value_and_choices' method to the Parameter to change the
       value and choices simultaneously without any incorrect intermediate 
       status.
 

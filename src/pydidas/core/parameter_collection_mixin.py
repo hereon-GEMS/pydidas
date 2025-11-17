@@ -29,7 +29,7 @@ __all__ = ["ParameterCollectionMixIn"]
 
 
 from numbers import Integral
-from typing import Any, NoReturn
+from typing import Any, NoReturn, Sequence
 
 from numpy import mod
 
@@ -57,18 +57,6 @@ class ParameterCollectionMixIn:
                 "The ParameterCollectionMixIn class requires an instance of "
                 "ParameterCollection."
             )
-
-    @classmethod
-    def get_default_params_copy(cls) -> ParameterCollection:
-        """
-        Get a copy of the default ParameterCollection.
-
-        Returns
-        -------
-        ParameterCollection
-            A copy of the default ParameterCollection.
-        """
-        return cls.default_params.copy()
 
     @property
     def param_values(self) -> dict:
@@ -107,23 +95,6 @@ class ParameterCollectionMixIn:
         """
         self.params.add_param(param)
 
-    def update_params_from_init(
-        self, *args: Parameter | ParameterCollection, **kwargs: Any
-    ):
-        """
-        Update the Parameters from the given init args and kwargs.
-
-        Parameters
-        ----------
-        *args : Parameter | ParameterCollection
-            The input arguments.
-        **kwargs : Any
-            The input keyword arguments.
-        """
-        self.add_params(*args)
-        self.set_default_params()
-        self.update_param_values_from_kwargs(**kwargs)
-
     def add_params(self, *params: Parameter | ParameterCollection):
         """
         Add parameters to the object.
@@ -149,6 +120,23 @@ class ParameterCollectionMixIn:
                     f'Cannot add object of type "{_param.__class__}" '
                     "to ParameterCollection."
                 )
+
+    def update_params_from_init_args_and_kwargs(
+        self, *args: Parameter | ParameterCollection, **kwargs: Any
+    ):
+        """
+        Update the Parameters from the given init args and kwargs.
+
+        Parameters
+        ----------
+        *args : Parameter | ParameterCollection
+            The input arguments.
+        **kwargs : Any
+            The input keyword arguments.
+        """
+        self.add_params(*args)
+        self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
 
     def set_default_params(self):
         """
@@ -290,7 +278,9 @@ class ParameterCollectionMixIn:
         for _key, _val in kwargs.items():
             self.params.set_value(_key, _val)
 
-    def get_param_values_as_dict(self, filter_types_for_export: bool = False) -> dict:
+    def get_param_values_as_dict(
+        self, filter_types_for_export: bool = False
+    ) -> dict[str, Any]:
         """
         Get a dictionary with Parameter names and values only.
 
@@ -301,7 +291,7 @@ class ParameterCollectionMixIn:
 
         Returns
         -------
-        name_val_pairs : dict
+        dict[str, Any]
             The dictionary with Parameter <name>: <value> pairs.
         """
         name_val_pairs = {
@@ -323,16 +313,24 @@ class ParameterCollectionMixIn:
             if _key in self.params:
                 self.set_param_value(_key, _value)
 
-    def get_param_keys(self) -> list[str]:
+    def set_param_value_and_choices(
+        self, param_key: str, value: Any, choices: None | Sequence[Any]
+    ):
         """
-        Get the keys of all registered Parameters.
+        Update a Parameter's value and choices.
 
-        Returns
-        -------
-        list
-            The keys of all registered Parameters.
+        Parameters
+        ----------
+        param_key : str
+            The reference key for the Parameter.
+        value : Any
+            The new value for the Parameter.
+        choices : None or Sequence[Any]
+            The new list of choices for the Parameter. If None, the choices
+            for the Parameter will be disabled.
         """
-        return list(self.params.keys())
+        self._check_key(param_key)
+        self.params[param_key].set_value_and_choices(value, choices)
 
     def print_param_values(self):
         """

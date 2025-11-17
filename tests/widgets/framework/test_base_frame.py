@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import unittest
 
+import pytest
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter
@@ -48,6 +49,7 @@ class SignalTestClass(QtCore.QObject):
         self.signal.emit(sig)
 
 
+@pytest.mark.gui
 class TestBaseFrame(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

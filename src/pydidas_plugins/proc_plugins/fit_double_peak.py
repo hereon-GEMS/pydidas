@@ -38,7 +38,7 @@ _FUNC_CHOICES = FitFuncMeta.get_fitter_names_with_num_peaks(2)
 _DEFAULTS = BaseFitPlugin.default_params.copy() | get_generic_param_collection(
     *_2PEAK_PARAMS
 )
-_DEFAULTS["fit_func"].update_value_and_choices(_FUNC_CHOICES[0], _FUNC_CHOICES)
+_DEFAULTS["fit_func"].set_value_and_choices(_FUNC_CHOICES[0], _FUNC_CHOICES)
 
 _ADVANCED = BaseFitPlugin.advanced_parameters + _2PEAK_PARAMS
 

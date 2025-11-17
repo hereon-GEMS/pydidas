@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
 
-from typing import Any
+from typing import Any, Sequence
 
 from qtpy import QtCore
 
@@ -131,8 +131,8 @@ class ParameterWidgetsMixIn:
                 f'"registered in this class.'
             )
         with QtCore.QSignalBlocker(self.param_widgets[key]):
-            self.param_widgets[key].param.set_value(key, value)
-            self.param_widgets[key].set_value(value)
+            self.param_composite_widgets[key].param.value = value
+            self.param_composite_widgets[key].set_value(value)
 
     def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
         """
@@ -170,3 +170,22 @@ class ParameterWidgetsMixIn:
             The value. The type depends on the Parameter's value.
         """
         self.param_widgets[param_key].update_widget_value(value)
+
+    def set_param_value_and_choices(
+        self, param_key: str, value: Any, choices: None | Sequence[Any]
+    ):
+        """
+        Update a Parameter's value and choices as well as the associated widget.
+
+        Parameters
+        ----------
+        param_key : str
+            The reference key for the Parameter.
+        value : Any
+            The new value for the Parameter.
+        choices : None or Sequence[Any]
+            The new list of choices for the Parameter. If None, the choices
+            for the Parameter will be disabled.
+        """
+        super().set_param_value_and_choices(param_key, value, choices)
+        self.param_composite_widgets[param_key].update_choices_from_param()

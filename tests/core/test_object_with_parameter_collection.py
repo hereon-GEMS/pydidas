@@ -245,11 +245,6 @@ class TestObjectWithParameterCollection(unittest.TestCase):
             obj.set_param_values(Test0=42, Test5=42)
         self.assertEqual(_val0, obj.get_param_value("Test0"))
 
-    def test_get_param_keys(self):
-        obj = ObjectWithParameterCollection()
-        obj.add_params(self._params)
-        self.assertEqual(obj.get_param_keys(), list(obj.params.keys()))
-
     def test_set_param_value__no_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
@@ -312,9 +307,18 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj._get_param_value_with_modulo("Test3", 10)
 
-    def test_get_default_params_copy(self):
-        defaults = ObjectWithParameterCollection.get_default_params_copy()
-        self.assertIsInstance(defaults, ParameterCollection)
+    def test_set_param_value_and_choices(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_value_and_choices("Test1", "new str", ["new str", "another"])
+        self.assertEqual(obj.get_param_value("Test1"), "new str")
+        self.assertEqual(obj.params["Test1"].choices, ["new str", "another"])
+
+    def test_set_param_value_and_choices__missing_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        with self.assertRaises(KeyError):
+            obj.set_param_value_and_choices("Test42", "A", None)
 
     def test_set_default_params(self):
         obj = ObjectWithParameterCollection()

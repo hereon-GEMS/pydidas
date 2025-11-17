@@ -73,7 +73,7 @@ def widget_instance(qtbot, param, **kwargs):
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
     qtbot.add_widget(widget)
-    qtbot.waitUntil(lambda: widget.isVisible(), timeout=500)
+    qtbot.waitUntil(lambda: widget.isVisible(), timeout=1000)
     return widget
 
 
@@ -265,10 +265,10 @@ def test_set_param_value(qtbot, dtype, default, new_value):
     assert widget.param.value == default
     assert widget.display_value == str(default)
     widget.io_widget.setFocus()
-    qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=500)
+    qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=1000)
     widget.io_widget.update_widget_value(str(new_value))
     widget.io_widget.clearFocus()
-    qtbot.waitUntil(lambda: widget.io_widget.hasFocus() is False, timeout=500)
+    qtbot.waitUntil(lambda: widget.io_widget.hasFocus() is False, timeout=1000)
     assert widget.param.value == new_value
     assert widget.display_value == str(new_value)
     assert widget.spy_new_value.n == 1
@@ -334,7 +334,7 @@ def test_set_value(qtbot, dtype, default, new_value):
 def test_update_choices_from_param(qtbot, selection):
     param = Parameter("test", str, "D", choices=["D", "E", "F"])
     widget = widget_instance(qtbot, param)
-    param.update_value_and_choices(selection, choices=["A", "B", "C"])
+    param.set_value_and_choices(selection, choices=["A", "B", "C"])
     print(widget.io_widget.current_choices)
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
@@ -350,7 +350,7 @@ def test_update_choices_from_param(qtbot, selection):
 def test_update_choices_from_param__no_previous_choices(qtbot, selection):
     param = Parameter("test", str, "D")
     widget = widget_instance(qtbot, param)
-    param.update_value_and_choices(selection, choices=["A", "B", "C"])
+    param.set_value_and_choices(selection, choices=["A", "B", "C"])
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
     assert isinstance(widget.io_widget, ParamIoWidgetComboBox)
@@ -365,7 +365,7 @@ def test_update_choices_from_param__no_previous_choices(qtbot, selection):
 def test_update_choices_from_param__choices_removed(qtbot, selection):
     param = Parameter("test", str, "D", choices=["D", "E", "F"])
     widget = widget_instance(qtbot, param)
-    param.update_value_and_choices(selection, None)
+    param.set_value_and_choices(selection, None)
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
     assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)

@@ -66,7 +66,7 @@ class BaseApp(ObjectWithParameterCollection):
     def __init__(self, *args: tuple, **kwargs: dict):
         self.clone_mode = kwargs.pop("clone_mode", False)
         ObjectWithParameterCollection.__init__(self)
-        self.update_params_from_init(*args, **kwargs)
+        self.update_params_from_init_args_and_kwargs(*args, **kwargs)
         self.parse_args_and_set_params()
         self._config["run_prepared"] = False
         self.mp_manager = {}

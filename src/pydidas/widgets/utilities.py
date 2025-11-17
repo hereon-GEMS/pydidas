@@ -262,7 +262,7 @@ def update_param_and_widget_choices(param_widget: QtWidgets.QWidget, new_choices
         _param.choices = None
         _param.value = ""
     else:
-        _param.update_value_and_choices(new_choices[0], new_choices)
+        _param.set_value_and_choices(new_choices[0], new_choices)
     param_widget.io_widget.setEnabled(len(new_choices) != 0)
     with QtCore.QSignalBlocker(param_widget.io_widget):
         if len(new_choices) == 0:

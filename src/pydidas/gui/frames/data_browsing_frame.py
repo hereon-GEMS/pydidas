@@ -308,7 +308,7 @@ class DataBrowsingFrame(BaseFrame):
                 _curr_choice = None
             if _ascii_data.shape[1] == 2:
                 _curr_choice = 0
-        self.params["xcol"].update_value_and_choices(_curr_choice, _new_choices)
+        self.set_param_value_and_choices("xcol", _curr_choice, _new_choices)
         self.param_composite_widgets["xcol"].setVisible(_ascii_data.ndim > 1)
         self.param_widgets["xcol"].update_choices(
             _new_choices, selection=_curr_choice, emit_signal=False

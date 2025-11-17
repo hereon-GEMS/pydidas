@@ -257,7 +257,7 @@ class QuickIntegrationFrame(BaseFrame):
             _model = _det_models[0]
         self._EXP.set_param_value("detector_npixx", self._image.shape[1])
         self._EXP.set_param_value("detector_npixy", self._image.shape[0])
-        self.params["detector_model"].update_value_and_choices(_model, _det_models)
+        self.set_param_value_and_choices("detector_model", _model, _det_models)
         self.param_widgets["detector_model"].update_choices(
             _det_models, selection=_model
         )

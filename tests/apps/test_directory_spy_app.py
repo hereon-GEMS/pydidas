@@ -42,6 +42,7 @@ from pydidas.core.utils import get_random_string
 _FNAME_PATTERN = "test_12345_#####_suffix.npy"
 _FNAME_GLOB_STR = _FNAME_PATTERN.replace("#####", "*")
 _IMG_SHAPE = (20, 20)
+_SHARE_SHAPE = (100, 100)
 
 
 def _glob_pattern(path: os.PathLike) -> str:
@@ -88,7 +89,7 @@ def mask() -> np.ndarray:
 
 @pytest.fixture
 def app(empty_temp_path):
-    app = DirectorySpyApp()
+    app = DirectorySpyApp(image_size=_SHARE_SHAPE)
     app.set_param_value("scan_for_all", False)
     app.set_param_value("directory_path", empty_temp_path)
     app.set_param_value("use_detector_mask", False)
@@ -117,6 +118,7 @@ def dummy_parse_func():
 def test_creation():
     app = DirectorySpyApp()
     assert isinstance(app, DirectorySpyApp)
+    assert app._DirectorySpyApp__image_size == DirectorySpyApp.AVAILABLE_IMAGE_SIZE
 
 
 def test_creation_with_args():
@@ -287,7 +289,7 @@ def test_initialize_arrays_from_shared_memory(app):
     app.initialize_shared_memory()
     app._DirectorySpyApp__initialize_array_from_shared_memory()
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_load_bg_file__simple(empty_temp_path, app):
@@ -365,7 +367,7 @@ def test_prepare_run__master(empty_temp_path, app):
     assert app._fname(42) != ""
     assert app._config["path"] == str(empty_temp_path)
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_prepare_run__as_clone(app):
@@ -385,7 +387,7 @@ def test_multiprocessing_pre_run(empty_temp_path, app):
     assert app._fname(42) != ""
     assert app._config["path"] == str(empty_temp_path)
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_multiprocessing_post_run(app):

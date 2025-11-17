@@ -137,9 +137,11 @@ class DirectorySpyApp(BaseApp):
         "_index",
         "multiprocessing_carryon",
     ]
+    AVAILABLE_IMAGE_SIZE = (10000, 10000)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.__image_size = kwargs.get("image_size", self.AVAILABLE_IMAGE_SIZE)
         self._det_mask = None
         self._bg_image = None
         self._fname = lambda x: ""
@@ -312,7 +314,9 @@ class DirectorySpyApp(BaseApp):
         _share["width"] = mp.Value("I", lock=mp.Lock())
         _share["height"] = mp.Value("I", lock=mp.Lock())
         _share["metadata"] = mp.Array("c", 200)
-        _share["array"] = mp.Array("f", 10000 * 10000, lock=mp.Lock())
+        _share["array"] = mp.Array(
+            "f", self.__image_size[0] * self.__image_size[1], lock=mp.Lock()
+        )
 
     def __initialize_array_from_shared_memory(self):
         """
@@ -320,7 +324,7 @@ class DirectorySpyApp(BaseApp):
         """
         self._shared_array = np.frombuffer(
             self._config["shared_memory"]["array"].get_obj(), dtype=np.float32
-        ).reshape((10000, 10000))
+        ).reshape(self.__image_size)
 
     def multiprocessing_carryon(self) -> bool:
         """

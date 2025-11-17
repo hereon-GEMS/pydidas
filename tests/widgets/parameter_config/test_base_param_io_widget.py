@@ -26,7 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import numbers
 from pathlib import Path
 from typing import Any
 
@@ -80,8 +79,7 @@ def param():
 
 @pytest.fixture
 def widget(qtbot, param):
-    widget = widget_with_param(qtbot, param)
-    return widget
+    return widget_with_param(qtbot, param)
 
 
 def widget_with_param(qtbot, param):
@@ -172,10 +170,6 @@ def test_get_value__None_number(qtbot, dtype):
     param = Parameter("test", dtype, "" if dtype is str else 0, allow_None=True)
     widget = widget_with_param(qtbot, param)
     widget._val = ""
-    print("is special:", widget.is_special_type_string(widget.current_text))
-    print("current_text:", widget.current_text == "")
-    print("allow_None:", widget._linked_param.allow_None)
-    print("dtype subclass:", issubclass(widget._linked_param.dtype, numbers.Real))
     if dtype is str:
         assert widget.get_value() == ""
     else:
@@ -227,6 +221,9 @@ def test_set_value(qtbot, dtype, value, update, expected):
         np.testing.assert_array_equal(widget._val, np.array(expected))
     else:
         assert widget._val == expected
+    assert widget.spy_new_value.n == 1
+    assert widget.spy_value_changed.n == 1
+    assert widget.spy_new_value.results[0] == [str(expected)]
 
 
 @pytest.mark.gui

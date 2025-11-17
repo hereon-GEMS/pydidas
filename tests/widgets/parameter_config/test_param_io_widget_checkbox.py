@@ -54,25 +54,13 @@ def _cleanup():
 
 @pytest.fixture
 def widget(qtbot, param):
-    widget = ParamIoWidgetCheckBox(param)
-    widget.show()
-    qtbot.add_widget(widget)
-    qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
-    return widget
-
-
-@pytest.fixture
-def spy_value_changed(widget):
-    return SignalSpy(widget.sig_value_changed)
-
-
-@pytest.fixture
-def spy_new_value(widget):
-    return SignalSpy(widget.sig_new_value)
+    return widget_with_param(qtbot, param)
 
 
 def widget_with_param(qtbot, param):
     widget = ParamIoWidgetCheckBox(param)
+    widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
+    widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.show()
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
@@ -80,13 +68,13 @@ def widget_with_param(qtbot, param):
 
 
 @pytest.mark.gui
-def test__creation(widget, param, spy_value_changed):
+def test__creation(widget, param):
     assert isinstance(widget, ParamIoWidgetCheckBox)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert widget.isEnabled()
     assert widget.text() == param.name
-    assert spy_value_changed.n == 0
+    assert widget.spy_value_changed.n == 0
 
 
 @pytest.mark.gui
@@ -110,6 +98,14 @@ def test__creation__w_one_choice_entry(qtbot, local_param):
 def test_current_text(widget, param, checked):
     widget.update_widget_value(checked)
     assert widget.current_text == ("True" if checked else "False")
+
+
+@pytest.mark.gui
+def test__update_widget_value(widget):
+    _orig_value = widget.get_value()
+    widget.update_widget_value(not _orig_value)
+    assert widget.spy_new_value.n == 0
+    assert widget.current_text == str(not _orig_value)
 
 
 if __name__ == "__main__":

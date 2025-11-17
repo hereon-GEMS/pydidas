@@ -31,7 +31,7 @@ import pytest
 from pydidas.core import Parameter
 from pydidas.core.constants import ASCII_TO_UNI
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_combo_box import (
+from pydidas.widgets.parameter_config.param_io_widget_combobox import (
     ParamIoWidgetComboBox,
 )
 from pydidas_qtcore import PydidasQApplication
@@ -109,6 +109,8 @@ def test_update_widget_value(widget, index, new_value):
     widget.update_widget_value(new_value)
     assert widget.current_text == new_value
     assert widget.currentText() == _UNICODE_CHOICES[index]
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
 
 
 @pytest.mark.gui

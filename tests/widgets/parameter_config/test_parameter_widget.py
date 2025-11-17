@@ -44,7 +44,7 @@ from pydidas.widgets.parameter_config import ParameterWidget
 from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
     ParamIoWidgetCheckBox,
 )
-from pydidas.widgets.parameter_config.param_io_widget_combo_box import (
+from pydidas.widgets.parameter_config.param_io_widget_combobox import (
     ParamIoWidgetComboBox,
 )
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
@@ -55,6 +55,15 @@ from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
     ParamIoWidgetLineEdit,
 )
 from pydidas_qtcore import PydidasQApplication
+
+
+_TEST_DTYPE_VAL_NEW_VALS = [
+    (str, "A", "Spam"),
+    (int, 42, -5),
+    (float, 1.2, -4.2),
+    (Path, Path("/tmp"), Path("/home/user")),
+    (Hdf5key, Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")),
+]
 
 
 def widget_instance(qtbot, param, **kwargs):
@@ -249,16 +258,7 @@ def test__creation__w_visible_kwarg(qtbot, qapp):
 
 
 @pytest.mark.gui
-@pytest.mark.parametrize(
-    "dtype, default, new_value",
-    [
-        (str, "A", "Spam"),
-        (int, 42, -5),
-        (float, 1.2, -4.2),
-        (Path, Path("/tmp"), Path("/home/user")),
-        (Hdf5key, Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")),
-    ],
-)
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
 def test_set_param_value(qtbot, dtype, default, new_value):
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
@@ -297,6 +297,36 @@ def test_set_param_value__illegal_new_value(qtbot, dtype, default, new_value):
     assert widget.display_value == str(default)
     assert widget.spy_new_value.n == 0
     assert widget.spy_value_changed.n == 0
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
+def test_update_display_value(qtbot, dtype, default, new_value):
+    param = Parameter("test", dtype, default, name="Test param")
+    widget = widget_instance(qtbot, param)
+    widget.update_display_value(new_value)
+    assert param.value == default
+    assert widget.display_value == str(new_value)
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
+def test_set_value(qtbot, dtype, default, new_value):
+    param = Parameter("test", dtype, default, name="Test param")
+    widget = widget_instance(qtbot, param)
+    with qtbot.waitSignal(widget.sig_new_value, timeout=500):
+        widget.set_value(new_value)
+    qtbot.wait(5)  # wait for signal processing
+    assert param.value == new_value
+    assert widget.display_value == str(new_value)
+    assert widget.spy_new_value.n == 1
+    assert widget.spy_value_changed.n == 1
+    widget.set_value(new_value)
+    qtbot.wait(5)  # wait for signal processing
+    assert widget.spy_new_value.n == 1
+    assert widget.spy_value_changed.n == 1
 
 
 if __name__ == "__main__":

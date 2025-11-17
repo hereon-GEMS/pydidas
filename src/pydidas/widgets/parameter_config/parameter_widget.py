@@ -50,7 +50,7 @@ from pydidas.widgets.parameter_config.base_param_io_widget import BaseParamIoWid
 from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
     ParamIoWidgetCheckBox,
 )
-from pydidas.widgets.parameter_config.param_io_widget_combo_box import (
+from pydidas.widgets.parameter_config.param_io_widget_combobox import (
     ParamIoWidgetComboBox,
 )
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
@@ -313,3 +313,25 @@ class ParameterWidget(EmptyWidget):
         except (ValueError, UserConfigError):
             self._widgets["io"].set_value(self.param.value)
             raise
+
+    def update_display_value(self, value: Any) -> None:
+        """
+        Update the displayed value in the I/O widget without emitting signals.
+
+        Parameters
+        ----------
+        value : Any
+            The new value to be displayed.
+        """
+        self._widgets["io"].update_widget_value(value)
+
+    def set_value(self, value: Any) -> None:
+        """
+        Set a new value in the I/O widget and emit the respective signals if required.
+
+        Parameters
+        ----------
+        value : Any
+            The new value to be set.
+        """
+        self._widgets["io"].set_value(value)

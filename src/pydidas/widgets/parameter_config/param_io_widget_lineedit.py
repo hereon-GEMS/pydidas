@@ -82,13 +82,14 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
 
     def update_widget_value(self, input: Any) -> None:
         """
-        Update the widget value.
+        Update the widget value without emitting signals.
 
         Parameters
         ----------
         input : Any
             The new value to set in the widget.
         """
+        # the setText method only emits the textChanged signal, not editingFinished
         self.setText(f"{input}")
 
     def update_validator(self) -> None:

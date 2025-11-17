@@ -89,6 +89,9 @@ class BaseParamIoWidgetMixIn:
         """
         Update the widget display to show the given value.
 
+        This method needs to be implemented by the subclass while ensuring that
+        no signals are emitted during the update.
+
         Parameters
         ----------
         value : Any
@@ -157,7 +160,7 @@ class BaseParamIoWidgetMixIn:
             raise UserConfigError(f'ValueError! {_msg} Input text was "{_text}"')
         return _text
 
-    def set_value(self, value: Any):
+    def set_value(self, value: Any) -> None:
         """
         Set the input field's value.
 

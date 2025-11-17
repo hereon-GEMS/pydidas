@@ -99,7 +99,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
 
     def update_widget_value(self, value: Any) -> None:
         """
-        Update the widget value.
+        Update the widget value without emitting signals.
 
         Parameters
         ----------
@@ -108,7 +108,8 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         """
         value = self.__convert_bool(value)
         _txt_repr = convert_special_chars_to_unicode(str(value))
-        self.setCurrentText(_txt_repr)
+        with QtCore.QSignalBlocker(self):
+            self.setCurrentText(_txt_repr)
 
     def __convert_bool(self, value: Any) -> Any:
         """

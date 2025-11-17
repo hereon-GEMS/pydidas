@@ -100,13 +100,14 @@ class ParamIoWidgetWithButton(
 
     def update_widget_value(self, value: Any) -> None:
         """
-        Update the widget value.
+        Update the widget value without emitting signals.
 
         Parameters
         ----------
         value : Any
             The new value to set in the widget.
         """
+        # the setText method only emits the textChanged signal, not editingFinished
         self._io_lineedit.setText(f"{value}")
 
     def button_function(self) -> None:

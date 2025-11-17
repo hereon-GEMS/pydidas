@@ -116,6 +116,8 @@ def test_current_text(widget):
 def test_update_widget_value(widget, text):
     widget.update_widget_value(text)
     assert widget._io_lineedit.text() == str(text)
+    assert widget.spy_new_value.n == 0
+    assert widget.spy_value_changed.n == 0
 
 
 @pytest.mark.gui

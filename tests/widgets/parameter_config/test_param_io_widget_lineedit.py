@@ -127,5 +127,14 @@ def test__lost_focus(qtbot):
     assert widget.spy_new_value.results == [["10"]]
 
 
+@pytest.mark.gui
+def test__update_widget_value(qtbot):
+    param = Parameter("test_float", float, 0.0, name="Test Float")
+    widget = widget_instance(qtbot, param)
+    widget.update_widget_value(3.14159)
+    assert widget.spy_new_value.n == 0
+    assert widget.current_text == "3.14159"
+
+
 if __name__ == "__main__":
     pytest.main([])

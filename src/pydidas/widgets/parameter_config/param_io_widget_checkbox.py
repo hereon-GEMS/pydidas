@@ -31,6 +31,8 @@ __all__ = ["ParamIoWidgetCheckBox"]
 
 from typing import Any
 
+from qtpy import QtCore
+
 from pydidas.core import Parameter
 from pydidas.core.utils import IS_QT6
 from pydidas.widgets.factory import PydidasCheckBox
@@ -98,11 +100,12 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
 
     def update_widget_value(self, value: Any) -> None:
         """
-        Update the widget value.
+        Update the widget value without emitting signals.
 
         Parameters
         ----------
         value : Any
             The new value to set in the widget.
         """
-        self.setChecked(self.__convert_to_bool(value))
+        with QtCore.QSignalBlocker(self):
+            self.setChecked(self.__convert_to_bool(value))

@@ -198,7 +198,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         for _key, _val in self._original_plugin_param_values.items():
             if _key in self._editor.param_widgets:
-                self.set_param_value_and_widget(_key, _val)
+                self.set_param_and_widget_value(_key, _val)
             else:
                 self._plugin.set_param_value(_key, _val)
         self.reset_selection_mode()
@@ -306,7 +306,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             return
         _other_type = "radial" if type_ == "azimuthal" else "azimuthal"
 
-        self.set_param_value_and_widget(
+        self.set_param_and_widget_value(
             f"{type_[:3]}_use_range", f"Specify {type_} range"
         )
         self._config[f"{type_}_active"] = True
@@ -317,7 +317,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self.sig_toggle_selection_mode.emit(True)
         self._plot.sig_new_point_selected.connect(getattr(self, f"_new_{type_}_point"))
 
-    def set_param_value_and_widget(self, key: str, value: Any):
+    def set_param_and_widget_value(self, key: str, value: Any):
         """
         Set the Plugin's Parameter value and the widget display value.
 
@@ -388,7 +388,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         )
         _bounds = "lower" if self._config["radial_n"] == 0 else "upper"
         self._editor.toggle_param_widget_visibility(f"rad_range_{_bounds}", True)
-        self.set_param_value_and_widget(f"rad_range_{_bounds}", np.round(_val, 5))
+        self.set_param_and_widget_value(f"rad_range_{_bounds}", np.round(_val, 5))
         if self._config["radial_n"] == 0:
             self._plot.draw_circle(_r_px, f"radial_{_bounds}")
         self._config["radial_n"] += 1
@@ -416,7 +416,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         )
         _bounds = "lower" if self._config["azimuthal_n"] == 0 else "upper"
         self._editor.toggle_param_widget_visibility(f"azi_range_{_bounds}", True)
-        self.set_param_value_and_widget(
+        self.set_param_and_widget_value(
             f"azi_range_{_bounds}", np.round(_factor * _chi, 5)
         )
         if self._config["azimuthal_n"] == 0:
@@ -428,7 +428,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             self.reset_selection_mode()
             self.remove_plot_items("all")
             if not self._plugin.is_range_valid():
-                self.set_param_value_and_widget("azi_use_range", "Full detector")
+                self.set_param_and_widget_value("azi_use_range", "Full detector")
                 self.update_input_widgets()
                 self.show_plot_items("roi")
                 raise UserConfigError(
@@ -437,8 +437,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
                 )
             self.show_plot_items("roi")
             _low, _high = self._plugin.get_azimuthal_range_native()
-            self.set_param_value_and_widget("azi_range_lower", _low)
-            self.set_param_value_and_widget("azi_range_upper", _high)
+            self.set_param_and_widget_value("azi_range_lower", _low)
+            self.set_param_and_widget_value("azi_range_upper", _high)
 
     @QtCore.Slot(str)
     def _change_azi_unit(self, new_unit: Literal["chi / deg", "chi / rad"]):
@@ -453,8 +453,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         _low = self._plugin.get_param_value("azi_range_lower")
         _high = self._plugin.get_param_value("azi_range_upper")
         _factor = 180 / np.pi if new_unit == "chi / deg" else np.pi / 180
-        self.set_param_value_and_widget("azi_range_lower", np.round(_low * _factor, 6))
-        self.set_param_value_and_widget("azi_range_upper", np.round(_high * _factor, 6))
+        self.set_param_and_widget_value("azi_range_lower", np.round(_low * _factor, 6))
+        self.set_param_and_widget_value("azi_range_upper", np.round(_high * _factor, 6))
 
     @QtCore.Slot(str)
     def _change_rad_unit(

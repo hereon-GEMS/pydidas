@@ -143,7 +143,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _path = kwargs.get("current_path", None)
         if _path is None:
             _path = self.q_settings_get("directory_explorer/path", default="")
-        self.set_param_value_and_widget("current_directory", _path)
+        self.set_param_and_widget_value("current_directory", _path)
         self._file_model = QtWidgets.QFileSystemModel()
         self._file_model.setRootPath(_path)
         self._file_model.setReadOnly(True)
@@ -237,7 +237,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         if os.path.isfile(_name):
             self.sig_new_file_selected.emit(_name)
         elif os.path.isdir(_name):
-            self.set_param_value_and_widget("current_directory", _name)
+            self.set_param_and_widget_value("current_directory", _name)
 
     @QtCore.Slot(str)
     def __user_dir_input(self, path: str):
@@ -260,7 +260,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _path = Path(path)
         if _path.is_file():
             with QtCore.QSignalBlocker(self.param_widgets["current_directory"]):
-                self.set_param_value_and_widget("current_directory", _path.parent)
+                self.set_param_and_widget_value("current_directory", _path.parent)
             self.sig_new_file_selected.emit(path)
 
     @QtCore.Slot()

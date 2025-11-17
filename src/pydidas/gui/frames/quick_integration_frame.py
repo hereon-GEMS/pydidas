@@ -264,11 +264,11 @@ class QuickIntegrationFrame(BaseFrame):
         if not (_model == _old_model and _old_available):
             self._change_detector_model()
 
-    def set_param_value_and_widget(self, key: str, value: Any) -> None:
+    def set_param_and_widget_value(self, key: str, value: Any) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the generic set_param_value_and_widget method to
+        This method overloads the generic set_param_and_widget_value method to
         process the linked energy / wavelength parameters.
 
         Parameters
@@ -289,7 +289,7 @@ class QuickIntegrationFrame(BaseFrame):
             else:
                 self.param_widgets[key].set_value(value)
         else:
-            BaseFrame.set_param_value_and_widget(self, key, value)
+            BaseFrame.set_param_and_widget_value(self, key, value)
 
     @QtCore.Slot()
     def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
@@ -326,12 +326,12 @@ class QuickIntegrationFrame(BaseFrame):
         _current_pxsize = self._config["previous_det_pxsize"]
         self._EXP.set_param_value("detector_pxsizex", _pxsize)
         self._EXP.set_param_value("detector_pxsizey", _pxsize)
-        self.set_param_value_and_widget("detector_pxsize", _pxsize)
+        self.set_param_and_widget_value("detector_pxsize", _pxsize)
         if self.get_param_value("detector_model") == "Custom detector":
             self._config["custom_det_pxsize"] = _pxsize
         _ratio = _pxsize / _current_pxsize
         for _key in ["rad_range_lower", "rad_range_upper"]:
-            self._roi_controller.set_param_value_and_widget(
+            self._roi_controller.set_param_and_widget_value(
                 _key, self._plugins["generic"].get_param_value(_key) * _ratio
             )
         self._update_beamcenter()
@@ -462,12 +462,12 @@ class QuickIntegrationFrame(BaseFrame):
             self._EXP.set_param_value(_key, _param.value)
             if _key in self.param_widgets:
                 self.param_widgets[_key].set_value(_param.value)
-        self.set_param_value_and_widget(
+        self.set_param_and_widget_value(
             "detector_pxsize", self.get_param_value("detector_pxsizex")
         )
         _center = self._EXP.beamcenter
-        self.set_param_value_and_widget("beamcenter_x", _center.x)
-        self.set_param_value_and_widget("beamcenter_y", _center.y)
+        self.set_param_and_widget_value("beamcenter_x", _center.x)
+        self.set_param_and_widget_value("beamcenter_y", _center.y)
         _det_name = self._EXP.get_param_value("detector_name")
         _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._EXP.det_shape, [])
         if _det_name not in _det_models:

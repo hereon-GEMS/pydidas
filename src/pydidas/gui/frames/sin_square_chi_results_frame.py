@@ -223,7 +223,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             The new data source to set.
         """
         self.param_widgets["selected_data_source"].setReadOnly(False)  # noqa E1101
-        self.set_param_value_and_widget("selected_data_source", data_source)
+        self.set_param_and_widget_value("selected_data_source", data_source)
         self.param_widgets["selected_data_source"].setReadOnly(True)  # noqa E1101
 
     @QtCore.Slot()
@@ -373,8 +373,8 @@ class SinSquareChiResultsFrame(BaseFrame):
         Update the sin^2(chi) limits from the selected data.
         """
         _min, _max = self._get_data_min_and_max(self._sin_square_chi_data)
-        self.set_param_value_and_widget("sin_square_chi_limit_low", _min)
-        self.set_param_value_and_widget("sin_square_chi_limit_high", _max)
+        self.set_param_and_widget_value("sin_square_chi_limit_low", _min)
+        self.set_param_and_widget_value("sin_square_chi_limit_high", _max)
         self.__set_scaling("square")
 
     @QtCore.Slot()
@@ -383,8 +383,8 @@ class SinSquareChiResultsFrame(BaseFrame):
         Update the sin(2*chi) limits from the selected data.
         """
         _min, _max = self._get_data_min_and_max(self._sin_2chi_data)
-        self.set_param_value_and_widget("sin_2chi_limit_low", _min)
-        self.set_param_value_and_widget("sin_2chi_limit_high", _max)
+        self.set_param_and_widget_value("sin_2chi_limit_low", _min)
+        self.set_param_and_widget_value("sin_2chi_limit_high", _max)
         self.__set_scaling("two_chi")
 
     @QtCore.Slot(str)

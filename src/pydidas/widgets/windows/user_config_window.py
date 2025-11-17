@@ -506,7 +506,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             return
         for _param_key, _param in self.params.items():
             _value = self.q_settings_get(f"user/{_param_key}", dtype=_param.dtype)
-            self.set_param_value_and_widget(_param_key, _value)
+            self.set_param_and_widget_value(_param_key, _value)
 
     def __reset(self):
         """

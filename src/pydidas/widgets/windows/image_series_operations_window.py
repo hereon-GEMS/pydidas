@@ -244,7 +244,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
-            self.set_param_value_and_widget("hdf5_key", dset)
+            self.set_param_and_widget_value("hdf5_key", dset)
 
     @QtCore.Slot()
     def process_file_series(self):

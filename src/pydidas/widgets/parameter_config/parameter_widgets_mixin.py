@@ -104,7 +104,7 @@ class ParameterWidgetsMixIn:
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
-    def set_param_value_and_widget(self, key: str, value: Any) -> None:
+    def set_param_and_widget_value(self, key: str, value: Any) -> None:
         """
         Update a parameter value both in the Parameter and the widget.
 

@@ -380,8 +380,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             )
         self._set_beamcenter_marker((_x[0], _y[0]))
         self.remove_plot_items("beamcenter_outline")
-        self._parent_frame.set_param_value_and_widget("beamcenter_x", _x[0])
-        self._parent_frame.set_param_value_and_widget("beamcenter_y", _y[0])
+        self._parent_frame.set_param_and_widget_value("beamcenter_x", _x[0])
+        self._parent_frame.set_param_and_widget_value("beamcenter_y", _y[0])
         self.sig_selected_beamcenter.emit()
 
     def _set_beamcenter_marker(self, position: tuple[float, float]):
@@ -411,8 +411,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             )
         _cx, _cy, _r = fit_circle_from_points(_x, _y)
         self._set_beamcenter_marker((_cx, _cy))
-        self._parent_frame.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
-        self._parent_frame.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
+        self._parent_frame.set_param_and_widget_value("beamcenter_x", np.round(_cx, 4))
+        self._parent_frame.set_param_and_widget_value("beamcenter_y", np.round(_cy, 4))
         self._toggle_beamcenter_is_set(True)
         _theta = np.linspace(0, 2 * np.pi, num=73, endpoint=True)
         _x = np.cos(_theta) * _r + _cx
@@ -439,8 +439,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             _coeffs,
         ) = fit_detector_center_and_tilt_from_points(_x, _y)
         self._set_beamcenter_marker((_cx, _cy))
-        self._parent_frame.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
-        self._parent_frame.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
+        self._parent_frame.set_param_and_widget_value("beamcenter_x", np.round(_cx, 4))
+        self._parent_frame.set_param_and_widget_value("beamcenter_y", np.round(_cy, 4))
         _x, _y = calc_points_on_ellipse(_coeffs)
         self._plot_beamcenter_outline(_x, _y)
         self.sig_selected_beamcenter.emit()

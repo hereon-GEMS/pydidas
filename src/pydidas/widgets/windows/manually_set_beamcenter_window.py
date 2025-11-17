@@ -265,7 +265,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         if _shape == self._image.shape:
             return
         self._image = Dataset(np.zeros(_shape))
-        self._widgets["image_selection"].set_param_value_and_widget("filename", ".")
+        self._widgets["image_selection"].set_param_and_widget_value("filename", ".")
         self._widgets["plot"].plot_pydidas_dataset(self._image)
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
 

@@ -169,11 +169,11 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         """
         self._widgets["button_accept"].setEnabled(False)
         for _key in _FIT2D_PARAM_KEYS:
-            self.set_param_value_and_widget(
+            self.set_param_and_widget_value(
                 _key, 100.0 if _key == "detector_dist_fit2d" else 0
             )
         for _key in _PYFAI_PARAM_KEYS:
-            self.set_param_value_and_widget(_key, 0.1 if _key == "detector_dist" else 0)
+            self.set_param_and_widget_value(_key, 0.1 if _key == "detector_dist" else 0)
         super().show()
 
     def update_detector(self, exp: DiffractionExperiment):

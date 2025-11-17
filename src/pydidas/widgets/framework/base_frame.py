@@ -195,7 +195,7 @@ class BaseFrame(
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
-                    self.set_param_value_and_widget(_key, _val)
+                    self.set_param_and_widget_value(_key, _val)
                 else:
                     self.set_param_value(_key, _val)
 

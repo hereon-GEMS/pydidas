@@ -122,11 +122,11 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
-    def set_param_value_and_widget(self, key: str, value: Any) -> None:
+    def set_param_and_widget_value(self, key: str, value: Any) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the generic set_param_value_and_widget method to
+        This method overloads the generic set_param_and_widget_value method to
         process the linked energy / wavelength parameters.
 
         Parameters
@@ -217,15 +217,15 @@ class DefineDiffractionExpFrame(BaseFrame):
             to ignore. True will show the warning. The default is True.
         """
         if det is not None:
-            self.set_param_value_and_widget("detector_name", det.name)
-            self.set_param_value_and_widget("detector_npixx", det.shape[1])
-            self.set_param_value_and_widget("detector_npixy", det.shape[0])
-            self.set_param_value_and_widget("detector_pxsizex", 1e6 * det.pixel2)
-            self.set_param_value_and_widget("detector_pxsizey", 1e6 * det.pixel1)
+            self.set_param_and_widget_value("detector_name", det.name)
+            self.set_param_and_widget_value("detector_npixx", det.shape[1])
+            self.set_param_and_widget_value("detector_npixy", det.shape[0])
+            self.set_param_and_widget_value("detector_pxsizex", 1e6 * det.pixel2)
+            self.set_param_and_widget_value("detector_pxsizey", 1e6 * det.pixel1)
             if maskfile is not None:
                 if maskfile.startswith("fabio:///"):
                     maskfile = maskfile[9:]
-                self.set_param_value_and_widget("detector_mask_file", maskfile)
+                self.set_param_and_widget_value("detector_mask_file", maskfile)
         elif show_warning:
             critical_warning(
                 "No pyFAI Detector",
@@ -253,7 +253,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 ["detector_rot2", _geo.rotation2().value()],
                 ["detector_rot3", _geo.rotation3().value()],
             ]:
-                self.set_param_value_and_widget(key, float(np.round(value, 12)))
+                self.set_param_and_widget_value(key, float(np.round(value, 12)))
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
@@ -272,7 +272,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         _geo = model.fittedGeometry()
         if _geo.isValid():
             _wavelength = float(np.round(_geo.wavelength().value() * 1e10, 12))
-            self.set_param_value_and_widget("xray_wavelength", _wavelength)
+            self.set_param_and_widget_value("xray_wavelength", _wavelength)
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)
 
@@ -311,10 +311,10 @@ class DefineDiffractionExpFrame(BaseFrame):
         _px_size_x = self.get_param_value("detector_pxsizex")
         _px_size_y = self.get_param_value("detector_pxsizey")
 
-        self.set_param_value_and_widget("detector_poni1", 1e-6 * _px_size_y * center_y)
-        self.set_param_value_and_widget("detector_poni2", 1e-6 * _px_size_x * center_x)
+        self.set_param_and_widget_value("detector_poni1", 1e-6 * _px_size_y * center_y)
+        self.set_param_and_widget_value("detector_poni2", 1e-6 * _px_size_x * center_x)
         for _index in [1, 2, 3]:
-            self.set_param_value_and_widget(f"detector_rot{_index}", 0)
+            self.set_param_and_widget_value(f"detector_rot{_index}", 0)
 
     @QtCore.Slot()
     def _child_window_closed(self) -> None:
@@ -428,9 +428,9 @@ class DefineDiffractionExpFrame(BaseFrame):
         rot3 : float
             The new detector rotation #3.
         """
-        self.set_param_value_and_widget("detector_dist", det_dist)
-        self.set_param_value_and_widget("detector_poni1", poni1)
-        self.set_param_value_and_widget("detector_poni2", poni2)
-        self.set_param_value_and_widget("detector_rot1", rot1)
-        self.set_param_value_and_widget("detector_rot2", rot2)
-        self.set_param_value_and_widget("detector_rot3", rot3)
+        self.set_param_and_widget_value("detector_dist", det_dist)
+        self.set_param_and_widget_value("detector_poni1", poni1)
+        self.set_param_and_widget_value("detector_poni2", poni2)
+        self.set_param_and_widget_value("detector_rot1", rot1)
+        self.set_param_and_widget_value("detector_rot2", rot2)
+        self.set_param_and_widget_value("detector_rot3", rot3)

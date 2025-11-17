@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["WidgetWithParameterCollection"]
 
 
-from typing import Any
+from typing import Any, NoReturn
 
 from qtpy import QtWidgets
 
@@ -36,6 +36,7 @@ from pydidas.core import (
     ParameterCollection,
     ParameterCollectionMixIn,
     PydidasQsettingsMixin,
+    UserConfigError,
 )
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
@@ -67,3 +68,14 @@ class WidgetWithParameterCollection(
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         apply_qt_properties(self, **kwargs)
+
+    def raise_UserConfigError(self, error_str: str) -> NoReturn:  # noqa
+        """
+        Raise a UserConfigError with the given error string.
+
+        Parameters
+        ----------
+        error_str : str
+            The error string to raise.
+        """
+        raise UserConfigError(error_str)

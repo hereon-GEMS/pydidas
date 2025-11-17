@@ -429,6 +429,12 @@ class TestParameter(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             obj.update_value_and_choices(12, [12, 14])
 
+    def test_update_value_and_choices__w_no_new_choices(self):
+        obj = Parameter("Test0", int, 2, choices=[1, 2, 3])
+        obj.update_value_and_choices(12, None)
+        self.assertIsNone(obj.choices)
+        self.assertEqual(obj.value, 12)
+
     def test_update_value_and_choices__valid(self):
         _val = 3.12
         _choices = [3.12, 34.2, 42.1]

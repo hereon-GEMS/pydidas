@@ -640,7 +640,7 @@ class Parameter:
         new_range = (float(new_range[0]), float(new_range[1]))
         self.__meta["range"] = new_range
 
-    def update_value_and_choices(self, value: Any, choices: Sequence[Any]):
+    def update_value_and_choices(self, value: Any, choices: None | Sequence[Any]):
         """
         Update the value and choices of the Parameter to prevent illegal selections.
 
@@ -648,8 +648,8 @@ class Parameter:
         ----------
         value : Any
             The new Parameter values.
-        choices : Sequence[Any]
-            The new choices for the Parameter.
+        choices : None | Sequence[Any]
+            The new choices for the Parameter. If None, no choices will be enforced.
         """
         if not self.__typecheck(value):
             raise ValueError(
@@ -660,7 +660,7 @@ class Parameter:
             raise UserConfigError(
                 "Choices are only valid if the Parameter does not have a range."
             )
-        if value not in choices:
+        if choices is not None and value not in choices:
             raise ValueError("The new value must be included in the new choices.")
         self.__value = value
         self.choices = choices

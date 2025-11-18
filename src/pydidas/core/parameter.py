@@ -107,7 +107,7 @@ class Parameter:
     |            |           | Parameter in the ParameterCollection      |
     +------------+-----------+-------------------------------------------+
     | dtype      | False     | The datatype of the Parameter value.      |
-    |            |           | This must be a base class or None.        |
+    |            |           | This must be a type or None.              |
     |            |           | If None, no type-checking is performed.   |
     +------------+-----------+-------------------------------------------+
     | value      | True      | The current value.                        |
@@ -323,35 +323,24 @@ class Parameter:
         if self.__meta["allow_None"] and value in ["None", "", None]:
             return None
         if isinstance(value, str):
-            if self.__type == Path:
-                value = Path(value)
-            elif self.__type == Hdf5key:
-                value = Hdf5key(value)
-            elif (
-                self.__type == Integral
-                and value in ["True", "False"]
-                and set(self.__meta["choices"]) == {0, 1}
-            ):
-                value = value == "True"
-            elif self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
-                value = self.__get_as_numbers(value)
+            if self.__type in [Path, Hdf5key]:
+                return self.__type(value)
+            if self.__type == Integral and value in ["True", "False"]:
+                return value == "True"
+            if self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
+                return self.__get_as_numbers(value)
         if self.__type in _NUMBERS:
             try:
-                value = float(value) if self.__type == Real else int(value)
+                return float(value) if self.__type == Real else int(value)
             except ValueError:
                 pass
-            finally:
-                return value
-        if (
-            isinstance(value, Iterable)
-            and self.__type in _ITERATORS
-            and not isinstance(value, str)
-        ):
-            if self.__meta["subtype"] in _NUMBERS:
-                value = self.__get_as_numbers(value)
-            return self.__type(value)
-        if isinstance(value, Iterable) and self.__type == ndarray:
-            return asarray(value)
+        if isinstance(value, Iterable):
+            if self.__type in _ITERATORS and not isinstance(value, str):
+                if self.__meta["subtype"] in _NUMBERS:
+                    value = self.__get_as_numbers(value)
+                return self.__type(value)
+            if self.__type == ndarray:
+                return asarray(value)
         return value
 
     def _raise_value_set_valueerror(self, val: Any) -> NoReturn:

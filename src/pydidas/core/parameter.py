@@ -335,7 +335,7 @@ class Parameter:
                 value = value == "True"
             elif self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
                 value = self.__get_as_numbers(value)
-        if self.__type in _NUMBERS and not self.__meta["allow_None"]:
+        if self.__type in _NUMBERS:
             try:
                 value = float(value) if self.__type == Real else int(value)
             except ValueError:

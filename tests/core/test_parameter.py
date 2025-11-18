@@ -540,6 +540,18 @@ class TestParameter(unittest.TestCase):
         _new_val = obj._Parameter__convenience_type_conversion(_val)
         self.assertEqual(_val, _new_val)
 
+    def test_convenience_type_conversion__int_w_string_input_and_None_allowed(self):
+        _val = 42
+        obj = Parameter("Test0", int, 12, allow_None=True)
+        _new_val = obj._Parameter__convenience_type_conversion(str(_val))
+        self.assertEqual(_val, _new_val)
+
+    def test_convenience_type_conversion__float_w_string_input_and_None_allowed(self):
+        _val = 12.3
+        obj = Parameter("Test0", float, 7.5, allow_None=True)
+        _new_val = obj._Parameter__convenience_type_conversion(str(_val))
+        self.assertEqual(_val, _new_val)
+
     def test_convenience_type_conversion_path(self):
         _val = __file__
         obj = Parameter("Test0", Path, "")

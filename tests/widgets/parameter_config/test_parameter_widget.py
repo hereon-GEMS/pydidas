@@ -262,6 +262,15 @@ def test__creation__w_visible_kwarg(qtbot, qapp):
 def test_set_param_value(qtbot, dtype, default, new_value):
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
+    widget.set_param_value(str(new_value))
+    assert widget.param.value == new_value
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
+def test_set_param_value__through_widget_signal(qtbot, dtype, default, new_value):
+    param = Parameter("test", dtype, default, name="Test param")
+    widget = widget_instance(qtbot, param)
     assert widget.param.value == default
     assert widget.display_value == str(default)
     widget.io_widget.setFocus()

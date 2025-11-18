@@ -142,10 +142,6 @@ class ParameterWidget(EmptyWidget):
         self.__create_param_io_widget()
         self.__create_unit_widget_if_required()
 
-        self._widgets["io"].sig_new_value.connect(self.set_param_value)
-        self._widgets["io"].sig_new_value.connect(self.sig_new_value)
-        self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
-
     @property
     def io_widget(self) -> BaseParamIoWidget:
         """Returns the I/O widget for the Parameter."""
@@ -243,6 +239,12 @@ class ParameterWidget(EmptyWidget):
         """
         Create an I/O widget for the Parameter based on its configuration and type.
         """
+        if "io" in self._widgets:
+            self.layout().removeWidget(self._widgets["io"])
+            self._widgets["io"].sig_new_value.disconnect()
+            self._widgets["io"].sig_value_changed.disconnect()
+            self._widgets["io"].deleteLater()
+            del self._widgets["io"]
         kwargs = {
             "persistent_qsettings_ref": self._config["persistent_qsettings_ref"],
             "linebreak": self._config["linebreak"],
@@ -260,6 +262,9 @@ class ParameterWidget(EmptyWidget):
                 minimum_width=0,
             )
             self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)
+        self._widgets["io"].sig_new_value.connect(self.set_param_value)
+        self._widgets["io"].sig_new_value.connect(self.sig_new_value)
+        self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
 
     def __create_unit_widget_if_required(self):
         """
@@ -344,12 +349,7 @@ class ParameterWidget(EmptyWidget):
         PARAMETER'S CHOICES. IT ONLY UPDATES THE WIDGET IN PLACE.
         """
         if not isinstance(self.io_widget, self._param_widget_class):
-            self.layout().removeWidget(self.io_widget)
-            self._widgets["io"].deleteLater()
             self.__create_param_io_widget()
-            self._widgets["io"].sig_new_value.connect(self.set_param_value)
-            self._widgets["io"].sig_new_value.connect(self.sig_new_value)
-            self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
         _choices = self.param.choices
         if _choices is not None:
             self._widgets["io"].update_choices(

@@ -44,7 +44,7 @@ import os
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Sequence
 
 import h5py
 import numpy as np
@@ -631,3 +631,30 @@ def export_context_to_hdf5(
             if len(_param.unit) > 0:
                 _attributes["units"] = _param.unit
             create_nx_dataset(_group, _key, _param.value_for_export, **_attributes)
+
+
+def get_generic_dataset(datasets: Sequence[str]) -> str:
+    """
+    Get the best standard dataset from a list of dataset names.
+
+    This function checks a list of dataset names and returns the one which
+    corresponds best to standard naming conventions for generic datasets.
+
+    Parameters
+    ----------
+    datasets : Sequence[str]
+        A sequence of dataset names to check.
+
+    Returns
+    -------
+    str
+        The best matching generic dataset name. If no match is found,
+        the first entry in the list is returned.
+    """
+    if len(datasets) == 0:
+        raise ValueError(
+            "The datasets list is empty. Cannot determine generic dataset."
+        )
+    if "entry/data/data" in datasets:
+        return "entry/data/data"
+    return datasets[0]

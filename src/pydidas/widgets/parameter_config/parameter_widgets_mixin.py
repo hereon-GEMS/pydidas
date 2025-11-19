@@ -104,36 +104,6 @@ class ParameterWidgetsMixIn:
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
-    def set_param_and_widget_value(self, key: str, value: Any) -> None:
-        """
-        Update a parameter value both in the Parameter and the widget.
-
-        This method will update the parameter referenced by <key> and
-        update both the Parameter.value and the displayed widget
-        entry.
-
-        Parameters
-        ----------
-        key : str
-            The reference key for the Parameter.
-        value : Any
-            The new parameter value. This must be of the same type as the
-            Parameter datatype (or supported by a converter).
-
-        Raises
-        ------
-        KeyError
-            If no parameter or widget has been registered with this key.
-        """
-        if key not in self.params or key not in self.param_widgets:
-            raise KeyError(
-                f'No parameter with the key `{key}` and associated widget is "'
-                f'"registered in this class.'
-            )
-        with QtCore.QSignalBlocker(self.param_widgets[key]):
-            self.param_composite_widgets[key].param.value = value
-            self.param_composite_widgets[key].set_value(value)
-
     def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
         """
         Toggle the visibility of widgets referenced with the key.
@@ -157,37 +127,88 @@ class ParameterWidgetsMixIn:
             raise KeyError(f'No parameter with key "{key}" found.')
         self.param_composite_widgets[key].setVisible(visible)
 
-    def update_param_widget_value(self, param_key: str, value: Any) -> None:
+    def update_param_widget_value(self, key: str, value: Any) -> None:
         """
         Update the value stored in a widget without changing the Parameter and
         without emitting signals.
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The Parameter reference key.
         value : Any
-            The value. The type depends on the Parameter's value.
+            The value. The type depends on the Parameter's value and will be
+            converted to string for display purposes.
         """
-        self.param_widgets[param_key].update_widget_value(value)
+        self.param_composite_widgets[key].update_display_value(value)
+
+    def set_param_and_widget_value(
+        self, key: str, value: Any, emit_signal: bool = True
+    ) -> None:
+        """
+        Update a parameter value both in the Parameter and the widget.
+
+        This method will update the parameter referenced by <key> and
+        update both the Parameter.value and the displayed widget
+        entry.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter.
+        value : Any
+            The new parameter value. This must be of the same type as the
+            Parameter datatype (or supported by a converter).
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            (if the value has changed). The default is True.
+
+        Raises
+        ------
+        KeyError
+            If no parameter or widget has been registered with this key.
+        """
+        if key not in self.params or key not in self.param_widgets:
+            raise KeyError(
+                f'No parameter with the key `{key}` and associated widget is "'
+                f'"registered in this class.'
+            )
+        _old_val = self.params[key].value
+        with QtCore.QSignalBlocker(self.param_widgets[key]):
+            self.param_composite_widgets[key].param.value = value
+            self.param_composite_widgets[key].set_value(value)
+        if _old_val != self.params[key].value and emit_signal:
+            self.param_composite_widgets[key].sig_value_changed.emit()
+            self.param_composite_widgets[key].sig_new_value.emit(str(value))
 
     def set_param_and_widget_value_and_choices(
-        self, param_key: str, value: Any, choices: None | Sequence[Any]
+        self,
+        key: str,
+        value: Any,
+        choices: None | Sequence[Any],
+        emit_signal: bool = True,
     ):
         """
         Update a Parameter's value and choices as well as the associated widget.
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The reference key for the Parameter.
         value : Any
             The new value for the Parameter.
         choices : None or Sequence[Any]
             The new list of choices for the Parameter. If None, the choices
             for the Parameter will be disabled.
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            and choices (if the value has changed). The default is True.
         """
         # not using ParameterCollectionMixIn.set_param_value_and_choices method
         # to have allow using this mixin independently
-        self.params[param_key].set_value_and_choices(value, choices)
-        self.param_composite_widgets[param_key].update_choices_from_param()
+        _old_val = self.params[key].value
+        self.params[key].set_value_and_choices(value, choices)
+        self.param_composite_widgets[key].update_choices_from_param()
+        if _old_val != self.params[key].value and emit_signal:
+            self.param_composite_widgets[key].sig_value_changed.emit()
+            self.param_composite_widgets[key].sig_new_value.emit(str(value))

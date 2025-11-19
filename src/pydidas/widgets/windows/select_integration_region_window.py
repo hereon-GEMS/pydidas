@@ -165,7 +165,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._roi_controller = ManuallySetIntegrationRoiController(
             self._widgets["roi_selector"], self._widgets["plot"], plugin=self._plugin
         )
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
         self._widgets["but_confirm"].clicked.connect(self._confirm_changes)
 

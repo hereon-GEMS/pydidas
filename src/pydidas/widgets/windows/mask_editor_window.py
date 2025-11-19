@@ -103,9 +103,7 @@ class MaskEditorWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
-        self._widgets["file_selector"].sig_new_file_selection.connect(
-            self._open_new_file
-        )
+        self._widgets["file_selector"].sig_new_selection.connect(self._open_new_file)
 
     @QtCore.Slot(str, dict)
     def _open_new_file(self, fname: str, input_options: dict):

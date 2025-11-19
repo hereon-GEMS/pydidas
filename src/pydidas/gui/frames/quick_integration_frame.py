@@ -144,7 +144,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.sig_toggle_selection_mode.connect(
             self._roi_selection_toggled
         )
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
         self._widgets["copy_exp_context"].clicked.connect(self._copy_diffraction_exp)

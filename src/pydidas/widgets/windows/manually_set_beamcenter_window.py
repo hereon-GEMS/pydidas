@@ -178,7 +178,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._bc_controller = ManuallySetBeamcenterController(
             self, self._widgets["plot"], self._widgets["point_table"]
         )
-        self._widgets["image_selection"].sig_new_file_selection.connect(
+        self._widgets["image_selection"].sig_new_selection.connect(
             self._selected_new_file
         )
         self._widgets["but_set_beamcenter"].clicked.connect(

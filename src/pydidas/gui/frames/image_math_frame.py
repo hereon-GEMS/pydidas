@@ -118,7 +118,7 @@ class ImageMathFrame(BaseFrame):
         """
         Connect all signals.
         """
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["but_store_input_image"].clicked.connect(self._store_input_image)
         self._widgets["combo_display_image"].currentTextChanged.connect(
             self.new_buffer_selection

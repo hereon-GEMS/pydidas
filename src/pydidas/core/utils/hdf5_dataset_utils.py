@@ -656,5 +656,9 @@ def get_generic_dataset(datasets: Sequence[str]) -> str:
             "The datasets list is empty. Cannot determine generic dataset."
         )
     if "entry/data/data" in datasets:
+        # this is the standard NeXus path for generic data
         return "entry/data/data"
+    if "/entry/instrument/detector/data" in datasets:
+        # this is the standard NeXus path for LAMBDA detectors
+        return "/entry/instrument/detector/data"
     return datasets[0]

@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = [
     "trim_filename",
     "get_extension",
+    "get_file_type_from_extension",
     "find_valid_python_files",
     "get_file_naming_scheme",
     "CatchFileErrors",
@@ -37,9 +38,13 @@ import os
 import re
 from numbers import Integral
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Literal
 
-from pydidas.core.constants import FILENAME_DELIMITERS
+from pydidas.core.constants import (
+    BINARY_EXTENSIONS,
+    FILENAME_DELIMITERS,
+    HDF5_EXTENSIONS,
+)
 from pydidas.core.exceptions import FileReadError, UserConfigError
 from pydidas.core.utils.iterable_utils import flatten
 
@@ -68,13 +73,13 @@ def trim_filename(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
-def get_extension(path: Union[Path, str], lowercase=False) -> str:
+def get_extension(path: Path | str, lowercase=False) -> str:
     """
     Get the extension to a file in the given path.
 
     Parameters
     ----------
-    path : Union[pathlib.Path, str]
+    path : Path or str
         The full filename and path
     lowercase : bool, optional
         Flag to get the extension as a lower case string.
@@ -96,7 +101,33 @@ def get_extension(path: Union[Path, str], lowercase=False) -> str:
     return _ext
 
 
-def find_valid_python_files(path: Path) -> List[Path]:
+def get_file_type_from_extension(path: Path | str) -> Literal["hdf5", "raw", "generic"]:
+    """
+    Get the file type from the file extension.
+
+    This function checks if a file (based on its extension) is
+    an HDF5 / NeXus file, a raw binary file or a generic file which can be
+    read with standard importers without further specification of metadata.
+
+    Parameters
+    ----------
+    path : Path or str
+        The full filename and path.
+
+    Returns
+    -------
+    str
+        The file type, one of "hdf5", "raw", or "generic".
+    """
+    _ext = get_extension(path, lowercase=True)
+    if _ext in HDF5_EXTENSIONS:
+        return "hdf5"
+    if _ext in BINARY_EXTENSIONS:
+        return "raw"
+    return "generic"
+
+
+def find_valid_python_files(path: Path) -> list[Path]:
     """
     Search for all python files in the path and subdirectories.
 
@@ -143,10 +174,10 @@ def find_valid_python_files(path: Path) -> List[Path]:
 
 
 def get_file_naming_scheme(
-    filename1: Union[Path, str],
-    filename2: Union[Path, str],
+    filename1: Path | str,
+    filename2: Path | str,
     ignore_leading_zeros: bool = False,
-) -> Tuple[str, range]:
+) -> tuple[str, range]:
     """
     Get the naming scheme (formattable string with 'index' variable) from two filenames.
 
@@ -155,9 +186,9 @@ def get_file_naming_scheme(
 
     Parameters
     ----------
-    filename1 : Union[pathlib.Path, str]
+    filename1 : Path or str
         The first filename (including the path).
-    filename2 : Union[pathlib.Path, str]
+    filename2 : Path or str
         The second filename (including the path).
     ignore_leading_zeros : bool, optional
         Keyword to ignore leading zeros, i.e., to allow entries like '_12' and '_1255'
@@ -211,9 +242,9 @@ class CatchFileErrors:
 
     Parameters
     ----------
-    filename : Union[Path, str]
+    filename : Path or str
         The filename of the file to be handled.
-    *additional_exceptions : tuple[type[Exception]]
+    *additional_exceptions : type[Exception]
         Additional exception types to be handled.
     raise_file_read_error : bool, optional
         Flag to raise the FileReadError exception. The default is True.
@@ -223,9 +254,9 @@ class CatchFileErrors:
 
     def __init__(
         self,
-        filename: Union[Path, str],
+        filename: Path | str,
         *additional_exceptions: type[Exception],
-        raise_file_read_error=True,
+        raise_file_read_error: bool = True,
         error_suffix: str = "",
     ):
         self._exceptions = additional_exceptions + (

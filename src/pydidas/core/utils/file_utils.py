@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = [
     "trim_filename",
     "get_extension",
-    "get_file_type_from_extension",
     "find_valid_python_files",
     "get_file_naming_scheme",
     "CatchFileErrors",
@@ -38,12 +37,9 @@ import os
 import re
 from numbers import Integral
 from pathlib import Path
-from typing import Literal
 
 from pydidas.core.constants import (
-    BINARY_EXTENSIONS,
     FILENAME_DELIMITERS,
-    HDF5_EXTENSIONS,
 )
 from pydidas.core.exceptions import FileReadError, UserConfigError
 from pydidas.core.utils.iterable_utils import flatten
@@ -99,32 +95,6 @@ def get_extension(path: Path | str, lowercase=False) -> str:
     if lowercase:
         _ext.lower()
     return _ext
-
-
-def get_file_type_from_extension(path: Path | str) -> Literal["hdf5", "raw", "generic"]:
-    """
-    Get the file type from the file extension.
-
-    This function checks if a file (based on its extension) is
-    an HDF5 / NeXus file, a raw binary file or a generic file which can be
-    read with standard importers without further specification of metadata.
-
-    Parameters
-    ----------
-    path : Path or str
-        The full filename and path.
-
-    Returns
-    -------
-    str
-        The file type, one of "hdf5", "raw", or "generic".
-    """
-    _ext = get_extension(path, lowercase=True)
-    if _ext in HDF5_EXTENSIONS:
-        return "hdf5"
-    if _ext in BINARY_EXTENSIONS:
-        return "binary"
-    return "generic"
 
 
 def find_valid_python_files(path: Path) -> list[Path]:

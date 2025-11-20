@@ -123,7 +123,7 @@ def get_file_type_from_extension(path: Path | str) -> Literal["hdf5", "raw", "ge
     if _ext in HDF5_EXTENSIONS:
         return "hdf5"
     if _ext in BINARY_EXTENSIONS:
-        return "raw"
+        return "binary"
     return "generic"
 
 

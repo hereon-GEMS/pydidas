@@ -37,6 +37,7 @@ __all__ = [
     "create_nx_dataset",
     "create_nxdata_entry",
     "get_nx_class_for_param",
+    "get_generic_dataset",
 ]
 
 

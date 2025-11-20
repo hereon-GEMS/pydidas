@@ -120,7 +120,7 @@ def assert_correct_widget_visibility(widget):
     _slicing_vis = widget.hdf5_file and widget._selection.axis is not None
     assert widget.param_composite_widgets["slicing_axis"].isVisible() == _slicing_vis
     assert widget._widgets["index_selector"].isVisible() == _slicing_vis
-    for _key in ["raw_datatype", "raw_shape_x", "raw_shape_y", "raw_header"]:
+    for _key in ["raw_datatype", "raw_n_x", "raw_n_y", "raw_header"]:
         assert widget.param_composite_widgets[_key].isVisible() == widget.binary_file
 
 
@@ -192,11 +192,14 @@ def test__select_invalid_file(widget, path_w_data_files):
 
 
 @pytest.mark.gui
-def test__select_empty_h5file(qtbot, widget, path_w_data_files):
+def test__select_empty_h5file(widget, path_w_data_files):
     widget.set_param_value("filename", path_w_data_files / "empty_hdf5_file.h5")
     with pytest.raises(UserConfigError):
         widget.process_new_filename()
-    assert_correct_widget_visibility(widget)
+    assert widget.param_composite_widgets["filename"].isVisible()
+    assert not widget.param_composite_widgets["hdf5_key_str"].isVisible()
+    assert not widget.param_composite_widgets["slicing_axis"].isVisible()
+    assert not widget._widgets["index_selector"].isVisible()
 
 
 @pytest.mark.gui

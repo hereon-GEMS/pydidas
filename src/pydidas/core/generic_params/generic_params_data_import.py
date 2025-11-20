@@ -306,7 +306,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "used for decoding with native byteorder."
         ),
     },
-    "raw_shape_x": {
+    "raw_n_x": {
         "type": int,
         "default": 0,
         "name": "Raw shape x",
@@ -318,7 +318,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "the first axis is y and the second axis is x."
         ),
     },
-    "raw_shape_y": {
+    "raw_n_y": {
         "type": int,
         "default": 0,
         "name": "Raw shape y",

@@ -27,19 +27,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SelectDataFrameWidget"]
 
-
-from typing import Any, Literal
+from typing import Any
 
 from qtpy import QtCore
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.utils import (
-    get_file_type_from_extension,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
     is_hdf5_filename,
 )
 from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
+from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5_dataset_utils import get_generic_dataset
 from pydidas.widgets.data_viewer import DataAxisSelector
 from pydidas.widgets.file_dialog import PydidasFileDialog
@@ -48,7 +47,7 @@ from pydidas.widgets.widget_with_parameter_collection import (
 )
 
 
-class SelectDataFrameWidget(WidgetWithParameterCollection):
+class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     """
     A widget which allows to select a data frame from a file.
 
@@ -77,39 +76,24 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         "hdf5_key_str",
         "slicing_axis",
         "raw_datatype",
-        "raw_shape_x",
-        "raw_shape_y",
+        "raw_n_x",
+        "raw_n_y",
         "raw_header",
     )
 
     def __init__(self, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.set_default_params()
+        AssociatedFileMixin.__init__(self, filename_param=self.params["filename"])
         self.set_param_value_and_choices("slicing_axis", None, [None])
         self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
         self._selection = FrameSliceHandler()
-        self._filetype: Literal["standard", "hdf5", "binary"] = "standard"
         self._raw_filesize = 0
         self._create_widgets()
         self.connect_signals()
         self._toggle_file_selection(False, emit_signal=False)
-
-    @property
-    def hdf5_file(self) -> bool:
-        """bool: Flag whether the selected file is an HDF5 file."""
-        return self._filetype == "hdf5"
-
-    @property
-    def binary_file(self) -> bool:
-        """bool: Flag whether the selected file is a raw binary file."""
-        return self._filetype == "binary"
-
-    @property
-    def generic_file(self) -> bool:
-        """bool: Flag whether the selected file is a standard file."""
-        return self._filetype == "standard"
 
     def _create_widgets(self):
         """Create the widgets for the data frame selection."""
@@ -126,8 +110,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
             allow_axis_use_modification=False,
         )
         self.create_param_widget("raw_datatype", visible=False)
-        self.create_param_widget("raw_shape_x", visible=False)
-        self.create_param_widget("raw_shape_y", visible=False)
+        self.create_param_widget("raw_n_x", visible=False)
+        self.create_param_widget("raw_n_y", visible=False)
         self.create_param_widget("raw_header", visible=False)
 
     def connect_signals(self):
@@ -153,10 +137,9 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
                 "The selected filename is not a valid file. Please check the input "
                 "and correct the path."
             )
-        self._filetype = get_file_type_from_extension(_fname)
-        if self._filetype == "hdf5":
+        if self.hdf5_file:
             self._process_new_hdf5_filename()
-        elif self._filetype == "binary":
+        elif self.binary_file:
             self._store_raw_size()
         else:
             self._selected_new_frame()
@@ -173,15 +156,15 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         emit_signal : bool, optional
             Flag to emit the file valid signal. The default is True.
         """
-        if not selected:
-            self._filetype = "standard"
-        _hdf5_selection = self.hdf5_file and self._selection.ndim > self.__ndim
+        _hdf5_ax_selection = (
+            selected and self.hdf5_file and self._selection.ndim > self.__ndim
+        )
         self.param_composite_widgets["hdf5_key_str"].setVisible(
             selected and self.hdf5_file
         )
-        self.param_composite_widgets["slicing_axis"].setVisible(_hdf5_selection)
-        self._widgets["index_selector"].setVisible(_hdf5_selection)
-        for _key in ["raw_datatype", "raw_shape_x", "raw_shape_y", "raw_header"]:
+        self.param_composite_widgets["slicing_axis"].setVisible(_hdf5_ax_selection)
+        self._widgets["index_selector"].setVisible(_hdf5_ax_selection)
+        for _key in ["raw_datatype", "raw_n_x", "raw_n_y", "raw_header"]:
             self.param_composite_widgets[_key].setVisible(self.binary_file)
         if emit_signal:
             self.sig_file_valid.emit(selected)
@@ -305,7 +288,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
     def _decode_binary_file(self):
         """Decode the raw binary file settings and update Parameters."""
         # _datatype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
-        # _shape_x = self.get_param_value("raw_shape_x", dtype=int)
-        # _shape_y = self.get_param_value("raw_shape_y", dtype=int)
+        # _shape_x = self.get_param_value("raw_n_x", dtype=int)
+        # _shape_y = self.get_param_value("raw_n_y", dtype=int)
         # _header = self.get_param_value("raw_header", dtype=int)
         pass

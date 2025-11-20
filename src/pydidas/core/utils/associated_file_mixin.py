@@ -30,7 +30,7 @@ __all__ = ["AssociatedFileMixin"]
 
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from pydidas.core.constants import (
     ASCII_IMPORT_EXTENSIONS,

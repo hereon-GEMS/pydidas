@@ -12,7 +12,7 @@ Programmatic changes
 --------------------
 - Refactored the Parameter I/O widgets and added tests
 - Overhauled the ParameterCollectionMixin and removed unused methods.
--
+- Added a mix-in class to handle an associated file and type checking centrally.
 
 Bugfixes
 --------

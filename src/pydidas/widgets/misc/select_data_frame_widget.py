@@ -28,12 +28,13 @@ __status__ = "Production"
 __all__ = ["SelectDataFrameWidget"]
 
 
-from typing import Any
+from typing import Any, Literal
 
 from qtpy import QtCore
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.utils import (
+    get_file_type_from_extension,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
     is_hdf5_filename,
@@ -72,7 +73,13 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         "ndim",
     ]
     default_params = get_generic_param_collection(
-        "filename", "hdf5_key_str", "slicing_axis"
+        "filename",
+        "hdf5_key_str",
+        "slicing_axis",
+        "raw_datatype",
+        "raw_shape_x",
+        "raw_shape_y",
+        "raw_header",
     )
 
     def __init__(self, **kwargs: Any):
@@ -83,9 +90,26 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
         self._selection = FrameSliceHandler()
+        self._filetype: Literal["standard", "hdf5", "binary"] = "standard"
+        self._raw_filesize = 0
         self._create_widgets()
         self.connect_signals()
         self._toggle_file_selection(False, emit_signal=False)
+
+    @property
+    def hdf5_file(self) -> bool:
+        """bool: Flag whether the selected file is an HDF5 file."""
+        return self._filetype == "hdf5"
+
+    @property
+    def binary_file(self) -> bool:
+        """bool: Flag whether the selected file is a raw binary file."""
+        return self._filetype == "binary"
+
+    @property
+    def generic_file(self) -> bool:
+        """bool: Flag whether the selected file is a standard file."""
+        return self._filetype == "standard"
 
     def _create_widgets(self):
         """Create the widgets for the data frame selection."""
@@ -101,6 +125,10 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
             multiline=True,
             allow_axis_use_modification=False,
         )
+        self.create_param_widget("raw_datatype", visible=False)
+        self.create_param_widget("raw_shape_x", visible=False)
+        self.create_param_widget("raw_shape_y", visible=False)
+        self.create_param_widget("raw_header", visible=False)
 
     def connect_signals(self):
         """Connect the widget signals to the relevant slots."""
@@ -117,14 +145,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
 
     @QtCore.Slot()
     def process_new_filename(self):
-        """
-        Process the input of a new filename in the Parameter widget.
-
-        Parameters
-        ----------
-        filename : Path | str
-            The filename for the new input data.
-        """
+        """Process the input of a new filename in the Parameter widget."""
         _fname = self.get_param_value("filename")
         if not _fname.is_file():
             self._toggle_file_selection(False)
@@ -132,8 +153,11 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
                 "The selected filename is not a valid file. Please check the input "
                 "and correct the path."
             )
-        if is_hdf5_filename(_fname):
+        self._filetype = get_file_type_from_extension(_fname)
+        if self._filetype == "hdf5":
             self._process_new_hdf5_filename()
+        elif self._filetype == "binary":
+            self._store_raw_size()
         else:
             self._selected_new_frame()
         self._toggle_file_selection(True)
@@ -149,11 +173,16 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         emit_signal : bool, optional
             Flag to emit the file valid signal. The default is True.
         """
-        _is_hdf5 = is_hdf5_filename(self.get_param_value("filename"))
-        _show_selection = selected and _is_hdf5 and self._selection.ndim > self.__ndim
-        self.param_composite_widgets["hdf5_key_str"].setVisible(selected and _is_hdf5)
-        self.param_composite_widgets["slicing_axis"].setVisible(_show_selection)
-        self._widgets["index_selector"].setVisible(_show_selection)
+        if not selected:
+            self._filetype = "standard"
+        _hdf5_selection = self.hdf5_file and self._selection.ndim > self.__ndim
+        self.param_composite_widgets["hdf5_key_str"].setVisible(
+            selected and self.hdf5_file
+        )
+        self.param_composite_widgets["slicing_axis"].setVisible(_hdf5_selection)
+        self._widgets["index_selector"].setVisible(_hdf5_selection)
+        for _key in ["raw_datatype", "raw_shape_x", "raw_shape_y", "raw_header"]:
+            self.param_composite_widgets[_key].setVisible(self.binary_file)
         if emit_signal:
             self.sig_file_valid.emit(selected)
 
@@ -243,17 +272,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
             _options["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
         self.sig_new_selection.emit(_fname, _options)
 
-    # TODO : check if really not needed and whether to remove
-    # def reset_selection(self):
-    #     """
-    #     Reset the file selection to default values.
-    #     """
-    #     self.set_param_and_widget_value("filename", "")
-    #     self.set_param_and_widget_value("hdf5_key_str", None)
-    #     self._toggle_file_selection(False, emit_signal=False)
-
     @QtCore.Slot(int, str)
-    def _new_frame_index(self, ax_index: int, frame_slice_str: str):
+    def _new_frame_index(self, ax_index: int, frame_slice_str: str):  # noqa ARG001
         """
         Process a new frame index from the axis selector.
 
@@ -268,3 +288,24 @@ class SelectDataFrameWidget(WidgetWithParameterCollection):
         _index = int(frame_slice_str.split(":")[0])
         self._selection.frame = _index
         self._selected_new_frame()
+
+    def _store_raw_size(self):
+        """Store the raw file size in the relevant Parameter."""
+        try:
+            self._raw_filesize = self.get_param_value("filename").stat().st_size
+        except Exception as e:
+            self._raw_filesize = 0
+            self._toggle_file_selection(False)
+            self.raise_UserConfigError(
+                "Could not access the selected raw file. Please check the input "
+                f"and correct the path. Original error message:\n\n{e}"
+            )
+        self._decode_binary_file()
+
+    def _decode_binary_file(self):
+        """Decode the raw binary file settings and update Parameters."""
+        # _datatype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
+        # _shape_x = self.get_param_value("raw_shape_x", dtype=int)
+        # _shape_y = self.get_param_value("raw_shape_y", dtype=int)
+        # _header = self.get_param_value("raw_header", dtype=int)
+        pass

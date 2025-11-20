@@ -111,22 +111,24 @@ def widget(qtbot):
     return widget
 
 
-def assert_hdf5_widget_visibility(widget, should_be_visible: bool):
+def assert_correct_widget_visibility(widget):
     assert widget.isVisible()
     assert widget.param_composite_widgets["filename"].isVisible()
     assert (
-        widget.param_composite_widgets["hdf5_key_str"].isVisible() == should_be_visible
+        widget.param_composite_widgets["hdf5_key_str"].isVisible() == widget.hdf5_file
     )
-    _slicing_vis = should_be_visible and widget._selection.axis is not None
+    _slicing_vis = widget.hdf5_file and widget._selection.axis is not None
     assert widget.param_composite_widgets["slicing_axis"].isVisible() == _slicing_vis
     assert widget._widgets["index_selector"].isVisible() == _slicing_vis
+    for _key in ["raw_datatype", "raw_shape_x", "raw_shape_y", "raw_header"]:
+        assert widget.param_composite_widgets[_key].isVisible() == widget.binary_file
 
 
 @pytest.mark.gui
 def test__creation(widget):
     assert isinstance(widget, SelectDataFrameWidget)
     assert widget.get_param_value("filename", dtype=str) == "."
-    assert_hdf5_widget_visibility(widget, False)
+    assert_correct_widget_visibility(widget)
 
 
 @pytest.mark.gui
@@ -139,13 +141,11 @@ def test_process_new_filename(qtbot, widget, path_w_data_files, filename, dtype)
     if filename == "invalid.tif":
         with pytest.raises(UserConfigError):
             widget.process_new_filename()
-        _h5_widgets_should_be_visible = False
     else:
         with qtbot.waitSignal(widget.sig_file_valid, timeout=1000):
             widget.process_new_filename()
-        _h5_widgets_should_be_visible = filename == "hdf5_file.h5"
     qtbot.wait(5)  # ensure signal processing
-    assert_hdf5_widget_visibility(widget, _h5_widgets_should_be_visible)
+    assert_correct_widget_visibility(widget)
     assert widget.spy_sig_file_valid.n == 1
     assert widget.spy_sig_file_valid.results[0] == [filename != "invalid.tif"]
     assert widget.spy_sig_new_selection.n == (filename != "invalid.tif")
@@ -161,7 +161,7 @@ def test__select_file(qtbot, widget, path_w_data_files, test_data, filename):
     ):
         widget.set_param_and_widget_value("filename", path_w_data_files / filename)
     qtbot.wait(5)  # ensure signal processing
-    assert_hdf5_widget_visibility(widget, filename == "hdf5_file.h5")
+    assert_correct_widget_visibility(widget)
     assert widget.spy_sig_file_valid.n == 1
     assert widget.spy_sig_file_valid.results[0] == [True]
     assert widget.spy_sig_new_selection.n == 1
@@ -188,7 +188,7 @@ def test__select_invalid_file(widget, path_w_data_files):
             widget.get_param_value("filename")
         )
     mock_error.assert_called_once()
-    assert_hdf5_widget_visibility(widget, False)
+    assert_correct_widget_visibility(widget)
 
 
 @pytest.mark.gui
@@ -196,7 +196,7 @@ def test__select_empty_h5file(qtbot, widget, path_w_data_files):
     widget.set_param_value("filename", path_w_data_files / "empty_hdf5_file.h5")
     with pytest.raises(UserConfigError):
         widget.process_new_filename()
-    assert_hdf5_widget_visibility(widget, False)
+    assert_correct_widget_visibility(widget)
 
 
 @pytest.mark.gui
@@ -208,7 +208,7 @@ def test__select_h5file_with_same_dsets(qtbot, widget, path_w_data_files):
         widget.set_param_and_widget_value(
             "filename", path_w_data_files / "hdf5_file.h5"
         )
-    assert_hdf5_widget_visibility(widget, True)
+    assert_correct_widget_visibility(widget)
     assert (
         widget.param_composite_widgets["hdf5_key_str"].display_value == _VALID_KEYS[0]
     )
@@ -219,7 +219,7 @@ def test__select_h5_2d_dset_after_3d(widget, path_w_data_files):
     widget.set_param_and_widget_value("filename", path_w_data_files / "hdf5_file.h5")
     widget.set_param_and_widget_value("hdf5_key_str", "/entry/data/3d_dataset_1")
     widget.set_param_and_widget_value("hdf5_key_str", "/entry/data/2d/data1")
-    assert_hdf5_widget_visibility(widget, True)
+    assert_correct_widget_visibility(widget)
     assert (
         widget.param_composite_widgets["hdf5_key_str"].display_value
         == "/entry/data/2d/data1"

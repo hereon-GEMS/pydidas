@@ -110,6 +110,16 @@ def test_shape_setter__valid():
     assert handler.ndim == 2
 
 
+def test_shape_setter__with_preselected_axis():
+    handler = FrameSliceHandler()
+    handler.shape = (5, 4, 6)
+    handler.axis = 2
+    handler.shape = (2, 3)
+    assert handler.shape == (2, 3)
+    assert handler.ndim == 2
+    assert handler.axis == 0
+
+
 @pytest.mark.parametrize("shape", [[1, 21], {1, 2}, (5, 0), (3, -2), (4, 2.5)])
 def test_shape_setter__invalid(shape):
     handler = FrameSliceHandler()

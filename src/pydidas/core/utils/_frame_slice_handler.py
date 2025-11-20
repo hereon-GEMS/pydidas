@@ -91,6 +91,9 @@ class FrameSliceHandler:
         if not all(isinstance(dim, Integral) and dim > 0 for dim in new_shape):
             raise UserConfigError("All dimensions in shape must be positive integers.")
         self._shape = new_shape
+        # Reset axis if it is out of bounds for the new shape
+        if self.axis is not None and len(new_shape) <= self.axis:
+            self._axis = 0
         self._check_frame_index_in__bounds()
 
     @property

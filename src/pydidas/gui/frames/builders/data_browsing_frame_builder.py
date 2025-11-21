@@ -34,13 +34,13 @@ from qtpy import QtGui, QtWidgets
 from pydidas.core.constants import POLICY_EXP_EXP
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.selection import (
+    ConfigureBinaryDecodingWidget,
     DirectoryExplorer,
     Hdf5DatasetSelector,
-    RawMetadataSelector,
 )
 
 
-DATA_BROWSING_FRAME_BUILD_CONFIG: list[str, tuple[Any], dict[str, Any]] = [
+DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = [
     ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
     [
         "create_empty_widget",
@@ -141,7 +141,7 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[str, tuple[Any], dict[str, Any]] = [
     ],
     [
         "create_any_widget",
-        ("raw_metadata_selector", RawMetadataSelector),
+        ("configure_binary_decoding", ConfigureBinaryDecodingWidget),
         {
             "gridPos": (-1, 1, 1, 2),
             "parent_widget": "viewer_and_filename",

@@ -69,6 +69,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
     default_params = get_generic_param_collection(
         "filename", "raw_datatype", "raw_n_y", "raw_n_x", "raw_header"
     )
+    init_kwargs = ["params"]
     sig_new_binary_image = QtCore.Signal(Path, dict)
     sig_new_binary_config = QtCore.Signal(dict)
 

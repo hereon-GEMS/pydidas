@@ -51,7 +51,9 @@ from pydidas.widgets.widget_with_parameter_collection import (
 
 class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     """
-    A compound widget to select metadata in raw image files.
+    A widget to configure the decoding of raw binary files. The widget allows
+    to set the datatype, shape, and header offset of the binary file which is
+    required to decode the file correctly.
 
     Parameters
     ----------
@@ -68,6 +70,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         "filename", "raw_datatype", "raw_n_y", "raw_n_x", "raw_header"
     )
     sig_new_binary_image = QtCore.Signal(Path, dict)
+    sig_new_binary_config = QtCore.Signal(dict)
 
     def __init__(self, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
@@ -162,6 +165,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         self.sig_new_binary_image.emit(
             self.current_filepath, self._config["decode_kwargs"]
         )
+        self.sig_new_binary_config.emit(self._config["decode_kwargs"])
 
     @QtCore.Slot()
     def _toggle_details(self):

@@ -80,6 +80,7 @@ def path_w_data_files(temp_path):
 def widget(qtbot):
     widget = ConfigureBinaryDecodingWidget()
     widget.spy_sig_new_binary_image = SignalSpy(widget.sig_new_binary_image)
+    widget.spy_sig_new_binary_config = SignalSpy(widget.sig_new_binary_config)
     widget.show()
     qtbot.waitUntil(lambda: widget.isVisible(), timeout=1000)
     yield widget
@@ -131,6 +132,7 @@ def test_set_new_filename__binary(widget, path_w_data_files, filename):
     _new_path = path_w_data_files / filename
     widget.set_new_filename(_new_path)
     assert widget.spy_sig_new_binary_image.n == 0
+    assert widget.spy_sig_new_binary_config.n == 0
     _dtype_bytes = int(re.sub(r"[a-z_]", "", filename.removesuffix(".bin"))) // 8
     assert widget._config["filesize"] == (_dtype_bytes * 625)
 
@@ -142,6 +144,7 @@ def test_set_new_filename__invalid_files(qtbot, widget, path_w_data_files, filen
     widget.set_new_filename(_new_path)
     qtbot.waitUntil(lambda: not widget.isVisible(), timeout=1000)
     assert widget.spy_sig_new_binary_image.n == 0
+    assert widget.spy_sig_new_binary_config.n == 0
     assert not widget.isVisible()
 
 
@@ -153,11 +156,13 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     widget.set_new_filename(_new_path)
     widget.set_param_and_widget_value("raw_datatype", _dtype_str)
     assert widget.spy_sig_new_binary_image.n == 0
+    assert widget.spy_sig_new_binary_config.n == 0
     # check with original size
     widget.set_param_and_widget_value("raw_n_y", 25)
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_x", 25)
     assert widget.spy_sig_new_binary_image.n == 1
+    assert widget.spy_sig_new_binary_config.n == 1
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[0]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (25, 25)
@@ -165,9 +170,11 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     widget.set_param_and_widget_value("raw_n_y", 625)
     qtbot.wait(5)  # wait to allow for possible signal processing
     assert widget.spy_sig_new_binary_image.n == 1
+    assert widget.spy_sig_new_binary_config.n == 1
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_x", 1)
     assert widget.spy_sig_new_binary_image.n == 2
+    assert widget.spy_sig_new_binary_config.n == 2
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[1]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (625, 1)
@@ -175,9 +182,11 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     widget.set_param_and_widget_value("raw_header", 25 * _dtype_size)
     qtbot.wait(5)  # wait to allow for possible signal processing
     assert widget.spy_sig_new_binary_image.n == 2
+    assert widget.spy_sig_new_binary_config.n == 2
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_y", 600)
     assert widget.spy_sig_new_binary_image.n == 3
+    assert widget.spy_sig_new_binary_config.n == 3
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[2]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (600, 1)

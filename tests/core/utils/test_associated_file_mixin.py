@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SelectDataFrameWidget for selecting data frames from a dataset.
+Module with pydidas unittests
 """
 
 __author__ = "Malte Storm"
@@ -70,7 +70,7 @@ def path_w_data_files(temp_path):
 
 @pytest.mark.parametrize("use_filename", [True, False])
 @pytest.mark.parametrize("use_param", [True, False])
-def test__creation__simply(temp_path, use_filename, use_param):
+def test__creation(temp_path, use_filename, use_param):
     kwargs = {}
     if use_filename:
         kwargs["filename"] = temp_path / "testfile.txt"

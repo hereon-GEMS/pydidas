@@ -36,7 +36,7 @@ class PydidasHdf5TableView(Hdf5TableView):
     def display_data(
         self,
         data: h5py.Dataset | h5py.File | h5py.Group | silx.gui.hdf5.H5Node,
-        **kwargs: Any,
+        **kwargs: Any,  # noqa ARG001
     ) -> None:
         """
         Display the data in the view.
@@ -55,6 +55,17 @@ class PydidasHdf5TableView(Hdf5TableView):
         """Clear the data reference."""
         self.setData(None)
 
+    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+        """
+        Set the graph title.
+
+        Parameters
+        ----------
+        title : str
+            The new title.
+        """
+        pass
+
 
 class PydidasArrayTableWidget(ArrayTableWidget):
     """
@@ -62,7 +73,9 @@ class PydidasArrayTableWidget(ArrayTableWidget):
     """
 
     def display_data(
-        self, data: np.ndarray | silx.gui.hdf5.H5Node, **kwargs: Any
+        self,
+        data: np.ndarray | silx.gui.hdf5.H5Node,
+        **kwargs: Any,  # noqa ARG001
     ) -> None:
         """
         Display the data in the view.
@@ -83,3 +96,14 @@ class PydidasArrayTableWidget(ArrayTableWidget):
     def clear(self):
         """Clear the table."""
         self.setArrayData(np.array([]))
+
+    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+        """
+        Set the graph title.
+
+        Parameters
+        ----------
+        title : str
+            The new title.
+        """
+        pass

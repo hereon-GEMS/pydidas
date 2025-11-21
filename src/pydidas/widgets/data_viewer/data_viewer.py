@@ -279,6 +279,7 @@ class DataViewer(WidgetWithParameterCollection):
         if data is None:
             if self._active_view is not None:
                 self._widgets[self._active_view].clear()
+                self._widgets[self._active_view].setGraphTitle("")
             return
         if isinstance(data, H5Node):
             h5node = data

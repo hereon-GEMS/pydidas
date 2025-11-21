@@ -295,7 +295,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "name": "Datatype",
         "choices": (
             ["boolean (1 bit integer)"]
-            + [f"float {_i} bit" for _i in [16, 32, 64, 128]]
+            + [f"float {_i} bit" for _i in [16, 32, 64]]
             + [f"int {_i} bit" for _i in [8, 16, 32, 64]]
             + [f" unsigned int {_i} bit" for _i in [8, 16, 32, 64]]
         ),

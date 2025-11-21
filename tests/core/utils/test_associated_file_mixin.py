@@ -135,6 +135,13 @@ def test__with_directory_instead_of_file(path_w_data_files):
     assert obj.generic_file
 
 
+def test__with_empty_value():
+    obj = AssociatedFileMixin()
+    obj.current_filename = ""
+    assert not obj.current_filename_is_valid
+    assert obj.generic_file
+
+
 def test__w_associated_parameter_and_external_change(path_w_data_files):
     param = get_generic_parameter("filename")
     obj = AssociatedFileMixin(filename_param=param)

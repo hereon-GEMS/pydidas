@@ -15,9 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Module with the SelectDataFrameWidget for selecting data frames from a dataset.
-"""
+"""Module with pydidas unittests"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"

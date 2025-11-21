@@ -105,7 +105,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
-        self._widgets["configure_binary_decoding"].sig_new_binary_image.connect(
+        self._widgets["configure_binary_decoding"].sig_new_binary_config.connect(
             self.__display_binary_data
         )
         self._widgets["hdf5_dataset_selector"].sig_request_hdf5_browser.connect(
@@ -264,19 +264,17 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             _data = _h5node
         self.__display_dataset(_data, h5node=_h5node, title=_fpath + "::" + dataset)
 
-    @QtCore.Slot(Path, dict)
-    def __display_binary_data(self, filename: Path, kwargs: dict):
+    @QtCore.Slot(dict)
+    def __display_binary_data(self, kwargs: dict[str, Any]):
         """
         Display the raw binary data in the viewer widget.
 
         Parameters
         ----------
-        filename : Path
-            The full file name (including directory) of the binary file.
         kwargs : dict
             The kwargs required for decoding the raw data.
         """
-        _data = import_data(filename, **kwargs)
+        _data = import_data(self.current_filename, **kwargs)
         self.__display_dataset(_data)
 
     @QtCore.Slot()

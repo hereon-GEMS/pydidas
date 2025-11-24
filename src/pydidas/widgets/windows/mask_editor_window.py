@@ -36,7 +36,7 @@ from pydidas.core.utils import update_size_policy
 from pydidas.data_io import import_data
 from pydidas.widgets import parameter_config, silx_plot
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import SelectDataFrameWidget
+from pydidas.widgets.selection import SelectDataFrameWidget
 
 
 class MaskEditorWindow(PydidasWindow):

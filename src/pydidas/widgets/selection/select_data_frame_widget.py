@@ -31,7 +31,7 @@ from typing import Any
 
 from qtpy import QtCore
 
-from pydidas.core import get_generic_param_collection
+from pydidas.core import ParameterCollection, get_generic_param_collection
 from pydidas.core.utils import (
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
@@ -42,6 +42,7 @@ from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5_dataset_utils import get_generic_dataset
 from pydidas.widgets.data_viewer import DataAxisSelector
 from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
@@ -70,15 +71,12 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     init_kwargs = WidgetWithParameterCollection.init_kwargs + [
         "import_reference",
         "ndim",
+        "import_hdf5_metadata",
     ]
     default_params = get_generic_param_collection(
         "filename",
         "hdf5_key_str",
         "slicing_axis",
-        "raw_datatype",
-        "raw_n_x",
-        "raw_n_y",
-        "raw_header",
     )
 
     def __init__(self, **kwargs: Any):
@@ -89,8 +87,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
+        self.__import_hdf5_metadata = kwargs.get("import_hdf5_metadata", False)
         self._selection = FrameSliceHandler()
-        self._raw_filesize = 0
         self._create_widgets()
         self.connect_signals()
         self._toggle_file_selection(False, emit_signal=False)
@@ -109,10 +107,12 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             multiline=True,
             allow_axis_use_modification=False,
         )
-        self.create_param_widget("raw_datatype", visible=False)
-        self.create_param_widget("raw_n_x", visible=False)
-        self.create_param_widget("raw_n_y", visible=False)
-        self.create_param_widget("raw_header", visible=False)
+        self.add_any_widget(
+            "binary_decoder",
+            ConfigureBinaryDecodingWidget(
+                params=ParameterCollection(self.get_param("filename"))
+            ),
+        )
 
     def connect_signals(self):
         """Connect the widget signals to the relevant slots."""
@@ -126,6 +126,12 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self._selected_new_slicing_axis
         )
         self._widgets["index_selector"].sig_new_slicing.connect(self._new_frame_index)
+        self._widgets["binary_decoder"].sig_new_binary_config.connect(
+            self._selected_new_frame
+        )
+        self._widgets["binary_decoder"].sig_decoding_invalid.connect(
+            self._process_binary_decoding_invalid
+        )
 
     @QtCore.Slot()
     def process_new_filename(self):
@@ -140,7 +146,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if self.hdf5_file:
             self._process_new_hdf5_filename()
         elif self.binary_file:
-            self._store_raw_size()
+            self._widgets["binary_decoder"].set_new_filename(_fname)
         else:
             self._selected_new_frame()
         self._toggle_file_selection(True)
@@ -164,8 +170,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         )
         self.param_composite_widgets["slicing_axis"].setVisible(_hdf5_ax_selection)
         self._widgets["index_selector"].setVisible(_hdf5_ax_selection)
-        for _key in ["raw_datatype", "raw_n_x", "raw_n_y", "raw_header"]:
-            self.param_composite_widgets[_key].setVisible(self.binary_file)
+        self._widgets["binary_decoder"].setVisible(selected and self.binary_file)
         if emit_signal:
             self.sig_file_valid.emit(selected)
 
@@ -244,16 +249,23 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if emit_signal:
             self._selected_new_frame()
 
-    @QtCore.Slot()
-    def _selected_new_frame(self):
+    @QtCore.Slot(dict)
+    def _selected_new_frame(self, config: dict = {}):
         """
         Open a new file / frame based on the input Parameters.
+
+        Parameters
+        ----------
+        config : dict, optional
+            Additional configuration options from external sources,
+            (e.g. used for binary data).
         """
         _fname = self.get_param_value("filename", dtype=str)
-        _options = {"indices": self._selection.indices}
+        config["indices"] = self._selection.indices
         if is_hdf5_filename(_fname):
-            _options["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
-        self.sig_new_selection.emit(_fname, _options)
+            config["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
+            config["import_metadata"] = self.__import_hdf5_metadata
+        self.sig_new_selection.emit(_fname, config)
 
     @QtCore.Slot(int, str)
     def _new_frame_index(self, ax_index: int, frame_slice_str: str):  # noqa ARG001
@@ -272,23 +284,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._selection.frame = _index
         self._selected_new_frame()
 
-    def _store_raw_size(self):
-        """Store the raw file size in the relevant Parameter."""
-        try:
-            self._raw_filesize = self.get_param_value("filename").stat().st_size
-        except Exception as e:
-            self._raw_filesize = 0
-            self._toggle_file_selection(False)
-            self.raise_UserConfigError(
-                "Could not access the selected raw file. Please check the input "
-                f"and correct the path. Original error message:\n\n{e}"
-            )
-        self._decode_binary_file()
-
-    def _decode_binary_file(self):
-        """Decode the raw binary file settings and update Parameters."""
-        # _datatype = NUMPY_HUMAN_READABLE_DATATYPES[self.get_param_value("raw_datatype")]
-        # _shape_x = self.get_param_value("raw_n_x", dtype=int)
-        # _shape_y = self.get_param_value("raw_n_y", dtype=int)
-        # _header = self.get_param_value("raw_header", dtype=int)
-        pass
+    @QtCore.Slot()
+    def _process_binary_decoding_invalid(self):
+        """Process invalid binary decoding settings."""
+        self.sig_file_valid.emit(False)

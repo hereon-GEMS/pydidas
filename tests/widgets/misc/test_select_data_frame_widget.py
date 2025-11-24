@@ -35,7 +35,7 @@ from skimage.io import imsave
 
 from pydidas.core import UserConfigError
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.misc.select_data_frame_widget import SelectDataFrameWidget
+from pydidas.widgets.selection.select_data_frame_widget import SelectDataFrameWidget
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -90,6 +90,9 @@ def path_w_data_files(temp_path, test_data):
     with h5py.File(_path / "empty_hdf5_file.h5", "w") as f:
         pass
     np.save(_path / "npy_file.npy", test_data["/entry/data/2d/data1"])
+    test_data["/entry/data/2d/data1"].astype(np.float64).tofile(
+        _path / "binary_file.bin"
+    )
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
         imsave(
@@ -118,8 +121,7 @@ def assert_correct_widget_visibility(widget):
     _slicing_vis = widget.hdf5_file and widget._selection.axis is not None
     assert widget.param_composite_widgets["slicing_axis"].isVisible() == _slicing_vis
     assert widget._widgets["index_selector"].isVisible() == _slicing_vis
-    for _key in ["raw_datatype", "raw_n_x", "raw_n_y", "raw_header"]:
-        assert widget.param_composite_widgets[_key].isVisible() == widget.binary_file
+    assert widget._widgets["binary_decoder"].isVisible() == widget.binary_file
 
 
 @pytest.mark.gui
@@ -187,6 +189,39 @@ def test__select_invalid_file(widget, path_w_data_files):
         )
     mock_error.assert_called_once()
     assert_correct_widget_visibility(widget)
+
+
+@pytest.mark.gui
+def test__select_binary_file(qtbot, widget, path_w_data_files):
+    widget.set_param_and_widget_value("filename", path_w_data_files / "binary_file.bin")
+    qtbot.wait(5)  # ensure signal processing
+    assert_correct_widget_visibility(widget)
+    assert widget.spy_sig_file_valid.n == 1
+    assert widget.spy_sig_file_valid.results[0] == [True]
+    assert widget.spy_sig_new_selection.n == 0
+    # configure binary decoder
+    widget._widgets["binary_decoder"].set_param_and_widget_value(
+        "raw_datatype", "float 64 bit"
+    )
+    widget._widgets["binary_decoder"].set_param_and_widget_value("raw_n_y", 5)
+    with qtbot.waitSignal(
+        widget._widgets["binary_decoder"].sig_new_binary_config, timeout=1000
+    ):
+        widget._widgets["binary_decoder"].set_param_and_widget_value("raw_n_x", 6)
+    qtbot.wait(5)  # ensure signal processing
+    _emitted_fname, _emitted_kwargs = widget.spy_sig_new_selection.results[0]
+    assert widget.spy_sig_new_selection.n == 1
+    assert _emitted_fname == str(path_w_data_files / "binary_file.bin")
+    assert _emitted_kwargs == {
+        "datatype": np.float64,
+        "shape": (5, 6),
+        "offset": 0,
+        "indices": None,
+    }
+    with qtbot.waitSignal(widget.sig_file_valid, timeout=1000):
+        widget._widgets["binary_decoder"].set_param_and_widget_value("raw_n_x", 2)
+    assert widget.spy_sig_file_valid.n == 2
+    assert widget.spy_sig_file_valid.results[1] == [False]
 
 
 @pytest.mark.gui

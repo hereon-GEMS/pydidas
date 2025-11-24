@@ -39,8 +39,9 @@ from pydidas.data_io import import_data
 from pydidas.widgets.controllers import ManuallySetIntegrationRoiController
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import SelectDataFrameWidget, ShowIntegrationRoiParamsWidget
+from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
 from pydidas.widgets.scroll_area import ScrollArea
+from pydidas.widgets.selection import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 

@@ -37,9 +37,9 @@ from pydidas.widgets import ScrollArea
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.misc import (
     PointsForBeamcenterWidget,
-    SelectDataFrameWidget,
     ShowIntegrationRoiParamsWidget,
 )
+from pydidas.widgets.selection import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import (
     PydidasPlot2DwithIntegrationRegions,
 )

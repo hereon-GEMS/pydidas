@@ -43,7 +43,6 @@ from pydidas.core.constants import (
 )
 from pydidas.core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
-from pydidas.widgets.utilities import get_pyqt_icon_from_str
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
@@ -72,6 +71,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
     init_kwargs = ["params"]
     sig_new_binary_image = QtCore.Signal(Path, dict)
     sig_new_binary_config = QtCore.Signal(dict)
+    sig_decoding_invalid = QtCore.Signal()
 
     def __init__(self, **kwargs: Any):
         WidgetWithParameterCollection.__init__(self, **kwargs)
@@ -82,7 +82,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         self._config = {
             "decode_kwargs": {},
             "filesize": 0,
-            "display_details": True,
+            "decoding_is_valid": False,
         }
         self.__create_widgets()
 
@@ -90,8 +90,15 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         """
         Create all required widgets.
         """
+        self.create_check_box(
+            "show_decoding_details",
+            "Show binary decoder settings",
+            checked=True,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+        )
+        self._widgets["show_decoding_details"].clicked.connect(self._toggle_details)
         for _key in ["raw_datatype", "raw_n_y", "raw_n_x", "raw_header"]:
-            self.create_param_widget(_key, gridPos=(-1, 0, 1, 1))
+            self.create_param_widget(_key)
             self.param_composite_widgets[_key].sig_value_changed.connect(
                 self._check_decoding_params
             )
@@ -100,19 +107,13 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "",
             font_metric_height_factor=2,
             font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
-            gridPos=(4, 0, 1, 1),
             policy=POLICY_EXP_FIX,
         )
-        self.create_button(
-            "button_toggle_details",
-            "Hide detailed options",
-            clicked=self._toggle_details,
-            icon="qt-std::SP_TitleBarShadeButton",
-            gridPos=(4, 1, 1, 1),
-        )
+        self.create_spacer(None, fixedWidth=1, gridPos=(0, 1, 1, 1))
+        self.layout().setColumnStretch(1, 1)
 
     @QtCore.Slot(str)
-    def set_new_filename(self, name: str | Path):
+    def set_new_filename(self, filename: str | Path):
         """
         Process a new filename.
 
@@ -121,10 +122,10 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
 
         Parameters
         ----------
-        name : Path or str
+        filename : Path or str
             The full file system path to the new file.
         """
-        self.set_param_value("filename", name)
+        self.current_filepath = filename
         self.setVisible(self.binary_file and self.current_filename_is_valid)
         if self.binary_file and self.current_filename_is_valid:
             self._config["filesize"] = self.current_filepath.stat().st_size
@@ -145,10 +146,13 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
                 f"File size: {self._config['filesize']:,} bytes\n"
                 f"decoder settings: {_expected_size:,} bytes."
             )
+            if self._config["decoding_is_valid"]:
+                self.sig_decoding_invalid.emit()
         else:
             _color = COLOR_GREEN
             self._widgets["decode_info"].setText("Decoding parameters are valid.")
             self._emit_new_image_settings()
+        self._config["decoding_is_valid"] = _expected_size == self._config["filesize"]
         self._widgets["decode_info"].setStyleSheet("QLabel {color: " + _color + ";}")
 
     @QtCore.Slot()
@@ -168,20 +172,15 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         )
         self.sig_new_binary_config.emit(self._config["decode_kwargs"])
 
-    @QtCore.Slot()
-    def _toggle_details(self):
+    @QtCore.Slot(bool)
+    def _toggle_details(self, checked: bool):
         """
         Toggle the visibility of the detailed dataset selection options.
+
+        Parameters
+        ----------
+        checked : bool
+            The checked state of the toggle button.
         """
-        _show = not self._config["display_details"]
         for _key in self.param_composite_widgets:
-            self.toggle_param_widget_visibility(_key, _show)
-        self._config["display_details"] = _show
-        self._widgets["button_toggle_details"].setText(
-            "Hide detailed options" if _show else "Show detailed options"
-        )
-        self._widgets["button_toggle_details"].setIcon(
-            get_pyqt_icon_from_str("qt-std::SP_TitleBarShadeButton")
-            if _show
-            else get_pyqt_icon_from_str("qt-std::SP_TitleBarUnshadeButton")
-        )
+            self.toggle_param_widget_visibility(_key, checked)

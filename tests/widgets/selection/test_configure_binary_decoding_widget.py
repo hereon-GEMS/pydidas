@@ -43,6 +43,7 @@ from pydidas.core.generic_parameters import get_generic_parameter
 from pydidas.data_io import import_data
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
+from pydidas_qtcore import PydidasQApplication
 
 
 _EXTENSIONS = (
@@ -60,6 +61,19 @@ _FILENAMES = [
     "ones_int8.bin",
     "ones_uint16.bin",
 ]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _cleanup():
+    yield
+    app = PydidasQApplication.instance()
+    for widget in [
+        _w
+        for _w in app.topLevelWidgets()
+        if isinstance(_w, ConfigureBinaryDecodingWidget)
+    ]:
+        widget.deleteLater()
+    app.processEvents()
 
 
 @pytest.fixture(scope="module")
@@ -81,6 +95,7 @@ def widget(qtbot):
     widget = ConfigureBinaryDecodingWidget()
     widget.spy_sig_new_binary_image = SignalSpy(widget.sig_new_binary_image)
     widget.spy_sig_new_binary_config = SignalSpy(widget.sig_new_binary_config)
+    widget.spy_sig_decoding_invalid = SignalSpy(widget.sig_decoding_invalid)
     widget.show()
     qtbot.waitUntil(lambda: widget.isVisible(), timeout=1000)
     yield widget
@@ -123,16 +138,17 @@ def test__creation(qtbot, temp_path, use_params):
     for _key in ["raw_datatype", "raw_n_y", "raw_n_x", "raw_header"]:
         assert _key in widget.param_composite_widgets
         assert widget.param_composite_widgets[_key].isVisible()
-    assert widget._config["display_details"] is True
 
 
 @pytest.mark.gui
 @pytest.mark.parametrize("filename", _FILENAMES)
-def test_set_new_filename__binary(widget, path_w_data_files, filename):
+def test_set_new_filename__binary(qtbot, widget, path_w_data_files, filename):
     _new_path = path_w_data_files / filename
     widget.set_new_filename(_new_path)
+    qtbot.wait(5) # wait to allow for possible signal processing
     assert widget.spy_sig_new_binary_image.n == 0
     assert widget.spy_sig_new_binary_config.n == 0
+    assert widget.spy_sig_decoding_invalid.n == 0
     _dtype_bytes = int(re.sub(r"[a-z_]", "", filename.removesuffix(".bin"))) // 8
     assert widget._config["filesize"] == (_dtype_bytes * 625)
 
@@ -145,6 +161,7 @@ def test_set_new_filename__invalid_files(qtbot, widget, path_w_data_files, filen
     qtbot.waitUntil(lambda: not widget.isVisible(), timeout=1000)
     assert widget.spy_sig_new_binary_image.n == 0
     assert widget.spy_sig_new_binary_config.n == 0
+    assert widget.spy_sig_decoding_invalid.n == 0
     assert not widget.isVisible()
 
 
@@ -157,12 +174,14 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     widget.set_param_and_widget_value("raw_datatype", _dtype_str)
     assert widget.spy_sig_new_binary_image.n == 0
     assert widget.spy_sig_new_binary_config.n == 0
+    assert widget.spy_sig_decoding_invalid.n == 0
     # check with original size
     widget.set_param_and_widget_value("raw_n_y", 25)
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_x", 25)
     assert widget.spy_sig_new_binary_image.n == 1
     assert widget.spy_sig_new_binary_config.n == 1
+    assert widget.spy_sig_decoding_invalid.n == 0
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[0]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (25, 25)
@@ -171,10 +190,12 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     qtbot.wait(5)  # wait to allow for possible signal processing
     assert widget.spy_sig_new_binary_image.n == 1
     assert widget.spy_sig_new_binary_config.n == 1
+    assert widget.spy_sig_decoding_invalid.n == 1
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_x", 1)
     assert widget.spy_sig_new_binary_image.n == 2
     assert widget.spy_sig_new_binary_config.n == 2
+    assert widget.spy_sig_decoding_invalid.n == 1
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[1]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (625, 1)
@@ -183,10 +204,12 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     qtbot.wait(5)  # wait to allow for possible signal processing
     assert widget.spy_sig_new_binary_image.n == 2
     assert widget.spy_sig_new_binary_config.n == 2
+    assert widget.spy_sig_decoding_invalid.n == 2
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_y", 600)
     assert widget.spy_sig_new_binary_image.n == 3
     assert widget.spy_sig_new_binary_config.n == 3
+    assert widget.spy_sig_decoding_invalid.n == 2
     _fname, _kwargs = widget.spy_sig_new_binary_image.results[2]
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (600, 1)
@@ -196,23 +219,19 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
 def test_toggle_details(qtbot, widget):
     for _key in widget.param_composite_widgets:
         assert widget.param_composite_widgets[_key].isVisible()
-    _button_icon = widget._widgets["button_toggle_details"].icon()
-    _button_text = widget._widgets["button_toggle_details"].text()
-    widget._toggle_details()
-    qtbot.wait(5)  # wait to allow for possible signal processing
-    for _key in widget.param_composite_widgets:
-        assert not widget.param_composite_widgets[_key].isVisible()
-    assert widget._widgets["button_toggle_details"].icon() != _button_icon
-    assert widget._widgets["button_toggle_details"].text() != _button_text
-    with qtbot.waitSignal(
-        widget._widgets["button_toggle_details"].clicked, timeout=1000
-    ):
-        qtbot.mouseClick(
-            widget._widgets["button_toggle_details"], QtCore.Qt.MouseButton.LeftButton
-        )
-    assert widget._widgets["button_toggle_details"].text() == _button_text
-    for _key in widget.param_composite_widgets:
-        assert widget.param_composite_widgets[_key].isVisible()
+    assert widget._widgets["show_decoding_details"].isVisible()
+    assert widget._widgets["show_decoding_details"].isEnabled()
+    for _run in range(2):
+        with qtbot.waitSignal(
+            widget._widgets["show_decoding_details"].clicked, timeout=1000
+        ):
+            qtbot.mouseClick(
+                widget._widgets["show_decoding_details"],
+                QtCore.Qt.MouseButton.LeftButton,
+            )
+        qtbot.wait(5)  # wait to allow for possible signal processing
+        for _key in widget.param_composite_widgets:
+            assert widget.param_composite_widgets[_key].isVisible() == _run
 
 
 if __name__ == "__main__":

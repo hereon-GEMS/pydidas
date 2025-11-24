@@ -28,37 +28,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .create_widgets_mixin import *
-from .empty_widget import *
-from .pydidas_checkbox import *
-from .pydidas_combobox import *
-from .pydidas_label import *
-from .pydidas_lineedit import *
-from .pydidas_pushbutton import *
-from .radio_button_group import *
-from .square_button import *
+from .create_widgets_mixin import CreateWidgetsMixIn
+from .empty_widget import EmptyWidget
+from .pydidas_checkbox import PydidasCheckBox
+from .pydidas_combobox import PydidasComboBox
+from .pydidas_label import PydidasLabel
+from .pydidas_lineedit import PydidasLineEdit
+from .pydidas_pushbutton import PydidasPushButton
+from .radio_button_group import RadioButtonGroup
+from .square_button import SquareButton
 
 
-__all__ = (
-    create_widgets_mixin.__all__
-    + empty_widget.__all__
-    + pydidas_checkbox.__all__
-    + pydidas_combobox.__all__
-    + pydidas_label.__all__
-    + pydidas_lineedit.__all__
-    + pydidas_pushbutton.__all__
-    + square_button.__all__
-    + radio_button_group.__all__
-)
-
-del (
-    create_widgets_mixin,
-    empty_widget,
-    pydidas_checkbox,
-    pydidas_combobox,
-    pydidas_label,
-    pydidas_lineedit,
-    pydidas_pushbutton,
-    square_button,
-    radio_button_group,
-)
+__all__ = [
+    "CreateWidgetsMixIn",
+    "EmptyWidget",
+    "PydidasCheckBox",
+    "PydidasComboBox",
+    "PydidasLabel",
+    "PydidasLineEdit",
+    "PydidasPushButton",
+    "SquareButton",
+    "RadioButtonGroup",
+]

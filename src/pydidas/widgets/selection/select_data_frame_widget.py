@@ -35,7 +35,6 @@ from pydidas.core import ParameterCollection, get_generic_param_collection
 from pydidas.core.utils import (
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
-    is_hdf5_filename,
 )
 from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
@@ -64,6 +63,13 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             If None, no persistent settings are stored. The default is None.
         ndim : int, optional
             The number of dimensions of the data to be imported. The default is 2.
+        filename : Parameter | None, optional
+            A Parameter to use for the filename selection. If None, a default
+            Parameter will be created. The default is None.
+        font_metric_width_factor : int | None, optional
+            An optional factor to modify the width of text elements in the
+            widget based on the font metrics. If None, the default width for
+            the used Parameter widgets is applied. The default is None.
     """
 
     sig_new_selection = QtCore.Signal(str, dict)
@@ -72,6 +78,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         "import_reference",
         "ndim",
         "import_hdf5_metadata",
+        "font_metric_width_factor",
     ]
     default_params = get_generic_param_collection(
         "filename",
@@ -87,6 +94,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
+        self.__font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
         self.__import_hdf5_metadata = kwargs.get("import_hdf5_metadata", False)
         self._selection = FrameSliceHandler()
         self._create_widgets()
@@ -96,10 +104,21 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     def _create_widgets(self):
         """Create the widgets for the data frame selection."""
         self.create_param_widget(
-            "filename", linebreak=True, persistent_qsettings_ref=self.__import_qref
+            "filename",
+            font_metric_width_factor=self.__font_metric_width_factor,
+            linebreak=True,
+            persistent_qsettings_ref=self.__import_qref,
         )
-        self.create_param_widget("hdf5_key_str", width_text=0.4)
-        self.create_param_widget("slicing_axis", width_text=0.4)
+        self.create_param_widget(
+            "hdf5_key_str",
+            font_metric_width_factor=self.__font_metric_width_factor,
+            width_text=0.4,
+        )
+        self.create_param_widget(
+            "slicing_axis",
+            font_metric_width_factor=self.__font_metric_width_factor,
+            width_text=0.4,
+        )
         self.create_any_widget(
             "index_selector",
             DataAxisSelector,
@@ -260,12 +279,11 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             Additional configuration options from external sources,
             (e.g. used for binary data).
         """
-        _fname = self.get_param_value("filename", dtype=str)
         config["indices"] = self._selection.indices
-        if is_hdf5_filename(_fname):
+        if self.hdf5_file:
             config["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
             config["import_metadata"] = self.__import_hdf5_metadata
-        self.sig_new_selection.emit(_fname, config)
+        self.sig_new_selection.emit(self.current_filename, config)
 
     @QtCore.Slot(int, str)
     def _new_frame_index(self, ax_index: int, frame_slice_str: str):  # noqa ARG001

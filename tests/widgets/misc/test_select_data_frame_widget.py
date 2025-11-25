@@ -125,9 +125,24 @@ def assert_correct_widget_visibility(widget):
 
 
 @pytest.mark.gui
-def test__creation(widget):
-    assert isinstance(widget, SelectDataFrameWidget)
-    assert widget.get_param_value("filename", dtype=str) == "."
+@pytest.mark.parametrize("width", [None, 20, 50])
+@pytest.mark.parametrize("ndim", [2, 3])
+@pytest.mark.parametrize("import_hdf5_metadata", [True, False])
+def test__creation(qtbot, width, ndim, import_hdf5_metadata):
+    widget = SelectDataFrameWidget(
+        width=width,
+        ndim=ndim,
+        import_hdf5_metadata=import_hdf5_metadata,
+    )
+    qtbot.add_widget(widget)
+    widget.show()
+    qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
+    assert widget._SelectDataFrameWidget__ndim == ndim
+    assert widget._SelectDataFrameWidget__import_hdf5_metadata == import_hdf5_metadata
+    _width = widget.width()
+    assert widget.param_composite_widgets["filename"].width() == _width
+    assert widget.param_composite_widgets["hdf5_key_str"].width() == _width
+    assert widget.param_composite_widgets["slicing_axis"].width() == _width
     assert_correct_widget_visibility(widget)
 
 

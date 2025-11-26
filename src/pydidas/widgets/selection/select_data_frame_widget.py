@@ -74,6 +74,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
 
     sig_new_selection = QtCore.Signal(str, dict)
     sig_file_valid = QtCore.Signal(bool)
+
     init_kwargs = WidgetWithParameterCollection.init_kwargs + [
         "import_reference",
         "ndim",
@@ -94,29 +95,30 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
-        self.__font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
+        self.__file_valid = False
         self.__import_hdf5_metadata = kwargs.get("import_hdf5_metadata", False)
         self._selection = FrameSliceHandler()
-        self._create_widgets()
+        self._create_widgets(kwargs)
         self.connect_signals()
         self._toggle_file_selection(False, emit_signal=False)
 
-    def _create_widgets(self):
+    def _create_widgets(self, kwargs: dict[str, Any]):
         """Create the widgets for the data frame selection."""
+        _font_metric_width = kwargs.get("font_metric_width_factor", None)
         self.create_param_widget(
             "filename",
-            font_metric_width_factor=self.__font_metric_width_factor,
+            font_metric_width_factor=_font_metric_width,
             linebreak=True,
             persistent_qsettings_ref=self.__import_qref,
         )
         self.create_param_widget(
             "hdf5_key_str",
-            font_metric_width_factor=self.__font_metric_width_factor,
+            font_metric_width_factor=_font_metric_width,
             width_text=0.4,
         )
         self.create_param_widget(
             "slicing_axis",
-            font_metric_width_factor=self.__font_metric_width_factor,
+            font_metric_width_factor=_font_metric_width,
             width_text=0.4,
         )
         self.create_any_widget(
@@ -146,7 +148,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         )
         self._widgets["index_selector"].sig_new_slicing.connect(self._new_frame_index)
         self._widgets["binary_decoder"].sig_new_binary_config.connect(
-            self._selected_new_frame
+            self._new_valid_binary_config
         )
         self._widgets["binary_decoder"].sig_decoding_invalid.connect(
             self._process_binary_decoding_invalid
@@ -167,8 +169,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         elif self.binary_file:
             self._widgets["binary_decoder"].set_new_filename(_fname)
         else:
+            self._toggle_file_selection(True)
             self._selected_new_frame()
-        self._toggle_file_selection(True)
 
     def _toggle_file_selection(self, selected: bool, emit_signal: bool = True):
         """
@@ -190,6 +192,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.param_composite_widgets["slicing_axis"].setVisible(_hdf5_ax_selection)
         self._widgets["index_selector"].setVisible(_hdf5_ax_selection)
         self._widgets["binary_decoder"].setVisible(selected and self.binary_file)
+        self.__file_valid = selected
         if emit_signal:
             self.sig_file_valid.emit(selected)
 
@@ -201,8 +204,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             min_dim=self.__ndim,
             max_dim=self.__ndim + 1,
         )
+        self._toggle_file_selection(bool(_dsets))
         if not _dsets:
-            self._toggle_file_selection(False)
             self.raise_UserConfigError(
                 "The selected HDF5 file does not contain any datasets with "
                 f"{self.__ndim} or {self.__ndim + 1} dimensions. Please select "
@@ -302,7 +305,23 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._selection.frame = _index
         self._selected_new_frame()
 
+    @QtCore.Slot(dict)
+    def _new_valid_binary_config(self, config: dict):
+        """
+        Process a new binary image selection.
+
+        Parameters
+        ----------
+        config : dict
+            The binary decoding configuration.
+        """
+        if not self.__file_valid:
+            self.__file_valid = True
+            self.sig_file_valid.emit(True)
+        self._selected_new_frame(config)
+
     @QtCore.Slot()
     def _process_binary_decoding_invalid(self):
         """Process invalid binary decoding settings."""
+        self.__file_valid = False
         self.sig_file_valid.emit(False)

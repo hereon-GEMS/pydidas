@@ -82,7 +82,6 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         self._config = {
             "decode_kwargs": {},
             "filesize": 0,
-            "decoding_is_valid": False,
         }
         self.__create_widgets()
 
@@ -111,6 +110,13 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         )
         self.create_spacer(None, fixedWidth=1, gridPos=(0, 1, 1, 1))
         self.layout().setColumnStretch(1, 1)
+
+    @property
+    def decoding_is_valid(self) -> bool:
+        """
+        Get the check whether the current decoding file/parameter combination is valid.
+        """
+        return self._config.get("decoding_is_valid", False)
 
     @QtCore.Slot(str)
     def set_new_filename(self, filename: str | Path):
@@ -146,7 +152,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
                 f"File size: {self._config['filesize']:,} bytes\n"
                 f"decoder settings: {_expected_size:,} bytes."
             )
-            if self._config["decoding_is_valid"]:
+            if self._config.get("decoding_is_valid", True):
                 self.sig_decoding_invalid.emit()
         else:
             _color = COLOR_GREEN

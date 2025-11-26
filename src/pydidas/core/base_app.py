@@ -30,7 +30,7 @@ __all__ = ["BaseApp"]
 from copy import copy
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import Optional, Self
+from typing import Any, Optional, Self
 
 from qtpy import QtCore
 
@@ -52,18 +52,18 @@ class BaseApp(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    *args : tuple
+    *args : Any
         Any arguments. Defined by the concrete implementation of the app.
-    **kwargs : dict
+    **kwargs : Any
         A dictionary of keyword arguments. Defined by the concrete
         implementation of the app.
     """
 
     default_params = ParameterCollection()
-    parse_func = lambda self: {}  # noqa E731
+    parse_func = staticmethod(lambda: {})  # noqa E731
     attributes_not_to_copy_to_app_clone = ["_mp_manager_instance"]
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         self.clone_mode = kwargs.pop("clone_mode", False)
         ObjectWithParameterCollection.__init__(self)
         self.update_params_from_init_args_and_kwargs(*args, **kwargs)
@@ -72,7 +72,7 @@ class BaseApp(ObjectWithParameterCollection):
         self.mp_manager = {}
         self._mp_manager_instance = None
 
-    def parse_args_and_set_params(self):
+    def parse_args_and_set_params(self) -> None:
         """
         Parse the command line arguments and update the corresponding Parameter values.
         """
@@ -83,7 +83,7 @@ class BaseApp(ObjectWithParameterCollection):
             if _key in self.params and _value is not None:
                 self.params.set_value(_key, _value)
 
-    def deleteLater(self):
+    def deleteLater(self) -> None:
         """
         Overwrite the deleteLater method to ensure proper cleanup.
 
@@ -133,10 +133,8 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return self._config.get("latest_results", None)
 
-    def run(self):
-        """
-        Run the app serially without multiprocessing support.
-        """
+    def run(self) -> None:
+        """Run the app serially without multiprocessing support."""
         self.multiprocessing_pre_run()
         tasks = self.multiprocessing_get_tasks()
         for task in tasks:
@@ -149,7 +147,7 @@ class BaseApp(ObjectWithParameterCollection):
                     break
         self.multiprocessing_post_run()
 
-    def multiprocessing_pre_run(self):
+    def multiprocessing_pre_run(self) -> None:
         """
         Perform operations prior to running main parallel processing function.
 
@@ -158,14 +156,12 @@ class BaseApp(ObjectWithParameterCollection):
         """
         self._config["run_prepared"] = True
 
-    def prepare_run(self):
-        """
-        Prepare running the app. This is a wrapper for multiprocessing_pre_run.
-        """
+    def prepare_run(self) -> None:
+        """Prepare running the app. This is a wrapper for multiprocessing_pre_run."""
         self.multiprocessing_pre_run()
 
     @QtCore.Slot()
-    def multiprocessing_post_run(self):
+    def multiprocessing_post_run(self) -> None:
         """
         Perform operations after running main parallel processing function.
 
@@ -182,7 +178,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
-    def multiprocessing_pre_cycle(self, index: int):
+    def multiprocessing_pre_cycle(self, index: int) -> None:
         """
         Perform operations in the pre-cycle of every task.
 
@@ -196,7 +192,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return
 
-    def multiprocessing_func(self, index: int):
+    def multiprocessing_func(self, index: int) -> None:
         """
         Perform key operation with parallel processing.
 
@@ -225,7 +221,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
-    def multiprocessing_store_results(self, index: int, *args: tuple):
+    def multiprocessing_store_results(self, index: int, *args: tuple) -> None:
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
@@ -278,21 +274,15 @@ class BaseApp(ObjectWithParameterCollection):
             "config": _cfg,
         }
 
-    def import_state(self, state: dict):
-        """
-        Import a stored state including Parameters and configuration.
-
-        Parameters
-        ----------
-        state : dict
-            The stored state.
-        """
+    def import_state(self, state: dict) -> None:
+        """Import a stored state including Parameters and configuration."""
         for _key, _val in state["params"].items():
             self.set_param_value(_key, _val)
         _new_cfg = {}
         for _key, _item in state["config"].items():
             if not isinstance(_item, str):
                 continue
+            _start = _stop = _step = None
             if _item.startswith("::range::") or _item.startswith("::slice::"):
                 _, _, _start, _stop, _step = _item.split("::")
                 _start = None if _start == "None" else int(_start)

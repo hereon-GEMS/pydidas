@@ -73,7 +73,7 @@ def _get_base_class(cls: Type | None) -> Type | Real | Integral | None:
     return cls
 
 
-def _outside_range_string(val: object, parameter: "Parameter") -> str:
+def _outside_range_string(val: Any, parameter: "Parameter") -> str:
     if parameter.dtype == Integral:
         _range = (int(parameter.range[0]), int(parameter.range[1]))
     else:
@@ -84,7 +84,7 @@ def _outside_range_string(val: object, parameter: "Parameter") -> str:
     )
 
 
-def _invalid_choice_str(val: object, choices: list[Any]) -> str:
+def _invalid_choice_str(val: Any, choices: list[Any]) -> str:
     return (
         f"The selected value '{val}' does not correspond to any of the allowed "
         f"choices: {choices}"
@@ -179,7 +179,7 @@ class Parameter:
         choices : Sequence[Any] |  None
             A list of allowed choices. If None, no checking will be enforced.
             The default is None.
-        value : object
+        value : Any
             The value of the parameter. This parameter should only be used
             to restore saved parameters.
         allow_None : bool, optional
@@ -191,7 +191,7 @@ class Parameter:
         self,
         refkey: str,
         param_type: Type | None,
-        default: object,
+        default: Any,
         meta: dict | None = None,
         **kwargs: Any,
     ):
@@ -207,8 +207,9 @@ class Parameter:
             optional=kwargs.get("optional", False),
             name=kwargs.get("name", ""),
             allow_None=kwargs.get("allow_None", False),
-            range=None,
+            range=None,  # type: ignore
             subtype=_get_base_class(kwargs.get("subtype", None)),
+            choices=None,  # type: ignore
         )
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
@@ -237,35 +238,21 @@ class Parameter:
             )
         self.__meta["default"] = default
 
-    def __process_choices_input(self, kwargs: dict[Any]):
-        """
-        Process the choices input.
-
-        Parameters
-        ----------
-        kwargs : dict[Any]
-            The kwargs passed to init.
-
-        Raises
-        ------
-        TypeError
-            If choices are not of an accepted type (None, list, tuple)
-        ValueError
-            If the default has been set, and it is not in choices.
-        """
+    def __process_choices_input(self, kwargs: dict[str, Any]):
+        """Process the choices input."""
         _choices = kwargs.get("choices", None)
         if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
             raise TypeError(
                 f"The type of choices (type: `{type(_choices)}`"
                 "is not supported. Please use list or tuple."
             )
-        self.__meta["choices"] = None if _choices is None else list(_choices)
+        self.__meta["choices"] = None if _choices is None else list(_choices)  # type: ignore
         _def = self.__meta["default"]
         if self.__meta["choices"] is not None and _def not in self.__meta["choices"]:
             raise ValueError(
                 f"The default value '{_def}' does not correspond to any of the defined "
                 f"choices: {self.__meta['choices']}."
-            )
+            )  # type: ignore
 
     def __typecheck(self, val: Any) -> bool:
         """
@@ -442,14 +429,7 @@ class Parameter:
 
     @property
     def choices(self) -> list[Any] | None:
-        """
-        Get or set the allowed choices for the Parameter value.
-
-        Returns
-        -------
-        list[Any] | None
-            The allowed choices for the Parameter.
-        """
+        """Get the allowed choices for the Parameter value."""
         return self.__meta["choices"]
 
     @choices.setter
@@ -489,7 +469,7 @@ class Parameter:
                 "The new choices do not include the current "
                 f"Parameter value ({self.__value})"
             )
-        self.__meta["choices"] = list(choices)
+        self.__meta["choices"] = list(choices)  # type: ignore
 
     @property
     def optional(self) -> bool:
@@ -504,15 +484,8 @@ class Parameter:
         return self.__meta["optional"]
 
     @property
-    def dtype(self) -> Type:
-        """
-        Get the data type of the Parameter value.
-
-        Returns
-        -------
-        object
-            The class of the parameter value data type.
-        """
+    def dtype(self) -> type:
+        """Get the data type of the Parameter value."""
         return self.__type
 
     @property
@@ -553,7 +526,7 @@ class Parameter:
             if not self.__meta["range"][0] <= val <= self.__meta["range"][1]:
                 raise UserConfigError(_outside_range_string(val, self))
         if self.__meta["choices"] and val not in self.__meta["choices"]:
-            raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))
+            raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))  # type: ignore
         if not (self.__typecheck(val) or (self.__meta["optional"] and val is None)):
             self._raise_value_set_valueerror(val)
         self.__value = val
@@ -586,15 +559,8 @@ class Parameter:
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
     @property
-    def range(self) -> None | tuple[Real, Real]:
-        """
-        Get the range of the Parameter.
-
-        Returns
-        -------
-        None | tuple[Real, Real]
-            The range of the Parameter.
-        """
+    def range(self) -> None | tuple[float, float]:
+        """Get the range of the Parameter."""
         return self.__meta["range"]
 
     @range.setter
@@ -627,7 +593,7 @@ class Parameter:
         if len(new_range) != 2:
             raise UserConfigError("The new range must be a tuple of two numbers.")
         new_range = (float(new_range[0]), float(new_range[1]))
-        self.__meta["range"] = new_range
+        self.__meta["range"] = new_range  # type: ignore
 
     def set_value_and_choices(self, value: Any, choices: None | Sequence[Any]):
         """
@@ -787,7 +753,7 @@ class Parameter:
         Parameters
         ----------
         value : str | Sequence[str | Real]
-            The input object.
+            The input value.
 
         Returns
         -------

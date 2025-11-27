@@ -44,33 +44,57 @@ class FrameSliceHandler:
         axis: Integral | None = None,
         frame: Integral = 0,
         shape: tuple[Integral, ...] = (),
-    ):
+    ) -> None:
         # Set _frame and _axis first to have references in setters
-        self._frame = 0
-        self._axis = None
-        self.shape = shape  # Use setter to validate shape first
+        self._frame: int = 0
+        self._axis: int | None = None
+        # Use setters to validate entries
+        self.shape = shape
         self.axis = axis
         self.frame = frame
 
     @property
-    def axis(self) -> Integral | None:
+    def axis(self) -> int | None:
+        """Get the current axis for slicing."""
         return self._axis
 
     @axis.setter
-    def axis(self, value: Integral | None):
-        if value is not None and (value < 0 or value >= self.ndim):
+    def axis(self, value: Integral | None) -> None:
+        """
+        Set the current axis for slicing.
+
+        If the axis is set to None, no slicing is applied.
+
+        Parameters
+        ----------
+        value : Integral | None
+            The axis index to set, or None for no slicing.
+        """
+        if value is None:
+            self._axis = None
+            return
+        if not (0 <= value < self.ndim):
             raise UserConfigError(
                 f"Axis {value} is out of bounds for data with {self.ndim} dimensions."
             )
-        self._axis = value
+        self._axis = int(value)
         self._check_frame_index_in__bounds()
 
     @property
     def frame(self) -> int:
-        return int(self._frame)
+        """Get the frame index for the current axis."""
+        return self._frame
 
     @frame.setter
-    def frame(self, value: Integral):
+    def frame(self, value: Integral) -> None:
+        """
+        Set the frame index for the current axis.
+
+        Parameters
+        ----------
+        value : Integral
+            The frame index to set.
+        """
         if not isinstance(value, Integral):
             raise UserConfigError("Frame index must be an integer.")
         if self.axis is not None and (value < 0 or value >= self.shape[self.axis]):
@@ -78,19 +102,28 @@ class FrameSliceHandler:
                 f"Frame {value} is out of bounds for axis {self.axis} with size "
                 f"{self.shape[self.axis]}."
             )
-        self._frame = value
+        self._frame = int(value)
 
     @property
-    def shape(self) -> tuple[Integral, ...]:
+    def shape(self) -> tuple[int, ...]:
+        """Get the shape of the data."""
         return self._shape
 
     @shape.setter
     def shape(self, new_shape: tuple[Integral, ...]):
+        """
+        Set the shape of the data.
+
+        Parameters
+        ----------
+        new_shape : tuple[Integral, ...]
+            The new shape of the data as a tuple of positive integers.
+        """
         if not isinstance(new_shape, tuple):
             raise UserConfigError("Shape must be a tuple of positive integers.")
         if not all(isinstance(dim, Integral) and dim > 0 for dim in new_shape):
             raise UserConfigError("All dimensions in shape must be positive integers.")
-        self._shape = new_shape
+        self._shape = tuple(int(_item) for _item in new_shape)
         # Reset axis if it is out of bounds for the new shape
         if self.axis is not None and len(new_shape) <= self.axis:
             self._axis = 0
@@ -98,23 +131,26 @@ class FrameSliceHandler:
 
     @property
     def ndim(self) -> int:
+        """Get the number of dimensions of the data."""
         return len(self._shape)
 
     @property
-    def slice(self) -> tuple[slice | int, ...]:
+    def slice(self) -> slice | tuple[slice | int, ...]:
+        """Get the current slice or tuple of slices for indexing."""
         if self.axis is None:
             return slice(None)
-        else:
-            return tuple(
-                self.frame if ax == self.axis else slice(None)
-                for ax in range(self.axis + 1)
-            )
+        return tuple(
+            self.frame if ax == self.axis else slice(None)
+            for ax in range(self.axis + 1)
+        )
 
     @property
-    def indices(self) -> tuple[None | tuple[None | Integral], ...]:
+    def indices(self) -> None | tuple[None | int]:
+        """Get the current indices for indexing."""
         return None if self.axis is None else ((None,) * self.axis + (self.frame,))
 
-    def _check_frame_index_in__bounds(self):
+    def _check_frame_index_in__bounds(self) -> None:
+        """Check if the frame index is within bounds and reset if necessary."""
         if self._axis is not None and self._frame >= self.shape[self._axis]:
             self._frame = 0
             warnings.warn(

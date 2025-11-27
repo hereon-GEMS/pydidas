@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import numpy as np
 import pytest
 
 from pydidas.core import UserConfigError
@@ -67,11 +68,15 @@ def test_init__w_valid_values(kwargs):
         assert getattr(handler, _key) == _value
 
 
-@pytest.mark.parametrize("axis", [1, None])
+@pytest.mark.parametrize("axis", [1, None, np.uint8(0), np.int32(1)])
 def test_axis_setter__valid(axis):
     handler = FrameSliceHandler(shape=(3, 4), frame=2)
     handler.axis = axis
-    assert handler.axis == axis
+    if axis is None:
+        assert handler.axis is None
+    else:
+        assert handler.axis == int(axis)
+        assert isinstance(handler.axis, int)
     assert handler.frame == 2
 
 
@@ -90,10 +95,12 @@ def test_axis_setter__w_frame_reset():
     assert handler.frame == 0
 
 
-def test_frame_setter__valid():
+@pytest.mark.parametrize("frame", [0, 2, np.uint8(1), np.int32(1)])
+def test_frame_setter__valid(frame):
     handler = FrameSliceHandler(shape=(3, 4), axis=1)
-    handler.frame = 2
-    assert handler.frame == 2
+    handler.frame = frame
+    assert handler.frame == int(frame)
+    assert isinstance(handler.frame, int)
 
 
 @pytest.mark.parametrize("frame", [-1, 4, 3.3])
@@ -103,10 +110,15 @@ def test_frame_setter__out_of_bounds(frame):
         handler.frame = frame
 
 
-def test_shape_setter__valid():
+@pytest.mark.parametrize(
+    "shape", [(5, 4), (np.uint8(5), 4), (np.uint64(5), np.int32(4))]
+)
+def test_shape_setter__valid(shape):
     handler = FrameSliceHandler()
-    handler.shape = (5, 4)
+    handler.shape = shape
     assert handler.shape == (5, 4)
+    assert isinstance(handler.shape[0], int)
+    assert isinstance(handler.shape[1], int)
     assert handler.ndim == 2
 
 

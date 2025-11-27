@@ -82,7 +82,7 @@ class ParameterCollectionMixIn:
         """
         return list(self.params.keys())
 
-    def add_param(self, param: Parameter):
+    def add_param(self, param: Parameter) -> None:
         """
         Add a parameter to the ParameterCollection.
 
@@ -91,15 +91,15 @@ class ParameterCollectionMixIn:
         Parameters
         ----------
         param : Parameter
-            An instance of a Parameter object.
+            An instance of a Parameter.
         """
         self.params.add_param(param)
 
-    def add_params(self, *params: Parameter | ParameterCollection):
+    def add_params(self, *params: Parameter | ParameterCollection) -> None:
         """
-        Add parameters to the object.
+        Add parameters to the collection.
 
-        This method adds Parameters to the ParameterCollection of the object.
+        This method adds Parameters to the ParameterCollection.
         Parameters can be either supplied as args or a ParameterCollection
         or dictionary in the form of <ref_key>: <Parameter>.
         This method is explicitly separated from the __init__ method to allow
@@ -123,7 +123,7 @@ class ParameterCollectionMixIn:
 
     def update_params_from_init_args_and_kwargs(
         self, *args: Parameter | ParameterCollection, **kwargs: Any
-    ):
+    ) -> None:
         """
         Update the Parameters from the given init args and kwargs.
 
@@ -138,7 +138,7 @@ class ParameterCollectionMixIn:
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
 
-    def set_default_params(self):
+    def set_default_params(self) -> None:
         """
         Set default entries.
 
@@ -150,7 +150,7 @@ class ParameterCollectionMixIn:
             if _key not in self.params:
                 self.add_param(_param.copy())
 
-    def update_param_values_from_kwargs(self, **kwargs: Any):
+    def update_param_values_from_kwargs(self, **kwargs: Any) -> None:
         """
         Update the Parameter values corresponding to the given keys.
 
@@ -260,7 +260,7 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         self.params.set_value(param_key, value)
 
-    def set_param_values(self, **kwargs: Any):
+    def set_param_values(self, **kwargs: Any) -> None:
         """
         Set multiple parameter values at once.
 
@@ -300,14 +300,14 @@ class ParameterCollectionMixIn:
         }
         return name_val_pairs
 
-    def set_param_values_from_dict(self, value_dict: dict):
+    def set_param_values_from_dict(self, value_dict: dict[str, Any]) -> None:
         """
         Set the Parameter values from a dict with name, value paris.
 
         Parameters
         ----------
-        value_dict : dict
-            The dictionary with the stored information.
+        value_dict : dict[str, Any]
+            The dictionary with the stored parameter names and values.
         """
         for _key, _value in value_dict.items():
             if _key in self.params:
@@ -315,7 +315,7 @@ class ParameterCollectionMixIn:
 
     def set_param_value_and_choices(
         self, param_key: str, value: Any, choices: None | Sequence[Any]
-    ):
+    ) -> None:
         """
         Update a Parameter's value and choices.
 
@@ -332,10 +332,8 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         self.params[param_key].set_value_and_choices(value, choices)
 
-    def print_param_values(self):
-        """
-        Print the name and value of all Parameters.
-        """
+    def print_param_values(self) -> None:
+        """Print the name and value of all Parameters."""
         _config = self.get_param_values_as_dict()
         for _key in _config:
             print(f"{_key}: {_config[_key]}")
@@ -388,7 +386,7 @@ class ParameterCollectionMixIn:
         _offset = 1 if _param.value < 0 else 0
         return _val + _offset
 
-    def restore_all_defaults(self, confirm: bool = False):
+    def restore_all_defaults(self, confirm: bool = False) -> None:
         """
         Restore the default values to all entries.
 

@@ -97,13 +97,13 @@ def test__file_type_properties(path_w_data_files, extension):
     )
 
 
-@pytest.mark.parametrize("property", ["filename", "filepath"])
-def test_currrent_file_properties(path_w_data_files, property):
+@pytest.mark.parametrize("property_name", ["filename", "filepath"])
+def test_current_file_properties(path_w_data_files, property_name):
     obj = AssociatedFileMixin()
     _new_path = path_w_data_files / "testfile.txt"
-    if property == "filename":
+    if property_name == "filename":
         obj.current_filename = _new_path
-    elif property == "filepath":
+    elif property_name == "filepath":
         obj.current_filepath = _new_path
     assert obj._filename_param.value == _new_path
     assert isinstance(obj.current_filepath, Path)
@@ -112,15 +112,15 @@ def test_currrent_file_properties(path_w_data_files, property):
     assert obj.current_filename == str(_new_path)
 
 
-@pytest.mark.parametrize("value", [12, (Path("somepath"),), 5.5, [1, 2, 3]])
-def test_currrent_filename_invalid_type(path_w_data_files, value):
+@pytest.mark.parametrize("value", [12, (Path("some_path"),), 5.5, [1, 2, 3]])
+def test_current_filename_invalid_type(path_w_data_files, value):
     obj = AssociatedFileMixin()
     with pytest.raises(UserConfigError):
         obj.current_filename = value
 
 
 @pytest.mark.parametrize("filename", _FILENAMES)
-def test_currrent_filename_is_valid(path_w_data_files, filename):
+def test_current_filename_is_valid(path_w_data_files, filename):
     obj = AssociatedFileMixin()
     obj.current_filename = path_w_data_files / filename
     assert obj.current_filename_is_valid

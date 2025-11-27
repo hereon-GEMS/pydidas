@@ -48,7 +48,7 @@ class AssociatedFileMixin:
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Additional keyword arguments. Supported kwargs are
 
         filename : Path or str
@@ -59,7 +59,7 @@ class AssociatedFileMixin:
             a generic filename Parameter will be created.
     """
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         self._filename_param = kwargs.get(
             "filename_param", get_generic_parameter("filename")
         )
@@ -81,22 +81,22 @@ class AssociatedFileMixin:
 
     @property
     def hdf5_file(self) -> bool:
-        """bool: Flag whether the selected file is an HDF5 file."""
+        """Flag whether the selected file is an HDF5 file."""
         return self._filetype == "hdf5"
 
     @property
     def binary_file(self) -> bool:
-        """bool: Flag whether the selected file is a raw binary file."""
+        """Flag whether the selected file is a raw binary file."""
         return self._filetype == "binary"
 
     @property
     def generic_file(self) -> bool:
-        """bool: Flag whether the selected file is a generic file."""
+        """Flag whether the selected file is a generic file."""
         return self._filetype == "generic"
 
     @property
     def ascii_file(self) -> bool:
-        """bool: Flag whether the selected file is an ASCII file."""
+        """Flag whether the selected file is an ASCII file."""
         return self._filetype == "ascii"
 
     @property
@@ -106,11 +106,11 @@ class AssociatedFileMixin:
 
     @property
     def current_filepath(self) -> Path:
-        """Get the current filen as a Path instance."""
+        """Get the current filename as a Path instance."""
         return self._filename_param.value
 
     @current_filename.setter
-    def current_filename(self, name: Path | str):
+    def current_filename(self, name: Path | str) -> None:
         """
         Set a new filename.
 
@@ -127,7 +127,7 @@ class AssociatedFileMixin:
         self._filename_param.value = name
 
     @current_filepath.setter
-    def current_filepath(self, path: Path | str):
+    def current_filepath(self, path: Path | str) -> None:
         """
         Set a new filepath.
 

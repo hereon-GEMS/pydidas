@@ -29,7 +29,7 @@ __all__ = ["CompositeCreatorApp"]
 
 import os
 import time
-from typing import Union
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -122,7 +122,18 @@ class CompositeCreatorApp(BaseApp):
     mp_func_results = QtCore.Signal(object)
     updated_composite = QtCore.Signal()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the CompositeCreatorApp.
+
+        Parameters
+        ----------
+        *args : Any
+            Any number of Parameters.
+        **kwargs : Any
+            Parameters supplied with their reference key as dict key and
+            the Parameter itself as value.
+        """
         super().__init__(*args, **kwargs)
         self._det_mask = None
         self._bg_image = None
@@ -163,7 +174,7 @@ class CompositeCreatorApp(BaseApp):
             "current_kwargs": {},
         }
 
-    def multiprocessing_pre_run(self):
+    def multiprocessing_pre_run(self) -> None:
         """
         Perform operations prior to running main parallel processing function.
         """
@@ -172,7 +183,7 @@ class CompositeCreatorApp(BaseApp):
         self._config["mp_tasks"] = range(_ntotal)
         self._store_detector_mask()
 
-    def prepare_run(self):
+    def prepare_run(self) -> None:
         """
         Prepare running the composite creation.
 
@@ -207,7 +218,7 @@ class CompositeCreatorApp(BaseApp):
         self.__check_and_store_thresholds()
         self._config["run_prepared"] = True
 
-    def _store_detector_mask(self):
+    def _store_detector_mask(self) -> None:
         """
         Get the detector mask, if used, based on the given Parameters.
         """
@@ -230,7 +241,7 @@ class CompositeCreatorApp(BaseApp):
             _mask = _mask.astype(np.bool_)
         self._det_mask = _mask
 
-    def __verify_number_of_images_fits_composite(self):
+    def __verify_number_of_images_fits_composite(self) -> None:
         """
         Check the dimensions of the composite image and verify that it holds
         the right amount of images.
@@ -261,23 +272,18 @@ class CompositeCreatorApp(BaseApp):
                 f"images. (nx={_nx}, ny={_ny}, n={_ntotal})"
             )
 
-    def _check_and_set_bg_file(self):
+    def _check_and_set_bg_file(self) -> None:
         """
         Check the selected background image file for consistency.
-
-        The background image file is checked and if all checks pass, the
-        background image is stored.
 
         Raises
         ------
         UserConfigError
             - If the selected background file does not exist
-            - If the selected dataset key does not exist (in case of hdf5
-              files)
-            - If the selected dataset number does not exist (in case of
-              hdf5 files)
-            - If the image dimensions for the background file differ from the
-              image files.
+            - If the selected dataset key does not exist (in case of hdf5 files)
+            - If the selected dataset number does not exist (in case of hdf5 files)
+            - If the image dimensions for the background file differ
+              from the image files.
         """
         _bg_file = self.get_param_value("bg_file")
         check_file_exists(_bg_file)
@@ -299,7 +305,7 @@ class CompositeCreatorApp(BaseApp):
             )
         self._bg_image = self.__apply_mask(_bg_image)
 
-    def __update_composite_image_params(self):
+    def __update_composite_image_params(self) -> None:
         """
         Update the derived Parameters of the composite and create a new array.
         """
@@ -307,7 +313,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.set_param_value("datatype", self._image_metadata.datatype)
         self._composite.create_new_image()
 
-    def __check_and_store_thresholds(self):
+    def __check_and_store_thresholds(self) -> None:
         """
         Check for thresholds and store them in the local config.
         """
@@ -322,6 +328,11 @@ class CompositeCreatorApp(BaseApp):
     def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
+
+        Returns
+        -------
+        np.ndarray
+            The array of tasks for multiprocessing.
         """
         if "mp_tasks" not in self._config.keys():
             raise KeyError(
@@ -330,7 +341,7 @@ class CompositeCreatorApp(BaseApp):
             )
         return self._config["mp_tasks"]
 
-    def multiprocessing_pre_cycle(self, index: int):
+    def multiprocessing_pre_cycle(self, index: int) -> None:
         """
         Run preparatory functions in the cycle prior to the main function.
 
@@ -341,7 +352,7 @@ class CompositeCreatorApp(BaseApp):
         """
         self._store_args_for_read_image(index)
 
-    def _store_args_for_read_image(self, index: int):
+    def _store_args_for_read_image(self, index: int) -> None:
         """
         Create the required kwargs to pass to the read_image function.
 
@@ -372,20 +383,16 @@ class CompositeCreatorApp(BaseApp):
         """
         Get the flag value whether to carry on processing.
 
-        By default, this Flag is always True. In the case of live processing,
-        a check is done whether the current file exists.
-
         Returns
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
-
         """
         if self.get_param_value("live_processing"):
             return self._image_exists_check(self._config["current_fname"], timeout=0.02)
         return True
 
-    def _image_exists_check(self, fname: str, timeout: float = -1) -> True:
+    def _image_exists_check(self, fname: str, timeout: float = -1) -> bool:
         """
         Wait for the file to exist in the file system.
 
@@ -394,15 +401,14 @@ class CompositeCreatorApp(BaseApp):
         fname : str
             The file path & name.
         timeout : float, optional
-            If a timeout larger than zero is selected, the process will wait
-            a maximum of timeout seconds before raising an Exception.
-            The value "-1" corresponds to no timeout. The default is -1.
+            If a timeout larger than zero is selected, the process will wait a
+            maximum of timeout seconds before raising an Exception. The value
+            "-1" corresponds to no timeout. The default is -1.
 
         Returns
         -------
         bool
-            Flag if the image exists and has the same size as the reference
-            file.
+            Flag if the image exists and has the same size as the reference file.
         """
         _target_size = self._filelist.filesize
         if _target_size is None:
@@ -427,7 +433,7 @@ class CompositeCreatorApp(BaseApp):
 
         Returns
         -------
-        _image : pydidas.core.Dataset
+        Dataset
             The (pre-processed) image.
         """
         _image = import_data(
@@ -436,18 +442,18 @@ class CompositeCreatorApp(BaseApp):
         _image = self.__apply_mask(_image)
         return _image
 
-    def __apply_mask(self, image: Union[np.ndarray, Dataset]) -> np.ndarray:
+    def __apply_mask(self, image: Dataset) -> Dataset:
         """
         Apply the detector mask to the image.
 
         Parameters
         ----------
-        image : np.ndarray
-            The image data.
+        image : Dataset
+            The input image data.
 
         Returns
         -------
-        image : pydidas.core.Dataset
+        Dataset
             The masked image data.
         """
         if self._det_mask is None:
@@ -460,7 +466,7 @@ class CompositeCreatorApp(BaseApp):
             return Dataset(_masked_image, **image.property_dict)
         return _masked_image
 
-    def multiprocessing_post_run(self):
+    def multiprocessing_post_run(self) -> None:
         """
         Perform operations after running main parallel processing function.
         """
@@ -468,7 +474,7 @@ class CompositeCreatorApp(BaseApp):
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
-    def apply_thresholds(self, **kwargs: dict):
+    def apply_thresholds(self, **kwargs: Any) -> None:
         """
         Refer to the pydidas.managers.CompositeImageManager docstring.
         """
@@ -487,7 +493,7 @@ class CompositeCreatorApp(BaseApp):
             )
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index: int, image: np.ndarray):
+    def multiprocessing_store_results(self, index: int, image: np.ndarray) -> None:
         """
         Store the results of the multiprocessing operation.
 
@@ -505,19 +511,19 @@ class CompositeCreatorApp(BaseApp):
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 
-    def export_image(self, output_fname: str, **kwargs: dict):
+    def export_image(self, output_fname: str, **kwargs: Any) -> None:
         """
         Export the composite image to a file.
 
         This method is a wrapper for the CompositeImageManager.export method.
-        Supported file types for export are all generic datatypes with exporters for
-        2-dimensional data.
+        Supported file types for export are all generic datatypes with exporters
+        for 2-dimensional data.
 
         Parameters
         ----------
         output_fname : str
             The full file system path and filename for the output image file.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. Supported arguments are:
 
             data_range : tuple, optional
@@ -526,15 +532,15 @@ class CompositeCreatorApp(BaseApp):
         self._composite.export(output_fname, **kwargs)
 
     @property
-    def composite(self) -> Union[None, np.ndarray]:
+    def composite(self) -> None | np.ndarray:
         """
         Get the composite image.
 
         Returns
         -------
-        image : Union[None, np.ndarray]
-            The composite image in np.ndarray format. If no composite has
-            been created, this property returns None.
+        None or np.ndarray
+            The composite image in np.ndarray format. If no composite has been
+            created, this property returns None.
         """
         if self._composite is None:
             return None

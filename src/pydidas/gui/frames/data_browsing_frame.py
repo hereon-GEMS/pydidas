@@ -84,7 +84,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
     )
     params_not_to_restore = ["xcol"]
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         AssociatedFileMixin.__init__(self, **kwargs)
         self.__qtapp = PydidasQApplication.instance()
@@ -95,10 +95,9 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.__metadata_window = None
         self.set_default_params()
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
-        Connect all required signals and slots between widgets and class
-        methods.
+        Connect all required signals and slots between widgets and class methods.
         """
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
@@ -113,7 +112,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         self._widgets["button_ascii_metadata"].clicked.connect(self.__display_metadata)
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and populate it with widgets.
         """
@@ -132,7 +131,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         _viewer_layout.setRowStretch(_viewer_layout.rowCount() - 1, 1)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: int):
+    def frame_activated(self, index: int) -> None:
         """
         Received signal that frame has been activated.
 
@@ -153,7 +152,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
                     _window.hide()
 
     @QtCore.Slot(str)
-    def __file_selected(self, filename: str):
+    def __file_selected(self, filename: str) -> None:
         """
         Open a file after sit has been selected in the DirectoryExplorer.
 
@@ -184,7 +183,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             _data = import_data(filename)
             self.__display_dataset(_data)
 
-    def __open_hdf5_file(self):
+    def __open_hdf5_file(self) -> None:
         """Process the input file and check whether it is a hdf5 file."""
         if self.__open_file is not None:
             self.__open_file.close()
@@ -211,7 +210,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
 
     def __display_dataset(
         self, data: Dataset | H5Node, h5node: H5Node = None, title: str | None = None
-    ):
+    ) -> None:
         """
         Display the data in the viewer widget.
 
@@ -228,7 +227,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self._widgets["viewer"].set_data(data, title=title, h5node=h5node)
 
     @QtCore.Slot(str)
-    def __display_hdf5_dataset(self, dataset: str):
+    def __display_hdf5_dataset(self, dataset: str) -> None:
         """
         Display the selected dataset in the viewer widget.
 
@@ -240,10 +239,11 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         if dataset == "":
             self._widgets["viewer"].set_data(None)
             return
-        _max_direct_import_size = 1_048_576 * self.q_settings_get(
-            "global/data_buffer_hdf5_max_size", dtype=int
+        _max_direct_import_size = int(
+            1_048_576
+            * self.q_settings_get("global/data_buffer_hdf5_max_size", dtype=int)
         )
-        _nbytes = get_hdf5_metadata(self.current_filename, "nbytes", dset=dataset)
+        _nbytes = int(get_hdf5_metadata(self.current_filename, "nbytes", dset=dataset))
         _fpath = self.current_filepath.name
         try:
             _item = Hdf5Item(
@@ -265,20 +265,20 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.__display_dataset(_data, h5node=_h5node, title=_fpath + "::" + dataset)
 
     @QtCore.Slot(dict)
-    def __display_binary_data(self, kwargs: dict[str, Any]):
+    def __display_binary_data(self, kwargs: dict[str, Any]) -> None:
         """
         Display the raw binary data in the viewer widget.
 
         Parameters
         ----------
-        kwargs : dict
+        kwargs : dict[str, Any]
             The kwargs required for decoding the raw data.
         """
         _data = import_data(self.current_filename, **kwargs)
         self.__display_dataset(_data)
 
     @QtCore.Slot()
-    def __inspect_hdf5_tree(self):
+    def __inspect_hdf5_tree(self) -> None:
         """
         Inspect the hdf5 tree structure of the current file.
 
@@ -288,7 +288,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             self.__browser_window = Hdf5BrowserWindow()
         self.__browser_window.open_file(self.current_filename)
 
-    def __open_ascii_file(self):
+    def __open_ascii_file(self) -> None:
         """Import ASCII raw data."""
         if not self.current_filename_is_valid:
             return
@@ -309,14 +309,15 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         self.__display_ascii_data(_curr_choice)
 
-    def __display_ascii_data(self, use_x_col: str):
+    def __display_ascii_data(self, use_x_col: str) -> None:
         """
         Display the ASCII data with the new x-column setting.
 
         Parameters
         ----------
         use_x_col : str
-            The new value for the xcol parameter. This can be "None" or an integer.
+            The string representation of the new value for the xcol parameter.
+            This can be "None" or an integer.
         """
         use_x_col = None if use_x_col in [None, "None"] else int(use_x_col)
         _data = import_data(
@@ -326,7 +327,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         self.__display_dataset(_data)
 
-    def __display_metadata(self):
+    def __display_metadata(self) -> None:
         """
         Display the metadata of the current file in a message box.
         """
@@ -344,7 +345,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         self.__metadata_window.show()
 
-    def __create_metadata_window(self):
+    def __create_metadata_window(self) -> None:
         """
         Create the metadata window if it does not yet exist.
         """

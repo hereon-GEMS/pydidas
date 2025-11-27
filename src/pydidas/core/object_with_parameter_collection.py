@@ -60,7 +60,7 @@ class ObjectWithParameterCollection(
         QtCore.QObject.__init__(self, parent=kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)
-        self._config = {}
+        self._config: dict[str, Any] = {}
 
     def __copy__(self) -> Self:
         """

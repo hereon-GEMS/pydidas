@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["create_splitter", "DATA_BROWSING_FRAME_BUILD_CONFIG"]
 
+
 from typing import Any
 
 from qtpy import QtGui, QtWidgets

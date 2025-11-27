@@ -122,7 +122,9 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
-    def set_param_and_widget_value(self, key: str, value: Any) -> None:
+    def set_param_and_widget_value(
+        self, key: str, value: Any, emit_signal: bool = True
+    ) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
@@ -135,15 +137,19 @@ class DefineDiffractionExpFrame(BaseFrame):
             The Parameter reference key.
         value : Any
             The new Parameter value. The datatype is determined by the Parameter.
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            (if the value has changed). The default is True.
         """
-        EXP.set_param_value(key, value)
-        if key in ["xray_energy", "xray_wavelength"]:  # noqa R0801
-            _energy = self.get_param_value("xray_energy")
-            _lambda = self.get_param_value("xray_wavelength")
-            self.param_widgets["xray_energy"].set_value(_energy)
-            self.param_widgets["xray_wavelength"].set_value(_lambda)
-        else:
-            self.param_widgets[key].set_value(value)
+        super().set_param_and_widget_value(key, value, emit_signal)
+        if key == "xray_energy":
+            self.update_param_widget_value(
+                "xray_wavelength", EXP.get_param_value("xray_wavelength")
+            )
+        elif key == "xray_wavelength":
+            self.update_param_widget_value(
+                "xray_energy", EXP.get_param_value("xray_energy")
+            )
 
     @QtCore.Slot()
     def update_param(self, param_key: str, widget: BaseParamIoWidget) -> None:

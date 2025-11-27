@@ -59,7 +59,7 @@ class WidgetWithParameterCollection(
 
     def __init__(self, **kwargs: Any):
         self.params = ParameterCollection()
-        self._config = {}
+        self._config: dict[str, Any] = {}
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)

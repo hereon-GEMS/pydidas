@@ -37,7 +37,7 @@ from pydidas.core import Dataset
 from pydidas.data_io.io_manager import IoManager
 
 
-def export_data(filename: Path | str, data: ndarray, **kwargs: Any):
+def export_data(filename: Path | str, data: ndarray, **kwargs: Any) -> None:
     """
     Export data to a file using the pydidas.data_io.IoManager metaclass.
 
@@ -47,7 +47,7 @@ def export_data(filename: Path | str, data: ndarray, **kwargs: Any):
         The filename to be used for the exported data.
     data : Union[np.ndarray, pydidas.core.Dataset]
         The data to be exported.
-    **kwargs : dict
+    **kwargs : Any
         Any keyword arguments. These will be passed to the implemented exporter,
         and the supported keywords vary depending on the selected file
         extension.
@@ -72,7 +72,7 @@ def import_data(filename: Path | str, **kwargs: Any) -> Dataset:
     return _data
 
 
-def read_metadata(filename: Path | str, **kwargs: Any) -> dict:
+def read_metadata(filename: Path | str, **kwargs: Any) -> dict[str, Any]:
     """
     Read metadata from a file using the pydidas.data_io.IoManager metaclass.
 

@@ -60,7 +60,7 @@ class ParamIoWidgetWithButton(
             The icon to use for the button.
     """
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param)
         PydidasWidgetMixin.__init__(self, **kwargs)
@@ -68,7 +68,9 @@ class ParamIoWidgetWithButton(
         if isinstance(_icon, str):
             _icon = get_pyqt_icon_from_str(_icon)
         if not isinstance(_icon, QtGui.QIcon):
-            _icon = self.style().standardIcon(QStyle.SP_DialogOpenButton)
+            _icon = self.style().standardIcon(
+                QStyle.StandardPixmap(QStyle.SP_DialogOpenButton)
+            )
 
         self._io_lineedit = PydidasLineEdit()
         self._button = SquareButton(_icon, "", font_metric_height_factor=1)

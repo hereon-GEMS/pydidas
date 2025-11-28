@@ -50,9 +50,10 @@ from pydidas.widgets.widget_with_parameter_collection import (
 
 class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     """
-    A widget to configure the decoding of raw binary files. The widget allows
-    to set the datatype, shape, and header offset of the binary file which is
-    required to decode the file correctly.
+    A widget to configure the decoding of raw binary files.
+
+    The widget allows to set the datatype, shape, and header offset
+    of the binary file which is required to decode the file correctly.
 
     Parameters
     ----------
@@ -73,7 +74,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
     sig_new_binary_config = QtCore.Signal(dict)
     sig_decoding_invalid = QtCore.Signal()
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         if "params" in kwargs:
             self.add_params(kwargs["params"])
@@ -85,10 +86,8 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         }
         self.__create_widgets()
 
-    def __create_widgets(self):
-        """
-        Create all required widgets.
-        """
+    def __create_widgets(self) -> None:
+        """Create all required widgets."""
         self.create_check_box(
             "show_decoding_details",
             "Show binary decoder settings",
@@ -109,7 +108,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             policy=POLICY_EXP_FIX,
         )
         self.create_spacer(None, fixedWidth=1, gridPos=(0, 1, 1, 1))
-        self.layout().setColumnStretch(1, 1)
+        self.layout().setColumnStretch(1, 1)  # type: ignore[attr-defined]
 
     @property
     def decoding_is_valid(self) -> bool:
@@ -119,7 +118,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         return self._config.get("decoding_is_valid", False)
 
     @QtCore.Slot(str)
-    def set_new_filename(self, filename: str | Path):
+    def set_new_filename(self, filename: str | Path) -> None:
         """
         Process a new filename.
 
@@ -138,7 +137,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             self._check_decoding_params()
 
     @QtCore.Slot()
-    def _check_decoding_params(self):
+    def _check_decoding_params(self) -> None:
         """
         Check if the decoding parameters are valid for the current file size.
         """
@@ -153,7 +152,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
                 f"decoder settings: {_expected_size:,} bytes."
             )
             if self._config.get("decoding_is_valid", True):
-                self.sig_decoding_invalid.emit()
+                self.sig_decoding_invalid.emit()  # type: ignore[attr-defined]
         else:
             _color = COLOR_GREEN
             self._widgets["decode_info"].setText("Decoding parameters are valid.")
@@ -162,7 +161,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         self._widgets["decode_info"].setStyleSheet("QLabel {color: " + _color + ";}")
 
     @QtCore.Slot()
-    def _emit_new_image_settings(self):
+    def _emit_new_image_settings(self) -> None:
         """
         Confirm the decoder settings and emit the signal.
         """
@@ -173,13 +172,13 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "offset": self.get_param_value("raw_header"),
             "shape": (self.get_param_value("raw_n_y"), self.get_param_value("raw_n_x")),
         }
-        self.sig_new_binary_image.emit(
+        self.sig_new_binary_image.emit(  # type: ignore[attr-defined]
             self.current_filepath, self._config["decode_kwargs"]
         )
-        self.sig_new_binary_config.emit(self._config["decode_kwargs"])
+        self.sig_new_binary_config.emit(self._config["decode_kwargs"])  # type: ignore[attr-defined]
 
     @QtCore.Slot(bool)
-    def _toggle_details(self, checked: bool):
+    def _toggle_details(self, checked: bool) -> None:
         """
         Toggle the visibility of the detailed dataset selection options.
 

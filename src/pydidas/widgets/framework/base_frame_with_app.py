@@ -16,9 +16,9 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The BaseFrameWithApp extends the BaseFrame with a pydidas Application.
+The BaseFrameWithApp extends the BaseFrame with a PydidasApplication.
 
-All frames with an associated app should interit BaseFrameWithApp instead of
+All frames with an associated app should inherit BaseFrameWithApp instead of
 the BaseFrame. This subclass includes methods for using a pydidas App in
 parallel processing.
 """
@@ -31,9 +31,9 @@ __status__ = "Production"
 __all__ = ["BaseFrameWithApp"]
 
 
-from typing import Tuple
+from typing import Any, Tuple
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import BaseApp
 from pydidas.widgets.framework.base_frame import BaseFrame
@@ -51,26 +51,22 @@ class BaseFrameWithApp(BaseFrame):
 
     Parameters
     ----------
-    parent : Union[QWidget, None], optional
+    parent : QWidget or None, optional
         The parent widget. The default is None.
-    **kwargs : dict
+    **kwargs : Any
         Any additional keyword arguments.
-    **init_layout : bool
-        Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
-        If False, no layout will be initialized and the subclass is
-        responsible for setting up the layout. The default is True.
     """
 
     status_msg = QtCore.Signal(str)
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
         BaseFrame.__init__(self, parent=parent, **kwargs)
         self._app = None
         self._runner = None
         self._app_attributes_to_update = []
 
     @QtCore.Slot(object)
-    def _set_app(self, app: BaseApp):
+    def _set_app(self, app: BaseApp) -> None:
         """
         Update the local copy of the App after the AppRunner computations.
 
@@ -93,7 +89,7 @@ class BaseFrameWithApp(BaseFrame):
             setattr(self._app, att, _att_val)
 
     @QtCore.Slot(float)
-    def _apprunner_update_progress(self, progress: float):
+    def _apprunner_update_progress(self, progress: float) -> None:
         """
         Update the progress of the AppRunner.
 
@@ -107,7 +103,7 @@ class BaseFrameWithApp(BaseFrame):
             self._widgets["progress"].setValue(_progress)
 
     @QtCore.Slot()
-    def _apprunner_finished(self):
+    def _apprunner_finished(self) -> None:
         """
         Clean up after AppRunner is done.
         """
@@ -134,7 +130,7 @@ class BaseFrameWithApp(BaseFrame):
             _state["app"] = self._app.export_state()
         return _index, _state
 
-    def restore_state(self, state: dict):
+    def restore_state(self, state: dict) -> None:
         """
         Restore the frame's state from stored information.
 

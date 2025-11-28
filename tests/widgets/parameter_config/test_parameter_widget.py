@@ -77,7 +77,6 @@ def widget_instance(qtbot, param, **kwargs):
     return widget
 
 
-@pytest.fixture(scope="module", autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

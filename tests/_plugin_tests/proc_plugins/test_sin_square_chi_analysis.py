@@ -159,7 +159,7 @@ def test_pre_execute(plugin):
     plugin.pre_execute()
     assert not plugin._config["flag_input_data_check"]
     assert not plugin._config["flag_conversion_set_up"]
-    assert plugin._converter is None
+    assert plugin._converter == plugin._converter_identity
 
 
 def test_pre_execute__w_invalid_limits(plugin):

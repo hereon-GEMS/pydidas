@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["MaskEditorWindow"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import get_generic_param_collection
@@ -49,14 +51,12 @@ class MaskEditorWindow(PydidasWindow):
         "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
     )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Average images", **kwargs)
         self.setWindowTitle("Mask editor")
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def build_frame(self) -> None:
+        """Build the frame and create all widgets."""
         self.create_any_widget(
             "param_frame",
             parameter_config.ParameterEditCanvas,
@@ -99,14 +99,12 @@ class MaskEditorWindow(PydidasWindow):
             "mask_tools", self._widgets["mask_tools"], gridPos=(1, 0, 1, 1)
         )
 
-    def connect_signals(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def connect_signals(self) -> None:
+        """Build the frame and create all widgets."""
         self._widgets["file_selector"].sig_new_selection.connect(self._open_new_file)
 
     @QtCore.Slot(str, dict)
-    def _open_new_file(self, fname: str, input_options: dict):
+    def _open_new_file(self, fname: str, input_options: dict[str, Any]) -> None:
         """
         Open a new file in the plot window.
 
@@ -114,7 +112,7 @@ class MaskEditorWindow(PydidasWindow):
         ----------
         fname : str
             The filename of the image file.
-        input_options : dict
+        input_options : dict[str, Any]
             Any additional input options.
         """
         _data = import_data(fname, **input_options)

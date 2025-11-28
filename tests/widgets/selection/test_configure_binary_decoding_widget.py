@@ -63,7 +63,7 @@ _FILENAMES = [
 ]
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

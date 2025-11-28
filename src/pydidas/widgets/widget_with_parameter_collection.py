@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SelectPointsForBeamcenterWindow class which allows to select points
-in an image to define the beamcenter.
+Module with the WidgetWithParameterCollection class which provides a QWidget
+with full access to Pydidas' ParameterCollection and widget creation methods.
 """
 
 __author__ = "Malte Storm"
@@ -57,7 +57,7 @@ class WidgetWithParameterCollection(
 
     init_kwargs = ["parent"]
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         self.params = ParameterCollection()
         self._config: dict[str, Any] = {}
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
@@ -69,7 +69,7 @@ class WidgetWithParameterCollection(
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         apply_qt_properties(self, **kwargs)
 
-    def raise_UserConfigError(self, error_str: str) -> NoReturn:  # noqa
+    def raise_UserConfigError(self, error_str: str) -> NoReturn:
         """
         Raise a UserConfigError with the given error string.
 

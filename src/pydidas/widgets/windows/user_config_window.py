@@ -77,16 +77,14 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         self.__qtapp = PydidasQApplication.instance()
         SingletonObject.__init__(self, **kwargs)
         self.setWindowTitle("pydidas user configuration")
         self.setSizePolicy(*POLICY_MIN_MIN)
 
-    def build_frame(self):
-        """
-        Populate the GlobalConfigurationFrame with widgets.
-        """
+    def build_frame(self) -> None:
+        """Populate the UserConfigWindow with its child widgets."""
         self.create_label(
             "title",
             "User configuration\n",
@@ -244,10 +242,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             self.get_param("cmap_nan_color"),
             gridPos=(0, 0, 1, 2),
             parent_widget="cmap_nan_color_container",
+            validator=QT_REG_EXP_RGB_VALIDATOR,
             width_io=0.25,
             width_text=0.75,
         )
-        self.param_widgets["cmap_nan_color"].setValidator(QT_REG_EXP_RGB_VALIDATOR)
         self.create_label(
             "cmap_nan_display_label",
             "Currently selected invalid data color:",
@@ -292,10 +290,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         update_palette(self._widgets["label_default_plugin"], base="#F0F0F0")
         self.create_param_widget(
-            self.get_param("plugin_path"), linebreak=True, parent_widget="config_canvas"
-        )
-        self.param_widgets["plugin_path"].update_size_hint(
-            QtCore.QSize(2 * GENERIC_STANDARD_WIDGET_WIDTH, 5)
+            self.get_param("plugin_path"),
+            linebreak=True,
+            parent_widget="config_canvas",
+            size_hint_width=2 * GENERIC_STANDARD_WIDGET_WIDTH,
         )
         self.create_button(
             "but_plugins",
@@ -304,10 +302,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             parent_widget="config_canvas",
         )
 
-    def connect_signals(self):
-        """
-        Connect the signals for Parameter updates.
-        """
+    def connect_signals(self) -> None:
+        """Connect the signals for Parameter updates."""
         for _param_key in self.params:
             if _param_key.startswith("cmap"):
                 continue
@@ -337,10 +333,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.__qtapp.sig_mpl_font_setting_error.connect(self.mpl_font_not_supported)
 
-    def finalize_ui(self):
-        """
-        finalize the UI initialization.
-        """
+    def finalize_ui(self) -> None:
+        """Finalize the UI initialization."""
         self._config["cmap_nan_palette"] = QtGui.QPalette()
         self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
         self.setFixedWidth(int(self._widgets["config_canvas"].sizeHint().width() + 20))
@@ -352,7 +346,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             self._widgets["cmap_combobox"].setCurrentText(_default_cmap)
 
     @QtCore.Slot(object)
-    def update_qsetting(self, param_key: str, value: Any):
+    def update_qsetting(self, param_key: str, value: Any) -> None:
         """
         Update a QSettings value
 
@@ -368,13 +362,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(QtGui.QColor)
-    def _update_cmap_nan_value(self, new_value: QtGui.QColor | str | None):
+    def _update_cmap_nan_value(self, new_value: QtGui.QColor | str | None) -> None:
         """
         Update the stored value for the colormap NaN.
 
         Parameters
         ----------
-        new_value : QtGui.QColor |str | None
+        new_value : QtGui.QColor or str or None
             The new value. If None, the Parameter input value will be used.
         """
         if new_value is None:
@@ -386,13 +380,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self._update_cmap_nan_current_color(new_value)
         self.update_param_widget_value("cmap_nan_color", new_value)
 
-    def _update_cmap_nan_current_color(self, new_color: QtGui.QColor | str):
+    def _update_cmap_nan_current_color(self, new_color: QtGui.QColor | str) -> None:
         """
         Update the label's current NaN color display with the new value.
 
         Parameters
         ----------
-        new_color : QtGui.QColor |str
+        new_color : QtGui.QColor or str
             The new window color.
         """
         if isinstance(new_color, str):
@@ -403,10 +397,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
 
     @QtCore.Slot()
-    def select_new_nan_color(self):
-        """
-        Select a new NaN color using a QColorDialog.
-        """
+    def select_new_nan_color(self) -> None:
+        """Select a new NaN color using a QColorDialog."""
         if self._config.get("nan_colordialog") is None:
             self._config["nan_colordialog"] = QtWidgets.QColorDialog(self)
             self._config["nan_colordialog"].colorSelected.connect(
@@ -417,7 +409,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self._config["nan_colordialog"].show()
 
     @QtCore.Slot()
-    def update_plugin_collection(self):
+    def update_plugin_collection(self) -> None:
         """
         Update the plugin collection from the updated QSetting values for the
         plugin directories.
@@ -434,7 +426,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
     @QtCore.Slot(str)
-    def update_cmap(self, cmap_name: str):
+    def update_cmap(self, cmap_name: str) -> None:
         """
         Update the default colormap.
 
@@ -445,28 +437,27 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """
         self.update_qsetting("cmap_name", cmap_name)
 
-    @QtCore.Slot()
-    def change_fontsize(self, change: int):
+    @QtCore.Slot(int)
+    def change_fontsize(self, change: int) -> None:
         """
         Process the button clicks to change the fontsize.
 
         Parameters
         ----------
-        change : Literal["increase", "decrease"]
+        change : int
             The change direction.
         """
+        _new_fontsize = self.__qtapp.font_size
         if change == 1:
-            _new_fontsize = min(ceil(self.__qtapp.font_size) + 1, 20)
+            _new_fontsize = min(ceil(_new_fontsize) + 1, 20)
         elif change == -1:
-            _new_fontsize = max(floor(self.__qtapp.font_size) - 1, 5)
+            _new_fontsize = max(floor(_new_fontsize) - 1, 5)
         self._widgets["edit_fontsize"].setText(str(_new_fontsize))
         self.process_new_fontsize_setting()
 
     @QtCore.Slot()
-    def process_new_fontsize_setting(self):
-        """
-        Process the user input of the new font size.
-        """
+    def process_new_fontsize_setting(self) -> None:
+        """Process the user input of the new font size."""
         self.__qtapp.font_size = float(self._widgets["edit_fontsize"].text())
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self._widgets["font_family_box"].setFixedWidth(
@@ -475,7 +466,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.adjustSize()
 
     @QtCore.Slot(QtGui.QFont)
-    def new_font_family_selected(self, font: QtGui.QFont):
+    def new_font_family_selected(self, font: QtGui.QFont) -> None:
         """
         Handle the selection of the new font and notify the PydidasQApplication.
 
@@ -488,7 +479,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.process_new_fontsize_setting()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: int):
+    def frame_activated(self, index: int) -> None:
         """
         Update the frame.
 
@@ -508,17 +499,16 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             _value = self.q_settings_get(f"user/{_param_key}", dtype=_param.dtype)
             self.set_param_and_widget_value(_param_key, _value)
 
-    def __reset(self):
+    def __reset(self) -> None:
         """
         Reset all Parameters to their default values.
         """
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
-            self, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
+            None, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
         )
         if answer == _qm.Yes:
             self.restore_all_defaults(True)
-
             self.__qtapp.reset_font_to_standard()
             with QtCore.QSignalBlocker(self._widgets["edit_fontsize"]):
                 self._widgets["edit_fontsize"].setText(str(self.__qtapp.font_size))
@@ -536,8 +526,9 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
                 self.q_settings_get("user/cmap_nan_color")
             )
 
+    @staticmethod
     @QtCore.Slot(str)
-    def mpl_font_not_supported(self, error: str):
+    def mpl_font_not_supported(error: str) -> None:
         """
         Handle the signal that matplotlib does not support the chosen font.
 

@@ -264,7 +264,9 @@ class QuickIntegrationFrame(BaseFrame):
         if not (_model == _old_model and _old_available):
             self._change_detector_model()
 
-    def set_param_and_widget_value(self, key: str, value: Any, emit_signal: bool = True) -> None:
+    def set_param_and_widget_value(
+        self, key: str, value: Any, emit_signal: bool = True
+    ) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 

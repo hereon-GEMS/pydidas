@@ -70,7 +70,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
     sig_selected_beamcenter = QtCore.Signal()
 
     @staticmethod
-    def _get_points_as_arrays(points: list[tuple[float, float]]):
+    def _get_points_as_arrays(
+        points: list[tuple[float, float]],
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Get the given list of points as arrays.
 
@@ -97,7 +99,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         plot: PydidasPlot2D,
         point_table: PointsForBeamcenterWidget,
         **kwargs: Any,
-    ):
+    ) -> None:
         QtCore.QObject.__init__(self)
         self._config = {
             "selection_active": kwargs.get("selection_active", True),
@@ -183,7 +185,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         return self._config["selection_active"]
 
     @QtCore.Slot(str)
-    def set_marker_color(self, color: str):
+    def set_marker_color(self, color: str) -> None:
         """
         Set the marker color for the markers.
 
@@ -205,7 +207,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
     def remove_plot_items(
         self, *kind: Literal["all", "marker", "beamcenter", "beamcenter_outline"]
-    ):
+    ) -> None:
         """
         Remove the selected items from the plot.
 
@@ -225,7 +227,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
     def show_plot_items(
         self, *kind: Literal["all", "marker", "beamcenter", "beamcenter_outline"]
-    ):
+    ) -> None:
         """
         Show the selected items in the plot.
 
@@ -259,7 +261,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 )
 
     @QtCore.Slot(bool)
-    def toggle_selection_active(self, active: bool):
+    def toggle_selection_active(self, active: bool) -> None:
         """
         Toggle the selection mode.
 
@@ -272,7 +274,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._points_for_bc.setVisible(active)
 
     @QtCore.Slot(bool)
-    def toggle_2click_selection(self, use_2_clicks: bool):
+    def toggle_2click_selection(self, use_2_clicks: bool) -> None:
         """
         Toggle the 2-click selection for points.
 
@@ -290,7 +292,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["wait_for_2nd_click"] = False
 
     @QtCore.Slot(dict)
-    def _process_plot_signal(self, event_dict):
+    def _process_plot_signal(self, event_dict: dict[str, Any]) -> None:
         """
         Process events from the plot and filter and process mouse clicks.
 
@@ -321,7 +323,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._points.append((_x, _y))
         self._points_for_bc.add_point_to_table(_x, _y)
 
-    def __process_click_one_of_two(self, x: float, y: float):
+    def __process_click_one_of_two(self, x: float, y: float) -> None:
         """
         Process the first click for the two-click selection.
 
@@ -340,10 +342,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _delta = 50
 
         _data = self._plot.getImage().getData(copy=False)
-        _x0 = int(np.round(max(0, x - _delta)))
-        _x1 = int(np.round(min(_data.shape[1], x + _delta)))
-        _y0 = int(np.round(max(0, y - _delta)))
-        _y1 = int(np.round(min(_data.shape[0], y + _delta)))
+        _x0 = int(np.round(max(0, x - _delta)))  # type: ignore
+        _x1 = int(np.round(min(_data.shape[1], x + _delta)))  # type: ignore
+        _y0 = int(np.round(max(0, y - _delta)))  # type: ignore
+        _y1 = int(np.round(min(_data.shape[0], y + _delta)))  # type: ignore
 
         _data = _data[_y0:_y1, _x0:_x1]
         if self._mask is not None:
@@ -353,7 +355,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _cmap.setVRange(np.amin(_data), np.amax(_data))
         self._config["wait_for_2nd_click"] = True
 
-    def __process_click_two_of_two(self):
+    def __process_click_two_of_two(self) -> None:
         """
         Process the second click in the two-click selection.
         """
@@ -366,7 +368,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         )
 
     @QtCore.Slot()
-    def set_beamcenter_from_point(self):
+    def set_beamcenter_from_point(self) -> None:
         """
         Set the beamcenter from a single point.
         """
@@ -382,9 +384,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self.remove_plot_items("beamcenter_outline")
         self._parent_frame.set_param_and_widget_value("beamcenter_x", _x[0])
         self._parent_frame.set_param_and_widget_value("beamcenter_y", _y[0])
-        self.sig_selected_beamcenter.emit()
+        self.sig_selected_beamcenter.emit()  # type: ignore[attr-defined]
 
-    def _set_beamcenter_marker(self, position: tuple[float, float]):
+    def _set_beamcenter_marker(self, position: tuple[float, float]) -> None:
         """
         Mark the beamcenter with a marker.
 
@@ -399,7 +401,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._toggle_beamcenter_is_set(True)
 
     @QtCore.Slot()
-    def fit_beamcenter_with_circle(self):
+    def fit_beamcenter_with_circle(self) -> None:
         """
         Fit the beamcenter through a circle.
         """
@@ -418,10 +420,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _x = np.cos(_theta) * _r + _cx
         _y = np.sin(_theta) * _r + _cy
         self._plot_beamcenter_outline(_x, _y)
-        self.sig_selected_beamcenter.emit()
+        self.sig_selected_beamcenter.emit()  # type: ignore[attr-defined]
 
     @QtCore.Slot()
-    def fit_beamcenter_with_ellipse(self):
+    def fit_beamcenter_with_ellipse(self) -> None:
         """
         Fit the beamcenter through an ellipse.
         """
@@ -443,15 +445,15 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._parent_frame.set_param_and_widget_value("beamcenter_y", np.round(_cy, 4))
         _x, _y = calc_points_on_ellipse(_coeffs)
         self._plot_beamcenter_outline(_x, _y)
-        self.sig_selected_beamcenter.emit()
+        self.sig_selected_beamcenter.emit()  # type: ignore[attr-defined]
 
-    def set_mask_file(self, mask: Path | None):
+    def set_mask_file(self, mask: Path | None) -> None:
         """
         Set the mask file.
 
         Parameters
         ----------
-        mask : Path | None
+        mask : Path or None
             The path to the mask file or None to skip masking.
         """
         if mask is None:
@@ -464,7 +466,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self._mask = import_data(mask)
             self._mask_hash = hash(mask)
 
-    def set_new_detector_with_mask(self, detector_name: str):
+    def set_new_detector_with_mask(self, detector_name: str) -> None:
         """
         Process the input of a new detector to select the generic mask.
 
@@ -476,7 +478,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._mask = pyFAI.detector_factory(detector_name).mask
         self._mask_hash = hash("detector-name::" + detector_name)
 
-    def _toggle_beamcenter_is_set(self, is_set: bool):
+    def _toggle_beamcenter_is_set(self, is_set: bool) -> None:
         """
         Toggle the visibility of the Parameter widgets for the results.
 
@@ -490,7 +492,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["beamcenter_set"] = is_set
 
     @QtCore.Slot(object)
-    def __new_points_selected(self, points: Iterable[str]):
+    def __new_points_selected(self, points: Iterable[str]) -> None:
         """
         Process the signal that new points have been selected.
 
@@ -507,7 +509,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             _marker.setSymbol(_symbol)
 
     @QtCore.Slot(object)
-    def __remove_points_from_plot(self, points: Iterable[str]):
+    def __remove_points_from_plot(self, points: Iterable[str]) -> None:
         """
         Remove the selected points from the plot.
 
@@ -524,7 +526,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 self._config["selected_points"].pop(_index)
 
     @QtCore.Slot()
-    def manual_beamcenter_update(self):
+    def manual_beamcenter_update(self) -> None:
         """
         Process a manual update of the beamcenter x/y Parameter.
         """
@@ -537,7 +539,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
     def _plot_beamcenter_outline(
         self, xpoints: Sequence[float], ypoints: Sequence[float]
-    ):
+    ) -> None:
         """
         Plot an outline from the beamcenter fit defined through the points.
 
@@ -551,6 +553,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         ypoints : Sequence[float]
             The y positions of the points for the outline in form of a sequence.
         """
+        xpoints = np.asarray(xpoints)
+        ypoints = np.asarray(ypoints)
         self._config["beamcenter_outline_points"] = (xpoints, ypoints)
         self._plot.addShape(
             xpoints,

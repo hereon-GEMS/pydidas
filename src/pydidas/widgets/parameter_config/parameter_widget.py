@@ -31,7 +31,7 @@ __all__ = ["ParameterWidget"]
 import html
 from numbers import Real
 from pathlib import Path
-from typing import Any, Type
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -84,7 +84,6 @@ class ParameterWidget(EmptyWidget):
     sig_value_changed : QtCore.Signal()
         Emitted when the value in the I/O widget has changed and been accepted.
 
-
     Parameters
     ----------
     param : pydidas.core.Parameter
@@ -112,30 +111,31 @@ class ParameterWidget(EmptyWidget):
             The width of the widget in multiples of the font metric width. If None,
             the widget will use the default size policy. The default is
             pydidas.core.constants.FONT_METRIC_PARAM_EDIT_WIDTH.
+        validator : QValidator | None
+            A custom validator to be used in the I/O widget, if applicable.
+            The default is None.
     """
 
     sig_new_value = QtCore.Signal(str)
     sig_value_changed = QtCore.Signal()
-    _MIN_VIS_UNIT_WIDTH = 5
+    _MIN_VIS_UNIT_WIDTH: float = 5.0
     _MARGINS = 2
     _SPACING = 2
 
     def __init__(
-        self,
-        param: Parameter,
-        **kwargs: Any,
-    ):
-        EmptyWidget.__init__(self, **kwargs)
+        self, param: Parameter, parent: QtWidgets.QWidget | None = None, **kwargs: Any
+    ) -> None:
+        EmptyWidget.__init__(self, parent, **kwargs)
         if not isinstance(self.font_metric_width_factor, Real):
             self.font_metric_width_factor = FONT_METRIC_PARAM_EDIT_WIDTH
-        self.setSizePolicy(*POLICY_EXP_FIX)
+        self.setSizePolicy(*POLICY_EXP_FIX)  # type: ignore[arg-type]
         self.layout().setHorizontalSpacing(0)
         self.layout().setVerticalSpacing(self._SPACING)
         self.layout().setContentsMargins(0, self._MARGINS, 0, self._MARGINS)
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
         self.param = param
-        self._widgets: dict[str, QtWidgets.QWidget] = {}
+        self._widgets: dict[str, QtWidgets.QWidget | BaseParamIoWidget] = {}
         self.__store_config_from_kwargs(kwargs)
 
         self.__create_name_widget_if_required()
@@ -157,20 +157,20 @@ class ParameterWidget(EmptyWidget):
         str
             The current display value as string.
         """
-        return self._widgets["io"].current_text
+        return self._widgets["io"].current_text  # type: ignore[attr-defined]
 
     @property
-    def _param_widget_class(self) -> Type[BaseParamIoWidget]:
+    def _param_widget_class(self) -> type[BaseParamIoWidget]:
         """Get the class of the Parameter I/O widget based on the Parameter."""
         if self.param.choices:
             if set(self.param.choices) in [{True, False}, {True}, {False}]:
-                return ParamIoWidgetCheckBox
-            return ParamIoWidgetComboBox
+                return ParamIoWidgetCheckBox  # type: ignore
+            return ParamIoWidgetComboBox  # type: ignore
         if self.param.dtype == Path:
-            return ParamIoWidgetFile
+            return ParamIoWidgetFile  # type: ignore
         if self.param.dtype == Hdf5key:
-            return ParamIoWidgetHdf5Key
-        return ParamIoWidgetLineEdit
+            return ParamIoWidgetHdf5Key  # type: ignore
+        return ParamIoWidgetLineEdit  # type: ignore
 
     def __store_config_from_kwargs(self, kwargs: dict[str, Any]):
         """
@@ -192,7 +192,7 @@ class ParameterWidget(EmptyWidget):
             )
         )
         _text_width = self.fm_w * (
-            max(_linebreak, kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH))
+            max(int(_linebreak), kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH))
         )
         # modify presets if checkbox is used to ignore linebreaks and text labels:
         if self._param_widget_class == ParamIoWidgetCheckBox:
@@ -216,6 +216,7 @@ class ParameterWidget(EmptyWidget):
             "layout_text": (0, 0, 1, 1 + 2 * _linebreak, ALIGN_CENTER_LEFT),
             "layout_io": (_linebreak, 1, 1, 2 - (_unit_width > 0), ALIGN_CENTER_LEFT),
             "layout_unit": (_linebreak, 2, 1, 1, ALIGN_CENTER_LEFT),
+            "validator": kwargs.get("validator", None),
         }
 
     def __create_name_widget_if_required(self):
@@ -231,7 +232,7 @@ class ParameterWidget(EmptyWidget):
             font_metric_width_factor=self._config["width_text"],
             margin=0,
         )
-        self.layout().addWidget(self._widgets["label"], *self._config["layout_text"])
+        self.layout().addWidget(self._widgets["label"], *self._config["layout_text"])  # type: ignore[arg-type]
         if not self._config["linebreak"]:
             self.layout().setColumnStretch(0, int(self._config["width_text"] * 100))
 
@@ -252,8 +253,12 @@ class ParameterWidget(EmptyWidget):
             "font_metric_width_factor": self._config["width_io"],
         }
         self._widgets["io"] = self._param_widget_class(self.param, **kwargs)
+        if self._config["validator"] is not None and hasattr(
+            self._widgets["io"], "setValidator"
+        ):
+            self._widgets["io"].setValidator(self._config["validator"])
         self._widgets["io"].set_value(self.param.value)
-        self.layout().addWidget(self._widgets["io"], *self._config["layout_io"])
+        self.layout().addWidget(self._widgets["io"], *self._config["layout_io"])  # type: ignore[arg-type]
         if self._config["linebreak"]:
             self._widgets["io_spacer"] = EmptyWidget(
                 size_hint_width=20,
@@ -261,7 +266,7 @@ class ParameterWidget(EmptyWidget):
                 font_metric_width_factor=0.1 * self._font_metric_width_factor,
                 minimum_width=0,
             )
-            self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)
+            self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)  # type: ignore[arg-type]
         self._widgets["io"].sig_new_value.connect(self.set_param_value)
         self._widgets["io"].sig_new_value.connect(self.sig_new_value)
         self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
@@ -279,7 +284,7 @@ class ParameterWidget(EmptyWidget):
             margin=3,
             minimum_width=0,
         )
-        self.layout().addWidget(self._widgets["unit"], *self._config["layout_unit"])
+        self.layout().addWidget(self._widgets["unit"], *self._config["layout_unit"])  # type: ignore[arg-type]
         self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
 
     def sizeHint(self) -> QtCore.QSize:  # noqa C0103

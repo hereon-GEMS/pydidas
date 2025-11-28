@@ -30,6 +30,7 @@ __all__ = ["Hdf5DatasetSelector"]
 
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore
 
@@ -104,7 +105,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
     sig_new_dataset_selected = QtCore.Signal(str)
     sig_request_hdf5_browser = QtCore.Signal()
 
-    def __init__(self, dataset_key_filters=None, **kwargs):
+    def __init__(self, dataset_key_filters=None, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(DATA_DIMENSION_PARAM.copy(), DATASET_PARAM.copy())
 
@@ -124,10 +125,8 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.__connect_slots()
         self._toggle_details()
 
-    def __create_widgets(self):
-        """
-        Create all required widgets.
-        """
+    def __create_widgets(self) -> None:
+        """Create all required widgets."""
         update_child_qobject(self, "layout", horizontalSpacing=2)
         self.create_button(
             "button_inspect",
@@ -147,14 +146,13 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
                 partial(self._toggle_filter_key, _key)
             )
         for _col in range(3):
-            update_child_qobject(self, "layout", columnStretch=(_col, 10))
+            self.layout().setColumnStretch(_col, 10)  # type: ignore[attr-defined]
             if _col in EMPTY_WIDGET_COLS[len(self._config["dsetFilters"]) % 3]:
                 self.create_empty_widget(
-                    f"empty_{_index}",
+                    f"empty_{_col}",
                     gridPos=(1 + _index // 3, _col, 1, 1),
                     fixedHeight=5,
                 )
-
         _row_offset = len(self._config["dsetFilters"]) // 2 + 2
 
         self.create_param_widget(
@@ -175,12 +173,8 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         )
         self.setVisible(False)
 
-    def __connect_slots(self):
-        """
-        Connect all required widget slots.
-
-        Filter keys are set up dynamically along with their checkbox widgets.
-        """
+    def __connect_slots(self) -> None:
+        # Note that filter keys are set up dynamically along with their checkbox widgets
         self.param_widgets["min_datadim"].sig_new_value.connect(
             self.__process_min_datadim
         )
@@ -188,9 +182,9 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self._widgets["button_inspect"].clicked.connect(self.sig_request_hdf5_browser)
 
     @QtCore.Slot(str)
-    def __process_min_datadim(self, value: str):
+    def __process_min_datadim(self, value: str) -> None:
         """
-        Process the minimum dataset dimension parameter.
+        Update the available datasets according to the new minimum dataset dimension.
 
         Parameters
         ----------
@@ -200,9 +194,9 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self._config["min_datadim"] = 0 if value == "any" else int(value.split("=")[1])
         self.__populate_dataset_list()
 
-    def __populate_dataset_list(self):
+    def __populate_dataset_list(self) -> None:
         """
-        Populate the dateset selection with a filtered list of datasets.
+        Populate the dataset selection drop-down menu.
 
         This method reads the structure of the hdf5 file and filters the
         list of datasets according to the selected criteria. The filtered list
@@ -223,7 +217,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         _param_widget.update_choices(_datasets)
         _param_widget.view().setMinimumWidth(
             get_max_pixel_width_of_entries(_datasets) + 50
-        )
+        )  # type: ignore[attr-defined]
 
     @property
     def dataset(self) -> str:
@@ -231,7 +225,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         return self.get_param_value("dataset")
 
     @QtCore.Slot()
-    def display_dataset(self):
+    def display_dataset(self) -> None:
         """
         Select a dataset from the drop-down list.
 
@@ -244,9 +238,9 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         if _dset == self._config["current_dataset"]:
             return
         self._config["current_dataset"] = _dset
-        self.sig_new_dataset_selected.emit(_dset)
+        self.sig_new_dataset_selected.emit(_dset)  # type: ignore[attr-defined]
 
-    def _toggle_filter_key(self, key: str):
+    def _toggle_filter_key(self, key: str) -> None:
         """
         Add or remove the filter key from the active dataset key filters.
 
@@ -269,7 +263,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.__populate_dataset_list()
 
     @QtCore.Slot(str)
-    def new_filename(self, filename: str):
+    def new_filename(self, filename: str) -> None:
         """
         Process the new filename.
 
@@ -293,18 +287,14 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             self.__populate_dataset_list()
         self.display_dataset()
 
-    def clear(self):
-        """
-        Clear all entries for the widget.
-        """
+    def clear(self) -> None:
+        """Clear all entries for the widget."""
         self.setVisible(False)
         self._config["current_dataset"] = ""
         self._config["current_filename"] = ""
 
-    def _toggle_details(self):
-        """
-        Toggle the visibility of the detailed dataset selection options.
-        """
+    def _toggle_details(self) -> None:
+        """Toggle the visibility of the detailed dataset selection options."""
         _show = not self._config["display_details"]
         for _key in self._widgets:
             if _key.startswith("check_filter_") or _key.startswith("empty_"):

@@ -49,7 +49,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     This widget includes a small button to select a filepath from a dialogue.
     """
 
-    def __init__(self, param, **kwargs: Any):
+    def __init__(self, param, **kwargs: Any) -> None:
         """
         Set up the widget.
 

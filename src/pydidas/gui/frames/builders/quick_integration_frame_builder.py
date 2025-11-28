@@ -116,7 +116,6 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         ("config",),
         {
             "font_metric_width_factor": constants.FONT_METRIC_PARAM_EDIT_WIDTH,
-            "init_layout": True,
             "parent_widget": None,
             "sizePolicy": constants.POLICY_FIX_EXP,
         },

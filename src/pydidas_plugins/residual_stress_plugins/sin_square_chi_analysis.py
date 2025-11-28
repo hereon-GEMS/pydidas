@@ -28,7 +28,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Deployment"
 __all__ = ["SinSquareChiAnalysis"]
 
-from numbers import Real
+
 from typing import Any, Callable
 
 import numpy as np
@@ -164,13 +164,13 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         "sin_square_chi_high_fit_limit",
     ]
 
-    def __init__(self, *args: tuple, **kwargs: Any) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         self._SCAN = kwargs.pop("scan", ScanContext())
         OutputPlugin.__init__(self, *args, **kwargs)
         self._plugin_group_in_sin_square_chi = SinSquareChiGrouping()
         self._plugin_group_in_sin_2_chi = Sin_2chiGrouping()
-        self._converter: Callable | None = None
+        self._converter: Callable = self._converter_identity
         # re-order the parameters to allow a better presentation in the GUI
         self.params = ParameterCollection(
             *(self.params[_key] for _key in _PARAM_KEY_ORDER)
@@ -192,7 +192,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         """
         return self._details
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Prepare the plugin for execution.
         """
@@ -200,7 +200,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             OutputPlugin.pre_execute(self)
         self._config["flag_conversion_set_up"] = False
         self._config["flag_input_data_check"] = False
-        self._converter = None
+        self._converter = self._converter_identity
         self._details = {}
         self._figure = None
         self._fit_slice: slice | None = None
@@ -281,7 +281,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         )
         return _sin_square_chi_data, _sin_2chi_data
 
-    def _check_input_data(self, data: Dataset):
+    def _check_input_data(self, data: Dataset) -> None:
         """
         Run basic checks on the input data.
 
@@ -307,7 +307,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             )
         self._config["flag_input_data_check"] = True
 
-    def _set_up_converter(self, input_data: Dataset):
+    def _set_up_converter(self, input_data: Dataset) -> None:
         """
         Set up the conversion method based on the input data.
         """
@@ -331,11 +331,11 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         self._config["flag_conversion_set_up"] = True
 
     @staticmethod
-    def _converter_identity(data: Dataset, *args: tuple) -> Dataset:
+    def _converter_identity(data: Dataset, *args: Any) -> Dataset:
         """Identity conversion function."""
         return data
 
-    def _fit_sin_square_chi_data(self, data: Dataset) -> np.ndarray[Real]:
+    def _fit_sin_square_chi_data(self, data: Dataset) -> np.ndarray:
         """
         Fit the sin^2(chi) data with a linear function.
 
@@ -347,7 +347,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
 
         Returns
         -------
-        np.ndarray[Real, ...]
+        np.ndarray
             The fitted parameters and their errors. The array elements are:
 
             [0]: slope
@@ -359,20 +359,20 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             self._calculate_fit_slice(data[2])
         _x, _y = _filter_nan_from_1d_dataset(data[2, self._fit_slice])
         if _y.size < 2:
-            return np.array([np.nan, np.nan, np.nan, np.nan])
+            return np.array([np.nan, np.nan, np.nan, np.nan], dtype=float)
         # Note: np.polynomial.Polynomial.fit does not (as of 2.1.1) support
         # covariance matrix calculation, so we use np.polyfit instead.
         # TODO: check if this is still the case in future numpy releases
         if _y.size <= 4:
             _p = np.polyfit(_x, _y, 1)
-            _p_errors = np.array((np.nan, np.nan))
+            _p_errors = np.array((np.nan, np.nan), dtype=float)
         else:
             _p, _cov = np.polyfit(_x, _y, 1, cov=True)
             _p_errors = np.sqrt(np.diag(_cov))
         return np.vstack((_p, _p_errors)).T.reshape(-1)
 
     @staticmethod
-    def _fit_sin_2chi_data(data: Dataset) -> np.ndarray[Real, Real]:
+    def _fit_sin_2chi_data(data: Dataset) -> np.ndarray:
         """
         Fit the sin(2*chi) data with a linear function.
 
@@ -394,10 +394,10 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         """
         _x, _y = _filter_nan_from_1d_dataset(data[2])
         if _y.size == 0:
-            return np.array([np.nan, np.nan])
+            return np.array([np.nan, np.nan], dtype=float)
         _popt, _pcov = scipy.optimize.curve_fit(_sin_2chi_fit_func, _x, _y)
         _perr = np.sqrt(np.diag(_pcov))
-        return np.array([_popt[0], _perr[0]])
+        return np.array([_popt[0], _perr[0]], dtype=float)
 
     def _calculate_fit_slice(self, data: Dataset) -> None:
         """
@@ -598,7 +598,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         _fname = self.get_output_filename("png")
         self._figure.savefig(_fname)
 
-    def __set_up_figure(self):
+    def __set_up_figure(self) -> None:
         """Set up the figure for plotting."""
         _plot_items = self._details[None]["items"]
         self._figure = plt.Figure(figsize=(15, 8), dpi=125)
@@ -615,7 +615,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         }
 
     @staticmethod
-    def __get_plot_args(item: dict[str, Any]) -> tuple[str, str, str | None]:
+    def __get_plot_args(item: dict[str, Any]) -> tuple[str, int, str | None]:
         """
         Get the plot arguments for the given item.
 
@@ -626,42 +626,41 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
 
         Returns
         -------
-        tuple[str, str, str | None]
+        tuple[str, int, str | None]
             The linestyle, linewidth, and label for the plot.
         """
         _linestyle = "-" if item["label"] == "fit" else "--"
         _linewidth = item.get("linewidth", 3 if item["label"] == "fit" else 2)
         if _linewidth == 0:
             _linestyle = None
-        match item["label"]:
-            case "lower fit limit":
-                _label = "fitted region limits"
-            case "fit":
-                _label = "linear fit"
-            case "d_pos":
-                _label = "pos. / neg. branch"
-            case "d_mean":
-                _label = "mean " + item["data"].data_label
-            case "data vs sin(2*chi)":
-                _label = "data points"
-            case _:
-                _label = None
+        if item["label"] == "lower fit limit":
+            _label = "fitted region limits"
+        elif item["label"] == "fit":
+            _label = "linear fit"
+        elif item["label"] == "d_pos":
+            _label = "pos. / neg. branch"
+        elif item["label"] == "d_mean":
+            _label = "mean " + item["data"].data_label
+        elif item["label"] == "data vs sin(2*chi)":
+            _label = "data points"
+        else:
+            _label = None
         return _linestyle, _linewidth, _label
 
-    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
+    def get_parameter_config_widget(self) -> type[QtWidgets.QWidget]:
         """
         Get the unique configuration widget associated with this Plugin.
 
         Returns
         -------
-        QtWidgets.QWidget
-            The unique ParameterConfig widget
+        type[QtWidgets.QWidget]
+            The unique ParameterConfig widget class
         """
         return _SinSquareChiAnalysisConfigWidget
 
 
 class _SinSquareChiAnalysisConfigWidget(GenericPluginConfigWidget):
-    def finalize_init(self):
+    def finalize_init(self) -> None:
         """Show/hide the output parameters based on user selection."""
         self._toggle_output_parameters()
         self.param_widgets["output_export_images_flag"].sig_new_value.connect(

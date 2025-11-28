@@ -41,7 +41,7 @@ def param():
     return Parameter("test", bool, True, name="Test name", choices=[True, False])
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

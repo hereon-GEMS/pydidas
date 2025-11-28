@@ -39,7 +39,17 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
     Create a QCheckBox with automatic font formatting.
     """
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the PydidasCheckBox.
+
+        Parameters
+        ----------
+        *args : Any
+            Positional arguments for QCheckBox.
+        **kwargs : Any
+            Keyword arguments for font formatting and widget initialization.
+        """
         kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 1)
         QtWidgets.QCheckBox.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)

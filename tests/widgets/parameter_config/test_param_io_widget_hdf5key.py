@@ -70,7 +70,7 @@ def test_dir(temp_path):
     return dir_path
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

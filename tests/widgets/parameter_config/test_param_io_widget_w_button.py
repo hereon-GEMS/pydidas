@@ -41,7 +41,7 @@ from pydidas_qtcore import PydidasQApplication
 param = Parameter("test", str, "item", name="Test param")
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

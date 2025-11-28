@@ -48,7 +48,7 @@ from pydidas.widgets.utilities import get_max_pixel_width_of_entries
 class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
     """Widget used for editing Parameter values with predefined choices."""
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         """
         Initialize the widget.
 

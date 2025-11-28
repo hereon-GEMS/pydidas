@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Subpackage with unittest objects. These object are included in the main
+Subpackage with unittest objects. These objects are included in the main
 distribution to have them in correct version control. They have no use
 apart from substituting for other object in unittests.
 """

@@ -47,7 +47,7 @@ class ParameterWidgetsMixIn:
     convenience functions for settings Parameter values.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.param_widgets: dict[str, BaseParamIoWidget] = {}
         self.param_composite_widgets: dict[str, ParameterWidget] = {}
         if not hasattr(self, "_widgets"):
@@ -187,7 +187,7 @@ class ParameterWidgetsMixIn:
         value: Any,
         choices: None | Sequence[Any],
         emit_signal: bool = True,
-    ):
+    ) -> None:
         """
         Update a Parameter's value and choices as well as the associated widget.
 

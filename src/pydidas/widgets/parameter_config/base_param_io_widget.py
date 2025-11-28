@@ -48,10 +48,8 @@ class BaseParamIoWidgetMixIn:
     """
     Base mixin class of widgets for I/O during Parameter editing.
 
-    Parameters
-    ----------
-    param : Parameter
-        A Parameter instance.
+    This class is intended to be used as a mixin in combination with a QWidget
+    subclass to create widgets that can edit Parameter values.
     """
 
     sig_new_value = QtCore.Signal(str)
@@ -66,10 +64,10 @@ class BaseParamIoWidgetMixIn:
         ndarray: NumpyParser,
     }
 
-    def __init__(self, param: Parameter):
+    def __init__(self, param: Parameter) -> None:
         self._linked_param = param
         self._old_value = None
-        self.setSizePolicy(*POLICY_EXP_FIX)
+        self.setSizePolicy(*POLICY_EXP_FIX)  # type: ignore[attr-defined]
 
     @property
     def current_text(self) -> str:
@@ -268,8 +266,8 @@ class BaseParamIoWidgetMixIn:
         _cur_value = self.current_text
         if _cur_value != self._old_value or force_update:
             self._old_value = _cur_value
-            self.sig_new_value.emit(_cur_value)
-            self.sig_value_changed.emit()
+            self.sig_new_value.emit(_cur_value)  # type: ignore[attr-defined]
+            self.sig_value_changed.emit()  # type: ignore[attr-defined]
 
 
 class BaseParamIoWidget(BaseParamIoWidgetMixIn, QtWidgets.QWidget):

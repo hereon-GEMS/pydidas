@@ -61,7 +61,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         """
         return value in ["1", 1, "True", "true"]
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         """
         Initialize the widget.
 

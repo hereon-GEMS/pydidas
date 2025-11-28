@@ -48,7 +48,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     dialogue.
     """
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         """
         Initialize the widget.
 

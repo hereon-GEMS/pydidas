@@ -73,14 +73,14 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     sig_new_file_selected = QtCore.Signal(str)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_param(get_generic_parameter("current_directory"))
         self._create_widgets()
         self._set_up_file_model(**kwargs)
         self._connect_signals()
 
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         """
         Create the widgets required for the Directory explorer.
         """
@@ -103,7 +103,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         )
         self.param_composite_widgets["current_directory"]._widgets[
             "io"
-        ]._button.setVisible(False)
+        ]._button.setVisible(False)  # type: ignore[attr-defined]
         self.create_empty_widget("option_container")
         self.create_lineedit(
             "filter_edit",
@@ -131,7 +131,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._widgets["option_container"].layout().setColumnStretch(2, 1)
         self.create_any_widget("explorer", DirectoryExplorerTreeView)
 
-    def _set_up_file_model(self, **kwargs: Any):
+    def _set_up_file_model(self, **kwargs: Any) -> None:
         """
         Set up the file model for the QTreeView.
 
@@ -152,7 +152,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._widgets["explorer"].setModel(self._filter_model)
         self._widgets["explorer"].expand_to_path(_path)
 
-    def _connect_signals(self):
+    def _connect_signals(self) -> None:
         """Connect the signals of the widgets to the slots."""
         self._widgets["explorer"].clicked.connect(self.__file_highlighted)
         self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
@@ -183,7 +183,9 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         return QtCore.QSize(400, 4000)
 
     @QtCore.Slot(int)
-    def __update_filesystem_network_drive_usage(self, state: QtCore.Qt.CheckState):
+    def __update_filesystem_network_drive_usage(
+        self, state: QtCore.Qt.CheckState
+    ) -> None:
         """
         Update the filesystem model network drive usage.
 
@@ -198,7 +200,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
     @QtCore.Slot(int)
-    def __update_filter_case_sensitivity(self, state: QtCore.Qt.CheckState):
+    def __update_filter_case_sensitivity(self, state: QtCore.Qt.CheckState) -> None:
         """
         Update the filter's case sensitivity.
 
@@ -215,7 +217,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
     @QtCore.Slot()
-    def __file_highlighted(self):
+    def __file_highlighted(self) -> None:
         """
         Store the selected filename after highlighting,
         """
@@ -227,7 +229,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self.q_settings_set("directory_explorer/path", _name)
 
     @QtCore.Slot()
-    def __file_selected(self):
+    def __file_selected(self) -> None:
         """
         Open a file after sit has been selected in the DirectoryExplorer.
         """
@@ -235,12 +237,12 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
         if os.path.isfile(_name):
-            self.sig_new_file_selected.emit(_name)
+            self.sig_new_file_selected.emit(_name)  # type: ignore[attr-defined]
         elif os.path.isdir(_name):
             self.set_param_and_widget_value("current_directory", _name)
 
     @QtCore.Slot(str)
-    def __user_dir_input(self, path: str):
+    def __user_dir_input(self, path: str) -> None:
         """
         Process the user file / directory input.
 
@@ -261,16 +263,16 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         if _path.is_file():
             with QtCore.QSignalBlocker(self.param_widgets["current_directory"]):
                 self.set_param_and_widget_value("current_directory", _path.parent)
-            self.sig_new_file_selected.emit(path)
+            self.sig_new_file_selected.emit(path)  # type: ignore[attr-defined]
 
     @QtCore.Slot()
-    def __collapse_all(self):
+    def __collapse_all(self) -> None:
         """Collapse all directories in the explorer."""
         for row in range(self._filter_model.rowCount()):
             index = self._filter_model.index(row, 0)
             self._widgets["explorer"].collapse(index)
 
     @QtCore.Slot()
-    def __reset_filter(self):
+    def __reset_filter(self) -> None:
         """Reset the filter to show all files."""
         self._widgets["filter_edit"].setText("")

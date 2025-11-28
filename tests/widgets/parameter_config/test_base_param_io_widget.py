@@ -61,7 +61,7 @@ class _TestBaseParamWidget(BaseParamIoWidget):
         self._val = value
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup():
     yield
     app = PydidasQApplication.instance()

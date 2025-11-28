@@ -60,7 +60,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         constructor.
     """
 
-    def __init__(self, param: Parameter, **kwargs: Any):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         PydidasLineEdit.__init__(self, **kwargs)
         BaseParamIoWidgetMixIn.__init__(self, param)
         self.update_validator()
@@ -80,17 +80,17 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         """
         return self.text()
 
-    def update_widget_value(self, input: Any) -> None:
+    def update_widget_value(self, value: Any) -> None:
         """
         Update the widget value without emitting signals.
 
         Parameters
         ----------
-        input : Any
+        value : Any
             The new value to set in the widget.
         """
         # the setText method only emits the textChanged signal, not editingFinished
-        self.setText(f"{input}")
+        self.setText(f"{value}")
 
     def update_validator(self) -> None:
         """Update the widget's validator based on the Parameter's configuration."""

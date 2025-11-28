@@ -29,6 +29,7 @@ __all__ = ["EmptyWidget"]
 
 from typing import Any
 
+from qtpy import QtWidgets
 from qtpy.QtWidgets import QGridLayout, QWidget
 
 from pydidas.core.constants import ALIGN_TOP_LEFT
@@ -44,19 +45,32 @@ class EmptyWidget(PydidasWidgetMixin, QWidget):
     a matching setter was found.
     """
 
-    init_kwargs = PydidasWidgetMixin.init_kwargs[:] + [
-        "init_layout",
-        "layout_column_stretches",
-    ]
+    init_kwargs = PydidasWidgetMixin.init_kwargs + ["layout_column_stretches"]
 
-    def __init__(self, **kwargs: Any):
-        QWidget.__init__(self)
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
+        """
+        Initialize the EmptyWidget.
+
+        Parameters
+        ----------
+        kwargs : Any
+            Keyword arguments for widget initialization and layout properties.
+        """
+        QWidget.__init__(self, parent)
         PydidasWidgetMixin.__init__(self, **kwargs)
-        if kwargs.get("init_layout", True):
-            self.setLayout(QGridLayout())
-            apply_qt_properties(
-                self.layout(), alignment=ALIGN_TOP_LEFT, contentsMargins=(0, 0, 0, 0)
-            )
+        self.setLayout(QGridLayout())
+        apply_qt_properties(
+            self.layout(), alignment=ALIGN_TOP_LEFT, contentsMargins=(0, 0, 0, 0)
+        )
         if "layout_column_stretches" in kwargs:
             for _key, _val in kwargs.get("layout_column_stretches").items():
                 self.layout().setColumnStretch(_key, _val)
+
+    def layout(self) -> QGridLayout:
+        """
+        Return the layout
+
+        This method only updates the return type because the EmptyWidget
+        layout is always a QGridLayout.
+        """
+        return super().layout()  # type: ignore[return-value]

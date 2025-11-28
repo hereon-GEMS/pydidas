@@ -48,6 +48,8 @@ class PydidasWidgetMixin:
 
     This class allows to use custom font settings (different sizes, bold etc.) and
     still update them automatically.
+
+    This class must be used in combination with a QWidget subclass.
     """
 
     init_kwargs = [
@@ -61,7 +63,7 @@ class PydidasWidgetMixin:
         "underline",
     ]
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Set up the class instance of the subclassed QWidget.
 
@@ -106,7 +108,7 @@ class PydidasWidgetMixin:
         return QtCore.QSize(*self._size_hint)
 
     @QtCore.Slot(float)
-    def update_fontsize(self, new_fontsize: float):
+    def update_fontsize(self, new_fontsize: float) -> None:
         """
         Update the fontsize with the new global default.
 
@@ -115,12 +117,12 @@ class PydidasWidgetMixin:
         new_fontsize : float
             The new font size.
         """
-        _font = self.font()
+        _font = self.font()  # type: ignore[attr-defined]
         _font.setPointSizeF(new_fontsize + self.__font_config["size_offset"])
-        self.setFont(_font)
+        self.setFont(_font)  # type: ignore[attr-defined]
 
     @QtCore.Slot(str)
-    def update_font_family(self, new_family: str):
+    def update_font_family(self, new_family: str) -> None:
         """
         Update the font family.
 
@@ -129,12 +131,12 @@ class PydidasWidgetMixin:
         new_family : str
             The name of the new font family.
         """
-        _font = self.font()
+        _font = self.font()  # type: ignore[attr-defined]
         _font.setFamily(new_family)
-        self.setFont(_font)
+        self.setFont(_font)  # type: ignore[attr-defined]
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, font_width: float, font_height: float):
+    def process_new_font_metrics(self, font_width: float, font_height: float) -> None:
         """
         Set the fixed width of the widget dynamically from the font metrics.
 
@@ -151,15 +153,15 @@ class PydidasWidgetMixin:
                 int(self.font_metric_width_factor * font_width),
             )
             self._size_hint[0] = _width
-            self.setFixedWidth(_width)
+            self.setFixedWidth(_width)  # type: ignore[attr-defined]
         if isinstance(self.font_metric_height_factor, Real):
-            _margins = self.contentsMargins().top() + self.contentsMargins().bottom()
+            _margins = self.contentsMargins().top() + self.contentsMargins().bottom()  # type: ignore[attr-defined]
             _height = max(
                 MINIMUN_WIDGET_DIMENSIONS,
                 int(self.font_metric_height_factor * font_height) + _margins + 6,
             )
             self._size_hint[1] = _height
-            self.setFixedHeight(_height)
+            self.setFixedHeight(_height)  # type: ignore[attr-defined]
 
     @property
     def font_metric_height_factor(self) -> None | float:
@@ -178,7 +180,7 @@ class PydidasWidgetMixin:
     fm_h = font_metric_height_factor
 
     @font_metric_height_factor.setter
-    def font_metric_height_factor(self, factor: None | Real):
+    def font_metric_height_factor(self, factor: None | Real) -> None:
         """
         Set the font metric height factor.
 
@@ -213,7 +215,7 @@ class PydidasWidgetMixin:
     fm_w = font_metric_width_factor
 
     @font_metric_width_factor.setter
-    def font_metric_width_factor(self, factor: None | Real):
+    def font_metric_width_factor(self, factor: None | Real) -> None:
         """
         Set the font metric width factor.
 

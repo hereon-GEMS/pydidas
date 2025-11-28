@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SelectPointsForBeamcenterWindow class which allows to select points
+Module with the ManuallySetBeamcenterWindow class which allows to select points
 in an image to define the beamcenter.
 """
 
@@ -29,9 +29,10 @@ __all__ = ["ManuallySetBeamcenterWindow"]
 
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, get_generic_param_collection
@@ -52,10 +53,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
 
     show_frame = False
     default_params = get_generic_param_collection(
-        "filename",
-        "hdf5_key",
-        "hdf5_frame",
-        "hdf5_slicing_axis",
         "beamcenter_x",
         "beamcenter_y",
         "overlay_color",
@@ -64,7 +61,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
     sig_selected_beamcenter = QtCore.Signal(float, float)
     sig_about_to_close = QtCore.Signal()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(
             self,
             activate_frame=False,
@@ -82,7 +79,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._image = Dataset(np.zeros((5, 5)))
         self.frame_activated(self.frame_index)
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create all widgets.
         """
@@ -126,10 +123,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.add_any_widget(
             "image_selection",
             SelectDataFrameWidget(
-                *self.get_params(
-                    "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
-                ),
-                import_reference="SelectPointsForBeamcenterWindow__import",
+                import_reference="SelectPointsForBeamcenterWindow__import"
             ),
             parent_widget="left_container",
         )
@@ -172,7 +166,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             parent_widget="left_container",
         )
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Build the frame and create all widgets.
         """
@@ -193,7 +187,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Finalize the user interface.
         """
@@ -202,7 +196,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._bc_controller.show_plot_items("beamcenter")
 
     @QtCore.Slot(str, object)
-    def _selected_new_file(self, filename, kwargs):
+    def _selected_new_file(self, filename: str, kwargs: dict) -> None:
         """
         Open a new file / frame based on the selected file input Parameters.
 
@@ -219,12 +213,16 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
 
-    def update_detector_description(self, detector_name: str, mask_filename: str):
+    def update_detector_description(
+        self, detector_name: str, mask_filename: str
+    ) -> None:
         """
         Process the new detector settings.
 
         Parameters
         ----------
+        detector_name : str
+            The name of the new detector.
         mask_filename : str
             The name of the new mask file or None to disable mask usage.
         """
@@ -237,10 +235,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             self._bc_controller.set_mask_file(None)
 
     @QtCore.Slot()
-    def _confirm_points(self):
-        """
-        Confirm the selection of the specified points.
-        """
+    def _confirm_points(self) -> None:
+        """Confirm the selection of the specified points."""
         if not self._bc_controller.beamcenter_is_set:
             _reply = QuestionBox(
                 "Beamcenter not set",
@@ -255,7 +251,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.sig_selected_beamcenter.emit(_x, _y)
         self.close()
 
-    def _update_image_if_required(self):
+    def _update_image_if_required(self) -> None:
         """
         Check the dimensions of the current image with respect to the Detector size.
         """
@@ -270,19 +266,19 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._widgets["plot"].plot_pydidas_dataset(self._image)
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         Handle the close event and also emit a signal.
 
         Parameters
         ----------
-        event : QEvent
+        event : QCloseEvent
             The calling event.
         """
         self.sig_about_to_close.emit()
         super().closeEvent(event)
 
-    def show(self):
+    def show(self) -> None:
         """
         Show the window and check the image shape.
         """

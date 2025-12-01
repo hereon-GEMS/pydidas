@@ -26,25 +26,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "delete_all_items_in_layout",
-    "create_default_grid_layout",
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
     "get_widget_layout_args",
-    "update_param_and_widget_choices",
     "icon_with_inverted_colors",
 ]
 
 
-from typing import Union
+from typing import Any
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
 from pydidas.core import PydidasGuiError
+from pydidas.core.utils import IS_QT6
 from pydidas.resources import icons
+from pydidas_qtcore import PydidasQApplication
 
 
-def delete_all_items_in_layout(layout: QtWidgets.QLayout):
+def delete_all_items_in_layout(layout: QtWidgets.QLayout) -> None:
     """
     Recursively delete items in a QLayout.
 
@@ -60,32 +60,13 @@ def delete_all_items_in_layout(layout: QtWidgets.QLayout):
                 layout.removeItem(item)
             if item.layout() is not None:
                 delete_all_items_in_layout(item.layout())
-                layout.remove(item)
+                if IS_QT6:
+                    layout.removeItem(item)
+                else:
+                    layout.remove(item)
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
-
-
-def create_default_grid_layout() -> QGridLayout:
-    """
-    Create a QGridLayout with default parameters.
-
-    The default parameters are
-
-        - vertical spacing: 5
-        - horizontal spacing: 5
-        - alignment: left | top
-
-    Returns
-    -------
-    layout : QGridLayout
-        The layout.
-    """
-    _layout = QGridLayout()
-    _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-    _layout.setHorizontalSpacing(5)
-    _layout.setVerticalSpacing(5)
-    return _layout
 
 
 def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
@@ -120,7 +101,7 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     _type, _ref = ref_string.split("::")
     if _type == "qt-std":
         _ref = getattr(QStyle, _ref)
-        app = QtWidgets.QApplication.instance()
+        app = PydidasQApplication.instance()
         return app.style().standardIcon(_ref)
     if _type == "pydidas":
         return icons.get_pydidas_qt_icon(_ref)
@@ -131,7 +112,7 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
     raise TypeError("Cannot interpret the string reference for the menu icon.")
 
 
-def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
+def get_max_pixel_width_of_entries(entries: str | tuple | list) -> int:
     """
     Get the maximum width from a number of entries.
 
@@ -139,7 +120,7 @@ def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
 
     Parameters
     ----------
-    entries : Union[str, tuple, list]
+    entries : str or tuple or list
         The entries.
 
     Returns
@@ -150,13 +131,13 @@ def get_max_pixel_width_of_entries(entries: Union[str, tuple, list]) -> int:
     if isinstance(entries, str):
         entries = [entries]
 
-    font = QtWidgets.QApplication.instance().font()
+    font = PydidasQApplication.instance().font()
     metrics = QtGui.QFontMetrics(font)
     _width = max(metrics.boundingRect(_item).width() for _item in entries)
     return _width
 
 
-def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: dict):
+def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: Any) -> list:
     """
     Get the arguments for adding a widget to the layout of the parent.
 
@@ -198,7 +179,7 @@ def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: dict):
     return [*_grid_pos]
 
 
-def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: dict):
+def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: Any) -> tuple:
     """
     Get the gridPos format from the kwargs or create it.
 
@@ -241,36 +222,6 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: dict):
     if _grid_pos[1] == -1:
         _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]
     return _grid_pos
-
-
-def update_param_and_widget_choices(param_widget: QtWidgets.QWidget, new_choices: list):
-    """
-    Update the choices for the given Parameter and in its widget.
-
-    This function will update the choices and also set the combo box widget to an
-    allowed choice.
-
-    Parameters
-    ----------
-    param_widget : pydidas.widgets.parameter_config.ParameterWidget
-        The pydidas ParameterWidget instance.
-    new_choices : list
-        The list of new choices.
-    """
-    _param = param_widget.param
-    if len(new_choices) == 0:
-        _param.choices = None
-        _param.value = ""
-    else:
-        _param.update_value_and_choices(new_choices[0], new_choices)
-    param_widget.io_widget.setEnabled(len(new_choices) != 0)
-    with QtCore.QSignalBlocker(param_widget.io_widget):
-        if len(new_choices) == 0:
-            param_widget.io_widget.update_choices([""])
-            param_widget.io_widget.setCurrentText("")
-            return
-        param_widget.io_widget.update_choices(new_choices)
-        param_widget.io_widget.setCurrentText(new_choices[0])
 
 
 def icon_with_inverted_colors(icon: QtGui.QIcon) -> QtGui.QIcon:

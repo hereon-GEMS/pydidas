@@ -62,7 +62,6 @@ NUMPY_HUMAN_READABLE_DATATYPES = {
     "float 16 bit": np.half,
     "float 32 bit": np.single,
     "float 64 bit": np.double,
-    "float 128 bit": np.longdouble,
     "int 8 bit": np.int8,
     "int 16 bit": np.int16,
     "int 32 bit": np.int32,

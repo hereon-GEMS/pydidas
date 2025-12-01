@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Subpackage with unittest objects. These object are included in the main
+Subpackage with unittest objects. These objects are included in the main
 distribution to have them in correct version control. They have no use
 apart from substituting for other object in unittests.
 """
@@ -36,6 +36,7 @@ from .dummy_proc import *
 from .dummy_proc_new_dataset import *
 from .local_plugin_collection import *
 from .mp_test_app import *
+from .signal_spy import SignalSpy
 
 
 __all__ = (
@@ -47,6 +48,7 @@ __all__ = (
     + dummy_proc_new_dataset.__all__
     + local_plugin_collection.__all__
     + mp_test_app.__all__
+    + signal_spy.__all__
 )
 
 del (

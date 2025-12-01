@@ -29,7 +29,7 @@ __all__ = ["PyfaiIntegrationConfigWidget"]
 
 
 from functools import partial
-from typing import Literal, NewType
+from typing import Literal
 
 from qtpy import QtCore
 
@@ -39,16 +39,13 @@ from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
 from pydidas.widgets.windows import SelectIntegrationRegionWindow
 
 
-BasePlugin = NewType("BasePlugin", type)
-
-
 class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
     """
     The PyfaiIntegrationConfigWidget is the custom widget to modify the Parameters for
     pyFAI integration plugins.
     """
 
-    def create_all_widgets(self):
+    def create_all_widgets(self) -> None:
         """
         Create all widgets for the plugin configuration.
         """
@@ -69,7 +66,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         if self._use_advanced_params:
             self.create_advanced_param_config_widgets()
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """Connect the signals of the widgets."""
         GenericPluginConfigWidget.connect_signals(self)
         if "azi_use_range" in self.param_composite_widgets:
@@ -90,7 +87,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
     @QtCore.Slot(str)
     def _toggle_azimuthal_ranges_visibility(
         self, new_selection: Literal["Specify azimuthal range", "Full detector"]
-    ):
+    ) -> None:
         """
         Toggle the visibility of the plugin parameters for the azimuthal ranges.
 
@@ -106,7 +103,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
     @QtCore.Slot(str)
     def _toggle_radial_ranges_visibility(
         self, new_selection: Literal["Specify radial range", "Full detector"]
-    ):
+    ) -> None:
         """
         Toggle the visibility of the plugin parameters for the radial ranges.
 
@@ -120,7 +117,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         self.toggle_param_widget_visibility("rad_range_upper", _visibility)
 
     @QtCore.Slot()
-    def _select_integration_region(self, allow_edit: bool = True):
+    def _select_integration_region(self, allow_edit: bool = True) -> None:
         """
         Select the plugin's integration region interactively.
 
@@ -141,12 +138,10 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         _window.show()
 
     @QtCore.Slot()
-    def update_edits(self):
-        """
-        Update the configuration fields of the plugin.
-        """
+    def update_edits(self) -> None:
+        """Update the configuration fields of the plugin."""
         for param in self.plugin.params.values():
-            self.update_widget_value(param.refkey, param.value)
+            self.update_param_widget_value(param.refkey, param.value)
         self._toggle_azimuthal_ranges_visibility(
             self.plugin.get_param_value("azi_use_range")
         )
@@ -159,7 +154,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
             self._window_edit.close()
         self._toggle_io_mode(True)
 
-    def _toggle_io_mode(self, enabled: bool):
+    def _toggle_io_mode(self, enabled: bool) -> None:
         """
         Block the input/output and disable all Parameter widgets.
 

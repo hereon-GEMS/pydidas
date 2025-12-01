@@ -29,7 +29,6 @@ __all__ = ["FitPluginConfigWidget"]
 
 
 from functools import partial
-from typing import NewType
 
 from qtpy import QtCore
 
@@ -40,17 +39,14 @@ from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
 )
 
 
-BaseFitPlugin = NewType("BaseFitPlugin", type)
-
-
 class FitPluginConfigWidget(GenericPluginConfigWidget):
     """
     A custom widget to modify the Parameters for peak fitting plugins.
 
-    The widget adds a list of tickboxes to select the fit output.
+    The widget adds a list of checkboxes to select the fit output.
     """
 
-    def create_param_config_widgets(self):
+    def create_param_config_widgets(self) -> None:
         self._params_already_added = ["fit_output"]
         _plugin_output = self.plugin.get_param_value("fit_output").split("; ")
         self._fit_output = {
@@ -93,7 +89,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
                 self.create_param_widget(_param)
 
     @QtCore.Slot(int)
-    def _box_checked(self, name: str, state: int):
+    def _box_checked(self, name: str, state: int) -> None:
         """
         Handle the signal that the checkbox for the fit output has been edited.
 
@@ -107,7 +103,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         self._fit_output[name] = bool(state)
         self._update_fit_output()
 
-    def _update_fit_output(self):
+    def _update_fit_output(self) -> None:
         """
         Update the fit output parameter from the checkboxes.
         """
@@ -117,7 +113,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         else:
             self.plugin.set_param_value("fit_output", "; ".join(_active))
 
-    def update_edits(self):
+    def update_edits(self) -> None:
         """
         Update the configuration fields of the plugin.
 
@@ -125,7 +121,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         """
         for param in self.plugin.params.values():
             if param.refkey != "fit_output":
-                self.update_widget_value(param.refkey, param.value)
+                self.update_param_widget_value(param.refkey, param.value)
             if param.refkey == "fit_output":
                 _keys = param.value.split("; ")
                 for _key in self._fit_output:

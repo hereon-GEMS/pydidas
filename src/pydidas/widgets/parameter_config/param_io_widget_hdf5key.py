@@ -29,6 +29,8 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetHdf5Key"]
 
 
+from typing import Any
+
 from pydidas.core import Parameter
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
@@ -46,7 +48,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     dialogue.
     """
 
-    def __init__(self, param: Parameter, **kwargs):
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
         """
         Initialize the widget.
 
@@ -57,10 +59,8 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         ----------
         param : Parameter
             A Parameter instance.
-        **kwargs : dict
-            Optional keyword arguments. Supported kwargs are "width" in pixel for the
-            I/O filed and "persistent_qsettings_ref" as reference name of the last
-            opened directory.
+        **kwargs : Any
+            Supported kwargs are all kwargs of ParamIoWidgetWithButton.
         """
         ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self._button.setToolTip(
@@ -69,7 +69,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         self.io_dialog = PydidasFileDialog()
         self._io_qsettings_ref = kwargs.get("persistent_qsettings_ref", None)
 
-    def button_function(self):
+    def button_function(self) -> None:
         """
         Open a dialogue to select a file.
 
@@ -77,12 +77,11 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         and opens a QFileDialog widget to select a filename.
         """
         _result = self.io_dialog.get_existing_filename(
-            formats=("Hdf5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
+            formats=("HDF5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
             qsettings_ref=self._io_qsettings_ref,
-            default_extension="Hdf5",
+            default_extension="nxs",
         )
         if _result is not None:
             dset = Hdf5DatasetSelectionPopup(self, _result).get_dset()
             if dset is not None:
-                self.setText(str(dset))
-                self.emit_signal()
+                self.set_value(str(dset))

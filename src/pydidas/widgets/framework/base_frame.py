@@ -27,7 +27,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFrame"]
 
+
 from numbers import Integral
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -53,17 +55,6 @@ class BaseFrame(
     The BaseFrame is a subclassed QWidget and the base class for all Frames in pydidas.
 
     By default, a QGridLayout is applied with an alignment of left/top.
-
-    Parameters
-    ----------
-    **kwargs : dict
-        Any additional keyword arguments which might be used by
-        subclasses.
-    **init_layout : bool, optional
-        Flag to initialize the frame layout with a QtWidgets.QGridLayout
-        and left / top alignment. If False, no layout will be initialized
-        and the subclass is responsible for setting up the layout. The
-        default is True.
     """
 
     show_frame = True
@@ -76,7 +67,15 @@ class BaseFrame(
     sig_this_frame_activated = QtCore.Signal()
     default_params = ParameterCollection()
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
+        """
+        Initialize the BaseFrame.
+
+        Parameters
+        ----------
+        **kwargs : Any
+            Any additional keyword arguments which might be used by subclasses.
+        """
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setVisible(False)
@@ -86,19 +85,17 @@ class BaseFrame(
         ParameterWidgetsMixIn.__init__(self)
         ParameterCollectionMixIn.__init__(self)
 
-        init_layout = kwargs.get("init_layout", True)
-        if init_layout:
-            _layout = QtWidgets.QGridLayout()
-            _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-            self.setLayout(_layout)
+        _layout = QtWidgets.QGridLayout()
+        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.setLayout(_layout)
         self.frame_index = -1
         self.menu_entry = kwargs.get("menu_entry", self.menu_entry)
         self.menu_title = kwargs.get("title", self.menu_title)
         self.icon = kwargs.get("icon", self.menu_icon)
-        self._config = {"built": False}
+        self._config: dict[str, Any] = {"built": False}
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: Integral):
+    def frame_activated(self, index: Integral) -> None:
         """
         Received signal that frame has been activated.
 
@@ -125,24 +122,21 @@ class BaseFrame(
                 self.restore_state(_state)
         self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
-            self.sig_this_frame_activated.emit()
+            self.sig_this_frame_activated.emit()  # type: ignore[attr-defined]
 
-    def build_frame(self):
-        """
-        Build all widgets of the frame.
-        """
+    def build_frame(self) -> None:
+        """Build all widgets of the frame."""
+        pass
 
-    def connect_signals(self):
-        """
-        Connect all the required signals for the frame.
-        """
+    def connect_signals(self) -> None:
+        """Connect all the required signals for the frame."""
+        pass
 
-    def finalize_ui(self):
-        """
-        finalize the UI initialization.
-        """
+    def finalize_ui(self) -> None:
+        """finalize the UI initialization."""
+        pass
 
-    def set_status(self, text: str):
+    def set_status(self, text: str) -> None:
         """
         Emit a status message to the main window.
 
@@ -151,7 +145,7 @@ class BaseFrame(
         text : str
             The status message to be emitted.
         """
-        self.status_msg.emit(text)
+        self.status_msg.emit(text)  # type: ignore[attr-defined]
 
     def export_state(self):
         """
@@ -173,7 +167,7 @@ class BaseFrame(
             "class": self.__class__.__name__,
         }
 
-    def restore_state(self, state: dict):
+    def restore_state(self, state: dict) -> None:
         """
         Restore the frame's state from stored information.
 
@@ -189,17 +183,17 @@ class BaseFrame(
             information for both.
         """
         if not self._config["built"]:
-            self._config["state"] = state
+            self._config["state"] = state  # type: ignore[arg-type]
             return
         self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
-                    self.set_param_value_and_widget(_key, _val)
+                    self.set_param_and_widget_value(_key, _val)
                 else:
                     self.set_param_value(_key, _val)
 
-    def closeEvent(self, event: QtCore.QEvent):
+    def closeEvent(self, event: QtCore.QEvent) -> None:
         """
         Reimplement the closeEvent to emit a signal about the closing.
 
@@ -208,5 +202,5 @@ class BaseFrame(
         event : QtCore.QEvent
             The event which triggered the closeEvent.
         """
-        self.sig_closed.emit()
-        QtWidgets.QWidget.closeEvent(self, event)
+        self.sig_closed.emit()  # type: ignore[attr-defined]
+        QtWidgets.QWidget.closeEvent(self, event)  # type: ignore[arg-type]

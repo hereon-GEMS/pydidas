@@ -29,6 +29,8 @@ __all__ = ["ImageSeriesOperationsWindow"]
 
 import numbers
 import os
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -40,6 +42,7 @@ from pydidas.data_io import IoManager, export_data, import_data
 from pydidas.managers import FilelistManager
 from pydidas.widgets import dialogues
 from pydidas.widgets.framework import PydidasWindow
+from pydidas_qtcore import PydidasQApplication
 
 
 _operation = Parameter(
@@ -48,7 +51,7 @@ _operation = Parameter(
     "mean",
     name="Image series operator",
     choices=["mean", "sum", "max"],
-    tooltip=("The mathematical operation to be applied to the image series."),
+    tooltip="The mathematical operation to be applied to the image series.",
 )
 
 _HDF5_PARAM_KEYS = [
@@ -74,12 +77,12 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     )
     default_params.add_param(_operation)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Image series operations", **kwargs)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
         self._config["num_frames_per_file"] = 1
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create all widgets.
         """
@@ -149,35 +152,31 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self.create_button("but_exec", "Process and export image")
         self.process_new_font_metrics()
 
-    def connect_signals(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def connect_signals(self) -> None:
+        """Build the frame and create all child widgets."""
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].sig_new_value.connect(
             self.__selected_first_file
         )
-        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
+        PydidasQApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )
 
     @QtCore.Slot()
-    def process_new_font_metrics(self):
-        """
-        Process the user input of the new font size.
-        """
+    def process_new_font_metrics(self) -> None:
+        """Process the user input of the new font size."""
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.adjustSize()
 
     @QtCore.Slot(str)
-    def __selected_first_file(self, fname):
+    def __selected_first_file(self, fname: str) -> None:
         """
         Perform required actions after selecting the first image file.
 
         This method checks whether a hdf5 file has been selected and shows/
         hides the required fields for selecting the dataset or the last file
         in case of a file series.
-        If an hdf5 image file has been selected, this method also opens a
+        If a hdf5 image file has been selected, this method also opens a
         pop-up for dataset selection.
 
         Parameters
@@ -193,13 +192,15 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         if get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS:
             self.__popup_select_hdf5_key(fname)
 
-    def __clear_entries(self, keys="all", hide=True):
+    def __clear_entries(
+        self, keys: list | str | tuple = "all", hide: bool = True
+    ) -> None:
         """
         Clear the Parameter entries and reset to default for selected keys.
 
         Parameters
         ----------
-        keys : Union['all', list, tuple], optional
+        keys : list or str or tuple, optional
             The keys for the Parameters to be reset. The default is 'all'.
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
@@ -213,9 +214,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             if _key in keys:
                 self.toggle_param_widget_visibility(_key, not hide)
 
-    def __update_widgets_after_selecting_first_file(self):
+    def __update_widgets_after_selecting_first_file(self) -> None:
         """
-        Update widget visibilty after selecting the first file based on the
+        Update widget visibility after selecting the first file based on the
         file format (hdf5 or not).
         """
         hdf5_flag = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
@@ -223,34 +224,30 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.toggle_param_widget_visibility(_key, hdf5_flag)
         self.toggle_param_widget_visibility("last_file", True)
 
-    def __update_file_selection(self):
-        """
-        Update the filelist based on the current selection.
-        """
+    def __update_file_selection(self) -> None:
+        """Update the filelist based on the current selection."""
         try:
             self._filelist.update()
         except UserConfigError as _ex:
             self.__clear_entries(["last_file"], hide=False)
             QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
 
-    def __popup_select_hdf5_key(self, fname):
+    def __popup_select_hdf5_key(self, fname: Path | str) -> None:
         """
         Create a popup window which asks the user to select a dataset.
 
         Parameters
         ----------
-        fname : str
+        fname : str or Path
             The filename to the hdf5 data file.
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
-            self.set_param_value_and_widget("hdf5_key", dset)
+            self.set_param_and_widget_value("hdf5_key", dset)
 
     @QtCore.Slot()
-    def process_file_series(self):
-        """
-        Process the file series.
-        """
+    def process_file_series(self) -> None:
+        """Process the file series."""
         if not IoManager.is_extension_registered(
             self.get_param_value("output_fname").suffix
         ):
@@ -285,22 +282,20 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         if self._widgets["check_keep_open"].isChecked():
             self.close()
 
-    def _calculate_hdf5_frame_limits(self):
-        """
-        Calculate the limits for the hdf5 frame indices.
-        """
+    def _calculate_hdf5_frame_limits(self) -> None:
+        """Calculate the limits for the hdf5 frame indices."""
         _start_index = self.get_param_value("hdf5_first_image_num")
         _max_index = self.get_param_value("hdf5_last_image_num") + 1
         _key = self.get_param_value("hdf5_key")
         if _max_index == 0:
             _fname = self._filelist.get_filename(0)
-            _max_index = get_hdf5_metadata(_fname, ["shape"], dset=_key)[
+            _max_index = get_hdf5_metadata(_fname, "shape", dset=_key)[
                 self.get_param_value("hdf5_slicing_axis")
             ]
         self._config["hdf5_frames"] = [_start_index, _max_index]
         self._config["num_frames_per_file"] = _max_index - _start_index
 
-    def _get_fname_and_frame_number(self, index):
+    def _get_fname_and_frame_number(self, index: int) -> tuple:
         """
         Get the filename and frame number for an image index.
 
@@ -317,18 +312,16 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         _i_file = index // self._config["num_frames_per_file"]
         _frame = index % self._config["num_frames_per_file"]
         _fname = self._filelist.get_filename(_i_file)
-        return (_fname, _frame)
+        return _fname, _frame
 
-    def _apply_operation(self, frame):
+    def _apply_operation(self, frame: np.ndarray) -> None:
         """
         Apply the selected operation on the input frame and the global data.
 
         Parameters
         ----------
-        frame : pydidas.core.Dataset
+        frame : np.ndarray
             The current frame.
-        data : pydidas.core.Dataset
-            The stored global processing data.
         """
         _op = self.get_param_value("operation")
         if _op in ["sum", "mean"]:
@@ -336,7 +329,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         elif _op == "max":
             self._data = np.maximum(self._data, frame)
 
-    def _final_operation(self):
+    def _final_operation(self) -> None:
         """
         Apply the final operation to the data, e.g. normalization for average.
         """
@@ -345,7 +338,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
             self._data = self._data / _n_frames
 
-    def _reduce_integer_dtype(self):
+    def _reduce_integer_dtype(self) -> None:
         """
         Reduce the datatype of integer values to use as little disk space as possible.
         """

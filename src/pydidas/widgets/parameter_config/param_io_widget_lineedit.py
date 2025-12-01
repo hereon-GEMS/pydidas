@@ -29,15 +29,20 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetLineEdit"]
 
 
-from numbers import Real
+import numbers
 from typing import Any
 
-import numpy as np
+from qtpy import QtGui
 
 from pydidas.core import Parameter
-from pydidas.core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_EXP_FIX
+from pydidas.core.constants import (
+    FLOAT_VALIDATOR,
+    POLICY_EXP_FIX,
+    QT_REG_EXP_FLOAT_VALIDATOR,
+    QT_REG_EXP_INT_VALIDATOR,
+)
 from pydidas.widgets.factory import PydidasLineEdit
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
 )
 
@@ -51,59 +56,54 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
     param : Parameter
         A Parameter instance.
     **kwargs : Any
-        Any additional kwargs.
+        Any additional kwargs. All kwargs are passed to the PydidasLineEdit
+        constructor.
     """
 
-    def __init__(self, param: Parameter, **kwargs: Any):
-        PydidasLineEdit.__init__(self, parent=kwargs.get("parent", None))
-        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
-        self.set_validator(param)
-        self.set_value(param.value)
+    def __init__(self, param: Parameter, **kwargs: Any) -> None:
+        PydidasLineEdit.__init__(self, **kwargs)
+        BaseParamIoWidgetMixIn.__init__(self, param)
+        self.update_validator()
+        self.setText(f"{param.value}")
         self.editingFinished.connect(self.emit_signal)
         self.setSizePolicy(*POLICY_EXP_FIX)  # noqa E1120, E1121
 
-    def emit_signal(self):
+    @property
+    def current_text(self) -> str:
         """
-        Emit a signal that the value has been edited.
-
-        This method emits a signal that the combobox selection has been
-        changed and the Parameter value needs to be updated.
-        """
-        _cur_value = self.text()
-        if _cur_value != self._old_value:
-            self._old_value = _cur_value
-            self.sig_new_value.emit(_cur_value)
-            self.sig_value_changed.emit()
-
-    def get_value(self) -> object:
-        """
-        Get the current value from the combobox to update the Parameter value.
+        Get the current text in the line edit.
 
         Returns
         -------
-        type
-            The text converted to the required datatype (int, float, path)
-            to update the Parameter value.
+        str
+            The current text in the line edit.
         """
-        _text = self.text()
-        _value = self.get_value_from_text(_text)
-        if _text == "" and _value is None:
-            self.setText("None")
-        return _value
+        return self.text()
 
-    def set_value(self, value: object):
+    def update_widget_value(self, value: Any) -> None:
         """
-        Set the input field's value.
-
-        This method changes the combobox selection to the specified value.
-        Warning: This method will *not* update the connected parameter value.
+        Update the widget value without emitting signals.
 
         Parameters
         ----------
-        value : object
-            The new value to be displayed in the widget.
+        value : Any
+            The new value to set in the widget.
         """
-        if self._ptype == Real and value is not None and np.isfinite(value):
-            value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
-        self._old_value = str(value)
+        # the setText method only emits the textChanged signal, not editingFinished
         self.setText(f"{value}")
+
+    def update_validator(self) -> None:
+        """Update the widget's validator based on the Parameter's configuration."""
+        _validator = None
+        if self._linked_param.dtype == numbers.Integral:
+            if self._linked_param.allow_None:
+                _validator = QT_REG_EXP_INT_VALIDATOR
+            else:
+                _validator = QtGui.QIntValidator()
+        elif self._linked_param.dtype == numbers.Real:
+            if self._linked_param.allow_None:
+                _validator = QT_REG_EXP_FLOAT_VALIDATOR
+            else:
+                _validator = FLOAT_VALIDATOR
+        if _validator is not None:
+            self.setValidator(_validator)

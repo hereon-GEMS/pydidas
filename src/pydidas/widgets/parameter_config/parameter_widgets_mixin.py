@@ -28,12 +28,12 @@ __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
 
-from typing import Any
+from typing import Any, Sequence
 
 from qtpy import QtCore
 
 from pydidas.core import Parameter, ParameterCollection, PydidasGuiError
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidget,
 )
 from pydidas.widgets.parameter_config.parameter_widget import ParameterWidget
@@ -47,7 +47,7 @@ class ParameterWidgetsMixIn:
     convenience functions for settings Parameter values.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.param_widgets: dict[str, BaseParamIoWidget] = {}
         self.param_composite_widgets: dict[str, ParameterWidget] = {}
         if not hasattr(self, "_widgets"):
@@ -55,7 +55,7 @@ class ParameterWidgetsMixIn:
         if not hasattr(self, "params"):
             self.params = ParameterCollection()
 
-    def create_param_widget(self, param: Parameter | str, **kwargs: Any):
+    def create_param_widget(self, param: Parameter | str, **kwargs: Any) -> None:
         """
         Add a name label and input widget for a specific parameter to the widget.
 
@@ -69,13 +69,13 @@ class ParameterWidgetsMixIn:
             gridPos : tuple, optional
                 The grid position in the layout. The default is (-1, 0, 1, 1)
             width_text : float, optional
-                The relative width of the text field for the Parameter name. The default
-                is 0.5.
+                The relative width of the text field for the Parameter name.
+                The default is defined in
+                pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.
             width_unit : float, optional
-                The relative width of the text field for the Parameter unit. The default
-                is 0.07.
-            width_io : int, optional
-                The relative width of the input widget. The default is 0.43.
+                The relative width of the text field for the Parameter unit.
+                The default is defined in
+                pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.
             linebreak : bool, optional
                 Keyword to toggle a line break between the text label and the
                 input widget. The default is False.
@@ -104,36 +104,7 @@ class ParameterWidgetsMixIn:
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
-    def set_param_value_and_widget(self, key: str, value: object):
-        """
-        Update a parameter value both in the Parameter and the widget.
-
-        This method will update the parameter referenced by <key> and
-        update both the Parameter.value and the displayed widget
-        entry.
-
-        Parameters
-        ----------
-        key : str
-            The reference key for the Parameter.
-        value : object
-            The new parameter value. This must be of the same type as the
-            Parameter datatype.
-
-        Raises
-        ------
-        KeyError
-            If no parameter or widget has been registered with this key.
-        """
-        if key not in self.params or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        with QtCore.QSignalBlocker(self.param_widgets[key]):
-            # The set_param_value method is expected to be defined in the
-            # class that uses this mixin:
-            self.set_param_value(key, value)  # noqa E1101
-            self.param_widgets[key].set_value(value)
-
-    def toggle_param_widget_visibility(self, key: str, visible: bool):
+    def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
         """
         Toggle the visibility of widgets referenced with the key.
 
@@ -156,15 +127,88 @@ class ParameterWidgetsMixIn:
             raise KeyError(f'No parameter with key "{key}" found.')
         self.param_composite_widgets[key].setVisible(visible)
 
-    def update_widget_value(self, param_key: str, value: object):
+    def update_param_widget_value(self, key: str, value: Any) -> None:
         """
-        Update the value stored in a widget without changing the Parameter.
+        Update the value stored in a widget without changing the Parameter and
+        without emitting signals.
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The Parameter reference key.
-        value : object
-            The value. The type depends on the Parameter's value.
+        value : Any
+            The value. The type depends on the Parameter's value and will be
+            converted to string for display purposes.
         """
-        self.param_widgets[param_key].set_value(value)
+        self.param_composite_widgets[key].update_display_value(value)
+
+    def set_param_and_widget_value(
+        self, key: str, value: Any, emit_signal: bool = True
+    ) -> None:
+        """
+        Update a parameter value both in the Parameter and the widget.
+
+        This method will update the parameter referenced by <key> and
+        update both the Parameter.value and the displayed widget
+        entry.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter.
+        value : Any
+            The new parameter value. This must be of the same type as the
+            Parameter datatype (or supported by a converter).
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            (if the value has changed). The default is True.
+
+        Raises
+        ------
+        KeyError
+            If no parameter or widget has been registered with this key.
+        """
+        if key not in self.params or key not in self.param_widgets:
+            raise KeyError(
+                f'No parameter with the key `{key}` and associated widget is "'
+                f'"registered in this class.'
+            )
+        _old_val = self.params[key].value
+        with QtCore.QSignalBlocker(self.param_widgets[key]):
+            self.param_composite_widgets[key].param.value = value
+            self.param_composite_widgets[key].set_value(value)
+        if _old_val != self.params[key].value and emit_signal:
+            self.param_composite_widgets[key].sig_value_changed.emit()
+            self.param_composite_widgets[key].sig_new_value.emit(str(value))
+
+    def set_param_and_widget_value_and_choices(
+        self,
+        key: str,
+        value: Any,
+        choices: None | Sequence[Any],
+        emit_signal: bool = True,
+    ) -> None:
+        """
+        Update a Parameter's value and choices as well as the associated widget.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter.
+        value : Any
+            The new value for the Parameter.
+        choices : None or Sequence[Any]
+            The new list of choices for the Parameter. If None, the choices
+            for the Parameter will be disabled.
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            and choices (if the value has changed). The default is True.
+        """
+        # not using ParameterCollectionMixIn.set_param_value_and_choices method
+        # to have allow using this mixin independently
+        _old_val = self.params[key].value
+        self.params[key].set_value_and_choices(value, choices)
+        self.param_composite_widgets[key].update_choices_from_param()
+        if _old_val != self.params[key].value and emit_signal:
+            self.param_composite_widgets[key].sig_value_changed.emit()
+            self.param_composite_widgets[key].sig_new_value.emit(str(value))

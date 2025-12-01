@@ -37,9 +37,9 @@ from pydidas.widgets import ScrollArea
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.misc import (
     PointsForBeamcenterWidget,
-    SelectImageFrameWidget,
     ShowIntegrationRoiParamsWidget,
 )
+from pydidas.widgets.selection import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import (
     PydidasPlot2DwithIntegrationRegions,
 )
@@ -116,7 +116,6 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         ("config",),
         {
             "font_metric_width_factor": constants.FONT_METRIC_PARAM_EDIT_WIDTH,
-            "init_layout": True,
             "parent_widget": None,
             "sizePolicy": constants.POLICY_FIX_EXP,
         },
@@ -145,7 +144,7 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
     ["create_label", (None, "Input file:"), _label_header()],
     [
         "create_any_widget",
-        ("file_selector", SelectImageFrameWidget),
+        ("file_selector", SelectDataFrameWidget),
         {
             "import_reference": "QuickIntegrationFrame__image_import",
             "parent_widget": "config",

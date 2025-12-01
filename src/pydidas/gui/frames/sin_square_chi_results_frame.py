@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DataBrowsingFrame which is used to browse through the filesystem in a
-dedicated filesystem tree and show file data in a view window.
+Module with the SinSquareChiResultsFrame which is used to display results from
+the sin square chi residual stress analysis plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["SinSquareChiResultsFrame"]
 
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -120,8 +121,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             WarningBox("Empty data", "The data does not include any valid values.")
         return _min, _max
 
-    def __init__(self, **kwargs: dict):
-        BaseFrame.__init__(self, **kwargs)
+    def __init__(self, **kwargs: Any):
+        super().__init__(**kwargs)
         self.__qtapp = PydidasQApplication.instance()
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog()
@@ -131,7 +132,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._sin_square_chi_data = None
         self._sin_2chi_data = None
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and populate it with widgets.
         """
@@ -145,7 +146,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             _method(*_args, **_kwargs)
         apply_qt_properties(self.layout(), columnStretch=(1, 1))
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all required signals and slots between widgets and class
         methods.
@@ -197,14 +198,14 @@ class SinSquareChiResultsFrame(BaseFrame):
             partial(self.__update_plot_numbers, "vert")
         )
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Finalize the UI initialization.
         """
         self._plots: GridCurvePlot = self._widgets["visualization"]
         self.reset_selection()
 
-    def restore_state(self, state: dict):
+    def restore_state(self, state: dict) -> None:
         """Restore the frame's state from stored information."""
         BaseFrame.restore_state(self, state)
         if self._config["built"]:
@@ -213,7 +214,7 @@ class SinSquareChiResultsFrame(BaseFrame):
                 self.get_param_value("num_horizontal_plots"),
             )
 
-    def update_selected_data_source(self, data_source: str):
+    def update_selected_data_source(self, data_source: str) -> None:
         """
         Update the selected data source parameter.
 
@@ -223,7 +224,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             The new data source to set.
         """
         self.param_widgets["selected_data_source"].setReadOnly(False)  # noqa E1101
-        self.set_param_value_and_widget("selected_data_source", data_source)
+        self.set_param_and_widget_value("selected_data_source", data_source)
         self.param_widgets["selected_data_source"].setReadOnly(True)  # noqa E1101
 
     @QtCore.Slot()
@@ -252,7 +253,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             self.reset_selection()
             self._update_selection_choices()
 
-    def reset_selection(self):
+    def reset_selection(self) -> None:
         """
         Reset the selection of sin-square chi and sin(2*chi) nodes.
 
@@ -268,7 +269,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             self._plots.set_xscaling(_key, (-0.05, 1.05), update_plot=False)
             self._plots.set_y_autoscaling(_key, update_plot=False)
 
-    def _update_selection_choices(self):
+    def _update_selection_choices(self) -> None:
         """
         Update the choices for the sin-square chi and sin(2*chi) nodes.
 
@@ -281,7 +282,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             for _key, _val in self.__current_results._config["plugin_names"].items()
             if StoreSinSquareChiData.plugin_name in _val
         } | {"no selection": -1}
-        self.params["selected_sin_square_chi_node"].update_value_and_choices(
+        self.set_param_value_and_choices(
+            "selected_sin_square_chi_node",
             list(self._sin_square_chi_node_keys)[0],
             list(self._sin_square_chi_node_keys),
         )
@@ -293,7 +295,8 @@ class SinSquareChiResultsFrame(BaseFrame):
             for _key, _val in self.__current_results._config["plugin_names"].items()
             if StoreSinTwoChiData.plugin_name in _val
         } | {"no selection": -1}
-        self.params["selected_sin_2chi_node"].update_value_and_choices(
+        self.set_param_value_and_choices(
+            "selected_sin_2chi_node",
             list(self._sin_2chi_node_keys)[0],
             list(self._sin_2chi_node_keys),
         )
@@ -307,7 +310,7 @@ class SinSquareChiResultsFrame(BaseFrame):
             self._update_plotted_data()
 
     @QtCore.Slot()
-    def _update_plotted_data(self):
+    def _update_plotted_data(self) -> None:
         """
         Update the data used in the plots.
         """
@@ -330,7 +333,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         )
 
     @QtCore.Slot(str)
-    def _update_scaling_visibility(self, results: str, autoscale: str):
+    def _update_scaling_visibility(self, results: str, autoscale: str) -> None:
         """
         Update the visibility of the scaling widgets based on the autoscale parameter.
 
@@ -347,7 +350,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._widgets[f"button_update_sin_{results}_limits"].setVisible(not autoscale)
 
     @QtCore.Slot()
-    def __set_scaling(self, result_key: str):
+    def __set_scaling(self, result_key: str) -> None:
         """
         Set the scaling for the sin-square chi or sin(2*chi) results.
 
@@ -366,27 +369,27 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._plots.set_yscaling(result_key, (_low, _high))
 
     @QtCore.Slot()
-    def _update_sin_square_chi_limits_from_data(self):
+    def _update_sin_square_chi_limits_from_data(self) -> None:
         """
         Update the sin^2(chi) limits from the selected data.
         """
         _min, _max = self._get_data_min_and_max(self._sin_square_chi_data)
-        self.set_param_value_and_widget("sin_square_chi_limit_low", _min)
-        self.set_param_value_and_widget("sin_square_chi_limit_high", _max)
+        self.set_param_and_widget_value("sin_square_chi_limit_low", _min)
+        self.set_param_and_widget_value("sin_square_chi_limit_high", _max)
         self.__set_scaling("square")
 
     @QtCore.Slot()
-    def _update_sin_2chi_limits_from_data(self):
+    def _update_sin_2chi_limits_from_data(self) -> None:
         """
         Update the sin(2*chi) limits from the selected data.
         """
         _min, _max = self._get_data_min_and_max(self._sin_2chi_data)
-        self.set_param_value_and_widget("sin_2chi_limit_low", _min)
-        self.set_param_value_and_widget("sin_2chi_limit_high", _max)
+        self.set_param_and_widget_value("sin_2chi_limit_low", _min)
+        self.set_param_and_widget_value("sin_2chi_limit_high", _max)
         self.__set_scaling("two_chi")
 
     @QtCore.Slot(str)
-    def __update_plot_numbers(self, direction: str, value: str):
+    def __update_plot_numbers(self, direction: str, value: str) -> None:
         """
         Update the number of horizontal or vertical plots in the grid.
 

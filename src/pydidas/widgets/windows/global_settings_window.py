@@ -56,14 +56,12 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
-    def initialize(self, **kwargs: Any):
+    def initialize(self, **kwargs: Any) -> None:
         self.set_default_params()
         self.setWindowTitle("pydidas system settings")
 
-    def build_frame(self):
-        """
-        Populate the GlobalConfigurationFrame with widgets.
-        """
+    def build_frame(self) -> None:
+        """Populate the GlobalSettingsWindow with widgets."""
         _section_options = {
             "fontsize_offset": 2,
             "bold": True,
@@ -109,10 +107,8 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         self.create_param_widget("plot_update_time", **_param_options)
         self.process_new_font_metrics()
 
-    def connect_signals(self):
-        """
-        Connect the signals for Parameter updates.
-        """
+    def connect_signals(self) -> None:
+        """Connect the signals for Parameter updates."""
         for _param_key in self.params:
             self.param_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
@@ -122,7 +118,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         _app.sig_font_metrics_changed.connect(self.process_new_font_metrics)
 
     @QtCore.Slot(str)
-    def update_qsetting(self, param_key: str, value: str):
+    def update_qsetting(self, param_key: str, value: str) -> None:
         """
         Update a QSettings value
 
@@ -138,7 +134,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int) -> None:
         """
         Update the frame.
 
@@ -156,12 +152,10 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
             return
         for _param_key, _param in self.params.items():
             _value = self.q_settings_get(f"global/{_param_key}", dtype=_param.dtype)
-            self.set_param_value_and_widget(_param_key, _value)
+            self.set_param_and_widget_value(_param_key, _value)
 
-    def __reset(self):
-        """
-        Reset all Parameters to their default values.
-        """
+    def __reset(self) -> None:
+        """Reset all Parameters to their default values."""
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
             self, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
@@ -170,13 +164,11 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
             self.restore_all_defaults(True)
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
-                self.update_widget_value(_param_key, _value)
+                self.update_param_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self):
-        """
-        Process the user input of the new font size.
-        """
+    def process_new_font_metrics(self) -> None:
+        """Process the user input of the new font size."""
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.adjustSize()

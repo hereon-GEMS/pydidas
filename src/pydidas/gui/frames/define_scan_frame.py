@@ -283,11 +283,11 @@ class DefineScanFrame(BaseFrame):
             SCAN.set_param_value(
                 f"scan_dim{dim_index}_{_key}", _previous_dim_entries[f"{_key}"]
             )
-            self.update_widget_value(
+            self.update_param_widget_value(
                 f"scan_dim{dim_index + direction}_{_key}",
                 SCAN.get_param_value(f"scan_dim{dim_index + direction}_{_key}"),
             )
-            self.update_widget_value(
+            self.update_param_widget_value(
                 f"scan_dim{dim_index}_{_key}",
                 SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )

@@ -32,11 +32,11 @@ __all__ = [
     "create_hdf5_dataset",
     "convert_data_for_writing_to_hdf5_dataset",
     "read_and_decode_hdf5_dataset",
-    "is_hdf5_filename",
     "create_nx_entry_groups",
     "create_nx_dataset",
     "create_nxdata_entry",
     "get_nx_class_for_param",
+    "get_generic_dataset",
 ]
 
 
@@ -44,7 +44,7 @@ import os
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Sequence
 
 import h5py
 import numpy as np
@@ -54,7 +54,7 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import FileReadError
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter import Parameter
-from pydidas.core.utils.file_utils import CatchFileErrors, get_extension
+from pydidas.core.utils.file_utils import CatchFileErrors
 
 
 def get_hdf5_populated_dataset_keys(
@@ -120,7 +120,13 @@ def get_hdf5_populated_dataset_keys(
         return []
 
     if isinstance(item, (str, Path)):
-        _hdf5_filename_check(item)
+        item = Path(item)
+        if not item.is_file():
+            raise FileReadError("The specified file does not exist.")
+        if item.suffix.removeprefix(".") not in HDF5_EXTENSIONS:
+            raise FileReadError(
+                "The specified file does not have a recognized hdf5 extension."
+            )
         item = h5py.File(item, "r")
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
@@ -148,49 +154,8 @@ def get_hdf5_populated_dataset_keys(
     return _datasets
 
 
-def is_hdf5_filename(filename: Path | str) -> bool:
-    """
-    Check whether the given filename has a hdf5 extension.
-
-    Parameters
-    ----------
-    filename : Union[Path, str]
-        The filename to check.
-
-    Returns
-    -------
-    bool
-        Flag whether the filename extension is a registered hdf5 extension.
-    """
-    return get_extension(filename) in HDF5_EXTENSIONS
-
-
-def _hdf5_filename_check(item: Path | str):
-    """
-    Check that a specified filename is okay and points to an existing file.
-
-    Parameters
-    ----------
-    item : str |Path
-        The filename.
-
-    Raises
-    ------
-    TypeError
-        If the file extension is not a recognized Hdf5 extension.
-    FileNotFoundError
-        If the file does not exist.
-    """
-    if get_extension(item) not in HDF5_EXTENSIONS:
-        raise TypeError(
-            "The file does not have any extension registered for hdf5 files."
-        )
-    if not os.path.exists(item):
-        raise FileNotFoundError(f'The specified file "{item}" does not exist.')
-
-
 def hdf5_dataset_check(
-    item: object,
+    item: Any,
     min_size: int = 0,
     min_dim: int = 3,
     max_dim: int | None = None,
@@ -205,7 +170,7 @@ def hdf5_dataset_check(
 
     Parameters
     ----------
-    item : object
+    item : Any
         This is the object to be checked for being an instance of
         :py:class:`h5py.Dataset`.
     min_size : int, optional
@@ -213,7 +178,7 @@ def hdf5_dataset_check(
         dataset, not the size along any one dimension. The default is 0.
     min_dim : int, optional
         The minimum dimensionality of the item. The default is 3.
-    max_dim : list | None, optional
+    max_dim : int | None, optional
         The maximum acceptable dimension of the Dataset.
     to_ignore : list | tuple, optional
         A list or tuple of strings. If the dataset key starts with any
@@ -226,19 +191,20 @@ def hdf5_dataset_check(
         and fulfills the requirements of minimum data size and dimensionality
         and does not start with any keys specified in the to_ignore?
     """
-    if (
-        isinstance(item, h5py.Dataset)
-        and len(item.shape) >= min_dim
-        and item.size >= min_size
+    if not isinstance(item, h5py.Dataset):
+        return False
+    return (
+        item.size >= min_size
         and not item.name.startswith(tuple(to_ignore))
-    ):
-        return max_dim is None or len(item.shape) <= max_dim
-    return False
+        and min_dim <= len(item.shape)
+        and item.size >= min_size
+        and (max_dim is None or (len(item.shape) <= max_dim))
+    )
 
 
 def _get_hdf5_file_and_dataset_names(
     fname: Path | str, dset: str | None = None
-) -> tuple[str]:
+) -> tuple[str, str]:
     """
     Get the name of the file and a hdf5 dataset.
 
@@ -478,7 +444,7 @@ def create_nx_entry_groups(
         _group = parent[group_name]
         if _group.attrs.get("NX_class", "") != group_type:
             raise ValueError(
-                f"Error when creating the group {group_name}: The group already exists"
+                f"Error when creating the group {group_name}: The group already exists "
                 f"but is not of specified type {group_type} (existing group: "
                 f"{_group.attrs.get('NX_class')})."
             )
@@ -565,7 +531,7 @@ def create_nx_dataset(
         The group to create the dataset in.
     name : str
         The name of the dataset.
-    data: Union[dict, np.ndarray, str, Real, Integral]
+    data: dict or np.ndarray or str or Real or Integral
         The data to be stored in the dataset. This should typically be a numpy array
         or a scalar value or a string. If a dict is given, this is interpreted as
         the arguments for calling the create_dataset method.
@@ -589,8 +555,8 @@ def get_nx_class_for_param(param: Parameter) -> str:
 
     Parameters
     ----------
-    param : str
-        The parameter name.
+    param : Parameter
+        The parameter.
 
     Returns
     -------
@@ -631,3 +597,34 @@ def export_context_to_hdf5(
             if len(_param.unit) > 0:
                 _attributes["units"] = _param.unit
             create_nx_dataset(_group, _key, _param.value_for_export, **_attributes)
+
+
+def get_generic_dataset(datasets: Sequence[str]) -> str:
+    """
+    Get the best standard dataset from a list of dataset names.
+
+    This function checks a list of dataset names and returns the one which
+    corresponds best to standard naming conventions for generic datasets.
+
+    Parameters
+    ----------
+    datasets : Sequence[str]
+        A sequence of dataset names to check.
+
+    Returns
+    -------
+    str
+        The best matching generic dataset name. If no match is found,
+        the first entry in the list is returned.
+    """
+    if len(datasets) == 0:
+        raise ValueError(
+            "The datasets list is empty. Cannot determine generic dataset."
+        )
+    if "entry/data/data" in datasets:
+        # this is the standard NeXus path for generic data
+        return "entry/data/data"
+    if "/entry/instrument/detector/data" in datasets:
+        # this is the standard NeXus path for LAMBDA detectors
+        return "/entry/instrument/detector/data"
+    return datasets[0]

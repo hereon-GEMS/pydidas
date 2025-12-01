@@ -82,7 +82,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.set_default_params()
         self.add_params(self._app.params)
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all required Qt slots and signals.
         """
@@ -108,14 +108,14 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.__update_det_mask_visibility()
         self.__update_bg_widget_visibility()
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Populate the frame with widgets.
         """
         DirectorySpyFrameBuilder.build_frame(self)
 
     @QtCore.Slot()
-    def __update_file_widget_visibility(self):
+    def __update_file_widget_visibility(self) -> None:
         """
         Update the visibility of the widgets for the selection of files based
         on the 'scan_for_all' Parameter.
@@ -129,19 +129,15 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.toggle_param_widget_visibility("hdf5_key", _vis or _hdf5_pattern)
 
     @QtCore.Slot()
-    def __update_det_mask_visibility(self):
-        """
-        Update the visibility of the detector mask Parameters.
-        """
+    def __update_det_mask_visibility(self) -> None:
+        """Update the visibility of the detector mask Parameters."""
         _vis = self.get_param_value("use_detector_mask")
         self.toggle_param_widget_visibility("detector_mask_file", _vis)
         self.toggle_param_widget_visibility("detector_mask_val", _vis)
 
     @QtCore.Slot()
-    def __update_bg_widget_visibility(self):
-        """
-        Update the visibility of the background-file related widgets.
-        """
+    def __update_bg_widget_visibility(self) -> None:
+        """Update the visibility of the background-file related widgets."""
         _vis = self.get_param_value("use_bg_file")
         self.toggle_param_widget_visibility("bg_file", _vis)
         _hdf5_bgfile = get_extension(self.get_param_value("bg_file")) in HDF5_EXTENSIONS
@@ -149,10 +145,8 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.toggle_param_widget_visibility("bg_hdf5_frame", _vis and _hdf5_bgfile)
 
     @QtCore.Slot()
-    def __scan_once(self):
-        """
-        Scan once for the latest file.
-        """
+    def __scan_once(self) -> None:
+        """Scan once for the latest file."""
         self._config["plot_active"] = True
         self._app.prepare_run()
         self._app.multiprocessing_carryon()
@@ -161,27 +155,21 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.__update_plot()
 
     @QtCore.Slot()
-    def __force_show(self):
-        """
-        Force an update of the plot.
-        """
+    def __force_show(self) -> None:
+        """Force an update of the plot."""
         _active = self._config["plot_active"]
         self._config["plot_active"] = True
         self.__update_plot()
         self._config["plot_active"] = _active
 
     @QtCore.Slot()
-    def __execute(self):
-        """
-        Execute the DirectorySpyApp.
-        """
+    def __execute(self) -> None:
+        """Execute the DirectorySpyApp."""
         self._config["plot_active"] = True
         self._run_app()
 
-    def _run_app(self):
-        """
-        Parallel implementation of the execution method.
-        """
+    def _run_app(self) -> None:
+        """Parallel implementation of the execution method."""
         logger.debug("Starting workflow")
         self._app.multiprocessing_pre_run()
         self._config["last_update"] = time.time()
@@ -196,20 +184,16 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self._runner.start()
 
     @QtCore.Slot()
-    def __stop_execution(self):
-        """
-        Abort the execution of the AppRunner.
-        """
+    def __stop_execution(self) -> None:
+        """Abort the execution of the AppRunner."""
         if self._runner is not None:
             self._runner.send_stop_signal()
         self.set_status("Stopped scanning for new image files.")
         self.__set_proc_widget_enabled_for_running(False)
 
     @QtCore.Slot()
-    def _apprunner_finished(self):
-        """
-        Clean up after AppRunner is done.
-        """
+    def _apprunner_finished(self) -> None:
+        """Clean up after AppRunner is done."""
         logger.debug("Telling AppRunner to exit.")
         self._runner.exit()
         self._runner.deleteLater()
@@ -220,16 +204,14 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self.__update_plot()
 
     @QtCore.Slot()
-    def __check_for_plot_update(self):
-        """
-        Check that whether the plot should be updated.
-        """
+    def __check_for_plot_update(self) -> None:
+        """Check whether the plot should be updated."""
         _dt = time.time() - self._config["plot_last_update"]
         if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
             self._config["plot_last_update"] = time.time()
             self.__update_plot()
 
-    def __update_plot(self):
+    def __update_plot(self) -> None:
         """
         Update the plot.
 
@@ -238,7 +220,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         if (not self._config["plot_active"]) or self._app.image is None:
             return
-        _fname = self._app.filename
+        _fname = self._app.current_filename
         _title = _fname + self._app.image_metadata
         self._widgets["plot"].setGraphTitle(_title)
         self._widgets["plot"].addImage(self._app.image, replace=True, copy=False)
@@ -246,7 +228,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self._widgets["plot"].setGraphXLabel("pixel")
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: int):
+    def frame_activated(self, index: int) -> None:
         """
         Received a signal that a new frame has been selected.
 
@@ -265,7 +247,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
             self.__check_for_plot_update()
         self._config["frame_active"] = index == self.frame_index
 
-    def __set_proc_widget_enabled_for_running(self, running: bool):
+    def __set_proc_widget_enabled_for_running(self, running: bool) -> None:
         """
         Set the visibility of all widgets which need to be updated for/after
         processing

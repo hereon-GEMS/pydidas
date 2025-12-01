@@ -25,7 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "trim_filename",
+    "get_directory",
     "get_extension",
     "find_valid_python_files",
     "get_file_naming_scheme",
@@ -37,9 +37,10 @@ import os
 import re
 from numbers import Integral
 from pathlib import Path
-from typing import List, Tuple, Union
 
-from pydidas.core.constants import FILENAME_DELIMITERS
+from pydidas.core.constants import (
+    FILENAME_DELIMITERS,
+)
 from pydidas.core.exceptions import FileReadError, UserConfigError
 from pydidas.core.utils.iterable_utils import flatten
 
@@ -51,30 +52,30 @@ _FILE_NAME_SCHEME_ERROR_STR = (
 ).replace("\\\\.", ".")
 
 
-def trim_filename(path: Path) -> Path:
+def get_directory(path: Path) -> Path:
     """
-    Trim a filename from a path if present.
+    Get the directory. If a file is given, return its parent directory.
 
     Parameters
     ----------
-    path : pathlib.Path
+    path : Path
         The file system path, including eventual filenames.
 
     Returns
     -------
-    path : pathlib.Path
+    path : Path
         The path without the filename.
     """
     return path.parent if path.is_file() else path
 
 
-def get_extension(path: Union[Path, str], lowercase=False) -> str:
+def get_extension(path: Path | str, lowercase=False) -> str:
     """
     Get the extension to a file in the given path.
 
     Parameters
     ----------
-    path : Union[pathlib.Path, str]
+    path : Path or str
         The full filename and path
     lowercase : bool, optional
         Flag to get the extension as a lower case string.
@@ -96,7 +97,7 @@ def get_extension(path: Union[Path, str], lowercase=False) -> str:
     return _ext
 
 
-def find_valid_python_files(path: Path) -> List[Path]:
+def find_valid_python_files(path: Path | str) -> list[Path]:
     """
     Search for all python files in the path and subdirectories.
 
@@ -107,12 +108,12 @@ def find_valid_python_files(path: Path) -> List[Path]:
 
     Parameters
     ----------
-    path : Union[str, Path]
+    path : Path or str
         The file system path to search.
 
     Returns
     -------
-    list
+    list[Path]
         A list with the full filesystem path of python files in the
         directory and its subdirectories.
     """
@@ -127,7 +128,7 @@ def find_valid_python_files(path: Path) -> List[Path]:
         ):
             return [path]
         return []
-    path = trim_filename(path)
+    path = get_directory(path)
     _entries = [
         path.joinpath(_item)
         for _item in path.iterdir()
@@ -139,14 +140,14 @@ def find_valid_python_files(path: Path) -> List[Path]:
         [find_valid_python_files(path.joinpath(_entry)) for _entry in _dirs]
     )
     _results += [f for f in _files if f.suffix == ".py"]
-    return _results
+    return list(_results)
 
 
 def get_file_naming_scheme(
-    filename1: Union[Path, str],
-    filename2: Union[Path, str],
+    filename1: Path | str,
+    filename2: Path | str,
     ignore_leading_zeros: bool = False,
-) -> Tuple[str, range]:
+) -> tuple[str, range]:
     """
     Get the naming scheme (formattable string with 'index' variable) from two filenames.
 
@@ -155,9 +156,9 @@ def get_file_naming_scheme(
 
     Parameters
     ----------
-    filename1 : Union[pathlib.Path, str]
+    filename1 : Path or str
         The first filename (including the path).
-    filename2 : Union[pathlib.Path, str]
+    filename2 : Path or str
         The second filename (including the path).
     ignore_leading_zeros : bool, optional
         Keyword to ignore leading zeros, i.e., to allow entries like '_12' and '_1255'
@@ -211,9 +212,9 @@ class CatchFileErrors:
 
     Parameters
     ----------
-    filename : Union[Path, str]
+    filename : Path or str
         The filename of the file to be handled.
-    *additional_exceptions : tuple[type[Exception]]
+    *additional_exceptions : type[Exception]
         Additional exception types to be handled.
     raise_file_read_error : bool, optional
         Flag to raise the FileReadError exception. The default is True.
@@ -223,12 +224,12 @@ class CatchFileErrors:
 
     def __init__(
         self,
-        filename: Union[Path, str],
+        filename: Path | str,
         *additional_exceptions: type[Exception],
-        raise_file_read_error=True,
+        raise_file_read_error: bool = True,
         error_suffix: str = "",
     ):
-        self._exceptions = additional_exceptions + (
+        self._exceptions = additional_exceptions + (  # noqa type: ignore
             ValueError,
             FileNotFoundError,
             OSError,
@@ -239,12 +240,8 @@ class CatchFileErrors:
         self._raise_file_read_error = raise_file_read_error
         self._exception_msg_suffix = error_suffix
 
-    def __enter__(self):
-        """
-        Enter the context.
-
-        The CatchFileErrors has an empty __enter__ method.
-        """
+    def __enter__(self) -> "CatchFileErrors":
+        """Enter the context."""
         return self
 
     def __exit__(self, ex_type, ex_value, traceback) -> bool | None:
@@ -270,15 +267,8 @@ class CatchFileErrors:
             return True
         return None
 
-    def __call__(self):
-        """
-        Get the raised exception status.
-
-        Returns
-        -------
-        bool
-            The status of the raised exception.
-        """
+    def __call__(self) -> bool:
+        """Get the raised exception status."""
         return self._raised_exception
 
     @property

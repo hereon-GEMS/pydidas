@@ -36,12 +36,12 @@ import pytest
 
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.core import FileReadError, UserConfigError, get_generic_parameter
-from pydidas.core.utils import get_random_string
 
 
 _FNAME_PATTERN = "test_12345_#####_suffix.npy"
 _FNAME_GLOB_STR = _FNAME_PATTERN.replace("#####", "*")
 _IMG_SHAPE = (20, 20)
+_SHARE_SHAPE = (100, 100)
 
 
 def _glob_pattern(path: os.PathLike) -> str:
@@ -88,7 +88,7 @@ def mask() -> np.ndarray:
 
 @pytest.fixture
 def app(empty_temp_path):
-    app = DirectorySpyApp()
+    app = DirectorySpyApp(image_size=_SHARE_SHAPE)
     app.set_param_value("scan_for_all", False)
     app.set_param_value("directory_path", empty_temp_path)
     app.set_param_value("use_detector_mask", False)
@@ -117,6 +117,7 @@ def dummy_parse_func():
 def test_creation():
     app = DirectorySpyApp()
     assert isinstance(app, DirectorySpyApp)
+    assert app._DirectorySpyApp__image_size == DirectorySpyApp.AVAILABLE_IMAGE_SIZE
 
 
 def test_creation_with_args():
@@ -287,7 +288,7 @@ def test_initialize_arrays_from_shared_memory(app):
     app.initialize_shared_memory()
     app._DirectorySpyApp__initialize_array_from_shared_memory()
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_load_bg_file__simple(empty_temp_path, app):
@@ -365,7 +366,7 @@ def test_prepare_run__master(empty_temp_path, app):
     assert app._fname(42) != ""
     assert app._config["path"] == str(empty_temp_path)
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_prepare_run__as_clone(app):
@@ -385,7 +386,7 @@ def test_multiprocessing_pre_run(empty_temp_path, app):
     assert app._fname(42) != ""
     assert app._config["path"] == str(empty_temp_path)
     assert isinstance(app._shared_array, np.ndarray)
-    assert app._shared_array.shape == (10000, 10000)
+    assert app._shared_array.shape == _SHARE_SHAPE
 
 
 def test_multiprocessing_post_run(app):
@@ -405,7 +406,8 @@ def test_multiprocessing_pre_cycle(app):
 def test_update_hdf5_metadata(empty_temp_path, app):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
     app.set_param_value("hdf5_key", _dset)
-    app._DirectorySpyApp__update_hdf5_metadata(_fname)
+    app.current_filename = _fname
+    app._DirectorySpyApp__update_hdf5_metadata()
     _meta = app._DirectorySpyApp__read_image_meta
     assert _meta["indices"] == (_shape[0] - 1,)
     assert _meta["dataset"] == _dset
@@ -414,9 +416,10 @@ def test_update_hdf5_metadata(empty_temp_path, app):
 @pytest.mark.parametrize("axis", [1, 2, None])
 def test_update_hdf5_metadata__w_slice_ax(empty_temp_path, app, axis):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
+    app.current_filename = _fname
     app.set_param_value("hdf5_key", _dset)
     app.set_param_value("hdf5_slicing_axis", axis)
-    app._DirectorySpyApp__update_hdf5_metadata(_fname)
+    app._DirectorySpyApp__update_hdf5_metadata()
     _meta = app._DirectorySpyApp__read_image_meta
     _indices_ref = None if axis is None else (None,) * axis + (_shape[1] - 1,)
     assert _meta["indices"] == _indices_ref
@@ -425,24 +428,27 @@ def test_update_hdf5_metadata__w_slice_ax(empty_temp_path, app, axis):
 
 def test_get_image__simple_image(empty_temp_path, app):
     _fname = create_pattern_files(empty_temp_path, n=1)[0]
+    app.current_filename = _fname
     _data = np.load(_fname)
-    _image = app.get_image(_fname)
+    _image = app.get_image()
     assert np.allclose(_data, _image)
 
 
 def test_get_image__high_dim_image(empty_temp_path, app):
     _fname = create_pattern_files(empty_temp_path, n=1)[0]
+    app.current_filename = _fname
     np.save(_fname, np.zeros((10, 10, 10)))
     with pytest.raises(UserConfigError):
-        app.get_image(_fname)
+        app.get_image()
 
 
 def test_get_image__hdf5_image(empty_temp_path, app):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
     app.set_param_value("hdf5_key", _dset)
+    app.current_filename = _fname
     with h5py.File(_fname, "r") as f:
         _data = f[_dset][()]
-    _image = app.get_image(_fname)
+    _image = app.get_image()
     assert np.allclose(_data[-1], _image)
 
 
@@ -520,19 +526,13 @@ def test_multiprocessing_store_results(empty_temp_path, app):
     _index, _fname = app.multiprocessing_func(None)
     app.multiprocessing_store_results(_index, _fname)
     assert np.allclose(app._DirectorySpyApp__current_image, np.load(_names[1]))
-    assert app._DirectorySpyApp__current_fname == _names[1]
+    assert app.current_filename == _names[1]
 
 
 def test_image_property(app):
     _data = np.random.random(_IMG_SHAPE)
     app._DirectorySpyApp__current_image = _data
     assert np.allclose(app.image, _data)
-
-
-def test_filename_property(app):
-    _name = get_random_string(12)
-    app._DirectorySpyApp__current_fname = _name
-    assert _name == app.filename
 
 
 if __name__ == "__main__":

@@ -33,6 +33,8 @@ from pathlib import Path
 
 import pytest
 
+from pydidas_qtcore import PydidasQApplication
+
 
 @pytest.fixture(scope="session", autouse=True)
 def temp_path():
@@ -56,3 +58,8 @@ def empty_temp_path():
     _path = Path(tempfile.mkdtemp())
     yield _path
     shutil.rmtree(_path)
+
+
+@pytest.fixture(scope="session")
+def qapp_cls():
+    return PydidasQApplication

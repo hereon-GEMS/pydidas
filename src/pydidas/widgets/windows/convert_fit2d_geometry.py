@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FeedbackWindow class which allows users to create a quick feedback
-form which they can copy and paste to submit feedback.
+Module with the ConvertFit2dGeometryWindow class which allows users to convert
+Fit2D geometry parameters to pyFAI geometry.
 """
 
 __author__ = "Malte Storm"
@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["ConvertFit2dGeometryWindow"]
 
 
-from qtpy import QtCore, QtWidgets
+from typing import Any
 
-from pydidas.contexts.diff_exp import (
-    DiffractionExperiment,
-)
+from qtpy import QtCore, QtGui
+
+from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import Parameter, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from pydidas.widgets.framework import PydidasWindow
@@ -58,13 +58,6 @@ _PYFAI_PARAM_KEYS = [
 class ConvertFit2dGeometryWindow(PydidasWindow):
     """
     Enter Fit2d geometry parameters and convert them to pyFAI geometry.
-
-    This window allows users to enter Fit2d geometry values and
-
-    Parameters
-    ----------
-    self : pydidas.gui.DefineScanFrame
-        The DefineScanFrame instance.
     """
 
     show_frame = False
@@ -84,16 +77,12 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
     sig_about_to_close = QtCore.Signal()
     sig_new_geometry = QtCore.Signal(float, float, float, float, float, float)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Convert Fit2d geometry to pyFAI", **kwargs)
         self._exp = DiffractionExperiment(*self.get_params(*_PYFAI_PARAM_KEYS))
 
-    def build_frame(self):
-        """
-        Create all widgets for the frame and place them in the layout.
-        """
-        _font_width, _font_height = QtWidgets.QApplication.instance().font_metrics
-
+    def build_frame(self) -> None:
+        """Create all widgets for the frame and place them in the layout."""
         self.create_label(
             "label_title",
             "Convert Fit2D geometry to pyFAI",
@@ -142,7 +131,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "button_accept", "Accept and store pyFAI geometry", enabled=False
         )
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect the signals.
         """
@@ -151,32 +140,32 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         )
         self._widgets["button_accept"].clicked.connect(self._emit_new_geometry)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         Handle the close event and also emit a signal.
 
         Parameters
         ----------
-        event : QEvent
+        event : QtGui.QCloseEvent
             The calling event.
         """
         self.sig_about_to_close.emit()
         super().closeEvent(event)
 
-    def show(self):
+    def show(self) -> None:
         """
         Show the window in a clean state.
         """
         self._widgets["button_accept"].setEnabled(False)
         for _key in _FIT2D_PARAM_KEYS:
-            self.set_param_value_and_widget(
+            self.set_param_and_widget_value(
                 _key, 100.0 if _key == "detector_dist_fit2d" else 0
             )
         for _key in _PYFAI_PARAM_KEYS:
-            self.set_param_value_and_widget(_key, 0.1 if _key == "detector_dist" else 0)
+            self.set_param_and_widget_value(_key, 0.1 if _key == "detector_dist" else 0)
         super().show()
 
-    def update_detector(self, exp: DiffractionExperiment):
+    def update_detector(self, exp: DiffractionExperiment) -> None:
         """
         Update the detector in the internal DiffractionExperiment instance.
 
@@ -195,7 +184,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             self._exp.set_param_value(_key, exp.get_param_value(_key))
 
     @QtCore.Slot()
-    def _convert_inputs_to_pyfai(self):
+    def _convert_inputs_to_pyfai(self) -> None:
         """
         Convert the inputs from Fit2D to pyFAI geometry.
         """
@@ -212,7 +201,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         self._widgets["button_accept"].setEnabled(True)
 
     @QtCore.Slot()
-    def _emit_new_geometry(self):
+    def _emit_new_geometry(self) -> None:
         """
         Emit the new geometry as a signal.
 

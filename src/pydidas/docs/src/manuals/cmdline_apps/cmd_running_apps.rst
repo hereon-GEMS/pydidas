@@ -45,7 +45,7 @@ total number of strings.
 
     >>> import pydidas
     >>> app = pydidas.apps.DummyApp()
-    >>> app.get_param_keys()
+    >>> app.param_keys
     ['number_of_strings', 'length_of_string']
     >>> app.set_param_value('number_of_strings', 10)
     >>> app.set_param_value('length_of_string', 10)

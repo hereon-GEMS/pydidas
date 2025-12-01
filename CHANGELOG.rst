@@ -2,6 +2,27 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+vYY.MM.DD
+=========
+
+Improvements
+------------
+
+Programmatic changes
+--------------------
+- Refactored the Parameter I/O widgets and added tests
+- Overhauled the ParameterCollectionMixin and removed unused methods.
+- Added a mix-in class to handle an associated file and type checking centrally.
+- Added a ConfigureBinaryDecodingWidget class which handles the decoding
+  options for raw/binary files centrally.
+
+Bugfixes
+--------
+- Fixed use of tabs in the CHANGELOG.rst
+- Fixed an issue in the Parameter class which did not convert strings to 
+  numbers if the Parameter also accepted None as value
+
+
 v25.10.28
 =========
 
@@ -23,8 +44,8 @@ Improvements
     - Added a pydidas.core.math subpackage to handle mathematical operations.
 - Modified Scan:
     - Added a `processed_file_naming_pattern` property to the Scan to handle conversion
-	  of wildcard hashes centrally in the scan.
-	- Added option to process multiple frames as `Stack` to the Scan
+      of wildcard hashes centrally in the scan.
+    - Added option to process multiple frames as `Stack` to the Scan
     - Added option to differentiate between index stepping and the number of frames used
       per scan point to allow rolling averages and staggered processing.
 - Changed the DiffractionExperiment to update detector parameters automatically, if 
@@ -90,12 +111,12 @@ v25.05.16
 Improvements
 ------------
 - Residual stress analysis plugins:
-	- Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
-	  plugin.
-	- The ConvertToDSpacing plugin can now also convert from d-spacing.
-	- Added a new plugin for sin^2(chi) analysis for high-energy data.
-	- Added plugins to store the raw data of sin^2(chi) and sin(2*chi) in addition
-	  to the fitted coefficients
+    - Added support for inputs in geometry (i.e. 2theta, Q, r) to SinSquareChiGrouping
+      plugin.
+    - The ConvertToDSpacing plugin can now also convert from d-spacing.
+    - Added a new plugin for sin^2(chi) analysis for high-energy data.
+    - Added plugins to store the raw data of sin^2(chi) and sin(2*chi) in addition
+      to the fitted coefficients
 - Added generic functions to convert scattering geometry and d-spacing.
 - Added axis_labels, axis_ranges and axis_units properties to Scan
 - Added an option to squeeze datasets when exporting results.
@@ -206,16 +227,16 @@ Improvements
     - Updated WorkflowResults contexts to accept dynamic result shapes.
     - Removed redundant code from plugins (because of changes in shape handling).
     - Switched to using ruff instead of black, flake8 and isort in github actions.
-	- Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
-	- Renamed `slaves` to `clones`
-	- Changed the builder of the DefineScanFrame to use functions instead of an 
-	  abstract class.
-	- Restructured the layout of the __init__ files for more clarity.
-	- Added a second category of importers named 'beamline file formats'
-	 to Scan and added a second registry in the ScanIo.
-	- Changed the creation of generic toolbar menus to use a dictionary which 
-	  can easily be extended by 3rd parties.
-	- Added widgets to select axes for data display also based on metadata.
+    - Moved the pydidas, pydidas_qtcore and pydidas_plugins folders to src.
+    - Renamed `slaves` to `clones`
+    - Changed the builder of the DefineScanFrame to use functions instead of an 
+      abstract class.
+    - Restructured the layout of the __init__ files for more clarity.
+    - Added a second category of importers named 'beamline file formats'
+      to Scan and added a second registry in the ScanIo.
+    - Changed the creation of generic toolbar menus to use a dictionary which 
+      can easily be extended by 3rd parties.
+    - Added widgets to select axes for data display also based on metadata.
 - Improved the formatting when displaying Plugin information.
 - Improved the behaviour of the logging and status widget and added options to
   hide and show it.
@@ -797,7 +818,7 @@ Improvements
       and 2D plots and allows to plot data using a single interface.
     - Moved the CompositeCreator frame from the main toolbar menu to the 
       utilities.
-    - Added an 'update_value_and_choices' method to the Parameter to change the 
+    - Added an 'update_value_and_choices' method to the Parameter to change the
       value and choices simultaneously without any incorrect intermediate 
       status.
 

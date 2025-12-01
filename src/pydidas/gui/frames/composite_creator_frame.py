@@ -159,11 +159,11 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         # composite update method
         self.param_widgets["composite_nx"].sig_value_changed.disconnect()
         self.param_widgets["composite_nx"].sig_value_changed.connect(
-            partial(self.__update_composite_dim, "x")
+            partial(self._update_composite_dim, "x")
         )
         self.param_widgets["composite_ny"].sig_value_changed.disconnect()
         self.param_widgets["composite_ny"].sig_value_changed.connect(
-            partial(self.__update_composite_dim, "y")
+            partial(self._update_composite_dim, "y")
         )
         self._app.updated_composite.connect(self.__received_composite_update)
         _app = QtWidgets.QApplication.instance()
@@ -352,7 +352,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self,
             "Name of file",
-            None,
+            "",
             IoManager.get_string_of_formats("export"),
         )[0]
         if fname not in [None, ""]:
@@ -405,8 +405,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                 self._image_metadata.raw_size_y,
                 self._image_metadata.raw_size_x,
             )
-            self.set_param_value_and_widget("raw_image_shape", _shape)
-            self.set_param_value_and_widget("images_per_file", 1)
+            self.set_param_and_widget_value("raw_image_shape", _shape)
+            self.set_param_and_widget_value("images_per_file", 1)
             self._config["input_configured"] = True
         _finalize_flag = self._config["input_configured"]
         self.__update_n_total()
@@ -478,12 +478,12 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
-            self.set_param_value_and_widget("hdf5_key", dset)
+            self.set_param_and_widget_value("hdf5_key", dset)
             self.__selected_hdf5_key()
         else:
             self._config["input_configured"] = False
             self.__finalize_selection(False)
-            self.set_param_value_and_widget("hdf5_key", "")
+            self.set_param_and_widget_value("hdf5_key", "")
             self.__clear_entries(
                 "images_per_file",
                 "n_total",
@@ -517,7 +517,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         if hdf5_flag:
             dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
-                self.set_param_value_and_widget("bg_hdf5_key", dset)
+                self.set_param_and_widget_value("bg_hdf5_key", dset)
                 self._config["bg_configured"] = True
         self.toggle_param_widget_visibility("bg_hdf5_key", hdf5_flag)
         self.toggle_param_widget_visibility("bg_hdf5_frame", hdf5_flag)
@@ -530,10 +530,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         try:
             self._image_metadata.update()
-            self.set_param_value_and_widget(
+            self.set_param_and_widget_value(
                 "hdf5_dataset_shape", self._image_metadata.hdf5_dset_shape
             )
-            self.set_param_value_and_widget(
+            self.set_param_and_widget_value(
                 "images_per_file", self._image_metadata.images_per_file
             )
             self._config["input_configured"] = True
@@ -583,7 +583,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._widgets["progress"].setVisible(False)
         self._widgets["plot_window"].setVisible(False)
         for _key in keys:
-            self.set_param_value_and_widget(_key, self.params[_key].default)
+            self.set_param_and_widget_value(_key, self.params[_key].default)
         if "first_file" in keys:
             self._config["input_configured"] = False
 
@@ -682,13 +682,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self.toggle_param_widget_visibility(_key, flag)
 
     @QtCore.Slot()
-    def __clear_entries(self, *keys: str, hide: bool = True):
+    def __clear_entries(self, *keys: str, hide: bool = True) -> None:
         """
         Clear the Parameter entries and reset to default for selected keys.
 
         Parameters
         ----------
-        keys : Union[Literal["all"], Iterable[str]], optional
+        keys : Literal["all"] or Iterable[str], optional
             The keys for the Parameters to be reset. The default is 'all'.
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
@@ -715,7 +715,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__check_exec_enable()
 
     @QtCore.Slot()
-    def __update_n_image(self):
+    def __update_n_image(self) -> None:
         """
         Update the number of images in the composite based on the input parameters.
         """
@@ -723,27 +723,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             return
         self._image_metadata.update_input_data()
         _n_per_file = self._image_metadata.images_per_file
-        self.set_param_value_and_widget("images_per_file", _n_per_file)
+        self.set_param_and_widget_value("images_per_file", _n_per_file)
         self.__update_n_total()
-
-    @QtCore.Slot()
-    def __update_composite_dim(self, dim: Literal["x", "y"]):
-        """
-        Update the composite dimension counters upon a change in one of them.
-
-        Parameters
-        ----------
-        dim : Union['x', 'y']
-            The dimension which has changed.
-        """
-        _n_total = self.get_param_value("n_total")
-        num1 = self.param_widgets[f"composite_n{dim}"].get_value()
-        num2 = int(np.ceil(_n_total / abs(num1)))
-        dim2 = "y" if dim == "x" else "x"
-        self.set_param_value_and_widget(f"composite_n{dim2}", num2)
-        self.set_param_value_and_widget(f"composite_n{dim}", abs(num1))
-        if (num1 - 1) * num2 >= _n_total or num1 * (num2 - 1) >= _n_total:
-            self.__update_composite_dim(dim2)  # noqa E1136
 
     @QtCore.Slot()
     def __update_file_selection(self):
@@ -762,7 +743,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                 "The list of files is empty. Please verify the selection.",
             )
             return
-        self.set_param_value_and_widget("n_files", self._filelist.n_files)
+        self.set_param_and_widget_value("n_files", self._filelist.n_files)
         self.__update_n_total()
 
     def __update_n_total(self):
@@ -772,8 +753,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         if not self._config["input_configured"]:
             return
         _n_total = self._image_metadata.images_per_file * self._filelist.n_files
-        self.set_param_value_and_widget("n_total", _n_total)
-        self.__update_composite_dim(self.get_param_value("composite_dir"))
+        self.set_param_and_widget_value("n_total", _n_total)
+        self._update_composite_dim(self.get_param_value("composite_dir"))
         self.__check_exec_enable()
 
     def __finalize_selection(self, flag: bool):
@@ -788,3 +769,21 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         for _key in ["file_stepping", "composite_nx", "composite_ny"]:
             self.toggle_param_widget_visibility(_key, flag)
         self._widgets["but_exec"].setEnabled(flag)
+
+    def _update_composite_dim(self, dim: Literal["x", "y"]) -> None:
+        """
+        Update the composite dimension counters upon a change in one of them.
+
+        Parameters
+        ----------
+        dim :  Literal["x", "y"]
+            The dimension which has changed ("x" or "y").
+        """
+        _n_total = self.get_param_value("n_total")
+        num1 = self.param_widgets[f"composite_n{dim}"].get_value()
+        num2 = int(np.ceil(_n_total / abs(num1)))
+        dim2 = "y" if dim == "x" else "x"
+        self.set_param_and_widget_value(f"composite_n{dim2}", num2)
+        self.set_param_and_widget_value(f"composite_n{dim}", abs(num1))
+        if (num1 - 1) * num2 >= _n_total or num1 * (num2 - 1) >= _n_total:
+            self._update_composite_dim(dim2)  # noqa E1136

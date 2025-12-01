@@ -153,6 +153,15 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, unit="The_unit")
         self.assertEqual(obj.unit, "The_unit")
 
+    def test_unit__wrong_type(self):
+        obj = Parameter("Test0", int, 12, unit=42)
+        self.assertEqual(obj.unit, "42")
+
+    def test_unit__w_None(self):
+        obj = Parameter("Test0", int, 12, unit=None)
+        self.assertEqual(obj.unit, "")
+        self.assertIsInstance(obj.unit, str)
+
     def test_tooltip__int(self):
         obj = Parameter("Test0", int, 12, unit="m", value=10, tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: integer)")
@@ -400,31 +409,37 @@ class TestParameter(unittest.TestCase):
         with self.assertRaises(TypeError):
             obj.value_for_export
 
-    def test_update_value_and_choices__wrong_type(self):
+    def test_set_value_and_choices__wrong_type(self):
         obj = Parameter("Test0", float, 27.7)
         with self.assertRaises(ValueError):
-            obj.update_value_and_choices("test", [12, 14])
+            obj.set_value_and_choices("test", [12, 14])
 
-    def test_update_value_and_choices__None_type_allowed(self):
+    def test_set_value_and_choices__None_type_allowed(self):
         obj = Parameter("Test0", float, 27.7, allow_None=True)
         with self.assertRaises(ValueError):
-            obj.update_value_and_choices(None, [12, 14])
+            obj.set_value_and_choices(None, [12, 14])
 
-    def test_update_value_and_choices__value_not_in_choices(self):
+    def test_set_value_and_choices__value_not_in_choices(self):
         obj = Parameter("Test0", float, 27.7)
         with self.assertRaises(ValueError):
-            obj.update_value_and_choices(3, [12, 14])
+            obj.set_value_and_choices(3, [12, 14])
 
-    def test_update_value_and_choices__w_range_set(self):
+    def test_set_value_and_choices__w_range_set(self):
         obj = Parameter("Test0", float, 27.7, range=(0, 42))
         with self.assertRaises(UserConfigError):
-            obj.update_value_and_choices(12, [12, 14])
+            obj.set_value_and_choices(12, [12, 14])
 
-    def test_update_value_and_choices__valid(self):
+    def test_set_value_and_choices__w_no_new_choices(self):
+        obj = Parameter("Test0", int, 2, choices=[1, 2, 3])
+        obj.set_value_and_choices(12, None)
+        self.assertIsNone(obj.choices)
+        self.assertEqual(obj.value, 12)
+
+    def test_set_value_and_choices__valid(self):
         _val = 3.12
         _choices = [3.12, 34.2, 42.1]
         obj = Parameter("Test0", float, 27.7)
-        obj.update_value_and_choices(_val, _choices)
+        obj.set_value_and_choices(_val, _choices)
         self.assertEqual(obj.value, _val)
         self.assertEqual(obj.choices, _choices)
 
@@ -470,7 +485,7 @@ class TestParameter(unittest.TestCase):
 
     def test_copy__with_choices(self):
         obj = Parameter("Test0", int, 12, choices=[12, 15, 18])
-        obj.update_value_and_choices(16, [16, 19, 22])
+        obj.set_value_and_choices(16, [16, 19, 22])
         _copy = copy.copy(obj)
         self.assertNotEqual(obj, _copy)
         self.assertIsInstance(_copy, Parameter)
@@ -493,6 +508,13 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12)
         _new_val = obj._Parameter__convenience_type_conversion(_val)
         self.assertEqual(_val, _new_val)
+
+    def test_convenience_type_conversion__no_type_set(self):
+        obj = Parameter("Test0", None, 12)
+        for _val in [42, 1.23, "any", [1, 2], (1, 2), {1: "a"}]:
+            with self.subTest(input=_val):
+                _new_val = obj._Parameter__convenience_type_conversion(_val)
+                self.assertEqual(_val, _new_val)
 
     def test_convenience_type_conversion__str_to_bool(self):
         for _val in ["True", "False"]:
@@ -523,6 +545,18 @@ class TestParameter(unittest.TestCase):
         _val = "42a"
         obj = Parameter("Test0", int, 12)
         _new_val = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _new_val)
+
+    def test_convenience_type_conversion__int_w_string_input_and_None_allowed(self):
+        _val = 42
+        obj = Parameter("Test0", int, 12, allow_None=True)
+        _new_val = obj._Parameter__convenience_type_conversion(str(_val))
+        self.assertEqual(_val, _new_val)
+
+    def test_convenience_type_conversion__float_w_string_input_and_None_allowed(self):
+        _val = 12.3
+        obj = Parameter("Test0", float, 7.5, allow_None=True)
+        _new_val = obj._Parameter__convenience_type_conversion(str(_val))
         self.assertEqual(_val, _new_val)
 
     def test_convenience_type_conversion_path(self):

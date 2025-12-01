@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["SelectIntegrationRegionWindow"]
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -36,11 +37,13 @@ from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
+from pydidas.plugins import pyFAIintegrationBase
 from pydidas.widgets.controllers import ManuallySetIntegrationRoiController
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
+from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
 from pydidas.widgets.scroll_area import ScrollArea
+from pydidas.widgets.selection import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
@@ -55,7 +58,17 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
 
-    def __init__(self, plugin, **kwargs):
+    def __init__(self, plugin: pyFAIintegrationBase, **kwargs: Any) -> None:
+        """
+        Initialize the SelectIntegrationRegionWindow.
+
+        Parameters
+        ----------
+        plugin : pyFAIintegrationBase
+            The plugin instance.
+        **kwargs : Any
+            Additional keyword arguments.
+        """
         PydidasWindow.__init__(
             self, title="Select integration region", activate_frame=False
         )
@@ -77,7 +90,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._image = None
         self.frame_activated(self.frame_index)
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create widgets.
         """
@@ -137,10 +150,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         )
         self.add_any_widget(
             "file_selector",
-            SelectImageFrameWidget(
-                *self.params.values(),
-                import_reference="SelectIntegrationRegion__import",
-            ),
+            SelectDataFrameWidget(import_reference="SelectIntegrationRegion__import"),
             parent_widget=self._widgets["left_container"],
         )
 
@@ -161,18 +171,18 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         )
         self.create_spacer(None, parent_widget=self._widgets["left_container"])
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all signals.
         """
         self._roi_controller = ManuallySetIntegrationRoiController(
             self._widgets["roi_selector"], self._widgets["plot"], plugin=self._plugin
         )
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
         self._widgets["but_confirm"].clicked.connect(self._confirm_changes)
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Finalize the UI and update the input widgets.
         """
@@ -192,7 +202,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._roi_controller.update_input_widgets()
 
     @QtCore.Slot(bool)
-    def _toggle_fname_valid(self, is_valid):
+    def _toggle_fname_valid(self, is_valid: bool) -> None:
         """
         Modify widgets visibility and activation based on the file selection.
 
@@ -204,13 +214,13 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._widgets["plot"].setEnabled(is_valid)
 
     @QtCore.Slot(str, object)
-    def open_image(self, filename, kwargs):
+    def open_image(self, filename, kwargs) -> None:
         """
         Open an image with the given filename and display it in the plot.
 
         Parameters
         ----------
-        filename : Union[str, Path]
+        filename : str or Path
             The filename and path.
         kwargs : dict
             Additional parameters to open a specific frame in a file.
@@ -224,7 +234,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._roi_controller.show_plot_items("roi")
 
     @QtCore.Slot()
-    def _confirm_changes(self):
+    def _confirm_changes(self) -> None:
         """
         Confirm all changes made to the plugin and close the window.
         """
@@ -232,7 +242,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.sig_roi_changed.emit()
         self.close()
 
-    def closeEvent(self, event: QtCore.QEvent):
+    def closeEvent(self, event: QtCore.QEvent) -> None:
         """
         Handle the Qt close event and add a question if closing without saving results.
 
@@ -258,12 +268,12 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.sig_about_to_close.emit()
         event.accept()
 
-    def show(self):
+    def show(self) -> None:
         """
         Overload the generic show to also update the input widgets.
         """
         for _key in self.param_widgets:
-            self.update_widget_value(_key, self.get_param_value(_key))
+            self.update_param_widget_value(_key, self.get_param_value(_key))
         self._roi_controller.update_input_widgets()
         self._roi_controller.show_plot_items("roi")
         QtWidgets.QWidget.show(self)

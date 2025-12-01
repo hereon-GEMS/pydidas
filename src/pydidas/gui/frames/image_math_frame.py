@@ -29,19 +29,24 @@ __all__ = ["ImageMathFrame"]
 
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.contexts import ScanContext
 from pydidas.core import (
+    Dataset,
     ParameterCollection,
     UserConfigError,
     constants,
     get_generic_param_collection,
 )
 from pydidas.data_io import IoManager, export_data, import_data
-from pydidas.gui.frames.builders import ImageMathFrameBuilder
+from pydidas.gui.frames.builders.image_math_frame_builder import (
+    IMAGE_BUFFER_SIZE,
+    IMAGE_MATH_FRAME_BUILD_CONFIG,
+)
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.framework import BaseFrame
 from pydidas.workflow import WorkflowTree
@@ -76,29 +81,27 @@ class ImageMathFrame(BaseFrame):
     menu_entry = "Analysis tools/Image math"
 
     default_params = _DEFAULTS.copy()
-    BUFFER_SIZE = 3
 
     def __init__(self, **kwargs: dict):
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
-        self._image_buffer = {_key: None for _key in range(1, self.BUFFER_SIZE + 1)}
-        self._input_image_buffer = {
-            _key: None for _key in range(1, self.BUFFER_SIZE + 1)
+        self._image_buffer = {_key: None for _key in range(1, IMAGE_BUFFER_SIZE + 1)}
+        self._input_image_buffer: dict[int, None | Dataset] = {
+            _key: None for _key in range(1, IMAGE_BUFFER_SIZE + 1)
         }
-        self._input_image_names = {_key: "" for _key in range(1, self.BUFFER_SIZE + 1)}
-        self._input_image_paths = {
-            _key: None for _key in range(1, self.BUFFER_SIZE + 1)
+        self._input_image_names: dict[int, str] = {
+            _key: "" for _key in range(1, IMAGE_BUFFER_SIZE + 1)
         }
-        self._ops = {"func": np.log, "param2": 0}
-        self._input = {"data": None, "path": None, "name": None}
+        self._ops: dict[str, np.ufunc] = {"func": np.log}
+        self._input: dict[str, Any] = {"data": None, "path": None, "name": None}
         self._current_image = None
         self.__export_dialog = PydidasFileDialog()
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
-        ImageMathFrameBuilder.populate_frame(self)
+    def build_frame(self) -> None:
+        """Build the frame and create all widgets."""
+        for _method_name, _args, _kwargs in IMAGE_MATH_FRAME_BUILD_CONFIG:
+            _method = getattr(self, _method_name)
+            _method(*_args, **_kwargs)
         self._toggle_features_enabled(False)
         self._widgets["combo_display_image"].setEnabled(False)
 
@@ -114,11 +117,10 @@ class ImageMathFrame(BaseFrame):
         """
         return int(self.get_param_value("buffer_no").split("#")[1])
 
-    def connect_signals(self):
-        """
-        Connect all signals.
-        """
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+    def connect_signals(self) -> None:
+        """Connect all signals."""
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_file_valid.connect(self._new_file_validity)
         self._widgets["but_store_input_image"].clicked.connect(self._store_input_image)
         self._widgets["combo_display_image"].currentTextChanged.connect(
             self.new_buffer_selection
@@ -136,27 +138,8 @@ class ImageMathFrame(BaseFrame):
         )
         self._widgets["but_export"].clicked.connect(self._export_image)
 
-    def finalize_ui(self):
-        """
-        Finalizes the UI and restore the SelectImageFrameWidgets params.
-        """
-        self._widgets["file_selector"].restore_param_widgets()
-
-    def restore_state(self, state: dict):
-        """
-        Restore the GUI state.
-
-        Parameters
-        ----------
-        state : dict
-            The frame's state dictionary.
-        """
-        BaseFrame.restore_state(self, state)
-        if self._config["built"]:
-            self._widgets["file_selector"].restore_param_widgets()
-
     @QtCore.Slot(str, dict)
-    def open_image(self, filename: str, open_kwargs: dict):
+    def open_image(self, filename: str, open_kwargs: dict[str, Any]) -> None:
         """
         Open an image with the given filename and display it in the plot.
 
@@ -164,7 +147,7 @@ class ImageMathFrame(BaseFrame):
         ----------
         filename : Union[str, Path]
             The filename and path.
-        open_kwargs : dict
+        open_kwargs : dict[str, Any]
             Additional parameters to open a specific frame in a file.
         """
         _fname = Path(filename).name
@@ -173,26 +156,44 @@ class ImageMathFrame(BaseFrame):
                 f"::{self.get_param_value('hdf5_key', dtype=str)}"
                 f"::{self.get_param_value('hdf5_frame')}"
             )
-        self._input["data"] = import_data(filename, **open_kwargs).astype(np.float32)
+        open_kwargs["datatype"] = np.float32
+        self._input["data"] = import_data(filename, **open_kwargs)
         self._input["name"] = _fname
         self._input["path"] = filename
         self._plot_image(input_data=True)
         self._widgets["combo_display_image"].setEnabled(True)
 
+    @QtCore.Slot(bool)
+    def _new_file_validity(self, is_valid: bool) -> None:
+        """
+        Process the change in file validity.
+
+        Parameters
+        ----------
+        is_valid : bool
+            Flag indicating whether the selected file is valid.
+        """
+        if not is_valid:
+            self._current_image = None
+            self._widgets["viewer"].clear_plot()
+
     @QtCore.Slot()
-    def _store_input_image(self):
+    def _store_input_image(self) -> None:
         """
         Store the input image in the buffer.
         """
+        if self._current_image is None:
+            raise UserConfigError(
+                "No valid input image to store. Please load an image first."
+            )
         _index = int(
             self._widgets["combo_store_input_image"].currentText().split("#")[1]
         )
         self._input_image_buffer[_index] = self._input["data"]
         self._input_image_names[_index] = self._input["name"]
-        self._input_image_paths[_index] = self._input["path"]
 
     @QtCore.Slot(str)
-    def new_buffer_selection(self, new_value: str):
+    def new_buffer_selection(self, new_value: str) -> None:
         """
         Process the change in the buffer selection.
 
@@ -217,7 +218,7 @@ class ImageMathFrame(BaseFrame):
 
     def _plot_image(
         self, index: int = 0, input_index: int = 0, input_data: bool = False
-    ):
+    ) -> None:
         """
         Plot the image given by the specified index.
 
@@ -252,7 +253,7 @@ class ImageMathFrame(BaseFrame):
         self._widgets["viewer"].changeCanvasToDataAction._actionTriggered()
         self._toggle_features_enabled(True)
 
-    def _toggle_features_enabled(self, enable: bool):
+    def _toggle_features_enabled(self, enable: bool) -> None:
         """
         Toggle the enable state of processing features based on the validity of input.
 
@@ -274,7 +275,7 @@ class ImageMathFrame(BaseFrame):
             self._widgets[_name].setEnabled(enable)
 
     @QtCore.Slot()
-    def _apply_arithmetic(self):
+    def _apply_arithmetic(self) -> None:
         """Apply the selected arithmetic operation to the image."""
         _index_out = int(
             self._widgets["ops_arithmetic_target"].currentText().split("#")[1]
@@ -330,7 +331,7 @@ class ImageMathFrame(BaseFrame):
         return _image
 
     @QtCore.Slot(str)
-    def _operator_changed(self, name: str):
+    def _operator_changed(self, name: str) -> None:
         """
         Handle the change of the operator.
 
@@ -348,7 +349,7 @@ class ImageMathFrame(BaseFrame):
         self._ops["func"] = _func
 
     @QtCore.Slot()
-    def _apply_operator(self):
+    def _apply_operator(self) -> None:
         """Apply the selected operator to the input image."""
         _index_out = int(
             self._widgets["ops_operator_target"].currentText().split("#")[1]
@@ -371,7 +372,7 @@ class ImageMathFrame(BaseFrame):
         self.new_buffer_selection(f"Image #{_index_out}")
 
     @QtCore.Slot()
-    def _apply_image_arithmetic(self):
+    def _apply_image_arithmetic(self) -> None:
         """Apply the selected arithmetic operation to the selected images."""
         _index_out = int(
             self._widgets["ops_image_arithmetic_target"].currentText().split("#")[1]
@@ -392,7 +393,7 @@ class ImageMathFrame(BaseFrame):
         self.new_buffer_selection(f"Image #{_index_out}")
 
     @QtCore.Slot()
-    def _export_image(self):
+    def _export_image(self) -> None:
         """Export the current image."""
         if self._current_image is None:
             return

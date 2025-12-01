@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DataAxisSelector class which allows to select a datapoint
+Module with the DataAxisSelect class which allows to select a datapoint
 on a specific axis.
 """
 
@@ -29,6 +29,7 @@ __all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
 
 
 from functools import partial
+from numbers import Integral, Real
 from typing import Any
 
 import numpy as np
@@ -55,7 +56,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     A widget to select a data point on a specific axis.
     """
 
-    init_kwargs = WidgetWithParameterCollection.init_kwargs + ["multiline_layout"]
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + [
+        "multiline",
+        "allow_axis_use_modification",
+    ]
 
     sig_new_slicing = QtCore.Signal(int, str)
     sig_display_choice_changed = QtCore.Signal(int, str)
@@ -76,15 +80,14 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._all_choices = ["slice at index"]
         self._stored_configs = {}
         self._use_multiline = kwargs.get("multiline", False)
+        self._allow_ax_use_mod = kwargs.get("allow_axis_use_modification", True)
         self._last_slicing_at_index = True
         self._create_widgets()
         self._connect_signals()
         self.layout().setHorizontalSpacing(5)
 
-    def _create_widgets(self):
-        """
-        Create the widgets for the DataAxisSelector.
-        """
+    def _create_widgets(self) -> None:
+        """Create the widgets for the DataAxisSelector."""
         for _method_name, _args, _kwargs in DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
             self._axis_index, self._use_multiline
         ):
@@ -104,11 +107,10 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 _nitems = self.layout().count()
                 _column = self.layout().getItemPosition(_nitems - 1)[1]
                 self.layout().setColumnStretch(_column, 8)
+        self._widgets["combo_axis_use"].setVisible(self._allow_ax_use_mod)
 
-    def _connect_signals(self):
-        """
-        Connect the signals of the DataAxisSelector.
-        """
+    def _connect_signals(self) -> None:
+        """Connect the signals of the DataAxisSelector."""
         self._widgets["combo_axis_use"].currentTextChanged.connect(
             self._handle_new_axis_use
         )
@@ -228,7 +230,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         unit: str = "",
         npoints: int | None = None,
         ndim: int | None = None,
-    ):
+        dim_label: str | None = None,
+    ) -> None:
         """
         Set the metadata for the axis.
 
@@ -246,6 +249,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ndim : int, optional
             The number of dimensions in the data. This is only required if the
             generic choices should be hidden.
+        dim_label : str, optional
+            The label for the dimension. If given, this will override the
+            generic label of "Dim {index}".
         """
         if data_range is None:
             if npoints is None:
@@ -261,10 +267,11 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         _max_length = 20 if not self._use_multiline else 45
         if len(self._data_label) > _max_length:
             self._data_label = self._data_label[: _max_length - 4] + " ..."
-        self._widgets["label_axis"].setText(
-            f"Dim {self._axis_index}"
-            + (f" ({self._data_label})" if len(self._data_label) > 0 else "")
-        )
+        if not dim_label:
+            dim_label = f"Dim {self._axis_index}" + (
+                f" ({self._data_label})" if len(self._data_label) > 0 else ""
+            )
+        self._widgets["label_axis"].setText(dim_label)
         self._widgets["label_unit"].setText(
             f" [{self._data_unit}]" if len(self._data_unit) > 0 else ""
         )
@@ -289,7 +296,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.setEnabled(self._npoints > 1)
 
     @QtCore.Slot(str)
-    def define_additional_choices(self, choices: str, store_config: bool = True):
+    def define_additional_choices(
+        self, choices: str, store_config: bool = True
+    ) -> None:
         """
         Set additional choices for the combobox.
 
@@ -330,10 +339,32 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         if choices in self._stored_configs:
             self._restore_old_config(choices)
 
-    def _restore_old_config(self, choices: str):
+    def set_to_value(self, value: Integral | Real) -> None:
         """
-        Restore the configuration, based on the available choices.
+        Set the current index / data value to the input value.
+
+        Parameters
+        ----------
+        value : Integral | Real
+            The index or data value to set.
         """
+        if self.display_choice == "slice at index":
+            _index = max(0, min(self._npoints - 1, int(value)))
+        elif self.display_choice == "slice at data value":
+            if self._data_range is None:
+                raise UserConfigError(
+                    "Cannot set to data value when no data range is defined."
+                )
+            _index = np.argmin(np.abs(self._data_range - float(value)))
+        else:
+            raise UserConfigError(
+                "Cannot set to value when a range-selecting display choice is used."
+            )
+        with QtCore.QSignalBlocker(self):
+            self._move_to_index(_index)
+
+    def _restore_old_config(self, choices: str) -> None:
+        """Restore the configuration, based on the available choices."""
         _ax_use, _range_choice, _slice = self._stored_configs[choices]
         with QtCore.QSignalBlocker(self):
             self._widgets["combo_axis_use"].setCurrentText(_ax_use)
@@ -351,7 +382,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
                 self._handle_new_index_range_selection()
 
     @QtCore.Slot(str)
-    def _handle_new_axis_use(self, use_selection: str):
+    def _handle_new_axis_use(self, use_selection: str) -> None:
         """
         Handle the input of a new axis use case by the user.
 
@@ -392,11 +423,13 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             _range_selection == "select range by data values" and _show_range
         )
         self._widgets["label_single_point"].setVisible(self.npoints == 1)
-        self._widgets["combo_axis_use"].setVisible(self.npoints > 1)
+        self._widgets["combo_axis_use"].setVisible(
+            self.npoints > 1 and self._allow_ax_use_mod
+        )
         self._update_slice_from_choice(use_selection)
         self.sig_display_choice_changed.emit(self._axis_index, use_selection)
 
-    def _update_slice_from_choice(self, use_selection: str):
+    def _update_slice_from_choice(self, use_selection: str) -> None:
         """
         Update the slice based on the choice.
 
@@ -415,10 +448,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             else:
                 raise UserConfigError(f"Invalid axis use case: {use_selection}")
 
-    def _update_slice_from_non_generic_choice(self):
-        """
-        Set the widgets to use the full axis.
-        """
+    def _update_slice_from_non_generic_choice(self) -> None:
+        """Set the widgets to use the full axis."""
         if self._widgets["combo_range"].currentText() == "use full axis":
             self._current_slice = slice(0, self._npoints)
         elif self._widgets["combo_range"].currentText() == "select range by indices":
@@ -441,17 +472,15 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
-    def _manual_index_changed(self):
-        """
-        Handle changes from users entering a new index manually.
-        """
+    def _manual_index_changed(self) -> None:
+        """Handle changes from users entering a new index manually."""
         _index = max(0, min(self._npoints - 1, int(self._widgets["edit_index"].text())))
         with QtCore.QSignalBlocker(self._widgets["slider"]):
             self._widgets["slider"].setSliderPosition(_index)
         self._new_index_selection(_index)
 
     @QtCore.Slot(int)
-    def _new_index_selection(self, index: int):
+    def _new_index_selection(self, index: int) -> None:
         """
         Handle a new index selection.
 
@@ -469,10 +498,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
-    def _manual_data_value_changed(self):
-        """
-        Handle changes from users entering a new data value manually.
-        """
+    def _manual_data_value_changed(self) -> None:
+        """Handle changes from users entering a new data value manually."""
         _value = float(self._widgets["edit_data"].text())
         _index = np.argmin(np.abs(self._data_range - _value))
         self._current_slice = slice(_index, _index + 1)
@@ -485,34 +512,26 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
-    def _clicked_start(self):
-        """
-        Handle the click on the start button.
-        """
+    def _clicked_start(self) -> None:
+        """Handle the click on the start button."""
         self._move_to_index(0)
 
     @QtCore.Slot()
-    def _clicked_backward(self):
-        """
-        Handle the click on the backward button.
-        """
+    def _clicked_backward(self) -> None:
+        """Handle the click on the backward button."""
         self._move_to_index(max(0, self._current_slice.start - 1))
 
     @QtCore.Slot()
-    def _clicked_forward(self):
-        """
-        Handle the click on the forward button.
-        """
+    def _clicked_forward(self) -> None:
+        """Handle the click on the forward button."""
         self._move_to_index(min(self._npoints - 1, self._current_slice.start + 1))
 
     @QtCore.Slot()
-    def _clicked_end(self):
-        """
-        Handle the click on the end button.
-        """
+    def _clicked_end(self) -> None:
+        """Handle the click on the end button."""
         self._move_to_index(self._npoints - 1)
 
-    def _move_to_index(self, index: int):
+    def _move_to_index(self, index: int) -> None:
         """
         Set the widgets to the given index.
 
@@ -535,7 +554,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._new_index_selection(index)
 
     @QtCore.Slot(str)
-    def _handle_range_selection(self, selection: str):
+    def _handle_range_selection(self, selection: str) -> None:
         """
         Handle the selection of a range selection method by the user.
 
@@ -560,7 +579,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets["edit_range_data"].setVisible(_data_edit_visible)
 
     @QtCore.Slot()
-    def _handle_new_index_range_selection(self):
+    def _handle_new_index_range_selection(self) -> None:
         """
         Handle the input of a new index range by the user.
 
@@ -595,9 +614,9 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
     @QtCore.Slot()
-    def _handle_new_data_range_selection(self):
+    def _handle_new_data_range_selection(self) -> None:
         """
-        Handle the input of a new data range by the user.
+        Process the input of a new data range by the user.
 
         Note: The indexing is defined to include the last point in the range,
         contrary to Python slicing.
@@ -631,14 +650,12 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
             self._widgets["edit_range_index"].setText(f"{_start}:{_stop - 1}")
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
-    def _handle_full_axis_selection(self):
-        """
-        Handle the selection of the full axis.
-        """
+    def _handle_full_axis_selection(self) -> None:
+        """Set the slicing to cover the full axis range."""
         self._current_slice = slice(0, self._npoints)
         self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
 
-    def _check_input_and_reset_unacceptable_input(self, edit_name: str):
+    def _check_input_and_reset_unacceptable_input(self, edit_name: str) -> None:
         """
         Check the input of the edit widget and reset it to the full range, if necessary.
 
@@ -660,7 +677,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets[edit_name].setPalette(self._palette_base)
 
     @QtCore.Slot(str)
-    def _check_edit_range_input(self, edit_name: str, new_text: str):  # noqa
+    def _check_edit_range_input(self, edit_name: str, new_text: str) -> None:  # noqa
         """
         Check the input of the range edit widget.
 
@@ -677,16 +694,14 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         else:
             self._widgets[edit_name].setPalette(self._palette_highlight)
 
-    def reset_to_slicing(self):
-        """
-        Reset the widget to the slicing state.
-        """
+    def reset_to_slicing(self) -> None:
+        """Reset the widget to the slicing state."""
         _slice_type = (
             "slice at index" if self._last_slicing_at_index else "slice at data value"
         )
         self._widgets["combo_axis_use"].setCurrentText(_slice_type)
 
-    def closeEvent(self, event: QtGui.QCloseEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         for child in self.findChildren(QtWidgets.QWidget):
             child.deleteLater()
         QtWidgets.QWidget.closeEvent(self, event)

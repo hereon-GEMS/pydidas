@@ -19,13 +19,21 @@
 Module with subclasses of silx widgets to allow direct access without data views.
 """
 
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+__all__ = ["PydidasHdf5TableView", "PydidasArrayTableWidget"]
+
+
 from typing import Any
 
 import h5py
 import numpy as np
-import silx
 from silx.gui.data.ArrayTableWidget import ArrayTableWidget
 from silx.gui.data.Hdf5TableView import Hdf5TableView
+from silx.gui.hdf5 import H5Node
 
 
 class PydidasHdf5TableView(Hdf5TableView):
@@ -35,15 +43,15 @@ class PydidasHdf5TableView(Hdf5TableView):
 
     def display_data(
         self,
-        data: h5py.Dataset | h5py.File | h5py.Group | silx.gui.hdf5.H5Node,
-        **kwargs: Any,
+        data: h5py.Dataset | h5py.File | h5py.Group | H5Node,
+        **kwargs: Any,  # noqa ARG001
     ) -> None:
         """
         Display the data in the view.
 
         Parameters
         ----------
-        data : h5py.Dataset | h5py.File | h5py.Group | silx.gui.hdf5.H5Node
+        data : h5py.Dataset or h5py.File or h5py.Group or H5Node
             The data to display.
         kwargs : Any
             Additional keyword arguments. These are not used but included in
@@ -51,9 +59,13 @@ class PydidasHdf5TableView(Hdf5TableView):
         """
         self.setData(data)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the data reference."""
         self.setData(None)
+
+    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+        """Set the graph title."""
+        pass
 
 
 class PydidasArrayTableWidget(ArrayTableWidget):
@@ -62,14 +74,16 @@ class PydidasArrayTableWidget(ArrayTableWidget):
     """
 
     def display_data(
-        self, data: np.ndarray | silx.gui.hdf5.H5Node, **kwargs: Any
+        self,
+        data: np.ndarray | H5Node,
+        **kwargs: Any,  # noqa ARG001
     ) -> None:
         """
         Display the data in the view.
 
         Parameters
         ----------
-        data : np.ndarray | silx.gui.hdf5.H5Node
+        data : np.ndarray or H5Node
             The data to display.
         kwargs : Any
             Additional keyword arguments. These are not used but included in
@@ -80,6 +94,10 @@ class PydidasArrayTableWidget(ArrayTableWidget):
         self.setArrayData(data)
         self.displayAxesSelector(False)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the table."""
         self.setArrayData(np.array([]))
+
+    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+        """Set the graph title."""
+        pass

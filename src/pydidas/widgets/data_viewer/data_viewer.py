@@ -80,7 +80,7 @@ class DataViewer(WidgetWithParameterCollection):
         }
         self._create_widgets()
 
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         """Create all required widgets"""
         self.create_empty_widget(
             "view_container", gridPos=(0, 0, 1, 1), minimumHeight=600
@@ -114,8 +114,11 @@ class DataViewer(WidgetWithParameterCollection):
                 clicked=partial(self._select_view, _ref),
             )
             self._button_group.addButton(self._widgets[f"button_{_ref}"], _view.id)
-        self.layout().setColumnStretch(0, 1)
-        self.layout().setRowStretch(0, 1)
+        layout = self.layout()
+        if hasattr(layout, "setColumnStretch"):
+            layout.setColumnStretch(0, 1)
+        if hasattr(layout, "setRowStretch"):
+            layout.setRowStretch(0, 1)
 
     @property
     def active_dims(self) -> tuple[int, ...]:
@@ -179,7 +182,7 @@ class DataViewer(WidgetWithParameterCollection):
         return self._data is not None
 
     @QtCore.Slot(str)
-    def _select_view(self, view_key: str):
+    def _select_view(self, view_key: str) -> None:
         """Select the view to display"""
         self._view_config: DataViewConfig = DATA_VIEW_CONFIG[view_key]
         _ax_selector: AxesSelector = self._widgets["axes_selector"]
@@ -196,7 +199,7 @@ class DataViewer(WidgetWithParameterCollection):
         self.__update_ax_selector_for_h5py_data()
         self._update_view(view_key)
 
-    def __create_view_widget_if_required(self, view_key: str):
+    def __create_view_widget_if_required(self, view_key: str) -> None:
         """Create the widgets for the selected view, if required"""
         if view_key in self._widgets:
             return
@@ -208,7 +211,7 @@ class DataViewer(WidgetWithParameterCollection):
                 self.sig_plot2d_get_more_info_for_data
             )
 
-    def __update_ax_selector_for_h5py_data(self):
+    def __update_ax_selector_for_h5py_data(self) -> None:
         """Update the axis selector if the data is a h5py dataset with chunking"""
         if isinstance(self._data, h5py.Dataset):
             _ax_selector: AxesSelector = self._widgets["axes_selector"]
@@ -220,13 +223,13 @@ class DataViewer(WidgetWithParameterCollection):
             _ax_selector.assign_index_use_to_dims(_used_index_dims)
 
     @QtCore.Slot()
-    def _update_view(self, view_key: str | None = None):
+    def _update_view(self, view_key: str | None = None) -> None:
         """
         Update the selected view with the current data.
 
         Parameters
         ----------
-        view_key : str | None
+        view_key : str or None
             The key of the view to update. If None, the currently active view
             will be updated.
         """
@@ -257,18 +260,18 @@ class DataViewer(WidgetWithParameterCollection):
         data: H5Node | h5py.Dataset | np.ndarray | None,
         title: str | None = None,
         h5node: H5Node | None = None,
-    ):
+    ) -> None:
         """
         Set the data to display
 
         Parameters
         ----------
-        data : H5Node | h5py.Dataset | np.ndarray | None
+        data : H5Node or h5py.Dataset or np.ndarray or None
             The data to display. A ndarray is acceptable but will be converted to a
-            Dataset object.
-        title : str | None, optional
+            pydidas.core.Dataset object.
+        title : str or None, optional
             The title of the data. If None, the title will not be updated.
-        h5node : H5Node | None, optional
+        h5node : H5Node or None, optional
             The H5Node associated with the data. If provided, metadata about
             the data can be read from the H5Node.
         """
@@ -279,6 +282,7 @@ class DataViewer(WidgetWithParameterCollection):
         if data is None:
             if self._active_view is not None:
                 self._widgets[self._active_view].clear()
+                self._widgets[self._active_view].setGraphTitle("")
             return
         if isinstance(data, H5Node):
             h5node = data
@@ -293,13 +297,13 @@ class DataViewer(WidgetWithParameterCollection):
     # Set up an alias for plotting
     plot_data = set_data
 
-    def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray):
+    def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray) -> None:
         """
         Store an internal reference to the imported data.
 
         Parameters
         ----------
-        data : Dataset | H5Node | h5py.Dataset | np.ndarray
+        data : Dataset or H5Node or h5py.Dataset or np.ndarray
             The data to import.
         """
         _buffer_size = self.q_settings_get("global/data_buffer_size", dtype=float)
@@ -319,7 +323,7 @@ class DataViewer(WidgetWithParameterCollection):
             )
         self._data = data
 
-    def _update_widgets_from_data(self):
+    def _update_widgets_from_data(self) -> None:
         """Update the widgets based on the current data."""
         for _ref, _view in DATA_VIEW_CONFIG.items():
             self._widgets[f"button_{_ref}"].setVisible(
@@ -335,7 +339,7 @@ class DataViewer(WidgetWithParameterCollection):
             self._widgets["axes_selector"].define_additional_choices("")
         self._widgets["axes_selector"].set_metadata_from_dataset(self._data)
 
-    def _set_new_view(self):
+    def _set_new_view(self) -> None:
         """Set or update the current view."""
         _preferred_view: str | None = (
             self._data.metadata.get("preferred_view", None)
@@ -359,7 +363,7 @@ class DataViewer(WidgetWithParameterCollection):
         else:
             self._update_view()
 
-    def update_data(self, data: np.ndarray, title: str | None = None):
+    def update_data(self, data: np.ndarray, title: str | None = None) -> None:
         """
         Update the stored data without updating the metadata.
 
@@ -367,7 +371,7 @@ class DataViewer(WidgetWithParameterCollection):
         ----------
         data : np.ndarray
             The data.
-        title : str | None, optional
+        title : str or None, optional
             The title of the data. If None, the title will not be updated.
         """
         if title is not None:
@@ -386,6 +390,6 @@ class DataViewer(WidgetWithParameterCollection):
         self._data = data
         self._update_view()
 
-    def deleteLater(self):
+    def deleteLater(self) -> None:
         for _widget in self.findChildren(QtWidgets.QWidget):
             _widget.deleteLater()

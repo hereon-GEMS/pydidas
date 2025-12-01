@@ -51,7 +51,7 @@ from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget_mixin import (
+from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidget,
 )
 
@@ -69,10 +69,6 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_pxsize",
         "beamcenter_x",
         "beamcenter_y",
-        "filename",
-        "hdf5_key",
-        "hdf5_frame",
-        "hdf5_slicing_axis",
         "overlay_color",
         "integration_direction",
         "azi_npoint",
@@ -80,7 +76,6 @@ class QuickIntegrationFrame(BaseFrame):
         "detector_model",
     )
     params_not_to_restore = [
-        "filename",
         "integration_direction",
         "azi_npoint",
         "rad_npoint",
@@ -125,8 +120,6 @@ class QuickIntegrationFrame(BaseFrame):
                 _kwargs["diffraction_exp"] = self._EXP
             if "input_beamcenter_points" in _args:
                 _args = _args + (self._widgets["input_plot"],)
-            if "file_selector" in _args:
-                _args += tuple(self.params.values())
             if "roi_selector" in _args:
                 _kwargs["plugin"] = self._plugins["generic"]
             getattr(self, _method)(*_args, **_kwargs)
@@ -151,7 +144,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.sig_toggle_selection_mode.connect(
             self._roi_selection_toggled
         )
-        self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
+        self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
         self._widgets["copy_exp_context"].clicked.connect(self._copy_diffraction_exp)
@@ -202,25 +195,6 @@ class QuickIntegrationFrame(BaseFrame):
             self._new_mask_file_selection
         )
 
-    def finalize_ui(self) -> None:
-        """
-        Finalizes the UI and restore the SelectImageFrameWidgets params.
-        """
-        self._widgets["file_selector"].restore_param_widgets()
-
-    def restore_state(self, state: dict[str, Any]) -> None:
-        """
-        Restore the GUI state.
-
-        Parameters
-        ----------
-        state : dict
-            The frame's state dictionary.
-        """
-        BaseFrame.restore_state(self, state)
-        if self._config["built"]:
-            self._widgets["file_selector"].restore_param_widgets()
-
     @QtCore.Slot(str, dict)
     def open_image(self, filename: str | Path, open_image_kwargs: dict) -> None:
         """
@@ -262,6 +236,9 @@ class QuickIntegrationFrame(BaseFrame):
         ]:
             self._widgets[_key].setVisible(is_valid)
         self.toggle_param_widget_visibility("detector_model", is_valid)
+        self._widgets["res_plot"].set_data(None)
+        if not is_valid:
+            self._widgets["input_plot"].clear_plot()
 
     def _update_detector_model(self) -> None:
         """Update the detector model selection based on the input image shape."""
@@ -280,18 +257,20 @@ class QuickIntegrationFrame(BaseFrame):
             _model = _det_models[0]
         self._EXP.set_param_value("detector_npixx", self._image.shape[1])
         self._EXP.set_param_value("detector_npixy", self._image.shape[0])
-        self.params["detector_model"].update_value_and_choices(_model, _det_models)
+        self.set_param_value_and_choices("detector_model", _model, _det_models)
         self.param_widgets["detector_model"].update_choices(
             _det_models, selection=_model
         )
         if not (_model == _old_model and _old_available):
             self._change_detector_model()
 
-    def set_param_value_and_widget(self, key: str, value: Any) -> None:
+    def set_param_and_widget_value(
+        self, key: str, value: Any, emit_signal: bool = True
+    ) -> None:
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the generic set_param_value_and_widget method to
+        This method overloads the generic set_param_and_widget_value method to
         process the linked energy / wavelength parameters.
 
         Parameters
@@ -301,18 +280,19 @@ class QuickIntegrationFrame(BaseFrame):
         value : Any
             The new Parameter value. The datatype is determined by the
             Parameter.
+        emit_signal : bool
+            Flag to toggle emitting a changed signal after updating the value
+            (if the value has changed). The default is True.
         """
-        if key in self._EXP.params:
-            self._EXP.set_param_value(key, value)
-            if key in ["xray_energy", "xray_wavelength"]:  # noqa R0801
-                _energy = self.get_param_value("xray_energy")
-                _lambda = self.get_param_value("xray_wavelength")
-                self.param_widgets["xray_energy"].set_value(_energy)
-                self.param_widgets["xray_wavelength"].set_value(_lambda)
-            else:
-                self.param_widgets[key].set_value(value)
-        else:
-            BaseFrame.set_param_value_and_widget(self, key, value)
+        super().set_param_and_widget_value(key, value, emit_signal)
+        if key == "xray_energy":
+            self.update_param_widget_value(
+                "xray_wavelength", self._EXP.get_param_value("xray_wavelength")
+            )
+        elif key == "xray_wavelength":
+            self.update_param_widget_value(
+                "xray_energy", self._EXP.get_param_value("xray_energy")
+            )
 
     @QtCore.Slot()
     def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
@@ -349,12 +329,12 @@ class QuickIntegrationFrame(BaseFrame):
         _current_pxsize = self._config["previous_det_pxsize"]
         self._EXP.set_param_value("detector_pxsizex", _pxsize)
         self._EXP.set_param_value("detector_pxsizey", _pxsize)
-        self.set_param_value_and_widget("detector_pxsize", _pxsize)
+        self.set_param_and_widget_value("detector_pxsize", _pxsize)
         if self.get_param_value("detector_model") == "Custom detector":
             self._config["custom_det_pxsize"] = _pxsize
         _ratio = _pxsize / _current_pxsize
         for _key in ["rad_range_lower", "rad_range_upper"]:
-            self._roi_controller.set_param_value_and_widget(
+            self._roi_controller.set_param_and_widget_value(
                 _key, self._plugins["generic"].get_param_value(_key) * _ratio
             )
         self._update_beamcenter()
@@ -485,12 +465,12 @@ class QuickIntegrationFrame(BaseFrame):
             self._EXP.set_param_value(_key, _param.value)
             if _key in self.param_widgets:
                 self.param_widgets[_key].set_value(_param.value)
-        self.set_param_value_and_widget(
+        self.set_param_and_widget_value(
             "detector_pxsize", self.get_param_value("detector_pxsizex")
         )
         _center = self._EXP.beamcenter
-        self.set_param_value_and_widget("beamcenter_x", _center.x)
-        self.set_param_value_and_widget("beamcenter_y", _center.y)
+        self.set_param_and_widget_value("beamcenter_x", _center.x)
+        self.set_param_and_widget_value("beamcenter_y", _center.y)
         _det_name = self._EXP.get_param_value("detector_name")
         _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._EXP.det_shape, [])
         if _det_name not in _det_models:
@@ -518,8 +498,8 @@ class QuickIntegrationFrame(BaseFrame):
                 if _key in self.param_widgets:
                     self.param_widgets[_key].set_value(_param.value)
         _center = self._EXP.beamcenter
-        self.update_widget_value("beamcenter_x", np.round(_center.x, 3))
-        self.update_widget_value("beamcenter_y", np.round(_center.y, 3))
+        self.update_param_widget_value("beamcenter_x", np.round(_center.x, 3))
+        self.update_param_widget_value("beamcenter_y", np.round(_center.y, 3))
 
     @QtCore.Slot()
     def _run_integration(self) -> None:

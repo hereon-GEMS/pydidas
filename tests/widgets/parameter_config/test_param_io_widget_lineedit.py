@@ -25,7 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import os
 from numbers import Integral
 
 import pytest
@@ -58,10 +58,13 @@ def widget_instance(qtbot, param):
     widget = ParamIoWidgetLineEdit(param)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
+    qtbot.add_widget(widget)
     widget.show()
     widget.setFocus()
-    qtbot.add_widget(widget)
-    qtbot.waitUntil(lambda: widget.hasFocus(), timeout=2000)
+    if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+        qtbot.wait(5)  # wait for signals to be processed
+    else:
+        qtbot.waitUntil(lambda: widget.hasFocus(), timeout=2000)
     return widget
 
 
@@ -109,6 +112,7 @@ def test__editing_finished(qtbot):
     widget = widget_instance(qtbot, param)
     widget.setText("10")
     qtbot.keyPress(widget, QtCore.Qt.Key.Key_Enter)
+    qtbot.wait(5)  # wait for signals to be processed
     assert widget.current_text == "10"
     assert widget.spy_new_value.n == 1
     assert widget.spy_value_changed.n == 1
@@ -120,7 +124,11 @@ def test__lost_focus(qtbot):
     param = Parameter("test_int", int, 5, name="Test Int")
     widget = widget_instance(qtbot, param)
     widget.setText("10")
-    widget.clearFocus()
+    if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+        widget.editingFinished.emit()
+    else:
+        widget.clearFocus()
+    qtbot.wait(5)  # wait for signals to be processed
     assert widget.current_text == "10"
     assert widget.spy_new_value.n == 1
     assert widget.spy_value_changed.n == 1

@@ -25,7 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import os
 from pathlib import Path
 
 import pytest
@@ -34,7 +34,6 @@ from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     FONT_METRIC_PARAM_EDIT_WIDTH,
     MINIMUN_WIDGET_DIMENSIONS,
-    PARAM_WIDGET_EDIT_WIDTH,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
 )
@@ -71,8 +70,8 @@ def widget_instance(qtbot, param, **kwargs):
     widget = ParameterWidget(param, **kwargs)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
-    widget.show()
     qtbot.add_widget(widget)
+    widget.show()
     qtbot.waitUntil(lambda: widget.isVisible(), timeout=1000)
     return widget
 
@@ -194,13 +193,13 @@ def test__creation__check_layout(qtbot, qapp, kwargs, width, unit):
         unit=unit,
     )
     _linebreak = int(kwargs.get("linebreak", False))
-    _text_width_in_chars = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
-    _io_width_in_chars = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH)
-    _unit_width_in_chars = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
+    _rel_text_width = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
+    _rel_unit_width = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
     widget = widget_instance(
         qtbot, param, **(kwargs | {"font_metric_width_factor": width})
     )
-    # determine the expected widths (first in characters then convert to pixels)
+    # determine the expected widths
+    # first in characters then convert to pixels (required for calc of I/O width)
     _expected_width = qapp.font_char_width * (
         width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
     )
@@ -209,17 +208,15 @@ def test__creation__check_layout(qtbot, qapp, kwargs, width, unit):
         * (1 + _linebreak)
     ) + widget._SPACING
     _width_in_chars = width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
-    _expected_label_width = _width_in_chars * max(_linebreak, _text_width_in_chars)
+    _expected_label_width = _width_in_chars * max(_linebreak, _rel_text_width)
     _expected_unit_width = (
         0
         if (
             len(unit) == 0
-            or _unit_width_in_chars == 0
+            or _rel_unit_width == 0
             or widget._param_widget_class in (ParamIoWidgetFile, ParamIoWidgetHdf5Key)
         )
-        else max(
-            widget._MIN_VIS_UNIT_WIDTH, int(_width_in_chars * _unit_width_in_chars)
-        )
+        else max(widget._MIN_VIS_UNIT_WIDTH, (_width_in_chars * _rel_unit_width))
     )
     _expected_io_width = (
         0.9 * _width_in_chars - _expected_unit_width
@@ -238,7 +235,6 @@ def test__creation__check_layout(qtbot, qapp, kwargs, width, unit):
         widget.io_widget.geometry().left() + _expected_io_width <= _expected_width + 2
     )
     if "unit" in widget._widgets:
-        assert "unit" in widget._widgets
         assert abs(_expected_unit_width - widget._widgets["unit"].width()) < 5
     assert abs(_expected_io_width - widget.io_widget.width()) < 5
 
@@ -273,10 +269,15 @@ def test_set_param_value__through_widget_signal(qtbot, dtype, default, new_value
     assert widget.param.value == default
     assert widget.display_value == str(default)
     widget.io_widget.setFocus()
-    qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=2000)
-    widget.io_widget.update_widget_value(str(new_value))
-    widget.io_widget.clearFocus()
-    qtbot.waitUntil(lambda: widget.io_widget.hasFocus() is False, timeout=1000)
+    if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+        widget.io_widget.update_widget_value(str(new_value))
+        widget.io_widget.emit_signal()
+        qtbot.wait(5)  # wait for signals to be processed
+    else:
+        qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=2000)
+        widget.io_widget.update_widget_value(str(new_value))
+        widget.io_widget.clearFocus()
+        qtbot.waitUntil(lambda: widget.io_widget.hasFocus() is False, timeout=1000)
     assert widget.param.value == new_value
     assert widget.display_value == str(new_value)
     assert widget.spy_new_value.n == 1
@@ -343,7 +344,6 @@ def test_update_choices_from_param(qtbot, selection):
     param = Parameter("test", str, "D", choices=["D", "E", "F"])
     widget = widget_instance(qtbot, param)
     param.set_value_and_choices(selection, choices=["A", "B", "C"])
-    print(widget.io_widget.current_choices)
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
     assert widget.io_widget.current_choices == ["A", "B", "C"]

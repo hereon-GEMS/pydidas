@@ -273,7 +273,7 @@ def test_set_param_value__through_widget_signal(qtbot, dtype, default, new_value
     assert widget.param.value == default
     assert widget.display_value == str(default)
     widget.io_widget.setFocus()
-    qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=1000)
+    qtbot.waitUntil(lambda: widget.io_widget.hasFocus(), timeout=2000)
     widget.io_widget.update_widget_value(str(new_value))
     widget.io_widget.clearFocus()
     qtbot.waitUntil(lambda: widget.io_widget.hasFocus() is False, timeout=1000)

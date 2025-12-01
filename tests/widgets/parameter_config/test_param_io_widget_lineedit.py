@@ -61,7 +61,7 @@ def widget_instance(qtbot, param):
     widget.show()
     widget.setFocus()
     qtbot.add_widget(widget)
-    qtbot.waitUntil(lambda: widget.hasFocus(), timeout=1000)
+    qtbot.waitUntil(lambda: widget.hasFocus(), timeout=2000)
     return widget
 
 

@@ -310,7 +310,6 @@ def test__select_hdf5_dset(
     if _current_dset == dataset:
         _new_key = _VALID_KEYS[1] if dataset == _VALID_KEYS[0] else _VALID_KEYS[0]
         widget.set_param_and_widget_value("hdf5_key_str", _new_key, emit_signal=False)
-        _current_dset = _new_key
     # A single selection signal should have been emitted for the file selection
     assert widget.spy_sig_file_valid.n == 1
     assert widget.spy_sig_new_selection.n == 1

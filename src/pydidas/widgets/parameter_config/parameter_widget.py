@@ -182,7 +182,6 @@ class ParameterWidget(EmptyWidget):
             The calling kwargs.
         """
         _linebreak = int(kwargs.get("linebreak", False))
-        _expected_width = self.font_metric_width_factor
         _unit_width = (
             0
             if (len(self.param.unit) == 0 or kwargs.get("width_unit", 1) == 0)

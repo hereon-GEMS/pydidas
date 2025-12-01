@@ -272,16 +272,19 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self._selected_new_frame()
 
     @QtCore.Slot(dict)
-    def _selected_new_frame(self, config: dict = {}):
+    def _selected_new_frame(self, config: dict | None = None):
         """
         Open a new file / frame based on the input Parameters.
 
         Parameters
         ----------
-        config : dict, optional
+        config : dict or None, optional
             Additional configuration options from external sources,
-            (e.g. used for binary data).
+            (e.g. used for binary data). If None, a new config dict is
+            created. The default is None.
         """
+        if config is None:
+            config = {}
         config["indices"] = self._selection.indices
         if self.hdf5_file:
             config["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)

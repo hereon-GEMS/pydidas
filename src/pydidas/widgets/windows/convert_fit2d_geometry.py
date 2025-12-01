@@ -83,11 +83,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         self._exp = DiffractionExperiment(*self.get_params(*_PYFAI_PARAM_KEYS))
 
     def build_frame(self) -> None:
-        """
-        Create all widgets for the frame and place them in the layout.
-        """
-        _font_width, _font_height = PydidasQApplication.instance().font_metrics
-
+        """Create all widgets for the frame and place them in the layout."""
         self.create_label(
             "label_title",
             "Convert Fit2D geometry to pyFAI",

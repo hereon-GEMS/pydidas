@@ -31,7 +31,7 @@ __status__ = "Production"
 __all__ = ["BaseFrameWithApp"]
 
 
-from typing import Any, Tuple
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -72,7 +72,7 @@ class BaseFrameWithApp(BaseFrame):
 
         Parameters
         ----------
-        app : pydidas.apps.BaseApp
+        app : BaseApp
             Any App instance.
         """
         if not isinstance(app, BaseApp):
@@ -111,7 +111,7 @@ class BaseFrameWithApp(BaseFrame):
             self._runner.exit()
             self._runner = None
 
-    def export_state(self) -> Tuple[int, dict]:
+    def export_state(self) -> tuple[int, dict]:
         """
         Export the state of the Frame for saving.
 

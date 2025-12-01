@@ -40,6 +40,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install .
         python -m pip install pytest
+        python -m pip install pytest-qt
     - name: Install system dependencies for PySide6
       if: ${{ matrix.QT_API == 'pyside6' }}
       run: |

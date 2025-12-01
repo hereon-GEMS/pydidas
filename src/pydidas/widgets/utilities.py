@@ -38,8 +38,8 @@ from typing import Any
 from qtpy import QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
-from pydidas.core.utils import IS_QT6
 from pydidas.core import PydidasGuiError
+from pydidas.core.utils import IS_QT6
 from pydidas.resources import icons
 from pydidas_qtcore import PydidasQApplication
 

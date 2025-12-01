@@ -33,7 +33,7 @@ import warnings
 from collections.abc import Iterable
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, NoReturn, Self, Sequence, Type
+from typing import Any, NoReturn, Sequence
 
 from numpy import asarray, ndarray
 
@@ -45,7 +45,7 @@ _ITERATORS = (list, set, tuple)
 _NUMBERS = [Integral, Real]
 
 
-def _get_base_class(cls: Type | None) -> Type | Real | Integral | None:
+def _get_base_class(cls: type | None) -> type | Real | Integral | None:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -147,7 +147,7 @@ class Parameter:
     refkey : str
         The reference key for the Parameter in the Parameter collection.
         If not specified, this will default to the name.
-    param_type : Type | None
+    param_type : type | None
         The datatype of the parameter. If None, no type-checking will be
         performed. If any integer or float value is used, this will be
         changed to the abstract base class of numbers.Integral or
@@ -190,7 +190,7 @@ class Parameter:
     def __init__(
         self,
         refkey: str,
-        param_type: Type | None,
+        param_type: type | None,
         default: Any,
         meta: dict | None = None,
         **kwargs: Any,
@@ -626,7 +626,7 @@ class Parameter:
         """
         self.value = self.__meta["default"]
 
-    def copy(self) -> Self:
+    def copy(self) -> "Parameter":
         """
         A method to get a copy of the Parameter object.
 
@@ -639,7 +639,7 @@ class Parameter:
 
     deepcopy = copy
 
-    def dump(self) -> tuple[str, Type, Any, dict]:
+    def dump(self) -> tuple[str, type, Any, dict]:
         """
         A method to get the full class information for saving.
 
@@ -746,7 +746,7 @@ class Parameter:
 
     def __get_as_numbers(
         self, value: str | Sequence[str | Real]
-    ) -> Sequence[Real | Integral]:
+    ) -> Sequence[float | int]:
         """
         Get the input as iterable of numbers of the Parameter type.
 
@@ -757,7 +757,7 @@ class Parameter:
 
         Returns
         -------
-        Sequence[Real | Integral]
+        Sequence[float | int]
             The input as iterable of numbers.
         """
         if self.__meta["subtype"] not in _NUMBERS:
@@ -775,7 +775,7 @@ class Parameter:
             pass
         return self.__type(value)
 
-    def __copy__(self) -> Self:
+    def __copy__(self) -> "Parameter":
         """
         Copy the Parameter object.
 

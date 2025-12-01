@@ -51,7 +51,7 @@ _operation = Parameter(
     "mean",
     name="Image series operator",
     choices=["mean", "sum", "max"],
-    tooltip=("The mathematical operation to be applied to the image series."),
+    tooltip="The mathematical operation to be applied to the image series.",
 )
 
 _HDF5_PARAM_KEYS = [
@@ -312,7 +312,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         _i_file = index // self._config["num_frames_per_file"]
         _frame = index % self._config["num_frames_per_file"]
         _fname = self._filelist.get_filename(_i_file)
-        return (_fname, _frame)
+        return _fname, _frame
 
     def _apply_operation(self, frame: np.ndarray) -> None:
         """

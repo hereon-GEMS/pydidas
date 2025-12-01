@@ -1539,6 +1539,14 @@ Data import
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : Used only for hdf5 files: The dataset key.
+   * - :py:data:`hdf5_key_str`
+     - | **type** : str
+       | **default** : None
+       | **name** : Hdf5 dataset key
+       | **choices** : [None]
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : Used only for hdf5 files: The dataset key.
    * - :py:data:`hdf5_frame`
      - | **type** : int
        | **default** : 0
@@ -1579,6 +1587,14 @@ Data import
        | **unit** : 
        | **allow_None** : True
        | **tooltip** : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to `None`. A `None` setting will also ignore the hdf5 frame number Parameter.
+   * - :py:data:`slicing_axis`
+     - | **type** : int
+       | **default** : 0
+       | **name** : Frame slicing axes
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : True
+       | **tooltip** : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to `None`. A `None` setting will also ignore the frame number Parameter.
    * - :py:data:`bg_file`
      - | **type** : Path
        | **default** : 
@@ -1663,11 +1679,11 @@ Data import
      - | **type** : str
        | **default** : float 64 bit
        | **name** : Datatype
-       | **choices** : ['boolean (1 bit integer)', 'float 16 bit', 'float 32 bit', 'float 64 bit', 'float 128 bit', 'int 8 bit', 'int 16 bit', 'int 32 bit', 'int 64 bit', ' unsigned int 8 bit', ' unsigned int 16 bit', ' unsigned int 32 bit', ' unsigned int 64 bit']
+       | **choices** : ['boolean (1 bit integer)', 'float 16 bit', 'float 32 bit', 'float 64 bit', 'int 8 bit', 'int 16 bit', 'int 32 bit', 'int 64 bit', 'unsigned int 8 bit', 'unsigned int 16 bit', 'unsigned int 32 bit', 'unsigned int 64 bit']
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The data type to be used for decoding. Note that numpy data types are used for decoding with native byteorder.
-   * - :py:data:`raw_shape_x`
+   * - :py:data:`raw_n_x`
      - | **type** : int
        | **default** : 0
        | **name** : Raw shape x
@@ -1675,7 +1691,7 @@ Data import
        | **unit** : px
        | **allow_None** : False
        | **tooltip** : The x shape of the raw data file. Following the python convention,the first axis is y and the second axis is x.
-   * - :py:data:`raw_shape_y`
+   * - :py:data:`raw_n_y`
      - | **type** : int
        | **default** : 0
        | **name** : Raw shape y

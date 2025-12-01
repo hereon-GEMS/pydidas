@@ -1032,33 +1032,22 @@ to the QScrollArea sizeHint.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a>, <a class="reference internal" href="#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <a class="reference internal" href="../core/others.html#pydidas.core.ParameterCollectionMixIn" title="pydidas.core.parameter_collection_mixin.ParameterCollectionMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a>, <a class="reference internal" href="parameter_config.html#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a></p>
 <p>A widget which has full access to Pydidas’s ParameterCollection and widget creation
 methods.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pydidas.widgets.create_default_grid_layout">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">create_default_grid_layout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QGridLayout</span></span></span><a class="headerlink" href="#pydidas.widgets.create_default_grid_layout" title="Link to this definition">#</a></dt>
-<dd><p>Create a QGridLayout with default parameters.</p>
-<p>The default parameters are</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>vertical spacing: 5</p></li>
-<li><p>horizontal spacing: 5</p></li>
-<li><p>alignment: left | top</p></li>
-</ul>
-</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError">
+<span class="sig-name descname"><span class="pre">raise_UserConfigError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError" title="Link to this definition">#</a></dt>
+<dd><p>Raise a UserConfigError with the given error string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layout</strong> – The layout.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>QGridLayout</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error_str</strong> (<em>str</em>) – The error string to raise.</p>
 </dd>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.delete_all_items_in_layout">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">delete_all_items_in_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QLayout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.delete_all_items_in_layout" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">delete_all_items_in_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QLayout</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.delete_all_items_in_layout" title="Link to this definition">#</a></dt>
 <dd><p>Recursively delete items in a QLayout.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1074,7 +1063,7 @@ methods.</p>
 <p>This function calculates the width (in pixels) of a list of given strings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>entries</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tuple</em><em>, </em><em>list</em><em>]</em>) – The entries.</p>
+<dd class="field-odd"><p><strong>entries</strong> (<em>str</em><em> or </em><em>tuple</em><em> or </em><em>list</em>) – The entries.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>width</strong> – The maximum width of the entries in pixels.</p>
@@ -1120,7 +1109,7 @@ in pydidas.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydidas.widgets.get_widget_layout_args">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_widget_layout_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.get_widget_layout_args" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_widget_layout_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.widgets.get_widget_layout_args" title="Link to this definition">#</a></dt>
 <dd><p>Get the arguments for adding a widget to the layout of the parent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1158,22 +1147,6 @@ the layout of the parent widget.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>QIcon</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pydidas.widgets.update_param_and_widget_choices">
-<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">update_param_and_widget_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.update_param_and_widget_choices" title="Link to this definition">#</a></dt>
-<dd><p>Update the choices for the given Parameter and in its widget.</p>
-<p>This function will update the choices and also set the combo box widget to an
-allowed choice.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>param_widget</strong> (<a class="reference internal" href="parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><em>pydidas.widgets.parameter_config.ParameterWidget</em></a>) – The pydidas ParameterWidget instance.</p></li>
-<li><p><strong>new_choices</strong> (<em>list</em>) – The list of new choices.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1265,14 +1238,15 @@ allowed choice.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.ScrollArea.sizeHint"><code class="docutils literal notranslate"><span class="pre">ScrollArea.sizeHint</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.WidgetWithParameterCollection"><code class="docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.create_default_grid_layout"><code class="docutils literal notranslate"><span class="pre">create_default_grid_layout</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.WidgetWithParameterCollection"><code class="docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError"><code class="docutils literal notranslate"><span class="pre">WidgetWithParameterCollection.raise_UserConfigError</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.delete_all_items_in_layout"><code class="docutils literal notranslate"><span class="pre">delete_all_items_in_layout</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_max_pixel_width_of_entries"><code class="docutils literal notranslate"><span class="pre">get_max_pixel_width_of_entries</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_pyqt_icon_from_str"><code class="docutils literal notranslate"><span class="pre">get_pyqt_icon_from_str</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_widget_layout_args"><code class="docutils literal notranslate"><span class="pre">get_widget_layout_args</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.icon_with_inverted_colors"><code class="docutils literal notranslate"><span class="pre">icon_with_inverted_colors</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.update_param_and_widget_choices"><code class="docutils literal notranslate"><span class="pre">update_param_and_widget_choices</span></code></a></li>
 </ul>
   </nav></div>
 

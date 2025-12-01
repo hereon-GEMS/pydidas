@@ -451,6 +451,46 @@
 <span id="the-widgets-selection-sub-package"></span><h1>The widgets.selection sub-package<a class="headerlink" href="#module-pydidas.widgets.selection" title="Link to this heading">#</a></h1>
 <p>Package with widgets which allow the selection of a specific element.</p>
 <dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.ConfigureBinaryDecodingWidget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">ConfigureBinaryDecodingWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
+<p>A widget to configure the decoding of raw binary files.</p>
+<p>The widget allows to set the datatype, shape, and header offset
+of the binary file which is required to decode the file correctly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any additional keyword arguments. In addition to all QAttributes supported
+by QWidget, see below for supported arguments:</p>
+<dl class="simple">
+<dt>params<span class="classifier">ParameterCollection, optional</span></dt><dd><p>A ParameterCollection with Parameters to share with this widget.
+If not given, new Parameters will be created.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decoding_is_valid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid" title="Link to this definition">#</a></dt>
+<dd><p>Get the check whether the current decoding file/parameter combination is valid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.ConfigureBinaryDecodingWidget.set_new_filename">
+<span class="sig-name descname"><span class="pre">set_new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.set_new_filename" title="Link to this definition">#</a></dt>
+<dd><p>Process a new filename.</p>
+<p>If the new filename has a suffix associated with raw binary files,
+show the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full file system path to the new file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.DirectoryExplorer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">DirectoryExplorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.DirectoryExplorer" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
@@ -487,7 +527,7 @@ as well as:</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_key_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_key_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
 <p>A compound widget to select datasets in Hdf5 files.</p>
 <p>The Hdf5DatasetSelector is a compound widget which allows to select
@@ -510,7 +550,7 @@ Qt attribute name with a lowercase first character. Examples are
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.clear">
-<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear" title="Link to this definition">#</a></dt>
 <dd><p>Clear all entries for the widget.</p>
 </dd></dl>
 
@@ -522,7 +562,7 @@ Qt attribute name with a lowercase first character. Examples are
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset">
-<span class="sig-name descname"><span class="pre">display_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">display_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset" title="Link to this definition">#</a></dt>
 <dd><p>Select a dataset from the drop-down list.</p>
 <p>This internal method is called by the Qt event system if the QComBoBox
 text has changed to notify the main program that the user has selected
@@ -532,7 +572,7 @@ accepted frame range for the sliders.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.new_filename">
-<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
 <dd><p>Process the new filename.</p>
 <p>If the new filename has a suffix associated with hdf5 files,
 show the widget.</p>
@@ -546,27 +586,42 @@ show the widget.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.widgets.selection.RawMetadataSelector">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">RawMetadataSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.RawMetadataSelector" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
-<p>A compound widget to select metadata in raw image files.</p>
+<dt class="sig sig-object py" id="pydidas.widgets.selection.SelectDataFrameWidget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">SelectDataFrameWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
+<p>A widget which allows to select a data frame from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. In addition to all QAttributes supported
-by QWidget, see below for supported arguments:</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are;</p>
+<dl class="simple">
+<dt>parent<span class="classifier">QWidget | None, optional</span></dt><dd><p>The parent widget. The default is None.</p>
+</dd>
+<dt>import_reference<span class="classifier">str | None, optional</span></dt><dd><p>The reference for the file dialogue to store persistent settings.
+If None, no persistent settings are stored. The default is None.</p>
+</dd>
+<dt>ndim<span class="classifier">int, optional</span></dt><dd><p>The number of dimensions of the data to be imported. The default is 2.</p>
+</dd>
+<dt>filename<span class="classifier">Parameter | None, optional</span></dt><dd><p>A Parameter to use for the filename selection. If None, a default
+Parameter will be created. The default is None.</p>
+</dd>
+<dt>font_metric_width_factor<span class="classifier">int | None, optional</span></dt><dd><p>An optional factor to modify the width of text elements in the
+widget based on the font metrics. If None, the default width for
+the used Parameter widgets is applied. The default is None.</p>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.selection.RawMetadataSelector.new_filename">
-<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.RawMetadataSelector.new_filename" title="Link to this definition">#</a></dt>
-<dd><p>Process the new filename.</p>
-<p>If the new filename has a suffix associated with raw files,
-show the widget.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The full file system path to the new file.</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="pydidas.widgets.selection.SelectDataFrameWidget.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect the widget signals to the relevant slots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename">
+<span class="sig-name descname"><span class="pre">process_new_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename" title="Link to this definition">#</a></dt>
+<dd><p>Process the input of a new filename in the Parameter widget.</p>
 </dd></dl>
 
 </dd></dl>
@@ -620,6 +675,11 @@ show the widget.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget.decoding_is_valid</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.set_new_filename"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget.set_new_filename</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.DirectoryExplorer"><code class="docutils literal notranslate"><span class="pre">DirectoryExplorer</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.DirectoryExplorer.sizeHint"><code class="docutils literal notranslate"><span class="pre">DirectoryExplorer.sizeHint</span></code></a></li>
 </ul>
@@ -631,8 +691,9 @@ show the widget.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.new_filename</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.RawMetadataSelector"><code class="docutils literal notranslate"><span class="pre">RawMetadataSelector</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.RawMetadataSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">RawMetadataSelector.new_filename</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.SelectDataFrameWidget"><code class="docutils literal notranslate"><span class="pre">SelectDataFrameWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.SelectDataFrameWidget.connect_signals"><code class="docutils literal notranslate"><span class="pre">SelectDataFrameWidget.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename"><code class="docutils literal notranslate"><span class="pre">SelectDataFrameWidget.process_new_filename</span></code></a></li>
 </ul>
 </li>
 </ul>

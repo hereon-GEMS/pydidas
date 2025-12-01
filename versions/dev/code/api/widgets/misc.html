@@ -558,52 +558,6 @@ the entries.</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.widgets.misc.SelectImageFrameWidget">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">SelectImageFrameWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">input_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.SelectImageFrameWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
-<p>A widget which allows to select an image from a file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>*input_params</strong> (<em>tuple</em><em>[</em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em>]</em>) – Parameters passed to the widget to handle the frame references.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are;</p>
-<dl class="simple">
-<dt>parent<span class="classifier">QWidget | None, optional</span></dt><dd><p>The parent widget. The default is None.</p>
-</dd>
-<dt>import_reference<span class="classifier">str | None, optional</span></dt><dd><p>The reference for the file dialogue to store persistent settings.
-If None, only the</p>
-</dd>
-</dl>
-</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.misc.SelectImageFrameWidget.open_image_dialog">
-<span class="sig-name descname"><span class="pre">open_image_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.SelectImageFrameWidget.open_image_dialog" title="Link to this definition">#</a></dt>
-<dd><p>Open the image selected through the filename.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.misc.SelectImageFrameWidget.process_new_filename_input">
-<span class="sig-name descname"><span class="pre">process_new_filename_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.SelectImageFrameWidget.process_new_filename_input" title="Link to this definition">#</a></dt>
-<dd><p>Process the input of a new filename in the Parameter widget.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename for the new input data.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.misc.SelectImageFrameWidget.restore_param_widgets">
-<span class="sig-name descname"><span class="pre">restore_param_widgets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.SelectImageFrameWidget.restore_param_widgets" title="Link to this definition">#</a></dt>
-<dd><p>Restore the hdf5 parameter keys from the Parameters.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ShowIntegrationRoiParamsWidget">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">ShowIntegrationRoiParamsWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ShowIntegrationRoiParamsWidget" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
@@ -702,12 +656,6 @@ by this widget.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.reprint"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.reprint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.setText"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.setText</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_text_from_list</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.SelectImageFrameWidget"><code class="docutils literal notranslate"><span class="pre">SelectImageFrameWidget</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.SelectImageFrameWidget.open_image_dialog"><code class="docutils literal notranslate"><span class="pre">SelectImageFrameWidget.open_image_dialog</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.SelectImageFrameWidget.process_new_filename_input"><code class="docutils literal notranslate"><span class="pre">SelectImageFrameWidget.process_new_filename_input</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.SelectImageFrameWidget.restore_param_widgets"><code class="docutils literal notranslate"><span class="pre">SelectImageFrameWidget.restore_param_widgets</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ShowIntegrationRoiParamsWidget"><code class="docutils literal notranslate"><span class="pre">ShowIntegrationRoiParamsWidget</span></code></a><ul class="nav section-nav flex-column">

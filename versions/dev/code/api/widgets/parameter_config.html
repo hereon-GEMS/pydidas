@@ -464,29 +464,133 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.parameter_config.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
-<p>A combined widget to display and modify a Parameter with name, value and unit.</p>
+<p>A composite widget to display and modify a Parameter with name, value and unit.</p>
 <p>This widget is a wrapper and includes labels for name and unit and the
 respective Parameter edit widget which is selected based on the Parameter
 type and choices.</p>
 <p>This is the public widget should be added to the GUI to display and modify
-Parameters.</p>
+Parameters. It includes the following signals:</p>
+<dl class="simple">
+<dt>sig_new_value<span class="classifier">QtCore.Signal(str)</span></dt><dd><dl class="simple">
+<dt>Emitted when a new value is entered in the I/O widget. The new value is</dt><dd><p>emitted as string representation.</p>
+</dd>
+</dl>
+</dd>
+<dt>sig_value_changed<span class="classifier">QtCore.Signal()</span></dt><dd><p>Emitted when the value in the I/O widget has changed and been accepted.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>pydidas.core.Parameter</em></a>) – The associated Parameter.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Additional keyword arguments</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments. Note that many keywords supported by the
+generic mixin-class are ignored here because this is a composite widget.
+Note that the I/O has no width setting here because it is determined
+automatically based on the remaining space after allocating space for
+the name and unit fields.
+Supported keyword arguments are:</p>
+<dl class="simple">
+<dt>width_text<span class="classifier">float</span></dt><dd><p>The relative width of the text field for the Parameter name.
+The default is defined in
+pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.</p>
+</dd>
+<dt>width_unit<span class="classifier">float</span></dt><dd><p>The relative width of the text field for the Parameter unit.
+The default is defined in
+pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.</p>
+</dd>
+<dt>linebreak<span class="classifier">bool</span></dt><dd><p>If True, the layout will include a linebreak between the name
+label and the I/O widget. The default is False.</p>
+</dd>
+<dt>font_metric_width_factor<span class="classifier">int | None</span></dt><dd><p>The width of the widget in multiples of the font metric width. If None,
+the widget will use the default size policy. The default is
+pydidas.core.constants.FONT_METRIC_PARAM_EDIT_WIDTH.</p>
+</dd>
+<dt>validator<span class="classifier">QValidator | None</span></dt><dd><p>A custom validator to be used in the I/O widget, if applicable.
+The default is None.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.display_value">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.display_value" title="Link to this definition">#</a></dt>
+<dd><p>Get the current display value from the I/O widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current display value as string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.io_widget">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">io_widget</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">BaseParamIoWidget</span></em><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.io_widget" title="Link to this definition">#</a></dt>
+<dd><p>Returns the I/O widget for the Parameter.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_str_repr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Update the Parameter value with the entry from the widget.</p>
 <p>This method tries to update the Parameter value with the entry from
 the widget. If unsuccessful, an exception box will be opened and
 the widget input will be reset to the stored Parameter value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value_str_repr</strong> (<em>str</em>) – The new value as string representation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_value" title="Link to this definition">#</a></dt>
+<dd><p>Set a new value in the I/O widget and emit the respective signals if required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Any</em>) – The new value to be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSize</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Set a reasonable sizeHint based on the font metrics and configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The widget sizeHint</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param">
+<span class="sig-name descname"><span class="pre">update_choices_from_param</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param" title="Link to this definition">#</a></dt>
+<dd><p>Update the choices of the Parameter’s widget from the Parameter.</p>
+<p>NOTE: THIS METHOD WILL NOT UPDATE THE PARAMETER VALUE OR THE
+PARAMETER’S CHOICES. IT ONLY UPDATES THE WIDGET IN PLACE.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.update_display_value">
+<span class="sig-name descname"><span class="pre">update_display_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.update_display_value" title="Link to this definition">#</a></dt>
+<dd><p>Update the displayed value in the I/O widget without emitting signals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>Any</em>) – The new value to be displayed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -500,7 +604,7 @@ classes to add functionality to create Parameter widgets and to have access to
 convenience functions for settings Parameter values.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget">
-<span class="sig-name descname"><span class="pre">create_param_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">create_param_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget" title="Link to this definition">#</a></dt>
 <dd><p>Add a name label and input widget for a specific parameter to the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -510,13 +614,13 @@ convenience functions for settings Parameter values.</p>
 <dl class="simple">
 <dt>gridPos<span class="classifier">tuple, optional</span></dt><dd><p>The grid position in the layout. The default is (-1, 0, 1, 1)</p>
 </dd>
-<dt>width_text<span class="classifier">float, optional</span></dt><dd><p>The relative width of the text field for the Parameter name. The default
-is 0.5.</p>
+<dt>width_text<span class="classifier">float, optional</span></dt><dd><p>The relative width of the text field for the Parameter name.
+The default is defined in
+pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.</p>
 </dd>
-<dt>width_unit<span class="classifier">float, optional</span></dt><dd><p>The relative width of the text field for the Parameter unit. The default
-is 0.07.</p>
-</dd>
-<dt>width_io<span class="classifier">int, optional</span></dt><dd><p>The relative width of the input widget. The default is 0.43.</p>
+<dt>width_unit<span class="classifier">float, optional</span></dt><dd><p>The relative width of the text field for the Parameter unit.
+The default is defined in
+pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.</p>
 </dd>
 <dt>linebreak<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle a line break between the text label and the
 input widget. The default is False.</p>
@@ -539,8 +643,8 @@ The default is self.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_value_and_widget">
-<span class="sig-name descname"><span class="pre">set_param_value_and_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_value_and_widget" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value">
+<span class="sig-name descname"><span class="pre">set_param_and_widget_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emit_signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value" title="Link to this definition">#</a></dt>
 <dd><p>Update a parameter value both in the Parameter and the widget.</p>
 <p>This method will update the parameter referenced by &lt;key&gt; and
 update both the Parameter.value and the displayed widget
@@ -549,8 +653,10 @@ entry.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The reference key for the Parameter.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The new parameter value. This must be of the same type as the
-Parameter datatype.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The new parameter value. This must be of the same type as the
+Parameter datatype (or supported by a converter).</p></li>
+<li><p><strong>emit_signal</strong> (<em>bool</em>) – Flag to toggle emitting a changed signal after updating the value
+(if the value has changed). The default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -560,8 +666,26 @@ Parameter datatype.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value_and_choices">
+<span class="sig-name descname"><span class="pre">set_param_and_widget_value_and_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emit_signal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value_and_choices" title="Link to this definition">#</a></dt>
+<dd><p>Update a Parameter’s value and choices as well as the associated widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The reference key for the Parameter.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The new value for the Parameter.</p></li>
+<li><p><strong>choices</strong> (<em>None</em><em> or </em><em>Sequence</em><em>[</em><em>Any</em><em>]</em>) – The new list of choices for the Parameter. If None, the choices
+for the Parameter will be disabled.</p></li>
+<li><p><strong>emit_signal</strong> (<em>bool</em>) – Flag to toggle emitting a changed signal after updating the value
+and choices (if the value has changed). The default is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.toggle_param_widget_visibility">
-<span class="sig-name descname"><span class="pre">toggle_param_widget_visibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.toggle_param_widget_visibility" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">toggle_param_widget_visibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.toggle_param_widget_visibility" title="Link to this definition">#</a></dt>
 <dd><p>Toggle the visibility of widgets referenced with the key.</p>
 <p>This method allows showing/hiding the label and input widget for a
 parameter referenced with &lt;key&gt;.</p>
@@ -579,14 +703,16 @@ parameter referenced with &lt;key&gt;.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_widget_value">
-<span class="sig-name descname"><span class="pre">update_widget_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_widget_value" title="Link to this definition">#</a></dt>
-<dd><p>Update the value stored in a widget without changing the Parameter.</p>
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_param_widget_value">
+<span class="sig-name descname"><span class="pre">update_param_widget_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_param_widget_value" title="Link to this definition">#</a></dt>
+<dd><p>Update the value stored in a widget without changing the Parameter and
+without emitting signals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param_key</strong> (<em>str</em>) – The Parameter reference key.</p></li>
-<li><p><strong>value</strong> (<em>object</em>) – The value. The type depends on the Parameter’s value.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The Parameter reference key.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The value. The type depends on the Parameter’s value and will be
+converted to string for display purposes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -645,14 +771,21 @@ parameter referenced with &lt;key&gt;.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterEditCanvas"><code class="docutils literal notranslate"><span class="pre">ParameterEditCanvas</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.display_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.display_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.io_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.io_widget</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_param_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.set_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.sizeHint"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.sizeHint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_choices_from_param</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.update_display_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_display_value</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.create_param_widget</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_value_and_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.set_param_value_and_widget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.set_param_and_widget_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.set_param_and_widget_value_and_choices"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.set_param_and_widget_value_and_choices</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.toggle_param_widget_visibility"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.toggle_param_widget_visibility</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_widget_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.update_widget_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn.update_param_widget_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn.update_param_widget_value</span></code></a></li>
 </ul>
 </li>
 </ul>

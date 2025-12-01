@@ -29,18 +29,30 @@ Useful methods of ParameterCollection
 
 For the full :py:class:`ParameterCollections <pydidas.core.ParameterCollection>`
 method documentation, please refer to the class documentation. However, users
-will probably manage with a handful of methods:
+will probably manage with a handful of methods and properties.
 
-    **get_param_keys**\ ()
-        Get all the reference keys to access the respective parameters.
+**Useful methods:**
+
     **get_param_value**\ (*key*)
         Get the value of the Parameter referenced by *key*.
-    **get_param_values_as_dict**\ ()
+    **set_param_value**\ (*key*, *value*)
+        Set the value of the Parameter referenced by *key* to the given *value*.
+    **print_param_values**\ ()
+        Print all Parameter reference keys and their current values to the
+        console.
+    **set_param_value_and_choices**\ (*key*, *value*, *choices*)
+        Set the value of the Parameter referenced by *key* to the given
+        *value* and update the available choices to the given *choices* list.
+
+**Useful properties:**
+
+    **param_keys**
+        Get all the reference keys to access the respective parameters.
+    **param_values**
         Get the value of all stored Parameters in form of a dictionary with the
         Parameter reference keys as dict keys and the Parameter values as dict
         values.
-    **set_param_value**\ (*key*, *value*)
-        Set the value of the Parameter referenced by *key* to the given *value*.
+
 
 .. tip::
     The described methods are universal and apply to all pydidas objects with
@@ -66,7 +78,7 @@ The object :py:data:`exp` will be used in all examples below.
 
         .. code-block::
 
-            >>> exp.get_param_keys()
+            >>> exp.param_keys
             ['xray_wavelength',
              'xray_energy',
              'detector_name',

@@ -468,18 +468,30 @@ manage Parameters but only modify their values.</p>
 <h3>Useful methods of ParameterCollection<a class="headerlink" href="#useful-methods-of-parametercollection" title="Link to this heading">#</a></h3>
 <p>For the full <a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a>
 method documentation, please refer to the class documentation. However, users
-will probably manage with a handful of methods:</p>
+will probably manage with a handful of methods and properties.</p>
+<p><strong>Useful methods:</strong></p>
 <blockquote>
 <div><dl class="simple">
-<dt><strong>get_param_keys</strong>()</dt><dd><p>Get all the reference keys to access the respective parameters.</p>
-</dd>
 <dt><strong>get_param_value</strong>(<em>key</em>)</dt><dd><p>Get the value of the Parameter referenced by <em>key</em>.</p>
 </dd>
-<dt><strong>get_param_values_as_dict</strong>()</dt><dd><p>Get the value of all stored Parameters in form of a dictionary with the
+<dt><strong>set_param_value</strong>(<em>key</em>, <em>value</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given <em>value</em>.</p>
+</dd>
+<dt><strong>print_param_values</strong>()</dt><dd><p>Print all Parameter reference keys and their current values to the
+console.</p>
+</dd>
+<dt><strong>set_param_value_and_choices</strong>(<em>key</em>, <em>value</em>, <em>choices</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given
+<em>value</em> and update the available choices to the given <em>choices</em> list.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Useful properties:</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>param_keys</strong></dt><dd><p>Get all the reference keys to access the respective parameters.</p>
+</dd>
+<dt><strong>param_values</strong></dt><dd><p>Get the value of all stored Parameters in form of a dictionary with the
 Parameter reference keys as dict keys and the Parameter values as dict
 values.</p>
-</dd>
-<dt><strong>set_param_value</strong>(<em>key</em>, <em>value</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given <em>value</em>.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -504,7 +516,7 @@ the use case.</p>
 <div><ol class="arabic">
 <li><p>Get all Parameter keys contained in <code class="xref py py-data docutils literal notranslate"><span class="pre">exp</span></code>:</p>
 <blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_keys</span><span class="p">()</span>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">param_keys</span>
 <span class="go">[&#39;xray_wavelength&#39;,</span>
 <span class="go"> &#39;xray_energy&#39;,</span>
 <span class="go"> &#39;detector_name&#39;,</span>

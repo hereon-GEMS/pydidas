@@ -2703,7 +2703,19 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_frame</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key_str</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> : None</div>
+<div class="line"><strong>name</strong> : Hdf5 dataset key</div>
+<div class="line"><strong>choices</strong> : [None]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : Used only for hdf5 files: The dataset key.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_frame</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2715,7 +2727,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_first_image_num</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_first_image_num</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2727,7 +2739,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_last_image_num</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_last_image_num</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : -1</div>
@@ -2739,7 +2751,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_stepping</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_stepping</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 1</div>
@@ -2751,7 +2763,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_slicing_axis</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_slicing_axis</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2760,6 +2772,18 @@ available:</p>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : True</div>
 <div class="line"><strong>tooltip</strong> : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to <cite>None</cite>. A <cite>None</cite> setting will also ignore the hdf5 frame number Parameter.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">slicing_axis</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : int</div>
+<div class="line"><strong>default</strong> : 0</div>
+<div class="line"><strong>name</strong> : Frame slicing axes</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : True</div>
+<div class="line"><strong>tooltip</strong> : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to <cite>None</cite>. A <cite>None</cite> setting will also ignore the frame number Parameter.</div>
 </div>
 </td>
 </tr>
@@ -2888,14 +2912,14 @@ available:</p>
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : float 64 bit</div>
 <div class="line"><strong>name</strong> : Datatype</div>
-<div class="line"><strong>choices</strong> : [‘boolean (1 bit integer)’, ‘float 16 bit’, ‘float 32 bit’, ‘float 64 bit’, ‘float 128 bit’, ‘int 8 bit’, ‘int 16 bit’, ‘int 32 bit’, ‘int 64 bit’, ‘ unsigned int 8 bit’, ‘ unsigned int 16 bit’, ‘ unsigned int 32 bit’, ‘ unsigned int 64 bit’]</div>
+<div class="line"><strong>choices</strong> : [‘boolean (1 bit integer)’, ‘float 16 bit’, ‘float 32 bit’, ‘float 64 bit’, ‘int 8 bit’, ‘int 16 bit’, ‘int 32 bit’, ‘int 64 bit’, ‘unsigned int 8 bit’, ‘unsigned int 16 bit’, ‘unsigned int 32 bit’, ‘unsigned int 64 bit’]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
 <div class="line"><strong>tooltip</strong> : The data type to be used for decoding. Note that numpy data types are used for decoding with native byteorder.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_shape_x</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_x</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2907,7 +2931,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_shape_y</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_y</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>

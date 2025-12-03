@@ -138,7 +138,7 @@ class PydidasPlot1D(Plot1D):
         """
         self.clear_plot(clear_data=False)
         self._y_function = self._plot_type.plot_yfunc
-        self._y_label = self._plot_type.plot_ylabel()
+        self._y_label = self._plot_type.plot_ylabel
         for _legend, (_data, _kwargs) in self._current_raw_data.items():
             _kwargs["legend"] = _legend
             self.plot_pydidas_dataset(_data, **_kwargs)

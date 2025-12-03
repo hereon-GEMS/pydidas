@@ -63,7 +63,7 @@ def delete_all_items_in_layout(layout: QtWidgets.QLayout) -> None:
                 if IS_QT6:
                     layout.removeItem(item)
                 else:
-                    layout.remove(item)
+                    layout.remove(item)  # type: ignore[attr-defined]
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
@@ -104,11 +104,11 @@ def get_pyqt_icon_from_str(ref_string: str) -> QtGui.QIcon:
         app = PydidasQApplication.instance()
         return app.style().standardIcon(_ref)
     if _type == "pydidas":
-        return icons.get_pydidas_qt_icon(_ref)
+        return icons.create_pydidas_icon(_ref)
     if _type == "path":
         return QtGui.QIcon(_ref)
     if _type == "mdi":
-        return icons.get_mdi_qt_icon(_ref)
+        return icons.create_mdi_icon(_ref)
     raise TypeError("Cannot interpret the string reference for the menu icon.")
 
 
@@ -125,7 +125,7 @@ def get_max_pixel_width_of_entries(entries: str | tuple | list) -> int:
 
     Returns
     -------
-    width : int
+    int
         The maximum width of the entries in pixels.
     """
     if isinstance(entries, str):
@@ -145,10 +145,9 @@ def get_widget_layout_args(parent: QtWidgets.QWidget, **kwargs: Any) -> list:
     ----------
     parent : QWidget
         The parent QWidget to which the new widget shall be added.
-    **kwargs : dict
-        The keyword arguments dictionary from the calling method. This
-        method only takes the "gridPos", "stretch" and "alignment" arguments from the
-        kwargs.
+    **kwargs : Any
+        Keyword arguments. This method only takes the "gridPos", "stretch"
+        and "alignment" arguments from the kwargs.
 
     Raises
     ------
@@ -187,10 +186,9 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: Any) -> tuple:
     ----------
     parent : QWidget
         The parent QWidget to be added to the layout.
-    **kwargs : dict
-        The keyword arguments dictionary from the calling method. This
-        method only takes the "gridPos" and "alignment" arguments from the
-        kwargs.
+    **kwargs : Any
+        Keyword arguments. This method only takes the "gridPos" and
+        "alignment" arguments from the kwargs.
 
     Raises
     ------
@@ -200,11 +198,11 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: Any) -> tuple:
 
     Returns
     -------
-    gridPos : tuple
+    tuple
         The 4-tuple of the gridPos.
     """
     _grid_pos = kwargs.get("gridPos", None)
-    _default_row = 0 if parent.layout().count() == 0 else parent.layout().rowCount()
+    _default_row = 0 if parent.layout().count() == 0 else parent.layout().rowCount()  # type: ignore[union-attr]
     if _grid_pos is None:
         _grid_pos = (
             kwargs.get("row", _default_row),
@@ -220,7 +218,7 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: Any) -> tuple:
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row,) + _grid_pos[1:4]
     if _grid_pos[1] == -1:
-        _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]
+        _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]  # type: ignore[union-attr]
     return _grid_pos
 
 

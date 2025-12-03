@@ -27,90 +27,46 @@ __status__ = "Production"
 __all__ = [
     "ICON_PATH",
     "pydidas_icon_with_bg",
-    "get_pydidas_qt_icon",
+    "create_pydidas_icon",
     "pydidas_error_icon",
     "pydidas_error_icon_with_bg",
-    "get_pydidas_qt_icon",
-    "get_mdi_qt_icon",
+    "create_pydidas_icon",
+    "create_mdi_icon",
 ]
 
 
-import os
 from pathlib import Path
-from typing import Union
 
 from qtpy import QtCore, QtGui
 
+from pydidas.core import UserConfigError
 
-ICON_PATH = Path(__file__).parent.joinpath("icons")
 
-
-def __icon_path_str(icon_name: str) -> str:
-    """
-    Get the path to the icon with the given name.
-
-    Parameters
-    ----------
-    icon_name : str
-        The icon name.
-
-    Returns
-    -------
-    str
-        The path to the icon.
-    """
-    return str(ICON_PATH.joinpath(icon_name))
+ICON_PATH = Path(__file__).parent / "icons"
+MDI_ICON_PATH = Path(__file__).parent / "mdi_icons"
 
 
 def pydidas_icon() -> QtGui.QIcon:
-    """
-    Get the pydidas icon.
-
-    Returns
-    -------
-    QtGui.QIcon
-        A QIcon with the pydidas icon.
-    """
-    return QtGui.QIcon(__icon_path_str("pydidas_snakes.svg"))
+    """Create a QIcon from the pydidas icon."""
+    return QtGui.QIcon(str(ICON_PATH / "pydidas_snakes.svg"))
 
 
 def pydidas_icon_with_bg() -> QtGui.QIcon:
-    """
-    Get the pydidas icon with a white background (with rounded corners).
-
-    Returns
-    -------
-    QtGui.QIcon
-        A QIcon with the pydidas con with background.
-    """
-    return QtGui.QIcon(__icon_path_str("pydidas_snakes_w_bg.svg"))
+    """Create a QIcon from the pydidas icon with a white background."""
+    return QtGui.QIcon(str(ICON_PATH / "pydidas_snakes_w_bg.svg"))
 
 
 def pydidas_error_icon() -> QtGui.QIcon:
-    """
-    Get the icon for a pydidas error.
-
-    Returns
-    -------
-    icon : QtGui.QIcon
-        A QIcon with the pydidas error icon.
-    """
-    return QtGui.QIcon(__icon_path_str("pydidas_error.svg"))
+    """Create a QIcon from the icon for a pydidas error with transparent background."""
+    return QtGui.QIcon(str(ICON_PATH / "pydidas_error.svg"))
 
 
 def pydidas_error_icon_with_bg() -> QtGui.QIcon:
-    """
-    Get the icon for a pydidas error with a white background.
-
-    Returns
-    -------
-    QtGui.QIcon
-        A QIcon with the pydidas error icon with background.
-    """
-    return QtGui.QIcon(__icon_path_str("pydidas_error_w_bg.svg"))
+    """Create a QIcon from the icon for a pydidas error with a white background."""
+    return QtGui.QIcon(str(ICON_PATH / "pydidas_error_w_bg.svg"))
 
 
-def get_pydidas_qt_icon(icon_name: str) -> QtGui.QIcon:
+def create_pydidas_icon(icon_name: str) -> QtGui.QIcon:
     """
     Get the QIcon from the file with the given name.
 
@@ -124,50 +80,49 @@ def get_pydidas_qt_icon(icon_name: str) -> QtGui.QIcon:
     QtGui.QIcon
         The QIcon created from the image file.
     """
-    _fnames = [_name for _name in os.listdir(ICON_PATH) if _name.startswith(icon_name)]
-    if len(_fnames) == 0:
+    if (ICON_PATH / icon_name).is_file():
+        _filenames = [ICON_PATH / icon_name]
+    else:
+        _filenames = list(ICON_PATH.glob(f"{icon_name}.*"))
+    if len(_filenames) == 0:
         raise FileNotFoundError(f"Could not find the icon with the name {icon_name}")
-    if len(_fnames) > 1:
+    if len(_filenames) > 1:
         raise ValueError(f"Found multiple icons with the name {icon_name}")
-    _filename = __icon_path_str(_fnames[0])
-    if _filename.endswith(".svg"):
-        return __load_svg_icon(_filename)
-    return QtGui.QIcon(_filename)
+    _filename = _filenames[0]
+    if _filename.suffix == ".svg":
+        return _create_icon_from_svg(_filename)
+    return QtGui.QIcon(str(_filename))
 
 
-def get_mdi_qt_icon(filename: str) -> QtGui.QIcon:
+def create_mdi_icon(icon_name: str) -> QtGui.QIcon:
     """
-    Get the QIcon from the file with the given name.
+    Create a QIcon from the given MDI icon_name.
+
+    Note that not all MDI icons are included in pydidas and this function
+    will only work for those icons which have been included.
 
     Parameters
     ----------
-    filename : str
-        The filename of the mdi icon.
+    icon_name : str
+        The name of the icon. This is equivalent to the filename
+        without the suffix.
 
     Returns
     -------
     QtGui.QIcon
-        The QIcon created from the mdi icon file.
+        The QIcon created from the MDI icon file.
     """
-    _path = __icon_path_str(filename + ".svg").replace("icons", "mdi_icons")
-    return __load_svg_icon(_path)
-    # return QtGui.QIcon(os.path.join(ICON_PATH.replace("icons", "mdi_icons"), filename))
+    _fname = (MDI_ICON_PATH / icon_name).with_suffix(".svg")
+    if not _fname.is_file():
+        raise UserConfigError(
+            f"Could not find MDI icon with name {icon_name}. Please check that "
+            "the icon has been included in pydidas."
+        )
+    return _create_icon_from_svg(_fname)
 
 
-def __load_svg_icon(path: Union[Path, str]) -> QtGui.QIcon:
-    """
-    Load an svg icon from the given path.
-
-    Parameters
-    ----------
-    path : Union[Path, str]
-        The path to the svg icon.
-
-    Returns
-    -------
-    QtGui.QIcon
-        The icon.
-    """
+def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
+    """Create a QIcon from a svg image at the given path."""
     icon = QtGui.QIcon()
     icon.addFile(str(path), QtCore.QSize(128, 128))
     return icon

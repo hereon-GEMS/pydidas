@@ -62,7 +62,7 @@ class ChangeCanvasToData(PlotAction):
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
+            icon=icons.create_pydidas_icon("silx_limit_plot_canvas.png"),
             text="Change Canvas to data shape",
             tooltip="Change the canvas shape to match the data aspect ratio.",
             triggered=self._actionTriggered,
@@ -106,7 +106,7 @@ class ExpandCanvas(PlotAction):
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
+            icon=icons.create_pydidas_icon("silx_expand_plot_canvas.png"),
             text="Maximize canvas size",
             tooltip="Maximize the canvas size.",
             triggered=self._actionTriggered,
@@ -114,7 +114,7 @@ class ExpandCanvas(PlotAction):
             parent=kwargs.get("parent", None),
         )
 
-    def _actionTriggered(self, checked=False) -> None:  # noqa
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
         """
         Trigger the "expand canvas" action.
 
@@ -136,12 +136,12 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
     ----------
     plot : silx.gui.plot.PlotWidget
         The associated plot widget.
-    **kwargs:
+    **kwargs : Any
         Supported keyword arguments are:
 
-        parent : Union[None, QObject], optional
+        parent : QObject or None, optional
             The parent QObject. The default is None.
-        forced_image_legend : Union[None, str], optional
+        forced_image_legend : str or None, optional
             A fixed image legend to use for enforcing the rescaling if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
@@ -151,7 +151,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icons.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
+            icons.create_pydidas_icon("silx_cmap_autoscale.png"),
             "Autoscale colormap to mean +/- 3 std",
             tooltip="Autoscale colormap to mean +/- 3 std",
             triggered=self._actionTriggered,
@@ -161,7 +161,15 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked=False) -> None:  # noqa C0103
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+        """
+        Trigger the autoscale action.
+
+        Parameters
+        ----------
+        checked : bool, optional
+            Silx flag for a checked action. The default is False.
+        """
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()
         else:
@@ -184,8 +192,8 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     upper limit.
 
     The resolution for the upper limit is 27 bit, implemented in two tiers of 12 bit
-    and 15 bit, respective to the full range of the image. For an Eiger detector, this
-    corresponds to minimal final bins of 32 counts.
+    and 15 bit, respective to the full range of the image. For an Eiger detector,
+    this corresponds to minimal final bins of 32 counts.
 
     The lower limit is implemented in two tiers of 12 bits.
 
@@ -196,9 +204,9 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     **kwargs : Any
         Supported keyword arguments are:
 
-        parent : Union[None, QObject], optional
+        parent : QObject or None, optional
             The parent QObject. The default is None.
-        forced_image_legend : Union[None, str], optional
+        forced_image_legend : str or None, optional
             A fixed image legend to use for enforcing the rescaling if multiple
             image items are in a plot. None defaults to the active image.
             The default is None.
@@ -208,7 +216,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.get_pydidas_qt_icon("silx_crop_histogram.png"),
+            icon=icons.create_pydidas_icon("silx_crop_histogram.png"),
             text="Crop colormap histogram outliers",
             tooltip="Crop the colormap's histogram outliers",
             triggered=self._actionTriggered,
@@ -218,7 +226,15 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+        """
+        Trigger the crop histogram outliers action.
+
+        Parameters
+        ----------
+        checked : bool, optional
+            Silx flag for a checked action. The default is False.
+        """
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()
         else:
@@ -227,7 +243,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
         _colormap = image.getColormap()
-        _cmap_limit_low, _cmap_limit_high = calculate_histogram_limits(image.getData())
+        _cmap_limit_low, _cmap_limit_high = calculate_histogram_limits(image.getData())  # type: ignore[attr-defined]
         _colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
 
 
@@ -239,11 +255,11 @@ class PydidasLoadImageAction(QtWidgets.QAction):
 
     Parameters
     ----------
-    parent : QtWidgets.QWidget | None
+    parent : QtWidgets.QWidget or None
         The parent widget. The default is None.
     caption : str, optional
         The caption string for the file dialog. The default is 'Select image file.'
-    ref : str, optional
+    ref : str or None, optional
         The reference for a persistent QSettings reference to the directory.
         The default is None.
     """
@@ -255,7 +271,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         ref: str | None = None,
     ) -> None:
         QtWidgets.QAction.__init__(self, parent)
-        self.triggered.connect(self.__execute)
+        self.triggered.connect(self.__execute)  # type: ignore[attr-defined]
         self._dialog = PydidasFileDialog()
         self._dialog_kwargs = {
             "caption": caption,
@@ -293,7 +309,7 @@ class PydidasGetDataInfoAction(PlotAction):
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.get_pydidas_qt_icon("silx_get_data_info.png"),
+            icon=icons.create_pydidas_icon("silx_get_data_info.png"),
             text="Show information of scan point",
             tooltip=(
                 "Show information about the scan point associated with this datapoint."
@@ -315,8 +331,13 @@ class PydidasGetDataInfoAction(PlotAction):
     def __process_event(self, event: dict[str, Any]) -> None:
         """
         Process the event. If a mouse button click was detected, show a popup.
+
+        Parameters
+        ----------
+        event : dict[str, Any]
+            The event dictionary containing event information.
         """
         if event["event"] == "mouseClicked":
             self.plot.sigPlotSignal.disconnect(self.__process_event)
-            self.sig_show_more_info_for_data.emit(event["x"], event["y"])
+            self.sig_show_more_info_for_data.emit(event["x"], event["y"])  # type: ignore[attr-defined]
             self.setEnabled(True)

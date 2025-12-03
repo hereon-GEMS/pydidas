@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CropAndBinImage"]
 
+
 from typing import Any
 
 from pydidas.core import Dataset, get_generic_param_collection
@@ -36,7 +37,7 @@ from pydidas.plugins import ProcPlugin
 
 class CropAndBinImage(ProcPlugin):
     """
-    Crop and bin an image (i.e. 2d input data).
+    Crop and bin an image (i.e. a 2d input dataset).
     """
 
     plugin_subtype = PROC_PLUGIN_IMAGE
@@ -64,9 +65,9 @@ class CropAndBinImage(ProcPlugin):
 
         Returns
         -------
-        data : Dataset
+        Dataset
             The image data frame.
-        kwargs : dict
+        dict[str, Any]
             The updated input keyword dictionary.
         """
         _roi = self._get_own_roi()

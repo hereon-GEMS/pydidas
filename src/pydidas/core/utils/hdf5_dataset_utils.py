@@ -51,7 +51,7 @@ import numpy as np
 
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.dataset import Dataset
-from pydidas.core.exceptions import FileReadError
+from pydidas.core.exceptions import FileReadError, UserConfigError
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter import Parameter
 from pydidas.core.utils.file_utils import CatchFileErrors
@@ -309,8 +309,8 @@ def _split_hdf5_file_and_dataset_names(
 
 def create_hdf5_dataset(
     origin: h5py.File | h5py.Group,
-    group: str | None,
     dset_name: str,
+    group: str | None = None,
     **dset_kws: Any,
 ) -> None:
     """
@@ -325,11 +325,11 @@ def create_hdf5_dataset(
     ----------
     origin : h5py.File or h5py.Group
         The original object where the data shall be appended.
-    group : str or None
-        The path to the group, relative to origin. If None, the dataset will be
-        created directly in origin.
     dset_name : str
         The name of the dataset
+    group : str or None, optional
+        The path to the group, relative to origin. If None, the dataset will be
+        created directly in the origin.
     **dset_kws : Any
         Any creation keywords for the h5py.Dataset.
     """
@@ -369,9 +369,9 @@ def convert_data_for_writing_to_hdf5_dataset(data: Any | None) -> Any:
 
 
 def read_and_decode_hdf5_dataset(
-    h5object: h5py.File | h5py.Dataset,
+    h5object: h5py.File | h5py.Group | h5py.Dataset,
     group: str | None = None,
-    dataset: h5py.Dataset | None = None,
+    dataset: str | None = None,
     return_dataset: bool = True,
 ) -> object:
     """
@@ -385,14 +385,14 @@ def read_and_decode_hdf5_dataset(
 
     Parameters
     ----------
-    h5object: h5py.File or h5py.Dataset
-        The input dataset. If the group and dataset are not given, this will be
-        interpreted as the full access path to the dataset.
+    h5object: h5py.File or h5py.Group or h5py.Dataset
+        The input HDF5 object. If the group and dataset are not given,
+        this will be interpreted as the direct dataset link.
     group : str or None
         The HDF5 group of the dataset. If None, the h5object will be read
         directly.
-    dataset : h5py.Dataset or None, optional
-        The input dataset. If not specified, the h5object will be used directly.
+    dataset : str or None, optional
+        The dataset key. If not specified, the h5object will be used directly.
     return_dataset : bool, optional
         Flag to toggle returning arrays as pydidas.core.Dataset. If False,
         generic np.ndarrays are returned. The default is True.
@@ -402,11 +402,19 @@ def read_and_decode_hdf5_dataset(
     object
         The data stored in the HDF5 dataset.
     """
-    _data = (
-        h5object[group][dataset][()]
-        if group is not None and dataset is not None
-        else h5object[()]
-    )
+    if group is not None and dataset is not None:
+        _data = h5object[group][dataset][()]
+    else:
+        if not isinstance(h5object, h5py.Dataset):
+            raise UserConfigError(
+                "Error in read_and_decode_hdf5_dataset: If group and dataset "
+                "are not specified, h5object must be a h5py.Dataset instance."
+            )
+        _data = h5object[()]
+    if isinstance(_data, Integral):
+        return int(_data)
+    if isinstance(_data, Real):
+        return float(_data)
     if isinstance(_data, bytes):
         _data = _data.decode("UTF-8")
         if _data == "::None::":

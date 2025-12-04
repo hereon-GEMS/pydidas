@@ -24,7 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -32,7 +31,7 @@ import h5py
 import numpy as np
 import pytest
 
-from pydidas.core import Dataset, FileReadError
+from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5_dataset_utils import (
     _split_hdf5_file_and_dataset_names,
@@ -54,6 +53,13 @@ _3d_DSETS = ["/3d/data/data", "/data/3d/data"]
 _4d_DSETS = ["/test/path/4ddata", "/entry/path/to_4d/data", "/test/ext_data/data"]
 # _ALL_DSETS does not include the 1d datasets as the default dim filter is 2
 _ALL_DSETS = set(_2d_DSETS + _3d_DSETS + _4d_DSETS)
+_DSETS_OF_MIN_DIM = {
+    1: set(_1d_DSETS + _2d_DSETS + _3d_DSETS + _4d_DSETS),
+    2: set(_2d_DSETS + _3d_DSETS + _4d_DSETS),
+    3: set(_3d_DSETS + _4d_DSETS),
+    4: set(_4d_DSETS),
+    5: set(),
+}
 
 
 @pytest.fixture(scope="module")
@@ -194,25 +200,20 @@ def test_get_hdf5_populated_dataset__wrong_input_datatype():
     assert _res == []
 
 
-def test_get_hdf5_populated_dataset_keys__w_str(hdf5_test_data):
-    _res = get_hdf5_populated_dataset_keys(hdf5_test_data["fname"])
+@pytest.mark.parametrize("as_type", [str, Path, h5py.File])
+def test_get_hdf5_populated_dataset_keys(hdf5_test_data, as_type):
+    if as_type == h5py.File:
+        with h5py.File(hdf5_test_data["fname"], "r") as _file:
+            _res = get_hdf5_populated_dataset_keys(_file)
+    else:
+        _res = get_hdf5_populated_dataset_keys(as_type(hdf5_test_data["fname"]))
     assert set(_res) == _ALL_DSETS
 
 
-def test_get_hdf5_populated_dataset_keys__w_Path(hdf5_test_data):
-    _res = get_hdf5_populated_dataset_keys(Path(hdf5_test_data["fname"]))
-    assert set(_res) == _ALL_DSETS
-
-
-def test_get_hdf5_populated_dataset_keys__min_dim(hdf5_test_data):
-    _res = get_hdf5_populated_dataset_keys(Path(hdf5_test_data["fname"]), min_dim=3)
-    assert set(_res) == set(_4d_DSETS + _3d_DSETS)
-
-
-def test_get_hdf5_populated_dataset_keys__w_h5py_file(hdf5_test_data):
-    with h5py.File(hdf5_test_data["fname"], "r") as _file:
-        _res = get_hdf5_populated_dataset_keys(_file)
-    assert set(_res) == _ALL_DSETS
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 5])
+def test_get_hdf5_populated_dataset_keys__min_dim(hdf5_test_data, n):
+    _res = get_hdf5_populated_dataset_keys(Path(hdf5_test_data["fname"]), min_dim=n)
+    assert set(_res) == _DSETS_OF_MIN_DIM[n]
 
 
 def test_get_hdf5_populated_dataset_keys__w_h5py_dset(hdf5_test_data):
@@ -221,25 +222,12 @@ def test_get_hdf5_populated_dataset_keys__w_h5py_dset(hdf5_test_data):
     assert set(_res) == set(k for k in _ALL_DSETS if k.startswith("/test/"))
 
 
-def test_get_hdf5_populated_dataset_keys_smaller_dim(hdf5_test_data):
-    _res = get_hdf5_populated_dataset_keys(hdf5_test_data["fname"], min_dim=1)
-    assert set(_res) == _ALL_DSETS | set(_1d_DSETS)
-
-
 @pytest.mark.parametrize("min_size", [5, 50, 500, 5000, 50000])
 def test_get_hdf5_populated_dataset_keys__test_sizes(hdf5_test_data, min_size):
     _res = get_hdf5_populated_dataset_keys(
         hdf5_test_data["fname"], min_dim=1, min_size=min_size
     )
-    _reference = set()
-    if min_size <= 10000:
-        _reference = _reference | set(_4d_DSETS)
-    if min_size <= 1000:
-        _reference = _reference | set(_3d_DSETS)
-    if min_size <= 100:
-        _reference = _reference | set(_2d_DSETS)
-    if min_size <= 10:
-        _reference = _reference | set(_1d_DSETS)
+    _reference = _DSETS_OF_MIN_DIM[int(np.log10(min_size).__ceil__())]
     assert set(_res) == _reference
 
 
@@ -256,153 +244,91 @@ def test_convert_data_for_writing_to_hdf5_dataset__data():
     assert isinstance(_data, np.ndarray)
 
 
-def test_read_and_decode_hdf5_dataset__string(hdf5_file):
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        ["Spam, Ham & Eggs"] * 2,
+        ["::None::", None],
+        [42, 42],
+        [[1, 2, 3], np.asarray([1, 2, 3])],
+        [np.random.random((30, 30))] * 2,
+        [3.14, 3.14],
+    ],
+)
+@pytest.mark.parametrize("return_dataset", [True, False])
+def test_read_and_decode_hdf5_dataset(hdf5_file, data, expected, return_dataset):
+    _group = hdf5_file.create_group("entry")
+    _dset = _group.create_dataset("test", data=data)
+    _out = read_and_decode_hdf5_dataset(_dset, return_dataset=return_dataset)
+    assert isinstance(_out, type(expected))
+    if isinstance(_out, np.ndarray):
+        assert np.allclose(_out, expected)
+        assert isinstance(_out, Dataset) == return_dataset
+    else:
+        assert _out == expected
+
+
+@pytest.mark.parametrize("group", ["entry", None])
+@pytest.mark.parametrize("dataset", ["test", None])
+def test_read_and_decode_hdf5_dataset__group_and_dataset(hdf5_file, group, dataset):
     _input = get_random_string(30)
     _group = hdf5_file.create_group("entry")
     _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset)
+    if None in (group, dataset):
+        with pytest.raises(UserConfigError):
+            read_and_decode_hdf5_dataset(hdf5_file, group=group, dataset=dataset)
+        _out = read_and_decode_hdf5_dataset(_dset, group=group, dataset=dataset)
+    else:
+        _out = read_and_decode_hdf5_dataset(hdf5_file, group=group, dataset=dataset)
     assert isinstance(_out, str)
     assert _out == _input
 
 
-def test_read_and_decode_hdf5_dataset__group_not_None(hdf5_file):
-    _input = get_random_string(30)
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset, group="test")
-    assert isinstance(_out, str)
-    assert _out == _input
-
-
-def test_read_and_decode_hdf5_dataset__dataset_not_None(hdf5_file):
-    _input = get_random_string(30)
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset, dataset="Test")
-    assert isinstance(_out, str)
-    assert _out == _input
-
-
-def test_read_and_decode_hdf5_dataset__dataset_and_group_not_None(hdf5_file):
-    _input = get_random_string(30)
-    _group = hdf5_file.create_group("entry")
-    _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file, "entry", "test")
-    assert isinstance(_out, str)
-    assert _out == _input
-
-
-def test_read_and_decode_hdf5_dataset__None(hdf5_file):
-    _input = "::None::"
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset)
-    assert _out is None
-
-
-def test_read_and_decode_hdf5_dataset__ndarray(hdf5_file):
-    _input = np.random.random((30, 30))
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset)
-    assert isinstance(_out, Dataset)
-    assert np.allclose(_out, _input)
-
-
-def test_read_and_decode_hdf5_dataset__ndarray_without_return_dataset(hdf5_file):
-    _input = np.random.random((30, 30))
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset, return_dataset=False)
-    assert isinstance(_out, np.ndarray)
-    assert not isinstance(_out, Dataset)
-    assert np.allclose(_out, _input)
-
-
-def test_read_and_decode_hdf5_dataset__list(hdf5_file):
-    _input = [1, 2, 3]
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset)
-    assert isinstance(_out, Dataset)
-    assert np.allclose(_out, _input)
-
-
-def test_read_and_decode_hdf5_dataset__float(hdf5_file):
-    _input = 12.4
-    _group = hdf5_file.create_group("entry")
-    _dset = _group.create_dataset("test", data=_input)
-    _out = read_and_decode_hdf5_dataset(_dset)
-    assert isinstance(_out, Real)
-    assert _input == _out
-
-
-def test_create_hdf5_dataset__w_data(hdf5_file):
+@pytest.mark.parametrize(
+    "dset_kws",
+    [
+        {"data": np.random.random((10, 10))},
+        {"shape": (10, 10)},
+        {"data": None},
+        {"data": 42},
+        {"data": "A test string"},
+    ],
+)
+def test_create_hdf5_dataset__w_data(hdf5_file, dset_kws):
     _group = "entry/test"
-    _dname = "test_dataset"
-    _input = np.random.random((30, 30))
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
-    assert isinstance(_out, Dataset)
-    assert np.allclose(_out, _input)
-
-
-def test_create_hdf5_dataset__w_shape(hdf5_file):
-    _group = "entry/test"
-    _dname = "test_dataset"
-    _input = np.random.random((30, 30))
-    create_hdf5_dataset(hdf5_file, _group, _dname, shape=_input.shape)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
-    assert isinstance(_out, Dataset)
-    assert _input.shape == _out.shape
-
-
-def test_create_hdf5_dataset__w_None(hdf5_file):
-    _group = "entry/test"
-    _dname = "test_dataset"
-    _input = None
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
-    assert _out is None
-
-
-def test_create_hdf5_dataset__w_str(hdf5_file):
-    _group = "entry/test"
-    _dname = "test_dataset"
-    _input = get_random_string(20)
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
-    assert _input == _out
-
-
-def test_create_hdf5_dataset__w_int(hdf5_file):
-    _group = "entry/test"
-    _dname = "test_dataset"
-    _input = 42
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
-    assert _input == _out
+    _dset = "test_dataset"
+    create_hdf5_dataset(hdf5_file, _dset, group=_group, **dset_kws)
+    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dset])
+    if dset_kws.get("data") is not None and isinstance(dset_kws["data"], np.ndarray):
+        assert isinstance(_out, Dataset)
+        assert np.allclose(_out, dset_kws["data"])
+    elif dset_kws.get("data") is not None:
+        assert _out == dset_kws["data"]
+    if dset_kws.get("shape") is not None:
+        assert _out.shape == dset_kws["shape"]
+    if dset_kws.get("data", "default") is None:
+        assert _out is None
 
 
 def test_create_hdf5_dataset__existing_dataset(hdf5_file):
     _group = "entry/test"
-    _dname = "test_dataset"
+    _dset = "test_dataset"
     _input = 42
     _input_new = np.random.random((30, 30))
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input)
-    create_hdf5_dataset(hdf5_file, _group, _dname, data=_input_new)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
+    create_hdf5_dataset(hdf5_file, _dset, group=_group, data=_input)
+    create_hdf5_dataset(hdf5_file, _dset, group=_group, data=_input_new)
+    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dset])
     assert isinstance(_out, Dataset)
     assert np.allclose(_out, _input_new)
 
 
 def test_create_hdf5_dataset__no_group(hdf5_file):
     _group = "entry/test"
-    _dname = "test_dataset"
+    _dset = "test_dataset"
     _input = np.random.random((30, 30))
     hdf5_file.create_group(_group)
-    create_hdf5_dataset(hdf5_file[_group], None, _dname, data=_input)
-    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dname])
+    create_hdf5_dataset(hdf5_file[_group], _dset, data=_input)
+    _out = read_and_decode_hdf5_dataset(hdf5_file[_group + "/" + _dset])
     assert isinstance(_out, Dataset)
     assert np.allclose(_out, _input)
 

@@ -36,7 +36,6 @@ __all__ = [
 
 import os
 from pathlib import Path
-from typing import List, Union
 
 from numpy import array
 
@@ -44,13 +43,13 @@ from pydidas.core.exceptions import UserConfigError
 from pydidas.core.utils.hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 
 
-def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
+def check_hdf5_key_exists_in_file(fname: Path | str, key: str) -> None:
     """
     Verify that the selected file has a dataset with key.
 
     Parameters
     ----------
-    fname : Union[Path, str]
+    fname : Path or str
         The filename and path.
     key : str
         The dataset key.
@@ -68,13 +67,13 @@ def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
         )
 
 
-def check_file_exists(fname: Union[Path, str]):
+def check_file_exists(fname: Path | str) -> None:
     """
     Check that a file exists and raise an Exception if not.
 
     Parameters
     ----------
-    fname : Union[Path, str]
+    fname : Path or str
         The filename and path.
 
     Raises
@@ -91,16 +90,16 @@ def check_file_exists(fname: Union[Path, str]):
 
 
 def verify_files_in_same_directory(
-    filename1: Union[Path, str], filename2: Union[Path, str]
-):
+    filename1: Path | str, filename2: Path | str
+) -> None:
     """
     Verify the given files are in the same directory.
 
     Parameters
     ----------
-    filename1 : Union[Path, str]
+    filename1 : Path or str
         The path or filename of the first file.
-    filename2 : Union[Path, str]
+    filename2 : Path or str
         The path or filename of the second file.
 
     Raises
@@ -108,7 +107,6 @@ def verify_files_in_same_directory(
     OSError
         If the two files are not in the same directory.
     """
-
     filename1 = Path(filename1) if isinstance(filename1, str) else filename1
     filename2 = Path(filename2) if isinstance(filename2, str) else filename2
     if filename2.parent not in [filename1.parent, Path()]:
@@ -118,13 +116,13 @@ def verify_files_in_same_directory(
         )
 
 
-def verify_files_of_range_are_same_size(files: List[Path]):
+def verify_files_of_range_are_same_size(files: list[Path]) -> None:
     """
     Verify a range of files are all the same size.
 
     Parameters
     ----------
-    files : List[Path]
+    files : list[Path]
         The list of Path objects with the file references.
 
     Raises
@@ -137,7 +135,7 @@ def verify_files_of_range_are_same_size(files: List[Path]):
         raise UserConfigError("The selected files are not all of the same size.")
 
 
-def file_is_writable(filename: Union[Path, str], overwrite=False) -> bool:
+def file_is_writable(filename: Path | str, overwrite: bool = False) -> bool:
     """
     Check whether a file exists and the file is writable.
 
@@ -147,10 +145,10 @@ def file_is_writable(filename: Union[Path, str], overwrite=False) -> bool:
 
     Parameters
     ----------
-    filename : Union[Path, str]
+    filename : Path or str
         The path or filename of the file to be checked.
-    overwrite: bool
-        Keyword to allow overwriting of existing files. Default: False
+    overwrite : bool, optional
+        Keyword to allow overwriting of existing files. The default is False.
 
     Returns
     -------

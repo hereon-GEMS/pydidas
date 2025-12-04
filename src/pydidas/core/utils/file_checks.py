@@ -61,7 +61,7 @@ def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
         If the dataset key is not found in the hdf5 file.
     """
     key = key if key.startswith("/") else f"/{key}"
-    dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
+    dsets = get_hdf5_populated_dataset_keys(fname, min_dim=0)
     if key not in dsets:
         raise UserConfigError(
             f"hdf5_key `{key}` is not a valid key for the file `{fname}`."

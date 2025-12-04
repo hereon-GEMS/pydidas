@@ -115,14 +115,11 @@ def get_hdf5_populated_dataset_keys(
     list[str]
         A list with all dataset keys which correspond to the filter criteria.
     """
-    _close_on_exit = isinstance(item, (str, Path))
-
     if isinstance(item, h5py.Dataset):
-        if hdf5_dataset_filter_check(item, **kwargs):
-            return [item.name]
-        return []
+        return [item.name] if hdf5_dataset_filter_check(item, **kwargs) else []
 
-    if isinstance(item, (str, Path)):
+    _file_to_open = isinstance(item, (str, Path))
+    if _file_to_open:
         item = Path(item)
         if not item.is_file():
             raise FileReadError("The specified file does not exist.")
@@ -155,7 +152,7 @@ def get_hdf5_populated_dataset_keys(
                     "Detected an external link to a h5py.Group which cannot "
                     f"be followed: {item.name}/{key}."
                 )
-    if _close_on_exit:
+    if _file_to_open:
         item.close()
     return _datasets
 

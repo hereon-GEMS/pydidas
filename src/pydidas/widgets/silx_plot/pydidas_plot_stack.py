@@ -110,6 +110,9 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         if self._2dplot is not None:
             self._2dplot.clear_plot()
 
+    # create an alias for clear_plots to maintain consistency with PydidasPlot1D/2D
+    clear_plot = clear_plots
+
     def _create_widget_if_required(self, dim: Integral) -> None:
         """
         Create the plot widget if required.

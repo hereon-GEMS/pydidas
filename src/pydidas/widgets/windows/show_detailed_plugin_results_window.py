@@ -156,7 +156,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 self._widgets[f"plot_{_index}"].setVisible(
                     _index < self._config["n_plots"]
                 )
-                self._widgets[f"plot_{_index}"].clear_plot()
+                self._widgets[f"plot_{_index}"].clear_plots()
 
     def __create_necessary_plots(self):
         """

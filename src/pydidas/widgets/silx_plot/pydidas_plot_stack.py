@@ -30,6 +30,7 @@ __all__ = ["PydidasPlotStack"]
 from numbers import Integral
 from typing import Any
 
+import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Dataset
@@ -39,14 +40,15 @@ from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 class PydidasPlotStack(QtWidgets.QStackedWidget):
     """
-    A stack with two plots for 1d and 2d data which selects the correct to display.
+    A stack with two plots for 1d and 2d data which selects the correct to
+    display.
 
     Parameters
     ----------
     **kwargs : Any
         Supported keyword arguments are:
 
-        parent : Union[QtWidgets.QWidget, None]
+        parent : QtWidgets.QWidget or None
             The parent widget.
         use_data_info_action : bool, optional
             Flag to use the PydidasGetDataInfoAction to display information
@@ -68,8 +70,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._frame1d.setLayout(QtWidgets.QGridLayout())
         self._frame2d = QtWidgets.QWidget()
         self._frame2d.setLayout(QtWidgets.QGridLayout())
-        self._1dplot = None
-        self._2dplot = None
+        self._1dplot: PydidasPlot1D | None = None
+        self._2dplot: PydidasPlot2D | None = None
         self._config = {
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "cs_transform": kwargs.get("cs_transform", True),
@@ -78,13 +80,13 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
 
-    def plot_data(self, data: Dataset, **kwargs: Any) -> None:
+    def plot_data(self, data: np.ndarray | Dataset, **kwargs: Any) -> None:
         """
         Plot the given data.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : np.ndarray or Dataset
             The data to be plotted.
         **kwargs : Any
             Any additional keywords to be passed to the plot.
@@ -96,10 +98,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         _title = kwargs.pop("title", None)
         if _title is not None:
             _plot.setGraphTitle(_title)
-        if _dim == 1:
-            _plot.plot_pydidas_dataset(data, **kwargs)
-        else:
-            _plot.set_data(data)
+        _plot.plot_pydidas_dataset(data, **kwargs)
 
     def clear_plots(self) -> None:
         """
@@ -112,6 +111,13 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
 
     # create an alias for clear_plots to maintain consistency with PydidasPlot1D/2D
     clear_plot = clear_plots
+
+    def resetZoom(self) -> None:
+        """Reset the zoom on the current plot."""
+        if self._1dplot is not None:
+            self._1dplot.resetZoom()
+        if self._2dplot is not None:
+            self._2dplot.resetZoom()
 
     def _create_widget_if_required(self, dim: Integral) -> None:
         """
@@ -131,4 +137,4 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             if dim == 2:
                 _plot.sig_get_more_info_for_data.connect(
                     self.sig_get_more_info_for_data
-                )
+                )  # type: ignore[attr-defined]

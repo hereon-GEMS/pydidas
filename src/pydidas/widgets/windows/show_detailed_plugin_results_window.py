@@ -56,7 +56,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         Parameters
         ----------
         results : dict[str or None, Any] or None, optional
-            The initial results dictionary. The default is None.
+            The initial results' dictionary. The default is None.
         **kwargs : Any
             Keyword arguments passed to the PydidasWindow constructor.
         """

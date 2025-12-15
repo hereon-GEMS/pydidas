@@ -36,7 +36,7 @@ fabio==2024.9.0
     # via
     #   pyfai
     #   silx
-fonttools==4.60.1
+fonttools==4.61.1
     # via matplotlib
 h5py==3.15.1
     # via
@@ -131,14 +131,15 @@ pyqt5-sip==12.17.1
     # via pyqt5
 pyqtgraph==0.13.7
     # via -r requirements.in
-pyside6>=6.9.3,<=6.10.0
+pyside6>=6.9.3,<=6.10.1
     # via -r requirements.in
     # modified to keep support for older linux glibc versions
-pyside6-addons>=6.9.3,<=6.10.0
+pyside6-addons>=6.9.3,<=6.10.1
     # via pyside6
     # modified to keep support for older linux glibc versions
-pyside6-essentials>=6.9.3,<=6.10.0
-    #   via pyside6
+pyside6-essentials>=6.9.3,<=6.10.1
+    # via
+    #   pyside6
     #   pyside6-addons
     #   modified to keep support for older linux glibc versions
 python-dateutil==2.9.0.post0
@@ -161,7 +162,7 @@ scipy==1.16.2
     # via
     #   pyfai
     #   scikit-image
-shiboken6>=6.9.3,<=6.10.0
+shiboken6>=6.9.3,<=6.10.1
     # via
     #   pyside6
     #   pyside6-addons
@@ -211,5 +212,5 @@ typing-extensions==4.15.0
     #   pydata-sphinx-theme
     #   pyopencl
     #   pytools
-urllib3==2.5.0
+urllib3==2.6.2
     # via requests

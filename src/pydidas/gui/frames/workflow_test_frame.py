@@ -236,8 +236,8 @@ class WorkflowTestFrame(BaseFrame):
         """
         self.__check_tree_uptodate()
         self.__tweak_window = TweakPluginParameterWindow()
-        self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)  # type: ignore[attr-defined]
         self.__details_window = ShowDetailedPluginResultsWindow()
+        self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)  # type: ignore[attr-defined]
         self.__details_window.sig_minimized.connect(self.__details_hidden)  # type: ignore[attr-defined]
 
     def __check_tree_uptodate(self) -> None:

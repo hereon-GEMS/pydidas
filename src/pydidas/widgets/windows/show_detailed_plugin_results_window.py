@@ -137,7 +137,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self._results = results
         self._config["result_keys"] = list(results.keys())
         self._widgets["label_title"].setText(
-            "Detailed plugin results: " + (f": {title}" if title else "")
+            "Detailed plugin results" + (f": {title}" if title else "")
         )
         if len(self._config["result_keys"]) > 0:
             _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)

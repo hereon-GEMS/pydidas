@@ -56,11 +56,14 @@ class PydidasPlot1D(Plot1D):
         data : Dataset or np.ndarray
             The data to display.
         """
-        if not data.ndim == 2:
+        if data.ndim == 1:
+            return
+        if data.ndim > 2:
             raise UserConfigError(
-                "The given dataset does not have exactly 2 dimensions. Please check "
+                "The given dataset has more than 2 dimensions. Please check "
                 f"the input data definition:\n The input data has {data.ndim} "
-                "dimensions."
+                "dimensions but only 1d or 2d data can be plotted as curves or "
+                "curve groups, respectively."
             )
         _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # type: ignore[assignment]
         if data.shape[0] > _n_max:
@@ -147,9 +150,10 @@ class PydidasPlot1D(Plot1D):
             if data.ndim == 1:
                 self.addCurve(x, data, **kwargs)
             else:
+                legend = kwargs.pop("legend", "Curve")
                 for _i in range(data.shape[0]):
-                    legend = kwargs.pop("legend", f"Curve {_i}")
-                    self.addCurve(x, data[_i], legend=legend, **kwargs)
+                    _legend = f"{legend} #{_i}"
+                    self.addCurve(x, data[_i], legend=_legend, **kwargs)
 
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any) -> None:
         """
@@ -186,8 +190,7 @@ class PydidasPlot1D(Plot1D):
         if kwargs.pop("replace", True):
             self.clear_plot()
         _i_data = 0 if data.ndim == 1 else 1
-        if data.ndim > 1:
-            self._check_data_dimensions(data)
+        self._check_data_dimensions(data)
         _ylabel = self._y_label(
             data.axis_labels[_i_data],
             data.axis_units[_i_data],

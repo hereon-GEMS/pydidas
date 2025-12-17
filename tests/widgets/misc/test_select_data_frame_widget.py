@@ -89,7 +89,7 @@ def path_w_data_files(temp_path, test_data) -> Generator[Path, None, None]:
     with h5py.File(_path / "hdf5_file.h5", "w") as f:
         for _dataset_path, _data in test_data.items():
             f[_dataset_path] = _data
-    with h5py.File(_path / "empty_hdf5_file.h5", "w") as f:
+    with h5py.File(_path / "empty_hdf5_file.h5", "w") as _:
         pass
     np.save(_path / "npy_file.npy", test_data["/entry/data/2d/data1"])
     test_data["/entry/data/2d/data1"].astype(np.float64).tofile(

@@ -30,7 +30,7 @@ __all__ = ["ShowDetailedPluginResultsWindow"]
 
 from typing import Any
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
@@ -118,7 +118,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         QtCore.QSize
             The desired size.
         """
-        _font_height = QtWidgets.QApplication.instance().font_height  # type: ignore[attr-defined]
+        _font_height = PydidasQApplication.instance().font_height
         return QtCore.QSize(70 * _font_height, 40 * _font_height)
 
     def update_results(

@@ -459,46 +459,45 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">WorkflowTestFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame" title="Link to this definition">#</a></dt>
-<dd><p>The ProcessingSinglePluginFrame allows to run / test single plugins on a
-single datapoint.</p>
+<dd><p>The WorkflowTestFrame allows to run / test the workflow on a single datapoint.</p>
 <p>The selection of a frame can be done either using the absolute frame number
 (if the <code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use global index”) or by
 supplying scan indices for all active scan dimensions (if the
-<code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use scan indices”).</p>
+<code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use scan dimensional indices”).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.build_frame">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.build_frame" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.build_frame" title="Link to this definition">#</a></dt>
 <dd><p>Build the frame and create all necessary widgets.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.clear_results">
-<span class="sig-name descname"><span class="pre">clear_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.clear_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">clear_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.clear_results" title="Link to this definition">#</a></dt>
 <dd><p>Clear all stored results.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.connect_signals">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.connect_signals" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.connect_signals" title="Link to this definition">#</a></dt>
 <dd><p>Connect all required signals and slots.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.execute_workflow_test">
-<span class="sig-name descname"><span class="pre">execute_workflow_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.execute_workflow_test" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">execute_workflow_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.execute_workflow_test" title="Link to this definition">#</a></dt>
 <dd><p>Test the Workflow on the selected frame and store results for presentation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.finalize_ui">
-<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.finalize_ui" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.finalize_ui" title="Link to this definition">#</a></dt>
 <dd><p>Check the local WorkflowTree is up to date and create the window to show the
 plugin results.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.frame_activated">
-<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.frame_activated" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.frame_activated" title="Link to this definition">#</a></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
 <p>This method checks whether the selected frame is the current class
 and if yes, it will call some updates.</p>
@@ -511,14 +510,14 @@ and if yes, it will call some updates.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.reload_workflow">
-<span class="sig-name descname"><span class="pre">reload_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.reload_workflow" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reload_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.reload_workflow" title="Link to this definition">#</a></dt>
 <dd><p>Reload the local WorkflowTree from the global one, e.g. to propagate changes
 to global settings.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.show_plugin_details">
-<span class="sig-name descname"><span class="pre">show_plugin_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.show_plugin_details" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">show_plugin_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.show_plugin_details" title="Link to this definition">#</a></dt>
 <dd><p>Show details for the selected plugin.</p>
 <p>This method will get the detailed results for the active node and open a
 new window to display the detailed information.</p>
@@ -531,7 +530,7 @@ new window to display the detailed information.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowTestFrame.show_tweak_params_window">
-<span class="sig-name descname"><span class="pre">show_tweak_params_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.show_tweak_params_window" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">show_tweak_params_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowTestFrame.show_tweak_params_window" title="Link to this definition">#</a></dt>
 <dd><p>Show the window to tweak the Parameters for the active plugin.</p>
 </dd></dl>
 
@@ -543,12 +542,11 @@ new window to display the detailed information.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">WorkflowTestFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>The ProcessingSinglePluginFrame allows to run / test single plugins on a
-single datapoint.</p>
+<dd><p>The WorkflowTestFrame allows to run / test the workflow on a single datapoint.</p>
 <p>The selection of a frame can be done either using the absolute frame number
 (if the <code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use global index”) or by
 supplying scan indices for all active scan dimensions (if the
-<code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use scan indices”).</p>
+<code class="docutils literal notranslate"><span class="pre">image_selection</span></code> Parameter equals “Use scan dimensional indices”).</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PaintDeviceMetric</span></span></dt>
@@ -680,7 +678,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Build the frame and create all necessary widgets.</p>
 </dd></dl>
 
@@ -728,7 +726,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">clear_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">clear_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Clear all stored results.</p>
 </dd></dl>
 
@@ -760,7 +758,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Connect all required signals and slots.</p>
 </dd></dl>
 
@@ -1278,7 +1276,7 @@ implementation are valid kwargs.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">execute_workflow_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">execute_workflow_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Test the Workflow on the selected frame and store results for presentation.</p>
 </dd></dl>
 
@@ -1300,7 +1298,7 @@ frame’s state.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Check the local WorkflowTree is up to date and create the window to show the
 plugin results.</p>
 </dd></dl>
@@ -1404,7 +1402,7 @@ plugin results.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
 <p>This method checks whether the selected frame is the current class
 and if yes, it will call some updates.</p>
@@ -2097,7 +2095,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">reload_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">reload_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Reload the local WorkflowTree from the global one, e.g. to propagate changes
 to global settings.</p>
 </dd></dl>
@@ -2694,7 +2692,7 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">show_plugin_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">show_plugin_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_focus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Show details for the selected plugin.</p>
 <p>This method will get the detailed results for the active node and open a
 new window to display the detailed information.</p>
@@ -2707,7 +2705,7 @@ new window to display the detailed information.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">show_tweak_params_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">show_tweak_params_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Show the window to tweak the Parameters for the active plugin.</p>
 </dd></dl>
 

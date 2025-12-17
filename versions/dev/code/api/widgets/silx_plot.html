@@ -461,7 +461,7 @@
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlot1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Plot1D</span></code></p>
-<p>A customized silx.gui.plot.Plot1D with an additional configuration.</p>
+<p>A customized silx.gui.plot.Plot1D with support for pydidas Datasets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot">
 <span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clear_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot" title="Link to this definition">#</a></dt>
@@ -481,7 +481,54 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be plotted.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – Additional keyword arguments to be passed to the silx plot method.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments to be passed to the silx plot method.
+Supported keywords are:</p>
+<dl class="simple">
+<dt>resetzoom<span class="classifier">bool, optional</span></dt><dd><p>Flag to reset the zoom after plotting. The default is True.</p>
+</dd>
+<dt>replace<span class="classifier">bool, optional</span></dt><dd><p>Flag to clear the plot before adding new curves. The default is
+True.</p>
+</dd>
+<dt>linewidth<span class="classifier">float, optional</span></dt><dd><p>The line width for the curves. The default is 1.5.</p>
+</dd>
+<dt>linestyle<span class="classifier">str, optional</span></dt><dd><p>The line style for the curves. The default is ‘-‘.</p>
+</dd>
+<dt>symbol<span class="classifier">str or None, optional</span></dt><dd><p>The symbol for the curves. The default is None.</p>
+</dd>
+<dt>ylabel<span class="classifier">str, optional</span></dt><dd><p>The y-axis label. If not provided, it will be automatically
+generated from the data metadata.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The plot title.</p>
+</dd>
+<dt>legend<span class="classifier">str, optional</span></dt><dd><p>The legend for the curve(s).</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot1D.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_data" title="Link to this definition">#</a></dt>
+<dd><p>Plot a numpy ndarray.</p>
+<p>This method supports both generic numpy ndarrays and pydidas Dataset
+instances. If a Dataset is provided, the plot_pydidas_dataset method
+is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – The data to be plotted.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments to be passed to the silx plot method.
+Supported arguments are all those supported by silx Plot1D.addCurve,
+as well as:</p>
+<dl class="simple">
+<dt>x<span class="classifier">numpy.ndarray, optional</span></dt><dd><p>The x values to be used for the plot. If not provided, the index
+of the data array will be used.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -495,7 +542,29 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be plotted.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – Additional keyword arguments to be passed to the silx plot method.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments to be passed to the silx plot method.
+Supported keywords are:</p>
+<dl class="simple">
+<dt>resetzoom<span class="classifier">bool, optional</span></dt><dd><p>Flag to reset the zoom after plotting. The default is True.</p>
+</dd>
+<dt>replace<span class="classifier">bool, optional</span></dt><dd><p>Flag to clear the plot before adding new curves. The default is
+True.</p>
+</dd>
+<dt>linewidth<span class="classifier">float, optional</span></dt><dd><p>The line width for the curves. The default is 1.5.</p>
+</dd>
+<dt>linestyle<span class="classifier">str, optional</span></dt><dd><p>The line style for the curves. The default is ‘-‘.</p>
+</dd>
+<dt>symbol<span class="classifier">str or None, optional</span></dt><dd><p>The symbol for the curves. The default is None.</p>
+</dd>
+<dt>ylabel<span class="classifier">str, optional</span></dt><dd><p>The y-axis label. If not provided, it will be automatically
+generated from the data metadata.</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>The plot title.</p>
+</dd>
+<dt>legend<span class="classifier">str, optional</span></dt><dd><p>The legend for the curve(s).</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -525,7 +594,7 @@ the image to the Plot2d.addImage method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a><em> | </em><em>np.ndarray</em>) – The input data to be displayed.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a><em> or </em><em>np.ndarray</em>) – The input data to be displayed.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – Any supported Plot2d.addImage keyword arguments.</p></li>
 </ul>
 </dd>
@@ -561,6 +630,22 @@ the image to the Plot2d.addImage method.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be plotted.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – Additional keyword arguments to be passed to the silx plot method.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlot2D.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_data" title="Link to this definition">#</a></dt>
+<dd><p>Add an image to the plot.</p>
+<p>This method implements an additional dimensionality check before passing
+the image to the Plot2d.addImage method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a><em> or </em><em>np.ndarray</em>) – The input data to be displayed.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any supported Plot2d.addImage keyword arguments.</p></li>
 </ul>
 </dd>
 </dl>
@@ -701,12 +786,13 @@ with (azi_start, azi_end) in radians for a region.</p></li>
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.silx_plot.</span></span><span class="sig-name descname"><span class="pre">PydidasPlotStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QStackedWidget</span></code></p>
-<p>A stack with two plots for 1d and 2d data which selects the correct to display.</p>
+<p>A stack with two plots for 1d and 2d data which selects the correct to
+display.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are:</p>
 <dl class="simple">
-<dt>parent<span class="classifier">Union[QtWidgets.QWidget, None]</span></dt><dd><p>The parent widget.</p>
+<dt>parent<span class="classifier">QtWidgets.QWidget or None</span></dt><dd><p>The parent widget.</p>
 </dd>
 <dt>use_data_info_action<span class="classifier">bool, optional</span></dt><dd><p>Flag to use the PydidasGetDataInfoAction to display information
 about a result datapoint. The default is False.</p>
@@ -722,6 +808,12 @@ DiffractionExperimentContext.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.clear_plot">
+<span class="sig-name descname"><span class="pre">clear_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plot" title="Link to this definition">#</a></dt>
+<dd><p>Clear all plots.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots">
 <span class="sig-name descname"><span class="pre">clear_plots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots" title="Link to this definition">#</a></dt>
 <dd><p>Clear all plots.</p>
@@ -729,16 +821,22 @@ DiffractionExperimentContext.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.plot_data">
-<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data" title="Link to this definition">#</a></dt>
 <dd><p>Plot the given data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>pydidas.core.Dataset</em></a>) – The data to be plotted.</p></li>
+<li><p><strong>data</strong> (<em>np.ndarray</em><em> or </em><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The data to be plotted.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keywords to be passed to the plot.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.silx_plot.PydidasPlotStack.resetZoom">
+<span class="sig-name descname"><span class="pre">resetZoom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.silx_plot.PydidasPlotStack.resetZoom" title="Link to this definition">#</a></dt>
+<dd><p>Reset the zoom on the current plot.</p>
 </dd></dl>
 
 </dd></dl>
@@ -796,6 +894,7 @@ DiffractionExperimentContext.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.clear_plot</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.display_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.display_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.plot_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.plot_pydidas_dataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot1D.update_mpl_fonts"><code class="docutils literal notranslate"><span class="pre">PydidasPlot1D.update_mpl_fonts</span></code></a></li>
 </ul>
@@ -805,6 +904,7 @@ DiffractionExperimentContext.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.clear_plot</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.default_unit"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.default_unit</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.display_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.display_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_nonlinear_axes_image"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_nonlinear_axes_image</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.plot_pydidas_dataset"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.plot_pydidas_dataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlot2D.update_cs_units"><code class="docutils literal notranslate"><span class="pre">PydidasPlot2D.update_cs_units</span></code></a></li>
@@ -820,8 +920,10 @@ DiffractionExperimentContext.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plot"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.clear_plot</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.clear_plots"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.clear_plots</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.plot_data"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.plot_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.silx_plot.PydidasPlotStack.resetZoom"><code class="docutils literal notranslate"><span class="pre">PydidasPlotStack.resetZoom</span></code></a></li>
 </ul>
 </li>
 </ul>

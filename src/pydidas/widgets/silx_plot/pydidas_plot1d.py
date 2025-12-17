@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["PydidasPlot1D"]
 
 
+import warnings
 from typing import Any
 
 import numpy as np
@@ -261,6 +262,6 @@ class PydidasPlot1D(Plot1D):
     def _activeItemChanged(self, type_: str) -> None:
         """Override generic Plot1D._activeItemChanged to catch QApplication signals."""
         if self.sender() == self._qtapp:
-            print("Skipping _activeItemChanged call from QApplication signal")
+            warnings.warn("Skipping _activeItemChanged call from QApplication signal")
             return
         Plot1D._activeItemChanged(self, type_)

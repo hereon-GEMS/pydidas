@@ -153,7 +153,9 @@ def test__creation(qtbot, width, ndim, import_hdf5_metadata) -> None:
 @pytest.mark.gui
 @pytest.mark.parametrize("filename", _FILENAMES)
 @pytest.mark.parametrize("dtype", [str, Path])
-def test_process_new_filename(qtbot, widget, path_w_data_files, filename, dtype) -> None:
+def test_process_new_filename(
+    qtbot, widget, path_w_data_files, filename, dtype
+) -> None:
     widget.set_param_and_widget_value(
         "filename", dtype(path_w_data_files / filename), emit_signal=False
     )
@@ -387,7 +389,9 @@ def test__select_slicing_axis(qtbot, widget, path_w_data_files, axis) -> None:
 
 @pytest.mark.gui
 @pytest.mark.parametrize("index", [2, 3])
-def test__select_new_frame__valid_index(qtbot, widget, path_w_data_files, index) -> None:
+def test__select_new_frame__valid_index(
+    qtbot, widget, path_w_data_files, index
+) -> None:
     widget.set_param_and_widget_value("filename", path_w_data_files / "hdf5_file.h5")
     widget.set_param_and_widget_value("hdf5_key_str", "/entry/data/3d_dataset_1")
     widget.set_param_and_widget_value("slicing_axis", 1)

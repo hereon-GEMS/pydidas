@@ -140,19 +140,21 @@ def _create_str_description_of_node_result(
 
 
 class _ResultsMock:
-    def __init__(self):
+    """Mock class to store result titles."""
+
+    def __init__(self) -> None:
+        """Initialize the _ResultsMock."""
         self.result_titles = {}
 
 
 class WorkflowTestFrame(BaseFrame):
     """
-    The ProcessingSinglePluginFrame allows to run / test single plugins on a
-    single datapoint.
+    The WorkflowTestFrame allows to run / test the workflow on a single datapoint.
 
     The selection of a frame can be done either using the absolute frame number
     (if the ``image_selection`` Parameter equals "Use global index") or by
     supplying scan indices for all active scan dimensions (if the
-    ``image_selection`` Parameter equals "Use scan indices").
+    ``image_selection`` Parameter equals "Use scan dimensional indices").
     """
 
     menu_icon = "pydidas::frame_icon_workflow_test"
@@ -171,7 +173,15 @@ class WorkflowTestFrame(BaseFrame):
         ),
     )
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
+        """
+        Initialize the WorkflowTestFrame.
+
+        Parameters
+        ----------
+        **kwargs : Any
+            Keyword arguments passed to the BaseFrame constructor.
+        """
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self._tree = None
@@ -192,7 +202,7 @@ class WorkflowTestFrame(BaseFrame):
             }
         )
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create all necessary widgets.
         """
@@ -206,31 +216,31 @@ class WorkflowTestFrame(BaseFrame):
 
         apply_qt_properties(self.layout(), columnStretch=(1, 10))
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Connect all required signals and slots.
         """
         self.param_widgets["image_selection"].sig_new_value.connect(
             self.__update_image_selection_visibility
-        )
-        self._widgets["result_table"].sig_node_selected.connect(self._selected_new_node)
-        self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
-        self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)
-        self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
-        self._widgets["but_tweak_params"].clicked.connect(self.show_tweak_params_window)
+        )  # type: ignore[attr-defined]
+        self._widgets["result_table"].sig_node_selected.connect(self._selected_new_node)  # type: ignore[attr-defined]
+        self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)  # type: ignore[attr-defined]
+        self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)  # type: ignore[attr-defined]
+        self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)  # type: ignore[attr-defined]
+        self._widgets["but_tweak_params"].clicked.connect(self.show_tweak_params_window)  # type: ignore[attr-defined]
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """
         Check the local WorkflowTree is up to date and create the window to show the
         plugin results.
         """
         self.__check_tree_uptodate()
-        self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window = TweakPluginParameterWindow()
-        self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
-        self.__details_window.sig_minimized.connect(self.__details_hidden)
+        self.__details_window = ShowDetailedPluginResultsWindow()
+        self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)  # type: ignore[attr-defined]
+        self.__details_window.sig_minimized.connect(self.__details_hidden)  # type: ignore[attr-defined]
 
-    def __check_tree_uptodate(self):
+    def __check_tree_uptodate(self) -> None:
         """
         Check if the WorkflowTree has changed and update the local Tree if
         it has changed.
@@ -240,14 +250,14 @@ class WorkflowTestFrame(BaseFrame):
             self.reload_workflow()
 
     @QtCore.Slot()
-    def __details_hidden(self):
+    def __details_hidden(self) -> None:
         """
         Set the flag to hide the details window.
         """
         self._config["details_active"] = False
 
     @QtCore.Slot(int)
-    def __updated_plugin_params(self, node_id: int):
+    def __updated_plugin_params(self, node_id: int) -> None:
         """
         Run the subtree with the new Parameters.
 
@@ -276,7 +286,7 @@ class WorkflowTestFrame(BaseFrame):
             self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
 
     @QtCore.Slot()
-    def __update_image_selection_visibility(self):
+    def __update_image_selection_visibility(self) -> None:
         """
         Update the visibility of the image selection widgets.
         """
@@ -294,7 +304,7 @@ class WorkflowTestFrame(BaseFrame):
         )
 
     @QtCore.Slot()
-    def execute_workflow_test(self):
+    def execute_workflow_test(self) -> None:
         """
         Test the Workflow on the selected frame and store results for presentation.
         """
@@ -316,7 +326,7 @@ class WorkflowTestFrame(BaseFrame):
                 self.__plot_results()
 
     @QtCore.Slot()
-    def reload_workflow(self):
+    def reload_workflow(self) -> None:
         """
         Reload the local WorkflowTree from the global one, e.g. to propagate changes
         to global settings.
@@ -346,7 +356,7 @@ class WorkflowTestFrame(BaseFrame):
         """
         Get the frame index.
 
-        The frame in dex is based on the user selection for indexing using
+        The frame index is based on the user selection for indexing using
         the absolute number, scan position numbers or the detector image number.
 
         Returns
@@ -432,7 +442,7 @@ class WorkflowTestFrame(BaseFrame):
             )
         return _index
 
-    def __store_tree_results(self):
+    def __store_tree_results(self) -> None:
         """
         Store the WorkflowTree results in a local dictionary.
         """
@@ -447,14 +457,14 @@ class WorkflowTestFrame(BaseFrame):
         if self._active_node not in self._results:
             self._active_node = -1
 
-    def __update_selection_choices(self):
+    def __update_selection_choices(self) -> None:
         """Update the choice of results to display"""
         self._widgets["result_table"].update_choices_from_workflow_results(
             self._local_results_mock
         )
 
     @QtCore.Slot(int)
-    def _selected_new_node(self, index: int):
+    def _selected_new_node(self, index: int) -> None:
         """
         Handle the selection of a new node.
 
@@ -476,14 +486,14 @@ class WorkflowTestFrame(BaseFrame):
         self.__update_text_description_of_node_results()
         self.__plot_results()
 
-    def clear_results(self):
+    def clear_results(self) -> None:
         """Clear all stored results."""
         self._results = {}
         self._local_results_mock.result_titles = {}
         self.__update_selection_choices()
         self.__set_derived_widget_visibility(False)
 
-    def __set_derived_widget_visibility(self, visible: bool):
+    def __set_derived_widget_visibility(self, visible: bool) -> None:
         """
         Change the visibility of all 'derived' widgets.
 
@@ -501,7 +511,7 @@ class WorkflowTestFrame(BaseFrame):
             self._config["has_details"] and visible
         )
 
-    def __update_text_description_of_node_results(self):
+    def __update_text_description_of_node_results(self) -> None:
         """
         Update the text description of the currently selected node's results.
         """
@@ -512,7 +522,7 @@ class WorkflowTestFrame(BaseFrame):
         )
         self._widgets["result_info"].setText(_str)
 
-    def __plot_results(self):
+    def __plot_results(self) -> None:
         """
         Update the plot.
 
@@ -524,9 +534,12 @@ class WorkflowTestFrame(BaseFrame):
         self._widgets["plot"].set_data(self._results[self._active_node])
         if self._config["details_active"] and self._config["has_details"]:
             self.show_plugin_details(set_focus=False)
+        else:
+            self._config["details_active"] = False
+            self.__details_window.hide()
 
     @QtCore.Slot()
-    def show_plugin_details(self, set_focus: bool = True):
+    def show_plugin_details(self, set_focus: bool = True) -> None:
         """
         Show details for the selected plugin.
 
@@ -549,7 +562,7 @@ class WorkflowTestFrame(BaseFrame):
             self.__details_window.activateWindow()
 
     @QtCore.Slot()
-    def show_tweak_params_window(self):
+    def show_tweak_params_window(self) -> None:
         """
         Show the window to tweak the Parameters for the active plugin.
         """
@@ -562,7 +575,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__tweak_window.activateWindow()
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: int):
+    def frame_activated(self, index: int) -> None:
         """
         Received a signal that a new frame has been selected.
 

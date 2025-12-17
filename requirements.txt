@@ -36,7 +36,7 @@ fabio==2024.9.0
     # via
     #   pyfai
     #   silx
-fonttools==4.60.1
+fonttools==4.61.1
     # via matplotlib
 h5py==3.15.1
     # via
@@ -138,7 +138,8 @@ pyside6-addons>=6.9.3,<=6.10.0
     # via pyside6
     # modified to keep support for older linux glibc versions
 pyside6-essentials>=6.9.3,<=6.10.0
-    #   via pyside6
+    # via
+    #   pyside6
     #   pyside6-addons
     #   modified to keep support for older linux glibc versions
 python-dateutil==2.9.0.post0
@@ -211,5 +212,5 @@ typing-extensions==4.15.0
     #   pydata-sphinx-theme
     #   pyopencl
     #   pytools
-urllib3==2.5.0
+urllib3==2.6.2
     # via requests

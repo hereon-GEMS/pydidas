@@ -21,6 +21,10 @@ Bugfixes
 - Fixed use of tabs in the CHANGELOG.rst
 - Fixed an issue in the Parameter class which did not convert strings to 
   numbers if the Parameter also accepted None as value
+- Fixed an issue with calling the ShowDetailedPluginResultsWindow which had a 
+  wrong method signature.
+- Fixed an issue in the ShowDetailedPluginResultsWindow which did not autoscale
+  the results due to a delayed event loop execution.
 
 
 v25.10.28

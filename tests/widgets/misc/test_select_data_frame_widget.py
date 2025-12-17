@@ -380,9 +380,6 @@ def test__select_slicing_axis(qtbot, widget, path_w_data_files, axis) -> None:
         _io_widget.setCurrentIndex(axis)
     # noinspection PyUnresolvedReferences
     assert widget.spy_sig_new_selection.n == 3
-    for _i in range(3):
-        # noinspection PyUnresolvedReferences
-        print(f"spy results #{_i}: ", widget.spy_sig_new_selection.results[_i])
     # noinspection PyUnresolvedReferences
     assert widget.spy_sig_new_selection.results[2][1]["indices"] == _expected_result
 

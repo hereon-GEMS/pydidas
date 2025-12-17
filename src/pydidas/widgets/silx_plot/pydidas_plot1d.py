@@ -62,7 +62,7 @@ class PydidasPlot1D(Plot1D):
         if data.ndim > 2:
             raise UserConfigError(
                 "The given dataset has more than 2 dimensions. Please check "
-                f"the input data definition:\n The input data has {data.ndim} "
+                f"the input data definition:\nThe input data has {data.ndim} "
                 "dimensions but only 1d or 2d data can be plotted as curves or "
                 "curve groups, respectively."
             )

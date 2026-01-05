@@ -13,13 +13,14 @@ on:
 
 jobs:
   unittests:
-
+    name: Test ${{ matrix.os }} Python ${{ matrix.python-version }} ${{ tests }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.12", "3.13"]
         QT_API: ["pyqt5", "pyside6"]
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         tests: ["", "-m slow", "-m gui"]
 
     steps:

@@ -7,6 +7,7 @@ vYY.MM.DD
 
 Improvements
 ------------
+- Added formal support for Python 3.13
 
 Programmatic changes
 --------------------

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters for the scan context.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -125,7 +125,7 @@ GENERIC_PARAMS_SCAN = (
                 "A value of 1 would increment the image index by 1 for each scan "
                 "point whereas a value of n corresponds to only using every n-th "
                 "index. For example, a value of 3 frame indices per scan point "
-                "process the frame 0 for scan point 0, frame 3 for scan point 1 etc."
+                "process the frame 0 for scan point 0, frame 3 for scan point 1 etc. "
                 "Please note that the index stepping refers to the frames, not the "
                 "filenames. In the case of container files (e.g. hdf5), the index "
                 "stepping will skip process every n-th frame, not every n-th file."
@@ -140,9 +140,9 @@ GENERIC_PARAMS_SCAN = (
             "allow_None": False,
             "tooltip": (
                 "Define the handling of images if multiple images were acquired per "
-                "scan point. If all individual images should be kept, please set the "
-                "scan multiplicity to 1 and add an additional dimension with the "
-                "multiplicity to the scan."
+                "scan point. Average, sum, and maximum reduce the number of N images "
+                "to a single output image. Stack will keep all images and add an "
+                "additional dimension to the output data."
             ),
         },
         "scan_frames_per_point": {
@@ -154,10 +154,11 @@ GENERIC_PARAMS_SCAN = (
             "allow_None": False,
             "tooltip": (
                 "The number of frames to process at *each* scan point. The default of "
-                "`1` corresponds to one image per scan point. Please note that the "
-                "value for the  "
-                "points. If this setting is used for `averaging` images, please reduce "
-                "the number of scan points correspondingly."
+                "`1` corresponds to one image per scan point. Please note that this "
+                "value allows for overlapping frames between scan points, for example "
+                "for rolling average or similar approaches. If this setting is used "
+                "for `averaging` images, please reduce the number of scan points "
+                "correspondingly."
             ),
         },
     }

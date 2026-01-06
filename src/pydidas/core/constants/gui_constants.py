@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ sizes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,7 +39,7 @@ __all__ = [
     "FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH",
     "GENERIC_IO_WIDGET_WIDTH",
     "GENERIC_STANDARD_WIDGET_WIDTH",
-    "MINIMUN_WIDGET_DIMENSIONS",
+    "MINIMUM_WIDGET_DIMENSIONS",
     "PARAM_WIDGET_EDIT_WIDTH",
     "PARAM_WIDGET_TEXT_WIDTH",
     "PARAM_WIDGET_UNIT_WIDTH",
@@ -49,7 +49,7 @@ __all__ = [
 # Generic sizeHints for widths of pydidas (I/O) widgets
 GENERIC_IO_WIDGET_WIDTH = 350
 GENERIC_STANDARD_WIDGET_WIDTH = 500
-MINIMUN_WIDGET_DIMENSIONS = 22
+MINIMUM_WIDGET_DIMENSIONS = 22
 
 # Settings for dynamic width factors based on font metric.
 FONT_METRIC_CONFIG_WIDTH = 50

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The pydidas_square_button module defines the SquareButton class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,7 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core.constants import MINIMUN_WIDGET_DIMENSIONS
+from pydidas.core.constants import MINIMUM_WIDGET_DIMENSIONS
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
@@ -89,7 +89,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         font_height : float
             The font height metrics.
         """
-        self.__size = int(max(font_height + 6, MINIMUN_WIDGET_DIMENSIONS))
+        self.__size = int(max(font_height + 6, MINIMUM_WIDGET_DIMENSIONS))
         self.setMinimumWidth(self.__size)
         self.setMinimumHeight(self.__size)
 

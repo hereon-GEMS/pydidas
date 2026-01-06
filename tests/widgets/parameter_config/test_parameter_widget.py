@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,12 +28,13 @@ __status__ = "Production"
 import os
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     FONT_METRIC_PARAM_EDIT_WIDTH,
-    MINIMUN_WIDGET_DIMENSIONS,
+    MINIMUM_WIDGET_DIMENSIONS,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
 )
@@ -63,6 +64,8 @@ _TEST_DTYPE_VAL_NEW_VALS = [
     (Path, Path("/tmp"), Path("/home/user")),
     (Hdf5key, Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")),
 ]
+LAYOUT_VERTICAL_SPACING = ParameterWidget.LAYOUT_VERTICAL_SPACING
+LAYOUT_TOP_BOTTOM_MARGIN = ParameterWidget.LAYOUT_TOP_BOTTOM_MARGIN
 
 
 def widget_instance(qtbot, param, **kwargs):
@@ -76,9 +79,12 @@ def widget_instance(qtbot, param, **kwargs):
     return widget
 
 
+@pytest.fixture(autouse=True)
 def _cleanup():
-    yield
     app = PydidasQApplication.instance()
+    _starting_fontsize = app.font_size
+    yield
+    app.font_size = _starting_fontsize
     for widget in [
         _w for _w in app.topLevelWidgets() if isinstance(_w, ParameterWidget)
     ]:
@@ -87,7 +93,7 @@ def _cleanup():
 
 
 @pytest.mark.gui
-@pytest.mark.parametrize("choices", [[True, False], [False], [True], [1, 0]])
+@pytest.mark.parametrize("choices", [[False], [True], [1, 0]])
 @pytest.mark.parametrize(
     "kwargs",
     [
@@ -99,9 +105,16 @@ def _cleanup():
     ],
 )
 @pytest.mark.parametrize("width", [30, 100, None])
-def test__creation__w__bool_choices(qtbot, qapp, choices, kwargs, width):
+@pytest.mark.parametrize("font_size", [7, 10, 15])
+def test__creation__w__bool_choices(qtbot, qapp, choices, kwargs, width, font_size):
+    qapp.font_size = font_size
     _expected_width = qapp.font_char_width * (
         width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
+    )
+    _expected_height = int(
+        max(np.ceil(qapp.font_height * 1.05), MINIMUM_WIDGET_DIMENSIONS)
+        + 2 * LAYOUT_VERTICAL_SPACING
+        + 2 * LAYOUT_TOP_BOTTOM_MARGIN
     )
     _default = True if (choices is None or True in choices) else False
     param = Parameter(
@@ -117,7 +130,7 @@ def test__creation__w__bool_choices(qtbot, qapp, choices, kwargs, width):
     )
     assert isinstance(widget.io_widget, ParamIoWidgetCheckBox)
     assert widget.param == param
-    assert widget.height() == MINIMUN_WIDGET_DIMENSIONS + 4  # assert no linebreak
+    assert widget.height() == _expected_height
     assert abs(_expected_width - widget.width()) < 3
     if "unit" in widget._widgets:
         _expected_unit_width = int(
@@ -185,58 +198,93 @@ def test__creation__check_choices_behaviour(
 @pytest.mark.parametrize("width", [30, 100, None])
 @pytest.mark.parametrize("unit", ["m", ""])
 def test__creation__check_layout(qtbot, qapp, kwargs, width, unit):
-    param = Parameter(
-        "test",
-        str,
-        "Test value",
-        name="Test",
-        unit=unit,
-    )
+    # Note: the font size is not checked here because it is covered in the test
+    # with the bool choices above.
     _linebreak = int(kwargs.get("linebreak", False))
     _rel_text_width = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
-    _rel_unit_width = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
+    _rel_unit_width = (
+        0 if len(unit) == 0 else kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
+    )
+    param = Parameter("test", str, "Test value", name="Test", unit=unit)
     widget = widget_instance(
         qtbot, param, **(kwargs | {"font_metric_width_factor": width})
     )
-    # determine the expected widths
-    # first in characters then convert to pixels (required for calc of I/O width)
-    _expected_width = qapp.font_char_width * (
-        width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
-    )
-    _expected_height = (
-        (widget._MARGINS + max(qapp.font_height, MINIMUN_WIDGET_DIMENSIONS))
-        * (1 + _linebreak)
-    ) + widget._SPACING
+    # determine the expected widths first in characters
+    # then convert to pixels (required for calc of relative I/O width)
     _width_in_chars = width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
+    _expected_global_width = int(qapp.font_char_width * _width_in_chars)
+    _expected_global_height = (
+        (2 + _linebreak) * LAYOUT_VERTICAL_SPACING
+        + 2 * LAYOUT_TOP_BOTTOM_MARGIN
+        + (1 + _linebreak)
+        * max(
+            int(np.ceil(1.05 * qapp.font_height)),
+            MINIMUM_WIDGET_DIMENSIONS,
+        )
+    )
     _expected_label_width = _width_in_chars * max(_linebreak, _rel_text_width)
+    _expected_label_width_px = int(qapp.font_char_width * _expected_label_width)
     _expected_unit_width = (
         0
-        if (
-            len(unit) == 0
-            or _rel_unit_width == 0
-            or widget._param_widget_class in (ParamIoWidgetFile, ParamIoWidgetHdf5Key)
-        )
+        if _rel_unit_width == 0
         else max(widget._MIN_VIS_UNIT_WIDTH, (_width_in_chars * _rel_unit_width))
     )
-    _expected_io_width = (
-        0.9 * _width_in_chars - _expected_unit_width
-        if _linebreak
-        else _width_in_chars - _expected_label_width - _expected_unit_width
-    ) * qapp.font_char_width
-    _expected_label_width *= qapp.font_char_width
-    _expected_unit_width *= qapp.font_char_width
-    # make assertions
+    _expected_unit_width_px = int(qapp.font_char_width * _expected_unit_width)
+    _expected_io_width_px = int(
+        (
+            0.9 * _width_in_chars - _expected_unit_width
+            if _linebreak
+            else _width_in_chars - _expected_label_width - _expected_unit_width
+        )
+        * qapp.font_char_width
+    )
+    _expected_subwidget_height = max(
+        int(np.ceil(1.05 * qapp.font_height)),
+        MINIMUM_WIDGET_DIMENSIONS,
+    )
+    _expected_row0_top = LAYOUT_TOP_BOTTOM_MARGIN + LAYOUT_VERTICAL_SPACING
+    _expected_row_offset = _expected_subwidget_height + LAYOUT_VERTICAL_SPACING
+
     assert widget.param == param
     assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
-    assert abs(_expected_height - widget.height()) < 2
-    assert abs(_expected_width - widget.width()) < 5
-    assert abs(_expected_label_width - widget._widgets["label"].width()) < 5
+    assert _expected_global_height == widget.height()
+    assert _expected_global_width == widget.width()
+
+    assert widget._widgets["label"].geometry().left() == 0
+    assert widget._widgets["label"].geometry().top() == _expected_row0_top
+    assert widget._widgets["label"].geometry().width() == _expected_label_width_px
+    assert widget._widgets["label"].geometry().height() == _expected_subwidget_height
+
     assert (
-        widget.io_widget.geometry().left() + _expected_io_width <= _expected_width + 2
+        widget._widgets["io"].geometry().left()
+        - (
+            int(0.1 * _expected_global_width)
+            if _linebreak
+            else _expected_label_width_px
+        )
+        <= 1
     )
+    assert widget._widgets["io"].geometry().top() == (
+        _expected_row0_top + _linebreak * _expected_row_offset
+    )
+    assert widget._widgets["io"].geometry().width() == _expected_io_width_px
+    assert widget._widgets["io"].geometry().height() == _expected_subwidget_height
+    assert _expected_io_width_px == widget.io_widget.width()
+
     if "unit" in widget._widgets:
-        assert abs(_expected_unit_width - widget._widgets["unit"].width()) < 5
-    assert abs(_expected_io_width - widget.io_widget.width()) < 5
+        # due to rounding errors, we need to allow for a tolerance of 1 pixel here
+        assert (
+            widget._widgets["unit"].geometry().left()
+            - _expected_global_width
+            - _expected_unit_width_px
+            <= 1
+        )
+        assert (
+            widget._widgets["unit"].geometry().top()
+            == _expected_row0_top + _linebreak * _expected_row_offset
+        )
+        assert widget._widgets["unit"].geometry().width() == _expected_unit_width_px
+        assert widget._widgets["unit"].geometry().height() == _expected_subwidget_height
 
 
 @pytest.mark.gui
@@ -249,7 +297,7 @@ def test__creation__w_visible_kwarg(qtbot, qapp):
     kwargs = {"visible": True, "fixedWidth": 123, "font_metric_width_factor": 50}
     widget = widget_instance(qtbot, param, **kwargs)
     assert widget.isVisible() is True
-    assert abs(widget.width() - qapp.font_char_width * 50) < 3
+    assert widget.width() == int(qapp.font_char_width * 50)
 
 
 @pytest.mark.gui

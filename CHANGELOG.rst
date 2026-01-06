@@ -16,6 +16,7 @@ Programmatic changes
 - Added a mix-in class to handle an associated file and type checking centrally.
 - Added a ConfigureBinaryDecodingWidget class which handles the decoding
   options for raw/binary files centrally.
+- PydidasWidgetMixin class can now also set the layout based on class attributes.
 
 Bugfixes
 --------
@@ -26,6 +27,7 @@ Bugfixes
   wrong method signature.
 - Fixed an issue in the ShowDetailedPluginResultsWindow which did not autoscale
   the results due to a delayed event loop execution.
+- Fixed an issue in the ParameterWidget which arranged the sub-widgets incorrectly.
 
 
 v25.10.28

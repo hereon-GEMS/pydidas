@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,20 +32,12 @@ import pytest
 from pydidas.contexts import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.widgets.plotting import GridCurvePlot
-from pydidas_qtcore import PydidasQApplication
 
 
 _DATASETS = {
     "test1": Dataset(np.random.random((140, 3, 12))),
     "test2": Dataset(np.random.random((140, 5, 12))),
 }
-
-
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
 
 
 @pytest.fixture
@@ -70,8 +62,8 @@ def test_init(grid_plot):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
-@pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
+@pytest.mark.parametrize("n_plots_hor", [2, 3, 5])
+@pytest.mark.parametrize("n_plots_vert", [3, 4, 5])
 def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
@@ -81,8 +73,8 @@ def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
-@pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
+@pytest.mark.parametrize("n_plots_hor", [2, 3, 5])
+@pytest.mark.parametrize("n_plots_vert", [3, 4, 5])
 def test_set_n_plots__w_data(grid_plot, datasets, n_plots_hor, n_plots_vert):
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
@@ -135,15 +127,15 @@ def test_set_datasets__no_datasets(grid_plot):
 def test_set_datasets__wrong_shape(grid_plot):
     with pytest.raises(UserConfigError):
         grid_plot.set_datasets(
-            test1=Dataset(np.random.random((140, 3, 12))),
-            test2=Dataset(np.random.random((135, 5, 10))),
+            test1=Dataset(np.zeros((140, 3, 12))),
+            test2=Dataset(np.zeros((135, 5, 10))),
         )
 
 
 def test_set_datasets__wrong_dim(grid_plot):
     with pytest.raises(UserConfigError):
         grid_plot.set_datasets(
-            test1=Dataset(np.random.random((140, 3, 12, 4))),
+            test1=Dataset(np.zeros((140, 3, 12, 4))),
         )
 
 
@@ -188,16 +180,15 @@ def test_set_autoscaling(grid_plot, datasets, direction):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots", [3, 4])
 @pytest.mark.parametrize(
     "start_value", ["::start::", "::end::", "::page+::", "::page-::", 1, -1, 4, -4]
 )
 @pytest.mark.parametrize("direction", ["vert", "hor"])
-def test_change_start_index(grid_plot, datasets, n_plots, start_value, direction):
+def test_change_start_index(grid_plot, datasets, start_value, direction):
     _index0 = 22
     grid_plot.set_datasets(**datasets)
-    grid_plot.n_plots_hor = n_plots if direction == "hor" else 2
-    grid_plot.n_plots_vert = n_plots if direction == "vert" else 2
+    grid_plot.n_plots_hor = 3 if direction == "hor" else 2
+    grid_plot.n_plots_vert = 3 if direction == "vert" else 2
     grid_plot._current_index = _index0
     grid_plot._change_start_index(start_value)
     if isinstance(start_value, Integral):

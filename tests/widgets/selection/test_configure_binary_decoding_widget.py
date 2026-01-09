@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Module with pydidas unittests"""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -65,21 +65,22 @@ _FILENAMES = [
 
 @pytest.fixture(autouse=True)
 def _cleanup():
-    yield
     app = PydidasQApplication.instance()
+    yield
     for widget in [
         _w
         for _w in app.topLevelWidgets()
         if isinstance(_w, ConfigureBinaryDecodingWidget)
     ]:
         widget.deleteLater()
-    app.processEvents()
+    app.processEvents()  # Process deferred deletions
 
 
 @pytest.fixture(scope="module")
 def path_w_data_files(temp_path):
-    _path = temp_path / "configure_binary_decoding_widget"
-    _path.mkdir()
+    _path = temp_path / "cbd_widget"
+    if not _path.exists():
+        _path.mkdir()
     np.arange(625).tofile(_path / "arange_int64.bin")
     np.arange(625).astype(np.double).tofile(_path / "arange_float64.bin")
     np.arange(625).astype(np.single).tofile(_path / "arange_float32.bin")
@@ -93,9 +94,9 @@ def path_w_data_files(temp_path):
 @pytest.fixture
 def widget(qtbot):
     widget = ConfigureBinaryDecodingWidget()
-    widget.spy_sig_new_binary_image = SignalSpy(widget.sig_new_binary_image)
-    widget.spy_sig_new_binary_config = SignalSpy(widget.sig_new_binary_config)
-    widget.spy_sig_decoding_invalid = SignalSpy(widget.sig_decoding_invalid)
+    widget.spy_sig_new_binary_image = SignalSpy(widget.sig_new_binary_image)  # type: ignore[attr-defined]
+    widget.spy_sig_new_binary_config = SignalSpy(widget.sig_new_binary_config)  # type: ignore[attr-defined]
+    widget.spy_sig_decoding_invalid = SignalSpy(widget.sig_decoding_invalid)  # type: ignore[attr-defined]
     widget.show()
     qtbot.waitUntil(lambda: widget.isVisible(), timeout=1000)
     yield widget
@@ -135,36 +136,45 @@ def test__creation(qtbot, temp_path, use_params):
         assert id(widget.get_param(_key)) != id(
             ConfigureBinaryDecodingWidget.default_params[_key]
         )
-    for _key in ["raw_datatype", "raw_n_y", "raw_n_x", "raw_header"]:
+    for _key in ["raw_datatype", "raw_n_y", "raw_n_x", "raw_header_size"]:
         assert _key in widget.param_composite_widgets
         assert widget.param_composite_widgets[_key].isVisible()
+
+
+@pytest.mark.gui
+def test_set_new_filename__qapp_test(qtbot, qapp):
+    _original_font_size = qapp.font_size
+    with qtbot.waitSignal(qapp.sig_font_size_changed):
+        qapp.font_size = _original_font_size + 1
+    qapp.font_size = _original_font_size
+    assert qapp.font_size == _original_font_size
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("filename", ["ascii_file.txt", "no_such_file.bin"])
+def test_set_new_filename__invalid_files(widget, path_w_data_files, filename):
+    _new_path = path_w_data_files / filename
+    widget.set_new_filename(_new_path)
+    assert not widget.decoding_is_valid
+    assert widget.spy_sig_new_binary_image.n == 0
+    assert widget.spy_sig_new_binary_config.n == 0
+    assert widget.spy_sig_decoding_invalid.n == 0
+    assert not widget.isVisible()
 
 
 @pytest.mark.gui
 @pytest.mark.parametrize("filename", _FILENAMES)
 def test_set_new_filename__binary(qtbot, widget, path_w_data_files, filename):
     _new_path = path_w_data_files / filename
-    widget.set_new_filename(_new_path)
-    qtbot.wait(5)  # wait to allow for possible signal processing
+    with qtbot.waitSignal(widget.sig_decoding_invalid, timeout=1000):
+        widget.set_new_filename(_new_path)
+    # Allow event loop to process all pending events
+    qtbot.waitUntil(lambda: widget.spy_sig_decoding_invalid.n == 1, timeout=1000)
     assert not widget.decoding_is_valid
     assert widget.spy_sig_new_binary_image.n == 0
     assert widget.spy_sig_new_binary_config.n == 0
-    assert widget.spy_sig_decoding_invalid.n == 1
     _dtype_bytes = int(re.sub(r"[a-z_]", "", filename.removesuffix(".bin"))) // 8
     assert widget._config["filesize"] == (_dtype_bytes * 625)
-
-
-@pytest.mark.gui
-@pytest.mark.parametrize("filename", ["ascii_file.txt", "no_such_file.bin"])
-def test_set_new_filename__invalid_files(qtbot, widget, path_w_data_files, filename):
-    _new_path = path_w_data_files / filename
-    widget.set_new_filename(_new_path)
-    qtbot.waitUntil(lambda: not widget.isVisible(), timeout=1000)
-    assert not widget.decoding_is_valid
-    assert widget.spy_sig_new_binary_image.n == 0
-    assert widget.spy_sig_new_binary_config.n == 0
-    assert widget.spy_sig_decoding_invalid.n == 0
-    assert not widget.isVisible()
 
 
 @pytest.mark.gui
@@ -191,11 +201,10 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     assert _image.shape == (25, 25)
     # check with invalid size
     widget.set_param_and_widget_value("raw_n_y", 625)
-    qtbot.wait(5)  # wait to allow for possible signal processing
+    qtbot.waitUntil(lambda: widget.spy_sig_decoding_invalid.n == 2, timeout=1000)
     assert not widget.decoding_is_valid
     assert widget.spy_sig_new_binary_image.n == 1
     assert widget.spy_sig_new_binary_config.n == 1
-    assert widget.spy_sig_decoding_invalid.n == 2
     # check with second correct size 625 * 1
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_x", 1)
@@ -207,12 +216,11 @@ def test_check_decoding(qtbot, widget, path_w_data_files, filename):
     _image = import_data(_fname, **_kwargs)
     assert _image.shape == (625, 1)
     # check with header offset
-    widget.set_param_and_widget_value("raw_header", 25 * _dtype_size)
-    qtbot.wait(5)  # wait to allow for possible signal processing
+    widget.set_param_and_widget_value("raw_header_size", 25 * _dtype_size)
+    qtbot.waitUntil(lambda: widget.spy_sig_decoding_invalid.n == 3, timeout=1000)
     assert not widget.decoding_is_valid
     assert widget.spy_sig_new_binary_image.n == 2
     assert widget.spy_sig_new_binary_config.n == 2
-    assert widget.spy_sig_decoding_invalid.n == 3
     # correct the size for the header offset
     with qtbot.waitSignal(widget.sig_new_binary_image, timeout=1000):
         widget.set_param_and_widget_value("raw_n_y", 600)
@@ -239,9 +247,18 @@ def test_toggle_details(qtbot, widget):
                 widget._widgets["show_decoding_details"],
                 QtCore.Qt.MouseButton.LeftButton,
             )
-        qtbot.wait(5)  # wait to allow for possible signal processing
-        for _key in widget.param_composite_widgets:
-            assert widget.param_composite_widgets[_key].isVisible() == _run
+        # Allow event loop to process visibility changes
+        qtbot.waitUntil(
+            lambda: (
+                all(
+                    widget.param_composite_widgets[_key].isVisible() == _run
+                    for _key in widget.param_composite_widgets
+                )
+            ),
+            timeout=1000,
+        )
+        # Note: the above waitUntil also serves as assertion of visibility state
+        # because if the condition is not met, the test will fail due to timeout
 
 
 if __name__ == "__main__":

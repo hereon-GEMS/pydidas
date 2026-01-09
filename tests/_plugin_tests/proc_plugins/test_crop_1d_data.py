@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,18 +30,10 @@ import pydidas
 from pydidas.core import UserConfigError
 from pydidas.plugins import ProcPlugin
 from pydidas.unittest_objects import create_dataset
-from pydidas_qtcore import PydidasQApplication
 
 
 _DATA = create_dataset(5, dtype=float)
 _REGISTRY = pydidas.plugins.PluginCollection()
-
-
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
 
 
 @pytest.fixture

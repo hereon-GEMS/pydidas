@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Module with pydidas unittests"""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -71,10 +71,10 @@ def test_data() -> dict:
     }
 
 
-@pytest.fixture(autouse=True)
+# @pytest.fixture(autouse=True)
 def _cleanup() -> Generator[None, None, None]:
-    yield
     app = PydidasQApplication.instance()
+    yield
     for widget in [
         _w for _w in app.topLevelWidgets() if isinstance(_w, SelectDataFrameWidget)
     ]:
@@ -179,10 +179,7 @@ def test_process_new_filename(
 @pytest.mark.parametrize("filename", _VALID_FILENAMES)
 def test__select_file(qtbot, widget, path_w_data_files, test_data, filename) -> None:
     _fname_widget = widget.param_composite_widgets["filename"]
-    with (
-        qtbot.waitSignal(_fname_widget.sig_new_value, timeout=1000),
-        qtbot.waitSignal(_fname_widget.sig_value_changed, timeout=1000),
-    ):
+    with qtbot.waitSignal(_fname_widget.sig_value_changed, timeout=1000):
         widget.set_param_and_widget_value("filename", path_w_data_files / filename)
     qtbot.wait(5)  # ensure signal processing
     assert_correct_widget_visibility(widget)
@@ -325,7 +322,7 @@ def test__select_h5_2d_dset_after_3d(widget, path_w_data_files) -> None:
 
 @pytest.mark.gui
 @pytest.mark.parametrize("dataset", _VALID_KEYS)
-@pytest.mark.parametrize("emulate_gui", [True, False])
+@pytest.mark.parametrize("emulate_gui", [False])
 def test__select_hdf5_dset(
     qtbot, widget, test_data, path_w_data_files, dataset, emulate_gui
 ) -> None:

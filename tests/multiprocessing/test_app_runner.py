@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -27,7 +27,8 @@ __status__ = "Production"
 import time
 import unittest
 
-from qtpy import QtCore, QtTest, QtWidgets
+import pytest
+from qtpy import QtCore, QtTest
 
 from pydidas import IS_QT6
 from pydidas.core import BaseApp, PydidasQsettings
@@ -35,24 +36,23 @@ from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 
 
+@pytest.mark.slow
 class TestAppRunner(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.qt_app = QtWidgets.QApplication.instance()
-        if cls.qt_app is None:
-            cls.qt_app = QtWidgets.QApplication([])
         cls.q_settings = PydidasQsettings()
         cls._mosaic_border_width = cls.q_settings.value("user/mosaic_border_width")
         cls._mosaic_border_value = cls.q_settings.value("user/mosaic_border_value")
+        cls._original_n_workers = cls.q_settings.value("global/mp_n_workers")
         cls.q_settings.set_value("user/mosaic_border_width", 0)
         cls.q_settings.set_value("user/mosaic_border_value", 1)
+        cls.q_settings.set_value("global/mp_n_workers", 2)
 
     @classmethod
     def tearDownClass(cls):
         cls.q_settings.set_value("user/mosaic_border_width", cls._mosaic_border_width)
         cls.q_settings.set_value("user/mosaic_border_value", cls._mosaic_border_value)
-        if cls.qt_app is not None:
-            cls.qt_app.quit()
+        cls.q_settings.set_value("global/mp_n_workers", cls._original_n_workers)
 
     def setUp(self):
         self.app = MpTestApp()
@@ -62,23 +62,17 @@ class TestAppRunner(unittest.TestCase):
         if self._runner is not None:
             self._runner.exit()
 
-    def wait_for_spy_signal(self, spy, timeout=8):
-        _t0 = time.time()
-        while True:
-            QtTest.QTest.qWait(100)
-            if len(spy) == 1:
-                break
-            if time.time() > _t0 + timeout:
-                raise TimeoutError("Waiting too long for final app state.")
-        time.sleep(0.1)
-
-    def wait_for_spy_signal_qt6(self, spy, timeout=10):
+    def wait_for_spy_signal(self, spy, timeout=10):
         _t0 = time.time()
         while True:
             time.sleep(0.1)
             QtTest.QTest.qWait(1)
-            if spy.count() >= 1:
-                break
+            if IS_QT6:
+                if spy.count() >= 1:
+                    break
+            else:
+                if len(spy) == 1:
+                    break
             if time.time() > _t0 + timeout:
                 raise TimeoutError("Waiting too long for final app state.")
         time.sleep(0.1)
@@ -109,10 +103,7 @@ class TestAppRunner(unittest.TestCase):
         _spy2 = QtTest.QSignalSpy(self._runner.finished)
         self._runner.start()
         time.sleep(0.1)
-        if IS_QT6:
-            self.wait_for_spy_signal_qt6(_spy2)
-        else:
-            self.wait_for_spy_signal(_spy2)
+        self.wait_for_spy_signal(_spy2)
         time.sleep(1)
         _new_app = _spy.at(0)[0] if IS_QT6 else _spy[0][0]
         _image = _new_app._composite.image

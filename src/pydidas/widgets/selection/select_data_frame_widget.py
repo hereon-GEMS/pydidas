@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ hdf5) files dataset and frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,7 +40,6 @@ from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5_dataset_utils import get_generic_dataset
 from pydidas.widgets.data_viewer import DataAxisSelector
-from pydidas.widgets.file_dialog import PydidasFileDialog
 from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
@@ -92,7 +91,6 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.set_default_params()
         AssociatedFileMixin.__init__(self, filename_param=self.params["filename"])
         self.set_param_value_and_choices("slicing_axis", None, [None])
-        self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
         self.__file_valid = False

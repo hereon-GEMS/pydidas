@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,7 +32,6 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.widgets.framework import BaseFrame
-from pydidas_qtcore import PydidasQApplication
 
 
 class SignalTestClass(QtCore.QObject):
@@ -53,22 +52,7 @@ class SignalTestClass(QtCore.QObject):
 class TestBaseFrame(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._qtapp = QtWidgets.QApplication.instance()
-        if cls._qtapp is None:
-            cls._qtapp = PydidasQApplication([])
-
         cls.tester = SignalTestClass()
-        # cls.widgets = []
-
-    @classmethod
-    def tearDownClass(cls):
-        # while cls.widgets:
-        #     w = cls.widgets.pop()
-        #     w.deleteLater()
-        cls._qtapp.quit()
-        app = QtWidgets.QApplication.instance()
-        if app is None:
-            app.deleteLater()
 
     def get_base_frame(self, **kwargs):
         _frame = BaseFrame(**kwargs)
@@ -104,13 +88,13 @@ class TestBaseFrame(unittest.TestCase):
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
-        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         _, _state = obj.export_state()
         self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
         self.assertEqual(obj.frame_index, _state["frame_index"])
         self.assertEqual(obj.menu_entry, _state["menu_entry"])
         self.assertEqual(obj.__class__.__name__, _state["class"])
+        obj.deleteLater()
 
     def test_restore_state__hidden_frame(self):
         _n = 10
@@ -119,10 +103,10 @@ class TestBaseFrame(unittest.TestCase):
         self.create_widgets_in_frame(obj, _n)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
         _state = {"params": _params, "frame_index": 0, "menu_entry": obj.menu_entry}
-        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)
         self.assertEqual(obj._config["state"], _state)
+        obj.deleteLater()
 
     def test_restore_state__frame_visible(self):
         _n = 10
@@ -135,11 +119,11 @@ class TestBaseFrame(unittest.TestCase):
             "frame_index": obj.frame_index,
             "menu_entry": obj.menu_entry,
         }
-        QtCore.QTimer.singleShot(100, self._qtapp.quit)
         obj.show()
         obj.restore_state(_state)
         _, _state = obj.export_state()
         self.assertEqual(_params, _state["params"])
+        obj.deleteLater()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,6 @@ from qtpy import QtWidgets
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
 from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
-from pydidas_qtcore import PydidasQApplication
 
 
 class _TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
@@ -46,9 +45,6 @@ class _TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
 class TestCreateWidgetsMixIn(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication.instance()
-        if cls.q_app is None:
-            cls.q_app = PydidasQApplication([])
         cls.widgets = []
 
     @classmethod
@@ -56,10 +52,6 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         while cls.widgets:
             w = cls.widgets.pop()
             w.deleteLater()
-        cls.q_app.quit()
-        app = QtWidgets.QApplication.instance()
-        if app is None:
-            app.deleteLater()
 
     def setUp(self): ...
 

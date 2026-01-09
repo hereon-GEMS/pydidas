@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Class to run pydidas workflows with an event loop from the command line.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,7 +39,6 @@ from pydidas.contexts.scan import Scan
 from pydidas.core import UserConfigError
 from pydidas.multiprocessing import AppRunner
 from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
-from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
@@ -87,7 +86,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
     def __init__(self, **kwargs: dict):
         QtCore.QObject.__init__(self, None)
-        self._qtapp = PydidasQApplication.instance()
+        self._loop: QtCore.QEventLoop | None = None
         self.parse_args_for_pydidas_workflow()
         self.update_parsed_args_from_kwargs(**kwargs)
 
@@ -206,7 +205,8 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             "HDF5",
             overwrite=self.parsed_args["overwrite"],
         )
-        self._qtapp.quit()
+        if self._loop is not None and self._loop.isRunning():
+            self._loop.quit()
 
     def process_scan(self, **kwargs: dict):
         """
@@ -286,7 +286,12 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         Execute the given workflow in an AppRunner with a QEventLoop.
         """
         self._app = ExecuteWorkflowApp()
-
+        if self._loop is None:
+            self._loop = QtCore.QEventLoop()
+        if self._loop.isRunning():
+            raise RuntimeError(
+                "An event loop is already running. Cannot start another event loop."
+            )
         try:
             runner = AppRunner(self._app)
             runner.sig_results.connect(self._app.multiprocessing_store_results)
@@ -297,11 +302,15 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             runner.start()
             if self.parsed_args["verbose"]:
                 print("Processing progress:")
-            self._qtapp.exec_()
+            self._loop.exec()
+            if self.parsed_args["verbose"]:
+                print("\nProcessing finished successfully.")
         except UserConfigError:
             runner.requestInterruption()
             if self.parsed_args["verbose"]:
                 print("\nAborted workflow processing because of illegal configuration.")
-            return
-        if self.parsed_args["verbose"]:
-            print("\nProcessing finished successfully.")
+        finally:
+            if self._loop.isRunning():
+                self._loop.quit()
+            self._loop.deleteLater()
+            self._loop = None

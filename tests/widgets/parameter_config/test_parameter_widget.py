@@ -30,6 +30,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from qtpy import QtCore
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
@@ -84,7 +85,8 @@ def _cleanup():
     app = PydidasQApplication.instance()
     _starting_fontsize = app.font_size
     yield
-    app.font_size = _starting_fontsize
+    with QtCore.QSignalBlocker(app):
+        app.font_size = _starting_fontsize
     for widget in [
         _w for _w in app.topLevelWidgets() if isinstance(_w, ParameterWidget)
     ]:

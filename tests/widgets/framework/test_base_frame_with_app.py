@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for the BaseFrameWithApp widget."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -34,7 +34,7 @@ from pydidas.widgets.framework import BaseFrameWithApp
 
 
 class DummyRunner:
-    def exit(self):
+    def exit(self) -> None:
         pass
 
 
@@ -42,46 +42,46 @@ class _TestClass(QtCore.QObject):
     signal = QtCore.Signal(float)
     simple_signal = QtCore.Signal()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.received_signals = []
+        self.received_signals: list = []
 
-    def get_progress(self, obj):
+    def get_progress(self, obj: object) -> None:
         self.received_signals.append(obj)
 
-    def send_progress(self, progress):
-        self.signal.emit(progress)
+    def send_progress(self, progress: float) -> None:
+        self.signal.emit(progress)  # type: ignore[attr-defined]
 
 
 class TestBaseFrameWithApp(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.tester = _TestClass()
 
-    def tearDown(self): ...
+    def tearDown(self) -> None: ...
 
-    def get_base_frame_with_app(self):
+    def get_base_frame_with_app(self) -> BaseFrameWithApp:
         _obj = BaseFrameWithApp()
         # self.widgets.append(_obj)
         return _obj
 
-    def test_init(self):
+    def test_init(self) -> None:
         obj = self.get_base_frame_with_app()
         self.assertIsInstance(obj, BaseFrameWithApp)
         self.assertEqual(obj.frame_index, -1)
         self.assertIsNone(obj._app)
 
-    def test_set_app_wrong_class(self):
+    def test_set_app_wrong_class(self) -> None:
         obj = self.get_base_frame_with_app()
         with self.assertRaises(TypeError):
-            obj._set_app("test")
+            obj._set_app("test")  # type: ignore[arg-type]
 
-    def test_set_app_no_existing_app(self):
+    def test_set_app_no_existing_app(self) -> None:
         obj = self.get_base_frame_with_app()
         app = BaseApp()
         obj._set_app(app)
         self.assertIsInstance(obj._app, BaseApp)
 
-    def test_set_app_existing_app(self):
+    def test_set_app_existing_app(self) -> None:
         _bin = 5
         _fname = Path("test/file/name.txt")
         obj = self.get_base_frame_with_app()
@@ -95,27 +95,32 @@ class TestBaseFrameWithApp(unittest.TestCase):
         app.set_param_value("binning", _bin)
         app.set_param_value("first_file", _fname)
         app._config["test_key"] = True
-        app.test_attr = [True, False]
+        app.test_attr = [True, False]  # type: ignore[attr-defined]
         obj._set_app(app)
         self.assertTrue(obj._app._config["test_key"])
         self.assertEqual(obj._app.get_param_value("binning"), _bin)
         self.assertEqual(obj._app.get_param_value("first_file"), _fname)
-        self.assertEqual(obj._app.test_attr, app.test_attr)
+        self.assertEqual(
+            obj._app.test_attr,
+            app.test_attr,  # type: ignore[attr-defined]
+        )
 
-    def test_apprunner_update_progress(self):
+    def test_apprunner_update_progress(self) -> None:
         _progress = 0.425
         obj = self.get_base_frame_with_app()
         obj._app = BaseApp()
         obj._widgets["progress"] = QtWidgets.QSpinBox()
-        self.tester.signal.connect(obj._apprunner_update_progress)
+        self.tester.signal.connect(  # type: ignore[attr-defined]
+            obj._apprunner_update_progress
+        )
         self.tester.send_progress(_progress)
         self.assertEqual(obj._widgets["progress"].value(), round(_progress * 100))
 
-    def test_apprunner_finished(self):
+    def test_apprunner_finished(self) -> None:
         obj = self.get_base_frame_with_app()
         obj._runner = DummyRunner()
-        self.tester.simple_signal.connect(obj._apprunner_finished)
-        self.tester.simple_signal.emit()
+        self.tester.simple_signal.connect(obj._apprunner_finished)  # type: ignore[attr-defined]
+        self.tester.simple_signal.emit()  # type: ignore[attr-defined]
         self.assertIsNone(obj._runner)
 
 

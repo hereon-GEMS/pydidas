@@ -94,8 +94,8 @@ class TestAppRunner(unittest.TestCase):
         _num = 12345
         self._runner = AppRunner(self.app)
         self._runner.set_app_param("hdf5_last_image_num", _num)
-        _appnum = self._runner._AppRunner__app.get_param_value("hdf5_last_image_num")
-        self.assertEqual(_num, _appnum)
+        _app_num = self._runner._AppRunner__app.get_param_value("hdf5_last_image_num")
+        self.assertEqual(_num, _app_num)
 
     def test_run(self):
         self._runner = AppRunner(self.app, n_workers=2)

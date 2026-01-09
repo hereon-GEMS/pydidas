@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for the BaseFrame widget."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 import unittest
+from typing import Any
 
 import pytest
 from qtpy import QtCore, QtWidgets
@@ -37,24 +38,25 @@ from pydidas.widgets.framework import BaseFrame
 class SignalTestClass(QtCore.QObject):
     signal = QtCore.Signal(int)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.reveived_signals = []
+        self.received_signals: list = []
 
-    def get_signal(self, obj):
-        self.reveived_signals.append(obj)
+    def get_signal(self, obj: object) -> None:
+        self.received_signals.append(obj)
 
-    def send_signal(self, sig):
-        self.signal.emit(sig)
+    def send_signal(self, sig: int) -> None:
+        self.signal.emit(sig)  # type: ignore[attr-defined]
 
 
 @pytest.mark.gui
 class TestBaseFrame(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.tester = SignalTestClass()
 
-    def get_base_frame(self, **kwargs):
+    @staticmethod
+    def get_base_frame(**kwargs: Any) -> BaseFrame:
         _frame = BaseFrame(**kwargs)
         # self.widgets.append(_frame)
         _frame.add_param(Parameter("test_int", int, 24))
@@ -62,29 +64,30 @@ class TestBaseFrame(unittest.TestCase):
         _frame.create_param_widget(_frame.get_param("test_int"))
         return _frame
 
-    def create_widgets_in_frame(self, frame, n=6):
+    @staticmethod
+    def create_widgets_in_frame(frame: BaseFrame, n: int = 6) -> None:
         for _index in range(n):
             frame.create_label(f"label_{_index}", get_random_string(120))
 
-    def test_init(self):
+    def test_init(self) -> None:
         obj = self.get_base_frame()
         self.assertIsInstance(obj, BaseFrame)
         self.assertEqual(obj.frame_index, -1)
         self.assertIsInstance(obj.layout(), QtWidgets.QGridLayout)
 
-    def test_frame_activated(self):
+    def test_frame_activated(self) -> None:
         obj = self.get_base_frame()
-        self.tester.signal.connect(obj.frame_activated)
+        self.tester.signal.connect(obj.frame_activated)  # type: ignore[attr-defined]
         self.tester.send_signal(1)
 
-    def test_set_status(self):
+    def test_set_status(self) -> None:
         _test = "This is the test status."
         obj = self.get_base_frame()
         obj.status_msg.connect(self.tester.get_signal)
         obj.set_status(_test)
-        self.assertEqual(self.tester.reveived_signals.pop(), _test)
+        self.assertEqual(self.tester.received_signals.pop(), _test)
 
-    def test_export_state(self):
+    def test_export_state(self) -> None:
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
@@ -96,19 +99,23 @@ class TestBaseFrame(unittest.TestCase):
         self.assertEqual(obj.__class__.__name__, _state["class"])
         obj.deleteLater()
 
-    def test_restore_state__hidden_frame(self):
+    def test_restore_state__hidden_frame(self) -> None:
         _n = 10
         obj = self.get_base_frame()
         obj._config["built"] = False
         self.create_widgets_in_frame(obj, _n)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
-        _state = {"params": _params, "frame_index": 0, "menu_entry": obj.menu_entry}
+        _state = {
+            "params": _params,
+            "frame_index": 0,
+            "menu_entry": obj.menu_entry,
+        }
         obj.show()
         obj.restore_state(_state)
         self.assertEqual(obj._config["state"], _state)
         obj.deleteLater()
 
-    def test_restore_state__frame_visible(self):
+    def test_restore_state__frame_visible(self) -> None:
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with pydidas unittests"""
+"""Unit tests for the SelectDataFrameWidget."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
@@ -71,7 +71,7 @@ def test_data() -> dict:
     }
 
 
-# @pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)
 def _cleanup() -> Generator[None, None, None]:
     app = PydidasQApplication.instance()
     yield

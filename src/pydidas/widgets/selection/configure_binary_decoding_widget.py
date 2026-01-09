@@ -16,8 +16,8 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ConfigureBinaryDecodingWidget widget which allows to select the metadata
-for raw encoded files.
+Module with the ConfigureBinaryDecodingWidget which allows configuration
+of metadata for raw encoded binary files.
 """
 
 __author__ = "Malte Storm"
@@ -171,7 +171,9 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         self.sig_new_binary_image.emit(  # type: ignore[attr-defined]
             self.current_filepath, self._config["decode_kwargs"]
         )
-        self.sig_new_binary_config.emit(self._config["decode_kwargs"])
+        self.sig_new_binary_config.emit(  # type: ignore[attr-defined]
+            self._config["decode_kwargs"]
+        )
 
     @QtCore.Slot(bool)
     def _toggle_details(self, checked: bool) -> None:

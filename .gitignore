@@ -26,6 +26,7 @@ coverage_html_report
 .ruff_cache/*
 src/pydidas/docs/src/dev_guide/dev_guide_list_of_generic_params.rst
 src/pydidas/docs/src/manuals/global/scan/scan_params.rst
+src/pydidas/sphinx/docs-built.yml
 
 # logging
 *.log

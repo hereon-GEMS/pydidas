@@ -37,6 +37,7 @@ from typing import Union
 
 import yaml
 
+from pydidas.version import VERSION
 from pydidas.core.utils.get_documentation_targets import (
     DOC_BUILD_PATH,
     DOC_SOURCE_DIRECTORY,
@@ -66,7 +67,7 @@ def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
             _content = yaml.safe_load(f)
     except (FileNotFoundError, OSError, yaml.YAMLError):
         _content = {}
-    return _content.get("docs-built", False)
+    return _content.get(VERSION, False)
 
 
 def run_sphinx_html_build(
@@ -109,7 +110,7 @@ def run_sphinx_html_build(
             )
     try:
         with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
-            yaml.dump({"docs-built": True}, f)
+            yaml.dump({VERSION: True}, f)
     except (FileNotFoundError, OSError, PermissionError):
         raise OSError(
             "Could not create the docs-built.yml file in the documentation "

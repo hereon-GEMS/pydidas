@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ generate the Sphinx html documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,11 +37,11 @@ from typing import Union
 
 import yaml
 
-from pydidas.version import VERSION
 from pydidas.core.utils.get_documentation_targets import (
     DOC_BUILD_PATH,
     DOC_SOURCE_DIRECTORY,
 )
+from pydidas.version import VERSION
 from pydidas_qtcore import PydidasSplashScreen
 
 

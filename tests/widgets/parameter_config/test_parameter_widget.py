@@ -108,7 +108,9 @@ def _cleanup() -> Generator[None, None, None]:
 )
 @pytest.mark.parametrize("width", [30, 100, None])
 @pytest.mark.parametrize("font_size", [7, 10, 15])
-def test__creation__w__bool_choices(qtbot, qapp, choices, kwargs, width, font_size) -> None:
+def test__creation__w__bool_choices(
+    qtbot, qapp, choices, kwargs, width, font_size
+) -> None:
     qapp.font_size = font_size
     _expected_width = qapp.font_char_width * (
         width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
@@ -313,7 +315,9 @@ def test_set_param_value(qtbot, dtype, default, new_value) -> None:
 
 @pytest.mark.gui
 @pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
-def test_set_param_value__through_widget_signal(qtbot, dtype, default, new_value) -> None:
+def test_set_param_value__through_widget_signal(
+    qtbot, dtype, default, new_value
+) -> None:
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
     assert widget.param.value == default

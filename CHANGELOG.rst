@@ -17,6 +17,7 @@ Programmatic changes
 - Added a ConfigureBinaryDecodingWidget class which handles the decoding
   options for raw/binary files centrally.
 - PydidasWidgetMixin class can now also set the layout based on class attributes.
+- Made Qt6 (through the PySide6 bindings) the default Qt.
 
 Bugfixes
 --------

@@ -29,6 +29,8 @@ Bugfixes
 - Fixed an issue in the ShowDetailedPluginResultsWindow which did not autoscale
   the results due to a delayed event loop execution.
 - Fixed an issue in the ParameterWidget which arranged the sub-widgets incorrectly.
+- Removed legacy calls to QApplication from tests because the pydidas module import
+  creates a PydidasQApplication
 
 
 v25.10.28

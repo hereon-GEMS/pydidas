@@ -33,7 +33,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Union
 
 import yaml
 
@@ -45,13 +44,13 @@ from pydidas.version import VERSION
 from pydidas_qtcore import PydidasSplashScreen
 
 
-def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
+def check_sphinx_html_docs(doc_dir: Path | str | None = None) -> bool:
     """
     Check whether the index.html file for the built sphinx documentation exists.
 
     Parameters
     ----------
-    doc_dir : Union[pathlib.Path, str, None], optional
+    doc_dir : Path or str or None, optional
         An optional build directory. If None, this defaults to the generic
         pydidas documentation directory. The default is None.
 
@@ -71,14 +70,14 @@ def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
 
 
 def run_sphinx_html_build(
-    build_dir: Union[Path, str, None] = None, verbose: bool = True
-):
+    build_dir: Path | str | None = None, verbose: bool = True
+) -> None:
     """
     Run the sphinx process to generate the html documentation.
 
     Parameters
     ----------
-    build_dir : Union[pathlib.Path, str, None], optional
+    build_dir : Path or str or None, optional
         An optional build directory. If None, this defaults to the generic
         pydidas documentation directory. The default is None.
     verbose : bool, optional
@@ -90,7 +89,11 @@ def run_sphinx_html_build(
         return
     if "-m" in sys.argv:
         _index = sys.argv.index("-m")
-        if len(sys.argv) > _index and sys.argv[_index + 1] in ["unittest", "sphinx"]:
+        if len(sys.argv) > _index and sys.argv[_index + 1] in [
+            "pytest",
+            "unittest",
+            "sphinx",
+        ]:
             return
     if build_dir is None:
         build_dir = DOC_BUILD_PATH / "html"

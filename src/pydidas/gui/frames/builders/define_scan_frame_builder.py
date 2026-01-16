@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DEFINE_SCAN_FRAME_BUILD_CONFIG configuration dictionary which
+Module with the DEFINE_SCAN_FRAME_BUILD_CONFIG configuration list which
 is used to populate the DefineScanFrame with widgets.
 """
 

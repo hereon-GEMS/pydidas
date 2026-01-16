@@ -28,6 +28,7 @@ __all__ = ["SquareButton"]
 
 from typing import Any
 
+import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core.constants import MINIMUM_WIDGET_DIMENSIONS
@@ -89,7 +90,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         font_height : float
             The font height metrics.
         """
-        self.__size = int(max(font_height + 6, MINIMUM_WIDGET_DIMENSIONS))
+        self.__size = max(int(np.ceil(1.05 * font_height)), MINIMUM_WIDGET_DIMENSIONS)
         self.setMinimumWidth(self.__size)
         self.setMinimumHeight(self.__size)
 

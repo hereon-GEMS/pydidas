@@ -58,10 +58,6 @@ import qtpy as __qtpy  # noqa E402
 
 __os.environ["PYQTGRAPH_QT_LIB"] = __qtpy.API_NAME
 
-if "--verbose" in __sys.argv:
-    print("pydidas Using QT: ", __qtpy.API_NAME)
-
-
 from .fontsize import PYDIDAS_STANDARD_FONT_SIZE  # noqa E402
 from .pydidas_qapp import PydidasQApplication  # noqa E402
 from .pydidas_splash_screen import PydidasSplashScreen  # noqa E402

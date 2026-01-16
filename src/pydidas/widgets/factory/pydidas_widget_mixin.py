@@ -46,7 +46,7 @@ from pydidas_qtcore import PydidasQApplication
 
 class PydidasWidgetMixin:
     """
-    Mixin class to handle automatic font updated from the QApplication.
+    Mixin class to handle automatic font updates from the QApplication.
 
     This class allows to use custom font settings (different sizes, bold etc.) and
     still update them automatically.
@@ -77,7 +77,32 @@ class PydidasWidgetMixin:
         Parameters
         ----------
         **kwargs : Any
-            Any kwargs for setting the font or other Qt parameters.
+            Any kwargs for setting the font or other Qt parameters. The
+            PydidasWidgetMixin supports the following kwargs:
+
+            bold : bool, optional
+                Whether to use a bold font. The default is False.
+            italic : bool, optional
+                Whether to use an italic font. The default is False.
+            fontsize_offset : float, optional
+                An offset to add to the global font size. The default is 0.
+            underline : bool, optional
+                Whether to use an underlined font. The default is False.
+            size_hint_width : int or None, optional
+                The width to return in sizeHint. The default is
+                GENERIC_STANDARD_WIDGET_WIDTH.
+            size_hint_height : int or None, optional
+                The height to return in sizeHint. The default is
+                MINIMUM_WIDGET_DIMENSIONS.
+            minimum_width : int or None, optional
+                The minimum width of the widget. The default is
+                MINIMUM_WIDGET_DIMENSIONS.
+            font_metric_width_factor : float or None, optional
+                A factor to multiply the font width with to set the widget
+                width dynamically. The default is None (disabled).
+            font_metric_height_factor : float or None, optional
+                A factor to multiply the font height with to set the widget
+                height dynamically. The default is None (disabled).
         """
         self.__font_config = {
             "bold": kwargs.get("bold", False),
@@ -146,9 +171,9 @@ class PydidasWidgetMixin:
         new_fontsize : float
             The new font size.
         """
-        _font = self.font()  # type: ignore[attr-defined]
-        _font.setPointSizeF(new_fontsize + self.__font_config["size_offset"])
-        self.setFont(_font)  # type: ignore[attr-defined]
+        update_qwidget_font(
+            self, pointSizeF=new_fontsize + self.__font_config["size_offset"]
+        )
 
     @QtCore.Slot(str)
     def update_font_family(self, new_family: str) -> None:
@@ -160,9 +185,7 @@ class PydidasWidgetMixin:
         new_family : str
             The name of the new font family.
         """
-        _font = self.font()  # type: ignore[attr-defined]
-        _font.setFamily(new_family)
-        self.setFont(_font)  # type: ignore[attr-defined]
+        update_qwidget_font(self, family=new_family)
 
     @QtCore.Slot(float, float)
     def process_new_font_metrics(self, font_width: float, font_height: float) -> None:

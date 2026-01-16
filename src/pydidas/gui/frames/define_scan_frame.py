@@ -96,10 +96,7 @@ class DefineScanFrame(BaseFrame):
             alignment=constants.ALIGN_TOP_LEFT,
         )
         for _name, _args, _kwargs in DEFINE_SCAN_FRAME_BUILD_CONFIG:
-            _method = getattr(self, _name)
-            if "widget" in _kwargs:
-                _kwargs["widget"] = self._widgets[_kwargs["widget"]]
-            _method(*_args, **_kwargs)
+            getattr(self, _name)(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 

@@ -1,7 +1,7 @@
 # Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
-pyFAI==2025.3.0
+pyFAI==2025.12.1
 silx==2.2.2
 scikit-image>=0.22.0
 sphinx>=8.0.0

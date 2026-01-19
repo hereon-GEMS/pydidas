@@ -35,8 +35,8 @@ from unittest.mock import patch
 
 import pytest
 
-from pydidas import VERSION
 from pydidas.core.utils import DOC_SOURCE_DIRECTORY, sphinx_html
+from pydidas.version import VERSION
 
 
 @pytest.fixture
@@ -60,6 +60,13 @@ def test_check_sphinx_html_docs__generic_case(setup_test_env, temp_path) -> None
 
 def test_check_sphinx_html_docs__empty_folder(setup_test_env, temp_path) -> None:
     """Test check_sphinx_html_docs with empty folder."""
+    assert not sphinx_html.check_sphinx_html_docs(temp_path / "docs" / "build")
+
+
+def test_check_sphinx_html_docs__empty_file(setup_test_env, temp_path) -> None:
+    """Test check_sphinx_html_docs with empty folder."""
+    with open(temp_path / "docs" / "build" / "docs-built.yml", "w") as f:
+        f.write("")
     assert not sphinx_html.check_sphinx_html_docs(temp_path / "docs" / "build")
 
 

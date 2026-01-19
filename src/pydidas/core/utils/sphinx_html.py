@@ -46,7 +46,7 @@ from pydidas_qtcore import PydidasSplashScreen
 
 def check_sphinx_html_docs(doc_dir: Path | str | None = None) -> bool:
     """
-    Check whether the index.html file for the built sphinx documentation exists.
+    Check whether the sphinx documentation was built for the current version.
 
     Parameters
     ----------
@@ -63,7 +63,7 @@ def check_sphinx_html_docs(doc_dir: Path | str | None = None) -> bool:
     _index_file = doc_dir / "docs-built.yml"
     try:
         with open(_index_file, "r") as f:
-            _content = yaml.safe_load(f)
+            _content = yaml.safe_load(f) or {}
     except (FileNotFoundError, OSError, yaml.YAMLError):
         _content = {}
     return _content.get(VERSION, False)
@@ -111,14 +111,6 @@ def run_sphinx_html_build(
             _splash_screen.show_aligned_message(
                 "Building html documentation (required only once during first startup)"
             )
-    try:
-        with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
-            yaml.dump({VERSION: True}, f)
-    except (FileNotFoundError, OSError, PermissionError):
-        raise OSError(
-            "Could not create the docs-built.yml file in the documentation "
-            "directory. Please check the permissions of the directory."
-        )
     subprocess.run(
         [
             sys.executable,
@@ -130,3 +122,11 @@ def run_sphinx_html_build(
             build_dir,
         ]
     )
+    try:
+        with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
+            yaml.dump({VERSION: True}, f)
+    except (FileNotFoundError, OSError, PermissionError):
+        raise OSError(
+            "Could not create the docs-built.yml file in the documentation "
+            "directory. Please check the permissions of the directory."
+        )

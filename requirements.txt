@@ -12,27 +12,28 @@ babel==2.17.0
     # via
     #   pydata-sphinx-theme
     #   sphinx
-beautifulsoup4==4.14.2
+beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-build==1.3.0
+build==1.4.0
     # via -r requirements.in
-certifi==2025.10.5
+certifi==2026.1.4
     # via requests
 charset-normalizer==3.4.4
     # via requests
 colorama==0.4.6
     # via
     #   build
+    #   pyqtgraph
     #   sphinx
 contourpy==1.3.3
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
-docutils==0.21.2
+docutils==0.22.4
     # via
     #   pydata-sphinx-theme
     #   sphinx
-fabio==2024.9.0
+fabio==2025.10.0
     # via
     #   pyfai
     #   silx
@@ -50,9 +51,9 @@ hdf5plugin==6.0.0
     #   fabio
 idna==3.11
     # via requests
-imagecodecs==2025.8.2
+imagecodecs==2026.1.14
     # via -r requirements.in
-imageio==2.37.0
+imageio==2.37.2
     # via scikit-image
 imagesize==1.4.1
     # via sphinx
@@ -66,13 +67,13 @@ lxml==6.0.2
     # via fabio
 markupsafe==3.0.3
     # via jinja2
-matplotlib==3.10.7
+matplotlib==3.10.8
     # via pyfai
-networkx==3.5
+networkx==3.6.1
     # via scikit-image
 numexpr==2.14.1
     # via pyfai
-numpy==2.3.4
+numpy==2.4.1
     # via
     #   contourpy
     #   fabio
@@ -97,13 +98,13 @@ packaging==25.0
     #   scikit-image
     #   silx
     #   sphinx
-pillow==12.0.0
+pillow==12.1.0
     # via
     #   fabio
     #   imageio
     #   matplotlib
     #   scikit-image
-platformdirs==4.5.0
+platformdirs==4.5.1
     # via
     #   pyopencl
     #   pytools
@@ -116,9 +117,9 @@ pygments==2.19.2
     #   accessible-pygments
     #   pydata-sphinx-theme
     #   sphinx
-pyopencl==2025.2.6
+pyopencl==2026.1.1
     # via -r requirements.in
-pyparsing==3.2.5
+pyparsing==3.3.1
     # via matplotlib
 pyproject-hooks==1.2.0
     # via build
@@ -127,9 +128,9 @@ pyqt5==5.15.11
 pyqt5-qt5==5.15.2; sys_platform != "darwin"
 pyqt5-qt5==5.15.14; sys_platform == "darwin"
     # via pyqt5
-pyqt5-sip==12.17.1
+pyqt5-sip==12.18.0
     # via pyqt5
-pyqtgraph==0.13.7
+pyqtgraph==0.14.0
     # via -r requirements.in
 pyside6>=6.9.3,<=6.10.0
     # via -r requirements.in
@@ -154,11 +155,11 @@ requests==2.32.5
     # via
     #   -r requirements.in
     #   sphinx
-roman-numerals-py==3.1.0
+roman-numerals-py==4.0.0
     # via sphinx
-scikit-image==0.25.2
+scikit-image==0.26.0
     # via -r requirements.in
-scipy==1.16.2
+scipy==1.17.0
     # via
     #   pyfai
     #   scikit-image
@@ -180,9 +181,9 @@ six==1.17.0
     # via python-dateutil
 snowballstemmer==3.0.1
     # via sphinx
-soupsieve==2.8
+soupsieve==2.8.1
     # via beautifulsoup4
-sphinx==8.2.3
+sphinx==9.0.4
     # via
     #   -r requirements.in
     #   pydata-sphinx-theme
@@ -204,7 +205,7 @@ sphinxcontrib-qthelp==2.0.0
     # via sphinx
 sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
-tifffile==2025.10.16
+tifffile==2026.1.14
     # via scikit-image
 typing-extensions==4.15.0
     # via
@@ -212,5 +213,5 @@ typing-extensions==4.15.0
     #   pydata-sphinx-theme
     #   pyopencl
     #   pytools
-urllib3==2.6.2
+urllib3==2.6.3
     # via requests

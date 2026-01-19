@@ -10,7 +10,7 @@ name = "pydidas"
 authors = [{name = "Malte Storm"}]
 description = "pydidas - the PYthon DIffraction Data Analysis Suite"
 readme = "README.md"
-requires-python = ">=3.11, <=3.13"
+requires-python = ">=3.11, <3.14"
 license = "GPL-3.0-only"
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [

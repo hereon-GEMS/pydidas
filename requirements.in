@@ -4,7 +4,7 @@
 pyFAI==2025.12.1
 silx==2.2.2
 scikit-image>=0.26.0
-sphinx>=9.0
+sphinx>=8.2.3
 pydata_sphinx_theme>=0.15.4
 sphinx-copybutton>=0.5.2
 sphinx-design>=0.6.0

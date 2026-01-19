@@ -39,6 +39,7 @@ from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 class _TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
     def __init__(self, *args: object, parent: object = None, **kwargs: Any) -> None:
         super().__init__(parent)
+        CreateWidgetsMixIn.__init__(self)
         self.hash = hash(self)
         self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 

@@ -25,6 +25,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
+import os
 import subprocess
 import sys
 
@@ -51,13 +53,6 @@ def test_qtcore_bindings(ENV_QT_API, SYS_FLAGS):
     Test that the correct Qt bindings are used based on environment
     variable and system flags.
     """
-    import os
-
-    _expected_binding = (
-        "pyqt5"
-        if ("--QT5" in SYS_FLAGS or "--qt5" in SYS_FLAGS)
-        else (ENV_QT_API or "pyside6")
-    )
     env = os.environ.copy()
     if ENV_QT_API is not None:
         env["QT_API"] = ENV_QT_API
@@ -65,11 +60,9 @@ def test_qtcore_bindings(ENV_QT_API, SYS_FLAGS):
         del env["QT_API"]
 
     _test_code = import_test_code(ENV_QT_API)
-
     _result = subprocess.run(
         [sys.executable, "-c", _test_code], env=env, capture_output=True, text=True
     )
-
     assert _result.returncode == 0, f"Failed: {_result.stderr}"
 
 

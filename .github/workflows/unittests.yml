@@ -14,7 +14,7 @@ on:
 jobs:
   unittests:
     name: Test ${{ matrix.os }} Python ${{ matrix.python-version }} ${{ matrix.tests }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -22,6 +22,15 @@ jobs:
         QT_API: ["pyqt5", "pyside6"]
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         tests: ["", "-m slow", "-m gui"]
+      exclude:
+        - os: windows-latest
+          python-version: "3.11"
+        - os: windows-latest
+          python-version: "3.12"
+        - os: macos-latest
+          python-version: "3.11"
+        - os: macos-latest
+          python-version: "3.12"
 
     steps:
     - uses: actions/checkout@v3

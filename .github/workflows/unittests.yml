@@ -20,17 +20,20 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
         QT_API: ["pyqt5", "pyside6"]
-        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        # Remove macos-latest until issues from silx with macOS are resolved
+        # https://github.com/silx-kit/silx/issues/4457
+        # TODO: re-add macos-latest when silx issue is fixed
+        os: ["ubuntu-latest", "windows-latest"] #, "macos-latest"]
         tests: ["", "-m slow", "-m gui"]
         exclude:
           - os: windows-latest
             python-version: "3.11"
           - os: windows-latest
             python-version: "3.12"
-          - os: macos-latest
-            python-version: "3.11"
-          - os: macos-latest
-            python-version: "3.12"
+#          - os: macos-latest
+#            python-version: "3.11"
+#          - os: macos-latest
+#            python-version: "3.12"
 
     steps:
     - uses: actions/checkout@v3
@@ -71,6 +74,6 @@ jobs:
     - name: Run tests with pytest
       env:
         QT_API: ${{ matrix.QT_API }}
+        QT_QPA_PLATFORM: offscreen
       run: |
-        export QT_QPA_PLATFORM=offscreen
         python -m pytest ${{ matrix.tests }}

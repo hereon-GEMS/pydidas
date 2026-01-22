@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,37 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for the Crop1dData plugin."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+
+
+from typing import Generator
 
 import numpy as np
 import pytest
 
 import pydidas
-from pydidas.core import UserConfigError
+from pydidas.core import Dataset, UserConfigError
 from pydidas.plugins import ProcPlugin
 from pydidas.unittest_objects import create_dataset
-from pydidas_qtcore import PydidasQApplication
 
 
 _DATA = create_dataset(5, dtype=float)
 _REGISTRY = pydidas.plugins.PluginCollection()
 
 
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
-
-
 @pytest.fixture
-def plugin():
+def plugin() -> Generator[ProcPlugin, None, None]:
     _plugin_class = _REGISTRY.get_plugin_by_name("Crop1dData")
     _plugin = _plugin_class()
     _plugin.set_param_value("crop_low", 1)
@@ -55,16 +50,16 @@ def plugin():
 
 
 @pytest.fixture
-def data():
+def data() -> Dataset:
     return _DATA.copy()
 
 
-def test_init(plugin):
+def test_init(plugin: ProcPlugin) -> None:
     assert isinstance(plugin, ProcPlugin)
 
 
 @pytest.mark.parametrize("bounds", [[None, None], [0, None], [None, 3], [0, 3]])
-def test_pre_execute(plugin, bounds):
+def test_pre_execute(plugin: ProcPlugin, bounds: list[int | None]) -> None:
     plugin._data = "dummy"
     plugin.set_param_value("crop_low", bounds[0])
     plugin.set_param_value("crop_high", bounds[1])
@@ -77,69 +72,85 @@ def test_pre_execute(plugin, bounds):
         assert plugin._config["slices"] is None
 
 
-def test_get_slices__existing_slices(plugin):
+def test_get_slices__existing_slices(plugin: ProcPlugin) -> None:
     _defined_slices = (slice(None, None), slice(1, 2))
     plugin._config["slices"] = _defined_slices
-    _received_slices = plugin._get_slices()
+    _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _defined_slices
 
 
 @pytest.mark.parametrize("process_data_dim", [6, -6])
-def test_get_slices__invalid_data_dim(plugin, data, process_data_dim):
+def test_get_slices__invalid_data_dim(
+    plugin: ProcPlugin, data: object, process_data_dim: int
+) -> None:
     plugin.set_param_value("process_data_dim", process_data_dim)
     plugin._data = data
     with pytest.raises(UserConfigError):
-        plugin._get_slices()
+        plugin._get_slices()  # type: ignore[attr-defined]
 
 
 @pytest.mark.parametrize("process_data_dim", [0, 1, 2, 3, 4, -1, -2, -3, -4])
-def test_get_slices__valid_data_dim__w_indices(plugin, data, process_data_dim):
+def test_get_slices__valid_data_dim__w_indices(
+    plugin: ProcPlugin, data: object, process_data_dim: int
+) -> None:
     plugin.set_param_value("process_data_dim", process_data_dim)
     plugin._data = data
-    _target_slicing_dim = process_data_dim % data.ndim
+    _target_slicing_dim = process_data_dim % data.ndim  # type: ignore[attr-defined]
     _target_slices = (slice(None, None),) * _target_slicing_dim + (slice(1, 4),)
-    _received_slices = plugin._get_slices()
+    _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _target_slices
     assert plugin._config["slices"] == _target_slices
 
 
 @pytest.mark.parametrize("proc_dim", [0, 1, 2, 3, 4])
 @pytest.mark.parametrize("cropping", [[None, 7], [2, None], [2, 7]])
-def test_get_slices__valid_data_dim__w_data_range(plugin, data, proc_dim, cropping):
+def test_get_slices__valid_data_dim__w_data_range(
+    plugin: ProcPlugin, data: object, proc_dim: int, cropping: list[int | None]
+) -> None:
     crop_low, crop_high = cropping
     plugin.set_param_value("process_data_dim", proc_dim)
     plugin.set_param_value("type_selection", "Axis values")
-    _xlow = data.axis_ranges[proc_dim][crop_low] if crop_low is not None else None
+    _xlow = (
+        data.axis_ranges[proc_dim][crop_low]  # type: ignore[attr-defined]
+        if crop_low is not None
+        else None
+    )
     plugin.set_param_value("crop_low", _xlow)
-    _xhigh = data.axis_ranges[proc_dim][crop_high] if crop_high is not None else None
+    _xhigh = (
+        data.axis_ranges[proc_dim][crop_high]  # type: ignore[attr-defined]
+        if crop_high is not None
+        else None
+    )
     plugin.set_param_value("crop_high", _xhigh)
     plugin._data = data
     if crop_low is None:
         crop_low = 0
     if crop_high is None:
-        crop_high = data.shape[proc_dim]
+        crop_high = data.shape[proc_dim]  # type: ignore[attr-defined]
     else:
         # increment the target by one to include the final datapoint
         crop_high += 1
     _target_slices = (slice(None, None),) * proc_dim + (slice(crop_low, crop_high),)
-    _received_slices = plugin._get_slices()
+    _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _target_slices
     assert plugin._config["slices"] == _target_slices
 
 
 @pytest.mark.parametrize("proc_dim", [0, 1, 2, 3, 4])
 @pytest.mark.parametrize("cropping", [[None, 7], [2, None], [2, 7]])
-def test_execute(plugin, data, proc_dim, cropping):
+def test_execute(
+    plugin: ProcPlugin, data: object, proc_dim: int, cropping: list[int | None]
+) -> None:
     crop_low, crop_high = cropping
     plugin.set_param_value("process_data_dim", proc_dim)
     plugin.set_param_value("crop_low", crop_low)
     plugin.set_param_value("crop_high", crop_high)
-    _new_data, _ = plugin.execute(data)
+    _new_data, _ = plugin.execute(data)  # type: ignore[arg-type]
     if crop_high is not None:
-        # increment the target by one to include the final datap
+        # increment the target by one to include the final datapoint
         crop_high += 1
     _slicing = (slice(None, None),) * proc_dim + (slice(crop_low, crop_high),)
-    _sliced_data = data[_slicing]
+    _sliced_data = data[_slicing]  # type: ignore[index]
     assert _new_data.shape == _sliced_data.shape
     assert _new_data.axis_labels == _sliced_data.axis_labels
     assert _new_data.axis_units == _sliced_data.axis_units

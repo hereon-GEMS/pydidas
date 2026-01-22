@@ -1,4 +1,4 @@
-.. Copyright 2021 - 2025, Helmholtz-Zentrum Hereon
+.. Copyright 2021 - 2026, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
 
@@ -7,6 +7,7 @@ vYY.MM.DD
 
 Improvements
 ------------
+- Added formal support for Python 3.13
 
 Programmatic changes
 --------------------
@@ -15,6 +16,8 @@ Programmatic changes
 - Added a mix-in class to handle an associated file and type checking centrally.
 - Added a ConfigureBinaryDecodingWidget class which handles the decoding
   options for raw/binary files centrally.
+- PydidasWidgetMixin class can now also set the layout based on class attributes.
+- Made Qt6 (through the PySide6 bindings) the default Qt.
 
 Bugfixes
 --------
@@ -25,6 +28,9 @@ Bugfixes
   wrong method signature.
 - Fixed an issue in the ShowDetailedPluginResultsWindow which did not autoscale
   the results due to a delayed event loop execution.
+- Fixed an issue in the ParameterWidget which arranged the sub-widgets incorrectly.
+- Removed legacy calls to QApplication from tests because the pydidas module import
+  creates a PydidasQApplication
 
 
 v25.10.28

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC-BY-4.0
 #
 # This workflow will check the formatting of the newly pushed commits
@@ -71,24 +71,3 @@ jobs:
     - name: Check copyrights
       run: |
         python formatter.py --copyright --check --git-only
-
-  check_docs_built_flag:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out source repository
-      uses: actions/checkout@v3
-    - name: Verify docs-built.yml content
-      run: |
-        expected_content="docs-built: false"
-        file_path="src/pydidas/sphinx/docs-built.yml"
-        if [[ ! -f "$file_path" ]]; then
-          echo "Error: $file_path does not exist."
-          exit 1
-        fi
-        actual_content=$(cat "$file_path" |tr -d '\n')
-        if [[ "$actual_content" != "$expected_content" ]]; then
-          echo "Error: $file_path content is not as expected."
-          echo "Expected: $expected_content"
-          echo "Found: $actual_content"
-          exit 1
-        fi

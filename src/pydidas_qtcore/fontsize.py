@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,21 +16,21 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the standard fontsize used in pydidas.
+Module with the standard font size used in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["STANDARD_FONT_SIZE"]
+__all__ = ["PYDIDAS_STANDARD_FONT_SIZE"]
 
 
 import platform
 
 
 if platform.system() == "Windows":
-    STANDARD_FONT_SIZE = 10
+    PYDIDAS_STANDARD_FONT_SIZE = 10
 else:
-    STANDARD_FONT_SIZE = 8
+    PYDIDAS_STANDARD_FONT_SIZE = 8

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,16 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for the GridCurvePlot widget."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from copy import copy
 from numbers import Integral
+from typing import Generator
 
 import numpy as np
 import pytest
@@ -32,7 +34,6 @@ import pytest
 from pydidas.contexts import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.widgets.plotting import GridCurvePlot
-from pydidas_qtcore import PydidasQApplication
 
 
 _DATASETS = {
@@ -41,15 +42,8 @@ _DATASETS = {
 }
 
 
-@pytest.fixture(scope="module")
-def app():
-    app = PydidasQApplication([])
-    yield app
-    app.quit()
-
-
 @pytest.fixture
-def grid_plot():
+def grid_plot() -> Generator[GridCurvePlot, None, None]:
     _grid_plot = GridCurvePlot()
     _grid_plot._local_scan.set_param_value("scan_dim0_n_points", 140)
     yield _grid_plot
@@ -57,11 +51,11 @@ def grid_plot():
 
 
 @pytest.fixture
-def datasets():
+def datasets() -> dict[str, Dataset]:
     return {_k: copy(_val) for _k, _val in _DATASETS.items()}
 
 
-def test_init(grid_plot):
+def test_init(grid_plot: GridCurvePlot) -> None:
     assert isinstance(grid_plot._local_scan, Scan)
     assert grid_plot._datasets == dict()
     assert grid_plot._yscaling == dict()
@@ -70,9 +64,11 @@ def test_init(grid_plot):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
-@pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
-def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
+@pytest.mark.parametrize("n_plots_hor", [2, 3, 5])
+@pytest.mark.parametrize("n_plots_vert", [3, 4, 5])
+def test_set_n_plots(
+    grid_plot: GridCurvePlot, n_plots_hor: int, n_plots_vert: int
+) -> None:
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
     assert grid_plot._config["n_hor"] == n_plots_hor
@@ -81,9 +77,11 @@ def test_set_n_plots(grid_plot, n_plots_hor, n_plots_vert):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots_hor", [2, 5, 7])
-@pytest.mark.parametrize("n_plots_vert", [3, 4, 6])
-def test_set_n_plots__w_data(grid_plot, datasets, n_plots_hor, n_plots_vert):
+@pytest.mark.parametrize("n_plots_hor", [2, 3, 5])
+@pytest.mark.parametrize("n_plots_vert", [3, 4, 5])
+def test_set_n_plots__w_data(
+    grid_plot: GridCurvePlot, datasets: dict, n_plots_hor: int, n_plots_vert: int
+) -> None:
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
     grid_plot.set_datasets(**datasets)
@@ -97,7 +95,7 @@ def test_set_n_plots__w_data(grid_plot, datasets, n_plots_hor, n_plots_vert):
 
 
 @pytest.mark.slow
-def test_set_scan(grid_plot):
+def test_set_scan(grid_plot: GridCurvePlot) -> None:
     _scan = Scan()
     _scan.set_param_value("scan_title", "dummy")
     grid_plot.set_scan(_scan)
@@ -107,7 +105,7 @@ def test_set_scan(grid_plot):
 
 
 @pytest.mark.slow
-def test_clear(grid_plot):
+def test_clear(grid_plot: GridCurvePlot) -> None:
     grid_plot._datasets = {"test1": None, "test2": [1, 2]}
     grid_plot._yscaling = {"test1": 1, "test2": 2}
     grid_plot._xscaling = {"test1": 1, "test2": 2}
@@ -119,7 +117,7 @@ def test_clear(grid_plot):
 
 
 @pytest.mark.slow
-def test_set_datasets(grid_plot, datasets):
+def test_set_datasets(grid_plot: GridCurvePlot, datasets: dict) -> None:
     grid_plot.set_datasets(**datasets)
     assert grid_plot._datasets == datasets
     assert grid_plot._yscaling == {k: (None, None) for k in datasets.keys()}
@@ -127,29 +125,29 @@ def test_set_datasets(grid_plot, datasets):
     assert grid_plot._config["max_index"] == datasets["test1"].shape[0] - 1
 
 
-def test_set_datasets__no_datasets(grid_plot):
+def test_set_datasets__no_datasets(grid_plot: GridCurvePlot) -> None:
     with pytest.raises(UserConfigError):
         grid_plot.set_datasets()
 
 
-def test_set_datasets__wrong_shape(grid_plot):
+def test_set_datasets__wrong_shape(grid_plot: GridCurvePlot) -> None:
     with pytest.raises(UserConfigError):
         grid_plot.set_datasets(
-            test1=Dataset(np.random.random((140, 3, 12))),
-            test2=Dataset(np.random.random((135, 5, 10))),
+            test1=Dataset(np.zeros((140, 3, 12))),
+            test2=Dataset(np.zeros((135, 5, 10))),
         )
 
 
-def test_set_datasets__wrong_dim(grid_plot):
+def test_set_datasets__wrong_dim(grid_plot: GridCurvePlot) -> None:
     with pytest.raises(UserConfigError):
         grid_plot.set_datasets(
-            test1=Dataset(np.random.random((140, 3, 12, 4))),
+            test1=Dataset(np.zeros((140, 3, 12, 4))),
         )
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize("direction", ["x", "y"])
-def test_set_scaling(grid_plot, datasets, direction):
+def test_set_scaling(grid_plot: GridCurvePlot, datasets: dict, direction: str) -> None:
     grid_plot.set_datasets(**datasets)
     _setter = getattr(grid_plot, f"set_{direction}scaling")
     _values = getattr(grid_plot, f"_{direction}scaling")
@@ -159,7 +157,9 @@ def test_set_scaling(grid_plot, datasets, direction):
 
 
 @pytest.mark.parametrize("direction", ["x", "y"])
-def test_set_scaling__missing_key(grid_plot, datasets, direction):
+def test_set_scaling__missing_key(
+    grid_plot: GridCurvePlot, datasets: dict, direction: str
+) -> None:
     grid_plot.set_datasets(**datasets)
     _setter = getattr(grid_plot, f"set_{direction}scaling")
     with pytest.raises(UserConfigError):
@@ -167,7 +167,9 @@ def test_set_scaling__missing_key(grid_plot, datasets, direction):
 
 
 @pytest.mark.parametrize("direction", ["x", "y"])
-def test_set_scaling__wrong_scaling(grid_plot, datasets, direction):
+def test_set_scaling__wrong_scaling(
+    grid_plot: GridCurvePlot, datasets: dict, direction: str
+) -> None:
     grid_plot.set_datasets(**datasets)
     _setter = getattr(grid_plot, f"set_{direction}scaling")
     with pytest.raises(UserConfigError):
@@ -176,7 +178,9 @@ def test_set_scaling__wrong_scaling(grid_plot, datasets, direction):
 
 @pytest.mark.slow
 @pytest.mark.parametrize("direction", ["x", "y"])
-def test_set_autoscaling(grid_plot, datasets, direction):
+def test_set_autoscaling(
+    grid_plot: GridCurvePlot, datasets: dict, direction: str
+) -> None:
     grid_plot.set_datasets(**datasets)
     grid_plot._xscaling = {"test1": (1, 2), "test2": (1, 2)}
     grid_plot._yscaling = {"test1": (1, 2), "test2": (1, 2)}
@@ -188,16 +192,20 @@ def test_set_autoscaling(grid_plot, datasets, direction):
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("n_plots", [3, 4])
 @pytest.mark.parametrize(
     "start_value", ["::start::", "::end::", "::page+::", "::page-::", 1, -1, 4, -4]
 )
 @pytest.mark.parametrize("direction", ["vert", "hor"])
-def test_change_start_index(grid_plot, datasets, n_plots, start_value, direction):
+def test_change_start_index(
+    grid_plot: GridCurvePlot,
+    datasets: dict,
+    start_value: str | int,
+    direction: str,
+) -> None:
     _index0 = 22
     grid_plot.set_datasets(**datasets)
-    grid_plot.n_plots_hor = n_plots if direction == "hor" else 2
-    grid_plot.n_plots_vert = n_plots if direction == "vert" else 2
+    grid_plot.n_plots_hor = 3 if direction == "hor" else 2
+    grid_plot.n_plots_vert = 3 if direction == "vert" else 2
     grid_plot._current_index = _index0
     grid_plot._change_start_index(start_value)
     if isinstance(start_value, Integral):

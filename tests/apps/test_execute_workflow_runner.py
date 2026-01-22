@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,23 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for ExecuteWorkflowRunner application."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+
 
 import io
 import shutil
 import sys
 import tempfile
 from pathlib import Path
+from typing import Generator
 
 import h5py
 import pytest
-from qtpy import QtWidgets
 
 from pydidas import unittest_objects
 from pydidas.apps import ExecuteWorkflowRunner
@@ -43,7 +44,6 @@ from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
-from pydidas_qtcore import PydidasQApplication
 
 
 TREE = WorkflowTree()
@@ -55,10 +55,7 @@ EXP = DiffractionExperimentContext()
 
 
 @pytest.fixture(scope="module")
-def setup_module():
-    _app = QtWidgets.QApplication.instance()
-    if _app is None:
-        _ = PydidasQApplication([])
+def setup_module() -> Generator[tuple, None, None]:
     RESULTS.clear_all_results()
     TREE.clear()
     path = Path(tempfile.mkdtemp())
@@ -79,7 +76,7 @@ def setup_module():
 
 
 @pytest.fixture(autouse=True)
-def setup_function(setup_module):
+def setup_function(setup_module: object) -> Generator[None, None, None]:
     path, q_settings, n_workers, old_stdout, mystdout = setup_module
     RESULT_SAVER.set_active_savers_and_title([])
     EXP.restore_all_defaults(True)
@@ -92,7 +89,7 @@ def setup_function(setup_module):
     sys.stdout = old_stdout
 
 
-def generate_tree(path):
+def generate_tree(path: Path) -> None:
     TREE.clear()
     TREE.create_and_add_node(unittest_objects.DummyLoader())
     TREE.create_and_add_node(unittest_objects.DummyProc())
@@ -100,7 +97,7 @@ def generate_tree(path):
     TREE.export_to_file(path.joinpath("workflow_tree.yml"), overwrite=True)
 
 
-def generate_scan(path):
+def generate_scan(path: Path) -> None:
     SCAN.restore_all_defaults(True)
     nscan = (5, 7, 3)
     scandelta = (0.1, -0.2, 1.1)
@@ -113,18 +110,18 @@ def generate_scan(path):
     SCAN.export_to_file(path.joinpath("scan.yml"), overwrite=True)
 
 
-def create_dummy_entries_from_parsing(obj):
-    parser_dummy_values = {
+def create_dummy_entries_from_parsing(obj: object) -> None:
+    parser_dummy_values = {  # type: ignore[assignment]
         key: get_random_string(12)
         for key in ["scan", "diffraction_exp", "workflow", "output_dir"]
     }
-    parser_dummy_values["overwrite"] = True
-    parser_dummy_values["verbose"] = True
+    parser_dummy_values["overwrite"] = True  # type: ignore[assignment]
+    parser_dummy_values["verbose"] = True  # type: ignore[assignment]
     for key, val in parser_dummy_values.items():
-        obj.parsed_args[key] = val
+        obj.parsed_args[key] = val  # type: ignore[attr-defined]
 
 
-def get_empty_dir_name(path):
+def get_empty_dir_name(path: Path) -> Path:
     while True:
         dir = path.joinpath(get_random_string(12))
         if not dir.is_dir():
@@ -132,7 +129,7 @@ def get_empty_dir_name(path):
     return dir
 
 
-def test_creation_plain():
+def test_creation_plain() -> None:
     obj = ExecuteWorkflowRunner()
     assert isinstance(obj, ExecuteWorkflowRunner)
     for key in ["scan", "diffraction_exp", "workflow", "output_dir"]:
@@ -141,7 +138,7 @@ def test_creation_plain():
         assert not obj.parsed_args[key]
 
 
-def test_creation_cmdline_args(setup_module):
+def test_creation_cmdline_args(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     scan_dir = str(path.joinpath(get_random_string(8)))
     sys.argv.extend(["-output_dir", scan_dir, "--overwrite"])
@@ -153,7 +150,7 @@ def test_creation_cmdline_args(setup_module):
         assert obj.parsed_args[key] == (key == "overwrite")
 
 
-def test_creation_cmdline_args_and_kwargs(setup_module):
+def test_creation_cmdline_args_and_kwargs(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     scan_dir = str(path.joinpath(get_random_string(8)))
     workflow = get_random_string(12)
@@ -171,13 +168,13 @@ def test_creation_cmdline_args_and_kwargs(setup_module):
         assert not obj.parsed_args[key]
 
 
-def test_parse_args_check_all_args():
-    test_values = {
+def test_parse_args_check_all_args() -> None:
+    test_values = {  # type: ignore[assignment]
         key: get_random_string(12)
         for key in ["scan", "diffraction_exp", "workflow", "output_dir"]
     }
-    test_values["overwrite"] = True
-    test_values["verbose"] = True
+    test_values["overwrite"] = True  # type: ignore[assignment]
+    test_values["verbose"] = True  # type: ignore[assignment]
     for key, val in test_values.items():
         if key in ("overwrite", "verbose"):
             sys.argv.append(f"--{key}")
@@ -188,8 +185,8 @@ def test_parse_args_check_all_args():
         assert obj.parsed_args[key] == val
 
 
-def test_parse_args_check_args_abbreviations():
-    test_values = {
+def test_parse_args_check_args_abbreviations() -> None:
+    test_values = {  # type: ignore[assignment]
         key: get_random_string(12)
         for key in ["scan", "diffraction_exp", "workflow", "output_dir"]
     }
@@ -201,7 +198,7 @@ def test_parse_args_check_args_abbreviations():
 
 
 @pytest.mark.parametrize("key", ["scan", "diffraction_exp", "workflow", "output_dir"])
-def test_update_parsed_args_from_kwargs_all_cases(key):
+def test_update_parsed_args_from_kwargs_all_cases(key: str) -> None:
     new_val = get_random_string(12)
     obj = ExecuteWorkflowRunner()
     create_dummy_entries_from_parsing(obj)
@@ -214,7 +211,7 @@ def test_update_parsed_args_from_kwargs_all_cases(key):
     assert obj.parsed_args[key] == new_val
 
 
-def test_update_parsed_args_from_kwargs_diffraction_exp_alias():
+def test_update_parsed_args_from_kwargs_diffraction_exp_alias() -> None:
     new_val = get_random_string(12)
     obj = ExecuteWorkflowRunner()
     create_dummy_entries_from_parsing(obj)
@@ -223,7 +220,7 @@ def test_update_parsed_args_from_kwargs_diffraction_exp_alias():
     assert obj.parsed_args["diffraction_exp"] == new_val
 
 
-def test_update_parsed_args_from_kwargs_double_diffraction_exp():
+def test_update_parsed_args_from_kwargs_double_diffraction_exp() -> None:
     obj = ExecuteWorkflowRunner()
     create_dummy_entries_from_parsing(obj)
     with pytest.raises(UserConfigError):
@@ -232,7 +229,7 @@ def test_update_parsed_args_from_kwargs_double_diffraction_exp():
         )
 
 
-def test_print_progress(setup_module):
+def test_print_progress(setup_module: object) -> None:
     _, _, _, _, mystdout = setup_module
     sys.stdout = mystdout
     obj = ExecuteWorkflowRunner()
@@ -241,7 +238,7 @@ def test_print_progress(setup_module):
     assert output.endswith("10.00%")
 
 
-def test_store_results_to_disk__empty_dir(setup_module):
+def test_write_results_to_disk__empty_dir(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
@@ -249,10 +246,10 @@ def test_store_results_to_disk__empty_dir(setup_module):
     RESULTS.store_results(0, _res)
     dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(output_dir=dir)
-    obj._store_results_to_disk()
+    obj._write_results_to_disk()  # type: ignore[attr-defined]
 
 
-def test_store_results_to_disk__existing_empty_dir(setup_module):
+def test_write_results_to_disk__existing_empty_dir(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     dir.mkdir()
@@ -261,12 +258,12 @@ def test_store_results_to_disk__existing_empty_dir(setup_module):
     RESULTS.prepare_new_results()
     RESULTS.store_results(0, _res)
     obj = ExecuteWorkflowRunner(output_dir=dir)
-    obj._store_results_to_disk()
+    obj._write_results_to_disk()  # type: ignore[attr-defined]
     assert dir.joinpath("node_01.h5").is_file()
     assert dir.joinpath("node_02.h5").is_file()
 
 
-def test_store_results_to_disk__used_dir(setup_module):
+def test_write_results_to_disk__used_dir(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     dir.mkdir()
@@ -278,22 +275,22 @@ def test_store_results_to_disk__used_dir(setup_module):
         f.write("dummy")
     obj = ExecuteWorkflowRunner(output_dir=dir)
     with pytest.raises(UserConfigError):
-        obj._store_results_to_disk()
+        obj._write_results_to_disk()  # type: ignore[attr-defined]
 
 
-def test_store_results_to_disk__used_dir_w_overwrite(setup_module):
+def test_write_results_to_disk__used_dir_w_overwrite(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     dir.mkdir()
     with open(dir.joinpath("node_02.h5"), "w") as f:
         f.write("dummy")
     obj = ExecuteWorkflowRunner(output_dir=dir, overwrite=True)
-    obj._store_results_to_disk()
+    obj._write_results_to_disk()  # type: ignore[attr-defined]
     assert dir.joinpath("node_01.h5").is_file()
     assert dir.joinpath("node_02.h5").is_file()
 
 
-def test_update_contexts_from_stored_args_scan_instance():
+def test_update_contexts_from_stored_args_scan_instance() -> None:
     scan = Scan()
     scan_params = {
         "scan_dim": 2,
@@ -309,7 +306,7 @@ def test_update_contexts_from_stored_args_scan_instance():
         assert SCAN.get_param_value(key) == val
 
 
-def test_update_contexts_from_stored_args_scan(setup_module):
+def test_update_contexts_from_stored_args_scan(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     scan_fname = path.joinpath("dummy_scan.yml")
     scan = Scan()
@@ -330,7 +327,7 @@ def test_update_contexts_from_stored_args_scan(setup_module):
             assert SCAN.get_param_value(key) == val
 
 
-def test_update_contexts_from_stored_args_workflow(setup_module):
+def test_update_contexts_from_stored_args_workflow(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     tree_fname = path.joinpath("dummy_workflow.yml")
     tree = ProcessingTree()
@@ -351,7 +348,9 @@ def test_update_contexts_from_stored_args_workflow(setup_module):
             )
 
 
-def test_update_contexts_from_stored_args_diffraction_exp(setup_module):
+def test_update_contexts_from_stored_args_diffraction_exp(
+    setup_module: object,
+) -> None:
     path, _, _, _, _ = setup_module
     exp_fname = path.joinpath("dummy_diffraction_exp.yml")
     exp = DiffractionExperiment()
@@ -379,7 +378,7 @@ def test_update_contexts_from_stored_args_diffraction_exp(setup_module):
         ("output_dir", "Output directory"),
     ],
 )
-def test_check_all_args_okay_keys_present(key, name):
+def test_check_all_args_okay_keys_present(key: str, name: str) -> None:
     keys = {
         item: (get_random_string(8) if item != key else None)
         for item in ["scan", "diffraction_exp", "workflow", "output_dir"]
@@ -390,7 +389,7 @@ def test_check_all_args_okay_keys_present(key, name):
     assert name in str(error.value)
 
 
-def test_check_all_args_okay_dir_okay_no_overwrite(setup_module):
+def test_check_all_args_okay_dir_okay_no_overwrite(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     dir.mkdir()
@@ -406,7 +405,7 @@ def test_check_all_args_okay_dir_okay_no_overwrite(setup_module):
 
 
 @pytest.mark.slow
-def test_process_scan_single_run(setup_module):
+def test_process_scan_single_run(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(
@@ -423,7 +422,7 @@ def test_process_scan_single_run(setup_module):
 
 
 @pytest.mark.slow
-def test_process_scan_multiple_run(setup_module):
+def test_process_scan_multiple_run(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
     dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(

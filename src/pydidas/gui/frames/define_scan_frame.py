@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ settings like dimensionality, number of points and labels.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,26 +31,27 @@ __all__ = ["DefineScanFrame"]
 from functools import partial
 from typing import Any
 
+import numpy as np
 from qtpy import QtCore, QtGui
 
 from pydidas.contexts import ScanContext, ScanIo
 from pydidas.core import UserConfigError, constants, utils
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    FONT_METRIC_SPACER,
+    FONT_METRIC_WIDE_CONFIG_WIDTH,
+)
 from pydidas.core.utils import doc_qurl_for_rel_address
 from pydidas.gui.frames.builders.define_scan_frame_builder import (
-    column_width_factor,
-    scan_frame_build_config,
+    DEFINE_SCAN_FRAME_BUILD_CONFIG,
 )
-from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import ItemInListSelectionWidget
 from pydidas.widgets.framework import BaseFrame
-from pydidas.workflow import WorkflowTree
 from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
-PLUGINS = PluginCollection()
-WORKFLOW = WorkflowTree()
 
 
 DIM_LABELS = {
@@ -83,6 +84,7 @@ class DefineScanFrame(BaseFrame):
         BaseFrame.__init__(self, **kwargs)
         self._io_dialog = PydidasFileDialog()
         self._qtapp = PydidasQApplication.instance()
+        self.params.update(SCAN.params)
 
     def build_frame(self) -> None:
         """
@@ -93,11 +95,8 @@ class DefineScanFrame(BaseFrame):
             horizontalSpacing=25,
             alignment=constants.ALIGN_TOP_LEFT,
         )
-        for _name, _args, _kwargs in scan_frame_build_config():
-            _method = getattr(self, _name)
-            if "widget" in _kwargs:
-                _kwargs["widget"] = self._widgets[_kwargs["widget"]]
-            _method(*_args, **_kwargs)
+        for _name, _args, _kwargs in DEFINE_SCAN_FRAME_BUILD_CONFIG:
+            getattr(self, _name)(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 
@@ -165,8 +164,11 @@ class DefineScanFrame(BaseFrame):
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
             if i in DIM_LABELS[_dim].keys():
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
-        _total_width = column_width_factor(_dim in [3, 4])
-        self._widgets["main"].font_metric_width_factor = _total_width
+        self._widgets["main"].font_metric_width_factor = (
+            FONT_METRIC_WIDE_CONFIG_WIDTH
+            + 2 * FONT_METRIC_SPACER
+            + int(FONT_METRIC_CONFIG_WIDTH * max(1.5, np.ceil(_dim / 2)))
+        )
         self._widgets["config_B"].setVisible(_dim in [3, 4])
         self._widgets["config_area"].force_width_from_size_hint()
 
@@ -238,8 +240,8 @@ class DefineScanFrame(BaseFrame):
         """
         Save ScanContext to a file.
 
-        This method will open a QFileDialog to select a filename for the
-        file in which the information shall be written.
+        This method will open a QFileDialog to select a filename where
+        the scan context information will be written.
         """
         _fname = self._io_dialog.get_saving_filename(
             caption="Export scan context file",
@@ -262,7 +264,7 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot(int, int)
     def move_dim(self, dim_index: int, direction: int) -> None:
         """
-        Move the selected dimension' position in the scan.
+        Move the selected dimension's position in the scan.
 
         Parameters
         ----------

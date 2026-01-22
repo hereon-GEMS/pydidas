@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the EmptyWidget, a QWidget with font-metric scaling and a QGridLayou
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,8 +32,6 @@ from typing import Any
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QGridLayout, QWidget
 
-from pydidas.core.constants import ALIGN_TOP_LEFT
-from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
@@ -57,11 +55,8 @@ class EmptyWidget(PydidasWidgetMixin, QWidget):
             Keyword arguments for widget initialization and layout properties.
         """
         QWidget.__init__(self, parent)
-        PydidasWidgetMixin.__init__(self, **kwargs)
         self.setLayout(QGridLayout())
-        apply_qt_properties(
-            self.layout(), alignment=ALIGN_TOP_LEFT, contentsMargins=(0, 0, 0, 0)
-        )
+        PydidasWidgetMixin.__init__(self, **kwargs)
         if "layout_column_stretches" in kwargs:
             for _key, _val in kwargs.get("layout_column_stretches").items():
                 self.layout().setColumnStretch(_key, _val)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ generate the Sphinx html documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Union
 
 import yaml
 
@@ -41,16 +40,17 @@ from pydidas.core.utils.get_documentation_targets import (
     DOC_BUILD_PATH,
     DOC_SOURCE_DIRECTORY,
 )
+from pydidas.version import VERSION
 from pydidas_qtcore import PydidasSplashScreen
 
 
-def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
+def check_sphinx_html_docs(doc_dir: Path | str | None = None) -> bool:
     """
-    Check whether the index.html file for the built sphinx documentation exists.
+    Check whether the sphinx documentation was built for the current version.
 
     Parameters
     ----------
-    doc_dir : Union[pathlib.Path, str, None], optional
+    doc_dir : Path or str or None, optional
         An optional build directory. If None, this defaults to the generic
         pydidas documentation directory. The default is None.
 
@@ -63,21 +63,21 @@ def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
     _index_file = doc_dir / "docs-built.yml"
     try:
         with open(_index_file, "r") as f:
-            _content = yaml.safe_load(f)
+            _content = yaml.safe_load(f) or {}
     except (FileNotFoundError, OSError, yaml.YAMLError):
         _content = {}
-    return _content.get("docs-built", False)
+    return _content.get(VERSION, False)
 
 
 def run_sphinx_html_build(
-    build_dir: Union[Path, str, None] = None, verbose: bool = True
-):
+    build_dir: Path | str | None = None, verbose: bool = True
+) -> None:
     """
     Run the sphinx process to generate the html documentation.
 
     Parameters
     ----------
-    build_dir : Union[pathlib.Path, str, None], optional
+    build_dir : Path or str or None, optional
         An optional build directory. If None, this defaults to the generic
         pydidas documentation directory. The default is None.
     verbose : bool, optional
@@ -89,7 +89,11 @@ def run_sphinx_html_build(
         return
     if "-m" in sys.argv:
         _index = sys.argv.index("-m")
-        if len(sys.argv) > _index and sys.argv[_index + 1] in ["unittest", "sphinx"]:
+        if len(sys.argv) > _index and sys.argv[_index + 1] in [
+            "pytest",
+            "unittest",
+            "sphinx",
+        ]:
             return
     if build_dir is None:
         build_dir = DOC_BUILD_PATH / "html"
@@ -107,14 +111,6 @@ def run_sphinx_html_build(
             _splash_screen.show_aligned_message(
                 "Building html documentation (required only once during first startup)"
             )
-    try:
-        with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
-            yaml.dump({"docs-built": True}, f)
-    except (FileNotFoundError, OSError, PermissionError):
-        raise OSError(
-            "Could not create the docs-built.yml file in the documentation "
-            "directory. Please check the permissions of the directory."
-        )
     subprocess.run(
         [
             sys.executable,
@@ -126,3 +122,11 @@ def run_sphinx_html_build(
             build_dir,
         ]
     )
+    try:
+        with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:
+            yaml.dump({VERSION: True}, f)
+    except (FileNotFoundError, OSError, PermissionError):
+        raise OSError(
+            "Could not create the docs-built.yml file in the documentation "
+            "directory. Please check the permissions of the directory."
+        )

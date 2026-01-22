@@ -484,7 +484,7 @@ Parameters. It includes the following signals:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>pydidas.core.Parameter</em></a>) – The associated Parameter.</p></li>
+<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a>) – The associated Parameter.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments. Note that many keywords supported by the
 generic mixin-class are ignored here because this is a composite widget.
 Note that the I/O has no width setting here because it is determined
@@ -493,21 +493,19 @@ the name and unit fields.
 Supported keyword arguments are:</p>
 <dl class="simple">
 <dt>width_text<span class="classifier">float</span></dt><dd><p>The relative width of the text field for the Parameter name.
-The default is defined in
-pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH.</p>
+The default is defined in PARAM_WIDGET_TEXT_WIDTH.</p>
 </dd>
 <dt>width_unit<span class="classifier">float</span></dt><dd><p>The relative width of the text field for the Parameter unit.
-The default is defined in
-pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.</p>
+The default is defined in PARAM_WIDGET_UNIT_WIDTH.</p>
 </dd>
 <dt>linebreak<span class="classifier">bool</span></dt><dd><p>If True, the layout will include a linebreak between the name
 label and the I/O widget. The default is False.</p>
 </dd>
-<dt>font_metric_width_factor<span class="classifier">int | None</span></dt><dd><p>The width of the widget in multiples of the font metric width. If None,
-the widget will use the default size policy. The default is
-pydidas.core.constants.FONT_METRIC_PARAM_EDIT_WIDTH.</p>
+<dt>font_metric_width_factor<span class="classifier">int or None</span></dt><dd><p>The width of the widget in multiples of the font metric width.
+If None, the widget will use the default size policy. The
+default is FONT_METRIC_PARAM_EDIT_WIDTH.</p>
 </dd>
-<dt>validator<span class="classifier">QValidator | None</span></dt><dd><p>A custom validator to be used in the I/O widget, if applicable.
+<dt>validator<span class="classifier">QValidator or None</span></dt><dd><p>A custom validator to be used in the I/O widget, if applicable.
 The default is None.</p>
 </dd>
 </dl>
@@ -537,7 +535,7 @@ The default is None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_str_repr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_str_repr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Update the Parameter value with the entry from the widget.</p>
 <p>This method tries to update the Parameter value with the entry from
 the widget. If unsuccessful, an exception box will be opened and

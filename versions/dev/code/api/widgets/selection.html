@@ -470,9 +470,15 @@ If not given, new Parameters will be created.</p>
 </dd>
 </dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.ConfigureBinaryDecodingWidget.datatype">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">datatype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">dtype</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.datatype" title="Link to this definition">#</a></dt>
+<dd><p>Get the current datatype selected for decoding.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decoding_is_valid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid" title="Link to this definition">#</a></dt>
-<dd><p>Get the check whether the current decoding file/parameter combination is valid.</p>
+<dd><p>Get the flag whether the current decoding settings are valid.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -594,19 +600,20 @@ show the widget.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are;</p>
 <dl class="simple">
-<dt>parent<span class="classifier">QWidget | None, optional</span></dt><dd><p>The parent widget. The default is None.</p>
+<dt>parent<span class="classifier">QWidget or None, optional</span></dt><dd><p>The parent widget. The default is None.</p>
 </dd>
-<dt>import_reference<span class="classifier">str | None, optional</span></dt><dd><p>The reference for the file dialogue to store persistent settings.
+<dt>import_reference<span class="classifier">str or None, optional</span></dt><dd><p>The reference for the file dialogue to store persistent settings.
 If None, no persistent settings are stored. The default is None.</p>
 </dd>
-<dt>ndim<span class="classifier">int, optional</span></dt><dd><p>The number of dimensions of the data to be imported. The default is 2.</p>
+<dt>ndim<span class="classifier">int, optional</span></dt><dd><p>The number of dimensions of the data to be imported. The
+default is 2.</p>
 </dd>
-<dt>filename<span class="classifier">Parameter | None, optional</span></dt><dd><p>A Parameter to use for the filename selection. If None, a default
-Parameter will be created. The default is None.</p>
+<dt>filename<span class="classifier">Parameter or None, optional</span></dt><dd><p>A Parameter to use for the filename selection. If None, a
+default Parameter will be created. The default is None.</p>
 </dd>
-<dt>font_metric_width_factor<span class="classifier">int | None, optional</span></dt><dd><p>An optional factor to modify the width of text elements in the
-widget based on the font metrics. If None, the default width for
-the used Parameter widgets is applied. The default is None.</p>
+<dt>font_metric_width_factor<span class="classifier">int or None, optional</span></dt><dd><p>An optional factor to modify the width of text elements in the
+widget based on the font metrics. If None, the default width
+for the used Parameter widgets is applied. The default is None.</p>
 </dd>
 </dl>
 </p>
@@ -614,13 +621,13 @@ the used Parameter widgets is applied. The default is None.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.SelectDataFrameWidget.connect_signals">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.connect_signals" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.connect_signals" title="Link to this definition">#</a></dt>
 <dd><p>Connect the widget signals to the relevant slots.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename">
-<span class="sig-name descname"><span class="pre">process_new_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">process_new_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.SelectDataFrameWidget.process_new_filename" title="Link to this definition">#</a></dt>
 <dd><p>Process the input of a new filename in the Parameter widget.</p>
 </dd></dl>
 
@@ -676,6 +683,7 @@ the used Parameter widgets is applied. The default is None.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.datatype"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget.datatype</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.decoding_is_valid"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget.decoding_is_valid</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.ConfigureBinaryDecodingWidget.set_new_filename"><code class="docutils literal notranslate"><span class="pre">ConfigureBinaryDecodingWidget.set_new_filename</span></code></a></li>
 </ul>

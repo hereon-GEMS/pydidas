@@ -447,7 +447,7 @@
 <span id="all-methods-executeworkflowrunner"></span><h2>ExecuteWorkflowRunner with inherited methods<a class="headerlink" href="#class-name-with-inherited-methods" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">ExecuteWorkflowRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">ExecuteWorkflowRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
 <p>Class to run pydidas workflows from the command line with parallelization.</p>
 <p>The WorkflowRunner can be run from the command line and creates and handles
@@ -459,17 +459,17 @@ arguments or as keyword arguments.</p>
 <p>Keyword arguments will override given command line inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Supported keyword arguments are:</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are:</p>
 <dl class="simple">
-<dt>workflow<span class="classifier">Union[Path, str, ProcessingTree]</span></dt><dd><p>The filename to the workflow or a ProcessingTree instance.</p>
+<dt>workflow<span class="classifier">Path or str or ProcessingTree</span></dt><dd><p>The filename to the workflow or a ProcessingTree instance.</p>
 </dd>
-<dt>scan<span class="classifier">Union[Path, str, Scan]</span></dt><dd><p>The filename to the stored Scan or a Scan instance.</p>
+<dt>scan<span class="classifier">Path or str or Scan</span></dt><dd><p>The filename to the stored Scan or a Scan instance.</p>
 </dd>
-<dt>diffraction_exp<span class="classifier">Union[Path, str, DiffractionExperiment]</span></dt><dd><p>The filename to the stored DiffractionExperiment or a
+<dt>diffraction_exp<span class="classifier">Path or str or DiffractionExperiment</span></dt><dd><p>The filename to the stored DiffractionExperiment or a
 DiffractionExperiment instance. Note that ‘diffraction_experiment’
 is also available as alias.</p>
 </dd>
-<dt>output_directory<span class="classifier">Union[Path, str]</span></dt><dd><p>The directory to write results to.</p>
+<dt>output_directory<span class="classifier">Path or str</span></dt><dd><p>The directory to write results to.</p>
 </dd>
 <dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Flag to enable printed output message. Do not use this setting for
 remote processing. The default is False.</p>
@@ -483,7 +483,7 @@ overwriting existing results. The default is False.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay">
-<span class="sig-name descname"><span class="pre">check_all_args_okay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">check_all_args_okay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.check_all_args_okay" title="Link to this definition">#</a></dt>
 <dd><p>Check that all required (keyword) arguments have been set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
@@ -494,25 +494,25 @@ overwriting existing results. The default is False.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner">
-<span class="sig-name descname"><span class="pre">execute_workflow_in_apprunner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">execute_workflow_in_apprunner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.execute_workflow_in_apprunner" title="Link to this definition">#</a></dt>
 <dd><p>Execute the given workflow in an AppRunner with a QEventLoop.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow">
-<span class="sig-name descname"><span class="pre">parse_args_for_pydidas_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">parse_args_for_pydidas_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.parse_args_for_pydidas_workflow" title="Link to this definition">#</a></dt>
 <dd><p>Parse the command line arguments for the run_pydidas_workflow script.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.process_scan">
-<span class="sig-name descname"><span class="pre">process_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.process_scan" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">process_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.process_scan" title="Link to this definition">#</a></dt>
 <dd><p>Process a scan.</p>
 <p>This method will check if new metadata has been provided in the given
 keywords and will update the stored arguments respectively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**kwargs</strong> (<em>dict</em>) – The updated keyword arguments. For the full list of supported keyword
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – The updated keyword arguments. For the full list of supported keyword
 arguments, please refer to the global class docstring.</p>
 </dd>
 </dl>
@@ -520,19 +520,19 @@ arguments, please refer to the global class docstring.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args">
-<span class="sig-name descname"><span class="pre">update_contexts_from_stored_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_contexts_from_stored_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_contexts_from_stored_args" title="Link to this definition">#</a></dt>
 <dd><p>Update the global contexts from the stored arguments.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs">
-<span class="sig-name descname"><span class="pre">update_parsed_args_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_parsed_args_from_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowRunner.update_parsed_args_from_kwargs" title="Link to this definition">#</a></dt>
 <dd><p>Update the parsed arguments with the given keyword arguments.</p>
 <p>For the specific supported keyword arguments, please check the class
 definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kwargs</strong> (<em>dict</em>) – The dictionary with the user-provided keyword-arguments</p>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – The dictionary with the user-provided keyword-arguments</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="../core/others.html#pydidas.core.UserConfigError" title="pydidas.core.UserConfigError"><strong>UserConfigError</strong></a> – If both the ‘diffraction_experiment’ and ‘diffraction_exp’ keywords

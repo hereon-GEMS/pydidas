@@ -446,15 +446,15 @@ class PydidasFileDialog(
             "All files"
         ) or self.selectedNameFilter().startswith("All supported files"):
             if self._calling_kwargs.get("default_extension") is not None:
-                return "." + self._calling_kwargs.get("default_extension")
-            _defaults = ["yaml", "npy", "tif", "h5"]
+                return self._calling_kwargs.get("default_extension")
+            _defaults = [".yaml", ".npy", ".tif", ".h5"]
             while len(_defaults) > 0:
                 _ext = _defaults.pop(0)
                 if _ext in self._calling_kwargs["extensions"]:
                     return f".{_ext}"
             return self._calling_kwargs["extensions"][0]
         _formats = self.selectedNameFilter().strip(")").split("*.")[1:]
-        return "." + _formats[0]
+        return _formats[0]
 
     def _check_extension(self, extension: str):
         """
@@ -467,7 +467,7 @@ class PydidasFileDialog(
         """
         if self._calling_kwargs["extensions"] is None:
             return
-        if extension.strip(".") not in self._calling_kwargs["extensions"]:
+        if extension not in self._calling_kwargs["extensions"]:
             raise UserConfigError(
                 f'The given extension "{extension}" is invalid because the file type '
                 "is unknown."

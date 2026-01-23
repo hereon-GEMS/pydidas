@@ -123,7 +123,7 @@ def get_hdf5_populated_dataset_keys(
         item = Path(item)
         if not item.is_file():
             raise FileReadError("The specified file does not exist.")
-        if item.suffix.removeprefix(".") not in HDF5_EXTENSIONS:
+        if item.suffix not in HDF5_EXTENSIONS:
             raise FileReadError(
                 "The specified file does not have a recognized hdf5 extension."
             )

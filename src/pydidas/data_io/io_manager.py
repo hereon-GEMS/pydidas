@@ -176,7 +176,6 @@ class IoManager(type):
         bool
             Flag whether the extension is registered or not.
         """
-        extension = extension.removeprefix(".")
         _registry = cls.registry_export if mode == "export" else cls.registry_import
         _in_registry = extension in _registry
         if mode == "metadata":

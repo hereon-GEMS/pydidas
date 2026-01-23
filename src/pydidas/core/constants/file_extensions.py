@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ File_extensions holds information about extension names and filename formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,21 +38,21 @@ __all__ = [
 ]
 
 
-HDF5_EXTENSIONS = ["h5", "hdf", "nxs", "hdf5", "HDF5"]
+HDF5_EXTENSIONS = [".h5", ".hdf", ".nxs", ".hdf5"]
 
-NUMPY_EXTENSIONS = ["npy"]
+NUMPY_EXTENSIONS = [".npy"]
 
-BINARY_EXTENSIONS = ["raw", "bin"]
+BINARY_EXTENSIONS = [".raw", ".bin"]
 
-ASCII_EXPORT_EXTENSIONS = ["txt", "csv", "chi", "dat"]
-ASCII_IMPORT_EXTENSIONS = ["txt", "csv", "chi", "dat", "asc", "fio"]
+ASCII_EXPORT_EXTENSIONS = [".txt", ".csv", ".chi", ".dat"]
+ASCII_IMPORT_EXTENSIONS = [".txt", ".csv", ".chi", ".dat", ".asc", ".fio"]
 
-TIFF_EXTENSIONS = ["tif", "tiff", "TIF", "TIFF"]
+TIFF_EXTENSIONS = [".tif", ".tiff"]
 
-JPG_EXTENSIONS = ["jpg", "jpeg"]
+JPG_EXTENSIONS = [".jpg", ".jpeg"]
 
-FABIO_EXTENSIONS = ["edf", "mccd", "mar3450", "f2d", "cbf", "msk"]
+FABIO_EXTENSIONS = [".edf", ".mccd", ".mar3450", ".f2d", ".cbf", ".msk"]
 
-YAML_EXTENSIONS = ["yaml", "yml"]
+YAML_EXTENSIONS = [".yaml", ".yml"]
 
 FILENAME_DELIMITERS = r"\.|_|-| "

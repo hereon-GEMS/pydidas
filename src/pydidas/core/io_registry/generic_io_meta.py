@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a registry of classes for a specific application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -190,7 +190,7 @@ class GenericIoMeta(type):
         kwargs : Any
             Any kwargs which should be passed to the underlying exporter.
         """
-        _extension = get_extension(filename, lowercase=False)
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.export_to_file(filename, **kwargs)
@@ -206,7 +206,7 @@ class GenericIoMeta(type):
         filename : str
             The full filename and path.
         """
-        _extension = get_extension(filename, lowercase=False)
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.import_from_file(filename)

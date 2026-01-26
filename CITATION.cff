@@ -29,7 +29,7 @@ identifiers:
     type: doi
     value: "10.5281/zenodo.7568610"
 date-released: 2026-01-26
-version: 26.01.26
+version: 26.01.26a
 references:
   - type: article
     title: "pydidas: a tool for automated X-ray diffraction data analysis"

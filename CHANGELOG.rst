@@ -2,6 +2,14 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+v26.01.26a
+==========
+
+Bugfixes
+--------
+- Fixed an issue with a pinned dependency for sphinx which occurs when
+  upgrading pydidas in an existing environment.
+
 v26.01.26
 =========
 

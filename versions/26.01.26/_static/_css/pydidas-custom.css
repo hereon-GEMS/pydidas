@@ -1,0 +1,13 @@
+.tight-table td {
+  white-space: normal !important;
+  overflow-x : hidden;
+  overflow-y : hidden;
+}
+
+.align-references a:first-child {
+  float: left;
+}
+
+.align-references a:last-child {
+  float: right;
+}

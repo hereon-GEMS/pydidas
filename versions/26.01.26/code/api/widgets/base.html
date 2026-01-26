@@ -1,0 +1,1335 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The widgets sub-package &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=5f6c46a8"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/base';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.01.26"';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.controllers sub-package" href="controllers.html" />
+    <link rel="prev" title="The widgets sub-package" href="../widgets.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="26.01.26" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The widgets sub-package</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pydidas.widgets">
+<span id="the-widgets-sub-package"></span><h1>The widgets sub-package<a class="headerlink" href="#module-pydidas.widgets" title="Link to this heading">#</a></h1>
+<p>Package with modified widgets required for creating the pydidas graphical user
+interface.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">CreateWidgetsMixIn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A mixin class to allow easy widget creation in their host classes.</p>
+<p>The CreateWidgetsMixIn class includes methods for easy adding of widgets
+to the layout. The create_something methods from the factories are called,
+and in addition, the layout and positions can be set.</p>
+<p>Use the “gridPos” keyword to define the widget position in the parent’s
+layout.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.add_any_widget">
+<span class="sig-name descname"><span class="pre">add_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.add_any_widget" title="Link to this definition">#</a></dt>
+<dd><p>Add any existing widget to the layout and apply settings to it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The widget reference key.</p></li>
+<li><p><strong>widget_instance</strong> (<em>QWidget</em>) – The widget instance.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the specific QWidget with a setAttribute
+method are valid kwargs. In addition, ‘layout_kwargs’ is a valid key
+to pass a dictionary with attributes for the widget’s layout.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_any_widget">
+<span class="sig-name descname"><span class="pre">create_any_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_any_widget" title="Link to this definition">#</a></dt>
+<dd><p>Create any widget with any settings and add it to the layout.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Widgets must support generic args and kwargs arguments. This means
+that generic PyQt widgets cannot be created using this method. They
+can be added, however, using the <code class="docutils literal notranslate"><span class="pre">add_any_widget</span></code> method.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference name in the _widgets dictionary.</p></li>
+<li><p><strong>widget_class</strong> (<em>type</em>) – The class type of the widget.</p></li>
+<li><p><strong>*args</strong> (<em>Any</em>) – Any arguments for the widget creation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Keyword arguments for the widget creation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If the reference “ref” is not of type string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_button">
+<span class="sig-name descname"><span class="pre">create_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_button" title="Link to this definition">#</a></dt>
+<dd><p>Create a QPushButton and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The button’s displayed text.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QPushButton with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the button’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
+be used to control the font properties.
+The button’s clicked method can be connected directly by specifying
+the slot through the ‘clicked’ kwarg.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_check_box">
+<span class="sig-name descname"><span class="pre">create_check_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_check_box" title="Link to this definition">#</a></dt>
+<dd><p>Create a PydidasCheckBox and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The CheckBox’s descriptive text.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QCheckBox with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the QProgressBar’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
+to control the font properties or generic Qt properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_combo_box">
+<span class="sig-name descname"><span class="pre">create_combo_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_combo_box" title="Link to this definition">#</a></dt>
+<dd><p>Create a PydidasComboBox and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QComboBox with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the QComboBox’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
+to control the font properties or generic Qt properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_double_spin_box">
+<span class="sig-name descname"><span class="pre">create_double_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_double_spin_box" title="Link to this definition">#</a></dt>
+<dd><p>Create a QDoubleSpinBox for floating point values and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpinBox with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the SpinBox’s position in its parent’s layout. The
+default range is set to (0, 1) if it is not overridden with the
+‘range’ keyword.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_empty_widget">
+<span class="sig-name descname"><span class="pre">create_empty_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_empty_widget" title="Link to this definition">#</a></dt>
+<dd><p>Create an empty QWidget with a grid layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the generic QWidget with a setAttribute
+method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the QWidget’s position in its parent’s layout.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_label">
+<span class="sig-name descname"><span class="pre">create_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_label" title="Link to this definition">#</a></dt>
+<dd><p>Create a PydidasLabel and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLabel with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the label’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
+be used to control the font properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_line">
+<span class="sig-name descname"><span class="pre">create_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_line" title="Link to this definition">#</a></dt>
+<dd><p>Create a line widget.</p>
+<p>This method creates a line widget (implemented as flat QFrame) as a separator
+and adds it to the parent widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+implementation are valid kwargs.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_lineedit">
+<span class="sig-name descname"><span class="pre">create_lineedit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_lineedit" title="Link to this definition">#</a></dt>
+<dd><p>Create a PydidasLineEdit and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLineEdit with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the LineEdit’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
+be used to control the font properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_progress_bar">
+<span class="sig-name descname"><span class="pre">create_progress_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_progress_bar" title="Link to this definition">#</a></dt>
+<dd><p>Create a QProgressBar and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QProgressBar with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the QProgressBar’s position in its parent’s layout.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_radio_button_group">
+<span class="sig-name descname"><span class="pre">create_radio_button_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_radio_button_group" title="Link to this definition">#</a></dt>
+<dd><p>Create a RadioButtonGroup widget and set its properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>entries</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – The list of entries for the buttons.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by the generic QWidget with a setAttribute
+method are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the RadioButtonGroup’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ can be used
+to control the font properties or generic Qt properties.
+The ‘entries’ keyword takes a list of entries for the buttons, and the
+number of rows and columns can be specified with the ‘rows’ and
+‘columns’ keywords, respectively.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_spacer">
+<span class="sig-name descname"><span class="pre">create_spacer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_spacer" title="Link to this definition">#</a></dt>
+<dd><p>Create a QSpacerItem and set its properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpacerItem with a setAttribute method
+are valid kwargs. In addition, the gridPos key allows specifying
+the spacer’s position in its parent’s layout.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_spin_box">
+<span class="sig-name descname"><span class="pre">create_spin_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_spin_box" title="Link to this definition">#</a></dt>
+<dd><p>Create a QSpinBox for integer values and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QSpinBox with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the SpinBox’s position in its parent’s layout. The
+default range is set to (0, 1) if it is not overridden with the
+‘range’ keyword.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_square_button">
+<span class="sig-name descname"><span class="pre">create_square_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_square_button" title="Link to this definition">#</a></dt>
+<dd><p>Create a SquareButton with only an icon and no text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QPushButton with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the button’s position in its parent’s layout.
+The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
+be used to control the font properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_svg_widget">
+<span class="sig-name descname"><span class="pre">create_svg_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svg_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_svg_widget" title="Link to this definition">#</a></dt>
+<dd><p>Create a widget with an SVG image and add it to the layout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em><em>,</em>) – The reference string for storing the widget.</p></li>
+<li><p><strong>svg_path</strong> (<em>str</em><em> | </em><em>Path</em>) – The path to the SVG file to be displayed in the widget.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any supported kwargs from the generic QWidget with a setAttribute
+method or from pydidas’ CreateWidgetsMixIn class are valid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_table" title="Link to this definition">#</a></dt>
+<dd><p>Create a QTableWidget and store the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QTableWidget with a setAttribute method
+are valid kwargs. In addition, the ‘gridPos’ keyword can be used
+to specify the QTableWidget’s position in its parent’s layout.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.CreateWidgetsMixIn.create_vertical_line">
+<span class="sig-name descname"><span class="pre">create_vertical_line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.CreateWidgetsMixIn.create_vertical_line" title="Link to this definition">#</a></dt>
+<dd><p>Create a vertical line widget.</p>
+<p>This method creates a vertical line widget (implemented as flat QFrame) as
+a separator and adds it to the parent widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keyword arguments. All QFrame attributes with setAttribute
+implementation are valid kwargs.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">PydidasFileDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/others.html#pydidas.core.SingletonObject" title="pydidas.core.singleton_object.SingletonObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingletonObject</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFileDialog</span></code>, <a class="reference internal" href="#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a></p>
+<p>pydidas’s subclassed QFileDialog with additional functionality.</p>
+<p>The PydidasFileDialogWidget is a subclassed QFileDialog with two additional
+buttons which allow fast navigation to the ScanContext base directory and to the
+latest selected directory (in any dialog).</p>
+<p>The usage is the same as for the generic QFileDialog.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.exec_">
+<span class="sig-name descname"><span class="pre">exec_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.exec_" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The return code of the file dialog.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_directory">
+<span class="sig-name descname"><span class="pre">get_existing_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_directory" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get an existing directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select directory’.</p>
+</dd>
+<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
+The default is None.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
+The qsettings_ref will take precedence over the reference keyword.</p>
+</dd>
+<dt>info_string<span class="classifier">str, optional</span></dt><dd><p>An additional info string to be displayed at the top of the file
+selection for user information.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The directory path, if selected or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_filename">
+<span class="sig-name descname"><span class="pre">get_existing_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_filename" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get the full path of an existing file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select existing file’.</p>
+</dd>
+<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
+The default is None.</p>
+</dd>
+<dt>select_multiple<span class="classifier">bool, optional</span></dt><dd><p>If True, multiple files can be selected. The default is False.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
+The qsettings_ref will take precedence over the reference keyword.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The full file path, if selected, or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_existing_filenames">
+<span class="sig-name descname"><span class="pre">get_existing_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_existing_filenames" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get a list of existing files.</p>
+<p>This is a wrapper around get_existing_filename with the necessary
+kwargs settings taken care of for the user.</p>
+<p>Please refer to get_existing_filename for more information and
+Parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.get_saving_filename">
+<span class="sig-name descname"><span class="pre">get_saving_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.get_saving_filename" title="Link to this definition">#</a></dt>
+<dd><p>Execute the dialog and get the full path of a file for saving.</p>
+<p>The file may exist or a new filename can be entered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select filename’.</p>
+</dd>
+<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active
+instance. The default is None.</p>
+</dd>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings
+registry. The qsettings_ref will take precedence over the
+reference keyword.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The full file path, if selected, or None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_latest_location">
+<span class="sig-name descname"><span class="pre">goto_latest_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location" title="Link to this definition">#</a></dt>
+<dd><p>Open the latest location from any dialogue.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_scan_base_dir">
+<span class="sig-name descname"><span class="pre">goto_scan_base_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir" title="Link to this definition">#</a></dt>
+<dd><p>Open the ScanContext home directory, if set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.initialize" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the PydidasFileDialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>Any</em>) – Positional arguments.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Keyword arguments. Supported keywords are:</p>
+<dl class="simple">
+<dt>parent<span class="classifier">Union[None, QWidget], optional</span></dt><dd><p>The dialog’s parent widget. The default is None.</p>
+</dd>
+<dt>caption<span class="classifier">str | None, optional</span></dt><dd><p>The dialog caption. If None, the caption will be selected based on the
+type of dialog. The default is None.</p>
+</dd>
+<dt>dialog_type<span class="classifier">str</span></dt><dd><p>The type of the dialog. Must be open_file, save_file, or open_directory.
+The default is open_file.</p>
+</dd>
+<dt>formats<span class="classifier">str | None, optional</span></dt><dd><p>The list of format filters for filenames, if used. The default is None.</p>
+</dd>
+<dt>info_string<span class="classifier">str | None, optional</span></dt><dd><p>An additional information string which is displayed in the FileDialog
+widget. The default is None.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.set_curr_dir">
+<span class="sig-name descname"><span class="pre">set_curr_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir" title="Link to this definition">#</a></dt>
+<dd><p>Set the current directory to the directory of the given item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference</strong> (<em>str</em><em> | </em><em>int</em>) – The stored reference name.</p></li>
+<li><p><strong>item</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename or directory name.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.ScrollArea">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">ScrollArea</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.ScrollArea" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QScrollArea</span></code></p>
+<p>Convenience class to simplify the setup of a QScrollArea.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>QWidget</em><em>, </em><em>optional</em>) – The parent widget. The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. All Qt attributes with a setAttribute
+method are valid keywords.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.ScrollArea.force_width_from_size_hint">
+<span class="sig-name descname"><span class="pre">force_width_from_size_hint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.ScrollArea.force_width_from_size_hint" title="Link to this definition">#</a></dt>
+<dd><p>Enforce a fixed width based on the own sizeHint.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.ScrollArea.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.ScrollArea.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Get the size hint.</p>
+<p>If a widget has been set, the ScrollArea will use the widget’s sizeHint
+to determine the required size. If no widget is set, it will default
+to the QScrollArea sizeHint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The size hint for the ScrollArea.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.WidgetWithParameterCollection">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">WidgetWithParameterCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.WidgetWithParameterCollection" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <a class="reference internal" href="../core/others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a>, <a class="reference internal" href="#pydidas.widgets.CreateWidgetsMixIn" title="pydidas.widgets.factory.create_widgets_mixin.CreateWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a>, <a class="reference internal" href="../core/others.html#pydidas.core.ParameterCollectionMixIn" title="pydidas.core.parameter_collection_mixin.ParameterCollectionMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a>, <a class="reference internal" href="parameter_config.html#pydidas.widgets.parameter_config.ParameterWidgetsMixIn" title="pydidas.widgets.parameter_config.parameter_widgets_mixin.ParameterWidgetsMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a></p>
+<p>A widget which has full access to Pydidas’s ParameterCollection and widget creation
+methods.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError">
+<span class="sig-name descname"><span class="pre">raise_UserConfigError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError" title="Link to this definition">#</a></dt>
+<dd><p>Raise a UserConfigError with the given error string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error_str</strong> (<em>str</em>) – The error string to raise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.delete_all_items_in_layout">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">delete_all_items_in_layout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QLayout</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.delete_all_items_in_layout" title="Link to this definition">#</a></dt>
+<dd><p>Recursively delete items in a QLayout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>layout</strong> (<em>QLayout</em>) – The layout to be cleared.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.get_max_pixel_width_of_entries">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_max_pixel_width_of_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.widgets.get_max_pixel_width_of_entries" title="Link to this definition">#</a></dt>
+<dd><p>Get the maximum width from a number of entries.</p>
+<p>This function calculates the width (in pixels) of a list of given strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entries</strong> (<em>str</em><em> or </em><em>tuple</em><em> or </em><em>list</em>) – The entries.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>width</strong> – The maximum width of the entries in pixels.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.get_pyqt_icon_from_str">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_pyqt_icon_from_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QIcon</span></span></span><a class="headerlink" href="#pydidas.widgets.get_pyqt_icon_from_str" title="Link to this definition">#</a></dt>
+<dd><p>Get a QIcon from the reference string.</p>
+<dl class="simple">
+<dt>Four types of strings can be processed:</dt><dd><ol class="arabic simple">
+<li><p>A reference number of a QStandardIcon, preceded by a ‘qt-std::’.</p></li>
+<li><p>A reference to an image file in the file system. The filename must be
+preceded by ‘path::’.</p></li>
+<li><p>A reference to an icon in pydidas.core.icons with the filename preceded
+by a ‘pydidas::’</p></li>
+<li><p>A reference to a mdi icon with the filename preceded by a ‘mdi::’
+Note that this only works for those mdi icons which have been included
+in pydidas.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ref_string</strong> (<em>str</em>) – The reference string for the icon.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If no correct preceding type has been found.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The icon</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtGui.QIcon</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.get_widget_layout_args">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">get_widget_layout_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.widgets.get_widget_layout_args" title="Link to this definition">#</a></dt>
+<dd><p>Get the arguments for adding a widget to the layout of the parent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>QWidget</em>) – The parent QWidget to which the new widget shall be added.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – The keyword arguments dictionary from the calling method. This
+method only takes the “gridPos”, “stretch” and “alignment” arguments from the
+kwargs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../core/others.html#pydidas.core.PydidasGuiError" title="pydidas.core.PydidasGuiError"><strong>PydidasGuiError</strong></a> – If the parent widget has no supported layout. Supported are
+    QBoxLayout, QStackedLayout or QGridLayout and subclasses.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of layout arguments required for adding the widget to
+the layout of the parent widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.widgets.icon_with_inverted_colors">
+<span class="sig-prename descclassname"><span class="pre">pydidas.widgets.</span></span><span class="sig-name descname"><span class="pre">icon_with_inverted_colors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">icon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QIcon</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QIcon</span></span></span><a class="headerlink" href="#pydidas.widgets.icon_with_inverted_colors" title="Link to this definition">#</a></dt>
+<dd><p>Invert the colors of a QIcon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>icon</strong> (<em>QIcon</em>) – The icon to be inverted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The inverted icon.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QIcon</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../widgets.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The widgets sub-package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="controllers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The widgets.controllers sub-package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.add_any_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.add_any_widget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_any_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_any_widget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_button"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_button</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_check_box"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_check_box</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_combo_box"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_combo_box</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_double_spin_box"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_double_spin_box</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_empty_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_empty_widget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_label"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_label</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_line"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_line</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_lineedit"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_lineedit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_progress_bar"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_progress_bar</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_radio_button_group"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_radio_button_group</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_spacer"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_spacer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_spin_box"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_spin_box</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_square_button"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_square_button</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_svg_widget"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_svg_widget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_table"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_table</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.CreateWidgetsMixIn.create_vertical_line"><code class="docutils literal notranslate"><span class="pre">CreateWidgetsMixIn.create_vertical_line</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.exec_"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.exec_</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_directory"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_directory</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_filename"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_existing_filenames"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_existing_filenames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.get_saving_filename"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.get_saving_filename</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.goto_latest_location</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.goto_scan_base_dir</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.initialize"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.initialize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir"><code class="docutils literal notranslate"><span class="pre">PydidasFileDialog.set_curr_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.ScrollArea"><code class="docutils literal notranslate"><span class="pre">ScrollArea</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.ScrollArea.force_width_from_size_hint"><code class="docutils literal notranslate"><span class="pre">ScrollArea.force_width_from_size_hint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.ScrollArea.sizeHint"><code class="docutils literal notranslate"><span class="pre">ScrollArea.sizeHint</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.WidgetWithParameterCollection"><code class="docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.WidgetWithParameterCollection.raise_UserConfigError"><code class="docutils literal notranslate"><span class="pre">WidgetWithParameterCollection.raise_UserConfigError</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.delete_all_items_in_layout"><code class="docutils literal notranslate"><span class="pre">delete_all_items_in_layout</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_max_pixel_width_of_entries"><code class="docutils literal notranslate"><span class="pre">get_max_pixel_width_of_entries</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_pyqt_icon_from_str"><code class="docutils literal notranslate"><span class="pre">get_pyqt_icon_from_str</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.get_widget_layout_args"><code class="docutils literal notranslate"><span class="pre">get_widget_layout_args</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.icon_with_inverted_colors"><code class="docutils literal notranslate"><span class="pre">icon_with_inverted_colors</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/widgets/base.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/code/api/widgets/base.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

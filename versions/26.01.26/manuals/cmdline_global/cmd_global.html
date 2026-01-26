@@ -1,0 +1,1149 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pydidas general command line tutorial &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=5f6c46a8"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'manuals/cmdline_global/cmd_global';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.01.26"';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="The DiffractionExperimentContext class" href="cmd_diffraction_exp_context.html" />
+    <link rel="prev" title="Command line manuals" href="../commandline_start.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="26.01.26" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Pydidas quick-start guide</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../commandline_start.html">Command line manuals</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">pydidas general command line tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_diffraction_exp_context.html">The DiffractionExperimentContext class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_scan_context.html">The ScanContext class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_workflow_tree.html">The WorkflowTree class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_workflow_results.html">The WorkflowResults class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_running_workflows.html">Running pydidas workflows from the command line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cmdline_apps/cmd_apps.html">Command line applications</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui/graphical_user_interface.html">Graphical user interface</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../manuals_main.html" class="nav-link">User manuals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../commandline_start.html" class="nav-link">Command line manuals</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">pydidas general command line tutorial</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pydidas-general-command-line-tutorial">
+<h1>pydidas general command line tutorial<a class="headerlink" href="#pydidas-general-command-line-tutorial" title="Link to this heading">#</a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#accessing-parameters" id="id3">Accessing Parameters</a></p>
+<ul>
+<li><p><a class="reference internal" href="#useful-methods-of-parametercollection" id="id4">Useful methods of ParameterCollection</a></p></li>
+<li><p><a class="reference internal" href="#examples" id="id5">Examples</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#global-pydidas-objects" id="id6">Global pydidas objects</a></p>
+<ul>
+<li><p><a class="reference internal" href="#global-objects-for-processing" id="id7">Global objects for processing</a></p></li>
+<li><p><a class="reference internal" href="#plugincollection" id="id8">PluginCollection</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#pydidas-qsettings" id="id9">pydidas QSettings</a></p>
+<ul>
+<li><p><a class="reference internal" href="#description-of-pydidas-s-qsettings" id="id10">Description of pydidas’s Qsettings</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="accessing-parameters">
+<span id="id1"></span><h2>Accessing Parameters<a class="headerlink" href="#accessing-parameters" title="Link to this heading">#</a></h2>
+<p>All pydidas objects handle user variables in the form of
+<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> which enforces type checks where
+required. These objects are organized in
+<a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a> which allow
+direct access to the Parameter values. Usually, users do not need to create or
+manage Parameters but only modify their values.</p>
+<section id="useful-methods-of-parametercollection">
+<h3>Useful methods of ParameterCollection<a class="headerlink" href="#useful-methods-of-parametercollection" title="Link to this heading">#</a></h3>
+<p>For the full <a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a>
+method documentation, please refer to the class documentation. However, users
+will probably manage with a handful of methods and properties.</p>
+<p><strong>Useful methods:</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>get_param_value</strong>(<em>key</em>)</dt><dd><p>Get the value of the Parameter referenced by <em>key</em>.</p>
+</dd>
+<dt><strong>set_param_value</strong>(<em>key</em>, <em>value</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given <em>value</em>.</p>
+</dd>
+<dt><strong>print_param_values</strong>()</dt><dd><p>Print all Parameter reference keys and their current values to the
+console.</p>
+</dd>
+<dt><strong>set_param_value_and_choices</strong>(<em>key</em>, <em>value</em>, <em>choices</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given
+<em>value</em> and update the available choices to the given <em>choices</em> list.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Useful properties:</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>param_keys</strong></dt><dd><p>Get all the reference keys to access the respective parameters.</p>
+</dd>
+<dt><strong>param_values</strong></dt><dd><p>Get the value of all stored Parameters in form of a dictionary with the
+Parameter reference keys as dict keys and the Parameter values as dict
+values.</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The described methods are universal and apply to all pydidas objects with
+Parameters.</p>
+</div>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
+<p>All examples will use the DiffractionExperimentContext object (please see below for a
+description of the object) and the examples will only cover the code bases, not
+the use case.</p>
+<p>First, let us create the object called <code class="xref py py-data docutils literal notranslate"><span class="pre">exp</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">DiffractionExperimentContext</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The object <code class="xref py py-data docutils literal notranslate"><span class="pre">exp</span></code> will be used in all examples below.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Get all Parameter keys contained in <code class="xref py py-data docutils literal notranslate"><span class="pre">exp</span></code>:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">param_keys</span>
+<span class="go">[&#39;xray_wavelength&#39;,</span>
+<span class="go"> &#39;xray_energy&#39;,</span>
+<span class="go"> &#39;detector_name&#39;,</span>
+<span class="go"> &#39;detector_npixx&#39;,</span>
+<span class="go"> &#39;detector_npixy&#39;,</span>
+<span class="go"> &#39;detector_pxsizex&#39;,</span>
+<span class="go"> &#39;detector_pxsizey&#39;,</span>
+<span class="go"> &#39;detector_mask_file&#39;,</span>
+<span class="go"> &#39;detector_dist&#39;,</span>
+<span class="go"> &#39;detector_poni1&#39;,</span>
+<span class="go"> &#39;detector_poni2&#39;,</span>
+<span class="go"> &#39;detector_rot1&#39;,</span>
+<span class="go"> &#39;detector_rot2&#39;,</span>
+<span class="go"> &#39;detector_rot3&#39;]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<p>2. Get the value of the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>
+<em>xray_energy</em></p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">15.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>3. Get the values of all <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> as
+a dictionary to process further:</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">get_param_values_as_dict</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span>
+<span class="go">{&#39;xray_wavelength&#39;: 0.8265613228880018,</span>
+<span class="go"> &#39;xray_energy&#39;: 15.0,</span>
+<span class="go"> &#39;detector_name&#39;: &#39;Eiger 9M&#39;,</span>
+<span class="go"> &#39;detector_npixx&#39;: 3110,</span>
+<span class="go"> &#39;detector_npixy&#39;: 3269,</span>
+<span class="go"> &#39;detector_sizex&#39;: 7.5e-05,</span>
+<span class="go"> &#39;detector_sizey&#39;: 7.5e-05,</span>
+<span class="go"> &#39;detector_mask_file&#39;: Path(&#39;.&#39;),</span>
+<span class="go"> &#39;detector_dist&#39;: 0.23561364873702045,</span>
+<span class="go"> &#39;detector_poni1&#39;: 0.11575233539615679,</span>
+<span class="go"> &#39;detector_poni2&#39;: 0.12393982882406686,</span>
+<span class="go"> &#39;detector_rot1&#39;: -0.007522050071166131,</span>
+<span class="go"> &#39;detector_rot2&#39;: -0.004845626736941386,</span>
+<span class="go"> &#39;detector_rot3&#39;: 5.799041608456517e-08}</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can also use the <code class="xref py py-data docutils literal notranslate"><span class="pre">param_values</span></code> property to retrieve
+all parameter values in a dictionary.</p>
+</div>
+</div></blockquote>
+<p>4. Set the value of the <em>xray_energy</em>
+<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. This is a float value,
+however, the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> will attempt
+to convert other types to float. If successful,
+for demonstration purposes, let us set it with a string first. This will
+raise a :py:data:ValueError` and the Parameter will not be updated.</p>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">15.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="s1">&#39;12.0&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">12.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">13.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">,</span> <span class="s2">&quot;twelve&quot;</span><span class="p">)</span>
+<span class="go">ValueError: Cannot set Parameter (object ID:2129071369296, refkey:</span>
+<span class="go">&#39;xray_energy&#39;, name: &#39;X-ray energy&#39;) because it is of the wrong data type.</span>
+<span class="go">(expected: &lt;class &#39;numbers.Real&#39;&gt;, input type: &lt;class &#39;str&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
+<span class="go">13.0</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div></blockquote>
+</section>
+</section>
+<section id="global-pydidas-objects">
+<h2>Global pydidas objects<a class="headerlink" href="#global-pydidas-objects" title="Link to this heading">#</a></h2>
+<section id="global-objects-for-processing">
+<h3>Global objects for processing<a class="headerlink" href="#global-objects-for-processing" title="Link to this heading">#</a></h3>
+<p>All apps use the same global persistent objects (implemented as singletons), if
+required. Information is separated according to the reasons to change. The three
+main objects are:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code></dt><dd><p>The details about the scan. This includes generic information like scan
+title, data directory and scan names and specific information like the
+number of scan dimensions and the number of points in each dimension
+(but also metadata like dimension names, units, offsets and step width).
+The latter information can be used to create the correct axis labels in
+plots. For the full documentation please visit the
+<a class="reference internal" href="cmd_scan_context.html#scan-context"><span class="std std-ref">ScanSetup manual</span></a>.</p>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></dt><dd><p>This object includes information about the global experimental setup
+like X-ray energy, detector type, position and geometry. For the full
+documentation please visit the
+<a class="reference internal" href="cmd_diffraction_exp_context.html#diffraction-exp-context"><span class="std std-ref">DiffractionExperimentContext manual</span></a>.</p>
+</dd>
+<dt><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a></dt><dd><p>The WorkflowTree holds information about which plugins are used and
+about the order of plugins to be processed. For the full documentation
+please visit the <a class="reference internal" href="cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">WorkflowTree manual</span></a>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>These objects can be accesses by calling their respective factories:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EXPERIMENT</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">DiffractionExperimentContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowTree</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Note that the factories return a link to the unique instance and multiple calls
+yield the same object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span>
+<span class="go">&lt;pydidas.contexts.scan.Scan at 0x1d4a257b820&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN2</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN2</span>
+<span class="go">&lt;pydidas.contexts.scan.Scan at 0x1d4a257b820&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SCAN</span> <span class="o">==</span> <span class="n">SCAN2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="plugincollection">
+<span id="global-plugincollection"></span><h3>PluginCollection<a class="headerlink" href="#plugincollection" title="Link to this heading">#</a></h3>
+<p>pydidas uses a global
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>
+to manage all known plugins. Plugins will be discovered based on known plugin
+paths which are managed persistently in the PluginCollection using Qt’s
+QSettings which use the systems registry and are platform-independent. A
+reference to the persistent <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a> object can be obtained
+using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the full documentation of all available methods, please refer to the
+class documentation:
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>
+This section handles only the most common use cases.</p>
+</div>
+<section id="management-of-stored-paths">
+<h4>Management of stored paths<a class="headerlink" href="#management-of-stored-paths" title="Link to this heading">#</a></h4>
+<p>Paths can be managed by various methods. New paths can be added using the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins" title="pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_and_register_plugins</span></code></a>
+method and a list of all currently registered paths can be obtained by the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_all_registered_paths</span></code>
+method. To permanently remove a stored paths, a user can use the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_plugin_path</span></code></a>
+method. To remove all stored paths and plugin, use
+the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a> method.
+This method must be called with a <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> flag to take effect and is
+ignored otherwise.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the generic plugin path is always included and cannot be removed from
+the collection by the user.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a>
+method will remove all custom paths which have ever been registered and the
+user is responsible to add all required paths again.</p>
+<p>This method will not keep any references to the original stored paths and they
+are truly lost.</p>
+</div>
+<p>An example of the use of stored paths is given below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[Path(&#39;&#39;/home/someuser/path/to/plugins&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">find_and_register_plugins</span><span class="p">(</span>
+<span class="go">    &#39;/home/someuser/another/path&#39;,</span>
+<span class="go">    &#39;home/someuser/yet/another/path&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
+<span class="go"> Path(&#39;/home/someuser/another/path&#39;),</span>
+<span class="go"> Path(&#39;/home/someuser/yet/another/path&#39;)]</span>
+
+<span class="go"># Now, if we exit and restart python, all paths will be included in the</span>
+<span class="go"># new instance:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exit</span><span class="p">()</span>
+<span class="go">$ python</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
+<span class="go"> Path(&#39;/home/someuser/another/path&#39;),</span>
+<span class="go"> Path(&#39;&#39;/home/someuser/yet/another/path&#39;)]</span>
+<span class="go"># Using the ``unregister_plugin_path`` method allows to remove a single path:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_plugin_path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/home/someuser/another/path&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
+<span class="go"> Path(&#39;&#39;/home/someuser/yet/another/path&#39;)]</span>
+<span class="go"># Using the ``unregister_all_paths`` method without the confirmation flag</span>
+<span class="go"># will be ignored:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_all_paths</span><span class="p">()</span>
+<span class="go">&#39;Confirmation for unregistering all paths was not given. Aborting...&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[Path(&#39;/home/someuser/path/to/plugins&#39;),</span>
+<span class="go"> Path(&#39;/home/someuser/yet/another/path&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">unregister_all_paths</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">registered_paths</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</section>
+<section id="plugin-references">
+<h4>Plugin references<a class="headerlink" href="#plugin-references" title="Link to this heading">#</a></h4>
+<p>Internally, plugins are referenced by their class name and there can only be one
+plugin registered with the same class name. This behaviour is deliberate to
+allow overwriting generic plugins with modified private versions. By default,
+plugin references are overridden with a new class if such a class is
+encountered. In addition to the class name, each plugin has a
+<code class="xref py py-data docutils literal notranslate"><span class="pre">plugin_name</span></code> attribute which allows to set a more readable reference
+name for the Plugin.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The loading of Plugins occurs in the order of the stored paths. Therefore,
+a path further down in the list will take precedence over an earlier path.
+The loading of Plugins can be controlled by organizing the sequence
+of paths.</p>
+<p>The generic plugins are always loaded first.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Trying to register a second class with a different class name but the same
+plugin name will fail and raise an exception. Both the class name and the
+plugin name must be unique and a plugin can only replace a plugin with both
+matching class and plugin names or with a similar class name and a different
+plugin name.</p>
+</div>
+</section>
+<section id="finding-and-getting-a-plugin">
+<h4>Finding and getting a plugin<a class="headerlink" href="#finding-and-getting-a-plugin" title="Link to this heading">#</a></h4>
+<p>Plugins can either be found by their class name using the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_plugin_by_name</span></code></a>
+method or by their plugin name using the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name" title="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_plugin_by_plugin_name</span></code></a>
+method. A list of all available plugin class names can be obtained with the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names" title="pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_all_plugin_names</span></code></a>
+method.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_all_plugin_names</span><span class="p">()</span>
+<span class="go">[&#39;Hdf5fileSeriesLoader&#39;,</span>
+<span class="go"> &#39;FrameLoader&#39;,</span>
+<span class="go"> &#39;MaskImage&#39;,</span>
+<span class="go"> &#39;PyFAI2dIntegration&#39;,</span>
+<span class="go"> &#39;PyFAIazimuthalIntegration&#39;,</span>
+<span class="go"> &#39;PyFAIradialIntegration&#39;,</span>
+<span class="go"> &#39;pyFAIintegrationBase&#39;,</span>
+<span class="go"> &#39;BasePlugin&#39;,</span>
+<span class="go"> &#39;InputPlugin&#39;,</span>
+<span class="go"> &#39;OutputPlugin&#39;,</span>
+<span class="go"> &#39;ProcPlugin&#39;]</span>
+
+<span class="go"># Get the plugin class from the collection:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_plugin</span> <span class="o">=</span> <span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_plugin_by_name</span><span class="p">(</span><span class="s1">&#39;PyFAI2dIntegration&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_plugin</span>
+<span class="go">proc_plugins.pyfai_2d_integration.PyFAI2dIntegration</span>
+
+<span class="go"># Create a new instance:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_integrate2d</span> <span class="o">=</span> <span class="n">_plugin</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_integrate2d</span>
+<span class="go">&lt;proc_plugins.pyfai_2d_integration.PyFAI2dIntegration at 0x2132e91a670&gt;</span>
+
+<span class="go"># Get an azimuthal integration plugin by its plugin name and create a</span>
+<span class="go"># new instance directly (note the additional &quot;()&quot; at the end)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_azi_int</span> <span class="o">=</span> <span class="n">COLLECTION</span><span class="o">.</span><span class="n">get_plugin_by_plugin_name</span><span class="p">(</span><span class="s1">&#39;pyFAI azimuthal Integration&#39;</span><span class="p">)()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_azi_int</span>
+<span class="go">&lt;proc_plugins.pyfai_azimuthal_integration.PyFAIazimuthalIntegration at 0x2132e9b6ee0&gt;</span>
+</pre></div>
+</div>
+<p>Once the plugins have been created, their Parameters can be modified as
+described in the <a class="reference internal" href="#id1">Accessing Parameters</a> section. The organization of plugins
+into a WorkflowTree are covered in the section <a class="reference internal" href="cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">WorkflowTree manual</span></a>.</p>
+</section>
+</section>
+</section>
+<section id="pydidas-qsettings">
+<span id="id2"></span><h2>pydidas QSettings<a class="headerlink" href="#pydidas-qsettings" title="Link to this heading">#</a></h2>
+<p>pydidas uses Qt’s QSettings to store persistent information in the system’s
+registry. The <a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings" title="pydidas.core.PydidasQsettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydidas.core.PydidasQsettings</span></code></a> class can be used to
+display and modify global parameters.
+The most useful methods for general users are
+<a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.show_all_stored_q_settings" title="pydidas.core.PydidasQsettings.show_all_stored_q_settings"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_all_stored_q_settings</span></code></a>
+to print the names and values of all stored settings and
+<a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.set_value" title="pydidas.core.PydidasQsettings.set_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_value</span></code></a> to modify a key.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">PydidasQsettings</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">show_all_stored_q_settings</span><span class="p">()</span>
+<span class="go">global/mp_n_workers: 4</span>
+<span class="go">global/plot_update_time: 1</span>
+<span class="go">global/shared_buffer_max_n: 20</span>
+<span class="go">global/shared_buffer_size: 100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;global/shared_buffer_size&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">show_all_stored_q_settings</span><span class="p">()</span>
+<span class="go">global/mp_n_workers: 4</span>
+<span class="go">global/plot_update_time: 1</span>
+<span class="go">global/shared_buffer_max_n: 20</span>
+<span class="go">global/shared_buffer_size: 50</span>
+</pre></div>
+</div>
+<p>Note that the full list of global keys is longer and only a subset is presented
+here for demonstration purposes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Qsettings are persistent (for a specific pydidas version) on the system
+for every individual user account, i.e. any changes you make will persist
+if you start a new pydidas instance or process. Likewise, any changes made
+as a different user will not be applied to your settings.</p>
+</div>
+<section id="description-of-pydidas-s-qsettings">
+<h3>Description of pydidas’s Qsettings<a class="headerlink" href="#description-of-pydidas-s-qsettings" title="Link to this heading">#</a></h3>
+<p>Pydidas QSettings are grouped into two main categories: ‘global’ settings and
+‘user’ settings. Global settings define the system behaviour and performance
+whereas the user settings handle convenience user configurations.</p>
+<section id="global-settings">
+<h4><strong>Global</strong> settings<a class="headerlink" href="#global-settings" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Multiprocessing settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Number of MP workers (key: global/mp_n_workers, type: int, default: 4)</dt><dd><p>The number of multiprocessing workers. Note that this number should not
+be set too high for two reasons:
+1. File reading processes interfere with each other if too many are
+active at once.
+2. pyFAI already inherently uses parallelization and you can only gain
+limited performance increases for multiple parallel processes.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Shared buffer size limit (key: global/shared_buffer_size, type: float, default: 100, unit: MB)</dt><dd><p>A shared buffer is used to efficiently transport data between the main
+App and multiprocessing Processes. This buffer must be large enough to
+store at least one instance of all result data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Memory settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Buffer dataframe limit (key: global/shared_buffer_max_n, type: int, default: 20)</dt><dd><p>The maximum number of datasets in the buffer. A dataset consists of all
+results for one frame. For performance reasons, the buffer should not
+be too large as this is only a temporary buffer.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Maximum image size (key: global/max_image_size, type: float, default: 100, unit: MPixel)</dt><dd><p>The maximum image size determines the maximum size of images pydidas
+will handle. The default is 100 Megapixels.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>GUI plot update settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Plot update time (key: global/plot_update_time, type: float, default: 1.0)</dt><dd><p>The delay before any plot updates will be processed. This will prevent
+multiple frequent update of plots.)- Composite creation settings</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="user-settings">
+<h4><strong>User</strong> settings<a class="headerlink" href="#user-settings" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Update settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Plot update time (key: user/auto_check_for_updates, type: bool, default: True)</dt><dd><p>Flag to set the update check behaviour. By default, the GUI will check
+for a new version after starting up, if an active internet connection
+exists. This behaviour can be disabled by setting this flag to False.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Composite creator settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Mosaic tiling border width (key: user/mosaic_border_width, type: int, default: 0, unit: px)</dt><dd><p>The width of the border inserted between adjacent frames in the
+composite creation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Mosaic border value (key: user/mosaic_border_value, type: float, default: 0)</dt><dd><p>The value to be put in the border pixels in mosaics.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Plot settings</dt><dd><ul>
+<li><dl class="simple">
+<dt>Histogram lower outlier fraction (key: user/histogram_outlier_fraction_low, type: float, default: 0.02)</dt><dd><p>The lower fraction of the histogram to be cropped when using the
+“Crop histogram outliers” button in plots in the GUI. The value is
+the absolute fraction, i.e. the default of 0.02 will ignore the lowest
+2% of pixels when setting the colormap from the histogram.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Histogram high outlier fraction (key: user/histogram_outlier_fraction_high, type: float, default: 0.07)</dt><dd><p>The high fraction of the histogram to be cropped when using the
+“Crop histogram outliers” button in plots in the GUI. The value is
+the absolute fraction, i.e. the default of 0.07 will ignore the brightest
+7% of pixels when setting the colormap from the histogram. The default of
+0.07 is set to allow masking all the gaps in Eiger detectors by default.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Default colormap (key: user/cmap_name, type: str, default: Gray)</dt><dd><p>The name of the default colormap to use. The name must be a valid
+matplotlib colormap name.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Default color for invalid data (key: user/cmap_nan_color, type: str, default: #9AFEFF)</dt><dd><p>The RGB color code to use for invalid / missing data to distinguish it from the
+generic colormap and its data points.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Plugins</dt><dd><ul>
+<li><dl class="simple">
+<dt>Custom plugin paths (key: user/plugin_path, type: str, default: “”)</dt><dd><p>The names of custom paths where pydidas will look for plugins. Generic plugins
+and the generic plugin path is handled independently for greater clarity.
+Multiple paths can be added by appending them with a double semicolon “;;”
+as separator.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../commandline_start.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Command line manuals</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cmd_diffraction_exp_context.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The DiffractionExperimentContext class</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-parameters">Accessing Parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-methods-of-parametercollection">Useful methods of ParameterCollection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#global-pydidas-objects">Global pydidas objects</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-objects-for-processing">Global objects for processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugincollection">PluginCollection</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#management-of-stored-paths">Management of stored paths</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-references">Plugin references</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#finding-and-getting-a-plugin">Finding and getting a plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas-qsettings">pydidas QSettings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#description-of-pydidas-s-qsettings">Description of pydidas’s Qsettings</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-settings"><strong>Global</strong> settings</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#user-settings"><strong>User</strong> settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/manuals/cmdline_global/cmd_global.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/manuals/cmdline_global/cmd_global.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

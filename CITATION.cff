@@ -1,4 +1,4 @@
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
 cff-version: 1.2.0
@@ -11,13 +11,15 @@ authors:
     email: malte.storm@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
     orcid: 'https://orcid.org/0000-0002-1602-781X'
-    date-start: "2021-02-15"
+    # Malte Storm contributed since February 2021
   - given-names: Gudrun
     family-names: Lotze
-    email: gudrun.lotze@hereon.de
     affiliation: Helmholtz-Zentrum Hereon
-    date-start: "2024-04-08"
+    # Gudrun Lotze contributed in the time period between April 2024 and May 2025
 url: 'https://pydidas.hereon.de/'
+funding:
+  - funder: Deutsche Forschungsgemeinschaft (DFG)
+    grant: 460248799
 keywords:
   - X-ray diffraction
 license: GPL-3.0
@@ -26,8 +28,36 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2025-10-28
-version: 25.10.28
-funding:
-  - funder: Deutsche Forschungsgemeinschaft (DFG)
-    grant: 460248799
+date-released: 2026-01-26
+version: 26.01.26
+references:
+  - type: article
+    title: "pydidas: a tool for automated X-ray diffraction data analysis"
+    authors:
+      - family-names: Storm
+        given-names: Malte
+      - family-names: Staron
+        given-names: Peter
+      - family-names: Krywka
+        given-names: Christina
+    journal: Journal of Applied Crystallography
+    volume: 58
+    pages: 1476-1485
+    year: 2025
+    doi: "10.1107/S160057672500398X"
+  - type: software
+    authors:
+      - family-names: Storm
+        given-names: Malte
+      - family-names: Lotze
+        given-names: Gudrun
+    doi: 10.5281/ZENODO.7568610
+    identifiers:
+      - type: doi
+        value: 10.5281/ZENODO.7568610
+      - type: url
+        value: https://zenodo.org/doi/10.5281/zenodo.7568610
+    title: pydidas - Python Diffraction Data Analysis Suite
+    url: https://zenodo.org/doi/10.5281/zenodo.7568610
+    publisher:
+      name: Zenodo

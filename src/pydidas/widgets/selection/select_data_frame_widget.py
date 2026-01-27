@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ hdf5) files dataset and frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SelectDataFrameWidget"]
+
 
 from typing import Any
 
@@ -40,7 +41,6 @@ from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5_dataset_utils import get_generic_dataset
 from pydidas.widgets.data_viewer import DataAxisSelector
-from pydidas.widgets.file_dialog import PydidasFileDialog
 from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
@@ -56,20 +56,21 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     **kwargs : Any
         Supported keyword arguments are;
 
-        parent : QWidget | None, optional
+        parent : QWidget or None, optional
             The parent widget. The default is None.
-        import_reference : str | None, optional
+        import_reference : str or None, optional
             The reference for the file dialogue to store persistent settings.
             If None, no persistent settings are stored. The default is None.
         ndim : int, optional
-            The number of dimensions of the data to be imported. The default is 2.
-        filename : Parameter | None, optional
-            A Parameter to use for the filename selection. If None, a default
-            Parameter will be created. The default is None.
-        font_metric_width_factor : int | None, optional
+            The number of dimensions of the data to be imported. The
+            default is 2.
+        filename : Parameter or None, optional
+            A Parameter to use for the filename selection. If None, a
+            default Parameter will be created. The default is None.
+        font_metric_width_factor : int or None, optional
             An optional factor to modify the width of text elements in the
-            widget based on the font metrics. If None, the default width for
-            the used Parameter widgets is applied. The default is None.
+            widget based on the font metrics. If None, the default width
+            for the used Parameter widgets is applied. The default is None.
     """
 
     sig_new_selection = QtCore.Signal(str, dict)
@@ -87,12 +88,11 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         "slicing_axis",
     )
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.set_default_params()
         AssociatedFileMixin.__init__(self, filename_param=self.params["filename"])
         self.set_param_value_and_choices("slicing_axis", None, [None])
-        self.__import_dialog = PydidasFileDialog()
         self.__import_qref = kwargs.get("import_reference", None)
         self.__ndim = kwargs.get("ndim", 2)
         self.__file_valid = False
@@ -102,7 +102,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.connect_signals()
         self._toggle_file_selection(False, emit_signal=False)
 
-    def _create_widgets(self, kwargs: dict[str, Any]):
+    def _create_widgets(self, kwargs: dict[str, Any]) -> None:
         """Create the widgets for the data frame selection."""
         _font_metric_width = kwargs.get("font_metric_width_factor", None)
         self.create_param_widget(
@@ -135,7 +135,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             ),
         )
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """Connect the widget signals to the relevant slots."""
         self.param_composite_widgets["filename"].sig_value_changed.connect(
             self.process_new_filename
@@ -155,7 +155,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         )
 
     @QtCore.Slot()
-    def process_new_filename(self):
+    def process_new_filename(self) -> None:
         """Process the input of a new filename in the Parameter widget."""
         _fname = self.get_param_value("filename")
         if not _fname.is_file():
@@ -172,7 +172,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self._toggle_file_selection(True)
             self._selected_new_frame()
 
-    def _toggle_file_selection(self, selected: bool, emit_signal: bool = True):
+    def _toggle_file_selection(self, selected: bool, emit_signal: bool = True) -> None:
         """
         Modify widgets visibility and activation based on the file selection.
 
@@ -194,9 +194,9 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._widgets["binary_decoder"].setVisible(selected and self.binary_file)
         self.__file_valid = selected
         if emit_signal:
-            self.sig_file_valid.emit(selected)
+            self.sig_file_valid.emit(selected)  # type: ignore[attr-defined]
 
-    def _process_new_hdf5_filename(self):
+    def _process_new_hdf5_filename(self) -> None:
         """Process a new HDF5 filename: update dataset keys and axis selector."""
         _current_dset = self.get_param_value("hdf5_key_str", dtype=str)
         _dsets = get_hdf5_populated_dataset_keys(
@@ -219,7 +219,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._selected_new_dset(_current_dset)
 
     @QtCore.Slot(str)
-    def _selected_new_dset(self, dataset: str):
+    def _selected_new_dset(self, dataset: str) -> None:
         """
         Process a new dataset selection.
 
@@ -229,8 +229,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             The selected dataset key.
         """
         _filename = self.get_param_value("filename", dtype=str)
-        _meta = get_hdf5_metadata(f"{_filename}://{dataset}", ["shape", "ndim"])
-        self._selection.shape = _meta["shape"]
+        self._selection.shape = get_hdf5_metadata(f"{_filename}://{dataset}", "shape")
         if self._selection.ndim == self.__ndim:
             self._selection.axis = None
             self.set_param_and_widget_value_and_choices("slicing_axis", None, [None])
@@ -248,7 +247,9 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._selected_new_frame()
 
     @QtCore.Slot(str)
-    def _selected_new_slicing_axis(self, axis_str: str, emit_signal: bool = True):
+    def _selected_new_slicing_axis(
+        self, axis_str: str, emit_signal: bool = True
+    ) -> None:
         """
         Process a new slicing axis selection.
 
@@ -272,7 +273,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self._selected_new_frame()
 
     @QtCore.Slot(dict)
-    def _selected_new_frame(self, config: dict | None = None):
+    def _selected_new_frame(self, config: dict | None = None) -> None:
         """
         Open a new file / frame based on the input Parameters.
 
@@ -289,10 +290,12 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if self.hdf5_file:
             config["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
             config["import_metadata"] = self.__import_hdf5_metadata
-        self.sig_new_selection.emit(self.current_filename, config)
+        self.sig_new_selection.emit(  # type: ignore[attr-defined]
+            self.current_filename, config
+        )
 
     @QtCore.Slot(int, str)
-    def _new_frame_index(self, ax_index: int, frame_slice_str: str):  # noqa ARG001
+    def _new_frame_index(self, ax_index: int, frame_slice_str: str) -> None:  # noqa ARG001
         """
         Process a new frame index from the axis selector.
 
@@ -309,7 +312,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self._selected_new_frame()
 
     @QtCore.Slot(dict)
-    def _new_valid_binary_config(self, config: dict):
+    def _new_valid_binary_config(self, config: dict) -> None:
         """
         Process a new binary image selection.
 
@@ -320,11 +323,11 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         """
         if not self.__file_valid:
             self.__file_valid = True
-            self.sig_file_valid.emit(True)
+            self.sig_file_valid.emit(True)  # type: ignore[attr-defined]
         self._selected_new_frame(config)
 
     @QtCore.Slot()
-    def _process_binary_decoding_invalid(self):
+    def _process_binary_decoding_invalid(self) -> None:
         """Process invalid binary decoding settings."""
         self.__file_valid = False
-        self.sig_file_valid.emit(False)
+        self.sig_file_valid.emit(False)  # type: ignore[attr-defined]

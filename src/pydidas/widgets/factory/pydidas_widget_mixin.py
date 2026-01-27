@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ functionality implemented in PydidasQApplication.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,12 +31,14 @@ __all__ = ["PydidasWidgetMixin"]
 from numbers import Real
 from typing import Any
 
+import numpy as np
 from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import (
+    ALIGN_TOP_LEFT,
     GENERIC_STANDARD_WIDGET_WIDTH,
-    MINIMUN_WIDGET_DIMENSIONS,
+    MINIMUM_WIDGET_DIMENSIONS,
 )
 from pydidas.core.utils import apply_qt_properties, update_qwidget_font
 from pydidas_qtcore import PydidasQApplication
@@ -44,7 +46,7 @@ from pydidas_qtcore import PydidasQApplication
 
 class PydidasWidgetMixin:
     """
-    Mixin class to handle automatic font updated from the QApplication.
+    Mixin class to handle automatic font updates from the QApplication.
 
     This class allows to use custom font settings (different sizes, bold etc.) and
     still update them automatically.
@@ -62,6 +64,11 @@ class PydidasWidgetMixin:
         "size_hint_width",
         "underline",
     ]
+    LAYOUT_VERTICAL_SPACING = 0
+    LAYOUT_HORIZONTAL_SPACING = 0
+    LAYOUT_TOP_BOTTOM_MARGIN = 0
+    LAYOUT_LEFT_RIGHT_MARGIN = 0
+    LAYOUT_ALIGNMENT = ALIGN_TOP_LEFT
 
     def __init__(self, **kwargs: Any) -> None:
         """
@@ -70,7 +77,32 @@ class PydidasWidgetMixin:
         Parameters
         ----------
         **kwargs : Any
-            Any kwargs for setting the font or other Qt parameters.
+            Any kwargs for setting the font or other Qt parameters. The
+            PydidasWidgetMixin supports the following kwargs:
+
+            bold : bool, optional
+                Whether to use a bold font. The default is False.
+            italic : bool, optional
+                Whether to use an italic font. The default is False.
+            fontsize_offset : float, optional
+                An offset to add to the global font size. The default is 0.
+            underline : bool, optional
+                Whether to use an underlined font. The default is False.
+            size_hint_width : int or None, optional
+                The width to return in sizeHint. The default is
+                GENERIC_STANDARD_WIDGET_WIDTH.
+            size_hint_height : int or None, optional
+                The height to return in sizeHint. The default is
+                MINIMUM_WIDGET_DIMENSIONS.
+            minimum_width : int or None, optional
+                The minimum width of the widget. The default is
+                MINIMUM_WIDGET_DIMENSIONS.
+            font_metric_width_factor : float or None, optional
+                A factor to multiply the font width with to set the widget
+                width dynamically. The default is None (disabled).
+            font_metric_height_factor : float or None, optional
+                A factor to multiply the font height with to set the widget
+                height dynamically. The default is None (disabled).
         """
         self.__font_config = {
             "bold": kwargs.get("bold", False),
@@ -80,17 +112,32 @@ class PydidasWidgetMixin:
         }
         self._size_hint = [
             kwargs.get("size_hint_width", GENERIC_STANDARD_WIDGET_WIDTH),
-            MINIMUN_WIDGET_DIMENSIONS,
+            kwargs.get("size_hint_height", MINIMUM_WIDGET_DIMENSIONS),
         ]
+        self._minimum_width = kwargs.get("minimum_width", MINIMUM_WIDGET_DIMENSIONS)
+        self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
+        self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
+
         apply_qt_properties(self, **kwargs)  # noqa self is a QWidget from base class
+        if self.layout() is not None:  # type: ignore[attr-defined]
+            apply_qt_properties(
+                self.layout(),  # type: ignore[attr-defined]
+                verticalSpacing=self.LAYOUT_VERTICAL_SPACING,
+                horizontalSpacing=self.LAYOUT_HORIZONTAL_SPACING,
+                alignment=self.LAYOUT_ALIGNMENT,
+                contentsMargins=(
+                    self.LAYOUT_LEFT_RIGHT_MARGIN,
+                    self.LAYOUT_TOP_BOTTOM_MARGIN,
+                    self.LAYOUT_LEFT_RIGHT_MARGIN,
+                    self.LAYOUT_TOP_BOTTOM_MARGIN,
+                ),
+            )
+
         self._qtapp = PydidasQApplication.instance()
         self.update_fontsize(self._qtapp.font_size)
         self.update_font_family(self._qtapp.font_family)
-        self._minimum_width = kwargs.get("minimum_width", MINIMUN_WIDGET_DIMENSIONS)
-        if True in self.__font_config.values():
+        if not all([_val == 0 for _val in self.__font_config.values()]):
             update_qwidget_font(self, **self.__font_config)  # noqa (see above)
-        self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
-        self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
         self._qtapp.sig_new_font_family.connect(self.update_font_family)
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
@@ -98,13 +145,20 @@ class PydidasWidgetMixin:
 
     def sizeHint(self) -> QtCore.QSize:  # noqa C0103
         """
-        Set a reasonable wide sizeHint so the label takes the available space.
+        Set a reasonable sizeHint based on the font metrics.
 
         Returns
         -------
         QtCore.QSize
             The widget sizeHint
         """
+        if None in self._size_hint:
+            _default = super().sizeHint()  # type: ignore[return-value]
+            if self._size_hint[0] is not None:
+                _default.setWidth(self._size_hint[0])
+            if self._size_hint[1] is not None:
+                _default.setHeight(self._size_hint[1])
+            return _default
         return QtCore.QSize(*self._size_hint)
 
     @QtCore.Slot(float)
@@ -117,9 +171,9 @@ class PydidasWidgetMixin:
         new_fontsize : float
             The new font size.
         """
-        _font = self.font()  # type: ignore[attr-defined]
-        _font.setPointSizeF(new_fontsize + self.__font_config["size_offset"])
-        self.setFont(_font)  # type: ignore[attr-defined]
+        update_qwidget_font(
+            self, pointSizeF=new_fontsize + self.__font_config["size_offset"]
+        )
 
     @QtCore.Slot(str)
     def update_font_family(self, new_family: str) -> None:
@@ -131,9 +185,7 @@ class PydidasWidgetMixin:
         new_family : str
             The name of the new font family.
         """
-        _font = self.font()  # type: ignore[attr-defined]
-        _font.setFamily(new_family)
-        self.setFont(_font)  # type: ignore[attr-defined]
+        update_qwidget_font(self, family=new_family)
 
     @QtCore.Slot(float, float)
     def process_new_font_metrics(self, font_width: float, font_height: float) -> None:
@@ -155,10 +207,15 @@ class PydidasWidgetMixin:
             self._size_hint[0] = _width
             self.setFixedWidth(_width)  # type: ignore[attr-defined]
         if isinstance(self.font_metric_height_factor, Real):
-            _margins = self.contentsMargins().top() + self.contentsMargins().bottom()  # type: ignore[attr-defined]
-            _height = max(
-                MINIMUN_WIDGET_DIMENSIONS,
-                int(self.font_metric_height_factor * font_height) + _margins + 6,
+            # NOTE: Qt applies the layout spacing in addition to the contents margins
+            # when adding widgets to a layout.
+            _height = (
+                2 * self.LAYOUT_TOP_BOTTOM_MARGIN
+                + 2 * self.LAYOUT_VERTICAL_SPACING
+                + max(
+                    MINIMUM_WIDGET_DIMENSIONS,
+                    int(np.ceil(self.font_metric_height_factor * font_height * 1.05)),
+                )
             )
             self._size_hint[1] = _height
             self.setFixedHeight(_height)  # type: ignore[attr-defined]
@@ -170,9 +227,9 @@ class PydidasWidgetMixin:
 
         Returns
         -------
-        None | float
-            The font metric height factor. None indicates that scaling is disabled.
-            The default is None.
+        None or float
+            The font metric height factor. None indicates that scaling is
+            disabled. The default is None.
         """
         return self._font_metric_height_factor
 
@@ -186,7 +243,7 @@ class PydidasWidgetMixin:
 
         Parameters
         ----------
-        factor : None | Real
+        factor : None or Real
             The new font metric height factor. None will disable scaling.
         """
         if not isinstance(factor, (type(None), Real)):
@@ -206,7 +263,7 @@ class PydidasWidgetMixin:
 
         Returns
         -------
-        None | Real
+        None or float
             The font metric width factor.
         """
         return self._font_metric_width_factor
@@ -221,7 +278,7 @@ class PydidasWidgetMixin:
 
         Parameters
         ----------
-        factor : None | float
+        factor : None or float
             The new font metric width factor. None will disable scaling.
         """
         if not isinstance(factor, (type(None), Real)):

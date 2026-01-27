@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,33 +18,20 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import sys
 import unittest
 
 from qtpy import QtCore, QtWidgets
 
 from pydidas.widgets.framework import PydidasStatusWidget
-from pydidas_qtcore import PydidasQApplication
 
 
 class TestPydidasStatusWidget(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication.instance()
-        if cls.q_app is None:
-            cls.q_app = PydidasQApplication(sys.argv)
-        cls.widgets = []
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.q_app.quit()
-
     def test_init(self):
         obj = PydidasStatusWidget()
         self.assertIsInstance(obj, QtWidgets.QDockWidget)

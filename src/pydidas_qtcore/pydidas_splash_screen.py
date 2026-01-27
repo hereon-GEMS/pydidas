@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the PydidasSplashScreen class to create a splash screen during start
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,30 +28,30 @@ __all__ = ["PydidasSplashScreen"]
 
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
 
-_SPLASH_IMAGE_PATH = Path(__file__).parent.parent.joinpath(
-    "pydidas", "resources", "images", "splash_image.png"
+_SPLASH_IMAGE_PATH = (
+    Path(__file__).parents[1] / "pydidas" / "resources" / "images" / "splash_image.png"
+)
+_ICON_PATH = (
+    Path(__file__).parents[1] / "pydidas" / "resources" / "icons" / "pydidas_snakes.svg"
 )
 
 
 class PydidasSplashScreen(QtWidgets.QSplashScreen):
     """
-    A splash screen which allows to show centered messages and with the pydidas icon.
+    A splash screen which shows centered messages with the pydidas icon.
 
     Parameters
     ----------
     pixmap : QtGui.QPixmap, optional
         The pixmap to be displayed on the splash screen.
-    f : QtCore.Qt.WindowFlags, optional
-        The window flags for the splash screen.
-    custom_splash_image : Path, optional
-        The path to a custom splash image to be displayed. This setting
-        cannot be used in combination with the pixmap parameter. The
-        pixmap parameter takes precedence.
+    custom_splash_image : Path or None, optional
+        The path to a custom splash image to be displayed. The default
+        is None.
     """
 
     _instance = None
@@ -60,27 +60,53 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
     def is_active(cls) -> bool:
         """
         Check whether the PydidasSplashScreen is currently active.
+
+        Returns
+        -------
+        bool
+            True if an instance is active, False otherwise.
         """
         return cls._instance is not None
 
     @classmethod
-    def instance(cls, **kwargs: Any):
+    def instance(cls, **kwargs: Any) -> "PydidasSplashScreen":
         """
         Get the singleton instance of the PydidasSplashScreen.
+
+        Parameters
+        ----------
+        **kwargs : Any
+            Keyword arguments to pass to the constructor.
+
+        Returns
+        -------
+        PydidasSplashScreen
+            The singleton instance.
         """
         if cls._instance is None:
             cls._instance = cls(**kwargs)
         if kwargs.get("custom_splash_image") is not None:
             _pixmap = QtGui.QPixmap(str(kwargs["custom_splash_image"]))
-            cls._instance.setPixmap(cls._instance.pixmap)
+            cls._instance.setPixmap(_pixmap)
         return cls._instance
 
     def __init__(
         self,
-        pixmap=None,
-        f=QtCore.Qt.WindowStaysOnTopHint,
-        custom_splash_image: Optional[Path] = None,
-    ):
+        pixmap: QtGui.QPixmap | None = None,
+        custom_splash_image: Path | None = None,
+    ) -> None:
+        """
+        Initialize the PydidasSplashScreen.
+
+        Parameters
+        ----------
+        pixmap : QtGui.QPixmap or None, optional
+            The pixmap to display. If None, a default splash image is used.
+            The default is None.
+        custom_splash_image : Path or None, optional
+            Path to a custom splash image. Only used if pixmap is None.
+            The default is None.
+        """
         if PydidasSplashScreen._instance is not None:
             return PydidasSplashScreen._instance
         if pixmap is None:
@@ -88,18 +114,21 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
                 custom_splash_image if custom_splash_image else _SPLASH_IMAGE_PATH
             )
             pixmap = QtGui.QPixmap(str(_splash_path))
-        QtWidgets.QSplashScreen.__init__(self, pixmap, f)
+        QtWidgets.QSplashScreen.__init__(self, pixmap)
+        PydidasSplashScreen._instance = self
+        self.setWindowFlag(QtCore.Qt.Tool, False)
+        self.setWindowIcon(QtGui.QIcon(str(_ICON_PATH)))
         self.show_aligned_message("Importing packages")
         self.show()
         QtWidgets.QApplication.instance().processEvents()
 
-    def show_aligned_message(self, message: str):
+    def show_aligned_message(self, message: str) -> None:
         """
         Show a message aligned bottom / center.
 
         Parameters
         ----------
         message : str
-            The message to be displayes.
+            The message to be displayed.
         """
-        self.showMessage(message, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
+        self.showMessage(message, int(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom))

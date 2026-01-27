@@ -12,4 +12,5 @@ ruff>=0.9.1
 pytest>=8.3.0
 pytest-qt>=4.5.0
 PyQt5-stubs>=5.15.6
+PySide6-stubs>=6.7
 setuptools>69.0.0

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,29 +31,32 @@ import sys
 import threading
 import time
 import unittest
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
-from qtpy import QtWidgets
 
 from pydidas.multiprocessing import processor
 
 
-def _test_func(number, fixed_arg, fixed_arg2, kw_arg=0):
+def _test_func(
+    number: float, fixed_arg: float, fixed_arg2: float, kw_arg: float = 0
+) -> float:
     return (number - fixed_arg) / fixed_arg2 + kw_arg
 
 
 class _ProcThread(threading.Thread):
     """Simple Thread to test blocking input / output."""
 
-    def __init__(self, func: Callable, mp_config: dict, *args: tuple, **kwargs: dict):
+    def __init__(
+        self, func: Callable, mp_config: dict, *args: Any, **kwargs: Any
+    ) -> None:
         super().__init__()
         self._kwargs = kwargs
         self._args = args
         self.func = func
         self._mp_config = mp_config
 
-    def run(self):
+    def run(self) -> None:
         processor(
             self.func,
             self._mp_config,
@@ -63,25 +66,17 @@ class _ProcThread(threading.Thread):
 
 
 class AppWithFunc:
-    def __init__(self):
+    def __init__(self) -> None:
         self.offset = 5
 
-    def test_func(self, number, fixed_arg, fixed_arg2, kw_arg=0):
+    def test_func(
+        self, number: float, fixed_arg: float, fixed_arg2: float, kw_arg: float = 0
+    ) -> float:
         return (number - fixed_arg) / fixed_arg2 + kw_arg + self.offset
 
 
 class Test_processor(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._qtapp = QtWidgets.QApplication.instance()
-        if cls._qtapp is None:
-            cls._qtapp = QtWidgets.QApplication([])
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._qtapp.deleteLater()
-
-    def setUp(self):
+    def setUp(self) -> None:
         self._queues = {
             "queue_input": mp.Queue(),
             "queue_output": mp.Queue(),
@@ -90,16 +85,16 @@ class Test_processor(unittest.TestCase):
         }
         self.n_test = 20
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         for _queue in self._queues.values():
             _queue.close()
 
-    def put_ints_in_queue(self):
+    def put_ints_in_queue(self) -> None:
         for i in range(self.n_test):
             self._queues["queue_input"].put(i)
         self._queues["queue_input"].put(None)
 
-    def get_results(self):
+    def get_results(self) -> tuple[np.ndarray, np.ndarray]:
         _return = np.array(
             [self._queues["queue_output"].get() for i in range(self.n_test)]
         )
@@ -107,13 +102,13 @@ class Test_processor(unittest.TestCase):
         _input = _return[:, 0]
         return _input, _res
 
-    def test_run__plain(self):
+    def test_run__plain(self) -> None:
         self.put_ints_in_queue()
         processor(lambda x: x, self._queues)
         _input, _output = self.get_results()
-        self.assertTrue((_input == _output).all())
+        self.assertTrue((_input == _output).all())  # type: ignore[union-attr]
 
-    def test_run__with_empty_queue(self):
+    def test_run__with_empty_queue(self) -> None:
         _thread = _ProcThread(lambda x: x, self._queues)
         _thread.start()
         time.sleep(0.08)
@@ -121,7 +116,7 @@ class Test_processor(unittest.TestCase):
         time.sleep(0.08)
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
-    def test_run__with_stop_signal(self):
+    def test_run__with_stop_signal(self) -> None:
         _thread = _ProcThread(lambda x: x, self._queues)
         self._queues["queue_stop"].put(1)
         _thread.start()
@@ -129,16 +124,16 @@ class Test_processor(unittest.TestCase):
             self._queues["queue_output"].get(timeout=0.1)
         self.assertEqual(self._queues["queue_shutting_down"].get(), 1)
 
-    def test_run__with_args(self):
+    def test_run__with_args(self) -> None:
         _args = (0, 1)
         self.put_ints_in_queue()
         processor(_test_func, self._queues, *_args)
         _input, _output = self.get_results()
         _direct_out = _test_func(_input, *_args)
-        self.assertTrue((_output == _direct_out).all())
+        self.assertTrue((_output == _direct_out).all())  # type: ignore[union-attr]
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
-    def test_run__exception_in_func(self):
+    def test_run__exception_in_func(self) -> None:
         self.put_ints_in_queue()
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
@@ -149,7 +144,7 @@ class Test_processor(unittest.TestCase):
         self.assertTrue(len(mystdout.getvalue()) > 0)
         self.assertEqual(self._queues["queue_shutting_down"].get(), 1)
 
-    def test_run__with_kwargs(self):
+    def test_run__with_kwargs(self) -> None:
         _args = (0, 1)
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
@@ -161,17 +156,17 @@ class Test_processor(unittest.TestCase):
         )
         _input, _output = self.get_results()
         _direct_out = _test_func(_input, *_args, **_kwargs)
-        self.assertTrue((_output == _direct_out).all())
+        self.assertTrue((_output == _direct_out).all())  # type: ignore[union-attr]
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
-    def test_run__with_class_method(self):
+    def test_run__with_class_method(self) -> None:
         _args = (0, 1)
         self.put_ints_in_queue()
         app = AppWithFunc()
         processor(app.test_func, self._queues, *_args)
         _input, _output = self.get_results()
         _direct_out = app.test_func(_input, *_args)
-        self.assertTrue((_output == _direct_out).all())
+        self.assertTrue((_output == _direct_out).all())  # type: ignore[union-attr]
         self.assertEqual(self._queues["queue_output"].get(timeout=1), [None, None])
 
 

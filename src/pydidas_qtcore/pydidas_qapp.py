@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the PydidasQApplication class which is the pydidas subclassed QAppli
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,7 +40,7 @@ import numpy as np
 from qtpy import QtCore, QtGui
 from qtpy.QtWidgets import QApplication, QStyle
 
-from . import fontsize
+from .fontsize import PYDIDAS_STANDARD_FONT_SIZE
 
 
 _LOCALE = QtCore.QLocale(QtCore.QLocale.English)
@@ -184,7 +184,7 @@ class PydidasQApplication(QApplication):
         self.__available_mpl_fonts = mpl_font_manager.get_font_names()
         self.__font_config = {
             "size": float(
-                self.__settings.value("font/point_size", fontsize.STANDARD_FONT_SIZE)
+                self.__settings.value("font/point_size", PYDIDAS_STANDARD_FONT_SIZE)
             ),
             "family": self.__settings.value("font/family", self.font().family()),
             "height": 20,

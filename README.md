@@ -1,5 +1,5 @@
 <!---
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 --->
 
@@ -29,8 +29,7 @@ Pydidas should be installed in a clean environment to allow pydidas to fix the
 required dependency versions. This environment should be used exclusively for
 pydidas and no further packages should be installed.
 
-Pydidas requires a **Python version >= 3.11**. Note that pydidas has not yet been 
-tested extensively with Python 3.13.
+Pydidas requires **Python version 3.11, 3.12, or 3.13**.
 
 ### Preparing the environment
 

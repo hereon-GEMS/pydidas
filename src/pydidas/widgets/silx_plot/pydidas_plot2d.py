@@ -28,10 +28,9 @@ __status__ = "Production"
 __all__ = ["PydidasPlot2D"]
 
 
-import inspect
 from contextlib import nullcontext
 from functools import partial
-from typing import Any, NoReturn
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -56,6 +55,7 @@ from pydidas.widgets.silx_plot.silx_actions import (
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
+from pydidas.widgets.silx_plot.utilities import get_allowed_kwargs
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -75,38 +75,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     sig_new_data_size = QtCore.Signal(int, int)
     sig_data_linearity = QtCore.Signal(bool)
     init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
-    _allowed_Plot2D_addImage_kwarg_keys: list[str] | None = None
-
-    @classmethod
-    def _get_allowed_addImage_kwargs(cls, kwargs: dict[str, Any]) -> dict[str, Any]:  # noqa
-        """
-        Filter the kwargs dictionary to only include those allowed by addImage.
-
-        Parameters
-        ----------
-        kwargs : dict[str, Any]
-            The input keyword arguments.
-
-        Returns
-        -------
-        dict[str, Any]
-            The filtered keyword arguments.
-        """
-        if cls._allowed_Plot2D_addImage_kwarg_keys is None:
-            _addImage_params = inspect.signature(Plot2D.addImage).parameters
-            cls._allowed_Plot2D_addImage_kwarg_keys = [
-                _key
-                for _key, _value in _addImage_params.items()
-                if _value.default is not inspect.Parameter.empty
-            ]
-        return {
-            _key: _val
-            for _key, _val in kwargs.items()
-            if _key in cls._allowed_Plot2D_addImage_kwarg_keys
-        }
 
     @staticmethod
-    def _check_data_dim(data: np.ndarray) -> None | NoReturn:
+    def _check_data_dim(data: np.ndarray) -> None:
         """
         Check the data dimensionality.
 
@@ -158,7 +129,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
         self._qtapp = PydidasQApplication.instance()
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # type: ignore[attr-defined]
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
         if hasattr(self._qtapp, "sig_updated_user_config"):
@@ -298,8 +269,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.cs_transform.sig_new_coordinate_system.connect(
             self._positionWidget.new_coordinate_system
         )
-        self.sig_new_data_size.connect(self.cs_transform.set_raw_data_size)
-        self.sig_data_linearity.connect(self.cs_transform.set_data_linearity)
+        self.sig_new_data_size.connect(self.cs_transform.set_raw_data_size)  # type: ignore[attr-defined]
+        self.sig_data_linearity.connect(self.cs_transform.set_data_linearity)  # type: ignore[attr-defined]
 
     def _set_colormap_and_bar(self) -> None:
         """
@@ -385,7 +356,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        data : Dataset | np.ndarray
+        data : Dataset or np.ndarray
             The input data to be displayed.
 
         **kwargs : Any
@@ -398,9 +369,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._check_data_dim(data)
             kwargs.update({"legend": _IMAGE_LEGEND, "replace": True})
             Plot2D.addImage(self, data, **kwargs)
-            self.sig_new_data_size.emit(*data.shape)
-            self.sig_data_linearity.emit(True)
+            self.sig_new_data_size.emit(*data.shape)  # type: ignore[attr-defined]
+            self.sig_data_linearity.emit(True)  # type: ignore[attr-defined]
             self.update_cs_units("", "")
+
+    # alias for addImage to have a uniform interface with PlotStack:
+    plot_data = addImage
 
     def plot_nonlinear_axes_image(self, data: Dataset, **kwargs: Any) -> None:  # noqa ARG001
         """
@@ -419,7 +393,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         self._check_data_dim(data)
         self.remove(_IMAGE_LEGEND, kind="image")
-        self.sig_data_linearity.emit(False)
+        self.sig_data_linearity.emit(False)  # type: ignore[attr-defined]
         _scatter = self.getScatter(_SCATTER_LEGEND)
         if _scatter is None:
             _scatter = Scatter()
@@ -448,13 +422,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "replace": kwargs.pop("replace", True),
             "copy": kwargs.pop("copy", False),
             "legend": _IMAGE_LEGEND,
-        } | self._get_allowed_addImage_kwargs(kwargs)
+        } | get_allowed_kwargs(Plot2D.addImage, kwargs)
         _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))
         _data_has_same_shape = data.shape == self.__plotted_data_shape
         self.__plotted_data_shape = data.shape
         self._config["data_shape"] = data.shape
         self.profile.setEnabled(_data_is_linear)
-        self.sig_data_linearity.emit(_data_is_linear)
+        self.sig_data_linearity.emit(_data_is_linear)  # type: ignore[attr-defined]
         if _data_is_linear:
             self.remove(_SCATTER_LEGEND, kind="scatter")
             _origin, _scale = self._get_origin_and_scale(data)
@@ -462,7 +436,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             _plot_kwargs["scale"] = _scale
             Plot2D.addImage(self, data.array, **_plot_kwargs)
             self.setActiveImage(_IMAGE_LEGEND)
-            self.sig_new_data_size.emit(*data.shape)
+            self.sig_new_data_size.emit(*data.shape)  # type: ignore[attr-defined]
         else:
             self.plot_nonlinear_axes_image(data, **kwargs)
         self.update_cs_units(data.axis_units[1], data.axis_units[0])
@@ -488,7 +462,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             _action._actionTriggered()
 
     # display_data is a generic alias used in all custom silx plots to have a
-    # uniform interface call to display data
+    # uniform interface call to display data in DataViewer-like classes
     display_data = plot_pydidas_dataset
 
     def clear_plot(self) -> None:
@@ -509,11 +483,18 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _image = self.getImage()
         if _image is None:
             return
-        self.setBackend("matplotlib")  # noqa
+        self.setBackend("matplotlib")  # type: ignore[arg-type]
 
     # TODO: check if still needed with silx 2.2.2
-    def _activeItemChanged(self, type_) -> None:
-        """Override generic Plot2D._activeItemChanged to catch QApplication signals."""
+    def _activeItemChanged(self, type_: str) -> None:
+        """
+        Override generic Plot2D._activeItemChanged to catch QApplication signals.
+
+        Parameters
+        ----------
+        type_ : str
+            The type of the active item.
+        """
         if self.sender() == self._qtapp:
             return
         Plot2D._activeItemChanged(self, type_)

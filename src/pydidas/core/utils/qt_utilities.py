@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with utility functions for Qt objects.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,28 +30,26 @@ __all__ = [
     "apply_qt_properties",
     "update_palette",
     "update_qwidget_font",
-    "apply_font_properties",
     "check_pydidas_qapp_instance",
     "IS_QT6",
     "qstate_is_checked",
 ]
 
 
-from collections.abc import Iterable
 from typing import Any, NoReturn
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QObject
-from qtpy.QtGui import QFont
 from qtpy.QtWidgets import QWidget
 
 from pydidas_qtcore import PydidasQApplication
 
 
-IS_QT6 = QT_VERSION[0] == "6"
+# noinspection PyTypeHints
+IS_QT6: bool = QT_VERSION[0] == "6"
 
 
-def _get_args_as_list(args: Iterable):
+def _get_args_as_list(args: Any) -> list:
     """
     Format the input arguments to an iterable list to be passed as *args.
 
@@ -60,20 +58,37 @@ def _get_args_as_list(args: Iterable):
 
     Parameters
     ----------
-    args : Iterable
+    args : Any
         Any input
 
     Returns
     -------
-    args : Union[tuple, list, set]
+    list
         The input arguments formatted to an iterable list.
     """
-    if not isinstance(args, (tuple, list, set)):
-        args = [args]
-    return args
+    if isinstance(args, (tuple, list, set)):
+        return list(args)
+    return [args]
 
 
-def update_child_qobject(obj: QObject, attr: str, **kwargs: Any):
+def _property_setter_name(name: str) -> str:
+    """
+    Generate the setter method name for a given property.
+
+    Parameters
+    ----------
+    name : str
+        The name of the property.
+
+    Returns
+    -------
+    str
+        The setter method name for the property.
+    """
+    return ("set" + name[0].upper() + name[1:]) if name else name
+
+
+def update_child_qobject(obj: QObject, attr: str, **kwargs: Any) -> None:
     """
     Update the objects given attribute in place.
 
@@ -100,25 +115,25 @@ def update_child_qobject(obj: QObject, attr: str, **kwargs: Any):
     """
     _child_obj = getattr(obj, attr)()
     apply_qt_properties(_child_obj, **kwargs)
-    _child_setter = getattr(obj, "set" + attr[0].upper() + attr[1:])
+    _child_setter = getattr(obj, _property_setter_name(attr))
     _child_setter(_child_obj)
 
 
-def update_size_policy(obj: QWidget, **kwargs: Any):
+def update_size_policy(obj: QWidget, **kwargs: Any) -> None:
     """
     Update the sizePolicy of an object with various keywords.
 
     Parameters
     ----------
     obj : QtWidgets.QWidget
-        Any QWidget (because other QObjects do not have a sicePolicy).
+        Any QWidget (because other QObjects do not have a sizePolicy).
     **kwargs : Any
         A dictionary with properties to set.
     """
     update_child_qobject(obj, "sizePolicy", **kwargs)
 
 
-def apply_qt_properties(obj: QObject, **kwargs: Any):
+def apply_qt_properties(obj: QObject, **kwargs: Any) -> None:
     """
     Set Qt widget properties from a supplied dict.
 
@@ -139,13 +154,13 @@ def apply_qt_properties(obj: QObject, **kwargs: Any):
         A dictionary with properties to be set.
     """
     for _key in kwargs:
-        _name = f"set{_key[0].upper()}{_key[1:]}"
-        if hasattr(obj, _name):
-            _func = getattr(obj, _name)
-            _func(*_get_args_as_list(kwargs.get(_key)))
+        _setter_name = _property_setter_name(_key)
+        if hasattr(obj, _setter_name):
+            _setter = getattr(obj, _setter_name)
+            _setter(*_get_args_as_list(kwargs.get(_key)))
 
 
-def update_palette(obj: QWidget, **kwargs: Any):
+def update_palette(obj: QWidget, **kwargs: Any) -> None:
     """
     Update the palette associated with a QWidget.
 
@@ -159,46 +174,22 @@ def update_palette(obj: QWidget, **kwargs: Any):
         A dictionary with palette values. Keys must correspond to palette roles.
     """
     _palette = obj.palette()
+    _QPALETTE_ROLES = QtGui.QPalette.ColorRole if IS_QT6 else QtGui.QPalette
     for _key, _value in kwargs.items():
-        if QT_VERSION.startswith("5"):
-            _role = _key[0].upper() + _key[1:]
-            if _role in QtGui.QPalette.__dict__:
-                _role_key = getattr(QtGui.QPalette, _role)
-                _palette.setColor(_role_key, QtGui.QColor(_value))
-        elif QT_VERSION.startswith("6"):
-            _role = _key[0].upper() + _key[1:]
-            if _role in QtGui.QPalette.ColorRole.__dict__:
-                _role_key = getattr(QtGui.QPalette.ColorRole, _role)
-                _palette.setColor(_role_key, QtGui.QColor(_value))
+        _role = _property_setter_name(_key)
+        if _role in _QPALETTE_ROLES.__dict__:
+            _role_key = getattr(_QPALETTE_ROLES, _role)
+            _palette.setColor(_role_key, QtGui.QColor(_value))
     obj.setPalette(_palette)
 
 
-def update_qwidget_font(obj: QWidget, **kwargs: Any):
+def update_qwidget_font(obj: QWidget, **kwargs: Any) -> None:
     """
     Update the font associated with a QWidget.
 
-    Note that the object is modified in place and no explicit return is given.
-
-    Parameters
-    ----------
-    obj : QtCore.QWidget
-        The QObject to be updated.
-    **kwargs : Any
-        A dictionary with font properties.
-    """
-    _font = obj.font()
-    apply_font_properties(_font, **kwargs)
-    obj.setFont(_font)
-
-
-def apply_font_properties(font_obj: QFont, **kwargs: Any):
-    """
-    Set font properties from a supplied dict.
-
-    This function takes a dictionary (i.e., keyword arguments) and iterates
-    through all keys. Keys will be interpreted in Qt style: A "property: 12"
-    entry in the dictionary will verify that the font object has a
-    "setProperty" method and will then call "font_obj.setProperty(12)". The
+    Keys will be interpreted in Qt style: A "property: 12" entry in the
+    kwargs dictionary will assume a corresponding setter "setProperty"
+    method and will then call "font_obj.setProperty(12)". The
     verification that methods exist allows this function to take the full
     kwargs of any object without the need to filter out non-related keys.
 
@@ -206,18 +197,20 @@ def apply_font_properties(font_obj: QFont, **kwargs: Any):
 
     Parameters
     ----------
-    font_obj : QFont
-        The QFont instance.
+    obj : QtWidgets.QWidget
+        The QWidget to be updated.
     **kwargs : Any
-        A dictionary with properties to be set.
+        A dictionary with font properties.
     """
+    _font = obj.font()
     if "fontsize" in kwargs and "pointSize" not in kwargs:
         kwargs["pointSize"] = kwargs.get("fontsize")
     for _key in kwargs:
-        _name = f"set{_key[0].upper()}{_key[1:]}"
-        if hasattr(font_obj, _name):
-            _func = getattr(font_obj, _name)
-            _func(*_get_args_as_list(kwargs.get(_key)))
+        _setter_name = _property_setter_name(_key)
+        if hasattr(_font, _setter_name):
+            _setter = getattr(_font, _setter_name)
+            _setter(*_get_args_as_list(kwargs.get(_key)))
+    obj.setFont(_font)
 
 
 def check_pydidas_qapp_instance() -> None | NoReturn:
@@ -230,9 +223,10 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
     _app = QtWidgets.QApplication.instance()
     if not isinstance(_app, PydidasQApplication):
         raise RuntimeError(
-            "The current QApplication instance is not a PydidasQApplication. "
-            "Pydidas widgets require a PydidasQApplication instance to work properly "
-            "and are not compatible with the generic QApplication."
+            "The current QApplication instance is not a "
+            "PydidasQApplication. Pydidas widgets require a "
+            "PydidasQApplication instance to work properly and are not "
+            "compatible with the generic QApplication."
         )
 
 
@@ -250,7 +244,7 @@ def qstate_is_checked(state: QtCore.Qt.CheckState) -> bool:
     bool
         True if the state is checked, False otherwise.
     """
-    # In Qt6, Qt.CheckState is an enum.Enum, and `.value` is used to get the integer
-    # value. In Qt5, no `.value` is available and the Qt.CheckState holds the
-    # integer value directly.
+    # In Qt6, Qt.CheckState is an enum.Enum, and `.value` is used to get
+    # the integer value. In Qt5, no `.value` is available and the
+    # Qt.CheckState holds the integer value directly.
     return state == getattr(QtCore.Qt.Checked, "value", QtCore.Qt.Checked)

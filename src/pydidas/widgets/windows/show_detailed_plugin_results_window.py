@@ -27,37 +27,47 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
+
 from typing import Any
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas_qtcore import PydidasQApplication
 
 
 class ShowDetailedPluginResultsWindow(PydidasWindow):
-    """
-    Window to display detailed plugin results.
-    """
+    """A window to display detailed plugin results."""
 
     show_frame = False
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
 
-    def __init__(self, results=None, **kwargs: Any):
+    def __init__(
+        self, results: dict[str | None, Any] | None = None, **kwargs: Any
+    ) -> None:
+        """
+        Initialize the ShowDetailedPluginResultsWindow.
+
+        Parameters
+        ----------
+        results : dict[str or None, Any] or None, optional
+            The initial results' dictionary. The default is None.
+        **kwargs : Any
+            Keyword arguments passed to the PydidasWindow constructor.
+        """
         PydidasWindow.__init__(self, title="Detailed plugin results", **kwargs)
         self._config["n_plots"] = 0
         self._results = results
         if results is not None:
             self.update_results(results)
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def build_frame(self) -> None:
+        """Build the frame and create all widgets."""
         self.create_label(
             "label_title",
             "Detailed plugin results",
@@ -95,13 +105,11 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             wordWrap=True,
         )
 
-    def connect_signals(self):
-        """
-        Connect all the required signals for the frame.
-        """
-        self._widgets["selector"].currentTextChanged.connect(self.__select_point)
+    def connect_signals(self) -> None:
+        """Connect all the required signals for the frame."""
+        self._widgets["selector"].currentTextChanged.connect(self.__select_point)  # type: ignore[attr-defined]
 
-    def sizeHint(self):
+    def sizeHint(self) -> QtCore.QSize:
         """
         Set the sizeHint for the preferred size.
 
@@ -110,21 +118,27 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         QtCore.QSize
             The desired size.
         """
-        _font_height = QtWidgets.QApplication.instance().font_height
+        _font_height = PydidasQApplication.instance().font_height
         return QtCore.QSize(70 * _font_height, 40 * _font_height)
 
-    def update_results(self, results, title=None):
+    def update_results(
+        self, results: dict[str | None, Any], title: str | None = None
+    ) -> None:
         """
         Update the displayed results.
 
         Parameters
         ----------
-        results : dict
+        results : dict[str or None, Any]
             The dictionary with the new results.
+        title : str or None, optional
+            An optional title to be used for the window. The default is None.
         """
         self._results = results
         self._config["result_keys"] = list(results.keys())
-        self.__update_title(title)
+        self._widgets["label_title"].setText(
+            "Detailed plugin results" + (f": {title}" if title else "")
+        )
         if len(self._config["result_keys"]) > 0:
             _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)
             self._config["n_plots"] = _n_plots
@@ -132,53 +146,30 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             self.__update_metadata()
             self.__plot_results(self._config["result_keys"][0])
 
-    def __update_title(self, title):
-        """
-        Update the title label.
-
-        Parameters
-        ----------
-        title : Union[None, str]
-            The new title.
-        """
-        if title is not None:
-            self._widgets["label_title"].setText("Detailed plugin results: " + title)
-        else:
-            self._widgets["label_title"].setText("Detailed plugin results")
-
-    def __prepare_widgets(self):
-        """
-        Prepare all widgets.
-        """
+    def __prepare_widgets(self) -> None:
+        """Prepare all widgets."""
         self.__create_necessary_plots()
         for _index in range(4):
             if f"plot_{_index}" in self._widgets:
                 self._widgets[f"plot_{_index}"].setVisible(
                     _index < self._config["n_plots"]
                 )
-                self._widgets[f"plot_{_index}"].clear_plot()
+                self._widgets[f"plot_{_index}"].clear_plots()
 
-    def __create_necessary_plots(self):
-        """
-        Create all required plots.
-        """
+    def __create_necessary_plots(self) -> None:
+        """Create all required plots."""
         for _index in range(self._config["n_plots"]):
-            if f"plot_{_index}" in self._widgets:
-                continue
-            _y = 1 + _index // 2
-            _x = 1 + _index % 2
-            self.create_any_widget(
-                f"plot_{_index}",
-                PydidasPlotStack,
-                gridPos=(_y, _x, 1, 1),
-                minimumWidth=500,
-            )
-            update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=1)
+            if f"plot_{_index}" not in self._widgets:
+                self.create_any_widget(
+                    f"plot_{_index}",
+                    PydidasPlotStack,
+                    gridPos=(1 + _index // 2, 1 + _index % 2, 1, 1),
+                    minimumWidth=500,
+                )
+                update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=1)
 
-    def __update_metadata(self):
-        """
-        Update the metadata of the results.
-        """
+    def __update_metadata(self) -> None:
+        """Update the metadata of the results."""
         if set(self._results.keys()) == {None}:
             self._widgets["selector"].setVisible(False)
             self.__select_point(None)
@@ -191,13 +182,13 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             self.__select_point(self._config["result_keys"][0])
 
     @QtCore.Slot(str)
-    def __select_point(self, key):
+    def __select_point(self, key: str | None) -> None:
         """
         Select a datapoint to display.
 
         Parameters
         ----------
-        key : str
+        key : str or None
             The key to identify the results.
         """
         _has_metadata = "metadata" in self._results[key].keys()
@@ -208,20 +199,20 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self._widgets["metadata_label"].setVisible(_has_metadata)
         self.__plot_results(key)
 
-    def __plot_results(self, key: str | None):
+    def __plot_results(self, key: str | None) -> None:
         """
         Plot the provided results.
 
         Parameters
         ----------
-        key : str | None
+        key : str or None
             The key to find the specific results.
         """
         _point_result = self._results[key]
         _plot_ylabels = _point_result.get("plot_ylabels", {})
         _titles = _point_result.get("plot_titles", {})
         self.__clear_plots()
-        for _item in _point_result.get("items", []):
+        for _n, _item in enumerate(_point_result.get("items", [])):
             _i_plot = _item["plot"]
             _data = _item["data"]
             if _data.ndim not in [1, 2]:
@@ -232,32 +223,34 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 _key: _val
                 for _key, _val in _item.items()
                 if _key in ["symbol", "linewidth", "linestyle"]
-            }
-            self._widgets[f"plot_{_i_plot}"].plot_pydidas_dataset(
+            } | {"resetzoom": False, "replace": False}
+            self._widgets[f"plot_{_i_plot}"].plot_data(
                 _data,
                 title=_titles.get(_i_plot, ""),
-                legend=_item.get("label", ""),
+                legend=_item.get("label", f"unlabeled item #{_n}"),
                 ylabel=_plot_ylabels.get(_i_plot, ""),
-                replace=False,
                 **_plot_kwargs,
             )
+        for _i_plot in range(self._config["n_plots"]):
+            self._widgets[f"plot_{_i_plot}"].resetZoom()
 
-    def __clear_plots(self):
-        """
-        Clear all items from all plots.
-        """
+    def __clear_plots(self) -> None:
+        """Clear all items from all plots."""
         for _index in range(self._config["n_plots"]):
             self._widgets[f"plot_{_index}"].clear_plot()
+        # for some reason, the plots do not update properly without this call
+        # to the event loop:
+        PydidasQApplication.instance().processEvents()
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QtCore.QEvent) -> None:
         """
-        Re-implement the closeEvent to also emit a signal that this Window has been
-        closed.
+        Re-implement the closeEvent to also emit a signal that this Window has
+        been closed.
 
         Parameters
         ----------
         event : QEvent
             The closing event.
         """
-        self.sig_minimized.emit()
-        QtWidgets.QWidget.closeEvent(self, event)
+        self.sig_minimized.emit()  # type: ignore[attr-defined]
+        super().closeEvent(event)  # type: ignore[arg-type]

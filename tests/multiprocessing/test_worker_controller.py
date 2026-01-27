@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,19 +18,19 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
 import multiprocessing as mp
-import sys
 import time
 import unittest
 
 import numpy as np
-from qtpy import QtCore, QtTest, QtWidgets
+import pytest
+from qtpy import QtCore, QtTest
 
 from pydidas import IS_QT6
 from pydidas.multiprocessing import WorkerController
@@ -45,21 +45,8 @@ def local_test_func(index, *args, **kwargs):
     return 3 * index
 
 
-def get_spy_values(spy, index=0):
-    return [spy[_index][index] for _index in range(len(spy))]
-
-
+@pytest.mark.slow
 class TestWorkerController(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._app = QtWidgets.QApplication.instance()
-        if cls._app is None:
-            cls._app = QtWidgets.QApplication(sys.argv)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._app.deleteLater()
-
     def tearDown(self):
         if hasattr(self, "_wc") and isinstance(self._wc, WorkerController):
             self._wc.exit()
@@ -68,17 +55,12 @@ class TestWorkerController(unittest.TestCase):
         t0 = time.time()
         _spy = QtTest.QSignalSpy(self._wc.finished)
         t0 = time.time()
-        while len(_spy) == 0 and time.time() - t0 < timeout:
-            time.sleep(0.05)
-        if time.time() - t0 >= timeout:
-            raise TimeoutError
-
-    def wait_for_finish_signal_qt6(self, wc, timeout=8):
-        t0 = time.time()
-        _spy = QtTest.QSignalSpy(self._wc.finished)
-        t0 = time.time()
-        while _spy.count() == 0 and time.time() - t0 < timeout:
-            time.sleep(0.05)
+        if IS_QT6:
+            while _spy.count() == 0 and time.time() - t0 < timeout:
+                time.sleep(0.05)
+        else:
+            while len(_spy) == 0 and time.time() - t0 < timeout:
+                time.sleep(0.05)
         if time.time() - t0 >= timeout:
             raise TimeoutError
 
@@ -140,9 +122,7 @@ class TestWorkerController(unittest.TestCase):
         self._wc.suspend()
         self.assertEqual(self._wc.flags["running"], False)
 
-    def test_run_qt5(self):
-        if IS_QT6:
-            return
+    def test_run(self):
         _tasks = [1, 2, 3, 4]
         self._wc = WorkerController(n_workers=2)
         self._wc.change_function(local_test_func, *(0, 0))
@@ -151,20 +131,10 @@ class TestWorkerController(unittest.TestCase):
         _spy = QtTest.QSignalSpy(self._wc.finished)
         self._wc.start()
         self.wait_for_finish_signal(self._wc)
-        self.assertEqual(len(_spy), 1)
-
-    def test_run_qt6(self):
-        if not IS_QT6:
-            return
-        _tasks = [1, 2, 3, 4]
-        self._wc = WorkerController(n_workers=2)
-        self._wc.change_function(local_test_func, *(0, 0))
-        self._wc.add_tasks(_tasks)
-        self._wc.finalize_tasks()
-        _spy = QtTest.QSignalSpy(self._wc.finished)
-        self._wc.start()
-        self.wait_for_finish_signal_qt6(self._wc)
-        self.assertEqual(_spy.count(), 1)
+        if IS_QT6:
+            self.assertEqual(_spy.count(), 1)
+        else:
+            self.assertEqual(len(_spy), 1)
 
     def test_restart(self):
         self._wc = WorkerController()

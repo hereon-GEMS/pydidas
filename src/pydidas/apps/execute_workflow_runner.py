@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Class to run pydidas workflows with an event loop from the command line.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["ExecuteWorkflowRunner"]
 
 import argparse
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore
 
@@ -39,7 +40,6 @@ from pydidas.contexts.scan import Scan
 from pydidas.core import UserConfigError
 from pydidas.multiprocessing import AppRunner
 from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
-from pydidas_qtcore import PydidasQApplication
 
 
 SCAN = ScanContext()
@@ -64,18 +64,18 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are:
 
-        workflow : Union[Path, str, ProcessingTree]
+        workflow : Path or str or ProcessingTree
             The filename to the workflow or a ProcessingTree instance.
-        scan : Union[Path, str, Scan]
+        scan : Path or str or Scan
             The filename to the stored Scan or a Scan instance.
-        diffraction_exp : Union[Path, str, DiffractionExperiment]
+        diffraction_exp : Path or str or DiffractionExperiment
             The filename to the stored DiffractionExperiment or a
             DiffractionExperiment instance. Note that 'diffraction_experiment'
             is also available as alias.
-        output_directory : Union[Path, str]
+        output_directory : Path or str
             The directory to write results to.
         verbose : bool, optional
             Flag to enable printed output message. Do not use this setting for
@@ -85,16 +85,14 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             overwriting existing results. The default is False.
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         QtCore.QObject.__init__(self, None)
-        self._qtapp = PydidasQApplication.instance()
+        self._loop: QtCore.QEventLoop | None = None
         self.parse_args_for_pydidas_workflow()
         self.update_parsed_args_from_kwargs(**kwargs)
 
-    def parse_args_for_pydidas_workflow(self):
-        """
-        Parse the command line arguments for the run_pydidas_workflow script.
-        """
+    def parse_args_for_pydidas_workflow(self) -> None:
+        """Parse the command line arguments for the run_pydidas_workflow script."""
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "--verbose",
@@ -125,7 +123,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         _options, _unknown = parser.parse_known_args()
         self.parsed_args = dict(vars(_options))
 
-    def update_parsed_args_from_kwargs(self, **kwargs: dict):
+    def update_parsed_args_from_kwargs(self, **kwargs: Any) -> None:
         """
         Update the parsed arguments with the given keyword arguments.
 
@@ -134,7 +132,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
         Parameters
         ----------
-        kwargs : dict
+        **kwargs : Any
             The dictionary with the user-provided keyword-arguments
 
         Raises
@@ -166,7 +164,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
     @staticmethod
     @QtCore.Slot(float)
-    def _print_progress(progress: float):
+    def _print_progress(progress: float) -> None:
         """
         Print the current progress in the same line.
 
@@ -185,7 +183,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         print(_txt, end="\r", flush=True)
 
     @QtCore.Slot(str)
-    def _process_messages(self, message: str):
+    def _process_messages(self, message: str) -> None:
         """
         Process messages from the AppRunner and pass them to the app instance.
 
@@ -197,18 +195,17 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         self._app.received_signal_message(message)
 
     @QtCore.Slot()
-    def _store_results_to_disk(self):
-        """
-        Store the WorkflowResults to disk.
-        """
+    def _write_results_to_disk(self) -> None:
+        """Write the WorkflowResults to disk."""
         RES.save_results_to_disk(
             self.parsed_args["output_dir"],
             "HDF5",
             overwrite=self.parsed_args["overwrite"],
         )
-        self._qtapp.quit()
+        if self._loop is not None and self._loop.isRunning():
+            self._loop.quit()
 
-    def process_scan(self, **kwargs: dict):
+    def process_scan(self, **kwargs: Any) -> None:
         """
         Process a scan.
 
@@ -217,7 +214,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             The updated keyword arguments. For the full list of supported keyword
             arguments, please refer to the global class docstring.
         """
@@ -226,10 +223,8 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         self.update_contexts_from_stored_args()
         self.execute_workflow_in_apprunner()
 
-    def update_contexts_from_stored_args(self):
-        """
-        Update the global contexts from the stored arguments.
-        """
+    def update_contexts_from_stored_args(self) -> None:
+        """Update the global contexts from the stored arguments."""
         if isinstance(self.parsed_args["scan"], Scan):
             SCAN.update_from_scan(self.parsed_args["scan"])
         elif isinstance(self.parsed_args["scan"], (str, Path)):
@@ -245,7 +240,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         elif isinstance(self.parsed_args["workflow"], (str, Path)):
             TREE.import_from_file(self.parsed_args["workflow"])
 
-    def check_all_args_okay(self):
+    def check_all_args_okay(self) -> None:
         """
         Check that all required (keyword) arguments have been set.
 
@@ -281,27 +276,36 @@ class ExecuteWorkflowRunner(QtCore.QObject):
                 "directory or enable overwriting of existing files-"
             )
 
-    def execute_workflow_in_apprunner(self):
-        """
-        Execute the given workflow in an AppRunner with a QEventLoop.
-        """
+    def execute_workflow_in_apprunner(self) -> None:
+        """Execute the given workflow in an AppRunner with a QEventLoop."""
         self._app = ExecuteWorkflowApp()
-
+        if self._loop is None:
+            self._loop = QtCore.QEventLoop()
+        if self._loop.isRunning():
+            raise RuntimeError(
+                "An event loop is already running. Cannot start another event loop."
+            )
+        runner: AppRunner | None = None
         try:
             runner = AppRunner(self._app)
             runner.sig_results.connect(self._app.multiprocessing_store_results)
             if self.parsed_args["verbose"]:
                 runner.sig_progress.connect(self._print_progress)
             runner.sig_message_from_worker.connect(self._process_messages)
-            runner.finished.connect(self._store_results_to_disk)
+            runner.finished.connect(self._write_results_to_disk)  # type: ignore[attr-defined]
             runner.start()
             if self.parsed_args["verbose"]:
                 print("Processing progress:")
-            self._qtapp.exec_()
+            self._loop.exec()
+            if self.parsed_args["verbose"]:
+                print("\nProcessing finished successfully.")
         except UserConfigError:
-            runner.requestInterruption()
+            if runner is not None:
+                runner.requestInterruption()
             if self.parsed_args["verbose"]:
                 print("\nAborted workflow processing because of illegal configuration.")
-            return
-        if self.parsed_args["verbose"]:
-            print("\nProcessing finished successfully.")
+        finally:
+            if self._loop.isRunning():
+                self._loop.quit()
+            self._loop.deleteLater()
+            self._loop = None

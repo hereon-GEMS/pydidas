@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for the ProcessingResults workflow class."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+
 
 import os
 import shutil
@@ -32,7 +33,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from qtpy import QtWidgets
 
 from pydidas import unittest_objects
 from pydidas.contexts import DiffractionExperiment
@@ -53,7 +53,6 @@ from pydidas.workflow import (
     WorkflowTree,
 )
 from pydidas.workflow.result_io import ProcessingResultIoMeta
-from pydidas_qtcore import PydidasQApplication
 
 
 SAVER = ProcessingResultIoMeta
@@ -65,21 +64,18 @@ EXP = DiffractionExperimentContext()
 
 class TestProcessingResults(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         _path = Path(unittest_objects.__file__).parent
         if _path not in PLUGINS.registered_paths:
             PLUGINS.find_and_register_plugins(_path)
-        _app = QtWidgets.QApplication.instance()
-        if _app is None:
-            _ = PydidasQApplication([])
         cls._EXP = DiffractionExperimentContext()
         cls._EXP.set_param_value("xray_wavelength", 1)
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         PLUGINS.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.set_up_scan()
         self.set_up_tree()
         self._plugin_metadata = {
@@ -109,10 +105,10 @@ class TestProcessingResults(unittest.TestCase):
         SAVER.set_active_savers_and_title([])
         self._tmpdir = Path(tempfile.mkdtemp())
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         shutil.rmtree(self._tmpdir)
 
-    def set_up_scan(self):
+    def set_up_scan(self) -> None:
         self._scan_n = (21, 3, 7)
         self._scan_offsets = (-3, 0, 3.2)
         self._scan_delta = (0.1, 1, 12)
@@ -126,7 +122,7 @@ class TestProcessingResults(unittest.TestCase):
             SCAN.set_param_value(f"scan_dim{_dim}_unit", self._scan_unit[_dim])
             SCAN.set_param_value(f"scan_dim{_dim}_label", self._scan_label[_dim])
 
-    def set_up_tree(self):
+    def set_up_tree(self) -> None:
         self._input_shape = (127, 324)
         self._new_shape = (12, 3, 1, 5)
         self._node_labels = {1: "Test plugin 1", 2: "Test plugin 2"}
@@ -185,39 +181,43 @@ class TestProcessingResults(unittest.TestCase):
 
     def create_h5_test_file(
         self, node_id: int, workflow_results_instance: ProcessingResults
-    ):
+    ) -> None:
         create_hdf5_results_file(
             self.get_node_output_path(node_id),
             workflow_results_instance._composites[node_id],
             workflow_results_instance._SCAN,
             workflow_results_instance._EXP,
             workflow_results_instance._TREE,
-            node_label=workflow_results_instance._config["node_labels"][node_id],
-            plugin_name=workflow_results_instance._config["plugin_names"][node_id],
-            node_id=node_id,
+            node_label=workflow_results_instance._config["node_labels"][
+                node_id  # type: ignore[assignment]
+            ],
+            plugin_name=workflow_results_instance._config["plugin_names"][
+                node_id  # type: ignore[assignment]
+            ],
+            node_id=node_id,  # type: ignore[assignment]
         )
 
-    def test_init__plain(self):
+    def test_init__plain(self) -> None:
         res = ProcessingResults()
         self.assertIsInstance(res, ProcessingResults)
         self.assertIsInstance(res._SCAN, Scan)
         self.assertIsInstance(res._EXP, DiffractionExperiment)
         self.assertIsInstance(res._TREE, ProcessingTree)
 
-    def test_init__with_contexts(self):
+    def test_init__with_contexts(self) -> None:
         _local_scan = Scan()
         _local_exp = DiffractionExperiment()
         _local_tree = ProcessingTree()
         res = ProcessingResults(
             scan_context=_local_scan,
             diffraction_exp_context=_local_exp,
-            workflow_tree=_local_tree,
+            workflow_tree=_local_tree,  # type: ignore[arg-type]
         )
         self.assertNotEqual(id(SCAN), id(res._SCAN))
         self.assertNotEqual(id(EXP), id(res._EXP))
         self.assertNotEqual(id(TREE), id(res._TREE))
 
-    def test_clear_all_results(self):
+    def test_clear_all_results(self) -> None:
         res = ProcessingResults()
         res._config["shapes"] = {1: (1, 2, 3), 2: (4, 5, 6)}
         res._config["plugin_names"] = {1: "a", 2: "b"}
@@ -239,7 +239,7 @@ class TestProcessingResults(unittest.TestCase):
         for _key in ["metadata_complete", "composites_created", "shapes_set"]:
             self.assertFalse(res._config[_key])
 
-    def test_prepare_new_results(self):
+    def test_prepare_new_results(self) -> None:
         res = ProcessingResults()
         res._TREE.prepare_execution()
         res.prepare_new_results()
@@ -257,11 +257,11 @@ class TestProcessingResults(unittest.TestCase):
             self.assertEqual(hash(res._config["frozen_TREE"].nodes[_id]), hash(_node))
         self.assertNotEqual(id(res._config["frozen_TREE"]), id(res._TREE))
 
-    def test_store_frame_shapes(self):
+    def test_store_frame_shapes(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        _shapes = {1: self._input_shape, 2: self._new_shape}
-        res.store_frame_shapes(_shapes)
+        _shapes = {1: self._input_shape, 2: self._new_shape}  # type: ignore[assignment]
+        res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
         _full_shapes = {
             1: SCAN.shape + self._input_shape,
             2: SCAN.shape + self._new_shape,
@@ -269,14 +269,14 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(res._config["shapes"], _full_shapes)
         self.assertTrue(res._config["shapes_set"])
 
-    def test_store_frame_shapes__wrong_nodes(self):
+    def test_store_frame_shapes__wrong_nodes(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        _shapes = {1: self._input_shape, 3: self._new_shape}
+        _shapes = {1: self._input_shape, 3: self._new_shape}  # type: ignore[assignment]
         with self.assertRaises(UserConfigError):
-            res.store_frame_shapes(_shapes)
+            res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
 
-    def test_store_frame_metadata(self):
+    def test_store_frame_metadata(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         _meta = self._plugin_metadata.copy()
@@ -296,10 +296,10 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(res._config["shapes"][2], SCAN.shape + self._new_shape)
         self.assertTrue(res._config["shapes_set"])
 
-    def test_store_results__w_frame_metadata(self):
+    def test_store_results__w_frame_metadata(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})
+        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
         res.store_frame_metadata(self._plugin_metadata)
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
@@ -308,7 +308,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 
-    def test_store_results__no_previous_metadata(self):
+    def test_store_results__no_previous_metadata(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         _index = 247
@@ -319,10 +319,10 @@ class TestProcessingResults(unittest.TestCase):
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
         self.assertTrue(res._config["metadata_complete"])
 
-    def test_store_results__w_composites(self):
+    def test_store_results__w_composites(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})
+        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
         res._create_composites()
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
@@ -331,25 +331,25 @@ class TestProcessingResults(unittest.TestCase):
         self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
         self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
 
-    def test_create_composites(self):
+    def test_create_composites(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})
+        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
         res._create_composites()
         self.assertEqual(res._composites[1].shape, SCAN.shape + self._input_shape)
         self.assertEqual(res._composites[2].shape, SCAN.shape + self._new_shape)
 
-    def test_create_composites__shapes_unset(self):
+    def test_create_composites__shapes_unset(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         with self.assertRaises(UserConfigError):
             res._create_composites()
 
-    def test_shapes(self):
+    def test_shapes(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
-        _shapes = {1: self._input_shape, 2: self._new_shape}
-        res.store_frame_shapes(_shapes)
+        _shapes = {1: self._input_shape, 2: self._new_shape}  # type: ignore[assignment]
+        res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
         self.assertEqual(
             res.shapes,
             {
@@ -358,11 +358,11 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_shapes__empty(self):
+    def test_shapes__empty(self) -> None:
         res = ProcessingResults()
         self.assertEqual(res.shapes, {})
 
-    def test_node_labels(self):
+    def test_node_labels(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
@@ -374,17 +374,17 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_node_labels__empty(self):
+    def test_node_labels__empty(self) -> None:
         res = ProcessingResults()
         self.assertEqual(res.node_labels, {})
 
-    def test_data_labels__empty_composites(self):
+    def test_data_labels__empty_composites(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
         self.assertEqual(res.data_labels, {})
 
-    def test_data_labels__w_composites(self):
+    def test_data_labels__w_composites(self) -> None:
         res = self.create_standard_workflow_results()
         self.assertEqual(
             res.data_labels,
@@ -394,13 +394,13 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_data_units__empty_composites(self):
+    def test_data_units__empty_composites(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
         self.assertEqual(res.data_units, {})
 
-    def test_data_units__w_composites(self):
+    def test_data_units__w_composites(self) -> None:
         res = self.create_standard_workflow_results()
         self.assertEqual(
             res.data_units,
@@ -410,13 +410,13 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_ndims__empty_composites(self):
+    def test_ndims__empty_composites(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
         self.assertEqual(res.ndims, {})
 
-    def test_ndims__w_composites(self):
+    def test_ndims__w_composites(self) -> None:
         res = self.create_standard_workflow_results()
         self.assertEqual(
             res.ndims,
@@ -426,42 +426,42 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_frozen_tree(self):
+    def test_frozen_tree(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         self.assertEqual(res.frozen_tree.export_to_string(), TREE.export_to_string())
 
-    def test_frozen_exp(self):
+    def test_frozen_exp(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         self.assertEqual(res.frozen_exp.param_values, EXP.param_values)
 
-    def test_frozen_scan(self):
+    def test_frozen_scan(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         self.assertEqual(res.frozen_scan.param_values, SCAN.param_values)
 
-    def test_source_hash(self):
+    def test_source_hash(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         self.assertEqual(hash(TREE), hash(res._TREE))
         self.assertEqual(res.source_hash, hash((hash(SCAN), hash(TREE), hash(EXP))))
 
-    def test_source_hash__custom_contexts(self):
+    def test_source_hash__custom_contexts(self) -> None:
         _local_scan = Scan()
         _local_exp = DiffractionExperiment()
         _local_tree = ProcessingTree()
         res = ProcessingResults(
             scan_context=_local_scan,
             diffraction_exp_context=_local_exp,
-            workflow_tree=_local_tree,
+            workflow_tree=_local_tree,  # type: ignore[arg-type]
         )
         self.assertEqual(
             res.source_hash,
             hash((hash(_local_scan), hash(_local_tree), hash(_local_exp))),
         )
 
-    def test_result_titles(self):
+    def test_result_titles(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
@@ -473,7 +473,7 @@ class TestProcessingResults(unittest.TestCase):
             },
         )
 
-    def test_get_result_ranges(self):
+    def test_get_result_ranges(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
@@ -488,34 +488,34 @@ class TestProcessingResults(unittest.TestCase):
         for _dim, _range in _ranges.items():
             self.assertTrue(np.allclose(_range, _ref[_dim]))
 
-    def test_get_result_ranges__no_such_node(self):
+    def test_get_result_ranges__no_such_node(self) -> None:
         res = ProcessingResults()
         res.prepare_new_results()
         res.store_frame_metadata(self._plugin_metadata)
         with self.assertRaises(UserConfigError):
             _ranges = res.get_result_ranges(42)
 
-    def test_get_results(self):
+    def test_get_results(self) -> None:
         res = self.create_standard_workflow_results()
         _res = res.get_results(1)
         self.assertEqual(_res.shape, SCAN.shape + self._input_shape)
 
-    def test_get_results__wrong_node_id(self):
+    def test_get_results__wrong_node_id(self) -> None:
         res = ProcessingResults()
         with self.assertRaises(UserConfigError):
             res.get_results(3)
 
-    def test_get_results_for_flattened_scan(self):
+    def test_get_results_for_flattened_scan(self) -> None:
         res = self.create_standard_workflow_results()
         _res = res.get_results_for_flattened_scan(1)
         self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
 
-    def test_get_results_for_flattened_scan__wrong_node_id(self):
+    def test_get_results_for_flattened_scan__wrong_node_id(self) -> None:
         res = self.create_standard_workflow_results()
         with self.assertRaises(UserConfigError):
             _res = res.get_results_for_flattened_scan(42)
 
-    def test_get_results_for_flattened_scan__w_squeeze(self):
+    def test_get_results_for_flattened_scan__w_squeeze(self) -> None:
         res = self.create_standard_workflow_results()
         _res = res.get_results_for_flattened_scan(1, squeeze=True)
         _res2 = res.get_results_for_flattened_scan(2, squeeze=True)
@@ -528,20 +528,20 @@ class TestProcessingResults(unittest.TestCase):
             tuple(_i for _i in (np.prod(SCAN.shape),) + self._new_shape if _i > 1),
         )
 
-    def test_get_result_subset__wrong_node_id(self):
+    def test_get_result_subset__wrong_node_id(self) -> None:
         res = self.create_standard_workflow_results()
         _slice = (0, 0, 0, 0, 0)
         with self.assertRaises(UserConfigError):
             _res = res.get_result_subset(42, *_slice)
 
-    def test_get_result_subset__no_flatten_single_point(self):
+    def test_get_result_subset__no_flatten_single_point(self) -> None:
         res = self.create_standard_workflow_results()
         _slice = (0, 0, 0, 0, 0)
         _node_id = 1
         _res = res.get_result_subset(_node_id, *_slice)
         self.assertIsInstance(_res, Real)
 
-    def test_get_result_subset__no_flatten_w_array(self):
+    def test_get_result_subset__no_flatten_w_array(self) -> None:
         res = self.create_standard_workflow_results()
         _slice = (slice(0, self._scan_n[0]), 0, slice(0, self._scan_n[2]), 0, 0)
         _node_id = 1
@@ -549,7 +549,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
 
-    def test_get_result_subset__no_flatten_w_array_indices(self):
+    def test_get_result_subset__no_flatten_w_array_indices(self) -> None:
         res = self.create_standard_workflow_results()
         _slice = (np.arange(self._scan_n[0]), [0], np.arange(1, self._scan_n[2] - 1))
         _res = res.get_result_subset(1, *_slice)
@@ -558,7 +558,7 @@ class TestProcessingResults(unittest.TestCase):
             _res.shape, (self._scan_n[0], 1, self._scan_n[2] - 2) + self._input_shape
         )
 
-    def test_get_result_subset__no_flatten_w_array_indices_squeezed(self):
+    def test_get_result_subset__no_flatten_w_array_indices_squeezed(self) -> None:
         res = self.create_standard_workflow_results()
         _slices = (np.arange(self._scan_n[0]), [0], np.arange(self._scan_n[2]), 0, 0)
         _ref_shape = res._composites
@@ -567,7 +567,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
 
-    def test_get_result_subset__ndarray_and_slice(self):
+    def test_get_result_subset__ndarray_and_slice(self) -> None:
         res = self.create_standard_workflow_results()
         _slices = (
             np.arange(self._scan_n[0]),
@@ -581,14 +581,14 @@ class TestProcessingResults(unittest.TestCase):
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2] - 2, 3))
 
-    def test_get_result_subset__flatten_single_point(self):
+    def test_get_result_subset__flatten_single_point(self) -> None:
         res = self.create_standard_workflow_results()
         _slices = (0, 0, 0)
         _node_id = 1
         _res = res.get_result_subset(_node_id, *_slices, flattened_scan_dim=True)
         self.assertIsInstance(_res, Real)
 
-    def test_get_result_subset__flatten_array(self):
+    def test_get_result_subset__flatten_array(self) -> None:
         res = self.create_standard_workflow_results()
         _slice = (slice(0, self._scan_n[0] - 3), 0, slice(0, self._scan_n[2]))
         _node_id = 1
@@ -596,7 +596,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0] - 3, self._scan_n[2]))
 
-    def test_get_result_subset__flatten_array_multidim(self):
+    def test_get_result_subset__flatten_array_multidim(self) -> None:
         res = self.create_standard_workflow_results()
         _slices = (
             slice(0, self._scan_n[0] - 3),
@@ -613,7 +613,7 @@ class TestProcessingResults(unittest.TestCase):
             (self._scan_n[0] - 3, self._new_shape[0] - 1, self._new_shape[3] - 2),
         )
 
-    def test_get_result_subset__flatten_array_multidim_with_arrays(self):
+    def test_get_result_subset__flatten_array_multidim_with_arrays(self) -> None:
         res = self.create_standard_workflow_results()
         _slices = (
             np.arange(self._scan_n[0] - 3),
@@ -627,12 +627,12 @@ class TestProcessingResults(unittest.TestCase):
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0] - 3, self._new_shape[3] - 1))
 
-    def test_get_result_metadata__wrong_id(self):
+    def test_get_result_metadata__wrong_id(self) -> None:
         res = self.create_standard_workflow_results()
         with self.assertRaises(UserConfigError):
             res.get_result_metadata(3)
 
-    def test_get_result_metadata(self):
+    def test_get_result_metadata(self) -> None:
         res = self.create_standard_workflow_results()
         _tmp_array = np.random.random((50, 50))
         res._composites[0] = Dataset(
@@ -653,7 +653,7 @@ class TestProcessingResults(unittest.TestCase):
                 )
             )
 
-    def test_get_result_metadata__use_scan_timeline(self):
+    def test_get_result_metadata__use_scan_timeline(self) -> None:
         res = self.create_standard_workflow_results()
         _curr_meta_info = {"spam": "eggs"}
         _tmp_array = np.random.random(SCAN.shape + (50, 50))
@@ -671,7 +671,7 @@ class TestProcessingResults(unittest.TestCase):
             _ref = list(getattr(res._composites[0], _key).values())[SCAN.ndim :]
             self.assertEqual(_entries, _ref)
 
-    def test_prepare_files_for_saving__setup_incomplete(self):
+    def test_prepare_files_for_saving__setup_incomplete(self) -> None:
         res = self.create_standard_workflow_results()
         for _key in ["shapes_set", "metadata_complete"]:
             res._config["shapes_set"] = _key != "shapes_set"
@@ -679,21 +679,21 @@ class TestProcessingResults(unittest.TestCase):
             with self.assertRaises(UserConfigError):
                 res.prepare_files_for_saving(self._tmpdir, "HDF5")
 
-    def test_prepare_files_for_saving__simple(self):
+    def test_prepare_files_for_saving__simple(self) -> None:
         res = self.create_standard_workflow_results()
         res.prepare_files_for_saving(self._tmpdir, "HDF5")
         _files = os.listdir(self._tmpdir)
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
 
-    def test_prepare_files_for_saving__single_node(self):
+    def test_prepare_files_for_saving__single_node(self) -> None:
         res = self.create_standard_workflow_results()
         res.prepare_files_for_saving(self._tmpdir, "HDF5", single_node=1)
         _files = os.listdir(self._tmpdir)
         self.assertIn(self.get_node_output_filename(1), _files)
         self.assertNotIn(self.get_node_output_filename(2), _files)
 
-    def test_prepare_files_for_saving__w_existing_file_no_overwrite(self):
+    def test_prepare_files_for_saving__w_existing_file_no_overwrite(self) -> None:
         res = self.create_standard_workflow_results()
         res.prepare_files_for_saving(self._tmpdir, "HDF5", single_node=1)
         with open(
@@ -703,7 +703,7 @@ class TestProcessingResults(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             res.prepare_files_for_saving(self._tmpdir, "HDF5")
 
-    def test_prepare_files_for_saving__w_existing_file_w_overwrite(self):
+    def test_prepare_files_for_saving__w_existing_file_w_overwrite(self) -> None:
         res = self.create_standard_workflow_results()
         with open(
             self._tmpdir.joinpath(self.get_node_output_filename(1)), "w"
@@ -714,7 +714,7 @@ class TestProcessingResults(unittest.TestCase):
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
 
-    def test_prepare_files_for_saving__w_non_existing_dir(self):
+    def test_prepare_files_for_saving__w_non_existing_dir(self) -> None:
         res = self.create_standard_workflow_results()
         shutil.rmtree(self._tmpdir)
         res.prepare_files_for_saving(self._tmpdir, "HDF5")
@@ -722,7 +722,7 @@ class TestProcessingResults(unittest.TestCase):
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
 
-    def test_save_results_to_disk__simple(self):
+    def test_save_results_to_disk__simple(self) -> None:
         res = self.create_standard_workflow_results()
         res.save_results_to_disk(self._tmpdir, "HDF5")
         with h5py.File(self.get_node_output_path(1), "r") as f:
@@ -732,7 +732,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(_shape1, res.shapes[1])
         self.assertEqual(_shape2, res.shapes[2])
 
-    def test_save_results_to_disk__w_squeeze(self):
+    def test_save_results_to_disk__w_squeeze(self) -> None:
         self._plugin_metadata[2] = {
             "axis_units": {0: "m", 1: "", 2: "spam!"},
             "axis_labels": {0: "dim1", 1: "dim #3", 2: "42"},
@@ -753,7 +753,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(_shape1, tuple(n for n in res.shapes[1] if n > 1))
         self.assertEqual(_shape2, tuple(n for n in res.shapes[2] if n > 1))
 
-    def test_save_results_to_disk__single_node(self):
+    def test_save_results_to_disk__single_node(self) -> None:
         res = self.create_standard_workflow_results()
         res.save_results_to_disk(self._tmpdir, "HDF5", node_id=1)
         with h5py.File(self.get_node_output_path(1), "r") as f:
@@ -761,7 +761,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(_shape1, res.shapes[1])
         self.assertFalse(self.get_node_output_path(2).is_file())
 
-    def test_get_node_result_metadata_string(self):
+    def test_get_node_result_metadata_string(self) -> None:
         res = self.create_standard_workflow_results()
         _node_info = res.get_node_result_metadata_string(2, use_scan_timeline=False)
         _ndim_scan = len([_dim for _dim in range(SCAN.ndim) if SCAN.shape[_dim] > 1])
@@ -774,14 +774,14 @@ class TestProcessingResults(unittest.TestCase):
             self.assertIn(f"Axis #{_dim:02d} (data):", _node_info)
         self.assertNotIn(f"Axis #{(_ndim_scan + _ndim_data):02d} (data):", _node_info)
 
-    def test_get_node_result_metadata_string__w_scan_timeline(self):
+    def test_get_node_result_metadata_string__w_scan_timeline(self) -> None:
         res = self.create_standard_workflow_results()
         _node_info = res.get_node_result_metadata_string(1, use_scan_timeline=True)
         self.assertIn("Axis #00 (scan):", _node_info)
         for _dim in range(1, 1 + len(self._input_shape)):
             self.assertIn(f"Axis #{_dim:02d} (data):", _node_info)
 
-    def test_get_node_result_metadata_string__no_squeeze(self):
+    def test_get_node_result_metadata_string__no_squeeze(self) -> None:
         res = self.create_standard_workflow_results()
         _node_info = res.get_node_result_metadata_string(
             2, use_scan_timeline=False, squeeze_results=False
@@ -794,7 +794,7 @@ class TestProcessingResults(unittest.TestCase):
             f"Axis #{(SCAN.ndim + len(self._new_shape)):02d} (data):", _node_info
         )
 
-    def test_import_data_from_directory__empty_dir(self):
+    def test_import_data_from_directory__empty_dir(self) -> None:
         _scan_title = get_random_string(8)
         SCAN.set_param_value("scan_title", _scan_title)
         res = ProcessingResults()
@@ -802,7 +802,7 @@ class TestProcessingResults(unittest.TestCase):
         self.assertEqual(res.shapes, {})
         self.assertEqual(res._SCAN.get_param_value("scan_title"), _scan_title)
 
-    def test_import_data_from_directory__with_files(self):
+    def test_import_data_from_directory__with_files(self) -> None:
         res = self.create_standard_workflow_results()
         res._composites[1][:] = np.random.random(res._composites[1].shape)
         res._composites[2][:] = np.random.random(res._composites[2].shape)
@@ -839,15 +839,23 @@ class TestProcessingResults(unittest.TestCase):
             self.assertIsInstance(_stored_metadata, dict)
             self.assertEqual(
                 set(_stored_metadata.keys()),
-                {"axis_labels", "axis_units", "axis_ranges", "data_unit", "data_label"},
+                {
+                    "axis_labels",
+                    "axis_units",
+                    "axis_ranges",
+                    "data_unit",
+                    "data_label",
+                },
             )
 
-    def test_update_from_processing_results__wrong_type(self):
+    def test_update_from_processing_results__wrong_type(self) -> None:
         res = ProcessingResults()
         with self.assertRaises(TypeError):
-            res.update_from_processing_results("not a ProcessingResults instance")
+            res.update_from_processing_results(  # type: ignore[arg-type]
+                "not a ProcessingResults instance"
+            )
 
-    def test_update_from_processing_results(self):
+    def test_update_from_processing_results(self) -> None:
         res = self.create_standard_workflow_results()
         _new_res = ProcessingResults()
         _new_res.update_from_processing_results(res)

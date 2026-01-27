@@ -33,6 +33,6 @@ from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMat
 class PngIo(IoExporterMatplotlib):
     """IObase implementation for png files."""
 
-    extensions_export = ["png"]
+    extensions_export = [".png"]
     extensions_import = []
     format_name = "Png"

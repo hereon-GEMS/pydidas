@@ -28,8 +28,8 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2026-01-26
-version: 26.01.26a
+date-released: 2026-01-27
+version: 26.01.27
 references:
   - type: article
     title: "pydidas: a tool for automated X-ray diffraction data analysis"

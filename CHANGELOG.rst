@@ -2,8 +2,8 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v26.01.26a
-==========
+v26.01.27
+=========
 
 Bugfixes
 --------

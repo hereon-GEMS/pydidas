@@ -35,8 +35,8 @@ from pydidas.data_io.implementations import IoBase
 
 
 class _IoTestClass(IoBase):
-    extensions_export = ["test", "export"]
-    extensions_import = ["test", "import"]
+    extensions_export = [".test", ".export"]
+    extensions_import = [".test", ".import"]
     format_name = "_IoTestClass"
 
     @classmethod
@@ -50,7 +50,7 @@ class _IoTestClass(IoBase):
 
 
 class _IoTestClassWithMetadataImporter(_IoTestClass):
-    extensions_import = ["meta_test"]
+    extensions_import = [".meta_test"]
     extensions_export = []
     format_name = "_IoTestClassWithMetadataImporter"
     allows_metadata_import = True
@@ -92,15 +92,15 @@ def test_register_class_add_class_and_verify_entries_not_deleted():
 @pytest.mark.parametrize("mode", ["import", "export"])
 def test_register_class__add_class_and_overwrite_old_entry(mode):
     _registry = getattr(IoManager, f"registry_{mode}")
-    _registry["test"] = None
+    _registry[".test"] = None
     IoManager.register_class(_IoTestClass, update_registry=True)
-    assert getattr(IoManager, f"registry_{mode}")["test"] == _IoTestClass
+    assert getattr(IoManager, f"registry_{mode}")[".test"] == _IoTestClass
 
 
 @pytest.mark.parametrize("mode", ["import", "export"])
 def test_register_class_add_and_keep_old_entry(mode):
     _registry = getattr(IoManager, f"registry_{mode}")
-    _registry["test"] = None
+    _registry[".test"] = None
     with pytest.raises(KeyError):
         IoManager.register_class(_IoTestClass, update_registry=False)
 
@@ -112,25 +112,29 @@ def test_clear_registry(io_manager_with_test_class):
 
 
 @pytest.mark.parametrize("mode", ["import", "export", "metadata"])
-@pytest.mark.parametrize("ext", ["test", "export", "import", "never", "meta_test"])
+@pytest.mark.parametrize("ext", [".test", ".export", ".import", ".never", ".meta_test"])
 def test_is_extension_registered(
     mode: Literal["import", "export", "metadata"], ext, io_manager_with_test_class
 ):
     IoManager.register_class(_IoTestClassWithMetadataImporter)
     _ref = (
-        ext == "meta_test"
+        ext == ".meta_test"
         if mode == "metadata"
-        else (ext == "test" or mode == ext or (mode == "import" and ext == "meta_test"))
+        else (
+            ext == ".test"
+            or "." + mode == ext
+            or (mode == "import" and ext == ".meta_test")
+        )
     )
     assert IoManager.is_extension_registered(ext, mode=mode) == _ref
 
 
 @pytest.mark.parametrize("mode", ["import", "export"])
-@pytest.mark.parametrize("ext", ["test", "export", "import", "never"])
+@pytest.mark.parametrize("ext", [".test", ".export", ".import", ".never"])
 def test_verify_extension_is_registered(
     mode: Literal["import", "export", "metadata"], ext, io_manager_with_test_class
 ):
-    if ext == "test" or mode == ext:
+    if ext == ".test" or "." + mode == ext:
         IoManager.verify_extension_is_registered(ext, mode=mode)
         assert True  # no exception raised
     else:
@@ -178,11 +182,11 @@ def test_import_from_file__w_forced_dim_kw():
         IoManager.import_from_file(_fname, forced_dimension=5)
 
 
-@pytest.mark.parametrize("ext", ["meta_test", "test", "import", "export"])
+@pytest.mark.parametrize("ext", [".meta_test", ".test", ".import", ".export"])
 def test_import_metadata_from_file(io_manager_with_test_class, ext):
     IoManager.register_class(_IoTestClassWithMetadataImporter)
-    if ext == "meta_test":
-        _metadata = IoManager.read_metadata_from_file(get_random_string(12) + f".{ext}")
+    if ext == ".meta_test":
+        _metadata = IoManager.read_metadata_from_file(get_random_string(12) + f"{ext}")
         assert _metadata == {"meta_data": True}
     else:
         with pytest.raises(UserConfigError):

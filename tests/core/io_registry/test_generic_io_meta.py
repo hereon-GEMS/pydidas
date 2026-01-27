@@ -39,21 +39,21 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=GenericIoMeta):
-            extensions = ["dummy", "test"]
+            extensions = [".dummy", ".test"]
             format_name = "TEST"
 
         self.test_class = TestClass()
 
     def create_test_class2(self):
         class TestClass2(metaclass=GenericIoMeta):
-            extensions = ["test2"]
+            extensions = [".test2"]
             format_name = "Test2"
 
         self.test_class2 = TestClass2()
 
     def get_unregistered_test_class(self):
         class TestClass3:
-            extensions = ["test3", "test4"]
+            extensions = [".test3", ".test4"]
             format_name = "Test3"
 
         return TestClass3
@@ -83,21 +83,21 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def test_is_extension_registered__True(self):
         self.create_test_class()
-        self.assertTrue(GenericIoMeta.is_extension_registered("dummy"))
+        self.assertTrue(GenericIoMeta.is_extension_registered(".dummy"))
 
     def test_is_extension_registered__False(self):
         self.create_test_class()
-        self.assertFalse(GenericIoMeta.is_extension_registered("none"))
+        self.assertFalse(GenericIoMeta.is_extension_registered(".none"))
 
     def test_verify_extension_is_registered__correct(self):
         self.create_test_class()
-        GenericIoMeta.verify_extension_is_registered("test")
+        GenericIoMeta.verify_extension_is_registered(".test")
         # assert does not raise an error
 
     def test_verify_extension_is_registered__incorrect(self):
         self.create_test_class()
         with self.assertRaises(UserConfigError):
-            GenericIoMeta.verify_extension_is_registered("none")
+            GenericIoMeta.verify_extension_is_registered(".none")
 
     def test_new__method(self):
         self.assertEqual(GenericIoMeta.registry, dict())

@@ -96,16 +96,16 @@ class AsciiIo(IoBase):
         _format = kwargs.get("format", "%.18e")
         _comment_prefix = "#"
         _delimiter = kwargs.get("delimiter", "\t")
-        if _ext == "chi":
+        if _ext == ".chi":
             if not _write_x_column:
                 raise UserConfigError("CHI files always need an x-column.")
             _header = cls.__create_chi_header(filename, data)
             _comment_prefix = ""
-        elif _ext in ["txt", "csv"]:
+        elif _ext in [".txt", ".csv"]:
             _header = cls.__create_txt_header(data, _write_x_column)
-            if _ext == "csv":
+            if _ext == ".csv":
                 _delimiter = ","
-        elif _ext == "dat":
+        elif _ext == ".dat":
             _header = cls.__create_specfile_header(filename, data, _write_x_column)
         else:
             raise UserConfigError(f"File extension '{_ext}' not supported for export.")
@@ -242,29 +242,29 @@ class AsciiIo(IoBase):
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
         _ext = get_extension(filename)
-        _x_column = kwargs.get("x_column", _ext in ["dat"])
+        _x_column = kwargs.get("x_column", _ext in [".dat"])
         _col_no = kwargs.get("x_column_index", 0)
         with CatchFileErrors(filename), warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            if _ext == "chi":
+            if _ext == ".chi":
                 cls._data = cls.__import_chi(filename)
-            elif _ext == "dat":
+            elif _ext == ".dat":
                 cls._data = cls.__import_specfile(
                     filename, _x_column, x_column_index=_col_no
                 )
-            elif _ext in ["txt", "csv"]:
-                _delimiter = "," if _ext == "csv" else None
+            elif _ext in [".txt", ".csv"]:
+                _delimiter = "," if _ext == ".csv" else None
                 cls._data = cls.__import_txt(
                     filename,
                     delimiter=_delimiter,
                     x_column=_x_column,
                     x_column_index=_col_no,
                 )
-            elif _ext == "fio":
+            elif _ext == ".fio":
                 cls._data = cls.__import_fio(
                     filename, x_column=_x_column, x_column_index=_col_no
                 )
-            elif _ext == "asc":
+            elif _ext == ".asc":
                 cls._data = cls.__import_asc(filename)
             else:
                 raise UserConfigError(
@@ -559,15 +559,15 @@ class AsciiIo(IoBase):
         ):
             warnings.simplefilter("ignore", UserWarning)
             _lines = f.readlines()
-        if _ext == "chi":
+        if _ext == ".chi":
             _metadata = cls.__read_chi_metadata(_lines)
-        elif _ext == "dat":
+        elif _ext == ".dat":
             _metadata = cls.__read_specfile_metadata(_lines)
-        elif _ext in ["txt", "csv"]:
+        elif _ext in [".txt", ".csv"]:
             _metadata = cls.__read_txt_metadata(_lines)
-        elif _ext == "fio":
+        elif _ext == ".fio":
             _metadata = cls.__read_fio_metadata(_lines)
-        elif _ext == "asc":
+        elif _ext == ".asc":
             _metadata = cls.__read_asc_metadata(_lines)
         return _metadata
 

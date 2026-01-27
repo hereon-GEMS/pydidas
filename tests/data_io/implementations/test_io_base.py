@@ -36,8 +36,6 @@ from pydidas.data_io.implementations import IoBase
 
 def create_tester_class():
     class Tester(IoBase):
-        extensions_export = [".test", ".export"]
-        extensions_import = [".test", ".import"]
         format_name = "Tester"
 
         @classmethod

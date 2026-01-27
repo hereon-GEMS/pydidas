@@ -136,7 +136,7 @@ class GenericIoMeta(type):
         bool
             Flag whether the extension is registered or not.
         """
-        if extension in cls.registry:
+        if extension.lower() in cls.registry:
             return True
         return False
 
@@ -155,9 +155,9 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = [f"*.{_key}" for _key in cls.registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.registry.keys()]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+            f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)
 

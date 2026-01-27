@@ -38,7 +38,7 @@ EXP = DiffractionExperimentContext()
 
 
 class TestIo(DiffractionExperimentIoBase):
-    extensions = ["test"]
+    extensions = [".test"]
     format_name = "Test"
 
     @classmethod

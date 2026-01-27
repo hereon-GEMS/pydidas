@@ -334,9 +334,9 @@ def test_update_from_pyfai_geometry__generic_detector():
         assert exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
 
 
-@pytest.mark.parametrize("ext", ["yaml", "poni", "h5"])
+@pytest.mark.parametrize("ext", [".yaml", ".poni", ".h5"])
 def test_import_from_file(exp_with_Eiger9M, temp_path, ext):
-    _file_path = temp_path / f"test_import.{ext}"
+    _file_path = temp_path / f"test_import{ext}"
     exp_with_Eiger9M.export_to_file(_file_path)
     _params = exp_with_Eiger9M.param_values
     exp_with_Eiger9M.restore_all_defaults(True)
@@ -350,10 +350,10 @@ def test_import_from_file(exp_with_Eiger9M, temp_path, ext):
             assert exp_with_Eiger9M.get_param_value(_key) == _ref
 
 
-@pytest.mark.parametrize("ext", ["yaml", "poni", "h5"])
+@pytest.mark.parametrize("ext", [".yaml", ".poni", ".h5"])
 @pytest.mark.parametrize("det_name", ["Eiger 9M", "Custom 9M"])
 def test_export_to_file(exp_with_Eiger9M, temp_path, ext, det_name):
-    _file_path = temp_path / f"test_export_{det_name}.{ext}"
+    _file_path = temp_path / f"test_export_{det_name}{ext}"
     exp_with_Eiger9M.set_param_value("detector_name", det_name)
     exp_with_Eiger9M.export_to_file(_file_path)
     assert _file_path.exists()

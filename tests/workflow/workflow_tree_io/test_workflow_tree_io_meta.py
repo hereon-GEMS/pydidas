@@ -38,7 +38,7 @@ class TestProcessingTreeIoMeta(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=ProcessingTreeIoMeta):
-            extensions = ["test", "another_test"]
+            extensions = [".test", ".another_test"]
             format_name = "Test"
             trees = {}
 

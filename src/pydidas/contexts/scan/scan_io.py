@@ -257,8 +257,8 @@ class ScanIo(GenericIoMeta):
             _cls.format_name: _cls.extensions
             for _cls in cls.beamline_format_registry.values()
         }
-        _extensions = [f"*.{_key}" for _key in cls.beamline_format_registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.beamline_format_registry.keys()]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+            f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)

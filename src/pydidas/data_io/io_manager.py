@@ -95,14 +95,14 @@ class IoManager(type):
             if _ext in cls.registry_export and not update_registry:
                 raise KeyError(
                     "An export class has already been registered "
-                    f'for the extension "{_ext}."'
+                    f'for the extension "{_ext}".'
                 )
             cls.registry_export[_ext] = new_class
         for _ext in new_class.extensions_import:
             if _ext in cls.registry_import and not update_registry:
                 raise KeyError(
                     "An import class has already been registered "
-                    f'for the extension "{_ext}."'
+                    f'for the extension "{_ext}".'
                 )
             cls.registry_import[_ext] = new_class
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Formatting script to avoid manually calling formatting modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -247,38 +247,6 @@ class CopyrightYearUpdater:
     _regex_full = re.compile("Copyright 20[0-9][0-9] ?- ?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
 
-    def _check_git_commit_year(self, fname: str) -> tuple[str, int]:
-        """
-        Check the commit year of a file in git.
-
-        If there is not `git diff` to the current file, this method returns the commit
-        year. If there is a difference, this method returns the current year.
-
-        Parameters
-        ----------
-        fname : str
-            The filename including the path.
-
-        Returns
-        -------
-        str
-            The input filename.
-        int
-            The timestamp (in years) of the last change
-            (either commit or file difference).
-        """
-        if not Path(fname).is_file():
-            return fname, -1
-        try:
-            _commit_epoch = self.__repo.git.log("-1", "--format=%at", fname)
-            _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year
-            _diff = self.__repo.git.diff(fname)
-            if _diff == "":
-                return fname, _commit_year
-            return fname, self.THIS_YEAR
-        except (subprocess.CalledProcessError, ValueError):
-            return fname, -1
-
     def __init__(self, directory: Optional[Path] = None, **kwargs):
         self._flags = {
             "check": kwargs.get("check", "--check" in sys.argv),
@@ -298,17 +266,32 @@ class CopyrightYearUpdater:
         if self._flags["autorun"]:
             self.run_copyright_check()
 
-    def _print(self, string):
+    def _check_commit_year(self, fname: Path) -> tuple[Path, int]:
         """
-        Print the given string if verbose.
+        Check the commit year of a file in git.
 
         Parameters
         ----------
-        string : str
-            The input string to be printed.
+        fname : Path
+            The full filename path.
+
+        Returns
+        -------
+        Path
+            The input filename.
+        int
+            The commit year of the last change.
         """
-        if self._flags["verbose"]:
-            print(string)
+        if not fname.is_file():
+            return fname, -1
+        try:
+            _commit_epoch = self.__repo.git.log("-1", "--format=%at", fname)
+            if _commit_epoch.strip():
+                _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year
+                return fname, _commit_year
+            return fname, -1
+        except Exception:
+            return fname, -1
 
     def run_copyright_check(self):
         """
@@ -325,18 +308,18 @@ class CopyrightYearUpdater:
         if self._flags["check"] and len(_outdated_files) > 0:
             sys.exit(1)
 
-    def _get_all_file_timestamps(self) -> dict:
+    def _get_all_file_timestamps(self) -> dict[Path, int]:
         """
-        Get all the files to be checked.
+        Get the timestamps for all files which correspond to the suffix whitelist.
 
         Returns
         -------
-        dict
+        dict[Path, int]
             The filenames and timestamps for all files.
         """
         _timestamps = self._get_gitfile_timestamps()
         if not self._flags["git-only"]:
-            _timestamps = _timestamps | self._get_unversioned_timestamps(_timestamps)
+            _timestamps = _timestamps | self._update_unversioned_timestamps(_timestamps)
         return _timestamps
 
     def _get_gitfile_timestamps(self) -> dict:
@@ -349,48 +332,52 @@ class CopyrightYearUpdater:
             The filenames and commit times of all files tracked by git.
         """
         _git_files = [
-            self._directory.joinpath(_fname)
-            for _fname in subprocess.check_output("git ls-files", shell=True)
-            .decode()
-            .strip()
-            .split("\n")
-            if self._directory.joinpath(_fname).suffix in self.SUFFIX_WHITELIST
+            self._directory / _fname
+            for _fname in self.__repo.git.ls_files().split()
+            if (self._directory / _fname).suffix in self.SUFFIX_WHITELIST
         ]
         with mp.Pool() as _pool:
-            _timestamps = {
+            _git_timestamps = {
                 _item[0]: _item[1]
-                for _item in _pool.imap_unordered(
-                    self._check_git_commit_year, _git_files
-                )
+                for _item in _pool.imap_unordered(self._check_commit_year, _git_files)
             }
-        return _timestamps
+        # Update modified files to THIS_YEAR:
+        for _name in self.__repo.git.diff("--name-only").split():
+            _path = self._directory / _name
+            if _path.suffix in self.SUFFIX_WHITELIST:
+                _git_timestamps[_path] = self.THIS_YEAR
+        return _git_timestamps
 
-    def _get_unversioned_timestamps(self, git_files: Optional[dict] = None) -> dict:
+    def _update_unversioned_timestamps(
+        self, git_files: dict[Path, int] | None = None
+    ) -> dict[Path, int]:
         """
-        Get the timestamps of unversioned files.
+        Get the timestamps of unversioned files and update the dictionary.
 
-        If a list of files in git version control is given, these files will be
-        ignored.
+        If a dictionary of files in git version control is given, these files
+        will be ignored.
 
         Parameters
         ----------
-        git_files : list[Path], optional
-            The list of files in git version control. Use None to check all
-            files. The default is None.
+        git_files : dict or None, optional
+            The dictionary of files in git version control with their timestamps.
+            Use None to check all files. The default is None.
 
         Returns
         -------
         dict
             The dictionary with all filenames and modification timestamps.
         """
-        git_files = git_files if git_files is not None else dict()
+        git_files = git_files if git_files else {}
         _unversioned_files = []
+        # TODO : change to pathlib.Path.walk when dropping python 3.11 support
         for _base, _dirs, _files in os.walk(self._directory):
+            _base = Path(_base)
             for _dirname in _DIRS_TO_SKIP:
                 if _dirname in _dirs:
                     _dirs.remove(_dirname)
             for _item in _files:
-                _fname = Path(_base).joinpath(_item)
+                _fname = _base / _item
                 if (
                     _fname.is_file()
                     and _fname.suffix.lower() in self.SUFFIX_WHITELIST
@@ -433,7 +420,8 @@ class CopyrightYearUpdater:
             if self._flags["update"]:
                 with open(_fname, "w", encoding="utf-8") as f:
                     f.write(_contents)
-            self._print(f"{_hint} copyright on file {_fname}")
+            if self._flags["verbose"]:
+                print(f"{_hint} copyright on file {_fname}")
         return _outdated
 
     def _update_short_regex(self, match: re.Match) -> str:

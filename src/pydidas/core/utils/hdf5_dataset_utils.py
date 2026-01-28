@@ -37,7 +37,7 @@ __all__ = [
     "create_nxdata_entry",
     "get_nx_class_for_param",
     "get_generic_dataset",
-    "check_hdf5_key_exists_in_file",
+    "verify_hdf5_dset_exists_in_file",
 ]
 
 
@@ -645,9 +645,9 @@ def get_generic_dataset(datasets: Sequence[str]) -> str:
     return datasets[0]
 
 
-def check_hdf5_key_exists_in_file(fname: Path | str, key: str) -> None:
+def verify_hdf5_dset_exists_in_file(fname: Path | str, key: str) -> None:
     """
-    Verify that the selected file has a dataset with key.
+    Verify that the selected file has a dataset with the given key.
 
     Parameters
     ----------

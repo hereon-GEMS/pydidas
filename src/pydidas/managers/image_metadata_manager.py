@@ -41,7 +41,7 @@ from pydidas.core.utils import (
     get_extension,
     get_hdf5_metadata,
 )
-from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
+from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -289,7 +289,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _filename = self._config["filename"]
         _key = self.get_param_value("hdf5_key")
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
-        check_hdf5_key_exists_in_file(_filename, _key)
+        verify_hdf5_dset_exists_in_file(_filename, _key)
         _meta = get_hdf5_metadata(_filename, ["shape", "dtype"], _key)
         self.__verify_selection_range(_meta["shape"][_slice_ax])
 

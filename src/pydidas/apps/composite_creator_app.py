@@ -43,7 +43,7 @@ from pydidas.core.utils import (
     rebin2d,
     verify_file_exists,
 )
-from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
+from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 from pydidas.managers import (
     CompositeImageManager,
@@ -291,7 +291,9 @@ class CompositeCreatorApp(BaseApp):
             binning=self.get_param_value("binning"), roi=self._image_metadata.roi
         )
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
+            verify_hdf5_dset_exists_in_file(
+                _bg_file, self.get_param_value("bg_hdf5_key")
+            )
             _params["dataset"] = self.get_param_value("bg_hdf5_key")
             _params["indices"] = (None,) * self.get_param_value("hdf5_slicing_axis") + (
                 self.get_param_value("bg_hdf5_frame"),

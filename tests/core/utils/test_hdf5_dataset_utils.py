@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import os
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +35,6 @@ from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5_dataset_utils import (
     _split_hdf5_file_and_dataset_names,
-    check_hdf5_key_exists_in_file,
     convert_data_for_writing_to_hdf5_dataset,
     create_hdf5_dataset,
     create_nx_dataset,
@@ -45,6 +44,7 @@ from pydidas.core.utils.hdf5_dataset_utils import (
     get_hdf5_populated_dataset_keys,
     hdf5_dataset_filter_check,
     read_and_decode_hdf5_dataset,
+    verify_hdf5_dset_exists_in_file,
 )
 
 
@@ -472,15 +472,20 @@ def test_create_nx_dataset__w_attributes(hdf5_file):
         assert dataset.attrs[key] == value
 
 
-def test_check_hdf5_key_exists_in_file(temp_files):
-    check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "test/path/data")
+def test_verify_hdf5_dset_exists_in_file(hdf5_test_data):
+    verify_hdf5_dset_exists_in_file(hdf5_test_data["fname"], _3d_DSETS[0])
 
 
-def test_check_hdf5_key_exists_in_file_group_not_dset(temp_files):
+def test_verify_hdf5_dset_exists_in_file__group_not_dset(hdf5_test_data):
+    _dset = os.path.dirname(_3d_DSETS[0])
     with pytest.raises(UserConfigError):
-        check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "test/path")
+        verify_hdf5_dset_exists_in_file(hdf5_test_data["fname"], _dset)
 
 
-def test_check_hdf5_key_exists_in_file_wrong_key(temp_files):
+def test_verify_hdf5_dset_exists_in_file__wrong_key(hdf5_test_data):
     with pytest.raises(UserConfigError):
-        check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "no/dataset")
+        verify_hdf5_dset_exists_in_file(hdf5_test_data["fname"], "no/dataset")
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])

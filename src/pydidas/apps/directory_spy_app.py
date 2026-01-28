@@ -52,7 +52,7 @@ from pydidas.core.utils import (
     verify_file_exists,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
-from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
+from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -262,7 +262,9 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         verify_file_exists(_bg_file)
         _params = {}
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
+            verify_hdf5_dset_exists_in_file(
+                _bg_file, self.get_param_value("bg_hdf5_key")
+            )
             _slice_ax = self.get_param_value("hdf5_slicing_axis")
             _params = {
                 "dataset": self.get_param_value("bg_hdf5_key"),

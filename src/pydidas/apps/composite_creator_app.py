@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the CompositeCreatorApp class which allows to combine images to mosa
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,12 +38,12 @@ from pydidas.apps.parsers import composite_creator_app_parser
 from pydidas.core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
-    check_file_exists,
-    check_hdf5_key_exists_in_file,
     copy_docstring,
     get_extension,
     rebin2d,
+    verify_file_exists,
 )
+from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
 from pydidas.data_io import import_data
 from pydidas.managers import (
     CompositeImageManager,
@@ -286,7 +286,7 @@ class CompositeCreatorApp(BaseApp):
               from the image files.
         """
         _bg_file = self.get_param_value("bg_file")
-        check_file_exists(_bg_file)
+        verify_file_exists(_bg_file)
         _params = dict(
             binning=self.get_param_value("binning"), roi=self._image_metadata.roi
         )

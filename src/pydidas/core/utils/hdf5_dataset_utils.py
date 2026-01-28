@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a list of all dataset keys which fulfill certain filter criteria.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,12 +37,13 @@ __all__ = [
     "create_nxdata_entry",
     "get_nx_class_for_param",
     "get_generic_dataset",
+    "check_hdf5_key_exists_in_file",
 ]
 
 
 import os
 from collections.abc import Iterable
-from numbers import Integral, Real
+from numbers import Integral, Number, Real
 from pathlib import Path
 from typing import Any, Literal, Sequence
 
@@ -54,6 +55,7 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import FileReadError, UserConfigError
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter import Parameter
+from pydidas.core.utils import verify_file_exists_and_extension_matches
 from pydidas.core.utils.file_utils import CatchFileErrors
 
 
@@ -121,37 +123,36 @@ def get_hdf5_populated_dataset_keys(
     _file_to_open = isinstance(item, (str, Path))
     if _file_to_open:
         item = Path(item)
-        if not item.is_file():
-            raise FileReadError("The specified file does not exist.")
-        if item.suffix.removeprefix(".") not in HDF5_EXTENSIONS:
-            raise FileReadError(
-                "The specified file does not have a recognized HDF5 extension."
-            )
+        verify_file_exists_and_extension_matches(item, HDF5_EXTENSIONS)
         item = h5py.File(item, "r")
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
-    file_ref = (
-        item.file
-        if kwargs.get("file_ref", None) is None
-        else kwargs.get("file_ref", None)
-    )
+    file_ref = kwargs.get("file_ref", None) or item.file
+
     _datasets = []
-    for key in item:
-        _item = item[key]
-        # add a check to filter external datasets.
-        # if file_ref == _item.file, this is a local dataset.
-        if file_ref == _item.file:
-            _datasets += get_hdf5_populated_dataset_keys(item[key], **kwargs)
-        else:
-            if hdf5_dataset_filter_check(_item, **kwargs):
-                # external datasets are referenced by their .name
-                # in the external datafile, not the current file.
-                _datasets += [f"{item.name}/{key}"]
-            if isinstance(_item, (h5py.File, h5py.Group)):
-                raise KeyError(
-                    "Detected an external link to a h5py.Group which cannot "
-                    f"be followed: {item.name}/{key}."
-                )
+    if item.attrs.get("NX_class", "") == "NXdata" and kwargs.get(
+        "nxdata_signal_only", True
+    ):
+        _signal_key = item.attrs.get("signal", None)
+        if _signal_key is not None and _signal_key in item:
+            _datasets.append(f"{item}/{_signal_key}")
+    else:
+        for key in item:
+            _item = item[key]
+            # add a check to filter external datasets.
+            # if file_ref == _item.file, this is a local dataset.
+            if file_ref == _item.file:
+                _datasets += get_hdf5_populated_dataset_keys(item[key], **kwargs)
+            else:
+                if hdf5_dataset_filter_check(_item, **kwargs):
+                    # external datasets are referenced by their .name
+                    # in the external datafile, not the current file.
+                    _datasets += [f"{item.name}/{key}"]
+                if isinstance(_item, (h5py.File, h5py.Group)):
+                    raise KeyError(
+                        "Detected an external link to a h5py.Group which cannot "
+                        f"be followed: {item.name}/{key}."
+                    )
     if _file_to_open:
         item.close()
     return _datasets
@@ -533,7 +534,7 @@ def create_nxdata_entry(
 def create_nx_dataset(
     group: h5py.Group,
     name: str,
-    data: dict | np.ndarray | str | Real | Integral,
+    data: dict | np.ndarray | str | Number,
     **attributes: Any,
 ) -> h5py.Dataset:
     """
@@ -545,7 +546,7 @@ def create_nx_dataset(
         The group to create the dataset in.
     name : str
         The name of the dataset.
-    data: dict or np.ndarray or str or Real or Integral
+    data: dict or np.ndarray or str or Number
         The data to be stored in the dataset. This should typically be a numpy array
         or a scalar value or a string. If a dict is given, this is interpreted as
         the arguments for calling the create_dataset method.
@@ -577,9 +578,9 @@ def get_nx_class_for_param(param: Parameter) -> str:
     str
         The NX class.
     """
-    if param.dtype == Integral:
+    if issubclass(param.dtype, Integral):
         return "NX_INT"
-    if param.dtype == Real:
+    if issubclass(param.dtype, Real):
         return "NX_FLOAT"
     return "NX_CHAR"
 
@@ -642,3 +643,27 @@ def get_generic_dataset(datasets: Sequence[str]) -> str:
         # this is the standard NeXus path for LAMBDA detectors
         return "/entry/instrument/detector/data"
     return datasets[0]
+
+
+def check_hdf5_key_exists_in_file(fname: Path | str, key: str) -> None:
+    """
+    Verify that the selected file has a dataset with key.
+
+    Parameters
+    ----------
+    fname : Path or str
+        The filename and path.
+    key : str
+        The dataset key.
+
+    Raises
+    ------
+    UserConfigError
+        If the dataset key is not found in the hdf5 file.
+    """
+    key = key if key.startswith("/") else f"/{key}"
+    dsets = get_hdf5_populated_dataset_keys(fname, min_dim=0)
+    if key not in dsets:
+        raise UserConfigError(
+            f"hdf5_key `{key}` is not a valid key for the file `{fname}`."
+        )

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ file or file of a specific pattern.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -46,13 +46,13 @@ from pydidas.core import (
 )
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
-    check_file_exists,
-    check_hdf5_key_exists_in_file,
     get_extension,
     get_hdf5_metadata,
     pydidas_logger,
+    verify_file_exists,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
+from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -259,7 +259,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         background image is stored.
         """
         _bg_file = self.get_param_value("bg_file")
-        check_file_exists(_bg_file)
+        verify_file_exists(_bg_file)
         _params = {}
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))

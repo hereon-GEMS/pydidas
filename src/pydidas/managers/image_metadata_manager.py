@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ image metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,10 +38,10 @@ from pydidas.core import (
 )
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
-    check_hdf5_key_exists_in_file,
     get_extension,
     get_hdf5_metadata,
 )
+from pydidas.core.utils.hdf5_dataset_utils import check_hdf5_key_exists_in_file
 from pydidas.data_io import import_data
 
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ and access files based on their index.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,9 +40,9 @@ from pydidas.core import (
 )
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
-    check_file_exists,
     get_file_naming_scheme,
-    verify_files_in_same_directory,
+    verify_file_exists,
+    verify_filenames_have_same_parent,
     verify_files_of_range_are_same_size,
 )
 
@@ -188,8 +188,8 @@ class FilelistManager(ObjectWithParameterCollection):
         UserConfigError
             If any of the checks fail.
         """
-        check_file_exists(self.get_param_value("first_file"))
-        verify_files_in_same_directory(
+        verify_file_exists(self.get_param_value("first_file"))
+        verify_filenames_have_same_parent(
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
         if (

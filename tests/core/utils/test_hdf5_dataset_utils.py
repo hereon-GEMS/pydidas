@@ -35,6 +35,7 @@ from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5_dataset_utils import (
     _split_hdf5_file_and_dataset_names,
+    check_hdf5_key_exists_in_file,
     convert_data_for_writing_to_hdf5_dataset,
     create_hdf5_dataset,
     create_nx_dataset,
@@ -469,3 +470,17 @@ def test_create_nx_dataset__w_attributes(hdf5_file):
     assert np.array_equal(dataset[()], data)
     for key, value in attributes.items():
         assert dataset.attrs[key] == value
+
+
+def test_check_hdf5_key_exists_in_file(temp_files):
+    check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "test/path/data")
+
+
+def test_check_hdf5_key_exists_in_file_group_not_dset(temp_files):
+    with pytest.raises(UserConfigError):
+        check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "test/path")
+
+
+def test_check_hdf5_key_exists_in_file_wrong_key(temp_files):
+    with pytest.raises(UserConfigError):
+        check_hdf5_key_exists_in_file(temp_files["hdf5_fname"], "no/dataset")

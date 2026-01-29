@@ -203,9 +203,9 @@ class IoManager(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats(mode=mode)
-        _extensions = [f"*.{_key}" for _key in getattr(cls, f"registry_{mode}")]
+        _extensions = [f"*{_key}" for _key in getattr(cls, f"registry_{mode}")]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{_name} files (*.{' *.'.join(_ext)})" for _name, _ext in _formats.items()
+            f"{_name} files (*{' *'.join(_ext)})" for _name, _ext in _formats.items()
         ]
         return ";;".join(_all)
 

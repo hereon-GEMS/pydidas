@@ -154,7 +154,7 @@ def test_get_string_of_formats__simple(
 ):
     _str = IoManager.get_string_of_formats(mode=mode)
     for _ext in getattr(_IoTestClass, f"extensions_{mode}"):
-        assert f"*.{_ext}" in _str
+        assert f"*{_ext}" in _str
 
 
 def test_export_to_file(io_manager_with_test_class):

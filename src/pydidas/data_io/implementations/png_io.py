@@ -27,12 +27,13 @@ __status__ = "Production"
 __all__ = []
 
 
+from pydidas.core.constants.file_extensions import PNG_EXTENSIONS
 from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
 
 
 class PngIo(IoExporterMatplotlib):
     """IObase implementation for png files."""
 
-    extensions_export = [".png"]
+    extensions_export = PNG_EXTENSIONS
     extensions_import = []
     format_name = "Png"

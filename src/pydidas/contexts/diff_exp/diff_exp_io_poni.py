@@ -37,6 +37,7 @@ from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
 from pydidas.core.constants import LAMBDA_IN_M_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants.file_extensions import PONI_EXTENSIONS
 
 
 EXP = DiffractionExperimentContext()
@@ -47,7 +48,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
     Base class for WorkflowTree exporters.
     """
 
-    extensions = [".poni"]
+    extensions = PONI_EXTENSIONS
     format_name = "PONI"
 
     @classmethod

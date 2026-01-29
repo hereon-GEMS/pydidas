@@ -42,6 +42,7 @@ from pydidas.core import (
 )
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.utils import flatten, update_child_qobject
+from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas_qtcore import PydidasQApplication
@@ -420,7 +421,7 @@ class PydidasFileDialog(
         if res == 0:
             return None
         _selection = self.selectedFiles()[0]
-        _ext = os.path.splitext(_selection)[1]
+        _ext = get_extension(_selection)
         if len(_ext) == 0:
             _selection = _selection + self._get_extension()
         else:

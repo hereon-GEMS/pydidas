@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a registry of classes for a specific application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -136,7 +136,7 @@ class GenericIoMeta(type):
         bool
             Flag whether the extension is registered or not.
         """
-        if extension in cls.registry:
+        if extension.lower() in cls.registry:
             return True
         return False
 
@@ -155,9 +155,9 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = [f"*.{_key}" for _key in cls.registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.registry.keys()]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+            f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)
 
@@ -190,7 +190,7 @@ class GenericIoMeta(type):
         kwargs : Any
             Any kwargs which should be passed to the underlying exporter.
         """
-        _extension = get_extension(filename, lowercase=False)
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.export_to_file(filename, **kwargs)
@@ -206,7 +206,7 @@ class GenericIoMeta(type):
         filename : str
             The full filename and path.
         """
-        _extension = get_extension(filename, lowercase=False)
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.import_from_file(filename)

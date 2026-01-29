@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -159,8 +159,8 @@ class Test_file_utils(unittest.TestCase):
         self.assertEqual(_ext, "")
 
     def test_get_extension__generic(self):
-        _input_ext = "extension"
-        _ext = get_extension(f"test/to/some/dir/file.{_input_ext}")
+        _input_ext = ".extension"
+        _ext = get_extension(f"test/to/some/dir/file{_input_ext}")
         self.assertEqual(_ext, _input_ext)
 
     def test_get_file_naming_scheme(self):

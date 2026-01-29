@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ The AssociatedFileMixin class handles convenience functions like type checking.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -70,7 +70,7 @@ class AssociatedFileMixin:
     @property
     def _filetype(self) -> str:
         """The file type of the associated file."""
-        _ext = get_extension(self._filename_param.value, lowercase=True)
+        _ext = get_extension(self._filename_param.value)
         if _ext in HDF5_EXTENSIONS:
             return "hdf5"
         if _ext in BINARY_EXTENSIONS:

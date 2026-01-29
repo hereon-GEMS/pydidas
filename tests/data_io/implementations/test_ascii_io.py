@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -407,11 +407,11 @@ def test_import_from_file__specfile_2col_no_xcolumn(temp_path, written_label):
 
 @pytest.mark.parametrize("x_column", [True, False])
 @pytest.mark.parametrize("ncols", [1, 2, 3, 4])
-@pytest.mark.parametrize("extension", ["txt", "csv"])
+@pytest.mark.parametrize("extension", [".txt", ".csv"])
 @pytest.mark.parametrize("header", [True, False])
 def test_import_from_file__txt(temp_path, x_column, ncols, extension, header):
     _temp_data = get_data_with_ncols(ncols)
-    _fname = temp_path / f"test.{extension}"
+    _fname = temp_path / f"test{extension}"
     AsciiIo.export_to_file(
         _fname, _temp_data, x_column=x_column, write_header=header, overwrite=True
     )
@@ -601,11 +601,11 @@ def test_read_metadata_from_file__wrong_ext(temp_path):
 
 @pytest.mark.parametrize("suffix", AsciiIo.extensions_import)
 def test_read_metadata_from_file__empty_file(temp_path, suffix):
-    _fname = temp_path / f"test_empty.{suffix}"
+    _fname = temp_path / f"test_empty{suffix}"
     with open(_fname, "w") as f:
         f.write("")
     _metadata = AsciiIo.read_metadata_from_file(_fname)
-    if suffix == "fio":
+    if suffix == ".fio":
         assert _metadata == {"comments": [], "parameters": {}, "data_columns": []}
     else:
         assert _metadata == {}

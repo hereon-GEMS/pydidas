@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,19 +20,20 @@ Module with the PngIo class for exporting png data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
 
+from pydidas.core.constants.file_extensions import PNG_EXTENSIONS
 from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
 
 
 class PngIo(IoExporterMatplotlib):
     """IObase implementation for png files."""
 
-    extensions_export = ["png"]
+    extensions_export = PNG_EXTENSIONS
     extensions_import = []
     format_name = "Png"

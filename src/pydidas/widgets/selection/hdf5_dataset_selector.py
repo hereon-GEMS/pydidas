@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ from a Hdf5 file and to browse through its data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -276,7 +276,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             The full file system path to the new file.
         """
         _filename = Path(filename)
-        _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
+        _is_hdf5 = get_extension(_filename) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
         if not _is_hdf5:
             return

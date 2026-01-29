@@ -199,7 +199,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         """Write the WorkflowResults to disk."""
         RES.save_results_to_disk(
             self.parsed_args["output_dir"],
-            "HDF5",
+            ".hdf5",
             overwrite=self.parsed_args["overwrite"],
         )
         if self._loop is not None and self._loop.isRunning():

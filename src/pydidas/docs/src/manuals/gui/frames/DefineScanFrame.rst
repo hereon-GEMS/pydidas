@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _define_scan_frame:
@@ -14,11 +14,11 @@ Define scan frame
     :local:
     :backlinks: none
 
-The *Scan setup* frame is a graphical interface to configure the 
-:py:class:`ScanContext <pydidas.contexts.scan.Scan>` 
-which holds information about the scan setup. 
+The *Scan setup* frame is a graphical interface to configure the
+:py:class:`ScanContext <pydidas.contexts.scan.Scan>`
+which holds information about the scan setup.
 
-The frame only holds the configuration widgets for its Parameters as well as 
+The frame only holds the configuration widgets for its Parameters as well as
 some buttons for convenience functionality.
 
 .. image:: images/scan/overview.png
@@ -72,8 +72,8 @@ Reset Parameters
 
 |
 
-The "Reset all scan settings" button allows the user to change all Parameters
-back to their default values. 
+The :py:data:`Reset all scan settings` button allows the user to change all Parameters
+back to their default values.
 
 Export scan settings
 ^^^^^^^^^^^^^^^^^^^^
@@ -84,7 +84,7 @@ Export scan settings
 |
 
 At the bottom of the Frame, the export button allows users to export the current
-:py:class:`ScanContext <pydidas.contexts.scan.Scan>` 
+:py:class:`ScanContext <pydidas.contexts.scan.Scan>`
 Parameters to a file. This button will open a filename dialogue.
 
 Scan dimension explanation
@@ -95,8 +95,8 @@ Scan dimension explanation
 
 |
 
-The scan dimension explanation section gives detailed information about the 
-ordering of scan scan dimensions. The *slowest* scan dimension is dimension no. 
+The scan dimension explanation section gives detailed information about the
+ordering of scan scan dimensions. The *slowest* scan dimension is dimension no.
 0 and the fastest is the last scan dimension. This ordering corresponds to how
 the scan must be performed algorithmically. The button opens a window with an
 in-depth explanation, including images.
@@ -114,7 +114,7 @@ Global Parameters
 .. image:: images/scan/globals.png
     :align: left
 
-Here, *global* refers to general scan Parameters in contrast to Parameters for 
+Here, *global* refers to general scan Parameters in contrast to Parameters for
 a specific scan dimension. The scan dimensionality defines the number of used
 dimensions (and also shows or hides the corresponding widgets for the selected
 dimensions). The scan title is used as reference in titles and captions.
@@ -123,8 +123,8 @@ The base directory and scan name pattern are used for :py:class:`InputPlugins
 <pydidas.plugins.InputPlugin>` to define the raw data source. The starting index
 defines the number of the first data file.
 
-For a detailed description of each Parameter, please refer to the 
-:ref:`list of ScanContext Parameters <scan_context_params>` found at the bottom of 
+For a detailed description of each Parameter, please refer to the
+:ref:`list of ScanContext Parameters <scan_context_params>` found at the bottom of
 this page.
 
 .. tip::
@@ -146,22 +146,22 @@ Configuring a scan dimension
     :align: left
 
 The configuration for each scan dimension is the same, and dimension #1 is shown
-only exemplarily. 
+only exemplarily.
 
-At the top, next to the name, are two small buttons with up and down arrows 
+At the top, next to the name, are two small buttons with up and down arrows
 which allow to move the given scan dimension up or down in the list to change
-the order. Only reasonable arrows are shown, for example the first scan 
-dimension cannot be further moved upwards. 
+the order. Only reasonable arrows are shown, for example the first scan
+dimension cannot be further moved upwards.
 
-Each scan dimension has one mandatory field which is the number of scan points. 
+Each scan dimension has one mandatory field which is the number of scan points.
 This number determines the layout of the data in pydidas. The other information
-is metadata which is used to determine labels and axis ranges (for plots and 
-export metadata) but which has no further relevance. The name of the scan 
-dimension corresponds to the label. The unit is also used to label the 
+is metadata which is used to determine labels and axis ranges (for plots and
+export metadata) but which has no further relevance. The name of the scan
+dimension corresponds to the label. The unit is also used to label the
 dimension range.
 
-The range of each scan dimension is determined by the number of points 
-:math:`N`, the step width :math:`\Delta x` between two points and the offset 
+The range of each scan dimension is determined by the number of points
+:math:`N`, the step width :math:`\Delta x` between two points and the offset
 :math:`x_0`. The full range is thus
 
 .. math::

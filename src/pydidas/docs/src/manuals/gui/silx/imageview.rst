@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 Pydidas ImageView
@@ -36,7 +36,7 @@ Its layout is shown below:
     This widget displays the coordinates and data values of the data under
     the mouse cursor.
 
-menu entries description
+Menu entries description
 """"""""""""""""""""""""
 
 .. list-table::
@@ -44,8 +44,8 @@ menu entries description
     :class: tight-table
     :header-rows: 1
 
-    * - menu icon
-      - description
+    * - Menu icon
+      - Description
     * -  .. image:: ../silx/images/menu_zoom.png
             :align: center
       - Zoom mode: clicking with the mouse and dragging spans a new selection
@@ -59,13 +59,13 @@ menu entries description
       - Unzoom: Reset the display region to the full data.
     * -  .. image:: ../silx/images/menu_palette.png
             :align: center
-      - Open the colormap editor. This button opens a window with selections
+      - Open the colormap editor: This button opens a window with selections
         for the colormap and scaling of the displayed minimum and maximum
         values.
     * - .. image:: ../silx/images/menu_crop_histogram_outliers.png
             :align: center
       - Crop histogram outliers: Calculate the histogram of the image and set
-        the colormap to ignore the low *x% and the top *y%* of the image
+        the colormap to ignore the low *x%* and the top *y%* of the image
         histogram. The levels of *x* and *y* can be adjusted in the pydidas
         user settings.
     * - .. image:: ../silx/images/menu_cmap_autoscale.png
@@ -74,9 +74,9 @@ menu entries description
         deviations.
     * -  .. image:: ../silx/images/menu_aspect.png
             :align: center
-      - This action allows to control the aspect of the displayed data and
-        allows to stretch the data to fill the available canvas or keep its
-        original aspect ratio.
+      - This action allows to control the aspect ratio of the displayed data
+        and allows to stretch the data to fill the available canvas or keep
+        its original aspect ratio.
     * -  .. image:: ../silx/images/menu_orientation.png
             :align: center
       - Control the position of the origin in the image: Select between the top
@@ -98,11 +98,11 @@ menu entries description
             :align: center
       - Set coordinate system: This button will open a submenu which allows to
         select the coordinate system (cartesian or cylindrical). Note that the
-        cylindrical coordinate system use the global :py:class:`DiffractionExperimentContext
+        cylindrical coordinate system uses the global :py:class:`DiffractionExperimentContext
         <pydidas.contexts.diff_exp.DiffractionExperiment>`
         calibration to determine the beam center. Therefore, looking at data
-        with a different calibration will display a wrong center and therefore
-        also wrong coordinates.
+        with a different calibration will display a wrong center and
+        consequently wrong coordinates.
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png
             :align: center
       - Copy the currently visible figure to the clipboard. This will only copy

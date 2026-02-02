@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _plots:
@@ -13,10 +13,10 @@ Plots
     :depth: 2
     :local:
     :backlinks: none
-    
-Pydidas uses `ESRF's silx toolkit <https://github.com/silx-kit/silx>`_ for 
+
+Pydidas uses `ESRF's silx toolkit <https://github.com/silx-kit/silx>`_ for
 plotting, with some minor additional functionality. The individual plots are
-presented below: 
+presented below:
 
 .. _plot_imageview:
 
@@ -29,5 +29,3 @@ presented below:
 .. _plot_plot1d:
 
 .. include:: ./plot1d.rst
-
-

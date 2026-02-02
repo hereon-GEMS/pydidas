@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -10,8 +10,8 @@
     :class: tight-table
     :header-rows: 1
 
-    * - menu icon
-      - description
+    * - Menu icon
+      - Description
     * -  .. image:: ../silx/images/menu_zoom.png
             :align: center
       - Zoom mode: clicking with the mouse and dragging spans a new selection
@@ -30,17 +30,17 @@
     * -  .. image:: ../silx/images/menu_expand_canvas.png
             :align: center
       - Expand canvas: Reset the canvas size to take up all available space.
-        This option does also change the data aspect to make use of the full
-        canvas.
+        This option does also change the data aspect ratio to make use of the
+        full canvas.
     * -  .. image:: ../silx/images/menu_palette.png
             :align: center
-      - Open the colormap editor. This button opens a window with selections
+      - Open the colormap editor: This button opens a window with selections
         for the colormap and scaling of the displayed minimum and maximum
         values.
     * - .. image:: ../silx/images/menu_crop_histogram_outliers.png
             :align: center
       - Crop histogram outliers: Calculate the histogram of the image and set
-        the colormap to ignore the low *x% and the top *y%* of the image
+        the colormap to ignore the low *x%* and the top *y%* of the image
         histogram. The levels of *x* and *y* can be adjusted in the pydidas
         user settings.
     * - .. image:: ../silx/images/menu_cmap_autoscale.png
@@ -68,14 +68,14 @@
             :align: center
       - Set coordinate system: This button will open a submenu which allows to
         select the coordinate system (cartesian or cylindrical). Note that the
-        cylindrical coordinate system use the global :py:class:`DiffractionExperimentContext
+        cylindrical coordinate system uses the global :py:class:`DiffractionExperimentContext
         <pydidas.contexts.diff_exp.DiffractionExperiment>`
         calibration to determine the beam center. Therefore, looking at data
-        with a different calibration will display a wrong center and therefore
-        also wrong coordinates.
+        with a different calibration will display a wrong center and
+        consequently wrong coordinates.
     * -  .. image:: ../silx/images/menu_get_data_info.png
             :align: center
-      - Get information for selected datapoint: This button will allow the user
+      - Get information for selected datapoint: This button allows the user
         to click on a point in the image and show a window with additional
         information about this point (specifically: all indices / data values).
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png
@@ -95,5 +95,5 @@
     * -  .. image:: ../silx/images/menu_profile.png
             :align: center
       - Create and delete line profiles. This function allows the selection and
-        editing of line profiles. The line profiles are shown in the histograms
-        plots for the vertical and horizontal, respectively.
+        editing of line profiles. The line profiles are shown in the histogram
+        plots for the vertical and horizontal axes, respectively.

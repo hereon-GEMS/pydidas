@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -38,5 +38,4 @@ the pixel shape, especially for coarse pixels.
 
 .. tip::
 
-    The scaling of the results can be achieved by modifying the colormap
-    settings.
+    Scaling of the results can be achieved by modifying the colormap settings.

@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _quickstart:
@@ -9,14 +9,14 @@
 Pydidas quick-start guide
 =========================
 
-Pydidas is usable both through its graphical user interface as well as through the 
+Pydidas is usable both through its graphical user interface as well as through the
 command line / notebooks.
 
 To quickly start using pydidas, there are multiple options:
 
   - Entry points (if pydidas was installed using pip)
   - Scripts in the ``pydidas_scripts`` folder.
-  - Using the ``pydidas`` module in the python shell. 
+  - Using the ``pydidas`` module in the python shell.
 
 Entry points
 ------------

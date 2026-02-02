@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _graphical_user_interface:
@@ -15,10 +15,10 @@ Graphical user interface
     :backlinks: none
 
 The graphical user interface is organized in *Frames* which are independent of
-each other and which each hold persistent information during each session.
+each other and each hold persistent information during each session.
 
-The individual :ref:`gui_frames` and :ref:`gui_windows` are presented below before
-:ref:`gui_recipes` are described which give a detailed guide on individual use
+The individual :ref:`gui_frames` and :ref:`gui_windows` presented below before
+:ref:`gui_recipes` are described to give a detailed guide on individual use
 cases.
 
 Overview
@@ -47,7 +47,7 @@ The general pydidas GUI layout is shown below:
     happens here.
 
 After starting the GUI, the home frame gives links to the documentation and a
-very brief reminder how to user the pydidas GUI.
+very brief reminder how to use the pydidas GUI.
 
 
 The UI state
@@ -55,7 +55,7 @@ The UI state
 
 The state of the interface, including all configurations of frames and apps, can
 be stored and restored by the user. This is handled in the **File > GUI state**
-menu and details are explained in detail :ref:`Menu manual <gui_menu>`.
+menu and details are explained in detail in the :ref:`Menu manual <gui_menu>`.
 
 This function allows to either store the state in a automatically controlled
 file in the OS-specific user's application config directory or in a file
@@ -84,7 +84,7 @@ Generic GUI information
 Frames
 ------
 
-Detailed descriptions of the individual frames are given section about :ref:`frames_main`.
+Detailed descriptions of the individual frames are given in the section about :ref:`frames_main`.
 
 .. toctree::
     :maxdepth: 1
@@ -97,7 +97,7 @@ Detailed descriptions of the individual frames are given section about :ref:`fra
 Windows
 -------
 
-Detailed information about the individual windows are given in hte section about :ref:`windows_main`.
+Detailed information about the individual windows is given in the section about :ref:`windows_main`.
 
 .. toctree::
     :maxdepth: 1

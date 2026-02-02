@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _data_browsing_frame:
@@ -13,7 +13,7 @@ Data browsing frame
     :depth: 2
     :local:
     :backlinks: none
-    
+
 The data browsing frame allows the visualization of one-dimensional and
 two-dimensional data. The frame is divided in two main parts: On the left, a
 directory explorer allows to browse the full file system and select files.
@@ -38,10 +38,10 @@ green frame in the screenshot above.
 
 .. warning::
 
-    The two main widgets have a defined minimum size. If the user drags the 
+    The two main widgets have a defined minimum size. If the user drags the
     splitter further, the respective widget will be hidden. It can be enlarged
     again by capturing and dragging the dark slider from the edge towards the center.
-    
+
 Controls
 ^^^^^^^^
 
@@ -51,13 +51,13 @@ Selecting or deselecting an option will directly update the directory explorer.
 The options and control widgets are:
 
   - Show network drives
-  
+
     This option allows to show or hide linked network drives in the explorer
     view.
-    
+
   - Sorting is case sensitive
-  
-    This option toggles case sensitive sorting. If enabled, lowercase and 
+
+    This option toggles case sensitive sorting. If enabled, lowercase and
     uppercase names will be sorted and displayed separately.
 
   - Current directory
@@ -97,11 +97,11 @@ The directory explorer is used to select the data to be displayed. The exact
 look and feel will depend on the used operating system and might be different
 from the screenshots shown here.
 
-A single click on an item will just highlight the item but will otherwise be 
-ignored. Double-clicking on a folder (or the arrow next to a folder) will 
-expand or collapse the folder, depending on the folder's current state. 
-Double-clicking on a file will instruct pydidas to open the selected file. If 
-the data format is readable and the file contains two-dimensional data, the 
+A single click on an item will just highlight the item but will otherwise be
+ignored. Double-clicking on a folder (or the arrow next to a folder) will
+expand or collapse the folder, depending on the folder's current state.
+Double-clicking on a file will instruct pydidas to open the selected file. If
+the data format is readable and the file contains two-dimensional data, the
 content will be displayed in the ImageView widget. In case of hdf5 files, an
 additional selection field will be shown to select the data frame.
 
@@ -154,9 +154,9 @@ all filter options is shown below:
     :align: center
 
 The first row allows the user to select dataset filters for specific names.
-For example, the Eiger detector master file has a number of datasets for 
-detector specific settings like offsets and calibrations for the different 
-modules. If the respective box is ticked, these datasets will not be shown in 
+For example, the Eiger detector master file has a number of datasets for
+detector specific settings like offsets and calibrations for the different
+modules. If the respective box is ticked, these datasets will not be shown in
 the drop-down list. Additional filters for datasets can be set on their and minimum
 data dimension. Any changes to the filters will update the list of filtered datasets
 immediately.
@@ -171,7 +171,7 @@ The raw data selection widget
 """""""""""""""""""""""""""""
 
 Importing raw data files requires an additional selection of data type, image shape
-and header length (the header length is given in bytes). Settings all these values
+and header length (the header length is given in bytes). Setting all these values
 allows to correctly decode raw images. The respective widget is shown below:
 
 .. image:: images/data_browse/hdf5_all.png
@@ -223,11 +223,3 @@ Menu icon descriptions
 The following functionality is available through the toolbar icons:
 
 .. include:: ../silx/plot2d_icons.rst
-
-
-
-
-
-
-
-

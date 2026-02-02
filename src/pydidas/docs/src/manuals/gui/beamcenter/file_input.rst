@@ -1,14 +1,14 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
 The input file can be selected in any one of four ways:
 
 .. image:: ../beamcenter/_images/input.png
-    :align: left
+    :align: right
 
 1. Use the "Select image file" button at the top.
 2. Enter the full file path in the input field.
@@ -20,7 +20,7 @@ The input file can be selected in any one of four ways:
 
 If the filename is valid, the selected file will be displayed immediately.
 
-For hdf5 files, however, you need to select data the dataset and frame number 
+For hdf5 files, however, you need to select data the dataset and frame number
 first and confirm the selection with the "Confirm input selection" button before
 any frame is loaded and displayed.
 

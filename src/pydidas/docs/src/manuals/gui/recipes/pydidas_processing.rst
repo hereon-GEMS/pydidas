@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 Using the pydidas processing pipeline
@@ -64,11 +64,11 @@ The pydidas frame to edit the experimental setup can be accessed through the
 in orange on the left).
 
 If you just performed the detector calibration, use the 2nd button from the top
-*Copy all experimental parameters from calibration* to automatically update
+:py:data:`Copy all experimental parameters from calibration` to automatically update
 all Parameter values, with the exception of the detector mask.
 
 If you want to re-use a previous detector calibration, use the topmost button
-*import experimerimental parameters from file* to open a file selection
+:py:data:`Import experimental parameters from file` to open a file selection
 dialogue. After confirming the selected file, the parameters are updated.
 Note that the *detector mask file* parameter is not included in pyFAI's
 .poni file format and is not updated when importing a poni file.
@@ -84,7 +84,7 @@ Example
 
 The example has been performed at an X-ray energy of 13 keV using an Eiger 9M
 detector. This information was available from the beamline. The mask file for
-the detector was saved at *E:\test\eiger_mask.npy* (in numpy binary format).
+the detector was saved at *E:\\test\\eiger_mask.npy* (in numpy binary format).
 All the information was copied from the detector calibration.
 
 3. Define the scan
@@ -115,7 +115,7 @@ Example
 ^^^^^^^
 
 In the example used in the image above, the individual image files are located
-in the E:\test\raw directory and the data files are named test_00010_data.h5,
+in the E:\\test\\raw directory and the data files are named test_00010_data.h5,
 test_00011_data.h5, etc. (therefore, the starting index is set to 10).
 
 One image was acquired at each scan point in a mesh of 25 x 25 points.
@@ -127,7 +127,7 @@ One image was acquired at each scan point in a mesh of 25 x 25 points.
     :align: center
     :width: 400px
 
-To create the workflow, select the *Workflow processing* - > *Workflow editing*
+To create the workflow, select the *Workflow processing* -> *Workflow editing*
 toolbar entry (marked in orange in the image above).
 The workflow is comprised of individual plugins which each perform a single
 task, like frame loading, azimuthal integration, background correction,
@@ -136,7 +136,7 @@ peak fitting. The workflow can branch downward in an unlimited number of nodes
 
 Use the Plugin browser at the bottom of the frame to display more information
 about and to select plugins. Double click on any plugin to add it as child to
-the current plugin or use the right mouse button on a Plugin to open a menu with
+the current plugin or use the right mouse button on a plugin to open a menu with
 additional options.
 
 Clicking on a plugin in the field at the top selects it and opens these plugin's
@@ -168,7 +168,7 @@ a Lorentzian function and to set the limits.
 
 
 Once the parameters for Experiment, Scan and and Workflow have been configured,
-the Workflow can be tested. Select the *Workflow processing* - > *Test Workflow*
+the Workflow can be tested. Select the *Workflow processing* -> *Test Workflow*
 toolbar entry (marked in orange in the image above).
 
 Pick a good datapoint by using either the image number or scan indices and click
@@ -180,15 +180,15 @@ the matrix tables.
 The *Results* dropdown selection allows to see the results for any plugin in the
 workflow. The textbox on the left gives you additional information about the
 plugin results, the window on the right plots the 2d image or 1d curve.
-If you are not happy with the results, select the *Tweak plugin
-parameters* button at the bottom to open a new window and edit this plugin's
+If you are not happy with the results, select the :py:data:`Tweak plugin
+parameters` button at the bottom to open a new window and edit this plugin's
 parameters.
 
 5.1 Plugin details
 ^^^^^^^^^^^^^^^^^^
 
 Some plugins allow to inspect detailed results which can be anything and which
-are defined in each plugin. The *Show detailed results for plugin* button opens
+are defined in each plugin. The :py:data:`Show detailed results for plugin` button opens
 a new window with the details for the selected plugin.
 
 .. image:: images/05a_test_details.png
@@ -202,17 +202,17 @@ through the *Options* at the bottom of the plot.
 5.2 Tweaking Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the *Tweak plugin parameters* button on the *Test Workflow* frame opens
+Using the :py:data:`Tweak plugin parameters` button on the *Test Workflow* frame opens
 a new window which allows to modify Plugin parameters in place.
 
 .. image:: images/05b_test_tweak.png
     :align: center
     :width: 400px
 
-The *Run plugin with current parameters* will run the current plugin only and
+:py:data:`Run plugin with current parameters` will run the current plugin only and
 display its results (and its details, if the plugin has them defined). Once
-you have configured the plugin to your wishes, use the *Confirm current
-parameters and close window* button. This will also run any child plugins with
+you have configured the plugin to your wishes, use the :py:data:`Confirm current
+parameters and close window` button. This will also run any child plugins with
 the updated input data again.
 
 Example
@@ -254,12 +254,12 @@ The resulting outputs for each plugin in the workflow are shown below:
     :width: 400px
 
 Once you are confident that everything is configured correctly, select the
-*Workflow processing* - > *Run full Workflow* toolbar entry (marked in orange
+*Workflow processing* -> *Run full Workflow* toolbar entry (marked in orange
 in the image above). This will open the *Run full workflow* frame which allows
 to run the workflow in separate processes in the background and to visualize
 the results.
 
-The *Start processing* button opens background processes, which perform the
+The :py:data:`Start processing` button opens background processes, which perform the
 actual processing and only communicate their results. Starting these processes
 takes some time and once results come in, you can select one of the nodes from
 the drop-down on the left to display their results. For details, please refer

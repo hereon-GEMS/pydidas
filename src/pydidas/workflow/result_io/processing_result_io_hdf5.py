@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Hdf5 file format.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,14 +40,12 @@ from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import (
+from pydidas.core.utils.hdf5 import (
     create_nx_dataset,
     create_nx_entry_groups,
     read_and_decode_hdf5_dataset,
 )
-from pydidas.core.utils.hdf5_dataset_utils import (
-    get_nx_class_for_param,
-)
+from pydidas.core.utils.hdf5.nxs_export import nx_dataset_config_from_param
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -69,23 +67,23 @@ _DEFAULT_GROUPS = [
 
 def _get_pydidas_context_config_entries(
     scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
-) -> list[list[str, str, dict]]:
+) -> list:  # noqa: PYI041
     """
     Get the context configuration from the pydidas Context singletons.
 
     Parameters
     ----------
-    scan : pydidas.contexts.Scan
+    scan : Scan
         The scan (context).
-    exp : pydidas.contexts.DiffractionExperiment
+    exp : DiffractionExperiment
         The diffraction experiment (context).
-    tree : WorkflowTree
+    tree : ProcessingTree
         The workflow tree.
 
     Returns
     -------
-    list[list[str, str, dict]]
-        List with writable entries for the contexts.
+    list
+        The writable entries for the contexts.
     """
     _dsets = []
     for _key, _param in scan.params.items():
@@ -93,8 +91,7 @@ def _get_pydidas_context_config_entries(
             [
                 "entry/pydidas_config/scan",
                 _key,
-                {"data": _param.value_for_export},
-                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
+                *nx_dataset_config_from_param(_param),
             ]
         )
     for _key, _param in exp.params.items():
@@ -102,8 +99,7 @@ def _get_pydidas_context_config_entries(
             [
                 "entry/pydidas_config/diffraction_exp",
                 _key,
-                {"data": _param.value_for_export},
-                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
+                *nx_dataset_config_from_param(_param),
             ]
         )
     _dsets += [
@@ -161,37 +157,39 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     @classmethod
     def prepare_files_and_directories(
-        cls, save_dir: Path | str, node_information: dict, **kwargs: dict
-    ):
+        cls, save_dir: Path | str, node_information: dict, **kwargs: Any
+    ) -> None:
         """
         Prepare the hdf5 files with the metadata.
 
         Parameters
         ----------
-        save_dir : Path | str
+        save_dir : Path or str
             The full path for the data to be saved.
         node_information : dict
-            A dictionary with nodeID keys and dictionary values. Each value dictionary
-            must have the following keys: shape, node_label, data_label, plugin_name
-            and the respective values. The shape (tuple) determines the shape of the
-            Dataset, the node_label is the user's name for the processing node. The
-            data_label gives the description of what the data shows (e.g. intensity)
-            and the plugin_name is simply the name of the plugin.
-        **kwargs:
+            A dictionary with nodeID keys and dictionary values. Each value
+            dictionary must have the following keys: shape, node_label,
+            data_label, plugin_name and the respective values. The shape
+            (tuple) determines the shape of the Dataset, the node_label is
+            the user's name for the processing node. The data_label gives
+            the description of what the data shows (e.g. intensity) and the
+            plugin_name is simply the name of the plugin.
+        **kwargs : Any
             Supported kwargs are:
 
-            scan_context : Optional[pydidas.contexts.Scan]
-                The scan context. If None, the generic context will be used.
-                Only specify this, if you explicitly require a different context.
-                The default is None.
-            diffraction_exp_context : Optional[pydidas.contexts.DiffractionExperiment]
-                The diffraction experiment context. If None, the generic context
-                will be used. Only specify this, if you explicitly require a
+            scan_context : Scan or None, optional
+                The scan context. If None, the generic context will be
+                used. Only specify this if you explicitly require a
                 different context. The default is None.
-            workflow_tree : Union[WorkflowTree, None], optional
-                The WorkflowTree. If None, the generic WorkflowTree will be used.
-                Only specify this, if you explicitly require a different context.
-                The default is None.
+            diffraction_exp_context : DiffractionExperiment or None,
+            optional
+                The diffraction experiment context. If None, the generic
+                context will be used. Only specify this if you explicitly
+                require a different context. The default is None.
+            workflow_tree : WorkflowTree or None, optional
+                The WorkflowTree. If None, the generic WorkflowTree will
+                be used. Only specify this if you explicitly require a
+                different context. The default is None.
         """
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
@@ -213,7 +211,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ):
+    ) -> None:
         """
         Create a hdf5 file and populate it with the Scan metadata.
 
@@ -221,15 +219,16 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         node_id : int
             The nodeID.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The scan (context).
-        exp : pydidas.contexts.DiffractionExperiment
+        exp : DiffractionExperiment
             The diffraction experiment (context).
-        workflow : WorkflowTree
+        workflow : ProcessingTree
             The workflow tree.
         """
         _dsets = cls._get_datasets_to_be_written(node_id, scan, exp, workflow)
-        with h5py.File(cls._save_dir / cls._filenames[node_id], "w") as _file:
+        _file_path = cls._save_dir / cls._filenames[node_id]
+        with h5py.File(_file_path, "w") as _file:  # type: ignore[operator]
             for _group_key, _type in _DEFAULT_GROUPS:
                 create_nx_entry_groups(_file, _group_key, group_type=_type)
             for _group, _name, kws, _nxs_attrs in _dsets:
@@ -242,7 +241,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ) -> list[list[str, str, dict]]:
+    ) -> list:  # noqa: PYI041
         """
         Get the datasets to be written to the hdf5 file.
 
@@ -250,17 +249,17 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         node_id : int
             The nodeID.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The scan (context).
-        exp : pydidas.contexts.DiffractionExperiment
+        exp : DiffractionExperiment
             The diffraction experiment (context).
-        workflow : WorkflowTree
+        workflow : ProcessingTree
             The workflow tree.
 
         Returns
         -------
-        list[list[str, str, dict, dict]]
-            List with the dataset information to be written.
+        list
+            The list with the dataset information to be written.
         """
 
         _node_attribute = partial(cls.get_node_attribute, node_id)
@@ -295,7 +294,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 {"shape": _node_attribute("shape")},
                 {"NX_class": "NX_INT", "units": ""},
             ],
-        ] + _get_pydidas_context_config_entries(scan, exp, workflow)
+        ]
+        _context_entries = _get_pydidas_context_config_entries(scan, exp, workflow)  # type: ignore[operator]
+        _dsets = _dsets + _context_entries
         return _dsets
 
     @classmethod
@@ -305,7 +306,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         frame_result_dict: dict,
         scan_context: Scan | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
         """
         Export the results of one frame and store them on disk.
 
@@ -315,10 +316,10 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The frame index.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Scan |None, optional
+        scan_context : Scan or None, optional
             The scan context to be used for exporting to file. If None, the
             global scan context will be used. The default is None.
-        kwargs : Any
+        **kwargs : Any
             Kwargs which should be passed to the underlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
@@ -327,7 +328,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             _metadata = cls.update_with_scan_metadata(frame_result_dict, _scan)
             cls.update_metadata(_metadata)
         for _node_id, _data in frame_result_dict.items():
-            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_node_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][_indices] = _data
 
     @classmethod
@@ -336,7 +338,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         full_data: dict,
         scan_context: Scan | None = None,
         squeeze: bool = False,
-    ):
+    ) -> None:
         """
         Export the full dataset to disk.
 
@@ -344,19 +346,21 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         full_data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Scan |None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        squeeze: bool, optional
-            Flag to toggle squeezing of empty dimensions. If True, the data will
-            be squeezed to remove empty dimensions. The default is False.
+        scan_context : Scan or None, optional
+            The scan context. If None, the generic context will be used. Only
+            specify this if you explicitly require a different context. The
+            default is None.
+        squeeze : bool, optional
+            Flag to toggle squeezing of empty dimensions. If True, the data
+            will be squeezed to remove empty dimensions. The default is False.
         """
         if not cls._metadata_written:
             cls.update_metadata(full_data, squeeze=squeeze)
         for _node_id, _data in full_data.items():
             if squeeze:
                 _data = _data.squeeze()
-            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_node_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
@@ -366,23 +370,22 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         """
         Update the frame metadata with the scan metadata.
 
-        This method updates the metadata of the frame with the scan metadata.
+        This method updates the metadata of the frame with the scan
+        metadata.
 
         Parameters
         ----------
-        metadata : dict[int, Dataset | dict]
+        metadata : dict[int, Dataset or dict]
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         scan : Scan
-            The scan context to be used for exporting to file. If None, the
-            global scan context will be used.
+            The scan context to be used for updating metadata.
 
         Returns
         -------
         dict[int, dict]
             The updated metadata.
         """
-        _ndim_scan = scan.ndim
         _scan_dim_labels = scan.axis_labels
         _scan_dim_units = scan.axis_units
         _scan_dim_ranges = scan.axis_ranges
@@ -414,7 +417,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     @classmethod
     def update_metadata(
         cls, metadata: dict[int, Dataset | dict], squeeze: bool = False
-    ):
+    ) -> None:
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
@@ -424,9 +427,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         metadata : dict
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
-        squeeze: bool, optional
-            Flag to toggle squeezing of empty dimensions. If True, the data will
-            be squeezed to remove empty dimensions. The default is False.
+        squeeze : bool, optional
+            Flag to toggle squeezing of empty dimensions. If True, the data
+            will be squeezed to remove empty dimensions. The default is False.
         """
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
@@ -434,8 +437,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     _metadata = _metadata.squeeze()
                 _metadata = _metadata.property_dict
             _ndim = len(_metadata["axis_labels"])
-            _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
-            with h5py.File(cls._save_dir / cls._filenames[_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _nxdata_group = _file["entry/data"]
                 _nxdata_group.attrs["title"] = _metadata.get("data_label", "")
                 _nxdata_group.attrs["signal"] = "data"
@@ -462,7 +465,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The full filename of the file to be imported.
 
         Returns
@@ -470,8 +473,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         data : pydidas.core.Dataset
             The dataset with the imported data.
         node_info : dict
-            A dictionary with node_label, data_label, plugin_name keys and the
-            respective values.
+            A dictionary with node_label, data_label, plugin_name keys and
+            the respective values.
         scan : pydidas.contexts.Scan
             The imported scan configuration.
         diffraction_exp : pydidas.contexts.DiffractionExperiment
@@ -488,7 +491,11 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         with h5py.File(filename, "r") as _file:
             try:
                 _tree.restore_from_string(
-                    read_and_decode_hdf5_dataset(_file["entry/pydidas_config/workflow"])
+                    str(
+                        read_and_decode_hdf5_dataset(
+                            _file["entry/pydidas_config/workflow"]
+                        )
+                    )  # type: ignore[arg-type]
                 )
             except KeyError:
                 raise UserConfigError(
@@ -496,9 +503,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     "standard and cannot be imported. Please check the input file."
                 )
             _info = {
-                "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),
-                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
-                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),
+                "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),  # type: ignore[arg-type]
+                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),  # type: ignore[arg-type]
+                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),  # type: ignore[arg-type]
             }
             _info["result_title"] = (
                 f"{_info['node_label']} (node #{_info['node_id']:03d})"

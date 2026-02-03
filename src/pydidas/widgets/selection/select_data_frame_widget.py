@@ -33,13 +33,13 @@ from typing import Any
 from qtpy import QtCore
 
 from pydidas.core import ParameterCollection, get_generic_param_collection
-from pydidas.core.utils import (
+from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
+from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
+from pydidas.core.utils.hdf5 import (
+    get_generic_dataset,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
 )
-from pydidas.core.utils._frame_slice_handler import FrameSliceHandler
-from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
-from pydidas.core.utils.hdf5_dataset_utils import get_generic_dataset
 from pydidas.widgets.data_viewer import DataAxisSelector
 from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
 from pydidas.widgets.widget_with_parameter_collection import (

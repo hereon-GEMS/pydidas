@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -319,15 +319,6 @@ class TestImageMetadataManager(unittest.TestCase):
         imm._store_image_data_from_hdf5_file()
         self.assertEqual(imm._config["images_per_file"], self._dsize // _step + 1)
         self.assertEqual(imm._config["numbers"], range(0, self._dsize, _step))
-
-    def test_update_final_image(self):
-        _shapex = 123
-        _shapey = 435
-        imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
-        imm.update_final_image()
-        # assert does not raise an Exception.
 
     def test_set_filename(self):
         imm = ImageMetadataManager()

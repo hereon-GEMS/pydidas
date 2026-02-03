@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for peak fitting plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,7 +78,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
                 gridPos=(_index + 1, 1, 1, 1),
                 parent_widget="checkbox_widget",
             )
-            self._widgets[f"checkbox_{_key}"].stateChanged.connect(
+            self._widgets[f"checkbox_{_key}"].sig_new_check_state.connect(
                 partial(self._box_checked, _key)
             )
         for _key, _param in self.plugin.params.items():
@@ -117,7 +117,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         """
         Update the configuration fields of the plugin.
 
-        This method is used restore the default parameter values.
+        This method is used to restore the default parameter values.
         """
         for param in self.plugin.params.values():
             if param.refkey != "fit_output":

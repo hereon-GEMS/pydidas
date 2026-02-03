@@ -2,6 +2,21 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+
+
+vyy.mm.dd
+=========
+
+Programmatic changes
+--------------------
+- Refactored the HDF5 processing tools.
+
+Bugfixes
+--------
+- Fixed an isssue with QCheckBox signals in Qt6.
+
+
 v26.01.27
 =========
 

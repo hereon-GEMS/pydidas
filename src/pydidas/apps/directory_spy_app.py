@@ -47,12 +47,11 @@ from pydidas.core import (
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
     get_extension,
-    get_hdf5_metadata,
     pydidas_logger,
     verify_file_exists,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
-from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
+from pydidas.core.utils.hdf5 import get_hdf5_metadata, verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -137,10 +136,25 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
     ]
     AVAILABLE_IMAGE_SIZE = (10000, 10000)
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the DirectorySpyApp.
+
+        Parameters
+        ----------
+        *args : Any
+            Any number of Parameters.
+        **kwargs : Any
+            Keyword arguments for Parameters with their reference key.
+            Additional supplied keyword arguments:
+
+            image_size : tuple, optional
+                The maximum size of the images to be stored in shared memory.
+                The default is (10000, 10000).
+        """
+        self.__image_size = kwargs.pop("image_size", self.AVAILABLE_IMAGE_SIZE)
         BaseApp.__init__(self, *args, **kwargs)
         AssociatedFileMixin.__init__(self)
-        self.__image_size = kwargs.get("image_size", self.AVAILABLE_IMAGE_SIZE)
         self._det_mask = None
         self._bg_image = None
         self._fname = lambda x: ""
@@ -303,7 +317,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         _val = self.get_param_value("detector_mask_val")
         return np.where(self._det_mask, _val, image)
 
-    def initialize_shared_memory(self):
+    def initialize_shared_memory(self) -> None:
         """
         Initialize the shared memory arrays based on the buffer size and
         the result shapes.
@@ -486,7 +500,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
 
         Returns
         -------
-        np.ndarray
+        Dataset
             The image.
         """
         self.__read_image_meta = {"forced_dimension": 2}
@@ -495,7 +509,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         _data = import_data(self.current_filename, **self.__read_image_meta)
         return _data
 
-    def __update_hdf5_metadata(self):
+    def __update_hdf5_metadata(self) -> None:
         """Set the metadata parameters to read a frame from an HDF5 file."""
         _dataset = self.get_param_value("hdf5_key")
         _shape = get_hdf5_metadata(self.current_filename, meta="shape", dset=_dataset)
@@ -508,14 +522,14 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         )
         self.__read_image_meta["import_metadata"] = False
 
-    def __store_image_in_shared_memory(self, image: np.ndarray):
+    def __store_image_in_shared_memory(self, image: np.ndarray) -> None:
         """
         Store the image data in the shared memory.
 
         Parameters
         ----------
         image : np.ndarray
-            The image data
+            The image data.
         """
         _meta = self.__get_image_metadata_string()
         _flag_lock = self._config["shared_memory"]["flag"]
@@ -544,17 +558,20 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         )
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index: int, fname: str, *args):
+    def multiprocessing_store_results(self, index: int, fname: str, *args: Any) -> None:
         """
-        Store the multiprocessing results for other pydidas apps and processes.
+        Store the multiprocessing results for other pydidas apps and
+        processes.
 
         Parameters
         ----------
         index : int
-            The frame index. This entry is kept for compatibility and not used
-            in this app.
+            The frame index. This entry is kept for compatibility and not
+            used in this app.
         fname : str
-            The filename
+            The filename.
+        *args : Any
+            Additional positional arguments (unused).
         """
         _flag_lock = self._config["shared_memory"]["flag"]
         with _flag_lock.get_lock():

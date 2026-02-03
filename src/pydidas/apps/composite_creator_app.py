@@ -43,7 +43,7 @@ from pydidas.core.utils import (
     rebin2d,
     verify_file_exists,
 )
-from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
+from pydidas.core.utils.hdf5 import verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 from pydidas.managers import (
     CompositeImageManager,
@@ -94,26 +94,26 @@ class CompositeCreatorApp(BaseApp):
     Parameters can be passed either through the argparse module during
     command line calls or through keyword arguments in scripts.
 
-    The names of the parameters are similar for both cases, only the calling
-    syntax changes slightly, based on the underlying structure used.
-    For the command line, parameters must be passed as -<parameter name>
-    <value>.
-    For keyword arguments, parameters must be passed during instantiation
-    using the standard <parameter name>=<value>.
+    The names of the parameters are similar for both cases, only the
+    calling syntax changes slightly, based on the underlying structure
+    used. For the command line, parameters must be passed as
+    -<parameter name> <value>. For keyword arguments, parameters must
+    be passed during instantiation using the standard
+    <parameter name>=<value>.
 
     Notes
     -----
-    Please refer to the help for the full list and explanation of Parameters used by
-    the CompositeCreatorApp.
+    Please refer to the help for the full list and explanation of
+    Parameters used by the CompositeCreatorApp.
 
     Parameters
     ----------
-    *args : tuple
+    *args : Any
         Any number of Parameters. These will be added to the app's
         ParameterCollection.
-    **kwargs : dict
-        Parameters supplied with their reference key as dict key and the
-        Parameter itself as value.
+    **kwargs : Any
+        Parameters supplied with their reference key as dict key and
+        the Parameter itself as value.
     """
 
     default_params = COMPOSITE_CREATOR_DEFAULT_PARAMS
@@ -444,7 +444,7 @@ class CompositeCreatorApp(BaseApp):
         _image = self.__apply_mask(_image)
         return _image
 
-    def __apply_mask(self, image: Dataset) -> Dataset:
+    def __apply_mask(self, image: Dataset) -> Dataset | np.ndarray:
         """
         Apply the detector mask to the image.
 
@@ -455,7 +455,7 @@ class CompositeCreatorApp(BaseApp):
 
         Returns
         -------
-        Dataset
+        Dataset or np.ndarray
             The masked image data.
         """
         if self._det_mask is None:
@@ -466,7 +466,7 @@ class CompositeCreatorApp(BaseApp):
         _masked_image = np.where(self._det_mask, _mask_val, image)
         if isinstance(image, Dataset):
             return Dataset(_masked_image, **image.property_dict)
-        return _masked_image
+        return _masked_image  # type: ignore[return-value]
 
     def multiprocessing_post_run(self) -> None:
         """
@@ -511,7 +511,7 @@ class CompositeCreatorApp(BaseApp):
         if self.get_param_value("use_bg_file"):
             image = image - self._bg_image
         self._composite.insert_image(image, index)
-        self.updated_composite.emit()
+        self.updated_composite.emit()  # type: ignore[attr-defined]
 
     def export_image(self, output_fname: str, **kwargs: Any) -> None:
         """
@@ -541,8 +541,8 @@ class CompositeCreatorApp(BaseApp):
         Returns
         -------
         None or np.ndarray
-            The composite image in np.ndarray format. If no composite has been
-            created, this property returns None.
+            The composite image in np.ndarray format. If no composite has
+            been created, this property returns None.
         """
         if self._composite is None:
             return None

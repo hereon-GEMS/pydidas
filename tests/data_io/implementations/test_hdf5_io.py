@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,7 @@ import pytest
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import create_nxdata_entry
+from pydidas.core.utils.hdf5 import create_nxdata_entry
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 
 

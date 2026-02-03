@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,7 +36,8 @@ import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import Dataset, UserConfigError
-from pydidas.core.utils import get_random_string, read_and_decode_hdf5_dataset
+from pydidas.core.utils import get_random_string
+from pydidas.core.utils.hdf5 import read_and_decode_hdf5_dataset
 from pydidas.unittest_objects import create_hdf5_results_file
 from pydidas.workflow import ProcessingResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta

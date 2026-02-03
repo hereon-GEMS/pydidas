@@ -33,8 +33,7 @@ import pytest
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.utils import get_random_string
-from pydidas.core.utils.hdf5_dataset_utils import (
-    _split_hdf5_file_and_dataset_names,
+from pydidas.core.utils.hdf5 import (
     convert_data_for_writing_to_hdf5_dataset,
     create_hdf5_dataset,
     create_nx_dataset,
@@ -46,12 +45,17 @@ from pydidas.core.utils.hdf5_dataset_utils import (
     read_and_decode_hdf5_dataset,
     verify_hdf5_dset_exists_in_file,
 )
+from pydidas.core.utils.hdf5.hdf5_dataset_utils import (
+    _split_hdf5_file_and_dataset_names,
+)
+from pydidas.core.utils.hdf5.nxs_export import _get_nx_class_for_ndarray
 
 
 _1d_DSETS = ["/test/data1d", "/test/1d/data"]
 _2d_DSETS = ["/test/path/data2d", "/test/other_2d/data"]
 _3d_DSETS = ["/3d/data/data", "/data/3d/data"]
 _4d_DSETS = ["/test/path/4ddata", "/entry/path/to_4d/data", "/test/ext_data/data"]
+_NXS_DSETS = ["/test/path/nxsdata", "/entry/nxs_data"]
 # _ALL_DSETS does not include the 1d datasets as the default dim filter is 2
 _ALL_DSETS = set(_2d_DSETS + _3d_DSETS + _4d_DSETS)
 _DSETS_OF_MIN_DIM = {
@@ -96,9 +100,24 @@ def hdf5_test_data(temp_path):
         _file["test/ext_data/data"] = h5py.ExternalLink(
             _fname("data"), "/ext/path/data"
         )
+    with h5py.File(_fname("nxs"), "w") as _file:
+        for dset in _NXS_DSETS:
+            _parent, _name = os.path.split(dset)
+            if _parent not in _file:
+                _file.create_group(_parent)
+                _file[_parent].attrs["NX_class"] = "NXdata"
+                _file[_parent].attrs["signal"] = _name
+                _file[_parent].attrs["axes"] = ["ax0", "ax1", "ax2", "ax3"]
+                for _i in range(4):
+                    _file[_parent].attrs[f"ax{_i}_indices"] = _i
+                    _file[_parent].create_dataset(
+                        f"ax{_i}", data=np.arange(_data.shape[_i])
+                    )
+            _file[dset] = _data
 
     yield {
         "fname": _fname(1),
+        "nxs_fname": _fname("nxs"),
         "ref": _ref,
         "data": _data,
     }
@@ -230,6 +249,22 @@ def test_get_hdf5_populated_dataset_keys__test_sizes(hdf5_test_data, min_size):
     )
     _reference = _DSETS_OF_MIN_DIM[int(np.log10(min_size).__ceil__())]
     assert set(_res) == _reference
+
+
+@pytest.mark.parametrize("nxsignal_only", [False])
+def test_get_hdf5_populated_dataset_keys__nxsignal_only(hdf5_test_data, nxsignal_only):
+    _res = get_hdf5_populated_dataset_keys(
+        hdf5_test_data["nxs_fname"], nxdata_signal_only=nxsignal_only, min_dim=1
+    )
+    if nxsignal_only:
+        assert set(_res) == set(_NXS_DSETS)
+    else:
+        _expected = []
+        for _dset in _NXS_DSETS:
+            _expected.append(_dset)
+            for _i in range(4):
+                _expected.append(os.path.split(_dset)[0] + f"/ax{_i}")
+        assert set(_res) == set(_expected)
 
 
 def test_convert_data_for_writing_to_hdf5_dataset__None():
@@ -470,6 +505,22 @@ def test_create_nx_dataset__w_attributes(hdf5_file):
     assert np.array_equal(dataset[()], data)
     for key, value in attributes.items():
         assert dataset.attrs[key] == value
+
+
+@pytest.mark.parametrize(
+    "arr, expected_val",
+    [
+        (np.array([1, 2, 3]), "NX_INT"),
+        (Dataset([1, 2, 3]), "NX_INT"),
+        (np.ones(10, dtype=np.uint8), "NX_INT"),
+        (np.array([1.0, 2.0, 3.0]), "NX_FLOAT"),
+        (Dataset([1.0, 2.0, 3.0]), "NX_FLOAT"),
+        (np.ones(10, dtype=np.float32), "NX_FLOAT"),
+        (np.asarray([[0], [1]], dtype=object), "NX_CHAR"),
+    ],
+)
+def test_get_nx_class_for_ndarray(arr, expected_val):
+    assert _get_nx_class_for_ndarray(arr) == expected_val
 
 
 def test_verify_hdf5_dset_exists_in_file(hdf5_test_data):

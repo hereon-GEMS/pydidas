@@ -29,19 +29,16 @@ __all__ = ["ImageMetadataManager"]
 
 
 from pathlib import Path
-from typing import Union
 
 from pydidas.core import (
     ObjectWithParameterCollection,
+    Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import (
-    get_extension,
-    get_hdf5_metadata,
-)
-from pydidas.core.utils.hdf5_dataset_utils import verify_hdf5_dset_exists_in_file
+from pydidas.core.utils import get_extension
+from pydidas.core.utils.hdf5 import get_hdf5_metadata, verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -79,10 +76,11 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    *args : tuple
+    *args : Parameter
         Any of the Parameters in use can be given as instances.
-    **kwargs : dict
-        Parameters can also be supplied as kwargs, referencey by their refkey.
+    **kwargs : Parameter
+        Parameters can also be supplied as kwargs, referenced by their
+        refkey.
     """
 
     default_params = get_generic_param_collection(
@@ -99,7 +97,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         "roi_xhigh",
     )
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Parameter, **kwargs: Parameter) -> None:
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
@@ -153,13 +151,13 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         return self._config["datatype"]
 
     @property
-    def numbers(self) -> Union[range, int]:
+    def numbers(self) -> range | int:
         """
         Get the frame numbers pointing to the selected images.
 
         Returns
         -------
-        Union[range, int]
+        range or int
             The selected frame numbers.
         """
         return self._config["numbers"]
@@ -177,15 +175,15 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         return self._config["final_shape"]
 
     @property
-    def roi(self) -> Union[None, tuple[slice, slice]]:
+    def roi(self) -> None | tuple[slice, slice]:
         """
         Get the ROI object required to achieve the final image shape.
 
         Returns
         -------
-        Union[None, tuple[slice, slice]]
-            Either None, if no ROI has been defined or a tuple with the slice
-            objects for y and x dimensions.
+        None or tuple[slice, slice]
+            Either None, if no ROI has been defined or a tuple with the
+            slice objects for y and x dimensions.
         """
         return self._config["roi"]
 
@@ -226,13 +224,13 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         return self._config["filename"]
 
     @filename.setter
-    def filename(self, filename: Union[Path, str]):
+    def filename(self, filename: Path | str) -> None:
         """
         Set the filename for processing.
 
         Parameters
         ----------
-        filename : Union[str, Path]
+        filename : Path or str
             The full path of the selected file.
 
         Raises
@@ -248,41 +246,33 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             )
         self._config["filename"] = filename
 
-    def update(self, filename: Union[str, Path, None] = None):
+    def update(self, filename: str | Path | None = None) -> None:
         """
         Perform a full update.
 
-        If a new filename is specified, it will be set as first action. Otherwise,
-        the metadata will be extracted from the current file.
+        If a new filename is specified, it will be set as first action.
+        Otherwise, the metadata will be extracted from the current file.
 
         Parameters
         ----------
-        filename : Union[str, Path, None], optional
-            The filename to be updated. If None, the current filename will be used.
-            The default is None.
+        filename : str or Path or None, optional
+            The filename to be updated. If None, the current filename will
+            be used. The default is None.
         """
         if filename is not None:
             self.filename = filename
         self.update_input_data()
-        self.update_final_image()
+        self._calculate_final_image_shape()
 
-    def update_input_data(self):
-        """
-        Update the image metadata from new input.
-        """
+    def update_input_data(self) -> None:
+        """Update the image metadata from new input."""
         _filename = self._config["filename"]
         if get_extension(_filename) in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
             self._store_image_data_from_single_image()
 
-    def update_final_image(self):
-        """
-        Calculate the dimensions of the final image.
-        """
-        self._calculate_final_image_shape()
-
-    def _store_image_data_from_hdf5_file(self):
+    def _store_image_data_from_hdf5_file(self) -> None:
         """
         Store config metadata from hdf5 file.
         """
@@ -305,7 +295,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _img_shape.pop(_slice_ax)
         self.store_image_data(_img_shape, _meta["dtype"], _n_per_file)
 
-    def __verify_selection_range(self, dset_length: int):
+    def __verify_selection_range(self, dset_length: int) -> None:
         """
         Verify the selection is valid for the size of the hdf5 dataset.
 
@@ -327,10 +317,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
                 "not describe a correct range."
             )
 
-    def _store_image_data_from_single_image(self):
-        """
-        Store config metadata from file range.
-        """
+    def _store_image_data_from_single_image(self) -> None:
+        """Store config metadata from file range."""
         _test_image = import_data(self._config["filename"])
         self._config["numbers"] = [0]
         self._config["hdf5_dset_shape"] = (0, 0, 0)
@@ -338,7 +326,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     def store_image_data(
         self, img_shape: tuple[int, int], img_dtype: type, n_image: int
-    ):
+    ) -> None:
         """
         Store the data about the image shape and datatype.
 
@@ -356,10 +344,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         self._config["raw_img_shape_x"] = img_shape[1]
         self._config["raw_img_shape_y"] = img_shape[0]
 
-    def _calculate_final_image_shape(self):
-        """
-        Process the ROI inputs and store the ROI.
-        """
+    def _calculate_final_image_shape(self) -> None:
+        """Process the ROI inputs and store the ROI."""
         _binning = self.get_param_value("binning")
         if self.get_param_value("use_roi"):
             self.__check_roi_for_consistency()
@@ -372,7 +358,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         self._config["roi"] = _roi
         self._config["final_shape"] = _final_shape
 
-    def __check_roi_for_consistency(self):
+    def __check_roi_for_consistency(self) -> None:
         """
         Check the ROI for consistency.
 

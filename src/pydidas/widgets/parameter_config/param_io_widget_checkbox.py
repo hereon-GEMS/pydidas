@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ accepted by the Parameter is valid.
 """
 
 __author__ = ("Nonni Heere", "Malte Storm")
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,7 +34,6 @@ from typing import Any
 from qtpy import QtCore
 
 from pydidas.core import Parameter
-from pydidas.core.utils import IS_QT6
 from pydidas.widgets.factory import PydidasCheckBox
 from pydidas.widgets.parameter_config.base_param_io_widget import (
     BaseParamIoWidgetMixIn,
@@ -81,10 +80,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         self.setText(param.name)
         self.setEnabled(True in param.choices and False in param.choices)
         self.update_widget_value(param.value)
-        if IS_QT6:
-            self.checkStateChanged.connect(self.emit_signal)
-        else:
-            self.stateChanged.connect(self.emit_signal)
+        self.sig_check_state_changed.connect(self.emit_signal)
 
     @property
     def current_text(self) -> str:

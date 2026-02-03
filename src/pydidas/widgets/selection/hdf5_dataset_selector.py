@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ from a Hdf5 file and to browse through its data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,9 +38,9 @@ from pydidas.core import Parameter
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
     get_extension,
-    get_hdf5_populated_dataset_keys,
     update_child_qobject,
 )
+from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.widgets.utilities import (
     get_max_pixel_width_of_entries,
     get_pyqt_icon_from_str,
@@ -142,7 +142,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
                 font_metric_height_factor=2,
                 gridPos=(1 + _index // 3, _index % 3, 1, 1),
             )
-            self._widgets[f"check_filter_{_key}"].stateChanged.connect(
+            self._widgets[f"check_filter_{_key}"].sig_check_state_changed.connect(
                 partial(self._toggle_filter_key, _key)
             )
         for _col in range(3):
@@ -240,6 +240,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self._config["current_dataset"] = _dset
         self.sig_new_dataset_selected.emit(_dset)  # type: ignore[attr-defined]
 
+    @QtCore.Slot()
     def _toggle_filter_key(self, key: str) -> None:
         """
         Add or remove the filter key from the active dataset key filters.

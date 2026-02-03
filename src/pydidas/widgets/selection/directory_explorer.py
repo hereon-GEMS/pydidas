@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ QTreeView with a file system model.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -50,10 +50,6 @@ from pydidas.widgets.widget_with_parameter_collection import (
 )
 
 
-AscendingOrder = QtCore.Qt.AscendingOrder
-QSortFilterProxyModel = QtCore.QSortFilterProxyModel
-
-
 class DirectoryExplorer(WidgetWithParameterCollection):
     """
     The DirectoryExplorer is an implementation of a QTreeView widget with a
@@ -65,7 +61,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         Supported keywords are any keywords that are supported by QTreeView
         as well as:
 
-        parent : Union[QWidget, None], optional
+        parent : QtWidgets.QWidget or None, optional
             The parent widget, if applicable. The default is None.
         current_path : str, optional
             The default path in the file system. The default is ''.
@@ -81,9 +77,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._connect_signals()
 
     def _create_widgets(self) -> None:
-        """
-        Create the widgets required for the Directory explorer.
-        """
+        """Create the widgets required for the Directory explorer."""
         self.create_check_box(
             "map_network_drives",
             "Show network drives",
@@ -156,10 +150,10 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """Connect the signals of the widgets to the slots."""
         self._widgets["explorer"].clicked.connect(self.__file_highlighted)
         self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
-        self._widgets["map_network_drives"].stateChanged.connect(
+        self._widgets["map_network_drives"].sig_new_check_state.connect(
             self.__update_filesystem_network_drive_usage
         )
-        self._widgets["case_sensitive"].stateChanged.connect(
+        self._widgets["case_sensitive"].sig_new_check_state.connect(
             self.__update_filter_case_sensitivity
         )
         self.param_widgets["current_directory"].sig_new_value.connect(
@@ -218,9 +212,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     @QtCore.Slot()
     def __file_highlighted(self) -> None:
-        """
-        Store the selected filename after highlighting,
-        """
+        """Store the selected filename after highlighting."""
         _filter_index = self._widgets["explorer"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
@@ -230,9 +222,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     @QtCore.Slot()
     def __file_selected(self) -> None:
-        """
-        Open a file after sit has been selected in the DirectoryExplorer.
-        """
+        """Open a file after it has been selected in the DirectoryExplorer."""
         _filter_index = self._widgets["explorer"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)

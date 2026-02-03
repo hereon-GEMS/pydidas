@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ ScanContext metadata from a HDF5 file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ScanIoHdf5"]
 
 
-from typing import Union
+from typing import Any
 
 import h5py
 
@@ -38,8 +38,8 @@ from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
-from pydidas.core.utils.hdf5_dataset_utils import (
-    export_context_to_hdf5,
+from pydidas.core.utils.hdf5 import (
+    export_context_to_nxs,
     get_hdf5_populated_dataset_keys,
     read_and_decode_hdf5_dataset,
 )
@@ -57,7 +57,7 @@ class ScanIoHdf5(ScanIoBase):
     format_name = "HDF5"
 
     @classmethod
-    def export_to_file(cls, filename: str, **kwargs: dict):
+    def export_to_file(cls, filename: str, **kwargs: Any) -> None:
         """
         Write the ScanTree to a file.
 
@@ -65,13 +65,19 @@ class ScanIoHdf5(ScanIoBase):
         ----------
         filename : str
             The filename of the file to be written.
+        **kwargs : Any
+            Keyword arguments. Supported kwargs are:
+
+            scan : Scan, optional
+                The Scan instance to be exported. The default is the
+                ScanContext instance.
         """
         _scan = kwargs.get("scan", SCAN)
         cls.check_for_existing_file(filename, **kwargs)
-        export_context_to_hdf5(filename, _scan, "entry/pydidas_config/scan")
+        export_context_to_nxs(filename, _scan, "entry/pydidas_config/scan")
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Union[Scan, None] = None):
+    def import_from_file(cls, filename: str, scan: Scan | None = None) -> None:
         """
         Restore the ScanContext from a HDF5 file.
 
@@ -79,9 +85,9 @@ class ScanIoHdf5(ScanIoBase):
         ----------
         filename : str
             The filename of the file to be written.
-        scan : Union[None, pydidas.contexts.scan.Scan], optional
-            The Scan instance to be updated. If None, the ScanContext instance is used.
-            The default is None.
+        scan : Scan or None, optional
+            The Scan instance to be updated. If None, the ScanContext
+            instance is used. The default is None.
         """
 
         _scan = SCAN if scan is None else scan
@@ -104,8 +110,8 @@ class ScanIoHdf5(ScanIoBase):
                 )
         if catcher.raised_exception:
             raise UserConfigError(
-                f"Cannot interpret the selected file {filename} as a saved instance of "
-                "ScanContext. Please check the file format and "
-                "content."
+                f"Cannot interpret the selected file {filename} as a "
+                "saved instance of ScanContext. Please check the file "
+                "format and content."
             )
         cls.update_scan_from_import(scan)

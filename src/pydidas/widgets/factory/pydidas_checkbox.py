@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The PydidasCheckBox is a QCheckBox with font formatting and sizeHint adjustment.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,15 +29,21 @@ __all__ = ["PydidasCheckBox"]
 
 from typing import Any
 
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
+from pydidas.core.utils import IS_QT6
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
 class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
     """
     Create a QCheckBox with automatic font formatting.
+
+    Note that this class is not intended to be used with tri-state checkboxes.
     """
+
+    sig_new_check_state = QtCore.Signal(int)
+    sig_check_state_changed = QtCore.Signal()
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
@@ -53,3 +59,36 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
         kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 1)
         QtWidgets.QCheckBox.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
+        if IS_QT6:
+            self.checkStateChanged.connect(self._emit_signal_in_qt6)
+        else:
+            self.stateChanged.connect(self._emit_signal_in_qt5)
+
+    def _emit_signal_in_qt6(self, state: QtCore.Qt.CheckState) -> None:
+        """
+        Handle the signal emission in Qt6.
+
+        Parameters
+        ----------
+        state : QtCore.Qt.CheckState
+            The new check state.
+        """
+        if state == QtCore.Qt.CheckState.Checked:
+            self.sig_new_check_state.emit(1)
+        elif state == QtCore.Qt.CheckState.Unchecked:
+            self.sig_new_check_state.emit(0)
+        elif state == QtCore.Qt.CheckState.PartiallyChecked:
+            self.sig_new_check_state.emit(-1)
+        self.sig_check_state_changed.emit()
+
+    def _emit_signal_in_qt5(self, state: int) -> None:
+        """
+        Handle the signal emission in Qt5.
+
+        Parameters
+        ----------
+        state : int
+            The new check state.
+        """
+        self.sig_new_check_state.emit(int(self.isChecked()))
+        self.sig_check_state_changed.emit()

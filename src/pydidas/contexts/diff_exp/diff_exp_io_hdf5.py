@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,15 @@ DiffractionExperimentContext metadata from HDF5 files (written by pydidas).
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIoHdf5"]
 
+
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import h5py
 import numpy as np
@@ -41,13 +42,7 @@ from pydidas.core.constants import HDF5_EXTENSIONS, LAMBDA_IN_A_TO_E
 from pydidas.core.utils import (
     CatchFileErrors,
 )
-from pydidas.core.utils.hdf5_dataset_utils import (
-    export_context_to_hdf5,
-    read_and_decode_hdf5_dataset,
-)
-
-
-EXP = DiffractionExperimentContext()
+from pydidas.core.utils.hdf5 import export_context_to_nxs, read_and_decode_hdf5_dataset
 
 
 class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
@@ -59,40 +54,44 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
     format_name = "HDF5"
 
     @classmethod
-    def export_to_file(cls, filename: Path | str, **kwargs: dict):
+    def export_to_file(cls, filename: Path | str, **kwargs: Any) -> None:
         """
         Write the ExperimentalTree to a HDF5 file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file to be written.
-        diffraction_exp : DiffractionExperiment, optional
-            The DiffractionExperiment instance to be exported. The default is the
-            DiffractionExperimentContext.
+        **kwargs : Any
+            Keyword arguments. Supported kwargs are:
+
+            diffraction_exp : DiffractionExperiment, optional
+                The DiffractionExperiment instance to be exported. The
+                default is the DiffractionExperimentContext.
         """
-        _EXP = kwargs.get("diffraction_exp", EXP)
+        _EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         cls.check_for_existing_file(filename, **kwargs)
-        export_context_to_hdf5(filename, _EXP, "entry/pydidas_config/diffraction_exp")
+        export_context_to_nxs(filename, _EXP, "entry/pydidas_config/diffraction_exp")
 
     @classmethod
     def import_from_file(
         cls,
         filename: Path | str,
-        diffraction_exp: Union[DiffractionExperiment, None] = None,
-    ):
+        diffraction_exp: DiffractionExperiment | None = None,
+    ) -> None:
         """
         Restore the DiffractionExperimentContext from a HDF5 file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file to be written.
-        diffraction_exp : Union[DiffractionExperiment, None], optional
-            The DiffractionExperiment instance to be updated.
+        diffraction_exp : DiffractionExperiment or None, optional
+            The DiffractionExperiment instance to be updated. The default is
+            None.
         """
         if diffraction_exp is None:
-            diffraction_exp = EXP
+            diffraction_exp = DiffractionExperimentContext()
         with (
             CatchFileErrors(filename, KeyError, raise_file_read_error=False) as catcher,
             h5py.File(filename, "r") as file,
@@ -104,9 +103,9 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
                 )
         if catcher.raised_exception:
             raise UserConfigError(
-                f"Cannot interpret the selected file {filename} as a saved instance of "
-                "DiffractionExperimentContext. Please check the file format and "
-                "content."
+                f"Cannot interpret the selected file {filename} as a "
+                "saved instance of DiffractionExperimentContext. Please "
+                "check the file format and content."
             )
         cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
             "xray_wavelength", np.nan

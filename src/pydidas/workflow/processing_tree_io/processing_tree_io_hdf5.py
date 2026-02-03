@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the ProcessingTreeIoHdf5 class to import/export the WorkflowTree to 
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,13 +28,13 @@ __all__ = ["ProcessingTreeIoHdf5"]
 
 
 from pathlib import Path
-from typing import NewType
+from typing import Any, NewType
 
 import h5py
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import (
+from pydidas.core.utils.hdf5 import (
     create_nx_dataset,
     create_nx_entry_groups,
     read_and_decode_hdf5_dataset,
@@ -57,7 +57,9 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
     format_name = "HDF5"
 
     @classmethod
-    def export_to_file(cls, filename: Path | str, tree: ProcessingTree, **kwargs: dict):
+    def export_to_file(
+        cls, filename: Path | str, tree: ProcessingTree, **kwargs: Any
+    ) -> None:
         """
         Write the content to a file.
 
@@ -65,10 +67,12 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file to be written.
         tree : ProcessingTree
             The workflow tree instance.
+        **kwargs : Any
+            Additional keyword arguments.
         """
         cls.check_for_existing_file(filename, **kwargs)
         _group_name = "entry/pydidas_config"
@@ -86,8 +90,8 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : Path | str
-            The filename of the file to be written.
+        filename : Path or str
+            The filename of the file to be read.
 
         Returns
         -------

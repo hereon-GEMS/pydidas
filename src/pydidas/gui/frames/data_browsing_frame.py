@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ dedicated filesystem tree and show file data in a view window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -46,9 +46,9 @@ from pydidas.core.utils import (
     CatchFileErrors,
     formatted_str_repr_of_dict,
     get_extension,
-    get_hdf5_metadata,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
+from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, import_data, read_metadata
 from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     DATA_BROWSING_FRAME_BUILD_CONFIG,
@@ -57,7 +57,6 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
 from pydidas.widgets.framework import BaseFrame, PydidasWindow
 from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas.widgets.windows import Hdf5BrowserWindow
-from pydidas_qtcore import PydidasQApplication
 
 
 class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
@@ -87,7 +86,6 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
     def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         AssociatedFileMixin.__init__(self, **kwargs)
-        self.__qtapp = PydidasQApplication.instance()
         self.__supported_extensions = set(IoManager.registry_import.keys())
         self.__open_file = None
         self.__hdf5node = Hdf5Node()
@@ -154,7 +152,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
     @QtCore.Slot(str)
     def __file_selected(self, filename: str) -> None:
         """
-        Open a file after sit has been selected in the DirectoryExplorer.
+        Open a file after it has been selected in the DirectoryExplorer.
 
         Parameters
         ----------
@@ -216,12 +214,14 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
 
         Parameters
         ----------
-        data : Dataset | H5Node
+        data : Dataset or H5Node
             The data to display.
-        h5node : H5Node | None
-            The H5Node if the data is from a hdf5 file.
-        title : str | None
-            The title to display in the viewer window.
+        h5node : H5Node or None, optional
+            The H5Node if the data is from a hdf5 file. The default is
+            None.
+        title : str or None, optional
+            The title to display in the viewer window. The default is
+            None.
         """
         title = Path(self.current_filename).name if title is None else title
         self._widgets["viewer"].set_data(data, title=title, h5node=h5node)

@@ -82,6 +82,8 @@ class ProcessingResultIoMeta(GenericIoMeta):
         cls.scan_title = title
         for _saver in savers:
             _saver = _saver.lower()
+            if not _saver.startswith("."):
+                _saver = "." + _saver
             if not (_saver is None or _saver == "None"):
                 cls.verify_extension_is_registered(_saver)
                 if _saver not in cls.active_savers:

@@ -78,11 +78,13 @@ class ScanIo(GenericIoMeta):
             else cls.registry
         )
         for _ext in new_class.extensions:
-            if _ext in _ref_registry and not update_registry:
+            if not _ext.startswith("."):
+                _ext = "." + _ext
+            if _ext.lower() in _ref_registry and not update_registry:
                 raise KeyError(
-                    f"A class has already been registered for the extension {_ext}."
+                    f"A class has already been registered for the extension `{_ext.lower()}`."
                 )
-            _ref_registry[_ext] = new_class
+            _ref_registry[_ext.lower()] = new_class
 
     @classmethod
     def clear_registry(cls):

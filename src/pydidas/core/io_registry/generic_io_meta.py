@@ -93,11 +93,13 @@ class GenericIoMeta(type):
             registered and update_registry is False.
         """
         for _ext in new_class.extensions:
-            if _ext in cls.registry and not update_registry:
+            if not _ext.startswith("."):
+                _ext = "." + _ext
+            if _ext.lower() in cls.registry and not update_registry:
                 raise KeyError(
-                    f"A class has already been registered for the extension {_ext}."
+                    f"A class has already been registered for the extension `{_ext.lower()}`."
                 )
-            cls.registry[_ext] = new_class
+            cls.registry[_ext.lower()] = new_class
 
     @classmethod
     def verify_extension_is_registered(cls, ext):
@@ -136,6 +138,8 @@ class GenericIoMeta(type):
         bool
             Flag whether the extension is registered or not.
         """
+        if not extension.startswith("."):
+            extension = "." + extension
         if extension.lower() in cls.registry:
             return True
         return False

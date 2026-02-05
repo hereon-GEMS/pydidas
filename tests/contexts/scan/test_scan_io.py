@@ -112,16 +112,25 @@ def test_clear_registry(clean_scan_io_registry):
 
 
 @pytest.mark.parametrize(
-    "format, _callable",
-    [["test", create_test_class], ["bl_test", create_bl_test_class]],
+    "format_key, _callable, input_ext",
+    [
+        ["test", create_test_class, None],
+        ["bl_test", create_bl_test_class, None],
+        ["test", create_test_class, "TEST"],
+    ],
 )
-def test_is_extension_registered(format, _callable, temp_path, clean_scan_io_registry):
-    _class = _callable()
-    if format == "bl_test":
+def test_is_extension_registered(
+    format_key, _callable, input_ext, temp_path, clean_scan_io_registry
+):
+    if input_ext:
+        _class = _callable(extensions=[input_ext])
+    else:
+        _class = _callable()
+    if format_key == "bl_test":
         assert ".bl_test" in ScanIo.beamline_format_registry
     else:
-        assert "." + format in ScanIo.registry
-    assert ScanIo.is_extension_registered("." + format)
+        assert "." + format_key in ScanIo.registry
+    assert ScanIo.is_extension_registered("." + format_key)
 
 
 def test_is_extension_registered__false(clean_scan_io_registry):

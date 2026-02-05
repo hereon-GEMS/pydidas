@@ -345,9 +345,9 @@ GENERIC_PARAMS_OTHER = {
     },
     "autosave_format": {
         "type": str,
-        "default": ".HDF5",
+        "default": "HDF5",
         "name": "Autosave formats",
-        "choices": [None, ".HDF5"],
+        "choices": [None, "HDF5"],
         "unit": "",
         "allow_None": True,
         "tooltip": (

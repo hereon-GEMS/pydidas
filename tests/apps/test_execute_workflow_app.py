@@ -44,7 +44,7 @@ from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import PydidasQsettings, UserConfigError, get_generic_parameter, utils
 from pydidas.core.utils import get_random_string
-from pydidas.multiprocessing import app_processor
+from pydidas.multiprocessing import app_processor_func
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
@@ -684,7 +684,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             **_queues,
         }
         _proc = mp.Process(
-            target=app_processor,
+            target=app_processor_func,
             args=(
                 _mp_kwargs,
                 ExecuteWorkflowApp,

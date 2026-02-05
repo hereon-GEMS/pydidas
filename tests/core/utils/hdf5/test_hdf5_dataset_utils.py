@@ -41,11 +41,11 @@ from pydidas.core.utils.hdf5 import (
     create_nxdata_entry,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
-    hdf5_dataset_filter_check,
     read_and_decode_hdf5_dataset,
     verify_hdf5_dset_exists_in_file,
 )
 from pydidas.core.utils.hdf5.hdf5_dataset_utils import (
+    _dataset_selection_valid_check,
     _split_hdf5_file_and_dataset_names,
 )
 from pydidas.core.utils.hdf5.nxs_export import _get_nx_class_for_ndarray
@@ -191,13 +191,13 @@ def test_get_hdf5_metadata_meta__no_such_dset(hdf5_test_data):
 
 
 def test_hdf5_dataset_filter_check__no_dset():
-    assert not hdf5_dataset_filter_check("something")
+    assert not _dataset_selection_valid_check("something")
 
 
 @pytest.mark.parametrize("min_dim", [1, 2, 3, 4, 5])
 def test_hdf5_dataset_filter_check__dim(hdf5_test_data, min_dim):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
-        assert hdf5_dataset_filter_check(_file[_4d_DSETS[0]], min_dim=min_dim) == (
+        assert _dataset_selection_valid_check(_file[_4d_DSETS[0]], min_dim=min_dim) == (
             min_dim <= 4
         )
 
@@ -205,7 +205,7 @@ def test_hdf5_dataset_filter_check__dim(hdf5_test_data, min_dim):
 def test_hdf5_dataset_filter_check__ignore_keys(hdf5_test_data):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
         assert "4ddata" in _file["/test/path/"].keys()
-        assert not hdf5_dataset_filter_check(
+        assert not _dataset_selection_valid_check(
             _file["/test/path/4ddata"], ignore_keys=("test/path")
         )
 
@@ -265,6 +265,15 @@ def test_get_hdf5_populated_dataset_keys__nxsignal_only(hdf5_test_data, nxsignal
             for _i in range(4):
                 _expected.append(os.path.split(_dset)[0] + f"/ax{_i}")
         assert set(_res) == set(_expected)
+
+
+def test_get_hdf5_populated_dataset_keys__with_ignore_exception(hdf5_test_data):
+    _res = get_hdf5_populated_dataset_keys(
+        hdf5_test_data["fname"],
+        ignore_keys=["/data/3d/"],
+        ignore_key_exceptions=("/data/3d/data",),
+    )
+    assert "/data/3d/data" in _res
 
 
 def test_convert_data_for_writing_to_hdf5_dataset__None():

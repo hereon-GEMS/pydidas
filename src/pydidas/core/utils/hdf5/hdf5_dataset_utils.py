@@ -26,7 +26,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "hdf5_dataset_filter_check",
     "get_hdf5_populated_dataset_keys",
     "get_hdf5_metadata",
     "create_hdf5_dataset",
@@ -91,6 +90,11 @@ def get_hdf5_populated_dataset_keys(
             Dataset keys (or snippets of key names) to be ignored. Any keys
             starting with any of the items in this list are ignored. The
             default is None.
+        ignore_key_exceptions : list or tuple or None, optional
+            Dataset keys (or snippets of key names) which are exceptions to the
+            ignore_keys. Any item in this group is  not ignored, even if they
+            start with any of the items in the ignore_keys list.
+            The default is None.
         nxdata_signal_only : bool, optional
             Flag to toggle displaying only datasets in NXdata groups which
             have the 'signal' attribute set to 1. If the group does not
@@ -112,7 +116,7 @@ def get_hdf5_populated_dataset_keys(
         criteria.
     """
     if isinstance(item, h5py.Dataset):
-        return [item.name] if hdf5_dataset_filter_check(item, **kwargs) else []
+        return [item.name] if _dataset_selection_valid_check(item, **kwargs) else []
 
     _file_to_open = isinstance(item, (str, Path))
     if _file_to_open:
@@ -138,7 +142,7 @@ def get_hdf5_populated_dataset_keys(
             if file_ref == _item.file:
                 _datasets += get_hdf5_populated_dataset_keys(item[key], **kwargs)
             else:
-                if hdf5_dataset_filter_check(_item, **kwargs):
+                if _dataset_selection_valid_check(_item, **kwargs):
                     # external datasets are referenced by their .name
                     # in the external datafile, not the current file.
                     _datasets += [f"{item.name}/{key}"]
@@ -152,9 +156,9 @@ def get_hdf5_populated_dataset_keys(
     return _datasets
 
 
-def hdf5_dataset_filter_check(item: Any, **kwargs: Any) -> bool:
+def _dataset_selection_valid_check(item: Any, **kwargs: Any) -> bool:
     """
-    Check if a h5py item is a dataset matching filter criteria.
+    Check if a h5py item is a valid selection based on kwargs settings.
 
     This function checks if an item is an instance of h5py.Dataset and if it
     fulfills the defined filtering criteria for minimum data size, minimum
@@ -181,6 +185,11 @@ def hdf5_dataset_filter_check(item: Any, **kwargs: Any) -> bool:
             A list or tuple of strings. If the dataset key starts with any
             of the entries, the dataset is ignored. The default is an
             empty tuple.
+        ignore_key_exceptions : list or tuple or None, optional
+            Dataset keys (or snippets of key names) which are exceptions to the
+            ignore_keys. Any item in this group is  not ignored, even if they
+            start with any of the items in the ignore_keys list.
+            The default is None.
 
     Returns
     -------
@@ -191,13 +200,18 @@ def hdf5_dataset_filter_check(item: Any, **kwargs: Any) -> bool:
     """
     if not isinstance(item, h5py.Dataset):
         return False
+    _name = item.name
+    _shape = item.shape
     _max_dim = kwargs.get("max_dim", None)
-    return (
-        item.size >= kwargs.get("min_size", 0)
-        and not item.name.startswith(tuple(kwargs.get("ignore_keys", ())))
-        and kwargs.get("min_dim", 2) <= len(item.shape)
+    _valid_name = _name in kwargs.get(
+        "ignore_key_exceptions", ()
+    ) or not _name.startswith(tuple(kwargs.get("ignore_keys", ())))
+    _valid_shape = (
+        kwargs.get("min_dim", 2) <= len(_shape)
         and (_max_dim is None or len(item.shape) <= _max_dim)  # type: ignore[operator]
     )
+    _valid_size = item.size >= kwargs.get("min_size", 0)
+    return _valid_size and _valid_name and _valid_shape
 
 
 def get_hdf5_metadata(
@@ -446,9 +460,13 @@ def get_generic_dataset(datasets: Sequence[str]) -> str:
         raise ValueError(
             "The datasets list is empty. Cannot determine generic dataset."
         )
-    if "entry/data/data" in datasets:
+    if "/entry/data/data" in datasets:
         # this is the standard NeXus path for generic data
-        return "entry/data/data"
+        return "/entry/data/data"
+    if "/entry/data/data_000001" in datasets:
+        # this is the standard HDF5 path for Eiger data when not
+        # stored in a NeXus file.
+        return "/entry/data/data_000001"
     if "/entry/instrument/detector/data" in datasets:
         # this is the standard NeXus path for LAMBDA detectors
         return "/entry/instrument/detector/data"

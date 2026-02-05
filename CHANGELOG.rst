@@ -8,6 +8,11 @@
 vyy.mm.dd
 =========
 
+Improvements
+------------
+- Added an option to exclude specific HDF5 dataset keys from filters
+  (e.g. necessary for Lambda files)
+
 Programmatic changes
 --------------------
 - Refactored the HDF5 processing tools.

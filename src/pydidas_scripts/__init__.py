@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,10 +23,13 @@ It is being developed by Helmholtz-Zentrum Hereon.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+# import pydidas_qtcore to set up the QApplication and assure
+# that the QT_API is set correctly
+import pydidas_qtcore as __pydidas_qtcore  # noqa: F401
 from . import clear_local_settings, pydidas_gui, remove_local_files, remove_pydidas

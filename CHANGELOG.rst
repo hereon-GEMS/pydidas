@@ -15,7 +15,9 @@ Programmatic changes
 Bugfixes
 --------
 - Fixed an isssue with QCheckBox signals in Qt6.
-
+- Fixed an issue with loading the correct Qt version when running a script 
+  from pydidas_scripts through legacy calling (on Windows standalone systems).
+  
 
 v26.01.27
 =========

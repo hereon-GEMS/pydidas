@@ -35,7 +35,7 @@ from typing import Any, Callable
 
 import numpy as np
 
-from pydidas.multiprocessing import processor
+from pydidas.multiprocessing import processor_func
 
 
 def _test_func(
@@ -57,7 +57,7 @@ class _ProcThread(threading.Thread):
         self._mp_config = mp_config
 
     def run(self) -> None:
-        processor(
+        processor_func(
             self.func,
             self._mp_config,
             *self._args,
@@ -104,7 +104,7 @@ class Test_processor(unittest.TestCase):
 
     def test_run__plain(self) -> None:
         self.put_ints_in_queue()
-        processor(lambda x: x, self._queues)
+        processor_func(lambda x: x, self._queues)
         _input, _output = self.get_results()
         self.assertTrue((_input == _output).all())  # type: ignore[union-attr]
 
@@ -127,7 +127,7 @@ class Test_processor(unittest.TestCase):
     def test_run__with_args(self) -> None:
         _args = (0, 1)
         self.put_ints_in_queue()
-        processor(_test_func, self._queues, *_args)
+        processor_func(_test_func, self._queues, *_args)
         _input, _output = self.get_results()
         _direct_out = _test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())  # type: ignore[union-attr]
@@ -137,9 +137,9 @@ class Test_processor(unittest.TestCase):
         self.put_ints_in_queue()
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
-        processor(_test_func, self._queues)
+        processor_func(_test_func, self._queues)
         sys.stdout = old_stdout
-        # Assert that the processor returned directly and did not wait for any
+        # Assert that the processor_func returned directly and did not wait for any
         # queue timeouts.
         self.assertTrue(len(mystdout.getvalue()) > 0)
         self.assertEqual(self._queues["queue_shutting_down"].get(), 1)
@@ -148,7 +148,7 @@ class Test_processor(unittest.TestCase):
         _args = (0, 1)
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
-        processor(
+        processor_func(
             _test_func,
             self._queues,
             *_args,
@@ -163,7 +163,7 @@ class Test_processor(unittest.TestCase):
         _args = (0, 1)
         self.put_ints_in_queue()
         app = AppWithFunc()
-        processor(app.test_func, self._queues, *_args)
+        processor_func(app.test_func, self._queues, *_args)
         _input, _output = self.get_results()
         _direct_out = app.test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())  # type: ignore[union-attr]

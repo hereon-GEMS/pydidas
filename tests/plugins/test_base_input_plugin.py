@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -191,7 +191,7 @@ def test_get_filename(offset, delta, frame_index, images_per_file, reset_scan):
     assert _fname == _input_fname.format(index=_target_index)
 
 
-@pytest.mark.parametrize("ext", ["tif", "npy", "h5"])
+@pytest.mark.parametrize("ext", [".tif", ".npy", ".h5"])
 def test_input_available__file_exists_and_readable(temp_dir_w_file, ext, reset_scan):
     _data = np.zeros((10, 10))
     _fname = temp_dir_w_file / f"test_dummy.{ext}"
@@ -201,9 +201,9 @@ def test_input_available__file_exists_and_readable(temp_dir_w_file, ext, reset_s
     assert plugin.input_available(5)
 
 
-@pytest.mark.parametrize("ext", ["tif", "npy", "h5"])
+@pytest.mark.parametrize("ext", [".tif", ".npy", ".h5"])
 def test_input_available__file_exists_w_no_data(temp_dir_w_file, ext, reset_scan):
-    _fname = temp_dir_w_file / f"test_empty_dummy.{ext}"
+    _fname = temp_dir_w_file / f"test_empty_dummy{ext}"
     with open(_fname, "wb") as f:
         f.write(b"")
     plugin = _TestInputPlugin(filename=_fname)

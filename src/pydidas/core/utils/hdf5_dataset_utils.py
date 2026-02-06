@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a list of all dataset keys which fulfill certain filter criteria.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -123,7 +123,7 @@ def get_hdf5_populated_dataset_keys(
         item = Path(item)
         if not item.is_file():
             raise FileReadError("The specified file does not exist.")
-        if item.suffix.removeprefix(".") not in HDF5_EXTENSIONS:
+        if item.suffix not in HDF5_EXTENSIONS:
             raise FileReadError(
                 "The specified file does not have a recognized hdf5 extension."
             )

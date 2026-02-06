@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -119,7 +119,7 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         _cls = META(
             title.upper(),
             (ProcessingResultIoBase,),
-            dict(extensions=[ext.upper()], format_name=ext),
+            dict(extensions=[ext.lower()], format_name=ext),
         )
         return _cls
 
@@ -179,24 +179,24 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
 
     def test_set_active_savers_and_title(self):
         _title = "no title"
-        self.create_saver_class("SAVER", "Test")
-        self.create_saver_class("SAVER2", "Test2")
-        META.set_active_savers_and_title(["TEST", "TEST2"], _title)
-        self.assertTrue("TEST" in META.active_savers)
-        self.assertTrue("TEST2" in META.active_savers)
+        self.create_saver_class("SAVER", ".Test")
+        self.create_saver_class("SAVER2", ".Test2")
+        META.set_active_savers_and_title([".TEST", ".TEST2"], _title)
+        self.assertTrue(".test" in META.active_savers)
+        self.assertTrue(".test2" in META.active_savers)
         self.assertEqual(META.scan_title, _title)
 
     def test_set_active_savers_and_title__not_registered(self):
         self.create_saver_class("SAVER", ".Test")
         with self.assertRaises(UserConfigError):
-            META.set_active_savers_and_title(["TEST", "TEST2"])
+            META.set_active_savers_and_title([".TEST", ".TEST2"])
 
     def test_export_frame_to_file(self):
         _index = 127
         _frame_results = {1: np.random.random((10, 10)), 2: np.random.random((11, 27))}
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.export_frame_to_file = classmethod(export_frame_to_file)
-        META.export_frame_to_file(_index, "TEST", _frame_results)
+        META.export_frame_to_file(_index, ".TEST", _frame_results)
         self.assertTrue(
             np.equal(_Saver._exported["frame_results"][1], _frame_results[1]).all()
         )
@@ -207,9 +207,9 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
     def test_export_frame_to_active_savers(self):
         _index = 127
         _frame_results = {1: np.random.random((10, 10)), 2: np.random.random((11, 27))}
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.export_frame_to_file = classmethod(export_frame_to_file)
-        META.set_active_savers_and_title(["TEST"])
+        META.set_active_savers_and_title([".TEST"])
         META.export_frame_to_active_savers(_index, _frame_results)
         self.assertTrue(
             np.equal(_Saver._exported["frame_results"][1], _frame_results[1]).all()
@@ -220,9 +220,9 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
 
     def test_push_metadata_to_active_savers(self):
         _metadata = self.generate_test_metadata()
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.update_metadata = classmethod(update_metadata)
-        META.set_active_savers_and_title(["TEST"])
+        META.set_active_savers_and_title([".TEST"])
         META.push_metadata_to_active_savers(_metadata)
         self.assertEqual(_Saver._metadata, _metadata)
 
@@ -231,9 +231,9 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
             1: np.random.random((10, 10, 10)),
             2: np.random.random((11, 27, 25)),
         }
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
-        META.set_active_savers_and_title(["TEST"])
+        META.set_active_savers_and_title([".TEST"])
         META.export_full_data_to_active_savers(_results)
         self.assertTrue(np.allclose(_Saver._exported["full_data"][1], _results[1]))
         self.assertTrue(np.allclose(_Saver._exported["full_data"][2], _results[2]))
@@ -243,9 +243,9 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
             1: np.random.random((10, 10, 10)),
             2: np.random.random((11, 27, 25)),
         }
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
-        META.export_full_data_to_file("TEST", _frame_results)
+        META.export_full_data_to_file(".TEST", _frame_results)
         self.assertTrue(
             np.allclose(_Saver._exported["full_data"][1], _frame_results[1])
         )
@@ -255,17 +255,17 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
 
     def test_prepare_active_savers(self):
         _save_dir, _node_info = self.get_save_dir_and_node_info()
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.prepare_files_and_directories = classmethod(
             prepare_files_and_directories
         )
-        META.set_active_savers_and_title(["TEST"])
+        META.set_active_savers_and_title([".TEST"])
         META.prepare_active_savers(_save_dir, _node_info)
         self.assertEqual(_Saver._prepared["save_dir"], _save_dir)
         self.assertEqual(_Saver._prepared["node_info"], _node_info)
 
     def test_import_data_from_directory(self):
-        _Saver = self.create_saver_class("SAVER", "Test")
+        _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.import_results_from_file = classmethod(import_results)
         for _id in [1, 3]:
             with open(os.path.join(self._dir, f"node_{_id:02d}.TEST"), "w") as _file:

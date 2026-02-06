@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -65,7 +65,7 @@ def create_test_class(
             "import_filename": None,
             "export_to_file": classmethod(export_to_file),
             "import_from_file": classmethod(import_from_file),
-            "extensions": extensions if extensions is not None else ["test"],
+            "extensions": extensions if extensions is not None else [".test"],
             "format_name": format_name if format_name is not None else "Test",
         }
         | kwargs,
@@ -78,7 +78,7 @@ def create_bl_test_class(
 ) -> type:
     _class = create_test_class(
         "TestIoBeamline" if class_name is None else class_name,
-        extensions=extensions if extensions is not None else ["bl_test"],
+        extensions=extensions if extensions is not None else [".bl_test"],
         format_name=format_name if format_name is not None else "Beamline Test",
         beamline_format=True,
         import_only=True,
@@ -112,16 +112,25 @@ def test_clear_registry(clean_scan_io_registry):
 
 
 @pytest.mark.parametrize(
-    "format, _callable",
-    [["test", create_test_class], ["bl_test", create_bl_test_class]],
+    "format_key, _callable, input_ext",
+    [
+        ["test", create_test_class, None],
+        ["bl_test", create_bl_test_class, None],
+        ["test", create_test_class, "TEST"],
+    ],
 )
-def test_is_extension_registered(format, _callable, temp_path, clean_scan_io_registry):
-    _class = _callable()
-    if format == "bl_test":
-        assert "bl_test" in ScanIo.beamline_format_registry
+def test_is_extension_registered(
+    format_key, _callable, input_ext, temp_path, clean_scan_io_registry
+):
+    if input_ext:
+        _class = _callable(extensions=[input_ext])
     else:
-        assert format in ScanIo.registry
-    assert ScanIo.is_extension_registered(format)
+        _class = _callable()
+    if format_key == "bl_test":
+        assert ".bl_test" in ScanIo.beamline_format_registry
+    else:
+        assert "." + format_key in ScanIo.registry
+    assert ScanIo.is_extension_registered("." + format_key)
 
 
 def test_is_extension_registered__false(clean_scan_io_registry):
@@ -148,7 +157,7 @@ def test_export_to_file__import_only_format(temp_path, clean_scan_io_registry):
 def test_export_to_file__bl_format(temp_path, clean_scan_io_registry):
     _test_class_bl_format = create_bl_test_class()
     _fname = temp_path / "test.bl_test"
-    ScanIo.beamline_format_registry["bl_test"].import_only = False
+    ScanIo.beamline_format_registry[".bl_test"].import_only = False
     ScanIo.export_to_file(_fname)
     assert _test_class_bl_format.exported
     assert _test_class_bl_format.export_filename == _fname
@@ -157,7 +166,7 @@ def test_export_to_file__bl_format(temp_path, clean_scan_io_registry):
 def test_export_to_file__import_only(temp_path, clean_scan_io_registry):
     _fname = temp_path / "test.test"
     _class = create_test_class()
-    ScanIo.registry["test"].import_only = True
+    ScanIo.registry[".test"].import_only = True
     with pytest.raises(UserConfigError):
         ScanIo.export_to_file(_fname)
 
@@ -198,16 +207,16 @@ def test_get_string_of_beamline_formats(clean_scan_io_registry):
 
 
 def test_register_class__w_existing_entry(clean_scan_io_registry):
-    ScanIo.registry["test"] = 42
+    ScanIo.registry[".test"] = 42
     with pytest.raises(KeyError):
         _class = create_test_class()
 
 
 def test_register_class__w_update_and_existing_entry(clean_scan_io_registry):
     _class = create_test_class()
-    ScanIo.registry["test"] = "dummy"
+    ScanIo.registry[".test"] = "dummy"
     ScanIo.register_class(_class, update_registry=True)
-    assert ScanIo.registry["test"] == _class
+    assert ScanIo.registry[".test"] == _class
 
 
 def test_get_io_class__w_bl_format(clean_scan_io_registry):

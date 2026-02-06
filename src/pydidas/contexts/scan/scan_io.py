@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ exporter/importer classes for the ScanContext singleton and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,11 +78,13 @@ class ScanIo(GenericIoMeta):
             else cls.registry
         )
         for _ext in new_class.extensions:
-            if _ext in _ref_registry and not update_registry:
+            if not _ext.startswith("."):
+                _ext = "." + _ext
+            if _ext.lower() in _ref_registry and not update_registry:
                 raise KeyError(
-                    f"A class has already been registered for the extension {_ext}."
+                    f"A class has already been registered for the extension `{_ext.lower()}`."
                 )
-            _ref_registry[_ext] = new_class
+            _ref_registry[_ext.lower()] = new_class
 
     @classmethod
     def clear_registry(cls):
@@ -207,7 +209,7 @@ class ScanIo(GenericIoMeta):
         kwargs : Any
             Any kwargs which should be passed to the underlying exporter.
         """
-        _extension = get_extension(filename, lowercase=False)
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         if _extension in cls.registry:
             _io_class = cls.registry[_extension]
@@ -257,8 +259,8 @@ class ScanIo(GenericIoMeta):
             _cls.format_name: _cls.extensions
             for _cls in cls.beamline_format_registry.values()
         }
-        _extensions = [f"*.{_key}" for _key in cls.beamline_format_registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.beamline_format_registry.keys()]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+            f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)

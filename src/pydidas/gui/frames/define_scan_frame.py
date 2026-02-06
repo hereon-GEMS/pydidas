@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore, QtGui
 
 from pydidas.contexts import ScanContext, ScanIo
-from pydidas.core import UserConfigError, constants, utils
+from pydidas.core import Parameter, UserConfigError, constants, utils
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     FONT_METRIC_SPACER,
@@ -69,6 +69,9 @@ DIM_LABELS = {
         3: "\nScan dimension 3 (fastest):",
     },
 }
+_DERIVED_N_FRAMES_PARAM = Parameter(
+    "derived_n_frames", int, 0, name="Derived total number of frames/spectra"
+)
 
 
 class DefineScanFrame(BaseFrame):
@@ -85,6 +88,7 @@ class DefineScanFrame(BaseFrame):
         self._io_dialog = PydidasFileDialog()
         self._qtapp = PydidasQApplication.instance()
         self.params.update(SCAN.params)
+        self.add_param(_DERIVED_N_FRAMES_PARAM)
 
     def build_frame(self) -> None:
         """
@@ -99,6 +103,7 @@ class DefineScanFrame(BaseFrame):
             getattr(self, _name)(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
+        self.param_composite_widgets["derived_n_frames"].io_widget.setEnabled(False)
 
     def connect_signals(self) -> None:
         """
@@ -132,6 +137,8 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].sig_new_value.connect(
             self.set_new_base_directory
         )
+        for _widget in self.param_composite_widgets.values():
+            _widget.sig_value_changed.connect(self._update_derived_n_frames)
 
     def finalize_ui(self) -> None:
         """
@@ -140,6 +147,7 @@ class DefineScanFrame(BaseFrame):
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
+        self._update_derived_n_frames()
 
     @QtCore.Slot()
     def update_dim_visibility(self) -> None:
@@ -323,3 +331,8 @@ class DefineScanFrame(BaseFrame):
         """Show the documentation about scan file naming."""
         _qurl = doc_qurl_for_rel_address("manuals/global/scan/file_naming_help.html")
         _ = QtGui.QDesktopServices.openUrl(_qurl)
+
+    @QtCore.Slot()
+    def _update_derived_n_frames(self) -> None:
+        """Update the derived total number of frames/spectra in the scan."""
+        self.set_param_and_widget_value("derived_n_frames", SCAN.n_frames_required)

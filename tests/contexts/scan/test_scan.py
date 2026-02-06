@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -84,6 +84,36 @@ def test_ndim():
     scan = Scan()
     set_scan_params(scan)
     assert scan.ndim == 4
+
+
+@pytest.mark.parametrize(
+    "n, m, delta, expected",
+    [
+        (8, 3, 1, 10),
+        (10, 1, 1, 10),
+        (4, 1, 3, 10),
+        (8, 6, 4, 34),
+        (6, 5, 3, 20),
+        (6, 1, 4, 21),
+        (6, 45, 15, 120),
+    ],
+)
+@pytest.mark.parametrize("ndims", [1, 2, 3])
+def test_n_frames_required(ndims, n, m, delta, expected):
+    scan = Scan()
+    scan.set_param_value("scan_dim", ndims)
+    if ndims == 1:
+        scan.set_param_value("scan_dim0_n_points", n)
+    elif ndims == 2:
+        scan.set_param_value("scan_dim0_n_points", n // 2)
+        scan.set_param_value("scan_dim1_n_points", 2)
+    elif ndims == 3:
+        scan.set_param_value("scan_dim0_n_points", n // 2)
+        scan.set_param_value("scan_dim1_n_points", 1)
+        scan.set_param_value("scan_dim2_n_points", 2)
+    scan.set_param_value("frame_indices_per_scan_point", delta)
+    scan.set_param_value("scan_frames_per_point", m)
+    assert scan.n_frames_required == expected
 
 
 @pytest.mark.parametrize(

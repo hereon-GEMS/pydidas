@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2025, Helmholtz-Zentrum Hereon
+    Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _multi_frame_help:
@@ -47,7 +47,7 @@ and 3 frames are processed at each scan point, the number of scan points cannot 
 larger than 10. If n_frames is the total number of frames, delta is the increment of
 the frame index per scan point, and m_frames is the number of frames processed at
 each scan point, the maximum number of scan points is given by:
-``max_scan_points = (n_frames - m_frames + 1) / delta``, rounded down to the nearest
+``max_scan_points = 1 + (n_frames - m_frames) / delta``, rounded down to the nearest
 integer. Please consult the table below for examples of how
 the number of scan points must be adjusted depending on the parameters:
 
@@ -66,21 +66,24 @@ the number of scan points must be adjusted depending on the parameters:
 | 30             | 1                      | 3                   | 28                   |
 +----------------+------------------------+---------------------+----------------------+
 |                | If 3 frames are processed at each scan point, the maximum number of |
-|                | scan points must be reduced by 2. The scan point #28 will use the   |  
-|                | frames #28, #29, and #30 and scan point #29 would require up to     |
-|                | frame #31.                                                          |                             
+|                | scan points must be reduced by 2. The scan point #27 (*) will use   |
+|                | the frames #27, #28, and #29 and scan point #29 would require up to |
+|                | frame #30.                                                          |
+|                |                                                                     |
+|                | (*) Note that counting starts at 0, i.e. #27 is the 28th scan point.|
 +----------------+------------------------+---------------------+----------------------+
-| 30             | 4                      | 6                   | 6                    |
+| 30             | 4                      | 6                   | 7                    |
 +----------------+------------------------+---------------------+----------------------+
 |                | Because 6 frames are processed at each scan point, the maximum      |
-|                | number of scan points must be reduced by 5. Since the frame index   |
+|                | number of scan points must be reduced by 6. Since the frame index   |
 |                | is incremented by 4 for each scan point, the maximum number of scan |
-|                | points must be divided by 4. Therefore, a total of (30 - 6 + 1)     |
-|                | / 4 = 6 scan points can be used. The last scan point #5 (*) will    |
-|                | use the frames #20, #21, #22, #23, #24, and #25. The scan point #6  |
-|                | would require up to frame #30 which is not available (**).          |
+|                | points must be divided by 4. Finally, add one for the initial       |
+|                | point. Therefore, a total of 1 + (30 - 6) / 4 = 1 + 6 = 7           |
+|                | scan points can be used. The last scan point #6 (*) will            |
+|                | use the frames #24, #25, #26, #27, #28, and #29. The scan point #7  |
+|                | would require images up to frame #33 which are not available (**).  |
 |                |                                                                     |
-|                | (*) Note that counting starts at 0, i.e. #5 is the 6th scan point.  |
+|                | (*) Note that counting starts at 0, i.e. #6 is the 7th scan point.  |
 |                |                                                                     |
 |                | (**) The 30 frames include the frames #0 to #29.                    |
 +----------------+------------------------+---------------------+----------------------+

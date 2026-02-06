@@ -12,6 +12,8 @@ Improvements
 ------------
 - Added an option to exclude specific HDF5 dataset keys from filters
   (e.g. necessary for Lambda files)
+- Added an info field to the DefineScanFrame to show the required total 
+  number of frames/spectra for the configured scan.
 
 Programmatic changes
 --------------------
@@ -22,6 +24,9 @@ Bugfixes
 - Fixed an isssue with QCheckBox signals in Qt6.
 - Fixed an issue with loading the correct Qt version when running a script 
   from pydidas_scripts through legacy calling (on Windows standalone systems).
+- Fixed an issue when selecting a Kratky-type plot.
+- Fixed an issue in the calculation of the required number of frames/spectra
+  for a scan with multiple images per point.
   
 
 v26.01.27

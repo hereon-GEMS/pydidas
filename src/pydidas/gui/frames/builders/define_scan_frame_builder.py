@@ -285,6 +285,12 @@ DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = 
         __param_widget_config("scan_frames_per_point", **_WIDE_PARAM_KWARGS),
         __param_widget_config("scan_multi_frame_handling", **_WIDE_PARAM_KWARGS),
         [
+            "create_spacer",
+            ("derived_n",),
+            {"fixedHeight": 10, "parent_widget": "config_global"},
+        ],
+        __param_widget_config("derived_n_frames", **_WIDE_PARAM_KWARGS),
+        [
             "create_button",
             ("but_save", "Export scan settings"),
             {

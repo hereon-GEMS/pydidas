@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ and allows to get the importers/exporters based on the file extension.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -95,14 +95,14 @@ class IoManager(type):
             if _ext in cls.registry_export and not update_registry:
                 raise KeyError(
                     "An export class has already been registered "
-                    f'for the extension "{_ext}."'
+                    f"for the extension `{_ext}`."
                 )
             cls.registry_export[_ext] = new_class
         for _ext in new_class.extensions_import:
             if _ext in cls.registry_import and not update_registry:
                 raise KeyError(
                     "An import class has already been registered "
-                    f'for the extension "{_ext}."'
+                    f"for the extension `{_ext}`."
                 )
             cls.registry_import[_ext] = new_class
 
@@ -176,7 +176,6 @@ class IoManager(type):
         bool
             Flag whether the extension is registered or not.
         """
-        extension = extension.removeprefix(".")
         _registry = cls.registry_export if mode == "export" else cls.registry_import
         _in_registry = extension in _registry
         if mode == "metadata":
@@ -204,9 +203,9 @@ class IoManager(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats(mode=mode)
-        _extensions = [f"*.{_key}" for _key in getattr(cls, f"registry_{mode}")]
+        _extensions = [f"*{_key}" for _key in getattr(cls, f"registry_{mode}")]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{_name} files (*.{' *.'.join(_ext)})" for _name, _ext in _formats.items()
+            f"{_name} files (*{' *'.join(_ext)})" for _name, _ext in _formats.items()
         ]
         return ";;".join(_all)
 

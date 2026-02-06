@@ -300,7 +300,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             The full file system path to the new file.
         """
         _filename = Path(filename)
-        _is_hdf5 = get_extension(_filename, lowercase=True) in HDF5_EXTENSIONS
+        _is_hdf5 = get_extension(_filename) in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
         if not _is_hdf5:
             return

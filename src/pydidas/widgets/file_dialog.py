@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ persistent references to the selected directory.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -42,6 +42,7 @@ from pydidas.core import (
 )
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.utils import flatten, update_child_qobject
+from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas_qtcore import PydidasQApplication
@@ -420,7 +421,7 @@ class PydidasFileDialog(
         if res == 0:
             return None
         _selection = self.selectedFiles()[0]
-        _ext = os.path.splitext(_selection)[1]
+        _ext = get_extension(_selection)
         if len(_ext) == 0:
             _selection = _selection + self._get_extension()
         else:
@@ -446,15 +447,15 @@ class PydidasFileDialog(
             "All files"
         ) or self.selectedNameFilter().startswith("All supported files"):
             if self._calling_kwargs.get("default_extension") is not None:
-                return "." + self._calling_kwargs.get("default_extension")
-            _defaults = ["yaml", "npy", "tif", "h5"]
+                return self._calling_kwargs.get("default_extension")
+            _defaults = [".yaml", ".npy", ".tif", ".h5"]
             while len(_defaults) > 0:
                 _ext = _defaults.pop(0)
                 if _ext in self._calling_kwargs["extensions"]:
                     return f".{_ext}"
             return self._calling_kwargs["extensions"][0]
         _formats = self.selectedNameFilter().strip(")").split("*.")[1:]
-        return "." + _formats[0]
+        return _formats[0]
 
     def _check_extension(self, extension: str) -> None:
         """
@@ -467,7 +468,7 @@ class PydidasFileDialog(
         """
         if self._calling_kwargs["extensions"] is None:
             return
-        if extension.strip(".") not in self._calling_kwargs["extensions"]:
+        if extension not in self._calling_kwargs["extensions"]:
             raise UserConfigError(
                 f'The given extension "{extension}" is invalid because the file type '
                 "is unknown."

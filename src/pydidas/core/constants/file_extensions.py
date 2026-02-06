@@ -28,44 +28,37 @@ __all__ = [
     "HDF5_EXTENSIONS",
     "NUMPY_EXTENSIONS",
     "BINARY_EXTENSIONS",
+    "PONI_EXTENSIONS",
     "ASCII_EXPORT_EXTENSIONS",
     "ASCII_IMPORT_EXTENSIONS",
     "TIFF_EXTENSIONS",
     "JPG_EXTENSIONS",
+    "PNG_EXTENSIONS",
     "FABIO_EXTENSIONS",
     "YAML_EXTENSIONS",
     "FILENAME_DELIMITERS",
 ]
 
 
-# TODO: Clean up extensions after merging fix for #131
-HDF5_EXTENSIONS = [
-    "h5",
-    "hdf",
-    "nxs",
-    "hdf5",
-    "HDF5",
-    ".h5",
-    ".hdf",
-    ".nxs",
-    ".hdf5",
-    ".HDF5",
-]
+HDF5_EXTENSIONS = [".h5", ".hdf", ".nxs", ".hdf5"]
 
-# TODO: Clean up extensions after merging fix for #131
-NUMPY_EXTENSIONS = ["npy", ".npy"]
+NUMPY_EXTENSIONS = [".npy"]
 
-BINARY_EXTENSIONS = ["raw", "bin"]
+BINARY_EXTENSIONS = [".raw", ".bin"]
 
-ASCII_EXPORT_EXTENSIONS = ["txt", "csv", "chi", "dat"]
-ASCII_IMPORT_EXTENSIONS = ["txt", "csv", "chi", "dat", "asc", "fio"]
+PONI_EXTENSIONS = [".poni"]
 
-TIFF_EXTENSIONS = ["tif", "tiff", "TIF", "TIFF"]
+ASCII_EXPORT_EXTENSIONS = [".txt", ".csv", ".chi", ".dat"]
+ASCII_IMPORT_EXTENSIONS = [".txt", ".csv", ".chi", ".dat", ".asc", ".fio"]
 
-JPG_EXTENSIONS = ["jpg", "jpeg"]
+TIFF_EXTENSIONS = [".tif", ".tiff"]
 
-FABIO_EXTENSIONS = ["edf", "mccd", "mar3450", "f2d", "cbf", "msk"]
+JPG_EXTENSIONS = [".jpg", ".jpeg"]
 
-YAML_EXTENSIONS = ["yaml", "yml"]
+PNG_EXTENSIONS = [".png"]
+
+FABIO_EXTENSIONS = [".edf", ".mccd", ".mar3450", ".f2d", ".cbf", ".msk"]
+
+YAML_EXTENSIONS = [".yaml", ".yml"]
 
 FILENAME_DELIMITERS = r"\.|_|-| "

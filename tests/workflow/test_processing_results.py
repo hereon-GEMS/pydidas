@@ -165,11 +165,11 @@ class TestProcessingResults(unittest.TestCase):
             _node_metadata["data_label"] = _meta["data_label"]
         return _new_metadata
 
-    def get_node_output_filename(self, node_id: int, extension: str = "h5") -> str:
+    def get_node_output_filename(self, node_id: int, extension: str = ".h5") -> str:
         _label = self._node_labels[node_id].replace(" ", "_")
-        return f"node_{node_id:02d}_{_label}.{extension}"
+        return f"node_{node_id:02d}_{_label}{extension}"
 
-    def get_node_output_path(self, node_id: int, extension: str = "h5") -> Path:
+    def get_node_output_path(self, node_id: int, extension: str = ".h5") -> Path:
         return self._tmpdir.joinpath(self.get_node_output_filename(node_id, extension))
 
     def create_standard_workflow_results(self) -> ProcessingResults:
@@ -677,31 +677,31 @@ class TestProcessingResults(unittest.TestCase):
             res._config["shapes_set"] = _key != "shapes_set"
             res._config["metadata_complete"] = _key != "metadata_complete"
             with self.assertRaises(UserConfigError):
-                res.prepare_files_for_saving(self._tmpdir, "HDF5")
+                res.prepare_files_for_saving(self._tmpdir, ".HDF5")
 
     def test_prepare_files_for_saving__simple(self) -> None:
         res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, "HDF5")
+        res.prepare_files_for_saving(self._tmpdir, ".HDF5")
         _files = os.listdir(self._tmpdir)
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
 
     def test_prepare_files_for_saving__single_node(self) -> None:
         res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, "HDF5", single_node=1)
+        res.prepare_files_for_saving(self._tmpdir, ".HDF5", single_node=1)
         _files = os.listdir(self._tmpdir)
         self.assertIn(self.get_node_output_filename(1), _files)
         self.assertNotIn(self.get_node_output_filename(2), _files)
 
     def test_prepare_files_for_saving__w_existing_file_no_overwrite(self) -> None:
         res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, "HDF5", single_node=1)
+        res.prepare_files_for_saving(self._tmpdir, ".HDF5", single_node=1)
         with open(
             self._tmpdir.joinpath(self.get_node_output_filename(1)), "w"
         ) as _file:
             _file.write("test")
         with self.assertRaises(UserConfigError):
-            res.prepare_files_for_saving(self._tmpdir, "HDF5")
+            res.prepare_files_for_saving(self._tmpdir, ".HDF5")
 
     def test_prepare_files_for_saving__w_existing_file_w_overwrite(self) -> None:
         res = self.create_standard_workflow_results()
@@ -709,7 +709,7 @@ class TestProcessingResults(unittest.TestCase):
             self._tmpdir.joinpath(self.get_node_output_filename(1)), "w"
         ) as _file:
             _file.write("test")
-        res.prepare_files_for_saving(self._tmpdir, "HDF5", overwrite=True)
+        res.prepare_files_for_saving(self._tmpdir, ".HDF5", overwrite=True)
         _files = os.listdir(self._tmpdir)
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
@@ -717,14 +717,14 @@ class TestProcessingResults(unittest.TestCase):
     def test_prepare_files_for_saving__w_non_existing_dir(self) -> None:
         res = self.create_standard_workflow_results()
         shutil.rmtree(self._tmpdir)
-        res.prepare_files_for_saving(self._tmpdir, "HDF5")
+        res.prepare_files_for_saving(self._tmpdir, ".HDF5")
         _files = os.listdir(self._tmpdir)
         for _id in res._composites:
             self.assertIn(self.get_node_output_filename(_id), _files)
 
     def test_save_results_to_disk__simple(self) -> None:
         res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, "HDF5")
+        res.save_results_to_disk(self._tmpdir, ".HDF5")
         with h5py.File(self.get_node_output_path(1), "r") as f:
             _shape1 = f["entry/data/data"].shape
         with h5py.File(self.get_node_output_path(2), "r") as f:
@@ -745,7 +745,7 @@ class TestProcessingResults(unittest.TestCase):
             "data_unit": "u2",
         }
         res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, "HDF5", squeeze_results=True)
+        res.save_results_to_disk(self._tmpdir, ".HDF5", squeeze_results=True)
         with h5py.File(self.get_node_output_path(1), "r") as f:
             _shape1 = f["entry/data/data"].shape
         with h5py.File(self.get_node_output_path(2), "r") as f:
@@ -755,7 +755,7 @@ class TestProcessingResults(unittest.TestCase):
 
     def test_save_results_to_disk__single_node(self) -> None:
         res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, "HDF5", node_id=1)
+        res.save_results_to_disk(self._tmpdir, ".HDF5", node_id=1)
         with h5py.File(self.get_node_output_path(1), "r") as f:
             _shape1 = f["entry/data/data"].shape
         self.assertEqual(_shape1, res.shapes[1])

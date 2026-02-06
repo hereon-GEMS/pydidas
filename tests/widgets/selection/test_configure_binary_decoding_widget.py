@@ -259,11 +259,9 @@ def test_toggle_details(qtbot, widget) -> None:
             )
         # Allow event loop to process visibility changes
         qtbot.waitUntil(
-            lambda: (
-                all(
-                    widget.param_composite_widgets[_key].isVisible() == _run
-                    for _key in widget.param_composite_widgets
-                )
+            lambda: all(
+                widget.param_composite_widgets[_key].isVisible() == _run
+                for _key in widget.param_composite_widgets
             ),
             timeout=1000,
         )

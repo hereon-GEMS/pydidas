@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ the specified file formats.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -81,6 +81,9 @@ class ProcessingResultIoMeta(GenericIoMeta):
         cls.active_savers = []
         cls.scan_title = title
         for _saver in savers:
+            _saver = _saver.lower()
+            if not _saver.startswith("."):
+                _saver = "." + _saver
             if not (_saver is None or _saver == "None"):
                 cls.verify_extension_is_registered(_saver)
                 if _saver not in cls.active_savers:
@@ -248,7 +251,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             this, if you explicitly require a different context. The default is None.
         """
         cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension]
+        _saver = cls.registry[extension.lower()]
         _saver.export_full_data_to_file(data, scan_context)
 
     @classmethod
@@ -275,7 +278,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             Any kwargs which should be passed to the underlying exporter.
         """
         cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension]
+        _saver = cls.registry[extension.lower()]
         _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod

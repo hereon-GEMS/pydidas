@@ -79,8 +79,8 @@ right):
       - Clear the current mask and reset it to an empty mask. (Shortcut:
         :py:data:`Del`)
 
-In addition, the *Display* slider allows to control the transparency of the
-mask overlay on the reference image.
+In addition, the *Display* slider allows to control the transparency of the mask
+overlay on the reference image.
 
 Draw tools
 ^^^^^^^^^^
@@ -111,11 +111,10 @@ geometric shapes.
         right-click and select *Close the polygon*. (Shortcut :py:data:`S`)
     * - .. image:: images/mask_tools/draw_pencil.png
       - Pencil
-      - Mask or unmask areas with a pencil. The operation (mask or unmask)
-        is controlled by the radio buttons below the button. The pencil size
-        can be edited by either entering a number for the *Pencil size* or using
-        the slider to modify the number.
-        (Shortcut :py:data:`P`)
+      - Mask or unmask areas with a pencil. The operation (mask or unmask) is
+        controlled by the radio buttons below the button. The pencil size can be
+        edited by either entering a number for the *Pencil size* or using the
+        slider to modify the number. (Shortcut :py:data:`P`)
 
 Threshold
 ^^^^^^^^^
@@ -152,8 +151,8 @@ selected threshold.
 Mask not finite values
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This button will mask all pixels in the image which have not finite values,
-i.e. :py:data:`NaN`, :py:data:`inf` or :py:data:`-inf`.
+This button will mask all pixels in the image which have not finite values, i.e.
+:py:data:`NaN`, :py:data:`inf` or :py:data:`-inf`.
 
 Data display
 ------------

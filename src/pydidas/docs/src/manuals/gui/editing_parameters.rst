@@ -51,11 +51,10 @@ Different types of widgets are implemented to help the user:
 
     Filenames can be entered by giving the filename (and absolute path) as a
     string in the entry field or by selecting a file from the filesystem.
-    Clicking on the "open" button opens a selection dialogue to pick a file
-    and its name will be filled in the field for the filename. The filename
-    can be filtered for supported extensions by changing the selection in the
-    dialogue. The exact look and feel of the dialogue depends on the operating
-    system.
+    Clicking on the "open" button opens a selection dialogue to pick a file and
+    its name will be filled in the field for the filename. The filename can be
+    filtered for supported extensions by changing the selection in the dialogue.
+    The exact look and feel of the dialogue depends on the operating system.
 
 - Hdf5 dataset keys
     .. image:: images/param_hdf5key.png
@@ -63,17 +62,16 @@ Different types of widgets are implemented to help the user:
         :align: left
 
     Hdf5 dataset keys can be entered by giving the dataset key as a string in
-    the entry field or by selecting from the available keys of a file.
-    Clicking on the "open" button opens a selection dialogue to pick a hdf5
-    file.
+    the entry field or by selecting from the available keys of a file. Clicking
+    on the "open" button opens a selection dialogue to pick a hdf5 file.
 
     .. image:: images/param_hdf5key_popup.png
         :width: 183
         :align: right
 
     After selecting a file, a second pop-up window will show with all the
-    dataset keys in the selected file and the user can select one of these to
-    be used.
+    dataset keys in the selected file and the user can select one of these to be
+    used.
 
     Using "cancel" during either of the two popup windows will keep the old
     value.

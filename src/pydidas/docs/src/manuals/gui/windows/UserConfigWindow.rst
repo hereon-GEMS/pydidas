@@ -13,8 +13,9 @@ The User config window
 ======================
 
 The *User config window* allows the user to customize the behaviour of their
-pydidas copy. The *User config window* can be accessed either through the GUI menu
-(Options :raw-html:`&rarr;` User config) or through the :ref:`utilities_frame`.
+pydidas copy. The *User config window* can be accessed either through the GUI
+menu (Options :raw-html:`&rarr;` User config) or through the
+:ref:`utilities_frame`.
 
 The individual Parameters are described below.
 
@@ -34,9 +35,9 @@ between 5 and 20 points are supported.
 The selection of fonts relies on the available system fonts. All TrueType
 scalable systems fonts are also available in pydidas.
 
-The pydidas user interface will rescale itself based on the font metrics of
-the selection font size & family configuration. Selecting larger fonts will
-grow all widgets and allows to rescale for high-DPI displays.
+The pydidas user interface will rescale itself based on the font metrics of the
+selection font size & family configuration. Selecting larger fonts will grow all
+widgets and allows to rescale for high-DPI displays.
 
 Update settings
 ---------------
@@ -60,8 +61,8 @@ setting set to True.
 Composite creator settings
 --------------------------
 
-These settings determine how individual images are arranged into a mosaic
-with the composite creator.
+These settings determine how individual images are arranged into a mosaic with
+the composite creator.
 
 .. list-table::
     :widths: 25 75
@@ -80,8 +81,8 @@ with the composite creator.
 Plot settings
 -------------
 
-These settings determine how plots are displayed and how specific buttons behave.
-For detailed descriptions, please see the list below.
+These settings determine how plots are displayed and how specific buttons
+behave. For detailed descriptions, please see the list below.
 
 .. list-table::
     :widths: 25 75
@@ -92,24 +93,24 @@ For detailed descriptions, please see the list below.
       - Description
     * - Histogram outlier fraction (low)
       - [This setting is for 2D image displays only]. This Parameter defines
-        which portion of the histogram should be ignored when defining the
-        lower limit for the colormap. The default value of 0.02 means that the
-        lowest 2% of the histogram will be ignored for setting the colormap.
+        which portion of the histogram should be ignored when defining the lower
+        limit for the colormap. The default value of 0.02 means that the lowest
+        2% of the histogram will be ignored for setting the colormap.
     * - Histogram outlier fraction (high)
       - [This setting is for 2D image displays only]. This Parameter defines
-        which portion of the histogram should be ignored when defining the
-        upper limit for the colormap. The default value of 0.07 means that the
-        top 7% of the histogram will be ignored for setting the colormap. The
-        default value was selected to cover all pixels in module gaps for an
-        Eiger detector.
+        which portion of the histogram should be ignored when defining the upper
+        limit for the colormap. The default value of 0.07 means that the top 7%
+        of the histogram will be ignored for setting the colormap. The default
+        value was selected to cover all pixels in module gaps for an Eiger
+        detector.
     * - Default colormap
-      - The default colormap to be used for displaying 2D datasets. The
-        colormap can still be changed in each individual data window but those
-        local changes are not persistent.
+      - The default colormap to be used for displaying 2D datasets. The colormap
+        can still be changed in each individual data window but those local
+        changes are not persistent.
     * - Color for invalid data / no data
       - The color given for invalid data points or missing data points to
-        distinguish them from the regular colormap. The color must be entered
-        as a RGB color code. The selected color is displayed in a box below the
+        distinguish them from the regular colormap. The color must be entered as
+        a RGB color code. The selected color is displayed in a box below the
         selection mask. A new color can also be selected in an interactive
         pop-up by using the *Pick a new color for invalid data / no data / NaN*
         button.

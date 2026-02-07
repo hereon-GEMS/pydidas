@@ -32,13 +32,13 @@ The following windows can be opened:
     * - Window title
       - description
     * - :ref:`User config window <user_config_window>`
-      - Edit the user preferences for the generic application config.
-        (e.g. colormaps, plugin path)
+      - Edit the user preferences for the generic application config. (e.g.
+        colormaps, plugin path)
     * - :ref:`Global settings window <global_settings_window>`
       - Edit the global application settings (e.g. multiprocessing preferences).
     * - :ref:`Export Eiger Mask window <export_eiger_pixelmask_window>`
-      - Get the mask file for the Eiger detector from a Hdf5 master file
-        written by the Eiger detector and export it as an image.
+      - Get the mask file for the Eiger detector from a Hdf5 master file written
+        by the Eiger detector and export it as an image.
     * - :ref:`Edit detector mask window <mask_editor_window>`
       - Edit the detector mask: Import an image and add mask regions based on
         threshold selections, polygons, etc. This utility is an integrated

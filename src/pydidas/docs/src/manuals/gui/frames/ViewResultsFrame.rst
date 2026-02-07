@@ -34,9 +34,9 @@ described in more detail below:
 Importing results
 -----------------
 
-Using the :py:data:`Import results from directory` button in the top left of the frame
-opens a window to select a directory. The selected directory is scanned for
-pydidas-written node result files which will be imported.
+Using the :py:data:`Import results from directory` button in the top left of the
+frame opens a window to select a directory. The selected directory is scanned
+for pydidas-written node result files which will be imported.
 
 .. note::
 

@@ -29,12 +29,12 @@ Settings
     * - Parameter
       - Description
     * - Number of MP workers
-      - The number of parallel processes which perform the calculations. Due
-        to the inherent parallelization of integration in pyFAI and due to
-        disk read access interference for too many processes, the number should
-        not be set too high. However, depending on system resources and the
-        type of workflow, a larger number of workers might speed up certain
-        processing tasks.
+      - The number of parallel processes which perform the calculations. Due to
+        the inherent parallelization of integration in pyFAI and due to disk
+        read access interference for too many processes, the number should not
+        be set too high. However, depending on system resources and the type of
+        workflow, a larger number of workers might speed up certain processing
+        tasks.
     * - Buffer dataframe limit
       - This Parameter determines the size of the buffer. The buffer will be
         created to hold the specified number of data frames, irrespective of

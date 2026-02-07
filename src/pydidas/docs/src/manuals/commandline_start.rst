@@ -9,8 +9,8 @@
 Command line manuals
 ====================
 
-pydidas can be started from any python console (iPython, jupyter, console in
-a development environment) and is dependent on a number of other modules which
+pydidas can be started from any python console (iPython, jupyter, console in a
+development environment) and is dependent on a number of other modules which
 should have been installed automatically (by anaconda or pip, if used).
 
 The following general manuals are available:

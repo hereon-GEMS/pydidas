@@ -50,15 +50,15 @@ The default setting of the app is to scan for files corresponding to a specific
 file-naming pattern. An existing file can be selected using the *Open* button
 and its filename modified to exchange the counters in the filename with
 hashtags. An example of a filename with wildcards is given on the right. Note
-that the Hdf5 dataset key Parameter widget is also shown automatically if a
-hdf5 file extension was detected.
+that the Hdf5 dataset key Parameter widget is also shown automatically if a hdf5
+file extension was detected.
 
 .. image:: images/dir_spy/scan_for_all.png
     :align: left
 
 If the :py:data:`scan_for_all` option has been selected, the filename pattern
-Parameter will be hidded. Note that the Hdf5 dataset key Parameter is also
-shown and this dataset is looked for in all new files in the specified folder.
+Parameter will be hidded. Note that the Hdf5 dataset key Parameter is also shown
+and this dataset is looked for in all new files in the specified folder.
 
 
 Image corrections
@@ -74,9 +74,9 @@ mask, toggled by changing the corresponding Parameter value.
     :align: right
 
 In addition, a generic background image can be subtracted from all images. If
-this option is selected, the widget to select the filename is shown. If an
-hdf5 file was selected, the widgets for the selection of dataset and frame
-number are shown as well, see image on the right.
+this option is selected, the widget to select the filename is shown. If an hdf5
+file was selected, the widgets for the selection of dataset and frame number are
+shown as well, see image on the right.
 
 
 Running the App
@@ -86,16 +86,16 @@ Running the App
     :align: left
 
 Running the :py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>` in this
-frame will automatically display the latest update in the presentation widget
-on the right.
+frame will automatically display the latest update in the presentation widget on
+the right.
 
-A single directory scan can be performed by using the :py:data:`Show latest image`
-button. This will also trigger a guaranteed update of the display widget.
+A single directory scan can be performed by using the :py:data:`Show latest
+image` button. This will also trigger a guaranteed update of the display widget.
 
 A continuous process can be started by using the :py:data:`Start scanning`
 button. This process will run until the pydidas UI is stopped or the
-:py:data:`Stop scanning` button has been pressed. Updates to the display
-widget will be send based on the frequency set in the global settings.
+:py:data:`Stop scanning` button has been pressed. Updates to the display widget
+will be send based on the frequency set in the global settings.
 
 .. note::
     If a pattern has been selected, the app will perform a single scan of the

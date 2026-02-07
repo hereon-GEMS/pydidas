@@ -26,10 +26,10 @@ including these two. For the selection, files will be sorted by name.
 .. image:: images/series_ops_hdf5_dset.png
     :align: left
 
-When selecting an Hdf5 file as the first file, a pop-up will show to select
-the dataset. The pop-up will show all datasets in the selected file. The
-user's selection will automatically be entered in the respective field for
-the Hdf5 dataset key.
+When selecting an Hdf5 file as the first file, a pop-up will show to select the
+dataset. The pop-up will show all datasets in the selected file. The user's
+selection will automatically be entered in the respective field for the Hdf5
+dataset key.
 
 .. image:: images/series_ops_hdf5_params.png
     :align: right
@@ -41,8 +41,8 @@ the last image number will select all images in the file.
 Operation
 ^^^^^^^^^
 
-This Parameter controls which type of Operation shall be performed on the
-image series. The selection choice correspond to the mathematical names of the
+This Parameter controls which type of Operation shall be performed on the image
+series. The selection choice correspond to the mathematical names of the
 operations and should be self-explanatory.
 
 Output

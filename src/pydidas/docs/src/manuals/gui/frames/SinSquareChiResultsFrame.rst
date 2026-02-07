@@ -31,9 +31,10 @@ Data selection
     :align: left
 
 Data for visualization can be selected in one of two ways: First, the current
-workflow results can be imported into this frame by clicking the *Import current
-workflow results* button. This will load a copy of the current workflow results.
-Second, results can be imported from a directory with exported pydidas results.
+workflow results can be imported into this frame by clicking the
+:py:data:`Import current workflow results` button. This will load a copy of the
+current workflow results. Second, results can be imported from a directory with
+exported pydidas results.
 
 |
 
@@ -131,12 +132,12 @@ described in detail in the following table:
             :align: center
       - Display the next scan point in the grid of plots. This will update
         all plots with the next scan point, i.e. the last plot will show the next
-        scan point and the other plots will be shifted in the grid.
+        scan point and the other plots will be shifted.
     * -  .. image:: images/sin_square_chi/button_page_forward.png
             :align: center
       - Go forward by one page. This will display the next set of scan points
         in the grid of plots, i.e. all plots will be updated with the next scan
-        points. For example, if the grid inlcudes 3x4 plots, the next 12 scan points
+        points. For example, if the grid includes 3x4 plots, the next 12 scan points
         will be displayed.
     * -  .. image:: images/sin_square_chi/button_end.png
             :align: center

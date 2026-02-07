@@ -29,16 +29,16 @@ pydidas menu structure
             is handled through Qts QStandardPaths. A dialog asks for
             confirmation before actually writing the file to disk.
         - Export GUI state
-            The *Export* entry will query the user to select a file to store
-            the state. The file content is similar to the *Store* action but
-            the file can be placed anywhere in the filesystem and therefore
-            allows to share state between different users or machines.
+            The *Export* entry will query the user to select a file to store the
+            state. The file content is similar to the *Store* action but the
+            file can be placed anywhere in the filesystem and therefore allows
+            to share state between different users or machines.
         - Restore GUI state
             The *Restore* entry will open a dialog to confirm that the user
             wants to restore the UI state from pydidas's automatically handled
             state file. If confirmed, all pydidas objects are updated and the
-            GUI view is changed to the active view. (Corresponding saver:
-            *Store GUI state*)
+            GUI view is changed to the active view. (Corresponding saver: *Store
+            GUI state*)
         - Restore GUI state at exit
             The *Restore at Exit* entry will open a dialog to confirm that the
             user wants to restore the UI state from pydidas's automatically
@@ -67,13 +67,13 @@ pydidas menu structure
         This action will close the pydidas GUI **without confirmation**.
 - Tools
     - Export Eiger Pixelmask
-        This menu item will open a small window which allows the user to
-        specify an Eiger-written *master* file which includes detector metadata,
+        This menu item will open a small window which allows the user to specify
+        an Eiger-written *master* file which includes detector metadata,
         including the detector pixelmask and an output filename to write the
         exported mask.
     - Images series processing
-        The *Image series processing* menu entry opens a new window to process
-        a series of images. This, for example, allows a user to average
+        The *Image series processing* menu entry opens a new window to process a
+        series of images. This, for example, allows a user to average
         calibration data. For more information, please refer to the :ref:`Image
         series operations window manual <series_ops_window>`.
     - Edit detector mask
@@ -106,10 +106,10 @@ pydidas menu structure
         This entry will open a small window with information about the local
         paths in which log files and configuration files are placed by pydidas.
     - Check for update
-        Using this option requires an active internet connection. Pydidas
-        will check the latest release version on Github and compare the
-        remote version number with the locally installed version. The result
-        will be supplied to the user in a pop-up window.
+        Using this option requires an active internet connection. Pydidas will
+        check the latest release version on Github and compare the remote
+        version number with the locally installed version. The result will be
+        supplied to the user in a pop-up window.
     - About
         The about window has copyright information and links to the pydidas
         homepage and GitHub home.

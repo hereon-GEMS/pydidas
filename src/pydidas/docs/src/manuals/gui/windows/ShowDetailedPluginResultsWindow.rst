@@ -9,12 +9,12 @@
 Show Detailed Plugin Results window
 ===================================
 
-The *Show detailed Plugin results window* will have a different layout for
-each plugin, depending on the detailed information.
+The *Show detailed Plugin results window* will have a different layout for each
+plugin, depending on the detailed information.
 
 .. image:: images/detailed_results.png
     :width: 640
     :align: center
 
-Generally, on the left will be a text box with metadata and on the right will
-be a number of plots.
+Generally, on the left will be a text box with metadata and on the right will be
+a number of plots.

@@ -9,10 +9,10 @@ Selecting radial integration range in image
 
 If the azimuthal range is "Full detector", nothing will be displayed to start
 with. If a range has been selected, the limits of the range will be marked by
-two lines starting from the beamcenter. Clicking on the first point will set
-the inner radial limit, which will be displayed as a circle. Clicking a second
-time will set the upper limit and the selected integration ROI will be displayed
-as overlay.
+two lines starting from the beamcenter. Clicking on the first point will set the
+inner radial limit, which will be displayed as a circle. Clicking a second time
+will set the upper limit and the selected integration ROI will be displayed as
+overlay.
 
 .. list-table::
     :widths: 33 33 33
@@ -36,12 +36,12 @@ as overlay.
 Selecting azimuthal integration range in image
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If the radial range is "Full detector", nothing will be displayed to start
-with. If a range has been selected, the limits of the range will be marked by
-two circles around the beamcenter. Clicking on the first point will set the
-starting radial limit and draw a line from the beamcenter. Clicking a second
-time will set the upper limit and the selected integration ROI will be displayed
-as overlay.
+If the radial range is "Full detector", nothing will be displayed to start with.
+If a range has been selected, the limits of the range will be marked by two
+circles around the beamcenter. Clicking on the first point will set the starting
+radial limit and draw a line from the beamcenter. Clicking a second time will
+set the upper limit and the selected integration ROI will be displayed as
+overlay.
 
 .. list-table::
     :widths: 33 33 33

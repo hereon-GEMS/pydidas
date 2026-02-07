@@ -59,13 +59,13 @@ menu and details are explained in detail in the :ref:`Menu manual <gui_menu>`.
 
 This function allows to either store the state in a automatically controlled
 file in the OS-specific user's application config directory or in a file
-specified by the user itself. For restoring, similar options exist.
-In addition, pydidas stores the GUI's state when closing the GUI properly (i.e.
-a regular exit), allowing the user to pick up where they left.
+specified by the user itself. For restoring, similar options exist. In addition,
+pydidas stores the GUI's state when closing the GUI properly (i.e. a regular
+exit), allowing the user to pick up where they left.
 
 .. note::
-    The automatically-controlled files are user-specific and if users log in
-    on the same machine using a different user account, the file will not be
+    The automatically-controlled files are user-specific and if users log in on
+    the same machine using a different user account, the file will not be
     accessible.
 
 
@@ -84,7 +84,8 @@ Generic GUI information
 Frames
 ------
 
-Detailed descriptions of the individual frames are given in the section about :ref:`frames_main`.
+Detailed descriptions of the individual frames are given in the section about
+:ref:`frames_main`.
 
 .. toctree::
     :maxdepth: 1
@@ -97,7 +98,8 @@ Detailed descriptions of the individual frames are given in the section about :r
 Windows
 -------
 
-Detailed information about the individual windows is given in the section about :ref:`windows_main`.
+Detailed information about the individual windows is given in the section about
+:ref:`windows_main`.
 
 .. toctree::
     :maxdepth: 1

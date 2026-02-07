@@ -18,14 +18,14 @@ with additional features useful in pydidas.
 
 - The menu
     The menu bar allows access to all generic silx and additional pydidas
-    functionality. The detailed menu icons and actions are described below
-    in the menu entries description.
+    functionality. The detailed menu icons and actions are described below in
+    the menu entries description.
 - The plot display
-    This plot shows the data. Depending on the zoom level, this is either
-    the full image or a sub-region.
+    This plot shows the data. Depending on the zoom level, this is either the
+    full image or a sub-region.
 - The position information
-    This widget displays the coordinates and data values of the data under
-    the mouse cursor.
+    This widget displays the coordinates and data values of the data under the
+    mouse cursor.
 
 Menu entries description
 """"""""""""""""""""""""
@@ -39,8 +39,8 @@ Menu entries description
       - Description
     * -  .. image:: ../silx/images/menu_zoom.png
             :align: center
-      - Zoom mode: clicking with the mouse and dragging spans a new selection
-        of the data to be visualized.
+      - Zoom mode: clicking with the mouse and dragging spans a new selection of
+        the data to be visualized.
     * -  .. image:: ../silx/images/menu_pan.png
             :align: center
       - Panning mode: clicking with the mouse and dragging moves the data on the

@@ -16,8 +16,8 @@ Define diffraction experiment
 
 The *Define Diffrraction setup* frame is a graphical interface to configure the
 :py:class:`DiffractionExperimentContext
-<pydidas.contexts.diff_exp.DiffractionExperiment>`
-which holds information about the experimental/beamline setup.
+<pydidas.contexts.diff_exp.DiffractionExperiment>` which holds information about
+the experimental/beamline setup.
 
 The frame only holds the configuration widgets:
 
@@ -68,9 +68,9 @@ Detector
     :align: left
 
 To select a detector and automatically update all detector Parameters, the
-:py:data:`Select X-ray detector` button will open a new window (using the
-pyFAI DetectorSelectorDialog, see the screenshot below) which allows to select
-a detector based on manufacturer and model.
+:py:data:`Select X-ray detector` button will open a new window (using the pyFAI
+DetectorSelectorDialog, see the screenshot below) which allows to select a
+detector based on manufacturer and model.
 
 .. image:: images/diff_exp/det_popup.png
     :width: 361px
@@ -80,13 +80,13 @@ Confirming the selection in the dialogue will update the detector Parameters.
 
 |
 
-Alternatively, the detector can be taken from the the pyFAI calibration,
-(see :ref:`copy_from calibration`) or all Parameters can also be entered
-manually in the input fields.
+Alternatively, the detector can be taken from the the pyFAI calibration, (see
+:ref:`copy_from calibration`) or all Parameters can also be entered manually in
+the input fields.
 
-The last field of the detector group, the *Detector pixel mask* determines if
-a mask should be used for the pyFAI integration. This parameter is independent
-of the other detector Parameters and is not updated with the selection of the
+The last field of the detector group, the *Detector pixel mask* determines if a
+mask should be used for the pyFAI integration. This parameter is independent of
+the other detector Parameters and is not updated with the selection of the
 detector. If empty, no detector mask will be applied to the pyFAI integration.
 
 Detector geometry
@@ -107,23 +107,23 @@ in detector pixel coordinates is also displayed.
 
 In addition to taking these settings from the pyFAI calibration (see
 :ref:`copy_from calibration`) and manual Parameter updates, pydidas also offers
-a tool for manually setting the beamcenter. The button :py:data:`Manual beamcenter
-definition` opens a new window. The window is described in detail in
+a tool for manually setting the beamcenter. The button :py:data:`Manual
+beamcenter definition` opens a new window. The window is described in detail in
 :ref:`manually_set_beamcenter_window`.
 
 .. image:: images/diff_exp/from_fit2d.png
     :width: 265px
     :align: right
 
-The button :py:data:`Convert Fit2D geometry` allows to convert an existing calibration
-in Fit2D geometry to pyFAI's PONI geometry. Clicking the button temporarily
-disables the frame's inputs and opens a new window to input the existing
-calibration:
-Input all parameters as required (sample-detector distance, beamcenter x/y,
-detector tilt plane and tilt angle). The :py:data:`Convert to pyFAI geometry` button will
-calculate the resulting pyFAI geometry parameters and display them in the bottom
-parameter fields. The :py:data:`Accept and store pyFAI geometry` button will close the
-window and copy the resulting geometry to the main frame.
+The button :py:data:`Convert Fit2D geometry` allows to convert an existing
+calibration in Fit2D geometry to pyFAI's PONI geometry. Clicking the button
+temporarily disables the frame's inputs and opens a new window to input the
+existing calibration: Input all parameters as required (sample-detector
+distance, beamcenter x/y, detector tilt plane and tilt angle). The
+:py:data:`Convert to pyFAI geometry` button will calculate the resulting pyFAI
+geometry parameters and display them in the bottom parameter fields. The
+:py:data:`Accept and store pyFAI geometry` button will close the window and copy
+the resulting geometry to the main frame.
 
 Export
 ^^^^^^
@@ -140,9 +140,8 @@ Using the Diffracion Experiment settings
 ----------------------------------------
 
 The :py:class:`DiffractionExperimentContext
-<pydidas.contexts.diff_exp.DiffractionExperiment>`
-is not used directly by the user but the information is required in
-applications, e.g. to run processing workflows or to determine the beam center
-on the detector.
+<pydidas.contexts.diff_exp.DiffractionExperiment>` is not used directly by the
+user but the information is required in applications, e.g. to run processing
+workflows or to determine the beam center on the detector.
 
 .. include:: ../../global/diff_exp_context_params.rst

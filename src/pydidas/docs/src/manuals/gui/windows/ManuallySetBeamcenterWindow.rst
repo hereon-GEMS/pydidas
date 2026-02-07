@@ -9,11 +9,11 @@
 Manually Set Beamcenter Window
 ==============================
 
-The *Manually set beamcenter window* allows to select the beamcenter in
-detector pixel coordinates, either by setting the pixel position directly or by
-using a graphical interface. The functionality is limited in the sense that a
-perfect detector orientation is assumed (i.e. all rotations are zero) and it is
-not possible to optimize rotations. If that is required, please perform a full
+The *Manually set beamcenter window* allows to select the beamcenter in detector
+pixel coordinates, either by setting the pixel position directly or by using a
+graphical interface. The functionality is limited in the sense that a perfect
+detector orientation is assumed (i.e. all rotations are zero) and it is not
+possible to optimize rotations. If that is required, please perform a full
 calibration.
 
 .. image:: images/set_bc_overview.png
@@ -43,8 +43,8 @@ Beamcenter selection
     :align: left
 
 
-The beamcenter position (in detector pixel coordinates) can be set directly,
-if it is known.
+The beamcenter position (in detector pixel coordinates) can be set directly, if
+it is known.
 
 The following control buttons are availabe:
 
@@ -60,5 +60,5 @@ The following control buttons are availabe:
    requires selecting at least 5 points on the circumference.
 
 The last button at the bottom, :py:data:`Confirm selected beamcenter`, will
-close the window and convert the selected beamcenter to pyFAI PONI
-coordinates and update the DiffractionExperiment.
+close the window and convert the selected beamcenter to pyFAI PONI coordinates
+and update the DiffractionExperiment.

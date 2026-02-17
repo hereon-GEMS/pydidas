@@ -9,8 +9,10 @@
 |class_name|
 ============
 
-* |class_name| documentation :ref:`with own methods only<own_methods_DataBrowsingFrame>`
-* |class_name| documentation :ref:`with inherited methods too<all_methods_DataBrowsingFrame>`
+* |class_name| documentation :ref:`with own methods only
+  <own_methods_DataBrowsingFrame>`
+* |class_name| documentation :ref:`with inherited methods too
+  <all_methods_DataBrowsingFrame>`
 
 .. _own_methods_DataBrowsingFrame:
 
@@ -29,5 +31,3 @@
     :members:
     :noindex:
     :inherited-members: QFrame
-    
-

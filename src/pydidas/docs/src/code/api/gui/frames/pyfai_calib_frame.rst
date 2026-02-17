@@ -9,8 +9,10 @@
 |class_name|
 ============
 
-* |class_name| documentation :ref:`with own methods only<own_methods_PyfaiCalibFrame>`
-* |class_name| documentation :ref:`with inherited methods too<all_methods_PyfaiCalibFrame>`
+* |class_name| documentation :ref:`with own methods only
+  <own_methods_PyfaiCalibFrame>`
+* |class_name| documentation :ref:`with inherited methods too
+  <all_methods_PyfaiCalibFrame>`
 
 .. _own_methods_PyfaiCalibFrame:
 
@@ -27,7 +29,5 @@
 
 .. autoclass:: pydidas.gui.frames.PyfaiCalibFrame
     :members:
-    :noindex:    
+    :noindex:
     :inherited-members: QFrame
-    
-

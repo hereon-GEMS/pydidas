@@ -21,4 +21,3 @@ The contexts sub-package
     :members:
     :inherited-members:
     :exclude-members: DiffractionExperiment, Scan
-

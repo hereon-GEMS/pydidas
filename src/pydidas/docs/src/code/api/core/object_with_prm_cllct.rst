@@ -17,4 +17,4 @@
 .. autoclass:: pydidas.core.ObjectWithParameterCollection
     :members:
     :inherited-members: QObject
-    :show-inheritance: 
+    :show-inheritance:

@@ -9,8 +9,10 @@
 |class_name|
 ============
 
-* |class_name| documentation :ref:`with own methods only<own_methods_DefineScanFrame>`
-* |class_name| documentation :ref:`with inherited methods too<all_methods_DefineScanFrame>`
+* |class_name| documentation :ref:`with own methods only
+  <own_methods_DefineScanFrame>`
+* |class_name| documentation :ref:`with inherited methods too
+  <all_methods_DefineScanFrame>`
 
 .. _own_methods_DefineScanFrame:
 
@@ -27,7 +29,5 @@
 
 .. autoclass:: pydidas.gui.frames.DefineScanFrame
     :members:
-    :noindex:    
+    :noindex:
     :inherited-members: QFrame
-    
-

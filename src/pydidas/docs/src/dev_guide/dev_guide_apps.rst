@@ -23,8 +23,8 @@ Class attributes
     :header-rows: 1
     :class: tight-table
 
-    * - class attribute
-      - description
+    * - Class attribute
+      - Description
     * - :py:data:`default_params`
       - A pydidas :py:class:`ParameterCollection
         <pydidas.core.ParameterCollection>` which define the
@@ -33,10 +33,10 @@ Class attributes
       - The function used to parse command line arguments to starting Parameter
         values.
     * - :py:data:`attributes_not_to_copy_to_app_clone`
-      - A list with the names of instance attributes which must not be copied
-        to an app clone. This is relevant for using the AppRunner for parallel
-        processing, where it should be avoided to copy large objects because
-        of the serialization of all objects during pickling.
+      - A list with the names of instance attributes which must not be copied to
+        an app clone. This is relevant for using the AppRunner for parallel
+        processing, where it should be avoided to copy large objects because of
+        the serialization of all objects during pickling.
 
 Instance attributes
 ^^^^^^^^^^^^^^^^^^^
@@ -46,8 +46,8 @@ Instance attributes
     :header-rows: 1
     :class: tight-table
 
-    * - instance attribute
-      - description
+    * - Instance attribute
+      - Description
     * - :py:data:`app_clone`
       - A boolean flag to toggle whether the current app instance is a manager
         or clone.
@@ -73,21 +73,20 @@ return values and calling parameters, please refer to the class documentation:
     :header-rows: 1
     :class: tight-table
 
-    * - method names
-      - description
+    * - Method names
+      - Description
     * - :py:data:`run`
       - Run the app's task list serially in the present process. Note that this
         will freeze the process and may take a lot of time, depending on the
         number of tasks and the processing steps.
     * - :py:data:`multiprocessing_get_tasks`
-      - This method must return all the tasks (as an iterable object) defined
-        in the app. The app configuration should be done using Parameters and
-        this method process the input from all Parameters to create the task
-        list. **This method must be defined in a custom app.**
+      - This method must return all the tasks (as an iterable object) defined in
+        the app. The app configuration should be done using Parameters and this
+        method processes the input from all Parameters to create the task list.
+        **This method must be defined in a custom app.**
     * - :py:data:`multiprocessing_pre_run`
       - This method runs all the required initialization which needs to be
-        performed once before processing tasks. By default, this method
-        passes.
+        performed once before processing tasks. By default, this method passes.
     * - :py:data:`multiprocessing_post_run`
       - Final processing which needs to be performed after all tasks have been
         completed. By default, this method passes.
@@ -96,8 +95,8 @@ return values and calling parameters, please refer to the class documentation:
         this method passes.
     * - :py:data:`multiprocessing_carryon`
       - This method allows to check whether processing can carry on or needs to
-        wait (for example for new data). It is called after the pre_cycle and
-        is called repeatedly until it returns a True. By default, this method
+        wait (for example for new data). It is called after the pre_cycle and is
+        called repeatedly until it returns a True. By default, this method
         returns True.
     * - :py:data:`multiprocessing_func`
       - This is the core processing function in which the computation for each
@@ -106,12 +105,12 @@ return values and calling parameters, please refer to the class documentation:
       - This method takes the task index and the function results and stores
         them in whichever way the app defined. It is separated from the
         processing to separate it in parallel processing and only store the
-        results in the main process. **This method must be defined in a
-        custom app.**
+        results in the main process. **This method must be defined in a custom
+        app.**
     * - :py:data:`initialize_shared_memory`
       - This method is used to create shared memory objects to be shared between
-        manager and app clones or it initialize it again. Details must be defined
-        by the app which wishes to use it.
+        manager and app clones or it initialize it again. Details must be
+        defined by the app which wishes to use it.
     * - :py:data:`export_state`
       - This method returns a dictionary with the app state in a serializable
         format, i.e. all entries are safe to process in YAML or pickle.
@@ -195,9 +194,9 @@ All pydidas apps can be configured at creation in one of three ways:
         {'num_images': 20, 'image_shape': (20, 20)}
 
     3. By sharing Parameters with other objects. One of the key advantages of
-    using pydidas Parameter for handling app data is that they are objects
-    which can be shared between different python objects. Any changes to the
-    object will be directly available to all linked apps:
+    using pydidas Parameter for handling app data is that they are objects which
+    can be shared between different python objects. Any changes to the object
+    will be directly available to all linked apps:
 
     .. code-block::
 
@@ -237,8 +236,8 @@ All pydidas apps can be configured at creation in one of three ways:
 Running an app
 --------------
 
-The app can be run locally (and serially) using the :py:meth:`run` method.
-The run method's definition is given below to demonstrate the exact sequence:
+The app can be run locally (and serially) using the :py:meth:`run` method. The
+run method's definition is given below to demonstrate the exact sequence:
 
 .. code-block::
 
@@ -258,7 +257,7 @@ The run method's definition is given below to demonstrate the exact sequence:
 
 
 To run an app with parallelization or simple in the background, please refer to
-:ref:`developer_guide_to_multiprocessing`\ .
+:ref:`developer_guide_to_multiprocessing`.
 
 
 Example
@@ -266,12 +265,10 @@ Example
 
 As example, let us extend the RandomImageGeneratorApp to a fully functional app.
 The app will create a random noisy image of the given shape as its core
-function.
-It will utilize a shared memory array to store results to demonstrate how
-manager and app clones interact in multiprocessing.
-Just for demonstration purposes, it will wait for 50 ms for every 5th index
-and fail every 2nd carryon check. These methods will also print some info for
-demonstration:
+function. It will utilize a shared memory array to store results to demonstrate
+how manager and app clones interact in multiprocessing. Just for demonstration
+purposes, it will wait for 50 ms for every 5th index and fail every 2nd carryon
+check. These methods will also print some info for demonstration:
 
 .. code-block::
 

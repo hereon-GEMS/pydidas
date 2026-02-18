@@ -13,10 +13,13 @@ Programmatic changes
 - Changed from plain extensions to file suffixed with the leading dot to
   be consistent with pathlib.Path
 - Added an option to remove a QSettings key to PydidasQsettings.
+- Modified the ParamIoWidgets to use the FileDialog only with either a 
+  persistent QSettings key or an ID reference and not both.
 
 Bugfixes
 --------
-- Fixed an issue 
+- Fixed an issue in the ParamIoWidgetHdf5 where two leading dots
+  were added to extensions.
 
 
 

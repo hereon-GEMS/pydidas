@@ -69,10 +69,13 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         self._flag_pattern = "pattern" in param.refkey
         self.io_dialog = PydidasFileDialog()
         self._io_dialog_config = {
-            "reference": id(self),
-            "formats": "All files (*);;" + IoManager.get_string_of_formats(),
-            "qsettings_ref": kwargs.get("persistent_qsettings_ref"),
+            "formats": "All files (*);;" + IoManager.get_string_of_formats()
         }
+        _persistent_qref = kwargs.get("persistent_qsettings_ref")
+        if _persistent_qref is not None:
+            self._io_dialog_config["qsettings_ref"] = _persistent_qref
+        else:
+            self._io_dialog_config["reference"] = id(self)
 
     @QtCore.Slot()
     def button_function(self) -> None:

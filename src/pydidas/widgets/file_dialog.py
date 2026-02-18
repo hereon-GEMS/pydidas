@@ -29,7 +29,7 @@ __all__ = ["PydidasFileDialog"]
 
 
 import os
-import pathlib
+from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -41,7 +41,7 @@ from pydidas.core import (
     UserConfigError,
 )
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
-from pydidas.core.utils import flatten, update_child_qobject
+from pydidas.core.utils import update_child_qobject
 from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
 from pydidas.widgets.factory import CreateWidgetsMixIn
@@ -50,14 +50,31 @@ from pydidas_qtcore import PydidasQApplication
 
 SCAN = ScanContext()
 ITEM_SELECTABLE = QtCore.Qt.ItemIsSelectable
+QStandardPaths = QtCore.QStandardPaths
 
 
 class SelectionModel(QtCore.QIdentityProxyModel):
-    """A selection proxy model which allows showing files but make them unselectable."""
+    """
+    A selection proxy model which allows showing files but make them
+    unselectable.
+    """
 
-    def flags(self, index):
+    def flags(self, index) -> QtCore.Qt.ItemFlags:
+        """
+        Return item flags for the given index.
+
+        Parameters
+        ----------
+        index
+            The model index.
+
+        Returns
+        -------
+        QtCore.Qt.ItemFlags
+            The flags for the given index.
+        """
         _flags = QtCore.QIdentityProxyModel.flags(self, index)
-        if not self.sourceModel().isDir(index):
+        if not self.sourceModel().isDir(index):  # type: ignore[attr-defined]
             _flags &= ~ITEM_SELECTABLE
         return _flags
 
@@ -86,19 +103,21 @@ class PydidasFileDialog(
         **kwargs : Any
             Keyword arguments. Supported keywords are:
 
-            parent : Union[None, QWidget], optional
+            parent : QWidget or None, optional
                 The dialog's parent widget. The default is None.
-            caption : str | None, optional
-                The dialog caption. If None, the caption will be selected based on the
-                type of dialog. The default is None.
+            caption : str or None, optional
+                The dialog caption. If None, the caption will be
+                selected based on the type of dialog. The default is
+                None.
             dialog_type : str
-                The type of the dialog. Must be open_file, save_file, or open_directory.
-                The default is open_file.
-            formats : str | None, optional
-                The list of format filters for filenames, if used. The default is None.
-            info_string : str | None, optional
-                An additional information string which is displayed in the FileDialog
-                widget. The default is None.
+                The type of the dialog. Must be open_file, save_file,
+                or open_directory. The default is open_file.
+            formats : str or None, optional
+                The list of format filters for filenames, if used. The
+                default is None.
+            info_string : str or None, optional
+                An additional information string which is displayed in
+                the FileDialog widget. The default is None.
         """
         self._files_unselectable_model = SelectionModel(self)
         self._config = {
@@ -106,70 +125,70 @@ class PydidasFileDialog(
             "type": kwargs.get("dialog_type", "open_file"),
             "formats": kwargs.get("formats", None),
             "info_string": kwargs.get("info_string", None),
-            "default_extension": kwargs.get("default_extension", None),
+            "default_suffix": kwargs.get("default_suffix", None),
         }
         self._stored_dirs = {}
         self._stored_selections = {}
         self._calling_kwargs = {}
 
-        self._set_basic_widget_configuration()
-        self._update_widgets()
+        self._configure_dialog()
+        self._insert_buttons_into_sidebar()
         self._widgets["but_latest_location"].clicked.connect(self.goto_latest_location)
         self._widgets["but_scan_home"].clicked.connect(self.goto_scan_base_dir)
 
-    def _set_basic_widget_configuration(self):
-        """Set the basic configuration for the widget."""
+    def _configure_dialog(self) -> None:
+        """Set up the basic configuration for the FileDialog."""
         self.setViewMode(QtWidgets.QFileDialog.Detail)
-        self.setOption(QtWidgets.QFileDialog.DontUseNativeDialog)
+        self.setOptions(
+            QtWidgets.QFileDialog.DontUseNativeDialog  # type: ignore[operator]
+            | QtWidgets.QFileDialog.DontResolveSymlinks
+            | QtWidgets.QFileDialog.DontUseCustomDirectoryIcons
+        )
+        _desktop = QStandardPaths.standardLocations(QStandardPaths.DesktopLocation)[0]
+        _docs = QStandardPaths.standardLocations(QStandardPaths.DocumentsLocation)[0]
         self.setSidebarUrls(
             [
                 QtCore.QUrl("file:"),
                 QtCore.QUrl.fromLocalFile(QtCore.QDir.homePath()),
-                QtCore.QUrl.fromLocalFile(
-                    QtCore.QStandardPaths.standardLocations(
-                        QtCore.QStandardPaths.DesktopLocation
-                    )[0]
-                ),
-                QtCore.QUrl.fromLocalFile(
-                    QtCore.QStandardPaths.standardLocations(
-                        QtCore.QStandardPaths.DocumentsLocation
-                    )[0]
-                ),
+                QtCore.QUrl.fromLocalFile(_desktop),
+                QtCore.QUrl.fromLocalFile(_docs),
             ]
         )
-        _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
-        _sidebar.setMinimumWidth(180)
         self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
-    def _update_widgets(self):
+    def _insert_buttons_into_sidebar(self) -> None:
         """Insert buttons to access specific locations and optional text fields."""
+        _splitter = self.findChild(QtWidgets.QSplitter)
+        _sidebar = _splitter.widget(0)
+        _fileview = _splitter.widget(1)
+        # Create a container widget for the sidebar to hold the buttons and the
+        # original sidebar content:
+        _sidebar.setMinimumWidth(180)
+        _sidebar.setParent(None)
         self.create_empty_widget(
-            "sidebar_frame",
+            "sidebar_container",
             font_metric_width_factor=FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH,
             parent_widget=None,
         )
-        self.create_empty_widget("fileview_frame", parent_widget=None)
         self.create_button(
             "but_latest_location",
             "Open latest selected location",
             icon="qt-std::SP_BrowserReload",
-            parent_widget=self._widgets["sidebar_frame"],
+            parent_widget=self._widgets["sidebar_container"],
         )
         self.create_button(
             "but_scan_home",
             "Open scan base directory",
             icon=icons.get_pydidas_qt_icon("scan_home.png"),
-            parent_widget=self._widgets["sidebar_frame"],
+            parent_widget=self._widgets["sidebar_container"],
         )
-        _splitter = self.layout().itemAt(2).widget()
-        _listview = _splitter.widget(0)
-        _listview.setParent(None)
         self.add_any_widget(
-            "listview", _listview, parent_widget=self._widgets["sidebar_frame"]
+            "sidebar", _sidebar, parent_widget=self._widgets["sidebar_container"]
         )
-        _splitter.insertWidget(0, self._widgets["sidebar_frame"])
-        _fileview = _splitter.widget(1)
+        # Create a container widget for the file view to hold the original
+        # file view and an additional label for information:
         _fileview.setParent(None)
+        self.create_empty_widget("fileview_frame", parent_widget=None)
         self.create_label(
             "info_label",
             "",
@@ -179,15 +198,17 @@ class PydidasFileDialog(
         self.add_any_widget(
             "fileview", _fileview, parent_widget=self._widgets["fileview_frame"]
         )
+        # Re-insert the new container widgets into the splitter:
+        _splitter.insertWidget(0, self._widgets["sidebar_container"])
         _splitter.insertWidget(1, self._widgets["fileview_frame"])
 
     @QtCore.Slot()
-    def goto_latest_location(self):
+    def goto_latest_location(self) -> None:
         """Open the latest location from any dialogue."""
         self.setDirectory(self.q_settings_get("dialogues/current"))
 
     @QtCore.Slot()
-    def goto_scan_base_dir(self):
+    def goto_scan_base_dir(self) -> None:
         """Open the ScanContext home directory, if set."""
         _scan_base = SCAN.get_param_value("scan_base_directory", dtype=str)
         self.setDirectory(_scan_base)
@@ -204,18 +225,21 @@ class PydidasFileDialog(
         _char_width, _char_height = PydidasQApplication.instance().font_metrics
         _geo_width = int(_char_width * 160)
         _geo_height = int(_char_height * 32)
-        update_child_qobject(self, "geometry", width=_geo_width, height=_geo_height)
-
-        self._widgets["info_label"].setText(self._calling_kwargs.get("info_string", ""))
-        self._widgets["info_label"].setVisible(
-            len(self._widgets["info_label"].text()) > 0
+        # noinspection PyTypeChecker
+        update_child_qobject(  # type: ignore[arg-type]
+            self, "geometry", width=_geo_width, height=_geo_height
         )
 
-        _scan_base = SCAN.get_param_value("scan_base_directory", dtype=str)
-        self._widgets["but_scan_home"].setEnabled(os.path.isdir(_scan_base))
+        _info_text = self._calling_kwargs.get("info_string", "")
+        self._widgets["info_label"].setText(_info_text)
+        self._widgets["info_label"].setVisible(len(_info_text) > 0)
+
+        _scan_base = SCAN.get_param_value("scan_base_directory")
+        _scan_base_valid = _scan_base.is_dir() and _scan_base != Path()
+        self._widgets["but_scan_home"].setEnabled(_scan_base_valid)
         _latest = self.q_settings_get("dialogues/current")
         if _latest is not None:
-            self._widgets["but_latest_location"].setEnabled(os.path.isdir(_latest))
+            self._widgets["but_latest_location"].setEnabled(Path(_latest).is_dir())
         _stored_selection, _stored_dir = self._get_stored_entries()
         if _stored_dir is not None:
             self.setDirectory(_stored_dir)
@@ -256,22 +280,23 @@ class PydidasFileDialog(
 
             caption : str, optional
                 The window title caption. The default is 'Select directory'.
-            reference : str | int, optional
-                A reference key to store the selection only during the active instance.
-                The default is None.
+            reference : str or int, optional
+                A reference key to store the selection only during the
+                active instance. The default is None.
             qsettings_ref : str, optional
-                The reference key for storing the selection in the QSettings registry.
-                The qsettings_ref will take precedence over the reference keyword.
+                The reference key for storing the selection in the
+                QSettings registry. The qsettings_ref will take
+                precedence over the reference keyword.
             info_string : str, optional
-                An additional info string to be displayed at the top of the file
-                selection for user information.
+                An additional info string to be displayed at the top
+                of the file selection for user information.
 
         Returns
         -------
-        str | None
+        str or None
             The directory path, if selected or None.
         """
-        self._calling_kwargs = kwargs
+        self._store_calling_kwargs(kwargs)
         self.setWindowTitle(kwargs.get("caption", "Select directory"))
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
         self.setFileMode(QtWidgets.QFileDialog.Directory)
@@ -294,21 +319,26 @@ class PydidasFileDialog(
 
             caption : str, optional
                 The window title caption. The default is 'Select existing file'.
-            reference : str | int, optional
-                A reference key to store the selection only during the active instance.
-                The default is None.
+            formats : str, optional
+                The list of format filters for filenames. The formats
+                string should be in the format of
+                "Description (*.ext1 *.ext2);;Another description (*.ext3)".
+            reference : str or int, optional
+                A reference key to store the selection only during the
+                active instance. The default is None.
             select_multiple : bool, optional
                 If True, multiple files can be selected. The default is False.
             qsettings_ref : str, optional
-                The reference key for storing the selection in the QSettings registry.
-                The qsettings_ref will take precedence over the reference keyword.
+                The reference key for storing the selection in the
+                QSettings registry. The qsettings_ref will take
+                precedence over the reference keyword.
 
         Returns
         -------
-        str | None
+        str or None
             The full file path, if selected, or None.
         """
-        self._calling_kwargs = kwargs
+        self._store_calling_kwargs(kwargs)
         _select_multiple = kwargs.get("select_multiple", False)
         self.setWindowTitle(kwargs.get("caption", "Select existing file"))
         self._set_name_filter()
@@ -318,13 +348,13 @@ class PydidasFileDialog(
             if _select_multiple
             else QtWidgets.QFileDialog.ExistingFile
         )
-        self.setProxyModel(None)
+        self.setProxyModel(None)  # type: ignore[arg-type]
         res = self.exec_()
         if res == 0:
             return None
         self._store_current_directory()
         if _select_multiple:
-            return self.selectedFiles()
+            return self.selectedFiles()  # type: ignore[return-value]
         return self.selectedFiles()[0]
 
     def get_existing_filenames(self, **kwargs: Any) -> list[str]:
@@ -342,48 +372,40 @@ class PydidasFileDialog(
         _names = self.get_existing_filename(**kwargs)
         return [] if _names is None else _names
 
-    def _set_name_filter(self):
-        """
-        Set the file dialog's nameFilter based on the specified formats.
-        """
+    def _set_name_filter(self) -> None:
+        """Set the file dialog's nameFilter based on the specified formats."""
         _formats = self._calling_kwargs.get("formats")
         self.setNameFilter(_formats)
+        self._config["valid_extensions"] = None
         if _formats is not None:
-            if _formats.split(";;")[0] == "All files (*.*)":
+            if len(_formats) >= 2 and _formats.split(";;")[0] == "All files (*)":
                 self.selectNameFilter(_formats.split(";;")[1])
-            if "All supported files" in _formats:
-                _exts = [
-                    [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
-                    for _entry in _formats.split(";;")
-                    if _entry.startswith("All supported files")
-                ][0]
-            else:
-                _exts = flatten(
-                    [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
-                    for _entry in _formats.split(";;")
-                )
+            _exts = []
+            for _ftype in _formats.split(";;"):
+                _suffixes = [_ext.strip() for _ext in _ftype.strip(")").split("*")[1:]]
+                _curr_exts = [_ext for _ext in _suffixes if _ext and _ext not in _exts]
+                _exts.extend(_curr_exts)
             if "*" in _exts:
                 _exts.pop(_exts.index("*"))
-            self._calling_kwargs["extensions"] = _exts if len(_exts) > 0 else None
+            if _exts:
+                self._config["valid_extensions"] = _exts
 
-    def _store_current_directory(self):
-        """
-        Store the active directory for re-opening the file dialog.
-        """
-        _selection = self.selectedFiles()[0]
-        if not os.path.isdir(_selection):
-            _selection = os.path.dirname(_selection)
-        self.q_settings_set("dialogues/current", _selection)
-        if self._calling_kwargs.get("qsettings_ref", None) is not None:
+    def _store_current_directory(self) -> None:
+        """Store the active directory for re-opening the file dialog."""
+        _selection = Path(self.selectedFiles()[0])
+        if not _selection.is_dir():
+            _selection = _selection.parent
+        _curr_dir = str(_selection)
+        self.q_settings_set("dialogues/current", _curr_dir)
+        _key = None
+        if self._calling_kwargs.get("qsettings_ref") is not None:
             _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
-            self.q_settings_set(_key, _selection)
-            self._stored_selections[_key] = self._widgets["selection"].text()
-            return
+            self.q_settings_set(_key, _curr_dir)
         if "reference" in self._calling_kwargs:
-            self._stored_dirs[self._calling_kwargs.get("reference")] = _selection
-            self._stored_selections[self._calling_kwargs.get("reference")] = (
-                self._widgets["selection"].text()
-            )
+            _key = self._calling_kwargs.get("reference")
+            self._stored_dirs[_key] = _curr_dir
+        if _key is not None:
+            self._stored_selections[_key] = self._widgets["selection"].text()
 
     def get_saving_filename(self, **kwargs: Any) -> str | None:
         """
@@ -397,26 +419,27 @@ class PydidasFileDialog(
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional
-                The window title caption. The default is 'Select filename'.
-            reference : str | int, optional
-                A reference key to store the selection only during the active
-                instance. The default is None.
+                The window title caption. The default is 'Select
+                filename'.
+            reference : str or int, optional
+                A reference key to store the selection only during the
+                active instance. The default is None.
             qsettings_ref : str, optional
-                The reference key for storing the selection in the QSettings
-                registry. The qsettings_ref will take precedence over the
-                reference keyword.
+                The reference key for storing the selection in the
+                QSettings registry. The qsettings_ref will take
+                precedence over the reference keyword.
 
         Returns
         -------
-        str | None
+        str or None
             The full file path, if selected, or None.
         """
-        self._calling_kwargs = kwargs
+        self._store_calling_kwargs(kwargs)
         self._set_name_filter()
         self.setWindowTitle(kwargs.get("caption", "Select filename"))
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
         self.setFileMode(QtWidgets.QFileDialog.AnyFile)
-        self.setProxyModel(None)
+        self.setProxyModel(None)  # type: ignore[arg-type]
         res = self.exec_()
         if res == 0:
             return None
@@ -428,6 +451,22 @@ class PydidasFileDialog(
             self._check_extension(_ext)
         self._store_current_directory()
         return _selection
+
+    def _store_calling_kwargs(self, kwarg_dict: dict[str, Any]) -> None:
+        """
+        Store the kwargs of the calling method for later use.
+
+        Parameters
+        ----------
+        kwarg_dict : dict[str, Any]
+            The kwargs to store.
+        """
+        if "reference" in kwarg_dict and "qsettings_ref" in kwarg_dict:
+            raise UserConfigError(
+                "Both `reference` and `qsettings_ref` keys are given in the kwargs. "
+                "Please only use one of them to avoid conflicts."
+            )
+        self._calling_kwargs = kwarg_dict
 
     def _get_extension(self) -> str:
         """
@@ -441,23 +480,22 @@ class PydidasFileDialog(
         str
             The extension for the filename.
         """
-        if self._calling_kwargs["extensions"] is None:
+        _global_default_suffixes = [".yaml", ".npy", ".tif", ".h5"]
+        _filter = self.selectedNameFilter()
+        _filtered_extensions = [
+            _e.strip() for _e in _filter.removesuffix(")").split("*")[1:]
+        ]
+        if _filtered_extensions in ([""], []):
             return ""
-        if self.selectedNameFilter().startswith(
-            "All files"
-        ) or self.selectedNameFilter().startswith("All supported files"):
-            if self._calling_kwargs.get("default_extension") is not None:
-                return self._calling_kwargs.get("default_extension")
-            _defaults = [".yaml", ".npy", ".tif", ".h5"]
-            while len(_defaults) > 0:
-                _ext = _defaults.pop(0)
-                if _ext in self._calling_kwargs["extensions"]:
-                    return f".{_ext}"
-            return self._calling_kwargs["extensions"][0]
-        _formats = self.selectedNameFilter().strip(")").split("*.")[1:]
-        return _formats[0]
+        _default = self._calling_kwargs.get("default_suffix")
+        if _default is not None and _default in _filtered_extensions:
+            return _default
+        for _suffix in _global_default_suffixes:
+            if _suffix in _filtered_extensions:
+                return _suffix
+        return _filtered_extensions[0]
 
-    def _check_extension(self, extension: str):
+    def _check_extension(self, extension: str) -> None:
         """
         Check the given extension and confirm that it is valid.
 
@@ -466,32 +504,32 @@ class PydidasFileDialog(
         extension : str
             The extension.
         """
-        if self._calling_kwargs["extensions"] is None:
+        if self._config["valid_extensions"] is None:
             return
-        if extension not in self._calling_kwargs["extensions"]:
+        if extension not in self._config["valid_extensions"]:
             raise UserConfigError(
                 f'The given extension "{extension}" is invalid because the file type '
                 "is unknown."
             )
 
-    def set_curr_dir(self, reference: str | int, item: pathlib.Path | str):
+    def set_curr_dir(self, reference: str | int, item: Path | str) -> None:
         """
         Set the current directory to the directory of the given item.
 
         Parameters
         ----------
-        reference: str | int
+        reference : str or int
             The stored reference name.
-        item : Path | str
+        item : Path or str
             The filename or directory name.
         """
-        if isinstance(item, pathlib.Path):
+        if isinstance(item, Path):
             item = str(item)
         if os.path.isfile(item):
             item = os.path.dirname(item)
         elif not os.path.isdir(item):
             raise UserConfigError(
-                f"The given entry {item} is neither a valid directory nor file. Please "
-                "check the input and try again."
+                f"The given entry {item} is neither a valid directory "
+                "nor file. Please check the input and try again."
             )
         self._stored_dirs[reference] = item

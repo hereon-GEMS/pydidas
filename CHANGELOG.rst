@@ -15,11 +15,14 @@ Programmatic changes
 - Added an option to remove a QSettings key to PydidasQsettings.
 - Modified the ParamIoWidgets to use the FileDialog only with either a 
   persistent QSettings key or an ID reference and not both.
+- Updated the code of the FileDialog
 
 Bugfixes
 --------
 - Fixed an issue in the ParamIoWidgetHdf5 where two leading dots
   were added to extensions.
+- Fixed an issue in the PydidasFileDialog where the extension for 
+  saving a file could not be automatically determined.
 
 
 

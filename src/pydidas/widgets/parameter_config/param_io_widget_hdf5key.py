@@ -77,7 +77,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         and opens a QFileDialog widget to select a filename.
         """
         _result = self.io_dialog.get_existing_filename(
-            formats=("HDF5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
+            formats=("HDF5 files (*" + " *".join(HDF5_EXTENSIONS) + ")"),
             qsettings_ref=self._io_qsettings_ref,
             default_suffix=".nxs",
         )

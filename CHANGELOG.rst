@@ -2,6 +2,24 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+
+v26.mm.dd
+=========
+
+
+Programmatic changes
+--------------------
+- Changed from plain extensions to file suffixed with the leading dot to
+  be consistent with pathlib.Path
+- Added an option to remove a QSettings key to PydidasQsettings.
+
+Bugfixes
+--------
+- Fixed an issue 
+
+
+
 v26.01.27
 =========
 
@@ -9,6 +27,7 @@ Bugfixes
 --------
 - Fixed an issue with a pinned dependency for sphinx which occurs when
   upgrading pydidas in an existing environment.
+
 
 v26.01.26
 =========

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ProcessingTreeIoYaml class to import/export the WorkflowTree to yaml
+Module with the ProcessingTreeIoYaml class to import/export the WorkflowTree to YAML
 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = ["ProcessingTreeIoYaml"]
 
 
 from pathlib import Path
-from typing import NewType, Union
+from typing import Any, NewType
 
 import yaml
 
@@ -46,16 +46,17 @@ ProcessingTree = NewType("ProcessingTree", type)
 
 class ProcessingTreeIoYaml(ProcessingTreeIoBase):
     """
-    Base class for ProcessingTree exporters.
+    Import/Export class for the ProcessingTree to/from YAML files.
     """
 
     extensions = YAML_EXTENSIONS
     format_name = "YAML"
+    default_suffix = ".yaml"
 
     @classmethod
     def export_to_file(
-        cls, filename: Union[Path, str], tree: ProcessingTree, **kwargs: dict
-    ):
+        cls, filename: Path | str, tree: ProcessingTree, **kwargs: Any
+    ) -> None:
         """
         Write the content to a file.
 
@@ -63,7 +64,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
         tree : ProcessingTree
             The workflow tree instance.
@@ -77,7 +78,7 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
             yaml.safe_dump(_dump, _file)
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str]) -> ProcessingTree:
+    def import_from_file(cls, filename: Path | str) -> ProcessingTree:
         """
         Restore the content from a file.
 
@@ -85,8 +86,8 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : Union[Path, str]
-            The filename of the file to be written.
+        filename : Path or str
+            The filename of the file to be read.
 
         Returns
         -------

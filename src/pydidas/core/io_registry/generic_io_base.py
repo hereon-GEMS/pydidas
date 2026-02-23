@@ -45,7 +45,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
     imported_params = {}
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs: Any) -> None:
+    def export_to_file(cls, filename, *args: Any, **kwargs: Any) -> None:
         """
         Write the content to a file.
 

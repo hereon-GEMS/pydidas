@@ -16,6 +16,8 @@ Programmatic changes
 - Modified the ParamIoWidgets to use the FileDialog only with either a 
   persistent QSettings key or an ID reference and not both.
 - Updated the code of the FileDialog
+- Changed the default saving extension for processing results to .nxs
+  (was .h5)
 
 Bugfixes
 --------
@@ -23,6 +25,8 @@ Bugfixes
   were added to extensions.
 - Fixed an issue in the PydidasFileDialog where the extension for 
   saving a file could not be automatically determined.
+- Fixed an issie in the PydidasFileDialog which did not add the correct 
+  extension when selecting an extension in the FileDialog dropdown.
 
 
 

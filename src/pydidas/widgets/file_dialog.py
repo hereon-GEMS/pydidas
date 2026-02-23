@@ -136,6 +136,10 @@ class PydidasFileDialog(
         self._widgets["but_latest_location"].clicked.connect(self.goto_latest_location)
         self._widgets["but_scan_home"].clicked.connect(self.goto_scan_base_dir)
 
+    # ========================================================================
+    # Private initialization and setup methods
+    # ========================================================================
+
     def _configure_dialog(self) -> None:
         """Set up the basic configuration for the FileDialog."""
         self.setViewMode(QtWidgets.QFileDialog.Detail)
@@ -202,6 +206,10 @@ class PydidasFileDialog(
         _splitter.insertWidget(0, self._widgets["sidebar_container"])
         _splitter.insertWidget(1, self._widgets["fileview_frame"])
 
+    # ========================================================================
+    # Slot handlers for navigation buttons
+    # ========================================================================
+
     @QtCore.Slot()
     def goto_latest_location(self) -> None:
         """Open the latest location from any dialogue."""
@@ -212,6 +220,10 @@ class PydidasFileDialog(
         """Open the ScanContext home directory, if set."""
         _scan_base = SCAN.get_param_value("scan_base_directory", dtype=str)
         self.setDirectory(_scan_base)
+
+    # ========================================================================
+    # Core public API methods - Dialog execution
+    # ========================================================================
 
     def exec_(self) -> int:
         """
@@ -246,28 +258,6 @@ class PydidasFileDialog(
             self.selectFile(_stored_selection)
         self._widgets["selection"].setText(_stored_selection)
         return QtWidgets.QFileDialog.exec_(self)
-
-    def _get_stored_entries(self) -> tuple[str, str | None]:
-        """
-        Get the stored directory and selection based on the reference name.
-
-        If a 'qsettings_ref' key is given, this takes precedence over the 'reference'
-        key.
-
-        Returns
-        -------
-        str
-            The stored selection or an empty string if no selection was saved.
-        str | None
-            The stored directory, if existing or None.
-        """
-        if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
-            return self._stored_selections.get(_key, ""), self.q_settings_get(_key)
-        if "reference" in self._calling_kwargs:
-            _key = self._calling_kwargs.get("reference")
-            return self._stored_selections.get(_key, ""), self._stored_dirs.get(_key)
-        return "", None
 
     def get_existing_directory(self, **kwargs: Any) -> str | None:
         """
@@ -372,41 +362,6 @@ class PydidasFileDialog(
         _names = self.get_existing_filename(**kwargs)
         return [] if _names is None else _names
 
-    def _set_name_filter(self) -> None:
-        """Set the file dialog's nameFilter based on the specified formats."""
-        _formats = self._calling_kwargs.get("formats")
-        self.setNameFilter(_formats)
-        self._config["valid_extensions"] = None
-        if _formats is not None:
-            if len(_formats) >= 2 and _formats.split(";;")[0] == "All files (*)":
-                self.selectNameFilter(_formats.split(";;")[1])
-            _exts = []
-            for _ftype in _formats.split(";;"):
-                _suffixes = [_ext.strip() for _ext in _ftype.strip(")").split("*")[1:]]
-                _curr_exts = [_ext for _ext in _suffixes if _ext and _ext not in _exts]
-                _exts.extend(_curr_exts)
-            if "*" in _exts:
-                _exts.pop(_exts.index("*"))
-            if _exts:
-                self._config["valid_extensions"] = _exts
-
-    def _store_current_directory(self) -> None:
-        """Store the active directory for re-opening the file dialog."""
-        _selection = Path(self.selectedFiles()[0])
-        if not _selection.is_dir():
-            _selection = _selection.parent
-        _curr_dir = str(_selection)
-        self.q_settings_set("dialogues/current", _curr_dir)
-        _key = None
-        if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
-            self.q_settings_set(_key, _curr_dir)
-        if "reference" in self._calling_kwargs:
-            _key = self._calling_kwargs.get("reference")
-            self._stored_dirs[_key] = _curr_dir
-        if _key is not None:
-            self._stored_selections[_key] = self._widgets["selection"].text()
-
     def get_saving_filename(self, **kwargs: Any) -> str | None:
         """
         Execute the dialog and get the full path of a file for saving.
@@ -452,6 +407,36 @@ class PydidasFileDialog(
         self._store_current_directory()
         return _selection
 
+    # ========================================================================
+    # Public utility methods
+    # ========================================================================
+
+    def set_curr_dir(self, reference: str | int, item: Path | str) -> None:
+        """
+        Set the current directory to the directory of the given item.
+
+        Parameters
+        ----------
+        reference : str or int
+            The stored reference name.
+        item : Path or str
+            The filename or directory name.
+        """
+        if isinstance(item, Path):
+            item = str(item)
+        if os.path.isfile(item):
+            item = os.path.dirname(item)
+        elif not os.path.isdir(item):
+            raise UserConfigError(
+                f"The given entry {item} is neither a valid directory "
+                "nor file. Please check the input and try again."
+            )
+        self._stored_dirs[reference] = item
+
+    # ========================================================================
+    # Private helper methods
+    # ========================================================================
+
     def _store_calling_kwargs(self, kwarg_dict: dict[str, Any]) -> None:
         """
         Store the kwargs of the calling method for later use.
@@ -468,6 +453,63 @@ class PydidasFileDialog(
             )
         self._calling_kwargs = kwarg_dict
 
+    def _get_stored_entries(self) -> tuple[str, str | None]:
+        """
+        Get the stored directory and selection based on the reference name.
+
+        If a 'qsettings_ref' key is given, this takes precedence over the 'reference'
+        key.
+
+        Returns
+        -------
+        str
+            The stored selection or an empty string if no selection was saved.
+        str | None
+            The stored directory, if existing or None.
+        """
+        if self._calling_kwargs.get("qsettings_ref") is not None:
+            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
+            return self._stored_selections.get(_key, ""), self.q_settings_get(_key)
+        if "reference" in self._calling_kwargs:
+            _key = self._calling_kwargs.get("reference")
+            return self._stored_selections.get(_key, ""), self._stored_dirs.get(_key)
+        return "", None
+
+    def _store_current_directory(self) -> None:
+        """Store the active directory for re-opening the file dialog."""
+        _selection = Path(self.selectedFiles()[0])
+        if not _selection.is_dir():
+            _selection = _selection.parent
+        _curr_dir = str(_selection)
+        self.q_settings_set("dialogues/current", _curr_dir)
+        _key = None
+        if self._calling_kwargs.get("qsettings_ref") is not None:
+            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
+            self.q_settings_set(_key, _curr_dir)
+        if "reference" in self._calling_kwargs:
+            _key = self._calling_kwargs.get("reference")
+            self._stored_dirs[_key] = _curr_dir
+        if _key is not None:
+            self._stored_selections[_key] = self._widgets["selection"].text()
+
+    def _set_name_filter(self) -> None:
+        """Set the file dialog's nameFilter based on the specified formats."""
+        _formats = self._calling_kwargs.get("formats")
+        self.setNameFilter(_formats)
+        self._config["valid_extensions"] = None
+        if _formats is not None:
+            if len(_formats) >= 2 and _formats.split(";;")[0] == "All files (*)":
+                self.selectNameFilter(_formats.split(";;")[1])
+            _exts = []
+            for _fmt in _formats.split(";;"):
+                _suffixes = [_ext.strip() for _ext in _fmt.strip(")").split("*")[1:]]
+                _curr_exts = [_ext for _ext in _suffixes if _ext and _ext not in _exts]
+                _exts.extend(_curr_exts)
+            if "*" in _exts:
+                _exts.pop(_exts.index("*"))
+            if _exts:
+                self._config["valid_extensions"] = _exts
+
     def _get_extension(self) -> str:
         """
         Get an extension for the selected filename.
@@ -480,7 +522,7 @@ class PydidasFileDialog(
         str
             The extension for the filename.
         """
-        _global_default_suffixes = [".yaml", ".npy", ".tif", ".h5"]
+        _global_default_suffixes = [".yaml", ".nxs", ".npy", ".tif", ".h5"]
         _filter = self.selectedNameFilter()
         _filtered_extensions = [
             _e.strip() for _e in _filter.removesuffix(")").split("*")[1:]
@@ -508,28 +550,6 @@ class PydidasFileDialog(
             return
         if extension not in self._config["valid_extensions"]:
             raise UserConfigError(
-                f'The given extension "{extension}" is invalid because the file type '
-                "is unknown."
+                f"The given extension `{extension}` is invalid because the file type "
+                "is not supported for this use case."
             )
-
-    def set_curr_dir(self, reference: str | int, item: Path | str) -> None:
-        """
-        Set the current directory to the directory of the given item.
-
-        Parameters
-        ----------
-        reference : str or int
-            The stored reference name.
-        item : Path or str
-            The filename or directory name.
-        """
-        if isinstance(item, Path):
-            item = str(item)
-        if os.path.isfile(item):
-            item = os.path.dirname(item)
-        elif not os.path.isdir(item):
-            raise UserConfigError(
-                f"The given entry {item} is neither a valid directory "
-                "nor file. Please check the input and try again."
-            )
-        self._stored_dirs[reference] = item

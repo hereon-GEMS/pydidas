@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The Timer context manager allows to time and print code runtimes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,6 +28,7 @@ __all__ = ["Timer", "TimerSaveRuntime"]
 
 
 import time
+from typing import Any
 
 
 class Timer:
@@ -36,6 +37,12 @@ class Timer:
 
     Is it designed to be used in a "with Timer():" statement.
 
+    Parameters
+    ----------
+    msg : str or None, optional
+        An optional message to be printed along with the runtime.
+        The default is None.
+
     Example
     -------
     >>> with Timer():
@@ -43,15 +50,21 @@ class Timer:
     Code runtime is 0.597181800 seconds.
     """
 
-    def __init__(self, msg=None):
-        self._tstart = None
+    def __init__(self, msg: str | None = None) -> None:
+        self._tstart: float | None = None
         self._msg = msg
 
-    def __enter__(self):
+    def __enter__(self) -> "Timer":
         """Start the context manager."""
         self._tstart = time.perf_counter()
+        return self
 
-    def __exit__(self, type_, value, traceback):
+    def __exit__(
+        self,
+        type_: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: Any,
+    ) -> None:
         """Exit the context manager."""
         _delta = time.perf_counter() - self._tstart
         _str = f"Code runtime is {_delta:0.9f} seconds."
@@ -77,16 +90,21 @@ class TimerSaveRuntime:
     0.597181800
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tstart = 0
         self._tend = 0
 
-    def __enter__(self) -> object:
+    def __enter__(self) -> "TimerSaveRuntime":
         """Start the context manager."""
         self._tstart = time.perf_counter()
         return self
 
-    def __exit__(self, type_, value, traceback):
+    def __exit__(
+        self,
+        type_: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: Any,
+    ) -> None:
         """Exit the context manager."""
         self._tend = time.perf_counter()
 

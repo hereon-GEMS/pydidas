@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+from pathlib import Path
 
 import pytest
 
@@ -160,7 +161,10 @@ def test_store_current_directory(file_dialog, temp_path, use_dir, qref, ref) -> 
     file_dialog.setDirectory(str(_test_dir))
     file_dialog.selectFile("file_dialog_test" if use_dir else "test_file.txt")
     file_dialog._store_current_directory()
-    assert file_dialog.q_settings_get("dialogues/current") == str(_test_dir)
+    # Normalize paths for comparison on Windows
+    stored_dir = Path(file_dialog.q_settings_get("dialogues/current")).resolve()
+    expected_dir = _test_dir.resolve()
+    assert stored_dir == expected_dir
     if qref is not None:
         assert file_dialog.q_settings_get(f"dialogues/{qref}") == str(_test_dir)
         assert file_dialog._stored_selections[f"dialogues/{qref}"] == (

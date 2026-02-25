@@ -162,16 +162,20 @@ def test_store_current_directory(file_dialog, temp_path, use_dir, qref, ref) -> 
     file_dialog.selectFile("file_dialog_test" if use_dir else "test_file.txt")
     file_dialog._store_current_directory()
     # Normalize paths for comparison on Windows
-    stored_dir = Path(file_dialog.q_settings_get("dialogues/current")).resolve()
-    expected_dir = _test_dir.resolve()
-    assert stored_dir == expected_dir
+    _stored_dir = Path(file_dialog.q_settings_get("dialogues/current")).resolve()
+    _expected_dir = _test_dir.resolve()
+    assert _stored_dir == _expected_dir
     if qref is not None:
-        assert file_dialog.q_settings_get(f"dialogues/{qref}") == str(_test_dir)
+        _stored_qref_dir = Path(
+            file_dialog.q_settings_get(f"dialogues/{qref}")
+        ).resolve()
+        assert _stored_qref_dir == _expected_dir
         assert file_dialog._stored_selections[f"dialogues/{qref}"] == (
             "file_dialog_test" if use_dir else "test_file.txt"
         )
     if ref is not None:
-        assert file_dialog._stored_dirs[ref] == str(_test_dir)
+        _stored_ref_dir = Path(file_dialog._stored_dirs[ref]).resolve()
+        assert _stored_ref_dir == _expected_dir
         assert file_dialog._stored_selections[ref] == (
             "file_dialog_test" if use_dir else "test_file.txt"
         )

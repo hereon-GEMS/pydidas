@@ -24,7 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
@@ -45,10 +44,10 @@ from pydidas.core.utils.file_checks import (
 
 class TestFileCheckFunctions(unittest.TestCase):
     def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._no_fname = os.path.join(self._path, "test.npy")
-        self._hdf5_fname = os.path.join(self._path, "test01.h5")
-        with h5py.File(self._hdf5_fname, "w") as _file:
+        self._path = Path(tempfile.mkdtemp())
+        self._no_fname = self._path / "test.npy"
+        self._hdf5_fname = self._path / "test01.h5"
+        with h5py.File(str(self._hdf5_fname), "w") as _file:
             _file["test/path/data"] = [1, 2, 3, 4, 5]
 
     def tearDown(self):
@@ -90,7 +89,7 @@ class TestFileCheckFunctions(unittest.TestCase):
         _data = np.random.random((10, 10))
         _fnames = [f"test{i:02d}.npy" for i in range(10)]
         for _name in _fnames:
-            np.save(os.path.join(self._path, _name), _data)
+            np.save(self._path / _name, _data)
         verify_files_of_range_are_same_size(
             [Path(self._path).joinpath(_name) for _name in _fnames]
         )
@@ -99,7 +98,7 @@ class TestFileCheckFunctions(unittest.TestCase):
         _data = np.random.random((10, 10))
         _fnames = [f"test{i:02d}.npy" for i in range(10)]
         for i, _name in enumerate(_fnames):
-            np.save(os.path.join(self._path, _name), _data[:i, :i])
+            np.save(self._path / _name, _data[:i, :i])
         with self.assertRaises(UserConfigError):
             verify_files_of_range_are_same_size(
                 [Path(self._path).joinpath(_name) for _name in _fnames]

@@ -117,9 +117,7 @@ class Test_file_utils(unittest.TestCase):
     def test_find_valid_python_files__simple_path(self):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
-        _target = set(
-            [Path(os.path.join(self._path, _file)) for _file in self._good_filenames]
-        )
+        _target = set([self._path / _file for _file in self._good_filenames])
         self.assertEqual(_files, _target)
 
     def test_find_valid_python_files__path_tree(self):
@@ -128,7 +126,7 @@ class Test_file_utils(unittest.TestCase):
         _target = set(
             flatten(
                 [
-                    [Path(_dir.joinpath(_file)) for _file in self._good_filenames]
+                    [Path(_dir) / _file for _file in self._good_filenames]
                     for _dir in _dirs
                 ]
             )

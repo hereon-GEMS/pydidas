@@ -23,11 +23,11 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
 import shutil
 import tempfile
 import unittest
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pyFAI
@@ -45,7 +45,7 @@ PLUGIN_COLLECTION = LocalPluginCollection()
 class TestCorrectSplineDistortion(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._temppath = tempfile.mkdtemp()
+        cls._temppath = Path(tempfile.mkdtemp())
         cls.data_shape = (512, 512)
         cls._spline_files = {}
         cls._detectors = {}
@@ -62,9 +62,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         }
         for _dir, _ext in enumerate(["shrink", "expand"]):
             _factor = 1 - 2 * _dir
-            cls._spline_files[_ext] = os.path.join(
-                cls._temppath, f"spline_file_{_ext}.txt"
-            )
+            cls._spline_files[_ext] = cls._temppath / f"spline_file_{_ext}.txt"
             _spline = pyFAI.spline.Spline()
             _spline.zeros(
                 xmax=cls.data_shape[1], ymax=cls.data_shape[0], pixSize=(1, 1)
@@ -122,7 +120,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
 
     def test_pre_execute__wrong_filename(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("CorrectSplineDistortion")()
-        plugin.set_param_value("spline_file", self._temppath)
+        plugin.set_param_value("spline_file", str(self._temppath))
         with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 

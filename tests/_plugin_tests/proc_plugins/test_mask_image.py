@@ -24,11 +24,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import random
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 from qtpy import QtCore
@@ -49,7 +49,7 @@ class TestMaskImage(unittest.TestCase):
         qs.remove("unittesting")
 
     def setUp(self):
-        self._temppath = tempfile.mkdtemp()
+        self._temppath = Path(tempfile.mkdtemp())
         self._shape = (20, 20)
         _n = self._shape[0] * self._shape[1]
         self._mask = np.asarray([random.choice([0, 1]) for _ in range(_n)]).reshape(
@@ -61,7 +61,7 @@ class TestMaskImage(unittest.TestCase):
         shutil.rmtree(self._temppath)
 
     def create_mask(self):
-        _maskfilename = os.path.join(self._temppath, "mask.npy")
+        _maskfilename = str(self._temppath / "mask.npy")
         np.save(_maskfilename, self._mask)
         return _maskfilename
 

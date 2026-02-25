@@ -24,17 +24,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoBase
 
 
 class TestProcessingTreeIoBase(unittest.TestCase):
     def setUp(self):
-        self._path = tempfile.mkdtemp()
+        self._path = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -55,21 +55,21 @@ class TestProcessingTreeIoBase(unittest.TestCase):
 
     def test_check_for_existing_file__file_does_not_exist(self):
         obj = ProcessingTreeIoBase
-        obj.check_for_existing_file(os.path.join(self._path, "test.txt"))
+        obj.check_for_existing_file(self._path / "test.txt")
         # assert does not raise an Error
 
     def test_check_for_existing_file__file_does_exist(self):
         obj = ProcessingTreeIoBase
-        _fname = os.path.join(self._path, "test.txt")
-        with open(_fname, "w") as f:
+        _fname = self._path / "test.txt"
+        with _fname.open("w") as f:
             f.write("test")
         with self.assertRaises(FileExistsError):
             obj.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_does_exist_and_overwrite(self):
         obj = ProcessingTreeIoBase
-        _fname = os.path.join(self._path, "test.txt")
-        with open(_fname, "w") as f:
+        _fname = self._path / "test.txt"
+        with _fname.open("w") as f:
             f.write("test")
         obj.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise an Error

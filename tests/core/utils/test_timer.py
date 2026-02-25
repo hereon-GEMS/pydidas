@@ -24,30 +24,30 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import time
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 
 from pydidas.core.utils import Timer, TimerSaveRuntime
 
 
 class TestTimer(unittest.TestCase):
     def setUp(self):
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
 
     def test_timer(self):
-        _fname = os.path.join(self._tmpdir, "out.txt")
-        with open(_fname, "w") as _f:
+        _fname = self._tmpdir / "out.txt"
+        with _fname.open("w") as _f:
             with redirect_stdout(_f):
                 with Timer():
                     time.sleep(0.01)
-        with open(_fname, "r") as _f:
+        with _fname.open("r") as _f:
             _text = _f.read()
         self.assertIn("Code runtime is ", _text)
 

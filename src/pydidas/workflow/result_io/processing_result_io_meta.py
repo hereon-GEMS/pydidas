@@ -318,10 +318,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         _files = [
             _file
             for _file in os.listdir(dir_name)
-            if (
-                os.path.isfile(os.path.join(dir_name, _file))
-                and _file.startswith("node_")
-            )
+            if ((Path(dir_name) / _file).exists() and _file.startswith("node_"))
         ]
         for _file in _files:
             _ext = get_extension(_file)

@@ -24,12 +24,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import random
 import shutil
 import tempfile
 import unittest
 from numbers import Integral, Real
+from pathlib import Path
 
 import h5py
 import numpy as np
@@ -54,7 +54,7 @@ H5SAVER = ProcessingResultIoHdf5
 class TestProcessingResultIoHdf5(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._dir = tempfile.mkdtemp()
+        cls._dir = Path(tempfile.mkdtemp())
         SCAN.restore_all_defaults(confirm=True)
         SCAN.set_param_value("scan_dim", 2)
         for d in range(4):
@@ -80,7 +80,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
 
     @classmethod
     def _create_h5_test_file(cls):
-        cls._import_test_filename = os.path.join(cls._dir, "import_test.h5")
+        cls._import_test_filename = cls._dir / "import_test.h5"
         cls._data = Dataset(
             np.random.random((9, 9, 27)),
             data_label=get_random_string(12),
@@ -134,7 +134,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             }
             for _node in self._shapes.keys()
         }
-        self._resdir = os.path.join(self._dir, get_random_string(8))
+        self._resdir = self._dir / get_random_string(8)
         H5SAVER.prepare_files_and_directories(self._resdir, _node_infos)
 
     def get_datasets(self, start_dim=3):
@@ -160,7 +160,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
 
     def assert_written_files_are_okay(self, data, metadata):
         for _node_id in self._shapes:
-            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            _fname = self._resdir / self._filenames[_node_id]
             with h5py.File(_fname, "r") as _file:
                 self.assertEqual(
                     _file["entry/data"].attrs["title"],
@@ -190,19 +190,19 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
 
     def test_prepare_files_and_directories(self):
         self.prepare_with_defaults()
-        self.assertTrue(os.path.exists(self._resdir))
+        self.assertTrue(self._resdir.exists())
         self.assertEqual(H5SAVER.get_attribute_dict("shape"), self._shapes)
         self.assertEqual(H5SAVER.get_attribute_dict("node_label"), self._labels)
         for _key in self._shapes:
             _fname = H5SAVER._filenames[_key]
             self.assertEqual(_fname, self._filenames[_key])
-            self.assertTrue(os.path.exists(os.path.join(self._resdir, _fname)))
+            self.assertTrue((self._resdir / _fname).exists())
 
     def test_create_file_and_populate_metadata(self):
         _node_id = 1
         self.prepare_with_defaults()
         H5SAVER._create_file_and_populate_metadata(_node_id, SCAN, EXP, TREE)
-        with h5py.File(os.path.join(self._resdir, self._filenames[1]), "r") as _file:
+        with h5py.File(self._resdir / self._filenames[1], "r") as _file:
             _data = _file["entry/data/data"]
             self.assertEqual(_data.shape, self._shapes[1])
             self.assertIsInstance(_data, h5py.Dataset)
@@ -265,7 +265,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         _data = self.get_datasets(start_dim=0)
         H5SAVER.export_full_data_to_file(_data, SCAN)
         for _node_id in self._shapes:
-            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            _fname = self._resdir / self._filenames[_node_id]
             with h5py.File(_fname, "r") as _file:
                 _writtendata = _file["entry/data/data"][()]
             self.assertTrue(np.allclose(_data[_node_id], _writtendata))
@@ -277,7 +277,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         _data = self.get_datasets(start_dim=0)
         H5SAVER.export_full_data_to_file(_data)
         for _node_id in self._shapes:
-            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            _fname = self._resdir / self._filenames[_node_id]
             with h5py.File(_fname, "r") as _file:
                 _writtendata = _file["entry/data/data"][()]
             self.assertTrue(np.allclose(_data[_node_id], _writtendata))
@@ -289,7 +289,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         _scan_indices = SCAN.get_indices_from_ordinal(_index)
         H5SAVER.export_frame_to_file(_index, _data, SCAN)
         for _node_id in self._shapes:
-            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            _fname = self._resdir / self._filenames[_node_id]
             with h5py.File(_fname, "r") as _file:
                 _written_data = _file["entry/data/data"][_scan_indices]
             self.assertTrue(np.allclose(_written_data, _data[_node_id].array))
@@ -321,7 +321,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
                 self.assertEqual(_param.value, _scan.get_param_value(_key))
 
     def test_import_results_from_file__with_missing_data(self):
-        _new_name = os.path.join(self._dir, "import_test_with_None.h5")
+        _new_name = self._dir / "import_test_with_None.h5"
         shutil.copy(self._import_test_filename, _new_name)
         with h5py.File(_new_name, "r+") as _file:
             del _file["entry/pydidas_config/scan/scan_dim0_n_points"]

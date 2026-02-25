@@ -25,7 +25,6 @@ __status__ = "Production"
 
 
 import copy
-import os
 import shutil
 import tempfile
 import unittest
@@ -54,10 +53,10 @@ class TestFilelistManager(unittest.TestCase):
 
     @classmethod
     def _fname(cls, i: int):
-        return cls._path.joinpath(f"test_{i:02d}.npy")
+        return cls._path / f"test_{i:02d}.npy"
 
     def setUp(self):
-        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:02d}.npy"))
+        self._fname = lambda i: self._path / f"test_{i:02d}.npy"
 
     def test_creation(self):
         fm = FilelistManager()
@@ -88,7 +87,7 @@ class TestFilelistManager(unittest.TestCase):
     def test_property_filesize(self):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(40), False, 2)
-        self.assertEqual(fm.filesize, os.stat(self._fname(0)).st_size)
+        self.assertEqual(fm.filesize, self._fname(0).stat().st_size)
 
     def test_update_params__multiple_files(self):
         fm = FilelistManager()

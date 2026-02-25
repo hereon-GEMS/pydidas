@@ -24,9 +24,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -53,7 +53,7 @@ class TestIoBase(unittest.TestCase):
         cls._stored_exts_import = IoManager.registry_import.copy()
         cls._stored_exts_export = IoManager.registry_export.copy()
         create_tester_class()
-        cls._tmpdir = tempfile.mkdtemp()
+        cls._tmpdir = Path(tempfile.mkdtemp())
 
     @classmethod
     def tearDownClass(cls):
@@ -73,21 +73,21 @@ class TestIoBase(unittest.TestCase):
             IoBase.export_to_file("", None)
 
     def test_check_for_existing_file__file_exists(self):
-        _fname = os.path.join(self._tmpdir, "test.txt")
-        with open(_fname, "w") as f:
+        _fname = self._tmpdir / "test.txt"
+        with _fname.open("w") as f:
             f.write("Test text")
         with self.assertRaises(FileExistsError):
             IoBase.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_exists_overwrite(self):
-        _fname = os.path.join(self._tmpdir, "test.txt")
-        with open(_fname, "w") as f:
+        _fname = self._tmpdir / "test.txt"
+        with _fname.open("w") as f:
             f.write("Test text")
         IoBase.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise an error
 
     def test_check_for_existing_file__file_does_not_exist(self):
-        _fname = os.path.join(self._tmpdir, "test.txt")
+        _fname = self._tmpdir / "test.txt"
         IoBase.check_for_existing_file(_fname)
         # assert does not raise an error
 

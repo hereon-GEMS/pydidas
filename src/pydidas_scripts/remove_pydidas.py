@@ -70,9 +70,9 @@ def remove_pydidas():
         _qs_file = Path(_qs.fileName())
         _qs_dir = _qs_file.parent
         if _qs_file.exists():
-            shutil.remove(str(_qs_file))
+            shutil.remove(qs_file))
         if len(os.listdir(str(_qs_dir))) == 0:
-            shutil.remove(str(_qs_dir))
+            shutil.remove(_qs_dir))
     else:
         raise TypeError("The system architecture is not supported by pydidas!")
     print("done!")
@@ -85,10 +85,10 @@ def remove_pydidas():
     if not str(_path).replace(os.sep, "/").endswith("Hereon/pydidas"):
         _path = _path / "Hereon" / "pydidas"
     if _path.exists():
-        shutil.rmtree(str(_path))
+        shutil.rmtree(_path)
     _top_path = _path.parent
     if _top_path.exists() and len(os.listdir(str(_top_path))) == 0:
-        shutil.rmtree(str(_top_path))
+        shutil.rmtree(_top_path)
     print("done!")
 
     # Remove all local documents and logs
@@ -99,7 +99,7 @@ def remove_pydidas():
         )[0]
     )
     _docs_path = _qt_docs_path / "pydidas"
-    shutil.rmtree(str(_docs_path))
+    shutil.rmtree(_docs_path)
     print("done!")
 
     print("\nSuccessfully removed all pydidas entries from the operating system.")

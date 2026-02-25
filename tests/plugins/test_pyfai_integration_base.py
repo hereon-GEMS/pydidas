@@ -25,7 +25,6 @@ __status__ = "Production"
 
 
 import logging
-import os
 import shutil
 import tempfile
 import unittest
@@ -68,7 +67,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         }
 
     def setUp(self):
-        self._temppath = tempfile.mkdtemp()
+        self._temppath = Path(tempfile.mkdtemp())
         self._shape = (50, 50)
 
     def tearDown(self):
@@ -98,7 +97,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _mask = rng.integers(
             low=0, high=2, size=shape if shape is not None else self._shape
         )
-        _maskfilename = os.path.join(self._temppath, "mask.npy")
+        _maskfilename = self._temppath / "mask.npy"
         np.save(_maskfilename, _mask)
         return _maskfilename, _mask
 
@@ -589,9 +588,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _maskfilename, _mask = self.create_mask()
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
-        EXP.set_param_value(
-            "detector_mask_file", os.path.join(self._temppath, "no_mask.npy")
-        )
+        EXP.set_param_value("detector_mask_file", self._temppath / "no_mask.npy")
         with self.assertRaises(UserConfigError):
             plugin.load_and_set_mask()
 

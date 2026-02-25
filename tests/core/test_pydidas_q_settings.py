@@ -24,11 +24,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 
 from qtpy import QtCore
 
@@ -41,7 +41,7 @@ VERSION = "unittesting"
 
 class TestPydidasQSettings(unittest.TestCase):
     def setUp(self):
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir = Path(tempfile.mkdtemp())
         self._params = ParameterCollection(
             Parameter("param_float", float, default=123.45),
             Parameter("param_int", int, default=23),
@@ -66,10 +66,10 @@ class TestPydidasQSettings(unittest.TestCase):
 
     def test_show_all_stored_q_settings(self):
         obj = PydidasQsettings(version="unittesting")
-        _fname = os.path.join(self._tmpdir, "out.txt")
-        with open(_fname, "w") as _f, redirect_stdout(_f):
+        _fname = self._tmpdir / "out.txt"
+        with _fname.open("w") as _f, redirect_stdout(_f):
             obj.show_all_stored_q_settings()
-        with open(_fname, "r") as _f:
+        with _fname.open("r") as _f:
             _text = _f.read()
         for _key in self._params:
             _val = self._params.get_value(_key)

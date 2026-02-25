@@ -326,7 +326,7 @@ class TestPluginRegistry(unittest.TestCase):
 
     def test_import_module_and_get_classes_in_module(self):
         _dirs, _mods = self.create_plugin_file_tree(width=1, depth=1)
-        _fname = os.path.join(_dirs[0], self._good_filenames[0])
+        _fname = Path(_dirs[0]) / self._good_filenames[0]
         PC = self.get_registry_with_random_plugins()
         _members = PC._PluginRegistry__get_classes_in_module("some other name", _fname)
         _classes = [_cls for _name, _cls in _members]

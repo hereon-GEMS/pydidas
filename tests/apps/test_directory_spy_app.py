@@ -44,8 +44,8 @@ _IMG_SHAPE = (20, 20)
 _SHARE_SHAPE = (100, 100)
 
 
-def _glob_pattern(path: os.PathLike) -> str:
-    _full_path = os.path.join(str(path), _FNAME_PATTERN)
+def _glob_pattern(path: Path) -> str:
+    _full_path = str(path / _FNAME_PATTERN)
     return _full_path.replace("#####", "*")
 
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the GUI startup.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -70,9 +70,9 @@ def remove_pydidas():
         _qs_file = Path(_qs.fileName())
         _qs_dir = _qs_file.parent
         if _qs_file.exists():
-            shutil.remove(qs_file))
+            shutil.remove(_qs_file)
         if len(os.listdir(str(_qs_dir))) == 0:
-            shutil.remove(_qs_dir))
+            shutil.remove(_qs_dir)
     else:
         raise TypeError("The system architecture is not supported by pydidas!")
     print("done!")

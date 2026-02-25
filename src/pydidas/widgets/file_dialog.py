@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasFileDialog"]
 
 
-import os
 import pathlib
 from pathlib import Path
 from typing import Any

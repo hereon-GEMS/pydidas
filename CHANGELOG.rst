@@ -25,7 +25,7 @@ Bugfixes
   were added to extensions.
 - Fixed an issue in the PydidasFileDialog where the extension for 
   saving a file could not be automatically determined.
-- Fixed an issie in the PydidasFileDialog which did not add the correct 
+- Fixed an issue in the PydidasFileDialog which did not add the correct 
   extension when selecting an extension in the FileDialog dropdown.
 
 

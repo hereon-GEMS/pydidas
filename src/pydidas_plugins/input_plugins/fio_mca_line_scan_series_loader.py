@@ -123,14 +123,14 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         self._config["roi"] = self._get_own_roi()
         self._check_files_per_directory()
 
-    def update_filename_string(self):
+    def update_filepath(self):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _basepath = Path(self._SCAN.get_param_value("scan_base_directory", dtype=str))
         _pattern = self._SCAN.processed_file_naming_pattern.replace("index", "index0")
         _fio_suffix = self.get_param_value("fio_suffix").replace("#", "{index1:d}")
-        self.filename_string = os.path.join(_basepath, _pattern, _pattern + _fio_suffix)
+        self.filepath = _basepath / _pattern / (_pattern + _fio_suffix)
 
     def _check_files_per_directory(self):
         """
@@ -138,7 +138,7 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         """
         if self.get_param_value("files_per_directory") == -1:
             _i_start = self._SCAN.get_param_value("pattern_number_offset")
-            _path = Path(self.filename_string.format(index0=_i_start, index1=1)).parent
+            _path = Path(str(self.filepath).format(index0=_i_start, index1=1)).parent
             if not _path.is_dir():
                 raise UserConfigError(
                     "The given directory for the first batch of fio files does not "
@@ -163,7 +163,7 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
             )
 
     @copy_docstring(InputPlugin)
-    def get_filename(self, frame_index: int) -> str:
+    def get_filename(self, frame_index: int) -> Path:
         """
         Get the filename for the given index.
 
@@ -178,7 +178,7 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         _file_index = (
             frame_index % _n_per_dir + 1
         )  # +1 because the filenames start at 1
-        return self.filename_string.format(index0=_path_index, index1=_file_index)
+        return Path(str(self.filepath).format(index0=_path_index, index1=_file_index))
 
     def get_frame(self, index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """

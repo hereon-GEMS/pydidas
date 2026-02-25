@@ -427,7 +427,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         bool
             The flag whether the file is valid.
         """
-        if self.get_param_value("live_processing") or os.path.isfile(fname):
+        if self.get_param_value("live_processing") or Path(fname).exists():
             return True
         if fname not in ["", "."]:
             dialogues.critical_warning(
@@ -595,7 +595,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         try:
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
-                assert os.path.isfile(self.get_param_value("bg_file"))
+                assert Path(self.get_param_value("bg_file")).exists()
                 assert self._config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):

@@ -141,14 +141,14 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         text : str
             The text to be displayed.
         """
-        _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
+        _logfile = get_logging_dir() / "pydidas_exception.log"
         _note = (
             "Please report the bug online using the form available on:\n"
             "\thttps://pydidas.hereon.de/\n\n"
             "You can simply use the button on the bottom left to coyy the\n"
             "exception trace to your clipboard and open the webpage in your"
             " default browser."
-            f"\n\nA log has been written to:\n\t{_logfile}\n\n"
+            f"\n\nA log has been written to:\n\t{str(_logfile)}\n\n"
             + "-" * 20
             + "\n"
             + "Exception trace:\n\n"

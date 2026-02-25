@@ -29,8 +29,8 @@ __all__ = ["pyFAIintegrationBase"]
 
 
 import multiprocessing as mp
-import os
 import pathlib
+from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
@@ -134,7 +134,7 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
         self._mask = None
         _mask_file = self._EXP.get_param_value("detector_mask_file")
         if _mask_file != pathlib.Path():
-            if os.path.isfile(_mask_file):
+            if Path(_mask_file).is_file():
                 self._mask = import_data(_mask_file)
             else:
                 raise UserConfigError(

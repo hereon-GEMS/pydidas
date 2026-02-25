@@ -100,7 +100,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
             If a file with filename exists and the overwrite flag is not True.
         """
         _overwrite = kwargs.get("overwrite", False)
-        if os.path.exists(filename) and not _overwrite:
+        if Path(filename).exists() and not _overwrite:
             raise FileExistsError(
                 f"The file `{filename}` exists and overwriting has not been confirmed."
             )

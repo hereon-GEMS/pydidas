@@ -30,6 +30,7 @@ __all__ = ["PydidasFileDialog"]
 
 import os
 import pathlib
+from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -211,11 +212,11 @@ class PydidasFileDialog(
             len(self._widgets["info_label"].text()) > 0
         )
 
-        _scan_base = SCAN.get_param_value("scan_base_directory", dtype=str)
-        self._widgets["but_scan_home"].setEnabled(os.path.isdir(_scan_base))
-        _latest = self.q_settings_get("dialogues/current")
+        _scan_base = Path(SCAN.get_param_value("scan_base_directory", dtype=str))
+        self._widgets["but_scan_home"].setEnabled(_scan_base.is_dir())
+        _latest = Path(self.q_settings_get("dialogues/current"))
         if _latest is not None:
-            self._widgets["but_latest_location"].setEnabled(os.path.isdir(_latest))
+            self._widgets["but_latest_location"].setEnabled(_latest.is_dir())
         _stored_selection, _stored_dir = self._get_stored_entries()
         if _stored_dir is not None:
             self.setDirectory(_stored_dir)
@@ -223,7 +224,7 @@ class PydidasFileDialog(
         self._widgets["selection"].setText(_stored_selection)
         return QtWidgets.QFileDialog.exec_(self)
 
-    def _get_stored_entries(self) -> tuple[str, str | None]:
+    def _get_stored_entries(self) -> tuple[Path, Path | None]:
         """
         Get the stored directory and selection based on the reference name.
 
@@ -370,9 +371,9 @@ class PydidasFileDialog(
         """
         Store the active directory for re-opening the file dialog.
         """
-        _selection = self.selectedFiles()[0]
-        if not os.path.isdir(_selection):
-            _selection = os.path.dirname(_selection)
+        _selection = Path(self.selectedFiles()[0])
+        if not _selection.is_dir():
+            _selection = _selection.parent
         self.q_settings_set("dialogues/current", _selection)
         if self._calling_kwargs.get("qsettings_ref", None) is not None:
             _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
@@ -487,11 +488,11 @@ class PydidasFileDialog(
         """
         if isinstance(item, pathlib.Path):
             item = str(item)
-        if os.path.isfile(item):
-            item = os.path.dirname(item)
-        elif not os.path.isdir(item):
+        if Path(item).is_file():
+            item = Path(item).parent
+        elif not Path(item).is_dir():
             raise UserConfigError(
-                f"The given entry {item} is neither a valid directory nor file. Please "
+                f"The given entry {str(item)} is neither a valid directory nor file. Please "
                 "check the input and try again."
             )
-        self._stored_dirs[reference] = item
+        self._stored_dirs[reference] = str(item)

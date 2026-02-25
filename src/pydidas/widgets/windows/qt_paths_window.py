@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = ["QtPathsWindow"]
 
 
-import os
 from functools import partial
+from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -52,16 +52,20 @@ class QtPathsWindow(PydidasWindow):
     show_frame = False
 
     def __init__(self, **kwargs: dict):
-        self._log_path = os.path.join(
-            QtCore.QStandardPaths.standardLocations(
-                QtCore.QStandardPaths.DocumentsLocation
-            )[0],
-            "pydidas",
-            VERSION,
+        self._log_path = (
+            Path(
+                QtCore.QStandardPaths.standardLocations(
+                    QtCore.QStandardPaths.DocumentsLocation
+                )[0]
+            )
+            / "pydidas"
+            / VERSION
         )
-        self._config_path = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )[0]
+        self._config_path = Path(
+            QtCore.QStandardPaths.standardLocations(
+                QtCore.QStandardPaths.ConfigLocation
+            )[0]
+        )
         PydidasWindow.__init__(self, title="pydidas paths", **kwargs)
 
     def build_frame(self):

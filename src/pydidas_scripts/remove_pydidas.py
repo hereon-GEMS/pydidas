@@ -31,6 +31,7 @@ __all__ = ["remove_pydidas"]
 import os
 import shutil
 import sys
+from pathlib import Path
 
 from qtpy import QtCore
 
@@ -66,37 +67,39 @@ def remove_pydidas():
             _parent_qs.remove("Hereon")
     elif sys.platform == "linux":
         _qs = QtCore.QSettings("Hereon", "pydidas")
-        _qs_file = _qs.fileName()
-        _qs_dir = os.path.dirname(_qs_file)
-        if os.path.exists(_qs_file):
-            shutil.remove(_qs_file)
-        if len(os.listdir(_qs_dir)) == 0:
-            shutil.remove(_qs_dir)
+        _qs_file = Path(_qs.fileName())
+        _qs_dir = _qs_file.parent
+        if _qs_file.exists():
+            shutil.remove(str(_qs_file))
+        if len(os.listdir(str(_qs_dir))) == 0:
+            shutil.remove(str(_qs_dir))
     else:
         raise TypeError("The system architecture is not supported by pydidas!")
     print("done!")
 
     # Remove all local config files
     print("\nRemoving local configuration files...", end="")
-    _path = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.ConfigLocation
-    )[0]
-    if not _path.replace(os.sep, "/").endswith("Hereon/pydidas"):
-        _path = os.path.join(_path, "Hereon", "pydidas")
-    if os.path.exists(_path):
-        shutil.rmtree(_path)
-    _top_path = os.path.dirname(_path)
-    if os.path.exists(_top_path) and len(os.listdir(_top_path)) == 0:
-        shutil.rmtree(_top_path)
+    _path = Path(
+        QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.ConfigLocation)[0]
+    )
+    if not str(_path).replace(os.sep, "/").endswith("Hereon/pydidas"):
+        _path = _path / "Hereon" / "pydidas"
+    if _path.exists():
+        shutil.rmtree(str(_path))
+    _top_path = _path.parent
+    if _top_path.exists() and len(os.listdir(str(_top_path))) == 0:
+        shutil.rmtree(str(_top_path))
     print("done!")
 
     # Remove all local documents and logs
     print("\nRemoving local documents and logfiles...", end="")
-    _qt_docs_path = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.DocumentsLocation
-    )[0]
-    _docs_path = os.path.join(_qt_docs_path, "pydidas")
-    shutil.rmtree(_docs_path)
+    _qt_docs_path = Path(
+        QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.DocumentsLocation
+        )[0]
+    )
+    _docs_path = _qt_docs_path / "pydidas"
+    shutil.rmtree(str(_docs_path))
     print("done!")
 
     print("\nSuccessfully removed all pydidas entries from the operating system.")

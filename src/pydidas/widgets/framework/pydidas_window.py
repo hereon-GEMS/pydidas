@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasWindow"]
 
 
-import os
+from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -73,7 +73,7 @@ class PydidasWindow(BaseFrame):
         _window_class = self.__class__.__name__
         _doc_file = doc_filename_for_window_manual(_window_class)
 
-        if os.path.exists(_doc_file):
+        if Path(_doc_file).exists():
             _url = doc_qurl_for_window_manual(_window_class)
         else:
             _url = DOC_HOME_QURL

@@ -185,7 +185,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             The filename of the first image file.
         """
         self.__clear_entries(["last_file", *_HDF5_PARAM_KEYS])
-        if not os.path.isfile(fname):
+        if not Path(fname).is_file():
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()

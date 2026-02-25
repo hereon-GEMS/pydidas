@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Formatting script to avoid manually calling formatting modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -399,7 +399,7 @@ class CopyrightYearUpdater:
                 ):
                     _unversioned_files.append(_fname)
         return {
-            _fname: datetime.fromtimestamp(os.path.getmtime(_fname)).year
+            _fname: datetime.fromtimestamp(Path(_fname).stat().st_mtime).year
             for _fname in _unversioned_files
         }
 

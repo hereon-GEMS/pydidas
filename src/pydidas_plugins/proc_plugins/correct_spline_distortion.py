@@ -107,10 +107,12 @@ class CorrectSplineDistortion(ProcPlugin):
         """
         Initialize the detector and modify the spline, if necessary.
         """
-        _spline = self.get_param_value("spline_file")
-        if not os.path.isfile(_spline):
-            raise UserConfigError(f"The given path `{_spline}` is not a valid file.")
-        self._detector = pyFAI.detector_factory("FReLoN", {"splineFile": _spline})
+        _spline = Path(self.get_param_value("spline_file"))
+        if not _spline.is_file():
+            raise UserConfigError(
+                f"The given path `{str(_spline)}` is not a valid file."
+            )
+        self._detector = pyFAI.detector_factory("FReLoN", {"splineFile": str(_spline)})
         if self.get_param_value("geometry") == "Fit2D":
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")

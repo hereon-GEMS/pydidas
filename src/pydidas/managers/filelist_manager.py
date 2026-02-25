@@ -274,7 +274,7 @@ class FilelistManager(ObjectWithParameterCollection):
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
         self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
-        self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
+        self._config["file_list"] = [Path(str(_fnames).format(index=i)) for i in _range]
         self._config["n_files"] = len(_range)
 
     def get_filename(self, index: int) -> Path:

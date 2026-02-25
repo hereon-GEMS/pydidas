@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Module with the CompositeCreatorApp class which allows to combine images to mosa
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CompositeCreatorApp"]
 
 
-import os
 import time
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -414,9 +414,9 @@ class CompositeCreatorApp(BaseApp):
         if _target_size is None:
             return False
         _starttime = time.time()
-        if not os.path.exists(fname):
+        if not Path(fname).exists():
             return False
-        while abs(os.stat(fname).st_size - _target_size) > 0.05 * _target_size:
+        while abs(Path(fname).stat().st_size - _target_size) > 0.05 * _target_size:
             time.sleep(0.1)
             if time.time() - _starttime > timeout > 0:
                 return False

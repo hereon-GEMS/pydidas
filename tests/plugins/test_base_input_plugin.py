@@ -54,7 +54,7 @@ class _TestInputPlugin(InputPlugin):
     def __init__(self, filename="", ndim=2):
         self.base_output_data_dim = ndim
         InputPlugin.__init__(self)
-        self.filename_string = str(filename)
+        self.filepath = Path(filename)
 
     def get_frame(self, index, **kwargs):
         _shape = _DUMMY_SHAPE if self.base_output_data_dim == 2 else _DUMMY_SHAPE_1d
@@ -68,9 +68,9 @@ class _TestInputPlugin(InputPlugin):
         return _frame, kwargs
 
     def read_frame(self, index, **kwargs):
-        return import_data(self.filename_string, **kwargs)
+        return import_data(self.filepath, **kwargs)
 
-    def update_filename_string(self):
+    def update_filepath(self):
         pass
 
 
@@ -160,20 +160,20 @@ def test_output_data_dim(reset_scan, base_dim, n_frames, multi_frame):
     ["test_1244.tiff", "test_0_22.npy", "test_###.tiff", "test_######0_22.npy"],
 )
 @pytest.mark.parametrize("directory", [Path(__file__).parent, None])
-def test_update_filename_string__valid_pattern(
+def test_update_filepath__valid_pattern(
     reset_scan, pattern, directory, temp_dir_w_file
 ):
     _dir = directory or temp_dir_w_file
     SCAN.set_param_value("scan_base_directory", _dir)
     SCAN.set_param_value("scan_name_pattern", pattern)
     plugin = InputPlugin()
-    plugin.update_filename_string()
+    plugin.update_filepath()
     _target = str(_dir / pattern)
     if "#" in pattern:
         _target = _target.replace(
             "#" * pattern.count("#"), "{index:0" + str(pattern.count("#")) + "d}"
         )
-    assert plugin.filename_string == _target
+    assert plugin.filepath == Path(_target)
 
 
 @pytest.mark.parametrize("frame_index", [0, 1, 37])
@@ -188,7 +188,7 @@ def test_get_filename(offset, delta, frame_index, images_per_file, reset_scan):
     plugin.set_param_value("_counted_images_per_file", images_per_file)
     _fname = plugin.get_filename(frame_index)
     _target_index = (frame_index // images_per_file) * delta + offset
-    assert _fname == _input_fname.format(index=_target_index)
+    assert _fname == Path(_input_fname.format(index=_target_index))
 
 
 @pytest.mark.parametrize("ext", [".tif", ".npy", ".h5"])

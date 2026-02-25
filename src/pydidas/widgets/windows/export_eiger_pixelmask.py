@@ -128,17 +128,17 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         """
         _master_fname = self.get_param_value("master_filename", str)
         _export_fname = self.get_param_value("output_filename", str)
-        _out_dir = os.path.dirname(_export_fname)
-        if not os.path.exists(_master_fname):
+        _out_dir = Path(_export_fname).parent
+        if not Path(_master_fname).exists():
             critical_warning(
                 "Input file not found",
                 (f'The specified input file "{_master_fname}" could not be found.'),
             )
             return
-        if not os.path.exists(_out_dir):
+        if not _out_dir.exists():
             critical_warning(
                 "Output directory not found",
-                f"The specified output directory '{_out_dir}' could not be found.",
+                f"The specified output directory '{str(_out_dir)}' could not be found.",
             )
             return
         store_eiger_pixel_mask_from_master_file(_master_fname, _export_fname)

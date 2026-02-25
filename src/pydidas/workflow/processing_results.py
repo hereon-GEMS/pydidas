@@ -643,7 +643,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             raise UserConfigError(
                 "The shapes and metadata have not been set. Cannot save results yet."
             )
-        save_dir = Path(save_dir) if isinstance(save_dir, str) else save_dir
+        save_dir = Path(save_dir)
         save_formats = [s.strip() for s in re.split("[&/,]", save_formats)]
         _name = self._config["frozen_SCAN"].get_param_value("scan_title")
         ResultSaver.set_active_savers_and_title(save_formats, _name)
@@ -670,8 +670,8 @@ class ProcessingResults(ObjectWithParameterCollection):
                 f'The specified directory "{save_dir}" exists and is not empty. Please '
                 "select a different directory."
             )
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+        if not save_dir.exists():
+            save_dir.mkdir(parents=True)
         ResultSaver.prepare_active_savers(
             save_dir,
             _node_info,

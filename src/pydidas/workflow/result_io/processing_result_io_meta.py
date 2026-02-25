@@ -328,7 +328,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             cls.verify_extension_is_registered(_ext)
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
-            _path = os.path.join(dir_name, _file)
+            _path = Path(dir_name) / _file
             _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
                 _path
             )

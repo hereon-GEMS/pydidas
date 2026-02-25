@@ -33,7 +33,7 @@ __all__ = ["PyfaiCalibFrame"]
 
 import argparse
 import functools
-import os
+from pathlib import Path
 from typing import Self, Union
 
 import numpy as np
@@ -157,8 +157,8 @@ class PyfaiCalibFrame(BaseFrame):
     available.
     """
 
-    menu_icon = "path::" + os.path.join(
-        os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"
+    menu_icon = "path::" + str(
+        Path(pyFAI.__file__).parent / "resources" / "gui" / "images" / "icon.png"
     )
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"

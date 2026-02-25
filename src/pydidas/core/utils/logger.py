@@ -58,9 +58,9 @@ def pydidas_logger(level: int = LOGGING_LEVEL) -> logging.Logger:
     multiprocessing.logger
         The logger instance
     """
-    _logpath = os.path.join(get_logging_dir(), "logs")
-    if not os.path.exists(_logpath):
-        os.makedirs(_logpath)
+    _logpath = get_logging_dir() / "logs"
+    if not _logpath.is_dir():
+        _logpath.mkdir()
 
     _logger = mp.get_logger()
     _logger.setLevel(level)
@@ -75,27 +75,27 @@ def pydidas_logger(level: int = LOGGING_LEVEL) -> logging.Logger:
     return _logger
 
 
-def get_logging_dir() -> str:
+def get_logging_dir() -> Path:
     """
     Return the pydidas logging directory.
 
     Returns
     -------
-    str
+    Path
         The path to the pydidas module.
     """
-    _docs_dir = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.DocumentsLocation
-    )[0]
-    if os.sep == "\\":
-        _docs_dir = _docs_dir.replace("/", "\\")
-    if not Path(_docs_dir).is_dir():
-        _docs_dir = os.path.expanduser("~")
-    if not Path(_docs_dir).is_dir():
+    _docs_dir = Path(
+        QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.DocumentsLocation
+        )[0]
+    )
+    if not _docs_dir.is_dir():
+        _docs_dir = Path(os.path.expanduser("~"))
+    if not _docs_dir.is_dir():
         from pydidas.core.pydidas_q_settings import PydidasQsettings
 
-        _docs_dir = PydidasQsettings().value("user/custom_logging_dir", str)
-    if not Path(_docs_dir).is_dir():
+        _docs_dir = Path(PydidasQsettings().value("user/custom_logging_dir", str))
+    if not _docs_dir.is_dir():
         from pydidas.core.exceptions import UserConfigError
 
         raise UserConfigError(
@@ -104,8 +104,8 @@ def get_logging_dir() -> str:
             f"{VERSION}/user/custom_logging_dir."
         )
 
-    _log_path = os.path.join(_docs_dir, "pydidas", VERSION)
-    if not os.path.exists(_log_path):
+    _log_path = _docs_dir / "pydidas" / VERSION
+    if not _log_path.is_dir():
         os.makedirs(_log_path)
     return _log_path
 
@@ -121,7 +121,7 @@ def _get_todays_log_name() -> str:
     """
     _time = time.localtime()
     _timestr = f"{_time.tm_year:04d}{_time.tm_mon:02d}{_time.tm_mday:02d}"
-    return os.path.join(get_logging_dir(), "logs", f"pydidas_log_{_timestr}.log")
+    return get_logging_dir() / "logs" / f"pydidas_log_{_timestr}.log"
 
 
 def clear_logging_dir() -> List[str]:
@@ -134,22 +134,22 @@ def clear_logging_dir() -> List[str]:
         The list of files which could not be removed because of permission problems.
     """
     _logdir = get_logging_dir()
-    _log_file_dir = os.path.join(_logdir, "logs")
+    _log_file_dir = _logdir / "logs"
 
     _files_wo_permission = []
     try:
-        os.remove(os.path.join(_logdir, "pydidas_exception.log"))
+        os.remove(str(_logdir / "pydidas_exception.log"))
     except PermissionError:
-        _files_wo_permission.append(os.path.join(_logdir, "pydidas_exception.log"))
+        _files_wo_permission.append(str(_logdir / "pydidas_exception.log"))
     except FileNotFoundError:
         pass
 
     for _file in os.listdir(_log_file_dir):
-        _fname = os.path.join(_log_file_dir, _file)
+        _fname = _log_file_dir / _file
         try:
-            os.remove(_fname)
+            os.remove(str(_fname))
         except PermissionError:
-            _files_wo_permission.append(_fname)
+            _files_wo_permission.append(str(_fname))
 
     if len(_files_wo_permission) > 0:
         _files_wo_permission.pop(-1)

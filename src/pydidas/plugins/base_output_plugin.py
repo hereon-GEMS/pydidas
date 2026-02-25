@@ -67,7 +67,7 @@ class OutputPlugin(BasePlugin):
                 "was not enabled. Please check the path or enable overwriting of "
                 "existing files."
             )
-        if not os.path.exists(self._path) and not self.test_mode:
+        if not self._path.exists() and not self.test_mode:
             os.makedirs(self._path)
         _label = self.get_param_value("label")
         _ndigits = self.get_param_value("output_fname_digits")

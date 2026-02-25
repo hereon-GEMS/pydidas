@@ -29,6 +29,7 @@ __all__ = ["EigerScanSeriesLoader"]
 
 
 import os
+from pathlib import Path
 
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 
@@ -82,9 +83,9 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
         _pattern = self._SCAN.processed_file_naming_pattern
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _basepath = Path(self._SCAN.get_param_value("scan_base_directory", dtype=str))
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
-        self.filename_string = os.path.join(
-            _basepath, _pattern, _eigerkey, _pattern + _suffix
+        self.filename_string = f".{os.sep}" + str(
+            _basepath / _pattern / _eigerkey / (_pattern + _suffix)
         )

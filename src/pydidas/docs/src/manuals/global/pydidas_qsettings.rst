@@ -15,10 +15,12 @@ whereas the user settings handle convenience user configurations.
     - Number of MP workers (key: global/mp_n_workers, type: int, default: 4)
         The number of multiprocessing workers. Note that this number should not
         be set too high for two reasons:
+
           1. File reading processes interfere with each other if too many are
              active at once.
           2. pyFAI already inherently uses parallelization and you can only gain
              limited performance increases for multiple parallel processes.
+
     - Shared buffer size limit (key: global/shared_buffer_size, type: float, default: 100, unit: MB)
         A shared buffer is used to efficiently transport data between the main
         App and multiprocessing Processes. This buffer must be large enough to

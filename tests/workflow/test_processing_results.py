@@ -165,11 +165,11 @@ class TestProcessingResults(unittest.TestCase):
             _node_metadata["data_label"] = _meta["data_label"]
         return _new_metadata
 
-    def get_node_output_filename(self, node_id: int, extension: str = ".h5") -> str:
+    def get_node_output_filename(self, node_id: int, extension: str = ".nxs") -> str:
         _label = self._node_labels[node_id].replace(" ", "_")
         return f"node_{node_id:02d}_{_label}{extension}"
 
-    def get_node_output_path(self, node_id: int, extension: str = ".h5") -> Path:
+    def get_node_output_path(self, node_id: int, extension: str = ".nxs") -> Path:
         return self._tmpdir.joinpath(self.get_node_output_filename(node_id, extension))
 
     def create_standard_workflow_results(self) -> ProcessingResults:

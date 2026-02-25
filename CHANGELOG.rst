@@ -2,6 +2,34 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+
+v26.mm.dd
+=========
+
+
+Programmatic changes
+--------------------
+- Changed from plain extensions to file suffixed with the leading dot to
+  be consistent with pathlib.Path
+- Added an option to remove a QSettings key to PydidasQsettings.
+- Modified the ParamIoWidgets to use the FileDialog only with either a 
+  persistent QSettings key or an ID reference and not both.
+- Updated the code of the FileDialog
+- Changed the default saving extension for processing results to .nxs
+  (was .h5)
+
+Bugfixes
+--------
+- Fixed an issue in the ParamIoWidgetHdf5 where two leading dots
+  were added to extensions.
+- Fixed an issue in the PydidasFileDialog where the extension for 
+  saving a file could not be automatically determined.
+- Fixed an issue in the PydidasFileDialog which did not add the correct 
+  extension when selecting an extension in the FileDialog dropdown.
+
+
+
 v26.01.27
 =========
 
@@ -9,6 +37,7 @@ Bugfixes
 --------
 - Fixed an issue with a pinned dependency for sphinx which occurs when
   upgrading pydidas in an existing environment.
+
 
 v26.01.26
 =========

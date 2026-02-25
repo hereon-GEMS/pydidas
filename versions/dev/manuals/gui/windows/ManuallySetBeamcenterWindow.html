@@ -450,11 +450,11 @@
                   
   <section id="manually-set-beamcenter-window">
 <span id="id1"></span><h1>Manually Set Beamcenter Window<a class="headerlink" href="#manually-set-beamcenter-window" title="Link to this heading">#</a></h1>
-<p>The <em>Manually set beamcenter window</em> allows to select the beamcenter in
-detector pixel coordinates, either by setting the pixel position directly or by
-using a graphical interface. The functionality is limited in the sense that a
-perfect detector orientation is assumed (i.e. all rotations are zero) and it is
-not possible to optimize rotations. If that is required, please perform a full
+<p>The <em>Manually set beamcenter window</em> allows to select the beamcenter in detector
+pixel coordinates, either by setting the pixel position directly or by using a
+graphical interface. The functionality is limited in the sense that a perfect
+detector orientation is assumed (i.e. all rotations are zero) and it is not
+possible to optimize rotations. If that is required, please perform a full
 calibration.</p>
 <a class="reference internal image-reference" href="../../../_images/set_bc_overview.png"><img alt="../../../_images/set_bc_overview.png" class="align-center" src="../../../_images/set_bc_overview.png" style="width: 600px;" />
 </a>
@@ -497,18 +497,18 @@ visualized by different symbols, as explained below.</p>
 <h2>Point list and controls<a class="headerlink" href="#point-list-and-controls" title="Link to this heading">#</a></h2>
 <p>Located at the top are controls for how to select points and for the overlay
 color.</p>
-<p>The <em>Use 2 click point selection</em> toggles how points are selected in the image:</p>
+<p><em>Use 2 click point selection</em> toggles how points are selected in the image:</p>
 <blockquote>
 <div><ul>
 <li><p>Disabled 2-click point selection:</p>
 <p>If disabled, points will be selected directly with a single click in the
-image. This requires the user to manually zoom in to select points with
-high accuracy.</p>
+image. This requires the user to manually zoom in to select points with high
+accuracy.</p>
 </li>
 <li><p>Enabled 2-click point selection:</p>
 <p>When enabled, clicking on a point in the image will zoom in on the selected
-point to allow a higher degree of precision for the point selection.
-The second click will select the point and reset the zoom to the previous
+point to allow a higher degree of precision for the point selection. The
+second click will select the point and reset the zoom to the previous
 settings.</p>
 </li>
 </ul>
@@ -517,12 +517,12 @@ settings.</p>
 overlay items like the points to increase the contrast, depending on the chosen
 colormap for the image. Changing the color in the drop-down selection will
 automatically update the color in all overlay items.</p>
-<p>The point list displays the positions of all clicked points. Left-clicking on
-a point in the list will select this point and also highlight it in the image
-by changing the marker. Multiple points can be selected by holding
-<code class="xref py py-data docutils literal notranslate"><span class="pre">Shift</span></code> when selecting the second point to select all points inbetween
-or by holding <code class="xref py py-data docutils literal notranslate"><span class="pre">Ctrl</span></code> while selecting points to add only single points
-to the selection. All selected points will be highlighted in the image.</p>
+<p>The point list displays the positions of all clicked points. Left-clicking on a
+point in the list will select this point and also highlight it in the image by
+changing the marker. Multiple points can be selected by holding <code class="xref py py-data docutils literal notranslate"><span class="pre">Shift</span></code>
+when selecting the second point to select all points inbetween or by holding
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Ctrl</span></code> while selecting points to add only single points to the
+selection. All selected points will be highlighted in the image.</p>
 <p>The two buttons at the bottom of the point list allow to delete the current
 selection of points or all points. The current selection of points can also be
 deleted by pressing <code class="xref py py-data docutils literal notranslate"><span class="pre">Del</span></code> while the plot list has the focus.</p>
@@ -532,7 +532,7 @@ deleted by pressing <code class="xref py py-data docutils literal notranslate"><
 <section id="file-input">
 <h3>File input<a class="headerlink" href="#file-input" title="Link to this heading">#</a></h3>
 <p>The input file can be selected in any one of four ways:</p>
-<img alt="../../../_images/input.png" class="align-left" src="../../../_images/input.png" />
+<img alt="../../../_images/input.png" class="align-right" src="../../../_images/input.png" />
 <ol class="arabic simple">
 <li><p>Use the “Select image file” button at the top.</p></li>
 <li><p>Enter the full file path in the input field.</p></li>
@@ -551,8 +551,8 @@ detector is used by default).</p>
 <section id="beamcenter-selection">
 <h3>Beamcenter selection<a class="headerlink" href="#beamcenter-selection" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/set_bc_controls.png" class="align-left" src="../../../_images/set_bc_controls.png" />
-<p>The beamcenter position (in detector pixel coordinates) can be set directly,
-if it is known.</p>
+<p>The beamcenter position (in detector pixel coordinates) can be set directly, if
+it is known.</p>
 <p>The following control buttons are availabe:</p>
 <blockquote>
 <div><ul class="simple">
@@ -568,9 +568,9 @@ instead of a circle is used to find the beamcenter. Fitting an ellipse
 requires selecting at least 5 points on the circumference.</p></li>
 </ul>
 </div></blockquote>
-<p>The last button at the bottom, “Comfirm selected beamcenter” will close the
-window and convert the selected beamcenter to pyFAI PONI coordinates and update
-the DiffractionExperiment.</p>
+<p>The last button at the bottom, <code class="xref py py-data docutils literal notranslate"><span class="pre">Confirm</span> <span class="pre">selected</span> <span class="pre">beamcenter</span></code>, will
+close the window and convert the selected beamcenter to pyFAI PONI coordinates
+and update the DiffractionExperiment.</p>
 </section>
 </section>
 </section>

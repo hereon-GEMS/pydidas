@@ -456,14 +456,14 @@ modes. This requires a different syntax from the user which will be presented
 below.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For a detailed description of the internal workings of applications
-please refer to the <a class="reference internal" href="../../dev_guide/dev_guide_apps.html#developer-guide-to-apps"><span class="std std-ref">Developers guide to pydidas applications</span></a> section.</p>
+<p>For a detailed description of the internal workings of applications please
+refer to the <a class="reference internal" href="../../dev_guide/dev_guide_apps.html#developer-guide-to-apps"><span class="std std-ref">Developers guide to pydidas applications</span></a> section.</p>
 </div>
 <section id="configuring-an-application">
 <h2>Configuring an application<a class="headerlink" href="#configuring-an-application" title="Link to this heading">#</a></h2>
 <p>pydidas applications are standard pydidas objects and their configuration is
-handled using pydidas <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>. A
-short usage guide has already been given in <a class="reference internal" href="../cmdline_global/cmd_global.html#accessing-parameters"><span class="std std-ref">Accessing Parameters</span></a>.</p>
+handled using pydidas <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>. A short
+usage guide has already been given in <a class="reference internal" href="../cmdline_global/cmd_global.html#accessing-parameters"><span class="std std-ref">Accessing Parameters</span></a>.</p>
 <p>Some applications might have additional properties or methods to further
 interact with the user, but these will be covered in the specific manuals.</p>
 <p>As an example, let us use a <code class="xref py py-class docutils literal notranslate"><span class="pre">DummyApp</span></code> which creates a list with
@@ -485,8 +485,8 @@ run in a real python console.</p>
 </section>
 <section id="running-an-application-serially">
 <h2>Running an application serially<a class="headerlink" href="#running-an-application-serially" title="Link to this heading">#</a></h2>
-<p>To run an app serially, simply call the <a class="reference internal" href="../../code/api/core/base_app.html#pydidas.core.BaseApp.run" title="pydidas.core.BaseApp.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method of the app. Note that this will be a
-blocking call until the application is finished with its processing.</p>
+<p>To run an app serially, simply call the <a class="reference internal" href="../../code/api/core/base_app.html#pydidas.core.BaseApp.run" title="pydidas.core.BaseApp.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method of the app. Note that this will be a blocking
+call until the application is finished with its processing.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DummyApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;number_of_strings&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
@@ -510,42 +510,36 @@ blocking call until the application is finished with its processing.</p>
 <h2>Running an application using parallelization<a class="headerlink" href="#running-an-application-using-parallelization" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For a detailed description of how the pydidas multiprocessing works,
-please refer to the <a class="reference internal" href="../../code/api/multiprocessing.html#multiprocessing-package"><span class="std std-ref">The multiprocessing sub-package</span></a> or to the
+<p>For a detailed description of how the pydidas multiprocessing works, please
+refer to the <a class="reference internal" href="../../code/api/multiprocessing.html#multiprocessing-package"><span class="std std-ref">The multiprocessing sub-package</span></a> or to the
 <a class="reference internal" href="../../dev_guide/dev_guide_multiprocessing.html#developer-guide-to-multiprocessing"><span class="std std-ref">Developers guide to pydidas multiprocessing</span></a>.</p>
 </div>
 <p>To run an application using parallel processing, an additional object is needed
-to control the parallelization. This is the
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>. Usage is
-straightforward and happens through only a few commands. The AppRunner starts
-in a separate thread and is non-blocking. It launches multiple independent
-processes and can run in the background.</p>
-<p>To run an application, first configure the application as usually. Then,
-create an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> instance
-with the configured application as calling argument. The app instance in the
+to control the parallelization. This is the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>. Usage is straightforward and happens
+through only a few commands. The AppRunner starts in a separate thread and is
+non-blocking. It launches multiple independent processes and can run in the
+background.</p>
+<p>To run an application, first configure the application as usually. Then, create
+an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> instance with the
+configured application as calling argument. The app instance in the
 <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is not directly
-accessible but the user can use the runner’s
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.call_app_method" title="pydidas.multiprocessing.AppRunner.call_app_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">call_app_method</span></code></a>
-method to call a method of the app or the
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.set_app_param" title="pydidas.multiprocessing.AppRunner.set_app_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_app_param</span></code></a>
-method to modify one of the application’s parameters.</p>
+accessible but the user can use the runner’s <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.call_app_method" title="pydidas.multiprocessing.AppRunner.call_app_method"><code class="xref py py-meth docutils literal notranslate"><span class="pre">call_app_method</span></code></a> method to call a method of
+the app or the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner.set_app_param" title="pydidas.multiprocessing.AppRunner.set_app_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_app_param</span></code></a> method to modify one of the
+application’s parameters.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Starting the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> will
 create a new instance of the application and any changes made to the local
-instance will not be mirrored in the
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>’s app instance.</p>
+instance will not be mirrored in the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>’s app instance.</p>
 </div>
-<p>Running an application with the
-:py:class`AppRunner &lt;pydidas.multiprocessing.AppRunner&gt;` requires to call the
-<code class="xref py py-data docutils literal notranslate"><span class="pre">start</span></code> method. This will start the thread and create the worker
-processes.</p>
+<p>Running an application with the <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> requires to call the <code class="xref py py-data docutils literal notranslate"><span class="pre">start</span></code>
+method. This will start the thread and create the worker processes.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Running apps which rely on Qt’s Signals and Slots (like the
 <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a>) will
-require a running QApplication event loop.
-Also do not forget to stop the event loop when finished.</p>
+require a running QApplication event loop. Also do not forget to stop the
+event loop when finished.</p>
 </div>
 <p>An example with a custom application is given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
@@ -623,9 +617,9 @@ Also do not forget to stop the event loop when finished.</p>
   <span class="mi">09</span><span class="p">:</span> <span class="n">BSrpoTxzOg</span>
 </pre></div>
 </div>
-<p>For status updates, one could use the <code class="xref py py-data docutils literal notranslate"><span class="pre">AppRunner.sig_process</span></code>
-Signal. An example with a new printing slot and an updated <code class="xref py py-data docutils literal notranslate"><span class="pre">main</span></code>
-function is given below:</p>
+<p>For status updates, one could use the <code class="xref py py-data docutils literal notranslate"><span class="pre">AppRunner.sig_process</span></code> signal.
+An example with a new printing slot and an updated <code class="xref py py-data docutils literal notranslate"><span class="pre">main</span></code> function is
+given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_progress</span><span class="p">(</span><span class="n">progress</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print the current progress repeatedly in the same line.&quot;&quot;&quot;</span>
     <span class="n">_n_chars</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="n">progress</span><span class="p">)</span>

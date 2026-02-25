@@ -444,14 +444,14 @@
                   
   <section id="explanations-of-scan-dimension-handling">
 <span id="scan-dimension-help"></span><h1>Explanations of Scan dimension handling<a class="headerlink" href="#explanations-of-scan-dimension-handling" title="Link to this heading">#</a></h1>
-<p>The scan dimensions are organized following the data structure. Both in the case of
-individual files and of container files (e.g. Hdf5), individual frames from a
-multi-dimension scan are acquired and stored in a linear manner. The scan dimensions
-must be set up to allow pydidas to extract the multi-dimensional coordinate from the
-single frame number.</p>
-<p>The number of scan dimensions starts with 0, in accordance with Python’s convention of
-zero-based indexing. The first scan dimension is therefore referred to as <em>dim_0</em>,
-the second as <em>dim_1</em>, and so on.</p>
+<p>The scan dimensions are organized following the data structure. Both in the case
+of individual files and of container files (e.g. Hdf5), individual frames from a
+multi-dimension scan are acquired and stored in a linear manner. The scan
+dimensions must be set up to allow pydidas to extract the multi-dimensional
+coordinate from the single frame number.</p>
+<p>The number of scan dimensions starts with 0, in accordance with Python’s
+convention of zero-based indexing. The first scan dimension is therefore
+referred to as <em>dim_0</em>, the second as <em>dim_1</em>, and so on.</p>
 <p>For a 2-dimensional scan which uses the motors A and B, the structure would be:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dim_0_points</span><span class="p">:</span>
@@ -462,16 +462,15 @@ the second as <em>dim_1</em>, and so on.</p>
         <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>The frame index <em>n</em> is not explicitly defined but usually incremented by the detector
-control software. However, it is also implicitly defined through
-<code class="docutils literal notranslate"><span class="pre">n(i,</span> <span class="pre">j)</span> <span class="pre">=</span> <span class="pre">i</span> <span class="pre">*</span> <span class="pre">number(dim_1_points)</span> <span class="pre">+</span> <span class="pre">j</span></code>. Pydidas follows the convention of defining
-scan dimension 0 as the slowest and scan dimension <em>n-1</em> in a <em>n</em>-dimensional scan as
-the fastest.</p>
+<p>The frame index <em>n</em> is not explicitly defined but usually incremented by the
+detector control software. However, it is also implicitly defined through
+<code class="docutils literal notranslate"><span class="pre">n(i,</span> <span class="pre">j)</span> <span class="pre">=</span> <span class="pre">i</span> <span class="pre">*</span> <span class="pre">number(dim_1_points)</span> <span class="pre">+</span> <span class="pre">j</span></code>. Pydidas follows the convention of
+defining scan dimension 0 as the slowest and scan dimension <em>n-1</em> in a
+<em>n</em>-dimensional scan as the fastest.</p>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
-<p>Consider the following example of a two-dimensional mesh scan in <em>x</em> and
-<em>z</em>: Three line scans with 6 points each in <em>x</em> inside a loop over 3
-<em>z</em> positions:</p>
+<p>Consider the following example of a two-dimensional mesh scan in <em>x</em> and <em>z</em>:
+Three line scans with 6 points each in <em>x</em> inside a loop over 3 <em>z</em> positions:</p>
 <img alt="Image with 3 line scans in x at 3 z positions" class="align-center" src="../../../_images/scan_scheme_with_lines.png" />
 <p>Programmatically, this scan is written as:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
@@ -486,8 +485,8 @@ the fastest.</p>
 <p>The (detector) frame numbers <em>n</em> are given by incrementing a global index,
 starting with <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">0</span></code>:</p>
 <img alt="Image with 3 line scans in x at 3 z positions with frame numbers" class="align-center" src="../../../_images/scan_scheme_with_points.png" />
-<p>Because <em>x</em> is iterating faster than <em>z</em>, it is considered the fast
-axis and must be put as the second scan dimension (scan dim #1 in pydidas) to be
+<p>Because <em>x</em> is iterating faster than <em>z</em>, it is considered the fast axis and
+must be put as the second scan dimension (scan dim #1 in pydidas) to be
 consistent with the programmatical scan order.</p>
 </section>
 </section>

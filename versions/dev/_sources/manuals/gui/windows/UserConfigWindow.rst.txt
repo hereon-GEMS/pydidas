@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. role:: raw-html(raw)
@@ -13,30 +13,31 @@ The User config window
 ======================
 
 The *User config window* allows the user to customize the behaviour of their
-pydidas copy. The *User config window* can either be accessed through the GUI menu
-(Options :raw-html:`&rarr;` User config) or through the :ref:`utilities_frame`.
+pydidas copy. The *User config window* can be accessed either through the GUI
+menu (Options :raw-html:`&rarr;` User config) or through the
+:ref:`utilities_frame`.
 
 The individual Parameters are described below.
 
 .. image:: images/user_config_overview.png
     :align: center
 
-Using the :py:data:`Restore defaults` button will change all settings back to 
+Using the :py:data:`Restore defaults` button will reset all settings back to
 their default values.
 
 Font settings
 -------------
 
 The font size and font family can be selected with the respective controls.
-These settings are global for the full pydidas user interface. Font sizes 
+These settings are global for the full pydidas user interface. Font sizes
 between 5 and 20 points are supported.
 
-The selection of fonts relies on the available system fonts. All TrueType 
+The selection of fonts relies on the available system fonts. All TrueType
 scalable systems fonts are also available in pydidas.
 
-The pydidas user interface will rescale itself based on the font metrics of 
-the selection font size & family configuration. Selecting larger fonts will
-grow all widgets and allows to rescale for high-DPI displays.
+The pydidas user interface will rescale itself based on the font metrics of the
+selection font size & family configuration. Selecting larger fonts will grow all
+widgets and allows to rescale for high-DPI displays.
 
 Update settings
 ---------------
@@ -60,8 +61,8 @@ setting set to True.
 Composite creator settings
 --------------------------
 
-These settings determine how individual images are arranged into a mosaic
-with the composite creator.
+These settings determine how individual images are arranged into a mosaic with
+the composite creator.
 
 .. list-table::
     :widths: 25 75
@@ -80,35 +81,35 @@ with the composite creator.
 Plot settings
 -------------
 
-These settings determine how plots are displayed and how specific buttons behave.
-For detailed descriptions, please see the list below.
+These settings determine how plots are displayed and how specific buttons
+behave. For detailed descriptions, please see the list below.
 
 .. list-table::
     :widths: 25 75
     :header-rows: 1
     :class: tight-table
-    
-    * - Parameter 
+
+    * - Parameter
       - Description
     * - Histogram outlier fraction (low)
       - [This setting is for 2D image displays only]. This Parameter defines
-        which portion of the histogram should be ignored when defining the 
-        lower limit for the colormap. The default value of 0.02 means that the
-        lowest 2% of the histogram will be ignored for setting the colormap.
+        which portion of the histogram should be ignored when defining the lower
+        limit for the colormap. The default value of 0.02 means that the lowest
+        2% of the histogram will be ignored for setting the colormap.
     * - Histogram outlier fraction (high)
       - [This setting is for 2D image displays only]. This Parameter defines
-        which portion of the histogram should be ignored when defining the
-        upper limit for the colormap. The default value of 0.07 means that the
-        top 7% of the histogram will be ignored for setting the colormap. The
-        default value was selected to cover all pixels in module gaps for an
-        Eiger detector.
+        which portion of the histogram should be ignored when defining the upper
+        limit for the colormap. The default value of 0.07 means that the top 7%
+        of the histogram will be ignored for setting the colormap. The default
+        value was selected to cover all pixels in module gaps for an Eiger
+        detector.
     * - Default colormap
-      - The default colormap to be used for displaying 2D datasets. The 
-        colormap can still be changed in each individual data window but those
-        local changes are not persistent.
+      - The default colormap to be used for displaying 2D datasets. The colormap
+        can still be changed in each individual data window but those local
+        changes are not persistent.
     * - Color for invalid data / no data
       - The color given for invalid data points or missing data points to
-        distinguish them from the regular colormap. The color must be given in
+        distinguish them from the regular colormap. The color must be entered as
         a RGB color code. The selected color is displayed in a box below the
         selection mask. A new color can also be selected in an interactive
         pop-up by using the *Pick a new color for invalid data / no data / NaN*
@@ -122,10 +123,10 @@ or to add additional paths, for example for custom plugins.
 The generic plugin path is given for reference only. The custom plugin paths accepts
 multiple entries and **entries must be separated by a double semicolon ";;"**.
 
-Changes to the plugin path will only take effect after using the 
+Changes to the plugin path will only take effect after using the
 :py:data:`Update plugin collection` button.
 
 .. note::
-    
+
     Updating the plugin collection will also clear any WorkflowTree currently
     defined / in use.

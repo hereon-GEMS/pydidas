@@ -469,10 +469,8 @@
 <p>The <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a> is one of
 the most important objects in pydidas as it allows to process workflows. Note
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
-but by the global objects for
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>,
-and <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+but by the global objects for <code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>, and
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
 <p>Documentation on the use of these objects is given in <a class="reference internal" href="../cmdline_global/cmd_scan_context.html#scan-context"><span class="std std-ref">The ScanContext class</span></a>,
 <a class="reference internal" href="../cmdline_global/cmd_diffraction_exp_context.html#diffraction-exp-context"><span class="std std-ref">The DiffractionExperimentContext class</span></a> and <a class="reference internal" href="../cmdline_global/cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">The WorkflowTree class</span></a>, respectively.</p>
 </section>
@@ -520,16 +518,16 @@ these values, if required:</p>
 <p>The ExecuteWorkflowApp has only a very limited number of Parameters because it
 uses the aforementioned objects (
 <code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>,
-and <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>)
-which include most of the required configuration.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>, and
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>) which include most
+of the required configuration.</p>
 <p>In the app, only the flags for <em>live processing</em> and for automatic saving of
 results need to be set.</p>
 <section id="live-processing">
 <h3>Live processing<a class="headerlink" href="#live-processing" title="Link to this heading">#</a></h3>
-<p>The live processing flag determines whether pydidas will check all files at
-the start of processing or accept file names without corresponding written
-files. This flag is modified using the <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code> Parameter:</p>
+<p>The live processing flag determines whether pydidas will check all files at the
+start of processing or accept file names without corresponding written files.
+This flag is modified using the <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code> Parameter:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;live_processing&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -540,10 +538,10 @@ files. This flag is modified using the <code class="xref py py-data docutils lit
 <h3>Automatic saving<a class="headerlink" href="#automatic-saving" title="Link to this heading">#</a></h3>
 <p>The ExecuteWorkflowApp includes the possibility to write results dynamically to
 disk as soon as they have been processed. The behaviour is controlled by the
-<code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_results``flag.</span> <span class="pre">A</span> <span class="pre">parent</span> <span class="pre">directory</span> <span class="pre">for</span> <span class="pre">all</span> <span class="pre">results</span> <span class="pre">must</span> <span class="pre">be</span>
-<span class="pre">defined</span> <span class="pre">using</span> <span class="pre">the</span> <span class="pre">:py:data:`autosave_dir</span></code> Parameter and the saving format can
-be selected using the <code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_format</span></code> Parameter. The different
-formats are predefined and only implemented formats can be chosen. To query the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_results</span></code> flag. A parent directory for all results must be
+defined using the <code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_dir</span></code> Parameter and the saving format can be
+selected using the <code class="xref py py-data docutils literal notranslate"><span class="pre">autosave_format</span></code> Parameter. The different formats
+are predefined and only implemented formats can be chosen. To query the
 available choices, please look at the code in the example below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
@@ -564,26 +562,23 @@ available choices, please look at the code in the example below:</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Note that auto-saving each frame will result will have a significant
-performance cost because the output files will need to be accessed for
-each processed scan point. Using auto-saving is only encouraged for very
-long processing times, e.g. multiple fittings for each scan data point.</p>
+performance cost because the output files will need to be accessed for each
+processed scan point. Using auto-saving is only encouraged for very long
+processing times, e.g. multiple fittings for each scan data point.</p>
 </div>
 </section>
 </section>
 <section id="running-the-executeworkflowapp">
 <h2>Running the ExecuteWorkflowApp<a class="headerlink" href="#running-the-executeworkflowapp" title="Link to this heading">#</a></h2>
-<p>Once configured, the <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a>
-is run like any pydidas app, as described in detail in
-<a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
+<p>Once configured, the <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp" title="pydidas.apps.ExecuteWorkflowApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecuteWorkflowApp</span></code></a> is run like any pydidas app, as described in
+detail in <a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
 <p>As a recap, to run the app serially, use the <a class="reference internal" href="../../code/api/apps/execute_workflow_app.html#pydidas.apps.ExecuteWorkflowApp.run" title="pydidas.apps.ExecuteWorkflowApp.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> method:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To run it utilizing parallelization, set up an
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
+<p>To run it utilizing parallelization, set up an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">ExecuteWorkflowApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -607,9 +602,9 @@ can corrupt the output files and make them illegible.</p>
 <section id="accessing-results-within-python">
 <h3>Accessing results within Python<a class="headerlink" href="#accessing-results-within-python" title="Link to this heading">#</a></h3>
 <p>The results from the ExecuteWorkflowApp are written in the global
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> (the
-Singleton instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code>) which is described in
-detail in <a class="reference internal" href="../cmdline_global/cmd_workflow_results.html#workflow-results"><span class="std std-ref">The WorkflowResults class</span></a>.</p>
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> (the Singleton
+instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code>)
+which is described in detail in <a class="reference internal" href="../cmdline_global/cmd_workflow_results.html#workflow-results"><span class="std std-ref">The WorkflowResults class</span></a>.</p>
 </section>
 </section>
 <section id="list-of-all-executeworkflowapp-parameters">
@@ -636,9 +631,9 @@ formats have been selected).</p>
 </li>
 <li><dl class="simple">
 <dt>autosave_format (type: str, default: ‘HDF5’)</dt><dd><p>The file format(s) for the data to be saved after the workflow has been
-excuted. All data will be saved in a single folder for each run with
-one file for each plugin. Note that the Parameter choices are defined
-in pydidas and the value can only correspond to any of these choices.</p>
+excuted. All data will be saved in a single folder for each run with one
+file for each plugin. Note that the Parameter choices are defined in
+pydidas and the value can only correspond to any of these choices.</p>
 </dd>
 </dl>
 </li>

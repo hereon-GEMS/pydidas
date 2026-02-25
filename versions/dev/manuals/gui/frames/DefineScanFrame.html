@@ -470,8 +470,8 @@
 </ul>
 </nav>
 <p>The <em>Scan setup</em> frame is a graphical interface to configure the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
-which holds information about the scan setup.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code> which holds information
+about the scan setup.</p>
 <p>The frame only holds the configuration widgets for its Parameters as well as
 some buttons for convenience functionality.</p>
 <a class="reference internal image-reference" href="../../../_images/overview1.png"><img alt="../../../_images/overview1.png" class="align-center" src="../../../_images/overview1.png" style="width: 600px;" />
@@ -503,8 +503,7 @@ importers.</p>
 <p>If you are unsure how to proceed for your specific beamline metadata files,
 please discuss with your local beamline support.</p>
 <p>If you are missing a specific beamline metadata importer, please contact the
-development team by raising a
-<a class="reference external" href="https://github.com/hereon-GEMS/pydidas/issues">GitHub issue</a>.</p>
+development team by raising a <a class="reference external" href="https://github.com/hereon-GEMS/pydidas/issues">GitHub issue</a>.</p>
 </section>
 <section id="reset-parameters">
 <h3>Reset Parameters<a class="headerlink" href="#reset-parameters" title="Link to this heading">#</a></h3>
@@ -512,8 +511,8 @@ development team by raising a
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>The “Reset all scan settings” button allows the user to change all Parameters
-back to their default values.</p>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">Reset</span> <span class="pre">all</span> <span class="pre">scan</span> <span class="pre">settings</span></code> button allows the user to change all
+Parameters back to their default values.</p>
 </section>
 <section id="export-scan-settings">
 <h3>Export scan settings<a class="headerlink" href="#export-scan-settings" title="Link to this heading">#</a></h3>
@@ -522,8 +521,8 @@ back to their default values.</p>
 <div class="line"><br /></div>
 </div>
 <p>At the bottom of the Frame, the export button allows users to export the current
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
-Parameters to a file. This button will open a filename dialogue.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code> Parameters to a file. This
+button will open a filename dialogue.</p>
 </section>
 </section>
 <section id="scan-dimension-explanation">
@@ -546,21 +545,20 @@ in-depth explanation, including images.</p>
 <section id="global-parameters">
 <h2>Global Parameters<a class="headerlink" href="#global-parameters" title="Link to this heading">#</a></h2>
 <img alt="../../../_images/globals.png" class="align-left" src="../../../_images/globals.png" />
-<p>Here, <em>global</em> refers to general scan Parameters in contrast to Parameters for
-a specific scan dimension. The scan dimensionality defines the number of used
+<p>Here, <em>global</em> refers to general scan Parameters in contrast to Parameters for a
+specific scan dimension. The scan dimensionality defines the number of used
 dimensions (and also shows or hides the corresponding widgets for the selected
 dimensions). The scan title is used as reference in titles and captions.</p>
 <p>The base directory and scan name pattern are used for <a class="reference internal" href="../../../code/api/plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPlugins</span></code></a> to define the raw data source. The starting index
 defines the number of the first data file.</p>
-<p>For a detailed description of each Parameter, please refer to the
-<a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of ScanContext Parameters</span></a> found at the bottom of
-this page.</p>
+<p>For a detailed description of each Parameter, please refer to the <a class="reference internal" href="#scan-context-params"><span class="std std-ref">list of
+ScanContext Parameters</span></a> found at the bottom of this page.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>The detailed explanation for the scan file naming pattern are given in
 <a class="reference external" href="../../global/scan/file_naming_help.html">Explanations of Scan file naming</a>.</p>
-<p>The detailed explanation for multi-frame handling are given in
-<a class="reference external" href="../../global/scan/multi_frame_help.html">Explanations of Scan multi-frame handling</a>.</p>
+<p>The detailed explanation for multi-frame handling are given in <a class="reference external" href="../../global/scan/multi_frame_help.html">Explanations
+of Scan multi-frame handling</a>.</p>
 </div>
 </section>
 <section id="configuring-a-scan-dimension">
@@ -580,8 +578,8 @@ dimension cannot be further moved upwards.</p>
 This number determines the layout of the data in pydidas. The other information
 is metadata which is used to determine labels and axis ranges (for plots and
 export metadata) but which has no further relevance. The name of the scan
-dimension corresponds to the label. The unit is also used to label the
-dimension range.</p>
+dimension corresponds to the label. The unit is also used to label the dimension
+range.</p>
 <p>The range of each scan dimension is determined by the number of points
 <span class="math notranslate nohighlight">\(N\)</span>, the step width <span class="math notranslate nohighlight">\(\Delta x\)</span> between two points and the offset
 <span class="math notranslate nohighlight">\(x_0\)</span>. The full range is thus</p>

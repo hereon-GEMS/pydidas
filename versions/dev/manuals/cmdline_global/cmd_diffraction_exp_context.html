@@ -452,18 +452,17 @@
 </nav>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
-is the pydidas Singleton instance of the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperiment</span></code>
-class. It is used for storing and accessing global information about the
-experimental setup. Stored information include</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> is the
+pydidas Singleton instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperiment</span></code> class. It is used for storing
+and accessing global information about the experimental setup. Stored
+information includes</p>
 <ul class="simple">
 <li><p>X-ray energy</p></li>
 <li><p>detector model (pixel numbers and sizes)</p></li>
 <li><p>detector geometry.</p></li>
 </ul>
 <p>All objects are stored as <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> and
-can be accesses as described in the basic tutorial. A full list of Parameters is
+can be accessed as described in the basic tutorial. A full list of Parameters is
 given in <a class="reference internal" href="#diffraction-exp-context-parameters"><span class="std std-ref">Full list of Parameters for DiffractionExperimentContext</span></a>.</p>
 <p>Its instance can be obtained by running the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -511,9 +510,9 @@ respectively.</p>
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>type</p></th>
-<th class="head"><p>unit</p></th>
-<th class="head"><p>description</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Unit</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -553,7 +552,8 @@ pyFAI integration plugins.</p></td>
 </div>
 <p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">detector_name</span></code> is only relevant for referencing any pyFAI object
 but is included in the metainformation and should be set correctly. The
-Parameters for numbers of pixels and pixelsize exactly what the name suggests.</p>
+Parameters for numbers of pixels and pixelsize do exactly what the name
+suggests.</p>
 <section id="defining-the-detector-manually">
 <h4>Defining the detector manually<a class="headerlink" href="#defining-the-detector-manually" title="Link to this heading">#</a></h4>
 <p>The detector can be defined manually if required, for example for a prototype
@@ -611,15 +611,15 @@ direction defines the <span class="math notranslate nohighlight">\(x_3\)</span> 
 <p>Three rotations (<span class="math notranslate nohighlight">\(rot_1\)</span>: mathmatically negative around the axis pointing
 up; <span class="math notranslate nohighlight">\(rot_2\)</span>: mathematically negative around the <span class="math notranslate nohighlight">\(x_2\)</span> axis;
 <span class="math notranslate nohighlight">\(rot_3\)</span>: mathematically positive (!) around the X-ray beam direction) are
-used to move the detector with respect to the origin (sample) are applied to
-the detector to transform the detector geometry into the experimental geometry.</p>
-<p>The correspondence between pyFAI geometry and pydidas DiffractionExperimentContext
-Parameter names is given below:</p>
+used to move the detector with respect to the origin (sample) are applied to the
+detector to transform the detector geometry into the experimental geometry.</p>
+<p>The correspondence between pyFAI geometry and pydidas
+DiffractionExperimentContext Parameter names is given below:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>pyFAI parameter name</p></th>
-<th class="head"><p>corresponding pydidas Parameter</p></th>
-<th class="head"><p>unit</p></th>
+<th class="head"><p>Corresponding pydidas Parameter</p></th>
+<th class="head"><p>Unit</p></th>
 </tr>
 </thead>
 <tbody>
@@ -669,19 +669,19 @@ given in the table above. For an example, see below:</p>
 </section>
 <section id="import-and-export">
 <h2>Import and Export<a class="headerlink" href="#import-and-export" title="Link to this heading">#</a></h2>
-<p>The DiffractionExperimentContext settings can be imported and exported to files, based on
-the available im-/exporters. The standard distribution ships with support for
-YAML files and pyFAI .poni files. Both types are supported for import and
-export. The format will be determined automatically based on the file extension.</p>
+<p>The DiffractionExperimentContext settings can be imported and exported to files,
+based on the available im-/exporters. The standard distribution ships with
+support for YAML files and pyFAI .poni files. Both types are supported for
+import and export. The format will be determined automatically based on the file
+extension.</p>
 <p>Imports and exports are started by calling the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">import_from_file(filename)</span></code>
-and
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">export_to_file(filename)</span></code>,
-respectively. The filename must include the absolute path to the file.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">import_from_file(filename)</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">export_to_file(filename)</span></code>, respectively.
+The filename must include the absolute path to the file.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Importing the <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
-from file will overwrite all current values without asking for confirmation.</p>
+<p>Importing the <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> from file will overwrite
+all current values without asking for confirmation.</p>
 </div>
 <p>An example to demonstrate these methods is given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -743,8 +743,8 @@ from file will overwrite all current values without asking for confirmation.</p>
 <h2>Full list of Parameters for DiffractionExperimentContext<a class="headerlink" href="#full-list-of-parameters-for-diffractionexperimentcontext" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
-<dt>xray_wavelength (float, unit: Angstrom, default: 1.0)</dt><dd><p>The X-ray wavelength. Any changes to the wavelength will also update
-the X-ray energy setting.</p>
+<dt>xray_wavelength (float, unit: Angstrom, default: 1.0)</dt><dd><p>The X-ray wavelength. Any changes to the wavelength will also update the
+X-ray energy setting.</p>
 </dd>
 </dl>
 </li>
@@ -810,8 +810,8 @@ measured in meters from the detector origin.</p>
 </li>
 <li><dl class="simple">
 <dt>detector_rot2 (float, unit: rad, default: 0.0)</dt><dd><p>The detector rotation 2 (pitching the detector; positive direction is
-tilting the detector top upstream while keeping the bottom of the
-detector stationary.</p>
+tilting the detector top upstream while keeping the bottom of the detector
+stationary.</p>
 </dd>
 </dl>
 </li>

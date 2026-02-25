@@ -423,8 +423,8 @@
                   
   <section id="pydidas-quick-start-guide">
 <span id="quickstart"></span><h1>Pydidas quick-start guide<a class="headerlink" href="#pydidas-quick-start-guide" title="Link to this heading">#</a></h1>
-<p>Pydidas is usable both through its graphical user interface as well as through the
-command line / notebooks.</p>
+<p>Pydidas is usable both through its graphical user interface as well as through
+the command line / notebooks.</p>
 <p>To quickly start using pydidas, there are multiple options:</p>
 <blockquote>
 <div><ul class="simple">
@@ -439,43 +439,45 @@ command line / notebooks.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pydidas-gui</span></code> to start the graphical user interface.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-documentation</span></code> to open the pydidas documentation in the default system
-web browser. <strong>Note:</strong> The pydidas module must have been run at least once
-(either through opening the GUI or imported in a python shell) for the
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-documentation</span></code> to open the pydidas documentation in the default
+system web browser. <strong>Note:</strong> The pydidas module must have been run at least
+once (either through opening the GUI or imported in a python shell) for the
 documentation to have been created.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pydidas-clear-settings</span></code> Remove the stored registry keys for pydidas.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-updater</span></code> Start a script which automatically updates pydidas to the latest
-version available on GitHub.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-remove-local-files</span></code> This script removes all local log files and stored
-configuration files.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">run-pydidas-workflow</span></code> Script to run a defined workflow in the console. This script
-also requires configuration files for the scan and diffraction experiment. Please
-refer to the full documentation for more details.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">remove-pydidas</span></code> Remove all local config files and registry settings from the
-system. Please note that this script will not remove the python code itself, but
-only cleans up the system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-updater</span></code> Start a script which automatically updates pydidas to
+the latest version available on GitHub.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas-remove-local-files</span></code> This script removes all local log files and
+stored configuration files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run-pydidas-workflow</span></code> Script to run a defined workflow in the console.
+This script also requires configuration files for the scan and diffraction
+experiment. Please refer to the full documentation for more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remove-pydidas</span></code> Remove all local config files and registry settings from
+the system. Please note that this script will not remove the python code
+itself, but only cleans up the system.</p></li>
 </ul>
 </div></blockquote>
 </section>
 <section id="scripts">
 <h2>Scripts<a class="headerlink" href="#scripts" title="Link to this heading">#</a></h2>
-<p>Pydidas includes multiple scripts which are located in the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> folder,
-which is located in the same folder as <code class="docutils literal notranslate"><span class="pre">pydidas</span></code>.
-These can be called directly by python from the command line and they are:</p>
+<p>Pydidas includes multiple scripts which are located in the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code>
+folder, which is located in the same folder as <code class="docutils literal notranslate"><span class="pre">pydidas</span></code>. These can be called
+directly by python from the command line and they are:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">pydidas_gui.py</span></code> to start the GUI.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pydidas_documentation.py</span></code> to open the html documentation in a browser.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">run_pydidas_workflow.py</span></code> to run a processing workflow on the command line.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pydidas_updater_script.py</span></code> to update pydidas to the latest release published on
-GitHub.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">clear_local_settings.py</span></code> to remove all registry settings written by pydidas.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_pydidas_workflow.py</span></code> to run a processing workflow on the command
+line.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pydidas_updater_script.py</span></code> to update pydidas to the latest release
+published on GitHub.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clear_local_settings.py</span></code> to remove all registry settings written by
+pydidas.</p></li>
 </ul>
 </div></blockquote>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h3>
-<p>If pydidas, was installed in <cite>/user/myname/code/python/my_packages/pydidas</cite>,
-the <code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> will be located in</p>
+<p>If pydidas, was installed in <cite>/user/myname/code/python/my_packages/pydidas</cite>, the
+<code class="docutils literal notranslate"><span class="pre">pydidas_scripts</span></code> will be located in</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/user/myname/code/python/my_packages/pydidas_scripts
 $<span class="w"> </span>python<span class="w"> </span>pydidas_gui.py
 </pre></div>
@@ -484,9 +486,9 @@ $<span class="w"> </span>python<span class="w"> </span>pydidas_gui.py
 </section>
 <section id="command-line">
 <h2>Command line<a class="headerlink" href="#command-line" title="Link to this heading">#</a></h2>
-<p>Much of pydidas’ functionality is also available from the command line or notebooks.
-Pydidas can be imported and used as any other python module. Please refer to the
-documentation, in particular to the <a class="reference internal" href="commandline_start.html#command-line-manual"><span class="std std-ref">Command line manuals</span></a>.</p>
+<p>Much of pydidas’ functionality is also available from the command line or
+notebooks. Pydidas can be imported and used as any other python module. Please
+refer to the documentation, in particular to the <a class="reference internal" href="commandline_start.html#command-line-manual"><span class="std std-ref">Command line manuals</span></a>.</p>
 </section>
 </section>
 

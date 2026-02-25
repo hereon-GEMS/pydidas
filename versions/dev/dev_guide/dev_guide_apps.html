@@ -436,8 +436,8 @@
 <col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>class attribute</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Class attribute</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -450,10 +450,10 @@
 values.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">attributes_not_to_copy_to_app_clone</span></code></p></td>
-<td><p>A list with the names of instance attributes which must not be copied
-to an app clone. This is relevant for using the AppRunner for parallel
-processing, where it should be avoided to copy large objects because
-of the serialization of all objects during pickling.</p></td>
+<td><p>A list with the names of instance attributes which must not be copied to
+an app clone. This is relevant for using the AppRunner for parallel
+processing, where it should be avoided to copy large objects because of
+the serialization of all objects during pickling.</p></td>
 </tr>
 </tbody>
 </table>
@@ -467,8 +467,8 @@ of the serialization of all objects during pickling.</p></td>
 <col style="width: 80.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>instance attribute</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Instance attribute</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -501,8 +501,8 @@ return values and calling parameters, please refer to the class documentation:
 <col style="width: 80.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>method names</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Method names</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -512,15 +512,14 @@ will freeze the process and may take a lot of time, depending on the
 number of tasks and the processing steps.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_get_tasks</span></code></p></td>
-<td><p>This method must return all the tasks (as an iterable object) defined
-in the app. The app configuration should be done using Parameters and
-this method process the input from all Parameters to create the task
-list. <strong>This method must be defined in a custom app.</strong></p></td>
+<td><p>This method must return all the tasks (as an iterable object) defined in
+the app. The app configuration should be done using Parameters and this
+method processes the input from all Parameters to create the task list.
+<strong>This method must be defined in a custom app.</strong></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_pre_run</span></code></p></td>
 <td><p>This method runs all the required initialization which needs to be
-performed once before processing tasks. By default, this method
-passes.</p></td>
+performed once before processing tasks. By default, this method passes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_post_run</span></code></p></td>
 <td><p>Final processing which needs to be performed after all tasks have been
@@ -532,8 +531,8 @@ this method passes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_carryon</span></code></p></td>
 <td><p>This method allows to check whether processing can carry on or needs to
-wait (for example for new data). It is called after the pre_cycle and
-is called repeatedly until it returns a True. By default, this method
+wait (for example for new data). It is called after the pre_cycle and is
+called repeatedly until it returns a True. By default, this method
 returns True.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">multiprocessing_func</span></code></p></td>
@@ -544,13 +543,13 @@ task should be defined. <strong>This method must be defined in a custom app.</st
 <td><p>This method takes the task index and the function results and stores
 them in whichever way the app defined. It is separated from the
 processing to separate it in parallel processing and only store the
-results in the main process. <strong>This method must be defined in a
-custom app.</strong></p></td>
+results in the main process. <strong>This method must be defined in a custom
+app.</strong></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">initialize_shared_memory</span></code></p></td>
 <td><p>This method is used to create shared memory objects to be shared between
-manager and app clones or it initialize it again. Details must be defined
-by the app which wishes to use it.</p></td>
+manager and app clones or it initialize it again. Details must be
+defined by the app which wishes to use it.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">export_state</span></code></p></td>
 <td><p>This method returns a dictionary with the app state in a serializable
@@ -632,9 +631,9 @@ update the Parameter values directly at creation:</p>
 </pre></div>
 </div>
 <p>3. By sharing Parameters with other objects. One of the key advantages of
-using pydidas Parameter for handling app data is that they are objects
-which can be shared between different python objects. Any changes to the
-object will be directly available to all linked apps:</p>
+using pydidas Parameter for handling app data is that they are objects which
+can be shared between different python objects. Any changes to the object
+will be directly available to all linked apps:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app_1</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">num_param</span> <span class="o">=</span> <span class="n">app_1</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s2">&quot;num_images&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app_2</span> <span class="o">=</span> <span class="n">RandomImageGeneratorApp</span><span class="p">(</span><span class="n">num_param</span><span class="p">)</span>
@@ -674,8 +673,8 @@ behaviour dynamically by changing calling arguments on the command line.</p>
 </section>
 <section id="running-an-app">
 <h2>Running an app<a class="headerlink" href="#running-an-app" title="Link to this heading">#</a></h2>
-<p>The app can be run locally (and serially) using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code> method.
-The run method’s definition is given below to demonstrate the exact sequence:</p>
+<p>The app can be run locally (and serially) using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code> method. The
+run method’s definition is given below to demonstrate the exact sequence:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run the app without multiprocessing.</span>
@@ -698,12 +697,10 @@ The run method’s definition is given below to demonstrate the exact sequence:<
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
 <p>As example, let us extend the RandomImageGeneratorApp to a fully functional app.
 The app will create a random noisy image of the given shape as its core
-function.
-It will utilize a shared memory array to store results to demonstrate how
-manager and app clones interact in multiprocessing.
-Just for demonstration purposes, it will wait for 50 ms for every 5th index
-and fail every 2nd carryon check. These methods will also print some info for
-demonstration:</p>
+function. It will utilize a shared memory array to store results to demonstrate
+how manager and app clones interact in multiprocessing. Just for demonstration
+purposes, it will wait for 50 ms for every 5th index and fail every 2nd carryon
+check. These methods will also print some info for demonstration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>

@@ -453,7 +453,7 @@
 <p>The <em>Global settings window</em> allows the user to set system Parameters which
 control multiprocessing, memory management and performance.</p>
 <img alt="../../../_images/global_settings_overview.png" class="align-center" src="../../../_images/global_settings_overview.png" />
-<p>Using the <code class="xref py py-data docutils literal notranslate"><span class="pre">Restore</span> <span class="pre">defaults</span></code> button will change all settings back to
+<p>Using the <code class="xref py py-data docutils literal notranslate"><span class="pre">Restore</span> <span class="pre">defaults</span></code> button will reset all settings back to
 their default values.</p>
 <section id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">#</a></h2>
@@ -469,12 +469,12 @@ their default values.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Number of MP workers</p></td>
-<td><p>The number of parallel processes which perform the calculations. Due
-to the inherent parallelization of integration in pyFAI and due to
-disk read access interference for too many processes, the number should
-not be set too high. However, depending on system resources and the
-type of workflow, a larger number of workers might speed up certain
-processing tasks.</p></td>
+<td><p>The number of parallel processes which perform the calculations. Due to
+the inherent parallelization of integration in pyFAI and due to disk
+read access interference for too many processes, the number should not
+be set too high. However, depending on system resources and the type of
+workflow, a larger number of workers might speed up certain processing
+tasks.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Buffer dataframe limit</p></td>
 <td><p>This Parameter determines the size of the buffer. The buffer will be

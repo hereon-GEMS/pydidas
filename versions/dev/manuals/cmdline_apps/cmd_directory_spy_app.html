@@ -469,11 +469,10 @@
 </nav>
 <section id="motivation">
 <h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> is
-designed to keep track of the files in a directory and notify the user if a new
-file (with a specific filename pattern) has been created or changed.
-If configured to do so, it will also supply the image data of the latest image
-as well as the filename.</p>
+<p>The <a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> is designed to
+keep track of the files in a directory and notify the user if a new file (with a
+specific filename pattern) has been created or changed. If configured to do so,
+it will also supply the image data of the latest image as well as the filename.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>While the use of different Parameters is handled in different sections of
@@ -484,16 +483,15 @@ this manual, they must all be combined to use all capabilities of the
 <section id="setup-of-the-directoryspyapp">
 <h2>Setup of the DirectorySpyApp<a class="headerlink" href="#setup-of-the-directoryspyapp" title="Link to this heading">#</a></h2>
 <p>This section describes the different input Parameters that can be used and gives
-an overview of the <a class="reference internal" href="#directory-spy-app-params"><span class="std std-ref">DirectorySpyApp Parameters</span></a> at the end of the
-section.</p>
+an overview of the <a class="reference internal" href="#directory-spy-app-params"><span class="std std-ref">DirectorySpyApp Parameters</span></a> at the end of the section.</p>
 <section id="selection-of-input-data">
 <h3>Selection of input data<a class="headerlink" href="#selection-of-input-data" title="Link to this heading">#</a></h3>
 <p>First of all, the user must specify the <code class="xref py py-data docutils literal notranslate"><span class="pre">directory_path</span></code> Parameter to
 define the working directory. In addition, the user must decide whether the app
-will scan for all new files the selected directory or only for files matching
-a specific filename pattern. In the latter case, the <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>
-Parameter is used and must include the filename pattern with hashes “#” for
-the counting variable.</p>
+will scan for all new files the selected directory or only for files matching a
+specific filename pattern. In the latter case, the <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>
+Parameter is used and must include the filename pattern with hashes “#” for the
+counting variable.</p>
 <p>The file finding behaviour is controlled through the <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code>
 Parameter. If set to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>, the app will look for all files in a
 directory. If <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code>, it will only look for incremental counts
@@ -503,13 +501,13 @@ according to the filename pattern and the current index.</p>
 <p>Using the <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all=True</span></code> setting will be slow in directories
 with many files and it is not recommended.</p>
 </div>
-<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code> Parameter only includes the filename with
-hash characters as wildcards. The number of wildcard characters must correspond
-to the length of the numbers to be replaced and it will be filled with leading
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code> Parameter only includes the filename with hash
+characters as wildcards. The number of wildcard characters must correspond to
+the length of the numbers to be replaced and it will be filled with leading
 zeros.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Only a single set of wildcars is accepted. Please leave all other numbers
+<p>Only a single set of wildcards is accepted. Please leave all other numbers
 in place.</p>
 </div>
 <p>If HDF5 files are used, the dataset to use must be specified with the
@@ -548,12 +546,11 @@ directory. The files are named <em>test_scan_01_0001.tiff</em>,
 <h2>Detector mask and background image<a class="headerlink" href="#detector-mask-and-background-image" title="Link to this heading">#</a></h2>
 <section id="using-a-mask-file">
 <h3>Using a mask file<a class="headerlink" href="#using-a-mask-file" title="Link to this heading">#</a></h3>
-<p>A mask file can be used by activating the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_det_mask</span></code>
-Parameter. This will instruct the app to apply the detector mask to the data
-frame.</p>
+<p>A mask file can be used by activating the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_det_mask</span></code> Parameter.
+This will instruct the app to apply the detector mask to the data frame.</p>
 <p>To modify the detector mask used by the DirectorySpyApp, set the
 <code class="xref py py-data docutils literal notranslate"><span class="pre">detector_mask_file</span></code> Parameter to point to the mask file. The value
-taken for masked pixels is controlled by the <code class="xref py py-data docutils literal notranslate"><span class="pre">det_mask_val</span></code> Parameter.
+used for masked pixels is controlled by the <code class="xref py py-data docutils literal notranslate"><span class="pre">det_mask_val</span></code> Parameter.
 The default value is 0.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
@@ -567,9 +564,9 @@ The default value is 0.</p>
 <p>Usage of a background file (which will be subtracted from all frames) can be
 activated by setting the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_bg_file</span></code> Parameter to True.</p>
 <p>The background file itself can be selected by specifying the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_file</span></code>
-Parameter. If a hdf5 file is selected, the dataset and frame can be given by
-the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code> Parameters. These
-values default to <em>entry/data/data</em> and 0, respectively.</p>
+Parameter. If a hdf5 file is selected, the dataset and frame can be given by the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code> Parameters. These values
+default to <em>entry/data/data</em> and 0, respectively.</p>
 <p>As example, let us use the first frame (i.e. zero) from the
 <em>/scratch/scan_42/test.h5df5</em> file and the <em>entry/detector/data</em> dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -595,9 +592,7 @@ is run like any pydidas app, as described in detail in
 <p>Because the DirectorySpyApp does not use tasks and is running indefinitely
 until stopped, it <strong>cannot</strong> be run serially.</p>
 </div>
-<p>To run it utilizing parallelization, set up an
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
+<p>To run it utilizing parallelization, set up an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -606,13 +601,13 @@ until stopped, it <strong>cannot</strong> be run serially.</p>
 </section>
 <section id="accessing-results">
 <h2>Accessing results<a class="headerlink" href="#accessing-results" title="Link to this heading">#</a></h2>
-<p><a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> results can
-be only be accessed indirectly within Python.</p>
+<p><a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp" title="pydidas.apps.DirectorySpyApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectorySpyApp</span></code></a> results can be only
+be accessed indirectly within Python.</p>
 <section id="accessing-results-within-python">
 <h3>Accessing results within Python<a class="headerlink" href="#accessing-results-within-python" title="Link to this heading">#</a></h3>
 <p>The results can be accessed through the <code class="xref py py-data docutils literal notranslate"><span class="pre">image</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">filename</span></code>
-and <code class="xref py py-data docutils literal notranslate"><span class="pre">image_metadata</span></code> properties. Note that this requires to connect
-the AppRunner <code class="xref py py-data docutils literal notranslate"><span class="pre">sig_results</span></code> with the local app’s
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">image_metadata</span></code> properties. Note that this requires to connect the
+AppRunner <code class="xref py py-data docutils literal notranslate"><span class="pre">sig_results</span></code> with the local app’s
 <a class="reference internal" href="../../code/api/apps/directory_spy_app.html#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="pydidas.apps.DirectorySpyApp.multiprocessing_store_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">multiprocessing_store_results</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">DirectorySpyApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
@@ -642,27 +637,26 @@ the AppRunner <code class="xref py py-data docutils literal notranslate"><span c
 <span id="directory-spy-app-params"></span><h2>DirectorySpyApp Parameters<a class="headerlink" href="#directoryspyapp-parameters" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><dl class="simple">
-<dt>scan_for_all (type: bool, default: False)</dt><dd><p>Flag to toggle scanning for all new files or only for files matching
-the input pattern (defined with the Parameter
-<code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>).</p>
+<dt>scan_for_all (type: bool, default: False)</dt><dd><p>Flag to toggle scanning for all new files or only for files matching the
+input pattern (defined with the Parameter <code class="xref py py-data docutils literal notranslate"><span class="pre">filename_pattern</span></code>).</p>
 </dd>
-<dt>filename_pattern (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The pattern of the filename. Use hashes “#” for wildcards which will
-be filled in with numbers. This Parameter must be set if
+<dt>filename_pattern (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The pattern of the filename. Use hashes “#” for wildcards which will be
+filled in with numbers. This Parameter must be set if
 <code class="xref py py-data docutils literal notranslate"><span class="pre">scan_for_all</span></code> is <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </dd>
 <dt>directory_path (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The absolute path of the directory to be used.</p>
 </dd>
 <dt>hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Used only for hdf5 files: The dataset key.</p>
 </dd>
-<dt>use_global_det_mask (type: bool, default: True)</dt><dd><p>Keyword to enable or disable using the global detector mask as
-defined by the global mask file and mask value.</p>
+<dt>use_global_det_mask (type: bool, default: True)</dt><dd><p>Keyword to enable or disable using the global detector mask as defined
+by the global mask file and mask value.</p>
 </dd>
 <dt>use_bg_file (type: bool, default: False)</dt><dd><p>Keyword to toggle usage of background subtraction.</p>
 </dd>
 <dt>bg_file (type: pathlib.Path, default: &lt;empty Path&gt;)</dt><dd><p>The name of the file used for background correction.</p>
 </dd>
-<dt>bg_hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Required for hdf5 background image files: The dataset key with the
-image for the background file.</p>
+<dt>bg_hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Required for hdf5 background image files: The dataset key with the image
+for the background file.</p>
 </dd>
 <dt>bg_hdf5_frame (type: int, default: 0)</dt><dd><p>Required for hdf5 background image files: The image number of the
 background image in the dataset.</p>

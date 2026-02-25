@@ -444,8 +444,8 @@
 </li>
 </ul>
 </nav>
-<p>Pydidas offers multiprocessing using the python multiprocessing package with
-a controller process in a separate thread to prevent the caller from blocking.</p>
+<p>Pydidas offers multiprocessing using the python multiprocessing package with a
+controller process in a separate thread to prevent the caller from blocking.</p>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController" title="pydidas.multiprocessing.WorkerController"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerController</span></code></a> is
 the generic pydidas implementation and the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is the subclassed version to run pydidas
 apps.</p>
@@ -460,7 +460,8 @@ tasks.</p>
 <li><p><strong>input queue</strong> queue to send tasks to the workers.</p></li>
 <li><p><strong>output queue</strong> queue to receive results from the workers.</p></li>
 <li><p><strong>stop queue</strong> queue to send stop signals to the workers.</p></li>
-<li><p><strong>finished queue</strong> queue for the workers to signal they have completed all tasks.</p></li>
+<li><p><strong>finished queue</strong> queue for the workers to signal they have completed all
+tasks.</p></li>
 </ul>
 <p>The user does not have to interact with the queues itself, this is handled by
 the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController" title="pydidas.multiprocessing.WorkerController"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerController</span></code></a>.</p>
@@ -479,24 +480,23 @@ signal will be processed.</p>
 </section>
 <section id="communication-with-the-user">
 <h3>Communication with the user<a class="headerlink" href="#communication-with-the-user" title="Link to this heading">#</a></h3>
-<p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController" title="pydidas.multiprocessing.WorkerController"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerController</span></code></a>
-uses <strong>Qt’s</strong> slots and signals for communicating results to the user.</p>
+<p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController" title="pydidas.multiprocessing.WorkerController"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerController</span></code></a> uses
+<strong>Qt’s</strong> slots and signals for communicating results to the user.</p>
 <p>Three signals are provided:</p>
 <ul class="simple">
 <li><p><strong>sig_progress(float):</strong> This signal is emitted after a result has been
 received and gives the current progress, normalized to the range [0, 1).</p></li>
 <li><p><strong>sig_results(object, object):</strong> This signal is emitted for each result and
-returns the tuple (task argument, task result) to allow identification of
-the result.</p></li>
-<li><p><strong>sig_finshed:</strong> The finished signal is emitted once all tasks have been
+returns the tuple (task argument, task result) to allow identification of the
+result.</p></li>
+<li><p><strong>sig_finished:</strong> The finished signal is emitted once all tasks have been
 performed and all workers have finished.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is the responsibility of the user to connect to the signals prior to
-starting a process to receive the results.
-Because of the Qt framework’s behaviour, an eventloop must be running for
-the signals to be processed.</p>
+starting a process to receive the results. Because of the Qt framework’s
+behaviour, an eventloop must be running for the signals to be processed.</p>
 </div>
 </section>
 <section id="key-methods">
@@ -508,8 +508,8 @@ the signals to be processed.</p>
 <col style="width: 70.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>method name</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Method name</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -527,9 +527,9 @@ to be processed.</p></td>
 </tr>
 <tr class="row-odd"><td><p>finalize_tasks()</p></td>
 <td><p>This method will add <em>stop tasks</em> to the queue to inform the workers
-that all tasks have been successfully finished.
-Calling this method will also flag the workers to finish and the
-processes will terminate after finishing all calculations.</p></td>
+that all tasks have been successfully finished. Calling this method will
+also flag the workers to finish and the processes will terminate after
+finishing all calculations.</p></td>
 </tr>
 <tr class="row-even"><td><p>start()</p></td>
 <td><p>The run method will start the thread event loop, start the worker
@@ -537,8 +537,8 @@ processes and submit all tasks to the queue.</p></td>
 </tr>
 <tr class="row-odd"><td><p>suspend()</p></td>
 <td><p>Suspend will temporarily suspend the event loop. <strong>Note</strong> that all
-submitted tasks will still be processed by the workers but no new
-tasks will be submitted and no results will be processed.</p></td>
+submitted tasks will still be processed by the workers but no new tasks
+will be submitted and no results will be processed.</p></td>
 </tr>
 <tr class="row-even"><td><p>restart()</p></td>
 <td><p>This method will restart processing of the event loop.</p></td>
@@ -551,8 +551,8 @@ tasks will be submitted and no results will be processed.</p></td>
 <h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
 <section id="minimal-working-example">
 <h4>Minimal working example<a class="headerlink" href="#minimal-working-example" title="Link to this heading">#</a></h4>
-<p>The following minimal working example can be run from an interactive console
-or saved as file.</p>
+<p>The following minimal working example can be run from an interactive console or
+saved as file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -593,8 +593,8 @@ or saved as file.</p>
 </section>
 <section id="working-example-with-restart-of-the-thread">
 <h4>Working example with restart of the Thread<a class="headerlink" href="#working-example-with-restart-of-the-thread" title="Link to this heading">#</a></h4>
-<p>In the following example, not calling the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController.finalize_tasks" title="pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_tasks</span></code></a> will keep the
-thread alive and allow the submission of new tasks.</p>
+<p>In the following example, not calling the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController.finalize_tasks" title="pydidas.multiprocessing.WorkerController.finalize_tasks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize_tasks</span></code></a> will keep the thread
+alive and allow the submission of new tasks.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -677,16 +677,16 @@ thread alive and allow the submission of new tasks.</p>
 <h2>AppRunner<a class="headerlink" href="#apprunner" title="Link to this heading">#</a></h2>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is the specialized
 subclass to work with pydidas <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Apps</span></code></a>.</p>
-<p>In addition to the four queues listed above, it has a 5th queue for passing (string)
-messages from the worker to the main event loop.</p>
+<p>In addition to the four queues listed above, it has a 5th queue for passing
+(string) messages from the worker to the main event loop.</p>
 <p>A sequence diagram of the communication with the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> is given below.</p>
 <a class="reference internal image-reference" href="../_images/AppRunner_sequence.png"><img alt="../_images/AppRunner_sequence.png" class="align-center" src="../_images/AppRunner_sequence.png" style="width: 400px;" />
 </a>
 <p>It is a QObject and uses signals and slots for communicating with the main event
 loop. The <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">app</span></code></a> will be executed in independent
-processes in the <a class="reference internal" href="#the-app-processor">The app_processor</a> .</p>
-<p>For a full description of the <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a> and
-how it works, please refer to the <a class="reference internal" href="dev_guide_apps.html#developer-guide-to-apps"><span class="std std-ref">Developers guide to pydidas applications</span></a>.</p>
+processes in the <a class="reference internal" href="#the-app-processor">The app_processor</a>.</p>
+<p>For a full description of the <a class="reference internal" href="../code/api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a> and how
+it works, please refer to the <a class="reference internal" href="dev_guide_apps.html#developer-guide-to-apps"><span class="std std-ref">Developers guide to pydidas applications</span></a>.</p>
 <section id="apprunner-signals">
 <h3>AppRunner signals<a class="headerlink" href="#apprunner-signals" title="Link to this heading">#</a></h3>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> uses the following
@@ -698,9 +698,9 @@ signals:</p>
 <col style="width: 60.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>signal name</p></th>
-<th class="head"><p>type</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Signal name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -734,8 +734,8 @@ loop.</p></td>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.app_processor" title="pydidas.multiprocessing.app_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor</span></code></a> is the
 pydidas function which runs App tasks in a separate process. Tasks and result
 notifications are exchanged via queues. The transfer of results to the AppRunner
-process must be handled by the app and can be implemented to the developer’s
-own taste. Because all queued data is pickled, it is not advisable to send large
+process must be handled by the app and can be implemented to the developer’s own
+taste. Because all queued data is pickled, it is not advisable to send large
 data over the queue but instead to use the multiprocessing shared memory.</p>
 <p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.app_processor" title="pydidas.multiprocessing.app_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor's</span></code></a> event
 loop is summarized in the flowchart below:</p>
@@ -745,8 +745,7 @@ loop is summarized in the flowchart below:</p>
 <section id="example">
 <h3>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h3>
 <p>The following example is a minimal working example. A <code class="xref py py-class docutils literal notranslate"><span class="pre">TestApp</span></code> has
-been written which performs a simple arithmetic operation on the numbers
-0..20.
+been written which performs a simple arithmetic operation on the numbers 0..20.
 Because signals and slots only work when the Qt event loop is running, a
 QCoreApplication is started and a test object is used to receive the
 <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner's</span></code></a> signals.</p>

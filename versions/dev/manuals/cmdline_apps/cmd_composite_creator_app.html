@@ -474,8 +474,8 @@
 <h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">#</a></h2>
 <p>The <a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a> is
 designed to combine multiple images into a composite image. Only basic
-operations of binning and cropping are applied to the raw images.
-Global offsets in the image data can be handled with a mask and background file.</p>
+operations of binning and cropping are applied to the raw images. Global offsets
+in the image data can be handled with a mask and background file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>While the use of different Parameters is handled in different sections of
@@ -485,8 +485,8 @@ this manual, they must all be combined to use all capabilities of the
 </section>
 <section id="globally-controlled-settings">
 <h2>Globally controlled settings<a class="headerlink" href="#globally-controlled-settings" title="Link to this heading">#</a></h2>
-<p>Some settings used by the CompositeCreatorApp are controlled globally by pydidas.
-These are:</p>
+<p>Some settings used by the CompositeCreatorApp are controlled globally by
+pydidas. These are:</p>
 <ul class="simple">
 <li><p>The width of the border between images in pixels
 (<cite>user/mosaic_border_width</cite>)</p></li>
@@ -500,9 +500,9 @@ These are:</p>
 <li><p>The number of parallel worker processes (<cite>global/mp_n_workers</cite>)</p></li>
 </ul>
 <p>Because these settings will typically be reused quite often, they have been
-implemented as global <a class="reference internal" href="../cmdline_global/cmd_global.html#pydidas-qsettings"><span class="std std-ref">pydidas QSettings</span></a>. The default is a border width
-of 0 pixels and a border pixel value of 0. The default maximum size is 100 Mpx.
-To modify these values, the user needs to create a QSettings instance and adjust
+implemented as global <a class="reference internal" href="../cmdline_global/cmd_global.html#pydidas-qsettings"><span class="std std-ref">pydidas QSettings</span></a>. The default is a border width of
+0 pixels and a border pixel value of 0. The default maximum size is 100 Mpx. To
+modify these values, the user needs to create a QSettings instance and adjust
 these values, if required:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">PydidasQsettings</span><span class="p">()</span>
@@ -523,22 +523,20 @@ section.</p>
 <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code> mode or not. This flag defines whether checks for
 file existance and size will be performed before the start of the processing.
 The default setting is <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code> which will enforce file system checks.
-This value is stored in the <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code>
-<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>
-(see <a class="reference internal" href="#composite-creator-app-params"><span class="std std-ref">Complete list of CompositeCreatorApp Parameters</span></a> for details).</p>
+This value is stored in the <code class="xref py py-data docutils literal notranslate"><span class="pre">live_processing</span></code> <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> (see <a class="reference internal" href="#composite-creator-app-params"><span class="std std-ref">Complete list of CompositeCreatorApp Parameters</span></a> for details).</p>
 <p>The input data is defined through the files to use by defining the first and
 last file (or only one file if a file with multiple frames per file is used,
 e.g. hdf5). The file(s) must be selected by the <code class="xref py py-data docutils literal notranslate"><span class="pre">first_file</span></code> and
 <code class="xref py py-data docutils literal notranslate"><span class="pre">last_file</span></code> <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>. If not
-every file single but only every n-th file should be processed, this
-can be defined by the <code class="xref py py-data docutils literal notranslate"><span class="pre">file_stepping</span></code> Parameter. pydidas will check the
+every file single but only every n-th file should be processed, this can be
+defined by the <code class="xref py py-data docutils literal notranslate"><span class="pre">file_stepping</span></code> Parameter. pydidas will check the
 filenames for running numbers and determine the names automatically.
 Incrementing numbers do not need to be given by wildcards but must be separated
 by a delimiter of “.” or “_” or “-” or “ “.</p>
 <p>Note that the first file must exist at the time the app is run because the file
 size will be used as reference for the future files.</p>
-<p>For hdf5 files, the hdf5 dataset needs to be specified as well. The dataset
-can be given with the <code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key</span></code> Parameter. The default is
+<p>For hdf5 files, the hdf5 dataset needs to be specified as well. The dataset can
+be given with the <code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key</span></code> Parameter. The default is
 <em>entry/data/data</em> and if this is correct, the Parameter does not need to be
 specified. A subset of images from hdf5 files can be selected by using the
 <code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_first_image_num</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_last_image_num</span></code> Parameters
@@ -546,9 +544,9 @@ with a frame stepping of <code class="xref py py-data docutils literal notransla
 <p>See <a class="reference internal" href="#composite-creator-app-params"><span class="std std-ref">Complete list of CompositeCreatorApp Parameters</span></a> for the detailed list of all Parameters.</p>
 <section id="example-1-loading-a-number-of-tiff-files">
 <h4>Example 1: Loading a number of tiff files<a class="headerlink" href="#example-1-loading-a-number-of-tiff-files" title="Link to this heading">#</a></h4>
-<p>For the first example, we want to load every 3rd file from a running scan
-which produces tiff files named <em>/scratch/scan_42/test_image_0000_suffix.tiff</em>
-to <em>/scratch/scan_42/test_image_1200_suffix.tiff</em>:</p>
+<p>For the first example, we want to load every 3rd file from a running scan which
+produces tiff files named <em>/scratch/scan_42/test_image_0000_suffix.tiff</em> to
+<em>/scratch/scan_42/test_image_1200_suffix.tiff</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;first_file&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/scan_42/test_image_0000_suffix.tiff&#39;</span><span class="p">)</span>
@@ -562,8 +560,8 @@ to <em>/scratch/scan_42/test_image_1200_suffix.tiff</em>:</p>
 </section>
 <section id="example-2-loading-a-subset-of-frames-from-a-single-hdf5-file">
 <h4>Example 2: Loading a subset of frames from a single hdf5 file<a class="headerlink" href="#example-2-loading-a-subset-of-frames-from-a-single-hdf5-file" title="Link to this heading">#</a></h4>
-<p>For this example, we want to load every 2nd frame for the frames 10 to 30 from
-a single hdf5 file named <em>/scratch/test_scan/some_file.h5</em>.</p>
+<p>For this example, we want to load every 2nd frame for the frames 10 to 30 from a
+single hdf5 file named <em>/scratch/test_scan/some_file.h5</em>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;first_file&#39;</span><span class="p">,</span> <span class="s1">&#39;/scratch/test_scan/some_file.h5&#39;</span><span class="p">)</span>
@@ -598,11 +596,11 @@ frame. For more information on the global settings, please refer to
 <p>Usage of a background file (which will be subtracted from all frames) can be
 activated by setting the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_bg_file</span></code> Parameter to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>.</p>
 <p>The background file itself can be selected by specifying the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_file</span></code>
-Parameter. If a hdf5 file is selected, the dataset and frame can be given by
-the <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code>. These values default to
+Parameter. If a hdf5 file is selected, the dataset and frame can be given by the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code>. These values default to
 <em>entry/data/data</em> and 0, respectively.</p>
-<p>As example, let us use the 0th frame from the <em>/scratch/scan_42/test.h5df5</em>
-file and the <em>entry/detector/data</em> dataset:</p>
+<p>As example, let us use the 0th frame from the <em>/scratch/scan_42/test.h5df5</em> file
+and the <em>entry/detector/data</em> dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;use_bg_file&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -617,22 +615,20 @@ file and the <em>entry/detector/data</em> dataset:</p>
 </section>
 <section id="using-a-region-of-interest">
 <h3>Using a region of interest<a class="headerlink" href="#using-a-region-of-interest" title="Link to this heading">#</a></h3>
-<p>A region of interest (ROI) can be selected by defining the four values for
-lower and upper pixels in <em>x</em> and <em>y</em>. Usage of the ROI must be activated by
-setting the Parameter <code class="xref py py-data docutils literal notranslate"><span class="pre">use_roi</span></code> to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>. The four
-boundaries can be defined by the <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xlow</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xhigh</span></code>,
-<code class="xref py py-data docutils literal notranslate"><span class="pre">roi_ylow</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span></code> values. To use the full range, use
-<code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> as value for the high boundaries and <code class="xref py py-data docutils literal notranslate"><span class="pre">0</span></code> for the low
-boundaries.
-These values are modulated by the image width and height, respectively. A value
-of <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span> <span class="pre">=</span> <span class="pre">-5</span></code> thus corresponds to cropping the five rightmost pixel
+<p>A region of interest (ROI) can be selected by defining the four values for lower
+and upper pixels in <em>x</em> and <em>y</em>. Usage of the ROI must be activated by setting
+the Parameter <code class="xref py py-data docutils literal notranslate"><span class="pre">use_roi</span></code> to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>. The four boundaries can be
+defined by the <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xlow</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xhigh</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_ylow</span></code>
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span></code> values. To use the full range, use <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> as
+value for the high boundaries and <code class="xref py py-data docutils literal notranslate"><span class="pre">0</span></code> for the low boundaries. These
+values are modulated by the image width and height, respectively. A value of
+<code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span> <span class="pre">=</span> <span class="pre">-5</span></code> thus corresponds to cropping the five rightmost pixel
 rows.</p>
 <p>The defaults are <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xlow</span> <span class="pre">=</span> <span class="pre">0</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_xhigh</span> <span class="pre">=</span> <span class="pre">None</span></code>,
 <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_ylow</span> <span class="pre">=</span> <span class="pre">0</span></code>, and <code class="xref py py-data docutils literal notranslate"><span class="pre">roi_yhigh</span> <span class="pre">=</span> <span class="pre">None</span></code>. Note that if the ROI
 is activated, all four values are used and need to be set correctly.</p>
-<p>As example, let the input image be of size 1000 x 1000 and let us select a
-ROI of pixel rows 5 to 1000 in height and the pixel columns 120 to 900 in
-width.</p>
+<p>As example, let the input image be of size 1000 x 1000 and let us select a ROI
+of pixel rows 5 to 1000 in height and the pixel columns 120 to 900 in width.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;use_roi&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -659,8 +655,8 @@ is controlled by the <code class="xref py py-data docutils literal notranslate">
 the input size and is ignored. The binning must be an integer value.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If a combination of binning and ROI is used, the ROI pixel coordinates
-refer to the unbinned image.</p>
+<p>If a combination of binning and ROI is used, the ROI pixel coordinates refer
+to the unbinned image.</p>
 </div>
 <p>As example, we set the binning factor to re-bin images by a factor of 4 in the
 composite image:</p>
@@ -673,12 +669,12 @@ composite image:</p>
 <section id="image-thresholds">
 <h3>Image thresholds<a class="headerlink" href="#image-thresholds" title="Link to this heading">#</a></h3>
 <p>The range of the composite image can be restricted by using thresholds. Two
-thresholds for the upper and lower value must be given. To activate the use
-of thresholds, set the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_thresholds</span></code> Parameter to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>.
-The values for the lower and upper thresholds are given by the
+thresholds for the upper and lower value must be given. To activate the use of
+thresholds, set the <code class="xref py py-data docutils literal notranslate"><span class="pre">use_thresholds</span></code> Parameter to <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code>. The
+values for the lower and upper thresholds are given by the
 <code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_low</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">threshold_high</span></code> Parameters, respectively.
-A value of <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> for a threshold will disable this specific
-threshold. The default value for threshold values is <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code>.</p>
+A value of <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> for a threshold will disable this specific threshold.
+The default value for threshold values is <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <p>As example, let us define an upper threshold of 42.0 and disable the lower
 threshold.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -722,8 +718,8 @@ and we want to adjust x automatically.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;composite_ny&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>As second example, we want to create a composite of 90 images with 10 images
-in y and starting at the left side in x.</p>
+<p>As second example, we want to create a composite of 90 images with 10 images in
+y and starting at the left side in x.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">set_param_value</span><span class="p">(</span><span class="s1">&#39;composite_nx&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
@@ -733,18 +729,17 @@ in y and starting at the left side in x.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Mathematically, it is equivalent to change the orientation of the raw
-images or to change the order of the images in the composite. However,
-users might prefer to have the composite composed in the same orientation
-as their raw data scan.</p>
+<p>Mathematically, it is equivalent to change the orientation of the raw images
+or to change the order of the images in the composite. However, users might
+prefer to have the composite composed in the same orientation as their raw
+data scan.</p>
 </div>
 </section>
 </section>
 <section id="running-the-compositecreatorapp">
 <h2>Running the CompositeCreatorApp<a class="headerlink" href="#running-the-compositecreatorapp" title="Link to this heading">#</a></h2>
-<p>Once configured, the <a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a>
-is run like any pydidas app, as described in detail in
-<a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
+<p>Once configured, the <a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a> is run like any pydidas app, as described in
+detail in <a class="reference internal" href="cmd_running_apps.html#running-pydidas-applications"><span class="std std-ref">Running pydidas applications</span></a>.</p>
 <p>As a recap, to run the app serially, use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span>
 <span class="pre">&lt;pydidas.apps.CompositeCreatorApp.run</span></code> method:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -752,9 +747,7 @@ is run like any pydidas app, as described in detail in
 <span class="gp">&gt;&gt;&gt; </span><span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To run it utilizing parallelization, set up an
-<a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use its
-:py:meth`start &lt;pydidas.multiprocessing.AppRunner.start&gt;` method:</p>
+<p>To run it utilizing parallelization, set up an <a class="reference internal" href="../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> and use its <code class="xref py py-meth docutils literal notranslate"><span class="pre">start</span></code> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">apps</span><span class="o">.</span><span class="n">CompositeCreatorApp</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">AppRunner</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -762,10 +755,8 @@ is run like any pydidas app, as described in detail in
 </pre></div>
 </div>
 <p>If any thresholding should be performed, this operation needs to be called on
-the app by the <code class="xref py py-data docutils literal notranslate"><span class="pre">apply_thresholds</span></code> method. Note that it is also
-possible to provide new threshold values. Please see the
-<a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp.apply_thresholds" title="pydidas.apps.CompositeCreatorApp.apply_thresholds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_thresholds</span></code></a>
-documentation for this.</p>
+the app by the <code class="xref py py-data docutils literal notranslate"><span class="pre">apply_thresholds</span></code> method. Note that it is also possible
+to provide new threshold values. Please see the <a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp.apply_thresholds" title="pydidas.apps.CompositeCreatorApp.apply_thresholds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_thresholds</span></code></a> documentation for this.</p>
 <p>Simply call the method to update the composite image with the thresholds
 provided by the associated Parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># To apply the thresholds</span>
@@ -784,14 +775,13 @@ effect.</p>
 </section>
 <section id="accessing-results">
 <h2>Accessing results<a class="headerlink" href="#accessing-results" title="Link to this heading">#</a></h2>
-<p>After running the
-<a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a>, results can
-be accessed either directly to store the object for further use in the Python
-console or script or they can be stored.</p>
+<p>After running the <a class="reference internal" href="../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a>, results can be accessed either directly to
+store the object for further use in the Python console or script or they can be
+stored.</p>
 <section id="accessing-results-within-python">
 <h3>Accessing results within Python<a class="headerlink" href="#accessing-results-within-python" title="Link to this heading">#</a></h3>
-<p>The results can be accessed through the <code class="xref py py-data docutils literal notranslate"><span class="pre">composite</span></code> property which
-will return the array with the image data:</p>
+<p>The results can be accessed through the <code class="xref py py-data docutils literal notranslate"><span class="pre">composite</span></code> property which will
+return the array with the image data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">composite</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 <span class="go">numpy.ndarray</span>
@@ -812,6 +802,181 @@ pydidas. The format is determined automatically from the extension:</p>
 </section>
 <section id="complete-list-of-compositecreatorapp-parameters">
 <span id="composite-creator-app-params"></span><h3>Complete list of CompositeCreatorApp Parameters<a class="headerlink" href="#complete-list-of-compositecreatorapp-parameters" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>live_processing (bool, default: False)</dt><dd><p>Keyword to toggle live processing which means file existance and size checks
+will be disabled in the setup process and the file processing will wait for
+files to be created (indefinitely).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>first_file (Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>The name of the first file for a file series or of the hdf5 file in case of
+hdf5 file input.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>last_file (Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>Used only for file series: The name of the last file to be added to the
+composite image.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>file_stepping (int, default: 1)</dt><dd><p>The step width (in files). A value n &gt; 1 will only process every n-th image
+for the composite.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Used only for hdf5 files: The dataset key.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_first_image_num (type: int, default: 0)</dt><dd><p>The first image in the hdf5-dataset to be used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_last_image_num (type: int, default: -1)</dt><dd><p>The last image in the hdf5-dataset to be used. The value -1 will default to
+the last image in the file.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_stepping (type: int, default: 1)</dt><dd><p>The step width (in images) of hdf5 datasets. A value n &gt; 1 will only add
+every n-th image to the composite.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_bg_file (type: bool, default: False)</dt><dd><p>Keyword to toggle usage of background subtraction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_file (type: Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>The name of the file used for background correction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Required for hdf5 background image files: The dataset key with the image for
+the background file.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_hdf5_frame (type: int, default: 0)</dt><dd><p>Required for hdf5 background image files: The image number of the background
+image in the dataset.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_global_det_mask (type: bool, default: True</dt><dd><p>Keyword to enable or disable using the global detector mask as defined by
+the global mask file and mask value.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_roi (type: bool, default: False)</dt><dd><p>Keyword to toggle use of the ROI for cropping the original images before
+combining them.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_xlow (type: int, default: 0)</dt><dd><p>The lower boundary (in pixel) for cropping images in x, if use_roi is
+enabled. Negative values will be modulated with the image width.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_xhigh (type: Union[int, None], default: None)</dt><dd><p>The upper boundary (in pixel) for cropping images in x, if use_roi is
+enabled. Negative values will be modulated with the image width, i.e. -1 is
+equivalent to the full image size minus one. None corresponds to the full
+image width (with respect to the upper boundary).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_ylow (type: int, default: 0)</dt><dd><p>The lower boundary (in pixel) for cropping images in y, if use_roi is
+enabled. Negative values will be modulated with the image height.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_yhigh (type: Union[int, None], default: None)</dt><dd><p>The upper boundary (in pixel) for cropping images in y, if use_roi is
+enabled. Negative values will be modulated with the image height, i.e. -1 is
+equivalent to the full image size minus one. None corresponds to the full
+image height (with respect to the upper boundary).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_thresholds (type: bool, default: False)</dt><dd><p>Keyword to enable or disable the use of thresholds. If True, threshold use
+is enabled and both threshold values will be used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>threshold_low (type: int, default: None)</dt><dd><p>The lower threshold of the composite image. If any finite value (i.e. not
+np.nan or None) is used, the value of any pixels with a value below the
+threshold will be replaced by the threshold value. A value of np.nan or None
+will ignore the threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>threshold_high (type: int, default: None)</dt><dd><p>The upper threshold of the composite image. If any finite value (i.e. not
+np.nan or None) is used, the value of any pixels with a value above the
+threshold will be replaced by the threshold value. A value of np.nan or None
+will ignore the threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>binning (type: int, default: 1)</dt><dd><p>The re-binning factor for the images in the composite. The binning will be
+applied to the cropped images.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_nx (type: int, default: 1)</dt><dd><p>The number of original images combined in the composite image in x
+direction. A value of -1 will determine the number of images in x direction
+automatically based on the number of images in y direction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_ny (type: int, default: -1)</dt><dd><p>The number of original images combined in the composite image in y
+direction. A value of -1 will determine the number of images in y direction
+automatically based on the number of images in x direction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_image_op (type: str, default: None)</dt><dd><p>The image operation applied to each raw image prior to merging it in the
+composite image. This allows to adjust the image orientation with respect to
+the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_xdir_orientation (type: str, default: left-to-right)</dt><dd><p>The direction of how images are inserted into the composite in x direction.
+Left-to-right starts with low indices (python standard) whereas
+right-to-left will insert image at the max index position first.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_ydir_orientation (type: str, default: top-to-bottom)</dt><dd><p>The direction of how images are inserted into the composite in y direction.
+Top-to-bottom starts with low indices (python standard) whereas
+bottom-to-top will insert image at the max index position first. Note that
+the display may be flipped with the origin at the bottom.</p>
+</dd>
+</dl>
+</li>
+</ul>
 </section>
 </section>
 </section>

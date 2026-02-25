@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 The contexts sub-package
@@ -21,4 +21,3 @@ The contexts sub-package
     :members:
     :inherited-members:
     :exclude-members: DiffractionExperiment, Scan
-

@@ -445,24 +445,23 @@
                   
   <section id="class-name">
 <h1>BaseApp<a class="headerlink" href="#class-name" title="Link to this heading">#</a></h1>
-<p>The BaseApp includes the structure that all applications must adhere to
-for allowing them to run in the <a class="reference internal" href="../multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>.</p>
+<p>The BaseApp includes the structure that all applications must adhere to for
+allowing them to run in the <a class="reference internal" href="../multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>.</p>
 <p>The basic functions in Apps are used as follows:</p>
 <ol class="arabic">
-<li><p>Call app.multiprocessing_pre_run to perform general setup tasks
-for multiprocessing. This method should only be called once because
-it might be expensive to run.</p></li>
+<li><p>Call app.multiprocessing_pre_run to perform general setup tasks for
+multiprocessing. This method should only be called once because it might be
+expensive to run.</p></li>
 <li><p>Run a loop &lt;for index in tasks&gt;:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Check app.multiprocessing_carryon value. If False, wait and
-repeat the check. If True, continue with processing.</p></li>
-<li><p>Call app.multiprocessing_func(index) to perform the main
-calculation task and put the results in a queue or transfer
-via a signal.</p></li>
-<li><p>Call app.multiprocessing_store_results (optionally). If the apps
-are running in parallel, they will skip this step and instead,
-they will send the results via queue to the AppRunner.</p></li>
+<li><p>Check app.multiprocessing_carryon value. If False, wait and repeat the
+check. If True, continue with processing.</p></li>
+<li><p>Call app.multiprocessing_func(index) to perform the main calculation task
+and put the results in a queue or transfer via a signal.</p></li>
+<li><p>Call app.multiprocessing_store_results (optionally). If the apps are
+running in parallel, they will skip this step and instead, they will send
+the results via queue to the AppRunner.</p></li>
 </ol>
 </div></blockquote>
 </li>

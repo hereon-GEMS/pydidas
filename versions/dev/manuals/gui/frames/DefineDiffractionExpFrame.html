@@ -469,8 +469,8 @@
 </ul>
 </nav>
 <p>The <em>Define Diffrraction setup</em> frame is a graphical interface to configure the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
-which holds information about the experimental/beamline setup.</p>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> which holds information about
+the experimental/beamline setup.</p>
 <p>The frame only holds the configuration widgets:</p>
 <a class="reference internal image-reference" href="../../../_images/full.png"><img alt="../../../_images/full.png" class="align-center" src="../../../_images/full.png" style="width: 540px;" />
 </a>
@@ -479,7 +479,7 @@ which holds information about the experimental/beamline setup.</p>
 <section id="import-settings">
 <h3>Import settings<a class="headerlink" href="#import-settings" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/btn_import.png" class="align-left" src="../../../_images/btn_import.png" />
-<p>Experimental settings can be import from file. Clicking the corresponding
+<p>Experimental settings can be imported from a file. Clicking the corresponding
 button will open a selection dialogue to pick the file with the stored settings.
 File extensions will be pre-selected based on the available importers.</p>
 </section>
@@ -502,21 +502,21 @@ will also modify the other value to keep them consistent.</p>
 <h3>Detector<a class="headerlink" href="#detector" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/detector.png" class="align-left" src="../../../_images/detector.png" />
 <p>To select a detector and automatically update all detector Parameters, the
-“Select X-ray detector” button will open a new window (using the
-pyFAI DetectorSelectorDialog, see the screenshot below) which allows to select
-a detector based on manufacturer and model.</p>
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Select</span> <span class="pre">X-ray</span> <span class="pre">detector</span></code> button will open a new window (using the pyFAI
+DetectorSelectorDialog, see the screenshot below) which allows to select a
+detector based on manufacturer and model.</p>
 <a class="reference internal image-reference" href="../../../_images/det_popup.png"><img alt="../../../_images/det_popup.png" class="align-right" src="../../../_images/det_popup.png" style="width: 361px;" />
 </a>
 <p>Confirming the selection in the dialogue will update the detector Parameters.</p>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>Alternatively, the detector can be taken from the the pyFAI calibration,
-(see <a class="reference internal" href="#copy-from-calibration"><span class="std std-ref">Copy Parameters from calibration</span></a>) or all Parameters can also be entered
-manually in the input fields.</p>
-<p>The last field of the detector group, the <em>Detector pixel mask</em> determines if
-a mask should be used for the pyFAI integration. This parameter is independent
-of the other detector Parameters and is not updated with the selection of the
+<p>Alternatively, the detector can be taken from the the pyFAI calibration, (see
+<a class="reference internal" href="#copy-from-calibration"><span class="std std-ref">Copy Parameters from calibration</span></a>) or all Parameters can also be entered manually in
+the input fields.</p>
+<p>The last field of the detector group, the <em>Detector pixel mask</em> determines if a
+mask should be used for the pyFAI integration. This parameter is independent of
+the other detector Parameters and is not updated with the selection of the
 detector. If empty, no detector mask will be applied to the pyFAI integration.</p>
 </section>
 <section id="detector-geometry">
@@ -525,32 +525,32 @@ detector. If empty, no detector mask will be applied to the pyFAI integration.</
 <p>pydidas uses the <a class="reference external" href="https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai">Default geometry in pyFAI</a>
 and the detector position is described by the sample-detector distance, two
 positions for the point of normal incidence on the detector (PONI1 in vertical
-and PONI2 in hprizontal directions) which describe the orthogonal projection of
+and PONI2 in horizontal directions) which describe the orthogonal projection of
 the origin (i.e. sample) on the detector and three rotations to modify the
 detector position. Please refer to the pyFAI documentation for a detailed
 description. For the user’s convenience, the derived beamcenter pixel position
 in detector pixel coordinates is also displayed.</p>
 <p>In addition to taking these settings from the pyFAI calibration (see
-<a class="reference internal" href="#copy-from-calibration"><span class="std std-ref">Copy Parameters from calibration</span></a>) and manual Parameter updates , pydidas also offers
-a tool for manually setting the beamcenter. The button <em>Manual beamcenter
-definition</em> opens a new window. The window is described in detail in
+<a class="reference internal" href="#copy-from-calibration"><span class="std std-ref">Copy Parameters from calibration</span></a>) and manual Parameter updates, pydidas also offers
+a tool for manually setting the beamcenter. The button <code class="xref py py-data docutils literal notranslate"><span class="pre">Manual</span>
+<span class="pre">beamcenter</span> <span class="pre">definition</span></code> opens a new window. The window is described in detail in
 <a class="reference internal" href="../windows/ManuallySetBeamcenterWindow.html#manually-set-beamcenter-window"><span class="std std-ref">Manually Set Beamcenter Window</span></a>.</p>
 <a class="reference internal image-reference" href="../../../_images/from_fit2d.png"><img alt="../../../_images/from_fit2d.png" class="align-right" src="../../../_images/from_fit2d.png" style="width: 265px;" />
 </a>
-<p>The button <em>Convert Fit2D geometry</em> allows to convert an existing calibration
-in Fit2D geometry to pyFAI’s PONI geometry. Clicking the button temporarily
-disables the frame’s inputs and opens a new window to input the existing
-calibration:
-Input all parameters as required (sample-detector distance, beamcenter x/y,
-detector tilt plane and tilt angle). The <em>Convet to pyFAI geometry</em> button will
-calculate the resulting pyFAI geometry parameters and display them in the bottom
-parameter fields. The <em>Accept and store pyFAI geometry</em> button will close the
-window and copy the resulting geometry to the main frame.</p>
+<p>The button <code class="xref py py-data docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">Fit2D</span> <span class="pre">geometry</span></code> allows to convert an existing
+calibration in Fit2D geometry to pyFAI’s PONI geometry. Clicking the button
+temporarily disables the frame’s inputs and opens a new window to input the
+existing calibration: Input all parameters as required (sample-detector
+distance, beamcenter x/y, detector tilt plane and tilt angle). The
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">to</span> <span class="pre">pyFAI</span> <span class="pre">geometry</span></code> button will calculate the resulting pyFAI
+geometry parameters and display them in the bottom parameter fields. The
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Accept</span> <span class="pre">and</span> <span class="pre">store</span> <span class="pre">pyFAI</span> <span class="pre">geometry</span></code> button will close the window and copy
+the resulting geometry to the main frame.</p>
 </section>
 <section id="export">
 <h3>Export<a class="headerlink" href="#export" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/export.png" class="align-left" src="../../../_images/export.png" />
-<p>All settings can be exported to file using the saving button. Clicking the
+<p>All settings can be exported to file using the export button. Clicking the
 button will open a dialogue to select a filename. By default, a filename filter
 for all supported extensions is active. The file type is selected automatically
 based on the extension.</p>
@@ -558,17 +558,16 @@ based on the extension.</p>
 </section>
 <section id="using-the-diffracion-experiment-settings">
 <h2>Using the Diffracion Experiment settings<a class="headerlink" href="#using-the-diffracion-experiment-settings" title="Link to this heading">#</a></h2>
-<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
-is not used directly by the user but the information is required in
-applications, e.g. to run processing workflows or to determine the beam center
-on the detector.</p>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> is not used directly by the
+user but the information is required in applications, e.g. to run processing
+workflows or to determine the beam center on the detector.</p>
 </section>
 <section id="full-list-of-parameters-for-diffractionexperimentcontext">
 <h2>Full list of Parameters for DiffractionExperimentContext<a class="headerlink" href="#full-list-of-parameters-for-diffractionexperimentcontext" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><dl class="simple">
-<dt>xray_wavelength (float, unit: Angstrom, default: 1.0)</dt><dd><p>The X-ray wavelength. Any changes to the wavelength will also update
-the X-ray energy setting.</p>
+<dt>xray_wavelength (float, unit: Angstrom, default: 1.0)</dt><dd><p>The X-ray wavelength. Any changes to the wavelength will also update the
+X-ray energy setting.</p>
 </dd>
 </dl>
 </li>
@@ -634,8 +633,8 @@ measured in meters from the detector origin.</p>
 </li>
 <li><dl class="simple">
 <dt>detector_rot2 (float, unit: rad, default: 0.0)</dt><dd><p>The detector rotation 2 (pitching the detector; positive direction is
-tilting the detector top upstream while keeping the bottom of the
-detector stationary.</p>
+tilting the detector top upstream while keeping the bottom of the detector
+stationary.</p>
 </dd>
 </dl>
 </li>

@@ -443,31 +443,33 @@
 </nav>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>A fundamental consideration is the separation of GUI and functionality. All computational
-functionality is designed to be accessible from the command line / scripts. (Although the
-GUI does provide some additional convenience methods.)
-Some funcionality like file browsing and result visualization requires a GUI and is not
-available from the command line.</p>
+<p>A fundamental consideration is the separation of GUI and functionality. All
+computational functionality is designed to be accessible from the command line
+/ scripts. (Although the GUI does provide some additional convenience methods.)
+Some functionality like file browsing and result visualization requires a GUI
+and is not available from the command line.</p>
 </section>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h2>
-<p>Much of pydidas’ functionality is based on Qt (PyQt5) and its QObjects with the inherent
-signal/slot system. For more information about Qt, please visit the Qt documentation.
-Qt is also used for storing persistent information about global settings in the registry.</p>
+<p>Much of pydidas’ functionality is based on Qt (PyQt5) and its QObjects with the
+inherent signal/slot system. For more information about Qt, please visit the Qt
+documentation. Qt is also used for storing persistent information about global
+settings in the registry.</p>
 <p>The computational part requires the pyFAI, numpy and scipy packages.</p>
-<p>Additionally, the GUI uses widgets from pyFAI and silx and requires both packages.</p>
+<p>Additionally, the GUI uses widgets from pyFAI and silx and requires both
+packages.</p>
 </section>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
-<p>pydidas is designed to be versatile and expandable. The processing is completely separated
-from the GUI and can be used from command line scripts as well.</p>
-<p>Generic functionality is grouped in basic sub-modules (for a full description please refer
-to the <a class="reference external" href="package_structure.html">Package Structure</a>). Specific use cases are defined as
-stand-alone applications and are agnostic to the way they are called (serial or parallel).
-Parallelization of apps is provided by the multiprocessing sub-package and works with all
-generic apps.</p>
-<p>Widgets and the GUI are not referenced by other components and are independant of the rest of the
-pydidas package.</p>
+<p>pydidas is designed to be versatile and expandable. The processing is completely
+separated from the GUI and can be used from command line scripts as well.</p>
+<p>Generic functionality is grouped in basic sub-modules (for a full description
+please refer to the <a class="reference external" href="package_structure.html">Package Structure</a>). Specific use
+cases are defined as stand-alone applications and are agnostic to the way they
+are called (serial or parallel). Parallelization of apps is provided by the
+multiprocessing sub-package and works with all generic apps.</p>
+<p>Widgets and the GUI are not referenced by other components and are independent
+of the rest of the pydidas package.</p>
 </section>
 <section id="further-code-documentation">
 <h2>Further code documentation<a class="headerlink" href="#further-code-documentation" title="Link to this heading">#</a></h2>

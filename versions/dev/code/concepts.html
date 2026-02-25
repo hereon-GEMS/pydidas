@@ -450,9 +450,7 @@
 <section id="variable-handling">
 <h2>Variable handling<a class="headerlink" href="#variable-handling" title="Link to this heading">#</a></h2>
 <p>Variables accessible by the user have been wrapped in their own class as
-<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. These
-<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>, in turn, are handled by a
-subclassed dictionary.</p>
+<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. These <a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a>, in turn, are handled by a subclassed dictionary.</p>
 <section id="parameter">
 <h3>Parameter<a class="headerlink" href="#parameter" title="Link to this heading">#</a></h3>
 <p>All (externally by the user accessible) variables are handled as
@@ -461,19 +459,16 @@ key, a type and value. Additional metadata can be handled in form of a longer
 name, a unit and pre-defined choices for the value.</p>
 <p><a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> enforce type-checking when
 setting the value which makes input/output operations by the user more
-esilient.</p>
+resilient.</p>
 <p>Generic parameters have been pre-defined in the core.constants sub-package and
 these can be used without the need to re-define the full Parameter.</p>
 </section>
 <section id="parametercollection">
 <h3>ParameterCollection<a class="headerlink" href="#parametercollection" title="Link to this heading">#</a></h3>
 <p><a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span> <span class="pre">collections</span></code></a> are
-subclassed dictionaries which allow only
-<a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> values. They are used by most
-pydidas objects and allow an easy and standardized access to all Parameters.
-For the full documentation of the
-<a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>, please
-refer to the documentation of the
+subclassed dictionaries which allow only <a class="reference internal" href="api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> values. They are used by most pydidas objects and
+allow an easy and standardized access to all Parameters. For the full
+documentation of the <a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>, please refer to the documentation of the
 <a class="reference internal" href="api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a> object.</p>
 </section>
 </section>
@@ -481,24 +476,23 @@ refer to the documentation of the
 <h2>De-coupling of processing and user interface<a class="headerlink" href="#de-coupling-of-processing-and-user-interface" title="Link to this heading">#</a></h2>
 <p>The full functionality of the pydidas suite <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>*<span class="fn-bracket">]</span></a> is available from the command
 line and can be used in scripted application without the need to invoke the
-graphical user interface.
-While the GUI allows for a convenient editing of Parameters and Workflows, it
-is not required for processing data.</p>
+graphical user interface. While the GUI allows for a convenient editing of
+Parameters and Workflows, it is not required for processing data.</p>
 </section>
 <section id="use-cases">
 <h2>Use cases<a class="headerlink" href="#use-cases" title="Link to this heading">#</a></h2>
 <p>pydidas has been developed with diffraction data analysis in mind, but the
 structure is flexible enough to allow other use cases as well. Each single use
-case has been defined as a unique
-<a class="reference internal" href="api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Application</span></code></a> which can be called via command
-line. Alternatively, pydidas includes a GUI frame for each generic application.</p>
+case has been defined as a unique <a class="reference internal" href="api/core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">Application</span></code></a>
+which can be called via command line. Alternatively, pydidas includes a GUI
+frame for each generic application.</p>
 </section>
 <section id="parallelization">
 <h2>Parallelization<a class="headerlink" href="#parallelization" title="Link to this heading">#</a></h2>
-<p>pydidas includes functionality for parallel processing of applications
-(or functions). The <a class="reference internal" href="api/multiprocessing.html#module-pydidas.multiprocessing" title="pydidas.multiprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>
-sub-package includes the required functionality. Results can be received using
-the PyQt5 signal/slot mechanism.</p>
+<p>pydidas includes functionality for parallel processing of applications (or
+functions). The <a class="reference internal" href="api/multiprocessing.html#module-pydidas.multiprocessing" title="pydidas.multiprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> sub-package
+includes the required functionality. Results can be received using the PyQt5
+signal/slot mechanism.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">*</a><span class="fn-bracket">]</span></span>

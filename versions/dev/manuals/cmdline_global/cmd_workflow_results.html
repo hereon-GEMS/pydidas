@@ -450,51 +450,46 @@
 </nav>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> is the
-Singleton instance of the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code>.
-It is used for managing the processing results.</p>
+<p><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> is the Singleton
+instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code>. It is used for managing the processing
+results.</p>
 <p>This class does not need any configuration as the layout of the results are
 determined based on</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>The information about the scan from the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code>
-class.</p></li>
-<li><p>The information about the processing steps from the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p></li>
+<li><p>The information about the scan from the <code class="xref py py-class docutils literal notranslate"><span class="pre">ScanContext</span></code> class.</p></li>
+<li><p>The information about the processing steps from the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p></li>
 </ol>
 </div></blockquote>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>
-is only responsible for storing and presenting the results.</p>
+<p><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> is only
+responsible for storing and presenting the results.</p>
 <p>To access the instance, execute the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>The public interface is detailed in the class documentation
-(<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>)
-and this document will focus on the use case to access results.</p>
+(<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a>) and this
+document will focus on the use case to access results.</p>
 </section>
 <section id="getting-information-about-the-results">
 <h2>Getting information about the results<a class="headerlink" href="#getting-information-about-the-results" title="Link to this heading">#</a></h2>
-<p>To get more information about the results, the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code>
-class has several properties to get general information about the stored results</p>
+<p>To get more information about the results, the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowResults" title="pydidas.workflow.WorkflowResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a> class has several properties to get
+general information about the stored results</p>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 25.0%" />
 <col style="width: 75.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>property name</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Property name</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>labels</p></td>
-<td><p>The labels of all the stored result <a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>.
-These labels are only used as captions and for user information.</p></td>
+<td><p>The labels of all the stored result <a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>. These labels are only used as captions and for
+user information.</p></td>
 </tr>
 <tr class="row-odd"><td><p>shapes</p></td>
 <td><p>The array shapes of the stored results.</p></td>
@@ -510,8 +505,7 @@ respective properties as values.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>All information needs to be accessed through the node ID of the
-corresponding node in the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+corresponding node in the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
 </div>
 <p>An example of what the property values look like is given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -535,9 +529,8 @@ corresponding node in the
 <section id="metadata">
 <h4>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">#</a></h4>
 <p>The metadata of a node ID’s Dataset can be accessed using the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_metadata(node_id)</span></code>
-method. It will return a dictionary with the metadata keys and their respective
-data:</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_metadata(node_id)</span></code> method. It will return
+a dictionary with the metadata keys and their respective data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span><span class="o">.</span><span class="n">get_result_metadata</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -551,16 +544,14 @@ data:</p>
 <span class="go"> &#39;metadata&#39;: {}}</span>
 </pre></div>
 </div>
-<p>Note that the metadata is also included in the full <a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
-and this method is primarily intended if the user needs the metadata without
-creating a copy of the full data.</p>
+<p>Note that the metadata is also included in the full <a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and this method is primarily intended if the user needs
+the metadata without creating a copy of the full data.</p>
 </section>
 <section id="generic-data">
 <h4>Generic Data<a class="headerlink" href="#generic-data" title="Link to this heading">#</a></h4>
-<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results(node_id)</span></code>
-method is available to access the full Dataset with the results of a Plugin.
-The calling parameter is the node ID of the particular Plugin corresponding to
-the results:</p>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results(node_id)</span></code> method is available to access
+the full Dataset with the results of a Plugin. The calling parameter is the node
+ID of the particular Plugin corresponding to the results:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
@@ -629,9 +620,9 @@ the results:</p>
 <h4>Flattened scan dimensions<a class="headerlink" href="#flattened-scan-dimensions" title="Link to this heading">#</a></h4>
 <p>For some applications, it might be interesting to ignore the detailed shape of
 the scan and flatten the scan to a <em>timeline</em>. The
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code>
-method allows to get a Dataset with all the scan dimensions flattened to a
-single dimension renamed to <em>timeline</em>:</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code> method
+allows to get a Dataset with all the scan dimensions flattened to a single
+dimension renamed to <em>timeline</em>:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
@@ -736,8 +727,8 @@ the resulting data. The default is False.</p></li>
 
 <p>This method is interesing if the user wants to access a specific subset in the
 flattened data, for example the results for the frames 40 to 55 of the
-experiment. This can easily be done using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_subset</span></code>
-method, as demonstrated in the example below:</p>
+experiment. This can easily be done using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_subset</span></code> method, as demonstrated
+in the example below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
 
@@ -783,8 +774,7 @@ method, as demonstrated in the example below:</p>
 </section>
 <section id="saving-results">
 <h2>Saving results<a class="headerlink" href="#saving-results" title="Link to this heading">#</a></h2>
-<p>Saving the results is achieved via the <code class="xref py py-meth docutils literal notranslate"><span class="pre">save_results_to_disk</span></code>
-method:</p>
+<p>Saving the results is achieved via the <code class="xref py py-meth docutils literal notranslate"><span class="pre">save_results_to_disk</span></code> method:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">save_results_to_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">save_formats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span></dt>

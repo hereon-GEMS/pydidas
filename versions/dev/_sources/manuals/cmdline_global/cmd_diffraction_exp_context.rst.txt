@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _diffraction_exp_context:
@@ -17,22 +17,21 @@ The DiffractionExperimentContext class
 Introduction
 ------------
 
-The :py:class:`DiffractionExperimentContext 
-<pydidas.contexts.diff_exp.diff_exp.DiffractionExperimentContext>`
-is the pydidas Singleton instance of the 
-:py:class:`DiffractionExperiment
-<pydidas.contexts.diff_exp.DiffractionExperiment>`
-class. It is used for storing and accessing global information about the 
-experimental setup. Stored information include
+The :py:class:`DiffractionExperimentContext
+<pydidas.contexts.diff_exp.diff_exp.DiffractionExperimentContext>` is the
+pydidas Singleton instance of the :py:class:`DiffractionExperiment
+<pydidas.contexts.diff_exp.DiffractionExperiment>` class. It is used for storing
+and accessing global information about the experimental setup. Stored
+information includes
 
 - X-ray energy
 - detector model (pixel numbers and sizes)
 - detector geometry.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
-can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`Full list of Parameters for DiffractionExperimentContext 
-<diffraction_exp_context_parameters>`\ .
+can be accessed as described in the basic tutorial. A full list of Parameters is
+given in :ref:`Full list of Parameters for DiffractionExperimentContext
+<diffraction_exp_context_parameters>`.
 
 Its instance can be obtained by running the following code:
 
@@ -47,10 +46,10 @@ Configuring the DiffractionExperimentContext
 X-ray energy and wavelength
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The X-ray energy and wavelength are two coupled Parameters and any changes to 
+The X-ray energy and wavelength are two coupled Parameters and any changes to
 one will cause the other Parameter to be updated as well. They can be accessed
-through the keys :py:data:`xray_energy` and :py:data:`xray_wavelength`, 
-respectively. 
+through the keys :py:data:`xray_energy` and :py:data:`xray_wavelength`,
+respectively.
 
 Please see also the example below:
 
@@ -62,7 +61,7 @@ Please see also the example below:
     1
     >>> EXP.get_param_value('xray_energy')
     12.398
-    
+
     # Now, set the wavelength and check the energy:
     >>> EXP.set_param_value('xray_wavelength', 2)
     >>> EXP.get_param_value('xray_energy')
@@ -84,9 +83,9 @@ The detector is defined by the following Parameters:
     :class: tight-table
 
     * - Parameter
-      - type
-      - unit
-      - description
+      - Type
+      - Unit
+      - Description
     * - detector_name
       - str
       - n/a
@@ -110,12 +109,13 @@ The detector is defined by the following Parameters:
     * - detector_mask_file (optional)
       - str
       - n/a
-      - The path and filename for the detector mask file. This file is used in 
+      - The path and filename for the detector mask file. This file is used in
         pyFAI integration plugins.
 
-The :py:data:`detector_name` is only relevant for referencing any pyFAI object 
-but is included in the metainformation and should be set correctly. The 
-Parameters for numbers of pixels and pixelsize exactly what the name suggests.
+The :py:data:`detector_name` is only relevant for referencing any pyFAI object
+but is included in the metainformation and should be set correctly. The
+Parameters for numbers of pixels and pixelsize do exactly what the name
+suggests.
 
 Defining the detector manually
 """"""""""""""""""""""""""""""
@@ -136,9 +136,9 @@ detector which is not inclued in pyFAI, by setting all Parameters values:
 Using a pyFAI detector
 """"""""""""""""""""""
 
-If the detector is defined in pyFAI, this library can be used to update the 
-detector settings automatically by giving the detector name in the 
-:py:meth:`set_detector_params_from_name 
+If the detector is defined in pyFAI, this library can be used to update the
+detector settings automatically by giving the detector name in the
+:py:meth:`set_detector_params_from_name
 <pydidas.contexts.diff_exp.DiffractionExperiment.set_detector_params_from_name>`
 method:
 
@@ -157,43 +157,44 @@ method:
     75.0
     >>> EXP.get_param_value('detector_pxsizey')
     75.0
-    
+
 The geometry
 ^^^^^^^^^^^^
 
-pydidas uses the pyFAI geometry. In short, it uses the point of normal 
-incidence (PONI), the orthogonal projection of the origin (i.e. the sample) on 
-the detector. 
+pydidas uses the pyFAI geometry. In short, it uses the point of normal
+incidence (PONI), the orthogonal projection of the origin (i.e. the sample) on
+the detector.
 
 .. tip::
 
     The pyFAI geometry is described in detail in this pyFAI document:
-    `Default geometry in pyFAI <https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai>`_\ .
+    `Default geometry in pyFAI
+    <https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai>`_.
 
-The pyFAI coordinate system used the :math:`x_1` (up), :math:`x_2` and 
-:math:`x_3` (along the beam direction) coordinates. The :math:`x_2` axis is 
-defined to create a right-handed coordinate system with the :math:`x_1` and 
+The pyFAI coordinate system used the :math:`x_1` (up), :math:`x_2` and
+:math:`x_3` (along the beam direction) coordinates. The :math:`x_2` axis is
+defined to create a right-handed coordinate system with the :math:`x_1` and
 :math:`x_3` axes.
 
-The PONI defines the :math:`x_1` and :math:`x_2` coordinates of the detector 
-(measured from the origin at the top left corner) and the distance in beam 
+The PONI defines the :math:`x_1` and :math:`x_2` coordinates of the detector
+(measured from the origin at the top left corner) and the distance in beam
 direction defines the :math:`x_3` coordinate (detector distance).
 
-Three rotations (:math:`rot_1`: mathmatically negative around the axis pointing 
-up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis; 
-:math:`rot_3`: mathematically positive (!) around the X-ray beam direction) are 
-used to move the detector with respect to the origin (sample) are applied to 
-the detector to transform the detector geometry into the experimental geometry.
+Three rotations (:math:`rot_1`: mathmatically negative around the axis pointing
+up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis;
+:math:`rot_3`: mathematically positive (!) around the X-ray beam direction) are
+used to move the detector with respect to the origin (sample) are applied to the
+detector to transform the detector geometry into the experimental geometry.
 
-The correspondence between pyFAI geometry and pydidas DiffractionExperimentContext
-Parameter names is given below:
+The correspondence between pyFAI geometry and pydidas
+DiffractionExperimentContext Parameter names is given below:
 
 .. list-table::
     :header-rows: 1
 
     * - pyFAI parameter name
-      - corresponding pydidas Parameter
-      - unit
+      - Corresponding pydidas Parameter
+      - Unit
     * - :math:`poni_1`
       - detector_poni1
       - m
@@ -229,29 +230,29 @@ given in the table above. For an example, see below:
     >>> EXP.set_param_value('detector_rot1', -0.011062669)
     >>> EXP.set_param_value('detector_rot2', -0.002172149)
     >>> EXP.set_param_value('detector_rot3', 0.0)
-    
+
 
 Import and Export
 -----------------
 
-The DiffractionExperimentContext settings can be imported and exported to files, based on
-the available im-/exporters. The standard distribution ships with support for
-YAML files and pyFAI .poni files. Both types are supported for import and 
-export. The format will be determined automatically based on the file extension.
+The DiffractionExperimentContext settings can be imported and exported to files,
+based on the available im-/exporters. The standard distribution ships with
+support for YAML files and pyFAI .poni files. Both types are supported for
+import and export. The format will be determined automatically based on the file
+extension.
 
-Imports and exports are started by calling the 
-:py:meth:`import_from_file(filename) 
-<pydidas.contexts.diff_exp.DiffractionExperiment.import_from_file>`
-and 
-:py:meth:`export_to_file(filename) 
-<pydidas.contexts.diff_exp.DiffractionExperiment.export_to_file>`,
-respectively. The filename must include the absolute path to the file. 
+Imports and exports are started by calling the
+:py:meth:`import_from_file(filename)
+<pydidas.contexts.diff_exp.DiffractionExperiment.import_from_file>` and
+:py:meth:`export_to_file(filename)
+<pydidas.contexts.diff_exp.DiffractionExperiment.export_to_file>`, respectively.
+The filename must include the absolute path to the file.
 
 .. warning::
 
-    Importing the :py:class:`DiffractionExperimentContext 
-    <pydidas.contexts.diff_exp.DiffractionExperiment>`
-    from file will overwrite all current values without asking for confirmation.
+    Importing the :py:class:`DiffractionExperimentContext
+    <pydidas.contexts.diff_exp.DiffractionExperiment>` from file will overwrite
+    all current values without asking for confirmation.
 
 An example to demonstrate these methods is given below:
 
@@ -291,7 +292,7 @@ An example to demonstrate these methods is given below:
      'detector_rot1': 0,
      'detector_rot2': 0,
      'detector_rot3': 0}
-    
+
     # If we load the settings from the stored file, these settings will be lost
     # and the saved state will be restored:
     >>> EXP.import_from_file('/scratch/exp_settings_test.yaml')

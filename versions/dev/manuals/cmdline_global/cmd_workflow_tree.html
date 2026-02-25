@@ -449,14 +449,14 @@
 </nav>
 <section id="introduction-to-the-workflowtree">
 <h2>Introduction to the WorkflowTree<a class="headerlink" href="#introduction-to-the-workflowtree" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
-consists of multipke <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNodes</span></code></a>
-which store information about their position in the tree and their parents and
-children as well as their associated processing plugin but the nodes are
-agnostic to any meta-information.</p>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
-is a pydidas singleton object with only a single instance at runtime. It manages
-the interactions between the user and the individual nodes.</p>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> consists of
+multiple <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowNodes</span></code></a> which store
+information about their position in the tree and their parents and children as
+well as their associated processing plugin but the nodes are agnostic to any
+meta-information.</p>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> is a pydidas
+singleton object with only a single instance at runtime. It manages the
+interactions between the user and the individual nodes.</p>
 <p>Its instance can be obtained by calling the following code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">TREE</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowTree</span><span class="p">()</span>
@@ -469,21 +469,16 @@ allows to easily run the WorkflowTree in serial or parallel processing.</p>
 </section>
 <section id="assembling-a-workflowtree">
 <h2>Assembling a WorkflowTree<a class="headerlink" href="#assembling-a-workflowtree" title="Link to this heading">#</a></h2>
-<p>To assemble a
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, users
+<p>To assemble a <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, users
 need to know which Plugins they want to use and they need to configure these
-plugins. Then, they can add these plugins to the tree. If the plugins are
-passed to the WorkflowTree without any further information, they will be
-connected in a linear manner, with every plugin appended to the last one.</p>
+plugins. Then, they can add these plugins to the tree. If the plugins are passed
+to the WorkflowTree without any further information, they will be connected in a
+linear manner, with every plugin appended to the last one.</p>
 <p><a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a> can be configured either in the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> or
-before adding them to the tree. Access to the individual plugins in the tree
-is somewhat hidded, though, and it is recommended to configure each
-<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a> before adding it to
-the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
-<p>To create a new node with a plugin and add it to the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, use the
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.create_and_add_node" title="pydidas.workflow.ProcessingTree.create_and_add_node"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_and_add_node</span></code></a> method:</p>
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> or before adding them
+to the tree. Access to the individual plugins in the tree is somewhat hidden,
+though, and it is recommended to configure each <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugin</span></code></a> before adding it to the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>.</p>
+<p>To create a new node with a plugin and add it to the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>, use the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.create_and_add_node" title="pydidas.workflow.ProcessingTree.create_and_add_node"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_and_add_node</span></code></a> method:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">create_and_add_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.WorkflowNode" title="pydidas.workflow.workflow_node.WorkflowNode"><span class="pre">WorkflowNode</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span></dt>
@@ -553,9 +548,8 @@ Hdf5 file and performs two separate integrations in different angular ranges:</p
 </section>
 <section id="running-workflows">
 <h2>Running workflows<a class="headerlink" href="#running-workflows" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
-includes several methods to run either the full Workflow or just individual
-plugins for testing.</p>
+<p>The <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> includes several
+methods to run either the full Workflow or just individual plugins for testing.</p>
 <section id="test-individual-plugins">
 <h3>Test individual plugins<a class="headerlink" href="#test-individual-plugins" title="Link to this heading">#</a></h3>
 <p>To test individual plugins, users can use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_single_plugin</span></code> method.</p>
@@ -619,12 +613,11 @@ from the previous example are still existing).</p>
 </section>
 <section id="run-the-full-workflowtree">
 <h3>Run the full WorkflowTree<a class="headerlink" href="#run-the-full-workflowtree" title="Link to this heading">#</a></h3>
-<p>Two different methods are available to run the full
-<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>. First,
-there is the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process" title="pydidas.workflow.ProcessingTree.execute_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process</span></code></a> method which
-will run the full workflow for a single frame but will not gather any results
-from the nodes nor return any values. This method is used by the automatic
-processing where pydidas organizes results. Secondly, the
+<p>Two different methods are available to run the full <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>. First, there is the
+<a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process" title="pydidas.workflow.ProcessingTree.execute_process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process</span></code></a>
+method which will run the full workflow for a single frame but will not gather
+any results from the nodes nor return any values. This method is used by the
+automatic processing where pydidas organizes results. Secondly, the
 <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree.execute_process_and_get_results" title="pydidas.workflow.ProcessingTree.execute_process_and_get_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_process_and_get_results</span></code></a>
 method will do the same calculations but also gathers the results from the
 individual plugins and returns them to the user. The documentation for the
@@ -651,8 +644,8 @@ and results items.</p>
 </dl>
 </dd></dl>
 
-<p>Using the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a>
-from the example above, the following example demonstrates the usage.</p>
+<p>Using the <a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a> from the
+example above, the following example demonstrates the usage.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This method will not return any results:</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="n">TREE</span><span class="o">.</span><span class="n">execute_process</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span>

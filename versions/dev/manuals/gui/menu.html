@@ -435,7 +435,7 @@
   <section id="the-menu">
 <span id="gui-menu"></span><h1>The menu<a class="headerlink" href="#the-menu" title="Link to this heading">#</a></h1>
 <p>The main user interaction with the GUI is controlled by the toolbar to the left
-and the frames itself. The menu includes some functions which are not used as
+and the frames themselves. The menu includes some functions which are not used
 frequently.</p>
 <p><strong>This documentation page covers the menu bar, not the toolbar.</strong></p>
 <section id="pydidas-menu-structure">
@@ -456,10 +456,10 @@ confirmation before actually writing the file to disk.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Export GUI state</dt><dd><p>The <em>Export</em> entry will query the user to select a file to store
-the state. The file content is similar to the <em>Store</em> action but
-the file can be placed anywhere in the filesystem and therefore
-allows to share state between different users or machines.</p>
+<dt>Export GUI state</dt><dd><p>The <em>Export</em> entry will query the user to select a file to store the
+state. The file content is similar to the <em>Store</em> action but the
+file can be placed anywhere in the filesystem and therefore allows
+to share state between different users or machines.</p>
 </dd>
 </dl>
 </li>
@@ -467,8 +467,8 @@ allows to share state between different users or machines.</p>
 <dt>Restore GUI state</dt><dd><p>The <em>Restore</em> entry will open a dialog to confirm that the user
 wants to restore the UI state from pydidas’s automatically handled
 state file. If confirmed, all pydidas objects are updated and the
-GUI view is changed to the active view. (Corresponding saver:
-<em>Store GUI state</em>)</p>
+GUI view is changed to the active view. (Corresponding saver: <em>Store
+GUI state</em>)</p>
 </dd>
 </dl>
 </li>
@@ -496,7 +496,7 @@ file with the UI state to be restored.</p>
 <p class="admonition-title">Note</p>
 <p>No additional confirmation is required, selecting a file is
 sufficient. To abort, simple use the <strong>Cancel</strong> button (or the
-:py:data`Esc` key) in the file selection dialog, this will stop
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Esc</span></code> key) in the file selection dialog, this will stop
 the import.</p>
 </div>
 </dd>
@@ -518,16 +518,16 @@ the import.</p>
 <li><dl class="simple">
 <dt>Tools</dt><dd><ul class="simple">
 <li><dl class="simple">
-<dt>Export Eiger Pixelmask</dt><dd><p>This menu item will open a small window which allows the user to
-specify an Eiger-written <em>master</em> file which includes detector metadata,
+<dt>Export Eiger Pixelmask</dt><dd><p>This menu item will open a small window which allows the user to specify
+an Eiger-written <em>master</em> file which includes detector metadata,
 including the detector pixelmask and an output filename to write the
 exported mask.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Images series processing</dt><dd><p>The <em>Image series processing</em> menu entry opens a new window to proces
-a series of images. This allows a user, for example, to average
+<dt>Images series processing</dt><dd><p>The <em>Image series processing</em> menu entry opens a new window to process a
+series of images. This, for example, allows a user to average
 calibration data. For more information, please refer to the <a class="reference internal" href="windows/ImageSeriesOperationsWindow.html#series-ops-window"><span class="std std-ref">Image
 series operations window manual</span></a>.</p>
 </dd>
@@ -554,8 +554,8 @@ from the local file system.</p>
 <dt>Options</dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt>User config</dt><dd><p>The User config entry opens a window to modify user preferences like
-colormaps, default detector masks, or the plugin paths. For more
-information, please see the <a class="reference internal" href="windows/UserConfigWindow.html#user-config-window"><span class="std std-ref">User config manual</span></a>.</p>
+colormaps, default detector masks or the plugin paths. For more
+information, please see the <a class="reference internal" href="windows/UserConfigWindow.html#user-config-window"><span class="std std-ref">User config window manual</span></a>.</p>
 </dd>
 </dl>
 </li>
@@ -587,22 +587,21 @@ improvement suggestions or questions.</p>
 </li>
 <li><dl class="simple">
 <dt>Pydidas paths</dt><dd><p>This entry will open a small window with information about the local
-paths in which log files and configuration files are placed by the
-pydidas application.</p>
+paths in which log files and configuration files are placed by pydidas.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Check for update</dt><dd><p>Using this option will require an active internet connection. Pydidas
-will check the latest release version on Github and compare the
-remote version number with the locally installed version. The result
-will be supplied to the user in a pop-up window.</p>
+<dt>Check for update</dt><dd><p>Using this option requires an active internet connection. Pydidas will
+check the latest release version on Github and compare the remote
+version number with the locally installed version. The result will be
+supplied to the user in a pop-up window.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>About</dt><dd><p>The about window has copyright information and links to the pydidas
-homepage and github home.</p>
+homepage and GitHub home.</p>
 </dd>
 </dl>
 </li>

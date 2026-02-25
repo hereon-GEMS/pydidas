@@ -472,14 +472,13 @@
 <a class="reference internal" href="../../../code/api/apps/composite_creator_app.html#pydidas.apps.CompositeCreatorApp" title="pydidas.apps.CompositeCreatorApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompositeCreatorApp</span></code></a> and to
 visualize the results.</p>
 <p>After starting the frame, only the menu for editing the Parameters is enabled
-(orange frame in the image below).
-For the tutorial about editing Parameters, please visit
-<a class="reference internal" href="../editing_parameters.html#gui-editing-parameters"><span class="std std-ref">Editing Parameters in the GUI</span></a>. The full list of Parameters and their description
-is given at the end in <a class="reference internal" href="#composite-image-creator-params"><span class="std std-ref">Full list of Composite image creator Parameters</span></a>.</p>
+(orange frame in the image below). For the tutorial about editing Parameters,
+please visit <a class="reference internal" href="../editing_parameters.html#gui-editing-parameters"><span class="std std-ref">Editing Parameters in the GUI</span></a>. The full list of Parameters and
+their description is given at the end in <a class="reference internal" href="#composite-image-creator-params"><span class="std std-ref">Full list of Composite image creator Parameters</span></a>.</p>
 <p>After setting the required Parameters, the app control panel (yellow frame in
 the image below) will become enabled and the user can start processing.</p>
-<p>The processed composite image will be shown on the right side of the frame
-(blue area in the image below).</p>
+<p>The processed composite image will be shown on the right side of the frame (blue
+area in the image below).</p>
 <a class="reference internal image-reference" href="../../../_images/initial.png"><img alt="../../../_images/initial.png" class="align-center" src="../../../_images/initial.png" style="width: 600px;" />
 </a>
 <section id="control-buttons">
@@ -487,53 +486,56 @@ the image below) will become enabled and the user can start processing.</p>
 <section id="clear-all-entries">
 <h3>Clear all entries<a class="headerlink" href="#clear-all-entries" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/clear.png" class="align-left" src="../../../_images/clear.png" />
-<p>The “Clear all entries” button at the top will reset all inputs to their default
-values. Note that no confirmation will be asked of the user.</p>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">Clear</span> <span class="pre">all</span> <span class="pre">entries</span></code> button at the top will reset all inputs to
+their default values. Note that no confirmation will be asked of the user.</p>
 </section>
 <section id="generate-composite">
 <h3>Generate composite<a class="headerlink" href="#generate-composite" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/generate.png" class="align-left" src="../../../_images/generate.png" />
 <p>Once the bare minimum Parameters have been selected (this is the first file name
-and in case of an Hdf5 file the dataset), the “Generate composite” button will
-be enabled. Clicking the button starts an <a class="reference internal" href="../../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a>
-process which loads and processes the images in parallel processes.</p>
-<p>Once clicked, the “Generate composite” button will be disabled and a
-progress bar as well as an “Abort” button will appear:</p>
+and in case of an Hdf5 file the dataset), the <code class="xref py py-data docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">composite</span></code>
+button will be enabled. Clicking the button starts an
+<a class="reference internal" href="../../../code/api/multiprocessing.html#pydidas.multiprocessing.AppRunner" title="pydidas.multiprocessing.AppRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppRunner</span></code></a> process which loads
+and processes the images in parallel processes.</p>
+<p>Once clicked, the <code class="xref py py-data docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">composite</span></code> button will be disabled and a
+progress bar as well as an <code class="xref py py-data docutils literal notranslate"><span class="pre">Abort</span></code> button will appear:</p>
 <img alt="../../../_images/abort.png" class="align-left" src="../../../_images/abort.png" />
 <p>The progress bar will update with each received image and it shows the global
-processing progress. The “Abort” button will stop the AppRunner. Any data
-received by the Frame up to this point will be kept but the rest of the
-composite image will only consist of zeros. The progress bar and “Abort” button
-will be hidden again after the Composite creation has finished.</p>
+processing progress. The <code class="xref py py-data docutils literal notranslate"><span class="pre">Abort</span></code> button will stop the AppRunner. Any
+data received by the Frame up to this point will be kept but the rest of the
+composite image will only consist of zeros. The progress bar and the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Abort</span></code> button will be hidden again after the Composite creation has
+finished.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>After starting the AppRunner, it is normal that the first results need
-a few seconds to arrive because the new processes need to be started and
-load all required python packages.</p>
+<p>After starting the AppRunner, it is normal that the first results need a few
+seconds to arrive because the new processes need to be started and load all
+required python packages.</p>
 </div>
 </section>
 <section id="show-composite">
 <h3>Show composite<a class="headerlink" href="#show-composite" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/show.png" class="align-left" src="../../../_images/show.png" />
-<p>During processing, the composite image is automatically updated. If the uses
-requires an additional manual update, the “Show composite” button can be used
-to perform this update.</p>
+<p>During processing, the composite image is automatically updated. If the user
+requires an additional manual update, the <code class="xref py py-data docutils literal notranslate"><span class="pre">Show</span> <span class="pre">composite</span></code> button can
+be used to perform this update.</p>
 </section>
 <section id="save-composite-image">
 <h3>Save composite image<a class="headerlink" href="#save-composite-image" title="Link to this heading">#</a></h3>
 <img alt="../../../_images/save.png" class="align-left" src="../../../_images/save.png" />
-<p>The “Save composite image” button opens a dialogue to select a file name. The
-image type is determined automatically based on the selected file extension.
-A filter for all supported data types can be selected at the bottom of the
-dialogue.</p>
+<p>The <code class="xref py py-data docutils literal notranslate"><span class="pre">Save</span> <span class="pre">composite</span> <span class="pre">image</span></code> button opens a dialogue to select a file
+name. The image type is determined automatically based on the selected file
+extension. A filter for all supported data types can be selected at the bottom
+of the dialogue.</p>
 </section>
 </section>
 <section id="result-visualization">
 <h2>Result visualization<a class="headerlink" href="#result-visualization" title="Link to this heading">#</a></h2>
 <a class="reference internal image-reference" href="../../../_images/results.png"><img alt="../../../_images/results.png" class="align-center" src="../../../_images/results.png" style="width: 600px;" />
 </a>
-<p>Results are visualized in a <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code>,
-described below:</p>
+<p>Results are visualized in a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code>, described
+below:</p>
 <section id="pydidas-2d-plot">
 <h3>Pydidas 2D plot<a class="headerlink" href="#pydidas-2d-plot" title="Link to this heading">#</a></h3>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasPlot2d</span></code> is a
@@ -544,8 +546,8 @@ with additional features useful in pydidas.</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>The menu</dt><dd><p>The menu bar allows access to all generic silx and additional pydidas
-functionality. The detailed menu icons and actions are described below
-in the menu entries description.</p>
+functionality. The detailed menu icons and actions are described below in
+the menu entries description.</p>
 </dd>
 </dl>
 </li>
@@ -562,8 +564,8 @@ colors.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under
-the mouse cursor.</p>
+<dt>The position information</dt><dd><p>This widget displays the coordinates and data values of the data under the
+mouse cursor.</p>
 </dd>
 </dl>
 </li>
@@ -576,26 +578,25 @@ the pixel center and the given values must be treated carefully with respect to
 the pixel shape, especially for coarse pixels.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>The scaling of the results can be achieved by modifying the colormap
-settings.</p>
+<p>Scaling of the results can be achieved by modifying the colormap settings.</p>
 </div>
 <section id="menu-entries-description">
-<h4>menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading">#</a></h4>
+<h4>Menu entries description<a class="headerlink" href="#menu-entries-description" title="Link to this heading">#</a></h4>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
 <colgroup>
 <col style="width: 20.0%" />
 <col style="width: 80.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>menu icon</p></th>
-<th class="head"><p>description</p></th>
+<tr class="row-odd"><th class="head"><p>Menu icon</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><img alt="../../../_images/menu_zoom.png" class="align-center" src="../../../_images/menu_zoom.png" />
 </td>
-<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection
-of the data to be visualized.</p></td>
+<td><p>Zoom mode: clicking with the mouse and dragging spans a new selection of
+the data to be visualized.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_pan.png" class="align-center" src="../../../_images/menu_pan.png" />
 </td>
@@ -608,27 +609,27 @@ canvas.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_match_canvas.png" class="align-center" src="../../../_images/menu_match_canvas.png" />
 </td>
-<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to
-the data to allow a tight fit.</p></td>
+<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to the
+data to allow a tight fit.</p></td>
 </tr>
 <tr class="row-even"><td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
 </td>
 <td><p>Expand canvas: Reset the canvas size to take up all available space.
-This option does also change the data aspect to make use of the full
-canvas.</p></td>
+This option does also change the data aspect ratio to make use of the
+full canvas.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
 </td>
-<td><p>Open the colormap editor. This button opens a window with selections
+<td><p>Open the colormap editor: This button opens a window with selections
 for the colormap and scaling of the displayed minimum and maximum
 values.</p></td>
 </tr>
 <tr class="row-even"><td><img alt="../../../_images/menu_crop_histogram_outliers.png" class="align-center" src="../../../_images/menu_crop_histogram_outliers.png" />
 </td>
 <td><p>Crop histogram outliers: Calculate the histogram of the image and set
-the colormap to ignore the low <em>x% and the top *y%</em> of the image
-histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas
-user settings.</p></td>
+the colormap to ignore the low <em>x%</em> and the top <em>y%</em> of the image
+histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas user
+settings.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
 </td>
@@ -653,22 +654,23 @@ left and bottom left corner.</p></td>
 <tr class="row-odd"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
 </td>
 <td><p>Mask tools: This button opens an additional widget at the bottom of the
-canvas with tools for importing or setting a mask to mask certain
-data regions.</p></td>
+canvas with tools for importing or setting a mask to mask certain data
+regions.</p></td>
 </tr>
 <tr class="row-even"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
 </td>
 <td><p>Set coordinate system: This button will open a submenu which allows to
 select the coordinate system (cartesian or cylindrical). Note that the
-cylindrical coordinate system use the global <code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code>
-calibration to determine the beam center. Therefore, looking at data
-with a different calibration will display a wrong center and therefore
-also wrong coordinates.</p></td>
+cylindrical coordinate system uses the global
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code> calibration to
+determine the beam center. Therefore, looking at data with a different
+calibration will display a wrong center and consequently wrong
+coordinates.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
 </td>
-<td><p>Get information for selected datapoint: This button will allow the user
-to click on a point in the image and show a window with additional
+<td><p>Get information for selected datapoint: This button allows the user to
+click on a point in the image and show a window with additional
 information about this point (specifically: all indices / data values).</p></td>
 </tr>
 <tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
@@ -691,8 +693,8 @@ visible on the canvas and it will retain colormap and scaling settings.</p></td>
 <tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
 </td>
 <td><p>Create and delete line profiles. This function allows the selection and
-editing of line profiles. The line profiles are shown in the histograms
-plots for the vertical and horizontal, respectively.</p></td>
+editing of line profiles. The line profiles are shown in the histogram
+plots for the vertical and horizontal axes, respectively.</p></td>
 </tr>
 </tbody>
 </table>
@@ -702,6 +704,181 @@ plots for the vertical and horizontal, respectively.</p></td>
 </section>
 <section id="full-list-of-composite-image-creator-parameters">
 <span id="composite-image-creator-params"></span><h2>Full list of Composite image creator Parameters<a class="headerlink" href="#full-list-of-composite-image-creator-parameters" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><dl class="simple">
+<dt>live_processing (bool, default: False)</dt><dd><p>Keyword to toggle live processing which means file existance and size checks
+will be disabled in the setup process and the file processing will wait for
+files to be created (indefinitely).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>first_file (Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>The name of the first file for a file series or of the hdf5 file in case of
+hdf5 file input.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>last_file (Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>Used only for file series: The name of the last file to be added to the
+composite image.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>file_stepping (int, default: 1)</dt><dd><p>The step width (in files). A value n &gt; 1 will only process every n-th image
+for the composite.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Used only for hdf5 files: The dataset key.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_first_image_num (type: int, default: 0)</dt><dd><p>The first image in the hdf5-dataset to be used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_last_image_num (type: int, default: -1)</dt><dd><p>The last image in the hdf5-dataset to be used. The value -1 will default to
+the last image in the file.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>hdf5_stepping (type: int, default: 1)</dt><dd><p>The step width (in images) of hdf5 datasets. A value n &gt; 1 will only add
+every n-th image to the composite.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_bg_file (type: bool, default: False)</dt><dd><p>Keyword to toggle usage of background subtraction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_file (type: Union[str, pathlib.Path], default: Path() [empty path])</dt><dd><p>The name of the file used for background correction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_hdf5_key (type: Hdf5key, default: entry/data/data)</dt><dd><p>Required for hdf5 background image files: The dataset key with the image for
+the background file.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>bg_hdf5_frame (type: int, default: 0)</dt><dd><p>Required for hdf5 background image files: The image number of the background
+image in the dataset.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_global_det_mask (type: bool, default: True</dt><dd><p>Keyword to enable or disable using the global detector mask as defined by
+the global mask file and mask value.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_roi (type: bool, default: False)</dt><dd><p>Keyword to toggle use of the ROI for cropping the original images before
+combining them.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_xlow (type: int, default: 0)</dt><dd><p>The lower boundary (in pixel) for cropping images in x, if use_roi is
+enabled. Negative values will be modulated with the image width.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_xhigh (type: Union[int, None], default: None)</dt><dd><p>The upper boundary (in pixel) for cropping images in x, if use_roi is
+enabled. Negative values will be modulated with the image width, i.e. -1 is
+equivalent to the full image size minus one. None corresponds to the full
+image width (with respect to the upper boundary).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_ylow (type: int, default: 0)</dt><dd><p>The lower boundary (in pixel) for cropping images in y, if use_roi is
+enabled. Negative values will be modulated with the image height.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roi_yhigh (type: Union[int, None], default: None)</dt><dd><p>The upper boundary (in pixel) for cropping images in y, if use_roi is
+enabled. Negative values will be modulated with the image height, i.e. -1 is
+equivalent to the full image size minus one. None corresponds to the full
+image height (with respect to the upper boundary).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>use_thresholds (type: bool, default: False)</dt><dd><p>Keyword to enable or disable the use of thresholds. If True, threshold use
+is enabled and both threshold values will be used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>threshold_low (type: int, default: None)</dt><dd><p>The lower threshold of the composite image. If any finite value (i.e. not
+np.nan or None) is used, the value of any pixels with a value below the
+threshold will be replaced by the threshold value. A value of np.nan or None
+will ignore the threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>threshold_high (type: int, default: None)</dt><dd><p>The upper threshold of the composite image. If any finite value (i.e. not
+np.nan or None) is used, the value of any pixels with a value above the
+threshold will be replaced by the threshold value. A value of np.nan or None
+will ignore the threshold.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>binning (type: int, default: 1)</dt><dd><p>The re-binning factor for the images in the composite. The binning will be
+applied to the cropped images.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_nx (type: int, default: 1)</dt><dd><p>The number of original images combined in the composite image in x
+direction. A value of -1 will determine the number of images in x direction
+automatically based on the number of images in y direction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_ny (type: int, default: -1)</dt><dd><p>The number of original images combined in the composite image in y
+direction. A value of -1 will determine the number of images in y direction
+automatically based on the number of images in x direction.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_image_op (type: str, default: None)</dt><dd><p>The image operation applied to each raw image prior to merging it in the
+composite image. This allows to adjust the image orientation with respect to
+the scan.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_xdir_orientation (type: str, default: left-to-right)</dt><dd><p>The direction of how images are inserted into the composite in x direction.
+Left-to-right starts with low indices (python standard) whereas
+right-to-left will insert image at the max index position first.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>composite_ydir_orientation (type: str, default: top-to-bottom)</dt><dd><p>The direction of how images are inserted into the composite in y direction.
+Top-to-bottom starts with low indices (python standard) whereas
+bottom-to-top will insert image at the max index position first. Note that
+the display may be flipped with the origin at the bottom.</p>
+</dd>
+</dl>
+</li>
+</ul>
 </section>
 </section>
 
@@ -761,7 +938,7 @@ plots for the vertical and horizontal, respectively.</p></td>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#result-visualization">Result visualization</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas-2d-plot">Pydidas 2D plot</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#menu-entries-description">menu entries description</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#menu-entries-description">Menu entries description</a></li>
 </ul>
 </li>
 </ul>

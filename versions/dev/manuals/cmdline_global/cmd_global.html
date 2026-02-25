@@ -458,12 +458,10 @@
 </nav>
 <section id="accessing-parameters">
 <span id="id1"></span><h2>Accessing Parameters<a class="headerlink" href="#accessing-parameters" title="Link to this heading">#</a></h2>
-<p>All pydidas objects handle user variables in the form of
-<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> which enforces type checks where
-required. These objects are organized in
-<a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a> which allow
-direct access to the Parameter values. Usually, users do not need to create or
-manage Parameters but only modify their values.</p>
+<p>All pydidas objects handle user variables in the form of <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a> which enforces type checks where required. These
+objects are organized in <a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a> which allow direct access to the Parameter
+values. Usually, users do not need to create or manage Parameters but only
+modify their values.</p>
 <section id="useful-methods-of-parametercollection">
 <h3>Useful methods of ParameterCollection<a class="headerlink" href="#useful-methods-of-parametercollection" title="Link to this heading">#</a></h3>
 <p>For the full <a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollections</span></code></a>
@@ -479,8 +477,8 @@ will probably manage with a handful of methods and properties.</p>
 <dt><strong>print_param_values</strong>()</dt><dd><p>Print all Parameter reference keys and their current values to the
 console.</p>
 </dd>
-<dt><strong>set_param_value_and_choices</strong>(<em>key</em>, <em>value</em>, <em>choices</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given
-<em>value</em> and update the available choices to the given <em>choices</em> list.</p>
+<dt><strong>set_param_value_and_choices</strong>(<em>key</em>, <em>value</em>, <em>choices</em>)</dt><dd><p>Set the value of the Parameter referenced by <em>key</em> to the given <em>value</em>
+and update the available choices to the given <em>choices</em> list.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -503,9 +501,9 @@ Parameters.</p>
 </section>
 <section id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
-<p>All examples will use the DiffractionExperimentContext object (please see below for a
-description of the object) and the examples will only cover the code bases, not
-the use case.</p>
+<p>All examples will use the DiffractionExperimentContext object (please see below
+for a description of the object) and the examples will only cover the code
+bases, not the use case.</p>
 <p>First, let us create the object called <code class="xref py py-data docutils literal notranslate"><span class="pre">exp</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">DiffractionExperimentContext</span><span class="p">()</span>
@@ -571,12 +569,11 @@ a dictionary to process further:</p>
 all parameter values in a dictionary.</p>
 </div>
 </div></blockquote>
-<p>4. Set the value of the <em>xray_energy</em>
-<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. This is a float value,
-however, the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> will attempt
-to convert other types to float. If successful,
-for demonstration purposes, let us set it with a string first. This will
-raise a :py:data:ValueError` and the Parameter will not be updated.</p>
+<p>4. Set the value of the <em>xray_energy</em> <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. This is a float value, however, the
+<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> will attempt to convert other
+types to float. If successful, for demonstration purposes, let us set it
+with a string first. This will raise a <code class="xref py py-data docutils literal notranslate"><span class="pre">ValueError</span></code> and the
+Parameter will not be updated.</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exp</span><span class="o">.</span><span class="n">get_param_value</span><span class="p">(</span><span class="s1">&#39;xray_energy&#39;</span><span class="p">)</span>
 <span class="go">15.0</span>
@@ -612,13 +609,13 @@ title, data directory and scan names and specific information like the
 number of scan dimensions and the number of points in each dimension
 (but also metadata like dimension names, units, offsets and step width).
 The latter information can be used to create the correct axis labels in
-plots. For the full documentation please visit the
-<a class="reference internal" href="cmd_scan_context.html#scan-context"><span class="std std-ref">ScanSetup manual</span></a>.</p>
+plots. For the full documentation please visit the <a class="reference internal" href="cmd_scan_context.html#scan-context"><span class="std std-ref">ScanSetup
+manual</span></a>.</p>
 </dd>
 <dt><code class="xref py py-class docutils literal notranslate"><span class="pre">DiffractionExperimentContext</span></code></dt><dd><p>This object includes information about the global experimental setup
 like X-ray energy, detector type, position and geometry. For the full
-documentation please visit the
-<a class="reference internal" href="cmd_diffraction_exp_context.html#diffraction-exp-context"><span class="std std-ref">DiffractionExperimentContext manual</span></a>.</p>
+documentation please visit the <a class="reference internal" href="cmd_diffraction_exp_context.html#diffraction-exp-context"><span class="std std-ref">DiffractionExperimentContext
+manual</span></a>.</p>
 </dd>
 <dt><a class="reference internal" href="../../code/api/workflow/workflow.html#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a></dt><dd><p>The WorkflowTree holds information about which plugins are used and
 about the order of plugins to be processed. For the full documentation
@@ -649,13 +646,12 @@ yield the same object:</p>
 </section>
 <section id="plugincollection">
 <span id="global-plugincollection"></span><h3>PluginCollection<a class="headerlink" href="#plugincollection" title="Link to this heading">#</a></h3>
-<p>pydidas uses a global
+<p>pydidas uses a global <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a> to manage all known plugins.
+Plugins will be discovered based on known plugin paths which are managed
+persistently in the PluginCollection using Qt’s QSettings which use the systems
+registry and are platform-independent. A reference to the persistent
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>
-to manage all known plugins. Plugins will be discovered based on known plugin
-paths which are managed persistently in the PluginCollection using Qt’s
-QSettings which use the systems registry and are platform-independent. A
-reference to the persistent <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a> object can be obtained
-using:</p>
+object can be obtained using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">COLLECTION</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">plugins</span><span class="o">.</span><span class="n">PluginCollection</span><span class="p">()</span>
 </pre></div>
@@ -663,9 +659,8 @@ using:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For the full documentation of all available methods, please refer to the
-class documentation:
-<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>
-This section handles only the most common use cases.</p>
+class documentation: <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_collection.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginCollection</span></code></a>. This section handles
+only the most common use cases.</p>
 </div>
 <section id="management-of-stored-paths">
 <h4>Management of stored paths<a class="headerlink" href="#management-of-stored-paths" title="Link to this heading">#</a></h4>
@@ -673,24 +668,24 @@ This section handles only the most common use cases.</p>
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins" title="pydidas.plugins.plugin_collection.PluginRegistry.find_and_register_plugins"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_and_register_plugins</span></code></a>
 method and a list of all currently registered paths can be obtained by the
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_all_registered_paths</span></code>
-method. To permanently remove a stored paths, a user can use the
+method. To permanently remove a stored path, a user can use the
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_plugin_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_plugin_path</span></code></a>
-method. To remove all stored paths and plugin, use
-the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a> method.
+method. To remove all stored paths and plugins, use the
+<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a> method.
 This method must be called with a <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> flag to take effect and is
 ignored otherwise.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Note that the generic plugin path is always included and cannot be removed from
-the collection by the user.</p>
+<p>Note that the generic plugin path is always included and cannot be removed
+from the collection by the user.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Using the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths" title="pydidas.plugins.plugin_collection.PluginRegistry.unregister_all_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unregister_all_paths</span></code></a>
 method will remove all custom paths which have ever been registered and the
 user is responsible to add all required paths again.</p>
-<p>This method will not keep any references to the original stored paths and they
-are truly lost.</p>
+<p>This method will not keep any references to the original stored paths and
+they are truly lost.</p>
 </div>
 <p>An example of the use of stored paths is given below.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
@@ -746,8 +741,8 @@ name for the Plugin.</p>
 <p class="admonition-title">Tip</p>
 <p>The loading of Plugins occurs in the order of the stored paths. Therefore,
 a path further down in the list will take precedence over an earlier path.
-The loading of Plugins can be controlled by organizing the sequence
-of paths.</p>
+The loading of Plugins can be controlled by organizing the sequence of
+paths.</p>
 <p>The generic plugins are always loaded first.</p>
 </div>
 <div class="admonition warning">
@@ -763,8 +758,7 @@ plugin name.</p>
 <h4>Finding and getting a plugin<a class="headerlink" href="#finding-and-getting-a-plugin" title="Link to this heading">#</a></h4>
 <p>Plugins can either be found by their class name using the
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name" title="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_plugin_by_name</span></code></a>
-method or by their plugin name using the
-<a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name" title="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_plugin_by_plugin_name</span></code></a>
+method or by their plugin name using the <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name" title="pydidas.plugins.plugin_collection.PluginRegistry.get_plugin_by_plugin_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_plugin_by_plugin_name</span></code></a>
 method. A list of all available plugin class names can be obtained with the
 <a class="reference internal" href="../../code/api/plugins.html#pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names" title="pydidas.plugins.plugin_collection.PluginRegistry.get_all_plugin_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_all_plugin_names</span></code></a>
 method.</p>
@@ -802,7 +796,7 @@ method.</p>
 </div>
 <p>Once the plugins have been created, their Parameters can be modified as
 described in the <a class="reference internal" href="#id1">Accessing Parameters</a> section. The organization of plugins
-into a WorkflowTree are covered in the section <a class="reference internal" href="cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">WorkflowTree manual</span></a>.</p>
+into a WorkflowTree is covered in the section <a class="reference internal" href="cmd_workflow_tree.html#workflow-tree"><span class="std std-ref">WorkflowTree manual</span></a>.</p>
 </section>
 </section>
 </section>
@@ -810,11 +804,9 @@ into a WorkflowTree are covered in the section <a class="reference internal" hre
 <span id="id2"></span><h2>pydidas QSettings<a class="headerlink" href="#pydidas-qsettings" title="Link to this heading">#</a></h2>
 <p>pydidas uses Qt’s QSettings to store persistent information in the system’s
 registry. The <a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings" title="pydidas.core.PydidasQsettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydidas.core.PydidasQsettings</span></code></a> class can be used to
-display and modify global parameters.
-The most useful methods for general users are
-<a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.show_all_stored_q_settings" title="pydidas.core.PydidasQsettings.show_all_stored_q_settings"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_all_stored_q_settings</span></code></a>
-to print the names and values of all stored settings and
-<a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.set_value" title="pydidas.core.PydidasQsettings.set_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_value</span></code></a> to modify a key.</p>
+display and modify global parameters. The most useful methods for general users
+are <a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.show_all_stored_q_settings" title="pydidas.core.PydidasQsettings.show_all_stored_q_settings"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_all_stored_q_settings</span></code></a> to print the names
+and values of all stored settings and <a class="reference internal" href="../../code/api/core/others.html#pydidas.core.PydidasQsettings.set_value" title="pydidas.core.PydidasQsettings.set_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_value</span></code></a> to modify a key.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">PydidasQsettings</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">show_all_stored_q_settings</span><span class="p">()</span>
@@ -846,16 +838,20 @@ as a different user will not be applied to your settings.</p>
 whereas the user settings handle convenience user configurations.</p>
 <section id="global-settings">
 <h4><strong>Global</strong> settings<a class="headerlink" href="#global-settings" title="Link to this heading">#</a></h4>
-<ul class="simple">
-<li><dl class="simple">
+<ul>
+<li><dl>
 <dt>Multiprocessing settings</dt><dd><ul>
-<li><dl class="simple">
+<li><dl>
 <dt>Number of MP workers (key: global/mp_n_workers, type: int, default: 4)</dt><dd><p>The number of multiprocessing workers. Note that this number should not
-be set too high for two reasons:
-1. File reading processes interfere with each other if too many are
-active at once.
-2. pyFAI already inherently uses parallelization and you can only gain
-limited performance increases for multiple parallel processes.</p>
+be set too high for two reasons:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>File reading processes interfere with each other if too many are
+active at once.</p></li>
+<li><p>pyFAI already inherently uses parallelization and you can only gain
+limited performance increases for multiple parallel processes.</p></li>
+</ol>
+</div></blockquote>
 </dd>
 </dl>
 </li>
@@ -871,11 +867,11 @@ store at least one instance of all result data.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Memory settings</dt><dd><ul>
+<dt>Memory settings</dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt>Buffer dataframe limit (key: global/shared_buffer_max_n, type: int, default: 20)</dt><dd><p>The maximum number of datasets in the buffer. A dataset consists of all
-results for one frame. For performance reasons, the buffer should not
-be too large as this is only a temporary buffer.</p>
+results for one frame. For performance reasons, the buffer should not be
+too large as this is only a temporary buffer.</p>
 </dd>
 </dl>
 </li>
@@ -890,10 +886,10 @@ will handle. The default is 100 Megapixels.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>GUI plot update settings</dt><dd><ul>
+<dt>GUI plot update settings</dt><dd><ul class="simple">
 <li><dl class="simple">
 <dt>Plot update time (key: global/plot_update_time, type: float, default: 1.0)</dt><dd><p>The delay before any plot updates will be processed. This will prevent
-multiple frequent update of plots.)- Composite creation settings</p>
+multiple frequent update of plots.</p>
 </dd>
 </dl>
 </li>
@@ -940,18 +936,19 @@ composite creation.</p>
 <dt>Plot settings</dt><dd><ul>
 <li><dl class="simple">
 <dt>Histogram lower outlier fraction (key: user/histogram_outlier_fraction_low, type: float, default: 0.02)</dt><dd><p>The lower fraction of the histogram to be cropped when using the
-“Crop histogram outliers” button in plots in the GUI. The value is
-the absolute fraction, i.e. the default of 0.02 will ignore the lowest
-2% of pixels when setting the colormap from the histogram.</p>
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Crop</span> <span class="pre">histogram</span> <span class="pre">outliers</span></code> button in plots in the GUI. The value
+is the absolute fraction, i.e. the default of 0.02 will ignore the
+lowest 2% of pixels when setting the colormap from the histogram.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>Histogram high outlier fraction (key: user/histogram_outlier_fraction_high, type: float, default: 0.07)</dt><dd><p>The high fraction of the histogram to be cropped when using the
-“Crop histogram outliers” button in plots in the GUI. The value is
-the absolute fraction, i.e. the default of 0.07 will ignore the brightest
-7% of pixels when setting the colormap from the histogram. The default of
-0.07 is set to allow masking all the gaps in Eiger detectors by default.</p>
+<code class="xref py py-data docutils literal notranslate"><span class="pre">Crop</span> <span class="pre">histogram</span> <span class="pre">outliers</span></code> button in plots in the GUI. The value
+is the absolute fraction, i.e. the default of 0.07 will ignore the
+brightest 7% of pixels when setting the colormap from the histogram. The
+default of 0.07 is set to allow masking all the gaps in Eiger detectors
+by default.</p>
 </dd>
 </dl>
 </li>
@@ -962,8 +959,8 @@ matplotlib colormap name.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Default color for invalid data (key: user/cmap_nan_color, type: str, default: #9AFEFF)</dt><dd><p>The RGB color code to use for invalid / missing data to distinguish it from the
-generic colormap and its data points.</p>
+<dt>Default color for invalid data (key: user/cmap_nan_color, type: str, default: #9AFEFF)</dt><dd><p>The RGB color code to use for invalid / missing data to distinguish it
+from the generic colormap and its data points.</p>
 </dd>
 </dl>
 </li>
@@ -974,10 +971,10 @@ generic colormap and its data points.</p>
 <li><dl class="simple">
 <dt>Plugins</dt><dd><ul>
 <li><dl class="simple">
-<dt>Custom plugin paths (key: user/plugin_path, type: str, default: “”)</dt><dd><p>The names of custom paths where pydidas will look for plugins. Generic plugins
-and the generic plugin path is handled independently for greater clarity.
-Multiple paths can be added by appending them with a double semicolon “;;”
-as separator.</p>
+<dt>Custom plugin paths (key: user/plugin_path, type: str, default: “”)</dt><dd><p>The names of custom paths where pydidas will look for plugins. Generic
+plugins and the generic plugin path is handled independently for greater
+clarity. Multiple paths can be added by appending them with a double
+semicolon “;;” as separator.</p>
 </dd>
 </dl>
 </li>

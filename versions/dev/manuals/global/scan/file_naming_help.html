@@ -444,23 +444,24 @@
                   
   <section id="explanations-of-scan-file-naming">
 <span id="file-naming-help"></span><h1>Explanations of Scan file naming<a class="headerlink" href="#explanations-of-scan-file-naming" title="Link to this heading">#</a></h1>
-<p>The scan/file naming pattern determines how the input plugins in the pydidas Workflow
-interpret the path to the detector images.</p>
+<p>The scan/file naming pattern determines how the input plugins in the pydidas
+Workflow interpret the path to the detector images.</p>
 <p>For most input plugins, the scan/file naming pattern corresponds directly to the
 file names of the files.</p>
-<p>Some plugins use the scan/file naming pattern not only for the file names but also
-to access files in a nested directory structure. Please check the documentation
-of the individual input plugins for details on how the scan/file naming pattern is
-used by the particular plugin.</p>
-<p>If multiple files are used in a scan, the scan/file naming pattern must be set up
-to specify which part of the file name corresponds to the counting variable.
-The dynamic part of the file name must be replaced by a placeholder of hash characters
-<cite>**#**</cite> of the same length as the digits of the number to be replaced. Files which
-include a counter of variable length (e.g. <cite>image_9.tif</cite>, <cite>image_10.tif</cite>, etc.)
-should use a placeholder of the minimum length of the counter.</p>
+<p>Some plugins use the scan/file naming pattern not only for the file names but
+also to access files in a nested directory structure. Please check the
+documentation of the individual input plugins for details on how the scan/file
+naming pattern is used by that particular plugin.</p>
+<p>If multiple files are used in a scan, the scan/file naming pattern must be set
+up to specify which part of the file name corresponds to the counting variable.
+The dynamic part of the file name must be replaced by a placeholder of hash
+characters <cite>**#**</cite> of the same length as the digits of the number to be
+replaced. Files which include a counter of variable length (e.g. <cite>image_9.tif</cite>,
+<cite>image_10.tif</cite>, etc.) should use a placeholder of the minimum length of the
+counter.</p>
 <p>The <em>First pattern number</em> is the first number that should be used in the
-scan/file naming pattern. The index stepping of filenames defines by how much the
-counter should be incremented for each file.</p>
+scan/file naming pattern. The index stepping of filenames defines by how much
+the counter should be incremented for each file.</p>
 <section id="programmatic-access">
 <h2>Programmatic access<a class="headerlink" href="#programmatic-access" title="Link to this heading">#</a></h2>
 <p>For accessing the ScanContext parameters programmatically, the following keys
@@ -471,8 +472,8 @@ must be used:</p>
 <col style="width: 50.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>item</p></th>
-<th class="head"><p>reference key</p></th>
+<tr class="row-odd"><th class="head"><p>Item</p></th>
+<th class="head"><p>Reference key</p></th>
 </tr>
 </thead>
 <tbody>
@@ -488,7 +489,8 @@ must be used:</p>
 </tbody>
 </table>
 </div>
-<p>An example of modifying the scan/file naming pattern programmatically is shown below:</p>
+<p>An example of modifying the scan/file naming pattern programmatically is shown
+below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Scan</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">contexts</span><span class="o">.</span><span class="n">ScanContext</span><span class="p">()</span>
 <span class="n">Scan</span><span class="o">.</span><span class="n">set_param</span><span class="p">(</span><span class="n">scan_name_pattern</span><span class="p">,</span> <span class="n">image_</span><span class="c1">####.tif)</span>
 <span class="n">Scan</span><span class="o">.</span><span class="n">set_param</span><span class="p">(</span><span class="n">pattern_number_offset</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -505,10 +507,10 @@ must be used:</p>
 <col style="width: 50.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>naming pattern</p></th>
-<th class="head"><p>first number</p></th>
-<th class="head"><p>index stepping</p></th>
-<th class="head"><p>resulting filenames</p></th>
+<tr class="row-odd"><th class="head"><p>Naming pattern</p></th>
+<th class="head"><p>First number</p></th>
+<th class="head"><p>Index stepping</p></th>
+<th class="head"><p>Resulting filenames</p></th>
 </tr>
 </thead>
 <tbody>

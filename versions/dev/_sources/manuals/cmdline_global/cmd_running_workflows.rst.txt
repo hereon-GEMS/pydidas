@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -9,7 +9,7 @@
 
 .. |Scan| replace:: :py:class:`Scan <pydidas.contexts.scan.scan.Scan>`
 
-.. |DiffractionExperiment| replace:: :py:class:`DiffractionExperiment <pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment>` 
+.. |DiffractionExperiment| replace:: :py:class:`DiffractionExperiment <pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment>`
 
 .. |ExecuteWorkflowRunner| replace:: :py:class:`ExecuteWorkflowRunner <pydidas.apps.execute_workflow_runner.ExecuteWorkflowRunner>`
 
@@ -27,28 +27,28 @@ Running pydidas workflows from the command line
 Required information
 --------------------
 
-To run pydidas workflows (as defined in the |WorkflowTree|) with parallelization 
-support from the command line, the following information must be provided by 
-the user:
+To run pydidas workflows (as defined in the |WorkflowTree|) with parallelization
+support from the command line, the following information must be provided by the
+user:
 
     - The |WorkflowTree| to be used.
     - The |Scan| configuration.
     - The |DiffractionExperiment| configuration.
-    - An output directory to save the results. Note that this directory must
-      be empty or an overwrite flag must be given.
+    - An output directory to save the results. Note that this directory must be
+      empty or an overwrite flag must be given.
 
-Pydidas includes the |ExecuteWorkflowRunner| class to facilitate running 
+Pydidas includes the |ExecuteWorkflowRunner| class to facilitate running
 workflows from the command line.
 
 The ExecuteWorkflowRunner
 -------------------------
 
-The |ExecuteWorkflowRunner| is designed to be easily used from a script, but
-all the required information can also be passed as keyword arguments. 
+The |ExecuteWorkflowRunner| is designed to be easily used from a script, but all
+the required information can also be passed as keyword arguments.
 
-One of its main features is that it creates and handles an event loop of a 
-QApplication to allow pydidas processing to communication using Qt's signals 
-and slots.
+One of its main features is that it creates and handles an event loop of a
+QApplication to allow pydidas processing to communication using Qt's signals and
+slots.
 
 Setup
 ^^^^^
@@ -71,7 +71,7 @@ All keywords also have a parsed equivalent, as described below:
 
     * - Keyword name
       - Accepted types
-      - equivalent parsed arg
+      - Equivalent parsed arg
       - Notes
     * - workflow
       - Path, str, |WorkflowTree|
@@ -91,7 +91,7 @@ All keywords also have a parsed equivalent, as described below:
     * - output_directory
       - Path, str
       - --output_dir / -o
-      - 
+      -
     * - verbose
       - bool
       - --verbose
@@ -101,12 +101,12 @@ All keywords also have a parsed equivalent, as described below:
       - --overwrite
       - Flag to enable overwriting of files and export results to existing,
         non-empty directories.
-      
-Running a workflow
-^^^^^^^^^^^^^^^^^^ 
 
-Running a workflow is very simple and only requires calling the 
-|process_scan| method, as shown in the example below.
+Running a workflow
+^^^^^^^^^^^^^^^^^^
+
+Running a workflow is very simple and only requires calling the |process_scan|
+method, as shown in the example below.
 
 .. code-block::
 
@@ -130,8 +130,8 @@ that the call to the ExecuteWorkflowRunner must be made from within a function
 due to using of python's** :mod:`multiprocessing` **module.**
 
 .. tip::
-    
-    All the keywords from the initialization can also be given in the 
+
+    All the keywords from the initialization can also be given in the
     |process_scan| method, for example:
 
     .. code-block::
@@ -164,17 +164,17 @@ follows:
 Command line script
 -------------------
 
-Pydidas also includes a ready-to-use script to execute from the command line.
-It is called ``run_pydidas_workflow.py`` and is located in the ``pydidas_scripts``
-directory. 
+Pydidas also includes a ready-to-use script to execute from the command line. It
+is called ``run_pydidas_workflow.py`` and is located in the ``pydidas_scripts``
+directory.
 
 If pydidas was installed with pip, a ``run-pydidas-workflow`` entrypoint was
-created and can be used. Otherwise, simply call the script with the python 
+created and can be used. Otherwise, simply call the script with the python
 interpreter:
 
 .. code:: bash
 
-    python pydidas_scripts/run_pydidas_workflow.py 
+    python pydidas_scripts/run_pydidas_workflow.py
         -workflow /home/username/data/experiment/workflow.yml
         -scan /home/username/data/experiment/scan01.yml
         -diffraction_exp /home/username/data/experiment/exp.yml

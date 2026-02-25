@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 The gui submodule
@@ -12,16 +12,16 @@ The gui submodule
     :local:
     :backlinks: none
 
-The gui submodule for the graphical user interface is the equivalent to *apps* 
+The gui submodule for the graphical user interface is the equivalent to *apps*
 submodule for processing as it exposes functionality to the user.
 
-The main graphical interface is handled by the :py:class:`MainWindow 
+The main graphical interface is handled by the :py:class:`MainWindow
 <pydidas.gui.MainWindow>` class. It handles the individual frames and persistent
 state storage.
 
-Functionality is organized in individual :py:class:`Frames 
-<pydidas.widgets.BaseFrame>` which allow storage of state and which are shown
-in the central widget and independent :py:class:`PydidasWindows 
+Functionality is organized in individual :py:class:`Frames
+<pydidas.widgets.BaseFrame>` which allow storage of state and which are shown in
+the central widget and independent :py:class:`PydidasWindows
 <pydidas.gui.windows.PydidasWindow>` which are not persistent and are used for
 individual and independent tasks.
 
@@ -32,9 +32,9 @@ Global GUI classes
     :maxdepth: 3
 
     gui/main_window
-    
+
 Frames
-------    
+------
 
 .. toctree::
     :maxdepth: 3

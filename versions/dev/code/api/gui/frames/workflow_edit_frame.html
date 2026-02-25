@@ -471,13 +471,13 @@ plugins.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.build_frame">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.build_frame" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.build_frame" title="Link to this definition">#</a></dt>
 <dd><p>Build the frame and create all widgets.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.configure_plugin">
-<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.configure_plugin" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.configure_plugin" title="Link to this definition">#</a></dt>
 <dd><p>Get the signal that a new Plugin has been selected to be edited and
 pass the information to the PluginEditCanvas.</p>
 <dl class="field-list simple">
@@ -489,13 +489,13 @@ pass the information to the PluginEditCanvas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.connect_signals">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.connect_signals" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.connect_signals" title="Link to this definition">#</a></dt>
 <dd><p>Connect all signals and slots in the frame.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.frame_activated">
-<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.frame_activated" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.frame_activated" title="Link to this definition">#</a></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
 <p>This method checks whether the selected frame is the current class
 and if yes, it will call some updates.</p>
@@ -508,25 +508,25 @@ and if yes, it will call some updates.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file">
-<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file" title="Link to this definition">#</a></dt>
-<dd><p>Open a Qdialog to select a filename, read the file and import an
+<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.load_tree_from_file" title="Link to this definition">#</a></dt>
+<dd><p>Open a QFileDialog to select a filename, read the file and import an
 existing WorkflowTree from the retrieved information.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.resizeEvent">
-<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.resizeEvent" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QResizeEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.resizeEvent" title="Link to this definition">#</a></dt>
 <dd><p>Handle the resizeEvent and also update the node positions in the WorkflowTree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The calling event.</p>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QResizeEvent</em>) – The calling event.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.restore_state">
-<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.restore_state" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.restore_state" title="Link to this definition">#</a></dt>
 <dd><p>Restore the frame’s state from stored information.</p>
 <p>The default implementation in the BaseFrame will update all Parameters
 (and associated widgets) and restore the visibility of all widgets. If the
@@ -542,8 +542,8 @@ information for both.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file">
-<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file" title="Link to this definition">#</a></dt>
-<dd><p>Open a QFileDialog to geta save name and export the WorkflowTree to
+<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.WorkflowEditFrame.save_tree_to_file" title="Link to this definition">#</a></dt>
+<dd><p>Open a QFileDialog to get a save name and export the WorkflowTree to
 the selected file with the specified format.</p>
 </dd></dl>
 
@@ -622,7 +622,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Build the frame and create all widgets.</p>
 </dd></dl>
 
@@ -639,7 +639,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">configure_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Get the signal that a new Plugin has been selected to be edited and
 pass the information to the PluginEditCanvas.</p>
 <dl class="field-list simple">
@@ -651,7 +651,7 @@ pass the information to the PluginEditCanvas.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Connect all signals and slots in the frame.</p>
 </dd></dl>
 
@@ -1044,7 +1044,7 @@ frame’s state.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Received a signal that a new frame has been selected.</p>
 <p>This method checks whether the selected frame is the current class
 and if yes, it will call some updates.</p>
@@ -1135,8 +1135,8 @@ keys.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Open a Qdialog to select a filename, read the file and import an
+<span class="sig-name descname"><span class="pre">load_tree_from_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
+<dd><p>Open a QFileDialog to select a filename, read the file and import an
 existing WorkflowTree from the retrieved information.</p>
 </dd></dl>
 
@@ -1201,6 +1201,17 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">q_settings_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Remove a stored QSettings key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The name of the key to be deleted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">q_settings_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Set the value of a QSettings key.</p>
 <dl class="field-list simple">
@@ -1215,11 +1226,11 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">resizeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QResizeEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Handle the resizeEvent and also update the node positions in the WorkflowTree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The calling event.</p>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QResizeEvent</em>) – The calling event.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1237,7 +1248,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">restore_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Restore the frame’s state from stored information.</p>
 <p>The default implementation in the BaseFrame will update all Parameters
 (and associated widgets) and restore the visibility of all widgets. If the
@@ -1253,8 +1264,8 @@ information for both.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Open a QFileDialog to geta save name and export the WorkflowTree to
+<span class="sig-name descname"><span class="pre">save_tree_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
+<dd><p>Open a QFileDialog to get a save name and export the WorkflowTree to
 the selected file with the specified format.</p>
 </dd></dl>
 

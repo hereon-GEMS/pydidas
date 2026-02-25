@@ -459,7 +459,9 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineScanFrame">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">DefineScanFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.DefineScanFrame" title="Link to this definition">#</a></dt>
-<dd><p>Frame for managing the global scan setup.</p>
+<dd><p>Frame for managing the global scan definition.</p>
+<p>This frame allows the user to modify the singleton global ScanContext
+which holds the scan definition for processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineScanFrame.build_frame">
 <span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineScanFrame.build_frame" title="Link to this definition">#</a></dt>
@@ -475,7 +477,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineScanFrame.export_to_file">
 <span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineScanFrame.export_to_file" title="Link to this definition">#</a></dt>
-<dd><p>Save ScanContext to a file.</p>
+<dd><p>Save the ScanContext to a file.</p>
 <p>This method will open a QFileDialog to select a filename where
 the scan context information will be written.</p>
 </dd></dl>
@@ -503,7 +505,7 @@ the scan context information will be written.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineScanFrame.reset_entries">
 <span class="sig-name descname"><span class="pre">reset_entries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineScanFrame.reset_entries" title="Link to this definition">#</a></dt>
-<dd><p>Reset all ScanSetting entries to their default values.</p>
+<dd><p>Reset all Scan parameter entries to their default values.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -520,8 +522,7 @@ the scan context information will be written.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineScanFrame.update_dim_visibility">
 <span class="sig-name descname"><span class="pre">update_dim_visibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineScanFrame.update_dim_visibility" title="Link to this definition">#</a></dt>
-<dd><p>Update the visibility of dimensions based on the selected number
-of scan dimensions.</p>
+<dd><p>Update the visibility based on the selected number of scan dimensions.</p>
 </dd></dl>
 
 </dd></dl>
@@ -532,7 +533,9 @@ of scan dimensions.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">DefineScanFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
-<dd><p>Frame for managing the global scan setup.</p>
+<dd><p>Frame for managing the global scan definition.</p>
+<p>This frame allows the user to modify the singleton global ScanContext
+which holds the scan definition for processing.</p>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PaintDeviceMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span></dt>
@@ -995,7 +998,7 @@ frame’s state.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
-<dd><p>Save ScanContext to a file.</p>
+<dd><p>Save the ScanContext to a file.</p>
 <p>This method will open a QFileDialog to select a filename where
 the scan context information will be written.</p>
 </dd></dl>
@@ -1174,6 +1177,17 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">q_settings_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Remove a stored QSettings key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The name of the key to be deleted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">q_settings_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Set the value of a QSettings key.</p>
 <dl class="field-list simple">
@@ -1189,7 +1203,7 @@ referenced by param_key or dtype, if given.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">reset_entries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
-<dd><p>Reset all ScanSetting entries to their default values.</p>
+<dd><p>Reset all Scan parameter entries to their default values.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1366,8 +1380,7 @@ parameter referenced with &lt;key&gt;.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">update_dim_visibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
-<dd><p>Update the visibility of dimensions based on the selected number
-of scan dimensions.</p>
+<dd><p>Update the visibility based on the selected number of scan dimensions.</p>
 </dd></dl>
 
 <dl class="py method">

@@ -770,6 +770,17 @@ The default is None.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.PydidasQsettings.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettings.remove" title="Link to this definition">#</a></dt>
+<dd><p>Remove a QSettings key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The name of the key to be removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.PydidasQsettings.set_value">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettings.set_value" title="Link to this definition">#</a></dt>
 <dd><p>Set the value of a QSettings key.</p>
@@ -848,6 +859,17 @@ referenced by param_key or dtype, if given.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.PydidasQsettingsMixin.q_settings_remove">
+<span class="sig-name descname"><span class="pre">q_settings_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.PydidasQsettingsMixin.q_settings_remove" title="Link to this definition">#</a></dt>
+<dd><p>Remove a stored QSettings key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – The name of the key to be deleted.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1066,6 +1088,7 @@ on the supplied keys.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasGuiError"><code class="docutils literal notranslate"><span class="pre">PydidasGuiError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings.get_all_stored_q_settings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.get_all_stored_q_settings</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings.remove"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.remove</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings.set_value"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.set_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings.show_all_stored_q_settings"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.show_all_stored_q_settings</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettings.value"><code class="docutils literal notranslate"><span class="pre">PydidasQsettings.value</span></code></a></li>
@@ -1073,6 +1096,7 @@ on the supplied keys.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettingsMixin"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettingsMixin.q_settings_get"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_get</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettingsMixin.q_settings_remove"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_remove</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettingsMixin.q_settings_set"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_set</span></code></a></li>
 </ul>
 </li>

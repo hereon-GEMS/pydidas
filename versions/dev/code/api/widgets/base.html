@@ -838,14 +838,15 @@ latest selected directory (in any dialog).</p>
 <dl class="simple">
 <dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select directory’.</p>
 </dd>
-<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
-The default is None.</p>
+<dt>reference<span class="classifier">str or int, optional</span></dt><dd><p>A reference key to store the selection only during the
+active instance. The default is None.</p>
 </dd>
-<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
-The qsettings_ref will take precedence over the reference keyword.</p>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the
+QSettings registry. The qsettings_ref will take
+precedence over the reference keyword.</p>
 </dd>
-<dt>info_string<span class="classifier">str, optional</span></dt><dd><p>An additional info string to be displayed at the top of the file
-selection for user information.</p>
+<dt>info_string<span class="classifier">str, optional</span></dt><dd><p>An additional info string to be displayed at the top
+of the file selection for user information.</p>
 </dd>
 </dl>
 </p>
@@ -854,7 +855,7 @@ selection for user information.</p>
 <dd class="field-even"><p>The directory path, if selected or None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str | None</p>
+<dd class="field-odd"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -869,13 +870,18 @@ selection for user information.</p>
 <dl class="simple">
 <dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select existing file’.</p>
 </dd>
-<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active instance.
-The default is None.</p>
+<dt>formats<span class="classifier">str, optional</span></dt><dd><p>The list of format filters for filenames. The formats
+string should be in the format of
+“Description (<em>.ext1 *.ext2);;Another description (</em>.ext3)”.</p>
+</dd>
+<dt>reference<span class="classifier">str or int, optional</span></dt><dd><p>A reference key to store the selection only during the
+active instance. The default is None.</p>
 </dd>
 <dt>select_multiple<span class="classifier">bool, optional</span></dt><dd><p>If True, multiple files can be selected. The default is False.</p>
 </dd>
-<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings registry.
-The qsettings_ref will take precedence over the reference keyword.</p>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the
+QSettings registry. The qsettings_ref will take
+precedence over the reference keyword.</p>
 </dd>
 </dl>
 </p>
@@ -884,7 +890,7 @@ The qsettings_ref will take precedence over the reference keyword.</p>
 <dd class="field-even"><p>The full file path, if selected, or None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str | None</p>
+<dd class="field-odd"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -908,14 +914,15 @@ Parameters.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keywords are:</p>
 <dl class="simple">
-<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select filename’.</p>
+<dt>caption<span class="classifier">str, optional</span></dt><dd><p>The window title caption. The default is ‘Select
+filename’.</p>
 </dd>
-<dt>reference<span class="classifier">str | int, optional</span></dt><dd><p>A reference key to store the selection only during the active
-instance. The default is None.</p>
+<dt>reference<span class="classifier">str or int, optional</span></dt><dd><p>A reference key to store the selection only during the
+active instance. The default is None.</p>
 </dd>
-<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the QSettings
-registry. The qsettings_ref will take precedence over the
-reference keyword.</p>
+<dt>qsettings_ref<span class="classifier">str, optional</span></dt><dd><p>The reference key for storing the selection in the
+QSettings registry. The qsettings_ref will take
+precedence over the reference keyword.</p>
 </dd>
 </dl>
 </p>
@@ -924,20 +931,20 @@ reference keyword.</p>
 <dd class="field-even"><p>The full file path, if selected, or None.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str | None</p>
+<dd class="field-odd"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_latest_location">
-<span class="sig-name descname"><span class="pre">goto_latest_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">goto_latest_location</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_latest_location" title="Link to this definition">#</a></dt>
 <dd><p>Open the latest location from any dialogue.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.goto_scan_base_dir">
-<span class="sig-name descname"><span class="pre">goto_scan_base_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">goto_scan_base_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.goto_scan_base_dir" title="Link to this definition">#</a></dt>
 <dd><p>Open the ScanContext home directory, if set.</p>
 </dd></dl>
 
@@ -951,18 +958,20 @@ reference keyword.</p>
 <li><p><strong>*args</strong> (<em>Any</em>) – Positional arguments.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Keyword arguments. Supported keywords are:</p>
 <dl class="simple">
-<dt>parent<span class="classifier">Union[None, QWidget], optional</span></dt><dd><p>The dialog’s parent widget. The default is None.</p>
+<dt>parent<span class="classifier">QWidget or None, optional</span></dt><dd><p>The dialog’s parent widget. The default is None.</p>
 </dd>
-<dt>caption<span class="classifier">str | None, optional</span></dt><dd><p>The dialog caption. If None, the caption will be selected based on the
-type of dialog. The default is None.</p>
+<dt>caption<span class="classifier">str or None, optional</span></dt><dd><p>The dialog caption. If None, the caption will be
+selected based on the type of dialog. The default is
+None.</p>
 </dd>
-<dt>dialog_type<span class="classifier">str</span></dt><dd><p>The type of the dialog. Must be open_file, save_file, or open_directory.
-The default is open_file.</p>
+<dt>dialog_type<span class="classifier">str</span></dt><dd><p>The type of the dialog. Must be open_file, save_file,
+or open_directory. The default is open_file.</p>
 </dd>
-<dt>formats<span class="classifier">str | None, optional</span></dt><dd><p>The list of format filters for filenames, if used. The default is None.</p>
+<dt>formats<span class="classifier">str or None, optional</span></dt><dd><p>The list of format filters for filenames, if used. The
+default is None.</p>
 </dd>
-<dt>info_string<span class="classifier">str | None, optional</span></dt><dd><p>An additional information string which is displayed in the FileDialog
-widget. The default is None.</p>
+<dt>info_string<span class="classifier">str or None, optional</span></dt><dd><p>An additional information string which is displayed in
+the FileDialog widget. The default is None.</p>
 </dd>
 </dl>
 </p></li>
@@ -973,13 +982,13 @@ widget. The default is None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.PydidasFileDialog.set_curr_dir">
-<span class="sig-name descname"><span class="pre">set_curr_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_curr_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.PydidasFileDialog.set_curr_dir" title="Link to this definition">#</a></dt>
 <dd><p>Set the current directory to the directory of the given item.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reference</strong> (<em>str</em><em> | </em><em>int</em>) – The stored reference name.</p></li>
-<li><p><strong>item</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename or directory name.</p></li>
+<li><p><strong>reference</strong> (<em>str</em><em> or </em><em>int</em>) – The stored reference name.</p></li>
+<li><p><strong>item</strong> (<em>Path</em><em> or </em><em>str</em>) – The filename or directory name.</p></li>
 </ul>
 </dd>
 </dl>

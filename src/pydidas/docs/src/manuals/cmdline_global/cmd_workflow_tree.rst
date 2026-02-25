@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _workflow_tree:
@@ -17,15 +17,15 @@ The WorkflowTree class
 Introduction to the WorkflowTree
 --------------------------------
 
-The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
-consists of multipke :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`
-which store information about their position in the tree and their parents and
-children as well as their associated processing plugin but the nodes are
-agnostic to any meta-information.
+The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` consists of
+multiple :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>` which store
+information about their position in the tree and their parents and children as
+well as their associated processing plugin but the nodes are agnostic to any
+meta-information.
 
-The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
-is a pydidas singleton object with only a single instance at runtime. It manages
-the interactions between the user and the individual nodes.
+The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` is a pydidas
+singleton object with only a single instance at runtime. It manages the
+interactions between the user and the individual nodes.
 
 Its instance can be obtained by calling the following code:
 
@@ -42,23 +42,21 @@ allows to easily run the WorkflowTree in serial or parallel processing.
 Assembling a WorkflowTree
 -------------------------
 
-To assemble a
-:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`, users
+To assemble a :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`, users
 need to know which Plugins they want to use and they need to configure these
-plugins. Then, they can add these plugins to the tree. If the plugins are
-passed to the WorkflowTree without any further information, they will be
-connected in a linear manner, with every plugin appended to the last one.
+plugins. Then, they can add these plugins to the tree. If the plugins are passed
+to the WorkflowTree without any further information, they will be connected in a
+linear manner, with every plugin appended to the last one.
 
 :py:class:`Plugins <pydidas.plugins.BasePlugin>` can be configured either in the
-:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` or
-before adding them to the tree. Access to the individual plugins in the tree
-is somewhat hidded, though, and it is recommended to configure each
-:py:class:`Plugins <pydidas.plugins.BasePlugin>` before adding it to
-the :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`.
+:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` or before adding them
+to the tree. Access to the individual plugins in the tree is somewhat hidden,
+though, and it is recommended to configure each :py:class:`Plugin
+<pydidas.plugins.BasePlugin>` before adding it to the :py:class:`WorkflowTree
+<pydidas.workflow.ProcessingTree>`.
 
-To create a new node with a plugin and add it to the
-:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`, use the
-:py:meth:`create_and_add_node
+To create a new node with a plugin and add it to the :py:class:`WorkflowTree
+<pydidas.workflow.ProcessingTree>`, use the :py:meth:`create_and_add_node
 <pydidas.workflow.ProcessingTree.create_and_add_node>` method:
 
 .. automethod:: pydidas.workflow.processing_tree.ProcessingTree.create_and_add_node
@@ -107,9 +105,8 @@ Hdf5 file and performs two separate integrations in different angular ranges:
 Running workflows
 -----------------
 
-The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
-includes several methods to run either the full Workflow or just individual
-plugins for testing.
+The :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` includes several
+methods to run either the full Workflow or just individual plugins for testing.
 
 Test individual plugins
 """""""""""""""""""""""
@@ -158,13 +155,12 @@ from the previous example are still existing).
 Run the full WorkflowTree
 """""""""""""""""""""""""
 
-Two different methods are available to run the full
-:py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`. First,
-there is the :py:meth:`execute_process
-<pydidas.workflow.ProcessingTree.execute_process>` method which
-will run the full workflow for a single frame but will not gather any results
-from the nodes nor return any values. This method is used by the automatic
-processing where pydidas organizes results. Secondly, the
+Two different methods are available to run the full :py:class:`WorkflowTree
+<pydidas.workflow.ProcessingTree>`. First, there is the
+:py:meth:`execute_process <pydidas.workflow.ProcessingTree.execute_process>`
+method which will run the full workflow for a single frame but will not gather
+any results from the nodes nor return any values. This method is used by the
+automatic processing where pydidas organizes results. Secondly, the
 :py:meth:`execute_process_and_get_results
 <pydidas.workflow.ProcessingTree.execute_process_and_get_results>`
 method will do the same calculations but also gathers the results from the
@@ -176,8 +172,8 @@ method is given below.
 .. automethod:: pydidas.workflow.ProcessingTree.execute_process_and_get_results
     :noindex:
 
-Using the :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>`
-from the example above, the following example demonstrates the usage.
+Using the :py:class:`WorkflowTree <pydidas.workflow.ProcessingTree>` from the
+example above, the following example demonstrates the usage.
 
 .. code-block::
 

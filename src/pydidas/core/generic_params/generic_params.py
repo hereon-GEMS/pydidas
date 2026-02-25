@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ generic Parameters.
 """
 
 __author__ = "Malte Storm, Nonni Heere"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["GENERIC_PARAMS_METADATA"]
 
 
 import importlib
+from datetime import date
 from pathlib import Path
 
 from pydidas.core.generic_params.generic_params_scan import GENERIC_PARAMS_SCAN
@@ -101,12 +102,12 @@ available:
 __SCAN_PARAMS_HEADER = """..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - YYYY, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 List of all ScanContext Parameters
 ----------------------------------
-"""
+""".replace("YYYY", str(date.today().year))
 
 __SCAN_DIM_PARAMS = """
 

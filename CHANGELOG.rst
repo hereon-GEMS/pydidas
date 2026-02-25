@@ -27,6 +27,8 @@ Bugfixes
   saving a file could not be automatically determined.
 - Fixed an issue in the PydidasFileDialog which did not add the correct 
   extension when selecting an extension in the FileDialog dropdown.
+- Fixed an issue in the auto-generated doc for the generic params which
+  had a fixed copyright date of 2025
 
 
 

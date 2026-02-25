@@ -66,9 +66,9 @@ def setup_module() -> Generator[tuple, None, None]:
     if plugin_path not in COLL.registered_paths:
         COLL.find_and_register_plugins(plugin_path)
     old_stdout = sys.stdout
-    mystdout = io.StringIO()
-    EXP.export_to_file(path.joinpath("diffraction_exp.yml"))
-    yield path, q_settings, n_workers, old_stdout, mystdout
+    my_stdout = io.StringIO()
+    EXP.export_to_file(path / "diffraction_exp.yml")
+    yield path, q_settings, n_workers, old_stdout, my_stdout
     shutil.rmtree(path)
     q_settings.set_value("global/mp_n_workers", n_workers)
     COLL.unregister_plugin_path(plugin_path)
@@ -77,15 +77,15 @@ def setup_module() -> Generator[tuple, None, None]:
 
 @pytest.fixture(autouse=True)
 def setup_function(setup_module: object) -> Generator[None, None, None]:
-    path, q_settings, n_workers, old_stdout, mystdout = setup_module
+    _path, q_settings, n_workers, old_stdout, my_stdout = setup_module
     RESULT_SAVER.set_active_savers_and_title([])
     EXP.restore_all_defaults(True)
-    generate_tree(path)
-    generate_scan(path)
-    sys.stdout = mystdout
-    sysargs = sys.argv[:]
+    generate_tree(_path)
+    generate_scan(_path)
+    sys.stdout = my_stdout
+    sys_args = sys.argv[:]
     yield
-    sys.argv = sysargs
+    sys.argv = sys_args
     sys.stdout = old_stdout
 
 
@@ -94,7 +94,7 @@ def generate_tree(path: Path) -> None:
     TREE.create_and_add_node(unittest_objects.DummyLoader())
     TREE.create_and_add_node(unittest_objects.DummyProc())
     TREE.create_and_add_node(unittest_objects.DummyProc(), parent=TREE.root)
-    TREE.export_to_file(path.joinpath("workflow_tree.yml"), overwrite=True)
+    TREE.export_to_file(path / "workflow_tree.yml", overwrite=True)
 
 
 def generate_scan(path: Path) -> None:
@@ -107,7 +107,7 @@ def generate_scan(path: Path) -> None:
         SCAN.set_param_value(f"scan_dim{i}_n_points", nscan[i])
         SCAN.set_param_value(f"scan_dim{i}_delta", scandelta[i])
         SCAN.set_param_value(f"scan_dim{i}_offset", scanoffset[i])
-    SCAN.export_to_file(path.joinpath("scan.yml"), overwrite=True)
+    SCAN.export_to_file(path / "scan.yml", overwrite=True)
 
 
 def create_dummy_entries_from_parsing(obj: object) -> None:
@@ -123,10 +123,10 @@ def create_dummy_entries_from_parsing(obj: object) -> None:
 
 def get_empty_dir_name(path: Path) -> Path:
     while True:
-        dir = path.joinpath(get_random_string(12))
-        if not dir.is_dir():
+        _dir = path / get_random_string(12)
+        if not _dir.is_dir():
             break
-    return dir
+    return _dir
 
 
 def test_creation_plain() -> None:
@@ -140,7 +140,7 @@ def test_creation_plain() -> None:
 
 def test_creation_cmdline_args(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    scan_dir = str(path.joinpath(get_random_string(8)))
+    scan_dir = str(path / get_random_string(8))
     sys.argv.extend(["-output_dir", scan_dir, "--overwrite"])
     obj = ExecuteWorkflowRunner()
     for key in ["scan", "diffraction_exp", "workflow"]:
@@ -152,7 +152,7 @@ def test_creation_cmdline_args(setup_module: object) -> None:
 
 def test_creation_cmdline_args_and_kwargs(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    scan_dir = str(path.joinpath(get_random_string(8)))
+    scan_dir = str(path / get_random_string(8))
     workflow = get_random_string(12)
     new_scan_dir = get_random_string(12)
     sys.argv.extend(["-output_dir", scan_dir, "--overwrite"])
@@ -230,11 +230,11 @@ def test_update_parsed_args_from_kwargs_double_diffraction_exp() -> None:
 
 
 def test_print_progress(setup_module: object) -> None:
-    _, _, _, _, mystdout = setup_module
-    sys.stdout = mystdout
+    _, _, _, _, my_stdout = setup_module
+    sys.stdout = my_stdout
     obj = ExecuteWorkflowRunner()
     obj._print_progress(0.1)
-    output = mystdout.getvalue().strip()
+    output = my_stdout.getvalue().strip()
     assert output.endswith("10.00%")
 
 
@@ -244,50 +244,50 @@ def test_write_results_to_disk__empty_dir(setup_module: object) -> None:
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
     RESULTS.store_results(0, _res)
-    dir = get_empty_dir_name(path)
-    obj = ExecuteWorkflowRunner(output_dir=dir)
+    _dir = get_empty_dir_name(path)
+    obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
 
 
 def test_write_results_to_disk__existing_empty_dir(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
-    dir.mkdir()
+    _dir = get_empty_dir_name(path)
+    _dir.mkdir()
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
     RESULTS.store_results(0, _res)
-    obj = ExecuteWorkflowRunner(output_dir=dir)
+    obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
-    assert dir.joinpath("node_01.h5").is_file()
-    assert dir.joinpath("node_02.h5").is_file()
+    assert (_dir / "node_01.nxs").is_file()
+    assert (_dir / "node_02.nxs").is_file()
 
 
 def test_write_results_to_disk__used_dir(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
-    dir.mkdir()
+    _dir = get_empty_dir_name(path)
+    _dir.mkdir()
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
     RESULTS.store_results(0, _res)
-    with open(dir.joinpath("node_02.h5"), "w") as f:
+    with open(_dir / "node_02.nxs", "w") as f:
         f.write("dummy")
-    obj = ExecuteWorkflowRunner(output_dir=dir)
+    obj = ExecuteWorkflowRunner(output_dir=_dir)
     with pytest.raises(UserConfigError):
         obj._write_results_to_disk()  # type: ignore[attr-defined]
 
 
 def test_write_results_to_disk__used_dir_w_overwrite(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
-    dir.mkdir()
-    with open(dir.joinpath("node_02.h5"), "w") as f:
+    _dir = get_empty_dir_name(path)
+    _dir.mkdir()
+    with open(_dir / "node_02.nxs", "w") as f:
         f.write("dummy")
-    obj = ExecuteWorkflowRunner(output_dir=dir, overwrite=True)
+    obj = ExecuteWorkflowRunner(output_dir=_dir, overwrite=True)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
-    assert dir.joinpath("node_01.h5").is_file()
-    assert dir.joinpath("node_02.h5").is_file()
+    assert (_dir / "node_01.nxs").is_file()
+    assert (_dir / "node_02.nxs").is_file()
 
 
 def test_update_contexts_from_stored_args_scan_instance() -> None:
@@ -308,7 +308,7 @@ def test_update_contexts_from_stored_args_scan_instance() -> None:
 
 def test_update_contexts_from_stored_args_scan(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    scan_fname = path.joinpath("dummy_scan.yml")
+    scan_fname = path / "dummy_scan.yml"
     scan = Scan()
     scan_params = {
         "scan_dim": 2,
@@ -329,7 +329,7 @@ def test_update_contexts_from_stored_args_scan(setup_module: object) -> None:
 
 def test_update_contexts_from_stored_args_workflow(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    tree_fname = path.joinpath("dummy_workflow.yml")
+    tree_fname = path / "dummy_workflow.yml"
     tree = ProcessingTree()
     tree.create_and_add_node(unittest_objects.DummyLoader())
     tree.create_and_add_node(unittest_objects.DummyProc())
@@ -340,10 +340,10 @@ def test_update_contexts_from_stored_args_workflow(setup_module: object) -> None
         generate_scan(path)
         obj = ExecuteWorkflowRunner(workflow=item)
         obj.update_contexts_from_stored_args()
-        for id, node in tree.nodes.items():
-            assert TREE.nodes[id].node_id == node.node_id
+        for _id, node in tree.nodes.items():
+            assert TREE.nodes[_id].node_id == node.node_id
             assert (
-                TREE.nodes[id].plugin.__class__.__name__
+                TREE.nodes[_id].plugin.__class__.__name__
                 == node.plugin.__class__.__name__
             )
 
@@ -352,7 +352,7 @@ def test_update_contexts_from_stored_args_diffraction_exp(
     setup_module: object,
 ) -> None:
     path, _, _, _, _ = setup_module
-    exp_fname = path.joinpath("dummy_diffraction_exp.yml")
+    exp_fname = path / "dummy_diffraction_exp.yml"
     exp = DiffractionExperiment()
     exp_params = {
         "detector_poni1": 0.1234,
@@ -391,14 +391,14 @@ def test_check_all_args_okay_keys_present(key: str, name: str) -> None:
 
 def test_check_all_args_okay_dir_okay_no_overwrite(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
-    dir.mkdir()
-    with open(dir.joinpath("dummy.txt"), "w") as f:
+    _dir = get_empty_dir_name(path)
+    _dir.mkdir()
+    with open(_dir / "dummy.txt", "w") as f:
         f.write("dummy")
     keys = {
         item: get_random_string(8) for item in ["scan", "diffraction_exp", "workflow"]
     }
-    obj = ExecuteWorkflowRunner(output_dir=dir, **keys)
+    obj = ExecuteWorkflowRunner(output_dir=_dir, **keys)
     with pytest.raises(UserConfigError) as error:
         obj.check_all_args_okay()
     assert "directory is not empty" in str(error.value)
@@ -406,17 +406,17 @@ def test_check_all_args_okay_dir_okay_no_overwrite(setup_module: object) -> None
 
 @pytest.mark.slow
 def test_process_scan_single_run(setup_module: object) -> None:
-    path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
+    _path, _, _, _, _ = setup_module
+    _dir = get_empty_dir_name(_path)
     obj = ExecuteWorkflowRunner(
-        workflow=path.joinpath("workflow_tree.yml"),
-        scan=path.joinpath("scan.yml"),
-        diffraction_exp=path.joinpath("diffraction_exp.yml"),
-        output_dir=dir,
+        workflow=_path / "workflow_tree.yml",
+        scan=_path / "scan.yml",
+        diffraction_exp=_path / "diffraction_exp.yml",
+        output_dir=_dir,
     )
     obj.process_scan()
-    for name in ["node_01.h5", "node_02.h5"]:
-        with h5py.File(dir.joinpath(name), "r") as f:
+    for name in ["node_01.nxs", "node_02.nxs"]:
+        with h5py.File(_dir / name, "r") as f:
             shape = f["entry/data/data"].shape
         assert shape == (5, 7, 3, 10, 10)
 
@@ -424,19 +424,19 @@ def test_process_scan_single_run(setup_module: object) -> None:
 @pytest.mark.slow
 def test_process_scan_multiple_run(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
-    dir = get_empty_dir_name(path)
+    _dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(
-        workflow=path.joinpath("workflow_tree.yml"),
-        scan=path.joinpath("scan.yml"),
-        diffraction_exp=path.joinpath("diffraction_exp.yml"),
-        output_dir=dir,
+        workflow=path / "workflow_tree.yml",
+        scan=path / "scan.yml",
+        diffraction_exp=path / "diffraction_exp.yml",
+        output_dir=_dir,
     )
     obj.process_scan()
-    dir2 = get_empty_dir_name(path)
-    obj.process_scan(output_dir=dir2)
-    for root in [dir, dir2]:
-        for name in ["node_01.h5", "node_02.h5"]:
-            with h5py.File(root.joinpath(name), "r") as f:
+    _dir2 = get_empty_dir_name(path)
+    obj.process_scan(output_dir=_dir2)
+    for root in [_dir, _dir2]:
+        for name in ["node_01.nxs", "node_02.nxs"]:
+            with h5py.File(root / name, "r") as f:
                 shape = f["entry/data/data"].shape
             assert shape == (5, 7, 3, 10, 10)
 

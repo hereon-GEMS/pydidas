@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2025, Helmholtz-Zentrum Hereon
+    Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _file_naming_help:
@@ -10,31 +10,32 @@ Explanations of Scan file naming
 --------------------------------
 
 
-The scan/file naming pattern determines how the input plugins in the pydidas Workflow
-interpret the path to the detector images.
+The scan/file naming pattern determines how the input plugins in the pydidas
+Workflow interpret the path to the detector images.
 
 For most input plugins, the scan/file naming pattern corresponds directly to the
 file names of the files.
 
-Some plugins use the scan/file naming pattern not only for the file names but also
-to access files in a nested directory structure. Please check the documentation
-of the individual input plugins for details on how the scan/file naming pattern is
-used by the particular plugin.
+Some plugins use the scan/file naming pattern not only for the file names but
+also to access files in a nested directory structure. Please check the
+documentation of the individual input plugins for details on how the scan/file
+naming pattern is used by that particular plugin.
 
-If multiple files are used in a scan, the scan/file naming pattern must be set up
-to specify which part of the file name corresponds to the counting variable.
-The dynamic part of the file name must be replaced by a placeholder of hash characters
-`**#**` of the same length as the digits of the number to be replaced. Files which
-include a counter of variable length (e.g. `image_9.tif`, `image_10.tif`, etc.)
-should use a placeholder of the minimum length of the counter.
+If multiple files are used in a scan, the scan/file naming pattern must be set
+up to specify which part of the file name corresponds to the counting variable.
+The dynamic part of the file name must be replaced by a placeholder of hash
+characters `**#**` of the same length as the digits of the number to be
+replaced. Files which include a counter of variable length (e.g. `image_9.tif`,
+`image_10.tif`, etc.) should use a placeholder of the minimum length of the
+counter.
 
 The *First pattern number* is the first number that should be used in the
-scan/file naming pattern. The index stepping of filenames defines by how much the
-counter should be incremented for each file.
+scan/file naming pattern. The index stepping of filenames defines by how much
+the counter should be incremented for each file.
 
 Programmatic access
 ^^^^^^^^^^^^^^^^^^^
-For accessing the ScanContext parameters programmatically, the following keys 
+For accessing the ScanContext parameters programmatically, the following keys
 must be used:
 
 .. list-table::
@@ -42,8 +43,8 @@ must be used:
     :class: tight-table
     :header-rows: 1
 
-    * - item
-      - reference key
+    * - Item
+      - Reference key
     * - Scan/file naming pattern
       - scan_name_pattern
     * - First filename number
@@ -53,7 +54,8 @@ must be used:
 
 
 
-An example of modifying the scan/file naming pattern programmatically is shown below:
+An example of modifying the scan/file naming pattern programmatically is shown
+below:
 
 .. code-block::
 
@@ -69,10 +71,10 @@ Examples
     :class: tight-table
     :header-rows: 1
 
-    * - naming pattern
-      - first number
-      - index stepping
-      - resulting filenames
+    * - Naming pattern
+      - First number
+      - Index stepping
+      - Resulting filenames
     * - image_####.tif
       - 1
       - 1

@@ -68,7 +68,7 @@ _DEFAULT_GROUPS = [
 
 def _get_pydidas_context_config_entries(
     scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
-) -> list[list[str, str, dict]]:
+) -> list[list[str | dict]]:
     """
     Get the context configuration from the pydidas Context singletons.
 
@@ -153,44 +153,46 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
-    default_extension = "h5"
+    default_suffix = ".nxs"
     _filenames = []
     _save_dir = None
     _metadata_written = False
 
     @classmethod
     def prepare_files_and_directories(
-        cls, save_dir: Path | str, node_information: dict, **kwargs: dict
-    ):
+        cls, save_dir: Path | str, node_information: dict, **kwargs: Any
+    ) -> None:
         """
         Prepare the hdf5 files with the metadata.
 
         Parameters
         ----------
-        save_dir : Path | str
+        save_dir : Path or str
             The full path for the data to be saved.
         node_information : dict
-            A dictionary with nodeID keys and dictionary values. Each value dictionary
-            must have the following keys: shape, node_label, data_label, plugin_name
-            and the respective values. The shape (tuple) determines the shape of the
-            Dataset, the node_label is the user's name for the processing node. The
-            data_label gives the description of what the data shows (e.g. intensity)
-            and the plugin_name is simply the name of the plugin.
-        **kwargs:
+            A dictionary with nodeID keys and dictionary values. Each value
+            dictionary must have the following keys: shape, node_label,
+            data_label, plugin_name and the respective values. The shape
+            (tuple) determines the shape of the Dataset, the node_label is
+            the user's name for the processing node. The data_label gives
+            the description of what the data shows (e.g. intensity) and the
+            plugin_name is simply the name of the plugin.
+        **kwargs : Any
             Supported kwargs are:
 
-            scan_context : Optional[pydidas.contexts.Scan]
-                The scan context. If None, the generic context will be used.
-                Only specify this, if you explicitly require a different context.
-                The default is None.
-            diffraction_exp_context : Optional[pydidas.contexts.DiffractionExperiment]
-                The diffraction experiment context. If None, the generic context
-                will be used. Only specify this, if you explicitly require a
+            scan_context : pydidas.contexts.Scan or None
+                The scan context. If None, the generic context will be
+                used. Only specify this, if you explicitly require a
                 different context. The default is None.
-            workflow_tree : Union[WorkflowTree, None], optional
-                The WorkflowTree. If None, the generic WorkflowTree will be used.
-                Only specify this, if you explicitly require a different context.
-                The default is None.
+            diffraction_exp_context : (
+                pydidas.contexts.DiffractionExperiment or None)
+                The diffraction experiment context. If None, the generic
+                context will be used. Only specify this, if you explicitly
+                require a different context. The default is None.
+            workflow_tree : WorkflowTree or None, optional
+                The WorkflowTree. If None, the generic WorkflowTree will be
+                used. Only specify this, if you explicitly require a
+                different context. The default is None.
         """
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
@@ -212,7 +214,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ):
+    ) -> None:
         """
         Create a hdf5 file and populate it with the Scan metadata.
 
@@ -241,7 +243,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ) -> list[list[str, str, dict]]:
+    ) -> list[list[str | dict]]:
         """
         Get the datasets to be written to the hdf5 file.
 
@@ -304,7 +306,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         frame_result_dict: dict,
         scan_context: Scan | None = None,
         **kwargs: Any,
-    ):
+    ) -> None:
         """
         Export the results of one frame and store them on disk.
 
@@ -314,10 +316,10 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The frame index.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Scan |None, optional
+        scan_context : Scan or None, optional
             The scan context to be used for exporting to file. If None, the
             global scan context will be used. The default is None.
-        kwargs : Any
+        **kwargs : Any
             Kwargs which should be passed to the underlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
@@ -335,7 +337,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         full_data: dict,
         scan_context: Scan | None = None,
         squeeze: bool = False,
-    ):
+    ) -> None:
         """
         Export the full dataset to disk.
 
@@ -343,12 +345,13 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         full_data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Scan |None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        squeeze: bool, optional
-            Flag to toggle squeezing of empty dimensions. If True, the data will
-            be squeezed to remove empty dimensions. The default is False.
+        scan_context : Scan or None, optional
+            The scan context. If None, the generic context will be used.
+            Only specify this, if you explicitly require a different
+            context. The default is None.
+        squeeze : bool, optional
+            Flag to toggle squeezing of empty dimensions. If True, the data
+            will be squeezed to remove empty dimensions. The default is False.
         """
         if not cls._metadata_written:
             cls.update_metadata(full_data, squeeze=squeeze)
@@ -369,19 +372,17 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        metadata : dict[int, Dataset | dict]
+        metadata : dict[int, Dataset or dict]
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         scan : Scan
-            The scan context to be used for exporting to file. If None, the
-            global scan context will be used.
+            The scan context to be used for metadata information.
 
         Returns
         -------
         dict[int, dict]
             The updated metadata.
         """
-        _ndim_scan = scan.ndim
         _scan_dim_labels = scan.axis_labels
         _scan_dim_units = scan.axis_units
         _scan_dim_ranges = scan.axis_ranges
@@ -413,17 +414,17 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     @classmethod
     def update_metadata(
         cls, metadata: dict[int, Dataset | dict], squeeze: bool = False
-    ):
+    ) -> None:
         """
         Update the frame metadata with a separately supplied metadata
         dictionary.
 
         Parameters
         ----------
-        metadata : dict
+        metadata : dict[int, Dataset or dict]
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
-        squeeze: bool, optional
+        squeeze : bool, optional
             Flag to toggle squeezing of empty dimensions. If True, the data will
             be squeezed to remove empty dimensions. The default is False.
         """

@@ -120,9 +120,9 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         self._dataunits = {1: "a.u.", 2: "km", 3: "square inch"}
         self._plugin_names = {1: "A plugin", 2: "Plugin no 2.", 3: "Ye olde plugin"}
         self._filenames = {
-            1: "node_01_Test.h5",
-            2: "node_02_not_again.h5",
-            3: "node_03_another.h5",
+            1: "node_01_Test.nxs",
+            2: "node_02_not_again.nxs",
+            3: "node_03_another.nxs",
         }
         _node_infos = {
             _node: {

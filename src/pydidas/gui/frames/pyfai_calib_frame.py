@@ -336,7 +336,7 @@ class PyfaiCalibFrame(BaseFrame):
         _fname = self.__export_dialog.get_saving_filename(
             caption="Export experiment context file",
             formats=DiffractionExperimentIo.get_string_of_formats(),
-            default_extension="yaml",
+            default_suffix=".yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="PyfaiCalibFrame__export",
             info_string=(

@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _scan_context:
@@ -18,12 +18,12 @@ The ScanContext class
 Introduction
 ------------
 
-The :py:class:`ScanContext` is the pydidas Singleton instance of the 
-:py:class:`Scan <pydidas.contexts.scan.Scan>` 
-class. It is used for storing and accessing global information about the scan 
-layout and generic infomation like title, directory and file naming patterns.
+The :py:class:`ScanContext` is the pydidas Singleton instance of the
+:py:class:`Scan <pydidas.contexts.scan.Scan>` class. It is used for storing and
+accessing global information about the scan layout and generic information like
+title, directory and file naming patterns.
 
-Stored information include
+Stored information includes
 
     - Dimensionality (for arranging results)
     - Name (for metadata and titles only)
@@ -31,7 +31,7 @@ Stored information include
     - Filename pattern (for data loading)
     - Scan multiplicity (the number of each frames at each scan point).
     - Starting index of files/frames
-    - Index stepping    
+    - Index stepping
     - Information for each scan dimension
 
         - Name for the scan dimension (for reference, e.g. motor name, time)
@@ -39,13 +39,14 @@ Stored information include
         - Step width between two scan points
         - Offset of the first scan points
         - Unit of the scan direction
-    
+
 These information allow to arrange the processed datasets in the correct order
 and to add metadata about the scan to plots and stored datasets.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in `List of all ScanContext Parameters <../global/scan/scan_params.html>`_\ .
+given in `List of all ScanContext Parameters
+<../global/scan/scan_params.html>`_.
 
 Its instance can be obtained by calling the following code:
 
@@ -60,17 +61,17 @@ Configuring the ScanContext
 Global Parameters
 ^^^^^^^^^^^^^^^^^
 
-The :py:class:`ScanContext <pydidas.contexts.scan.Scan>` 
-has *global* Parameters for generic information, listed in detail below:
+The :py:class:`ScanContext <pydidas.contexts.scan.Scan>` has *global* Parameters
+for generic information, listed in detail below:
 
 
 .. list-table::
     :header-rows: 1
-    :class: tight-table    
+    :class: tight-table
 
     * - ScanContext Parameter name
-      - data type
-      - description
+      - Data type
+      - Description
     * - scan_dim
       - int
       - The number of dimensions in the scan.
@@ -80,10 +81,10 @@ has *global* Parameters for generic information, listed in detail below:
         metadata.
     * - scan_base_directory
       - pathlib.Path
-      - The base directory for finding the files of the scan. 
+      - The base directory for finding the files of the scan.
     * - scan_name_pattern
       - str
-      - The naming pattern of the scan files. Use hashes '#' for wildcards 
+      - The naming pattern of the scan files. Use hashes '#' for wildcards
         which will be replaced by indices.
     * - pattern_number_offset
       - int
@@ -91,8 +92,8 @@ has *global* Parameters for generic information, listed in detail below:
     * - scan_frames_per_point
       - int
       - The number of frames acquired at each scan point.
-        Note: If you want to handle multiple images individually, add them as 
-        an additional scan dimension.
+        Note: If you want to handle multiple images individually, add them as an
+        additional scan dimension.
     * - scan_multi_frame_handling
       - str
       - Flag how to handle multiple images. Choices are averaging or summation.
@@ -104,12 +105,12 @@ has *global* Parameters for generic information, listed in detail below:
     >>> SCAN.set_param_value('scan_name', 'Test_42')
     >>> SCAN.set_param_value('scan_dim', 2)
     >>> SCAN.set_param_value('scan_base_directory', '/home/user/dir_to_data')
-    
+
 .. note::
 
-    The number of dimensions in the scan is limited to 4 which should be 
+    The number of dimensions in the scan is limited to 4 which should be
     sufficient for all applications. If you have a specific application which
-    required a larger number of dimensions, please get in contact with the 
+    required a larger number of dimensions, please get in contact with the
     pydidas development team to discuss your needs.
 
 Parameters for each dimension
@@ -126,15 +127,15 @@ Each dimension is described by a total of five Parameters:
     :widths: 22 10 10 58
     :header-rows: 1
     :class: tight-table
-    
-    * - name
-      - type
-      - default
-      - description
+
+    * - Name
+      - Type
+      - Default
+      - Description
     * - scan_dim{i}_label
       - str
       - ""
-      - The axis name for scan direction *i*. This information will only be used 
+      - The axis name for scan direction *i*. This information will only be used
         for labelling.
     * - scan_dim{i}_n_points
       - int
@@ -147,23 +148,23 @@ Each dimension is described by a total of five Parameters:
     * - scan_dim{i}_offset
       - float
       - 0
-      - The coordinate offset of the movement in scan direction *i* (i.e. the 
+      - The coordinate offset of the movement in scan direction *i* (i.e. the
         counter / motor position for scan step #0)
     * - scan_dim{i}_unit
       - str
       - ""
-      - The unit of the movement / steps / offset in scan direction *i*. This 
+      - The unit of the movement / steps / offset in scan direction *i*. This
         value will only be used for labelling these numbers.
 
 .. note::
 
-    The only Parameter that must be set for each dimension is the number of 
-    points :py:data:`scan_dim{i}_n_points` to allow pydidas to organize results 
+    The only Parameter that must be set for each dimension is the number of
+    points :py:data:`scan_dim{i}_n_points` to allow pydidas to organize results
     in the correct grid.
-    
-As example, let us configure a scan with 2 dimensions. The slow motor is the 
-x-axis with 25 scan points in the range [-12.0 mm, -11.5 mm, ..., 12.0 mm] and 
-the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, ..., 
+
+As example, let us configure a scan with 2 dimensions. The slow motor is the
+x-axis with 25 scan points in the range [-12.0 mm, -11.5 mm, ..., 12.0 mm] and
+the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, ...,
 7575 nm]:
 
 .. code-block::

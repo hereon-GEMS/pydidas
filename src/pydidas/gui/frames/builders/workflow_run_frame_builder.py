@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,23 +21,29 @@ populate the WorkflowRunFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WORKFLOW_RUN_FRAME_BUILD_CONFIG"]
+
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 
 
 WORKFLOW_RUN_FRAME_BUILD_CONFIG = [
     [
         "create_param_widget",
         ("autosave_results",),
-        {"parent_widget": "run_app_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "run_app_container",
+        },
     ],
     [
         "create_param_widget",
         ("autosave_directory",),
         {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "linebreak": True,
             "visible": False,
             "parent_widget": "run_app_container",
@@ -46,13 +52,27 @@ WORKFLOW_RUN_FRAME_BUILD_CONFIG = [
     [
         "create_param_widget",
         ("autosave_format",),
-        {"visible": False, "parent_widget": "run_app_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "visible": False,
+            "parent_widget": "run_app_container",
+        },
     ],
-    ["create_line", ("line_autosave",), {"parent_widget": "run_app_container"}],
+    [
+        "create_line",
+        ("line_autosave",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "run_app_container",
+        },
+    ],
     [
         "create_param_widget",
         ("live_processing",),
-        {"parent_widget": "run_app_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "run_app_container",
+        },
     ],
     [
         "create_button",

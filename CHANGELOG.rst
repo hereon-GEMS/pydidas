@@ -29,6 +29,9 @@ Bugfixes
   extension when selecting an extension in the FileDialog dropdown.
 - Fixed an issue in the auto-generated doc for the generic params which
   had a fixed copyright date of 2025
+- Fixed an issue in the GUI where the parameters for auto-saving in the 
+  WorkflowRunFrame where to large which prevented the user from opening
+  the selection file dialog.
 
 
 

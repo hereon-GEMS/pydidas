@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The start_pydidas_gui module includes a function to run start pydidas GUI instan
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,6 @@ __all__ = ["start_pydidas_gui"]
 
 import signal
 from pathlib import Path
-from typing import Type
 
 from qtpy.QtWidgets import QApplication
 
@@ -42,39 +41,40 @@ from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
 
 def start_pydidas_gui(
-    *frames: tuple[BaseFrame],
+    *frames: type[BaseFrame],
     use_default_frames: bool = True,
     restore_state: str = "exit",
-    custom_mainwindow: Type[MainWindow] | None = None,
+    custom_mainwindow: type[MainWindow] | None = None,
     custom_splash_image: Path | None = None,
     splash_screen: PydidasSplashScreen | None = None,
     export_exit_state: bool = True,
-):
+) -> None:
     """
     Open the pydidas GUI with the given frames and run the QEventLoop.
 
     Parameters
     ----------
-    frames : tuple[BaseFrame]
+    *frames : type[BaseFrame]
         The frames to be registered in the GUI.
     use_default_frames : bool, optional
-        Flag to use all the default frames to the GUI.
+        Flag to use all the default frames to the GUI. The default is True.
     restore_state : str, optional
-        Flag to restore the state of the pydidas GUI. Flags can be either "None" to
-        start fresh, "exit" to restore the exit state or "saved" to restore the last
-        saved state.
-    custom_mainwindow : MainWindow, optional
-        Custom MainWindow class to be used. If not provided, the default MainWindow
-        class will be used.
-    custom_splash_image : Path, optional
+        Flag to restore the state of the pydidas GUI. Flags can be either
+        "None" to start fresh, "exit" to restore the exit state or "saved"
+        to restore the last saved state. The default is "exit".
+    custom_mainwindow : type[MainWindow] or None, optional
+        Custom MainWindow class to be used. If not provided, the default
+        MainWindow class will be used. The default is None.
+    custom_splash_image : Path or None, optional
         The path to a custom splash image to be used. If not provided, the
-        default splash image will be used.
-    splash_screen : PydidasSplashScreen, optional
-        An existing splash screen instance to be used. If not provided, a new
-        PydidasSplashScreen instance will be created.
+        default splash image will be used. The default is None.
+    splash_screen : PydidasSplashScreen or None, optional
+        An existing splash screen instance to be used. If not provided, a
+        new PydidasSplashScreen instance will be created. The default is
+        None.
     export_exit_state : bool, optional
-        Flag to export the state of the pydidas GUI on exit. If True, the state will
-        be exported on exit.
+        Flag to export the state of the pydidas GUI on exit. If True, the
+        state will be exported on exit. The default is True.
     """
     main_window_cls = MainWindow if custom_mainwindow is None else custom_mainwindow
     restore_state = "None" if restore_state is None else restore_state
@@ -87,6 +87,7 @@ def start_pydidas_gui(
         if splash_screen is None
         else splash_screen
     )
+    _app = None
     try:
         _splash.show_aligned_message("Starting QApplication")
         _app = _get_pydidas_qapplication()
@@ -113,23 +114,24 @@ def start_pydidas_gui(
         _ = _app.exec_()
     except Exception:
         _splash.close()
-    _app.deleteLater()
+    if _app is not None:
+        _app.deleteLater()
 
 
-def _prepare_interpreter():
+def _prepare_interpreter() -> None:
     """
     Prepare the interpreter for the pydidas GUI.
     """
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
-def _check_frames(frames: tuple[BaseFrame]):
+def _check_frames(frames: tuple[type[BaseFrame]]) -> None:
     """
     Check if the given frames are valid.
 
     Parameters
     ----------
-    frames : tuple[BaseFrame]
+    frames : tuple[type[BaseFrame]]
         The frames to be checked.
     """
     _invalid_frames = [frame for frame in frames if not issubclass(frame, BaseFrame)]

@@ -37,6 +37,7 @@ from typing import List
 
 from qtpy import QtCore
 
+from pydidas.core.pydidas_q_settings import PydidasQsettings
 from pydidas.logging_level import LOGGING_LEVEL
 from pydidas.version import VERSION
 
@@ -84,17 +85,17 @@ def get_logging_dir() -> Path:
     Path
         The path to the pydidas module.
     """
-    _docs_dir = Path(
-        QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.DocumentsLocation
-        )[0]
-    )
+    _docs_dir = Path()
+    if PydidasQsettings().value("user/custom_logging_dir", str) != None:
+        _docs_dir = Path(PydidasQsettings().value("user/custom_logging_dir", str))
+    if not _docs_dir.is_dir():
+        _docs_dir = Path(
+            QtCore.QStandardPaths.standardLocations(
+                QtCore.QStandardPaths.DocumentsLocation
+            )[0]
+        )
     if not _docs_dir.is_dir():
         _docs_dir = Path(os.path.expanduser("~"))
-    if not _docs_dir.is_dir():
-        from pydidas.core.pydidas_q_settings import PydidasQsettings
-
-        _docs_dir = Path(PydidasQsettings().value("user/custom_logging_dir", str))
     if not _docs_dir.is_dir():
         from pydidas.core.exceptions import UserConfigError
 
@@ -106,11 +107,11 @@ def get_logging_dir() -> Path:
 
     _log_path = _docs_dir / "pydidas" / VERSION
     if not _log_path.is_dir():
-        os.makedirs(_log_path)
+        _log_path.mkdir(parents=True)
     return _log_path
 
 
-def _get_todays_log_name() -> str:
+def _get_todays_log_name() -> Path:
     """
     Get the name of today's logfile.
 

@@ -51,6 +51,7 @@ from pydidas.core.utils.hdf5.hdf5_dataset_utils import (
 from pydidas.core.utils.hdf5.nxs_export import _get_nx_class_for_ndarray
 
 
+_scalar_DSETS = ["/test/scalar/data", "/entry/scalar/data"]
 _1d_DSETS = ["/test/data1d", "/test/1d/data"]
 _2d_DSETS = ["/test/path/data2d", "/test/other_2d/data"]
 _3d_DSETS = ["/3d/data/data", "/data/3d/data"]
@@ -87,6 +88,8 @@ def hdf5_test_data(temp_path):
 
     # Create main test file with link to external dataset and datasets
     with h5py.File(_fname(1), "w") as _file:
+        for dset in _scalar_DSETS:
+            _file[dset] = -1
         for dset in _1d_DSETS:
             _file[dset] = _data[0, 0, 0]
         for dset in _2d_DSETS:

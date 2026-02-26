@@ -125,31 +125,36 @@ def get_hdf5_populated_dataset_keys(
         item = h5py.File(item, "r")
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
+
+    # Update kwargs with default values if not already set:
     file_ref = kwargs.get("file_ref", None) or item.file
+    # Ensure file_ref is in kwargs for recursive calls
+    if "file_ref" not in kwargs:
+        kwargs = {**kwargs, "file_ref": file_ref}
 
     _datasets = []
-    if item.attrs.get("NX_class", "") == "NXdata" and kwargs.get(
-        "nxdata_signal_only", False
-    ):
+    nxdata_signal_only = kwargs.get("nxdata_signal_only", False)
+    if item.attrs.get("NX_class", "") == "NXdata" and nxdata_signal_only:
         _signal_key = item.attrs.get("signal", None)
         if _signal_key is not None and _signal_key in item:
             _datasets.append(f"{item.name}/{_signal_key}")
     else:
+        item_name = item.name
         for key in item:
             _item = item[key]
             # add a check to filter external datasets.
             # if file_ref == _item.file, this is a local dataset.
             if file_ref == _item.file:
-                _datasets += get_hdf5_populated_dataset_keys(item[key], **kwargs)
+                _datasets.extend(get_hdf5_populated_dataset_keys(_item, **kwargs))
             else:
                 if _dataset_selection_valid_check(_item, **kwargs):
                     # external datasets are referenced by their .name
                     # in the external datafile, not the current file.
-                    _datasets += [f"{item.name}/{key}"]
+                    _datasets.append(f"{item_name}/{key}")
                 if isinstance(_item, (h5py.File, h5py.Group)):
                     raise KeyError(
                         "Detected an external link to a h5py.Group which cannot "
-                        f"be followed: {item.name}/{key}."
+                        f"be followed: {item_name}/{key}."
                     )
     if _file_to_open:
         item.close()
@@ -200,18 +205,30 @@ def _dataset_selection_valid_check(item: Any, **kwargs: Any) -> bool:
     """
     if not isinstance(item, h5py.Dataset):
         return False
-    _name = item.name
-    _shape = item.shape
-    _max_dim = kwargs.get("max_dim", None)
-    _valid_name = _name in kwargs.get(
-        "ignore_key_exceptions", ()
-    ) or not _name.startswith(tuple(kwargs.get("ignore_keys", ())))
-    _valid_shape = (
-        kwargs.get("min_dim", 2) <= len(_shape)
-        and (_max_dim is None or len(item.shape) <= _max_dim)  # type: ignore[operator]
-    )
-    _valid_size = item.size >= kwargs.get("min_size", 0)
-    return _valid_size and _valid_name and _valid_shape
+    # Check size first (cheapest check)
+    min_size = kwargs.get("min_size", 0)
+    if item.size < min_size:
+        return False
+    # Check shape/dimensionality
+    min_dim = kwargs.get("min_dim", 2)
+    max_dim = kwargs.get("max_dim", None)
+    ndim = item.ndim
+    if ndim < min_dim or (max_dim is not None and ndim > max_dim):
+        return False
+    # Check name filtering (potentially expensive with startswith)
+    ignore_keys = kwargs.get("ignore_keys", ())
+    if ignore_keys:
+        ignore_key_exceptions = kwargs.get("ignore_key_exceptions", ())
+        item_name = item.name
+        if ignore_key_exceptions and item_name in ignore_key_exceptions:
+            return True
+        if "ignore_keys_tuple" not in kwargs:
+            # Cache tuple conversion if not already cached
+            kwargs["ignore_keys_tuple"] = tuple(ignore_keys)
+        if item_name.startswith(kwargs["ignore_keys_tuple"]):
+            return False
+
+    return True
 
 
 def get_hdf5_metadata(

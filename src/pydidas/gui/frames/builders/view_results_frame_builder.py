@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ populate the ViewResultsFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -81,8 +81,8 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
         "create_button",
         ("but_load", "Import results from directory"),
         {
-            "icon": "qt-std::SP_DialogOpenButton",
             "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "icon": "qt-std::SP_DialogOpenButton",
             "parent_widget": "import_container",
         },
     ],
@@ -91,6 +91,7 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
         ("label_select_header", "Select results to display:"),
         {
             "bold": True,
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "fontsize_offset": 1,
             "parent_widget": "config",
             "visible": False,
@@ -110,6 +111,7 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
         "create_radio_button_group",
         ("radio_arrangement", ["by scan shape", "as a timeline"]),
         {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "title": "Arrangement of results:",
             "parent_widget": "config",
             "vertical": False,
@@ -147,27 +149,44 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
         ("config_export_spacer",),
         {"parent_widget": "config"},
     ],
-    ["create_empty_widget", ("export_container",), {"parent_widget": "config"}],
+    [
+        "create_empty_widget",
+        ("export_container",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "config",
+        },
+    ],
     [
         "create_param_widget",
         ("saving_format",),
-        {"parent_widget": "export_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "export_container",
+        },
     ],
     [
         "create_param_widget",
         ("squeeze_empty_dims",),
-        {"parent_widget": "export_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "export_container",
+        },
     ],
     [
         "create_param_widget",
         ("enable_overwrite",),
-        {"parent_widget": "export_container"},
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "parent_widget": "export_container",
+        },
     ],
     [
         "create_button",
         ("but_export_current", "Export current node results"),
         {
             "enabled": False,
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "icon": "qt-std::SP_FileIcon",
             "parent_widget": "export_container",
             "toolTip": (
@@ -181,6 +200,7 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
         ("but_export_all", "Export all results"),
         {
             "enabled": False,
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "icon": "qt-std::SP_DialogSaveButton",
             "parent_widget": "export_container",
             "tooltip": "Export all results. Note that the directory must be empty.",

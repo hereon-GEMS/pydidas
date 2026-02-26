@@ -35,7 +35,7 @@ from typing import Any, Callable
 import numpy as np
 import pytest
 
-from pydidas.multiprocessing import processor_func
+from pydidas.multiprocessing.processor import processor_func
 
 
 _N_TEST = 20
@@ -109,9 +109,9 @@ def get_results(mp_config: dict[str, mp.Queue]) -> tuple[np.ndarray, np.ndarray]
 
 def test_run__plain(mp_config) -> None:
     """Test basic processor_func with identity function."""
-    put_ints_in_queue(mp_config, _N_TEST)
+    put_ints_in_queue(mp_config)
     processor_func(lambda x: x, mp_config)
-    _input, _output = get_results(mp_config, _N_TEST)
+    _input, _output = get_results(mp_config)
     assert (_input == _output).all()  # type: ignore[union-attr]
 
 
@@ -138,9 +138,9 @@ def test_run__with_stop_signal(mp_config) -> None:
 def test_run__with_args(mp_config) -> None:
     """Test processor_func with additional arguments."""
     _args = (0, 1)
-    put_ints_in_queue(mp_config, _N_TEST)
+    put_ints_in_queue(mp_config)
     processor_func(_test_func, mp_config, *_args)
-    _input, _output = get_results(mp_config, _N_TEST)
+    _input, _output = get_results(mp_config)
     _direct_out = _test_func(_input, *_args)  # type: ignore[arg-type]
     assert (_output == _direct_out).all()  # type: ignore[union-attr]
     assert mp_config["queue_output"].get(timeout=1) == [None, None]
@@ -148,7 +148,7 @@ def test_run__with_args(mp_config) -> None:
 
 def test_run__exception_in_func(mp_config) -> None:
     """Test processor_func with exception in function."""
-    put_ints_in_queue(mp_config, _N_TEST)
+    put_ints_in_queue(mp_config)
     old_stdout = sys.stdout
     sys.stdout = my_stdout = io.StringIO()
     processor_func(_test_func, mp_config)
@@ -163,14 +163,14 @@ def test_run__with_kwargs(mp_config) -> None:
     """Test processor_func with keyword arguments."""
     _args = (0, 1)
     _kwargs = dict(kw_arg=12)
-    put_ints_in_queue(mp_config, _N_TEST)
+    put_ints_in_queue(mp_config)
     processor_func(
         _test_func,
         mp_config,
         *_args,
         **_kwargs,
     )
-    _input, _output = get_results(mp_config, _N_TEST)
+    _input, _output = get_results(mp_config)
     _direct_out = _test_func(_input, *_args, **_kwargs)  # type: ignore[arg-type]
     assert (_output == _direct_out).all()  # type: ignore[union-attr]
     assert mp_config["queue_output"].get(timeout=1) == [None, None]
@@ -179,10 +179,10 @@ def test_run__with_kwargs(mp_config) -> None:
 def test_run__with_class_method(mp_config) -> None:
     """Test processor_func with class method."""
     _args = (0, 1)
-    put_ints_in_queue(mp_config, _N_TEST)
+    put_ints_in_queue(mp_config)
     app = _ClassForMethodTest()
     processor_func(app.test_func, mp_config, *_args)
-    _input, _output = get_results(mp_config, _N_TEST)
+    _input, _output = get_results(mp_config)
     _direct_out = app.test_func(_input, *_args)  # type: ignore[arg-type]
     assert (_output == _direct_out).all()  # type: ignore[union-attr]
     assert mp_config["queue_output"].get(timeout=1) == [None, None]

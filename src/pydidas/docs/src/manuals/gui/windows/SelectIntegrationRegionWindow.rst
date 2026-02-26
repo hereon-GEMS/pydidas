@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _select_integration_region_window:
@@ -17,9 +17,9 @@ image.
     :align: center
     :width: 600
 
-The left side offers controls for loading images, adjusting the integration 
-regions and starting the graphic selection. The image with the integration 
-region overlay is shown on the right. Note that if not image has been selected
+The left side offers controls for loading images, adjusting the integration
+regions and starting the graphic selection. The image with the integration
+region overlay is shown on the right. Note that if no image has been selected
 yet, an image with zero intensity in the correct detector dimensions is shown.
 
 Controls
@@ -40,7 +40,7 @@ Manual selection of integration regions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Any of the parameters for the integration range and limits can be updated in the
-Parameter edit widgets. Any changes made will be displayed in the plot for 
+Parameter edit widgets. Any changes made will be displayed in the plot for
 inspection.
 
 .. include:: ../integration_roi/select_roi.rst

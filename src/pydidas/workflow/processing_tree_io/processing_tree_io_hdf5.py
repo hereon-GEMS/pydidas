@@ -55,6 +55,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
 
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
+    default_suffix = ".nxs"
 
     @classmethod
     def export_to_file(

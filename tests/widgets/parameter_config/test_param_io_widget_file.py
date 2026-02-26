@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -93,11 +93,12 @@ def test__creation(qtbot, param, test_dir, qref):
     assert isinstance(widget, ParamIoWidgetFile)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
-    assert widget._io_dialog_config["reference"] == id(widget)
     if qref is None:
-        assert widget._io_dialog_config["qsettings_ref"] is None
+        assert widget._io_dialog_config.get("qsettings_ref") is None
+        assert widget._io_dialog_config["reference"] == id(widget)
     else:
         assert widget._io_dialog_config["qsettings_ref"] == qref
+        assert widget._io_dialog_config.get("reference") is None
 
 
 @pytest.mark.gui
@@ -167,7 +168,7 @@ def test_drag_enter_event(qtbot, test_dir, mime_method):
 
 @pytest.mark.gui
 @pytest.mark.parametrize("n_files", [0, 1, 2])
-def test_drop_event(qtbot, qapp, test_dir, n_files):
+def test_drop_event(qtbot, test_dir, n_files):
     widget = widget_from_param(qtbot, param_output_file)
     widget.set_value(test_dir / "default_file.npy")
     assert widget.spy_new_value.n == 1

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ global experimental settings like detector, geometry and energy.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -365,7 +365,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         _fname = self._io_dialog.get_saving_filename(
             caption="Export experiment context file",
             formats=DiffractionExperimentIo.get_string_of_formats(),
-            default_extension="yaml",
+            default_suffix=".yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="DefineDiffractionExpFrame__export",
         )

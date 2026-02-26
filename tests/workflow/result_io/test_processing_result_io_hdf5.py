@@ -81,7 +81,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
 
     @classmethod
     def _create_h5_test_file(cls):
-        cls._import_test_filename = os.path.join(cls._dir, "import_test.h5")
+        cls._import_test_filename = os.path.join(cls._dir, "import_test.nxs")
         cls._data = Dataset(
             np.random.random((9, 9, 27)),
             data_label=get_random_string(12),
@@ -121,9 +121,9 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         self._dataunits = {1: "a.u.", 2: "km", 3: "square inch"}
         self._plugin_names = {1: "A plugin", 2: "Plugin no 2.", 3: "Ye olde plugin"}
         self._filenames = {
-            1: "node_01_Test.h5",
-            2: "node_02_not_again.h5",
-            3: "node_03_another.h5",
+            1: "node_01_Test.nxs",
+            2: "node_02_not_again.nxs",
+            3: "node_03_another.nxs",
         }
         _node_infos = {
             _node: {
@@ -322,7 +322,7 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
                 self.assertEqual(_param.value, _scan.get_param_value(_key))
 
     def test_import_results_from_file__with_missing_data(self):
-        _new_name = os.path.join(self._dir, "import_test_with_None.h5")
+        _new_name = os.path.join(self._dir, "import_test_with_None.nxs")
         shutil.copy(self._import_test_filename, _new_name)
         with h5py.File(_new_name, "r+") as _file:
             del _file["entry/pydidas_config/scan/scan_dim0_n_points"]

@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore, QtGui
 
 from pydidas.contexts import ScanContext, ScanIo
-from pydidas.core import Parameter, UserConfigError, constants, utils
+from pydidas.core import Parameter, UserConfigError
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     FONT_METRIC_SPACER,
@@ -76,7 +76,10 @@ _DERIVED_N_FRAMES_PARAM = Parameter(
 
 class DefineScanFrame(BaseFrame):
     """
-    Frame for managing the global scan setup.
+    Frame for managing the global scan definition.
+
+    This frame allows the user to modify the singleton global ScanContext
+    which holds the scan definition for processing.
     """
 
     menu_icon = "pydidas::frame_icon_define_scan"
@@ -91,14 +94,8 @@ class DefineScanFrame(BaseFrame):
         self.add_param(_DERIVED_N_FRAMES_PARAM)
 
     def build_frame(self) -> None:
-        """
-        Populate the frame with widgets.
-        """
-        utils.apply_qt_properties(
-            self.layout(),
-            horizontalSpacing=25,
-            alignment=constants.ALIGN_TOP_LEFT,
-        )
+        """Populate the frame with widgets."""
+        self.layout().setHorizontalSpacing(25)  # type: ignore[attr-defined]
         for _name, _args, _kwargs in DEFINE_SCAN_FRAME_BUILD_CONFIG:
             getattr(self, _name)(*_args, **_kwargs)
         for _name in ["scan_base_directory", "scan_name_pattern"]:
@@ -106,9 +103,7 @@ class DefineScanFrame(BaseFrame):
         self.param_composite_widgets["derived_n_frames"].io_widget.setEnabled(False)
 
     def connect_signals(self) -> None:
-        """
-        Connect all required signals and slots.
-        """
+        """Connect all required signals and slots."""
         self._widgets["but_save"].clicked.connect(self.export_to_file)
         self._widgets["but_import_from_pydidas"].clicked.connect(
             self._import_from_pydidas_file
@@ -141,9 +136,7 @@ class DefineScanFrame(BaseFrame):
             _widget.sig_value_changed.connect(self._update_derived_n_frames)
 
     def finalize_ui(self) -> None:
-        """
-        Finalize the UI initialization.
-        """
+        """Finalize the UI initialization."""
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
@@ -151,10 +144,7 @@ class DefineScanFrame(BaseFrame):
 
     @QtCore.Slot()
     def update_dim_visibility(self) -> None:
-        """
-        Update the visibility of dimensions based on the selected number
-        of scan dimensions.
-        """
+        """Update the visibility based on the selected number of scan dimensions."""
         _prefixes = [
             "scan_dim{n}_label",
             "scan_dim{n}_n_points",
@@ -183,7 +173,7 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot()
     def _import_from_pydidas_file(self) -> None:
         """
-        Load ScanContext from a file.
+        Load a stored ScanContext from a file.
 
         This method will open a QFileDialog to select the file to be read.
         """
@@ -200,9 +190,11 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot()
     def _import_from_beamline_file_format(self) -> None:
         """
-        Load ScanContext from a file or multiple files in the beamline format.
+        Set the ScanContext from imports in beamline format.
 
         This method will open a QFileDialog to select the file to be read.
+        The scan can be defined by a single file or multiple files, depending
+        on the beamline format.
         """
         _fnames = self._io_dialog.get_existing_filenames(
             caption="Import scan context files",
@@ -246,7 +238,7 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot()
     def export_to_file(self) -> None:
         """
-        Save ScanContext to a file.
+        Save the ScanContext to a file.
 
         This method will open a QFileDialog to select a filename where
         the scan context information will be written.
@@ -254,7 +246,7 @@ class DefineScanFrame(BaseFrame):
         _fname = self._io_dialog.get_saving_filename(
             caption="Export scan context file",
             formats=ScanIo.get_string_of_formats(),
-            default_extension="yaml",
+            default_suffix=".yaml",
             qsettings_ref="DefineScanFrame__export",
         )
         if _fname is not None:
@@ -262,9 +254,7 @@ class DefineScanFrame(BaseFrame):
 
     @QtCore.Slot()
     def reset_entries(self) -> None:
-        """
-        Reset all ScanSetting entries to their default values.
-        """
+        """Reset all Scan parameter entries to their default values."""
         SCAN.restore_all_defaults(True)
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)

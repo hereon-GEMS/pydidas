@@ -44,7 +44,7 @@ from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import PydidasQsettings, UserConfigError, get_generic_parameter, utils
 from pydidas.core.utils import get_random_string
-from pydidas.multiprocessing import app_processor_func
+from pydidas.multiprocessing.app_processor import app_processor_func
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
@@ -517,7 +517,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         for _key, _data in TREE.get_current_results().items():
             self.assertTrue(np.allclose(_data, app._shared_arrays[_key][0]))
 
-    def test_must_send_signal_and_wait_for_respose(self):
+    def test_must_send_signal_and_wait_for_response(self):
         app = self.get_exec_workflow_app()
         _sig = app.must_send_signal_and_wait_for_response()
         self.assertEqual(_sig, "::shapes_not_set::")
@@ -584,7 +584,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         _index = main_app.multiprocessing_func(0)
         main_app.multiprocessing_store_results(0, _index)
         _node_id = 1
-        _fname = self._path.joinpath("test", f"node_{_node_id:02d}.h5")
+        _fname = self._path.joinpath("test", f"node_{_node_id:02d}.nxs")
         self.assertTrue(main_app._config["export_files_prepared"])
         with h5py.File(_fname, "r") as _f:
             _data = _f["entry/data/data"][SCAN.get_indices_from_ordinal(0)]
@@ -731,9 +731,4 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print(
-        "\n\nWarning: Calling test_execute_workflow_app.py as main is very slow. "
-        "Please consider calling it with unittest discover option instead: \n"
-        "python -m unittest discover .\\tests\\apps\\test_execute_workflow_app.py\n\n"
-    )
     unittest.main()

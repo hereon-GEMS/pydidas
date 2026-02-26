@@ -67,7 +67,7 @@ _DEFAULT_GROUPS = [
 
 def _get_pydidas_context_config_entries(
     scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
-) -> list:  # noqa: PYI041
+) -> list[list[str | dict]]:
     """
     Get the context configuration from the pydidas Context singletons.
 
@@ -82,7 +82,7 @@ def _get_pydidas_context_config_entries(
 
     Returns
     -------
-    list
+    list[list[str, dict]]
         The writable entries for the contexts.
     """
     _dsets = []
@@ -150,7 +150,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
-    default_extension = "h5"
+    default_suffix = ".nxs"
     _filenames = []
     _save_dir = None
     _metadata_written = False
@@ -181,8 +181,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 The scan context. If None, the generic context will be
                 used. Only specify this if you explicitly require a
                 different context. The default is None.
-            diffraction_exp_context : DiffractionExperiment or None,
-            optional
+            diffraction_exp_context : DiffractionExperiment or None, optional
                 The diffraction experiment context. If None, the generic
                 context will be used. Only specify this if you explicitly
                 require a different context. The default is None.
@@ -241,7 +240,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ) -> list:  # noqa: PYI041
+    ) -> list[list[str | dict]]:
         """
         Get the datasets to be written to the hdf5 file.
 
@@ -258,7 +257,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Returns
         -------
-        list
+        list[list[str, dict]]
             The list with the dataset information to be written.
         """
 
@@ -295,8 +294,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 {"NX_class": "NX_INT", "units": ""},
             ],
         ]
-        _context_entries = _get_pydidas_context_config_entries(scan, exp, workflow)  # type: ignore[operator]
-        _dsets = _dsets + _context_entries
+        _dsets = _dsets + _get_pydidas_context_config_entries(scan, exp, workflow)  # type: ignore[operator]
         return _dsets
 
     @classmethod
@@ -379,7 +377,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         scan : Scan
-            The scan context to be used for updating metadata.
+            The scan context to be used for metadata information.
 
         Returns
         -------
@@ -424,7 +422,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        metadata : dict
+        metadata : dict[int, Dataset or dict]
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         squeeze : bool, optional

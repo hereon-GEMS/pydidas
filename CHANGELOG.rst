@@ -43,6 +43,8 @@ Bugfixes
 - Fixed an issue in the GUI where the parameters for auto-saving in the 
   WorkflowRunFrame where to large which prevented the user from opening
   the selection file dialog.
+- Fixed an issue in the ParamIoWidgetCombobox which was slow in updating
+  long lists of choices
 
 
 v26.01.27

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,11 @@ class is used for all Parameters with predefined choices.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
-
 
 from collections.abc import Sequence
 from typing import Any
@@ -65,12 +64,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         """
         PydidasComboBox.__init__(self, **kwargs)
         BaseParamIoWidgetMixIn.__init__(self, param)
-        self.__items = []
-        for choice in param.choices:
-            _display_txt = convert_special_chars_to_unicode(str(choice))
-            self.__items.append(_display_txt)
-            self.addItem(_display_txt)
-        self.update_widget_value(param.value)
+        self.update_choices(param.choices, selection=param.value, emit_signal=False)
         self.currentIndexChanged.connect(self.emit_signal)
 
     @property
@@ -157,12 +151,10 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             The default is True.
         """
         self._old_value = self.current_text
+        self.__items = [convert_special_chars_to_unicode(str(_s)) for _s in new_choices]
         with QtCore.QSignalBlocker(self):
             self.clear()
-            for choice in new_choices:
-                _itemstr = convert_special_chars_to_unicode(str(choice))
-                self.addItem(_itemstr)
-            self.__items = [self.itemText(i) for i in range(self.count())]
+            self.addItems(self.__items)
             if selection is not None and selection in new_choices:
                 self.update_widget_value(selection)
             else:

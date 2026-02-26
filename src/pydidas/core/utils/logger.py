@@ -86,7 +86,7 @@ def get_logging_dir() -> Path:
         The path to the pydidas module.
     """
     _docs_dir = Path()
-    if PydidasQsettings().value("user/custom_logging_dir", str) != None:
+    if PydidasQsettings().value("user/custom_logging_dir", str) is not None:
         _docs_dir = Path(PydidasQsettings().value("user/custom_logging_dir", str))
     if not _docs_dir.is_dir():
         _docs_dir = Path(

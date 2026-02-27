@@ -202,8 +202,9 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             "Restore defaults confirmation",
             "Do you want to restore all plugin parameters to their default values?",
         ).exec_()
-        self.plugin.restore_all_defaults(confirm=_reply)
-        self.update_edits()
+        if _reply:
+            self.plugin.restore_all_defaults(confirm=True)
+            self.update_edits()
 
     def update_edits(self):
         """

@@ -56,7 +56,7 @@ _1d_DSETS = ["/test/data1d", "/test/1d/data"]
 _2d_DSETS = ["/test/path/data2d", "/test/other_2d/data"]
 _3d_DSETS = ["/3d/data/data", "/data/3d/data"]
 _4d_DSETS = ["/test/path/4ddata", "/entry/path/to_4d/data", "/test/ext_data/data"]
-_NXS_DSETS = ["/test/path/nxsdata", "/entry/nxs_data"]
+_NXS_DSETS = {"/test/path/nxsdata": 2, "/nx_entry/data": 3, "/entry/nxs_data_4d": 4}
 # _ALL_DSETS does not include the 1d datasets as the default dim filter is 2
 _ALL_DSETS = set(_2d_DSETS + _3d_DSETS + _4d_DSETS)
 _DSETS_OF_MIN_DIM = {
@@ -88,35 +88,34 @@ def hdf5_test_data(temp_path):
 
     # Create main test file with link to external dataset and datasets
     with h5py.File(_fname(1), "w") as _file:
-        for dset in _scalar_DSETS:
-            _file[dset] = -1
-        for dset in _1d_DSETS:
-            _file[dset] = _data[0, 0, 0]
-        for dset in _2d_DSETS:
-            _file[dset] = _data[0, 0]
-        for dset in _3d_DSETS:
-            _file[dset] = _data[0]
-        for dset in _4d_DSETS:
-            if dset == "/test/ext_data/data":
+        for _dset in _scalar_DSETS:
+            _file[_dset] = -1
+        for _dset in _1d_DSETS:
+            _file[_dset] = _data[0, 0, 0]
+        for _dset in _2d_DSETS:
+            _file[_dset] = _data[0, 0]
+        for _dset in _3d_DSETS:
+            _file[_dset] = _data[0]
+        for _dset in _4d_DSETS:
+            if _dset == "/test/ext_data/data":
                 continue
-            _file[dset] = _data
+            _file[_dset] = _data
         _file["test/ext_data/data"] = h5py.ExternalLink(
             _fname("data"), "/ext/path/data"
         )
     with h5py.File(_fname("nxs"), "w") as _file:
-        for dset in _NXS_DSETS:
-            _parent, _name = os.path.split(dset)
-            if _parent not in _file:
-                _file.create_group(_parent)
-                _file[_parent].attrs["NX_class"] = "NXdata"
-                _file[_parent].attrs["signal"] = _name
-                _file[_parent].attrs["axes"] = ["ax0", "ax1", "ax2", "ax3"]
-                for _i in range(4):
-                    _file[_parent].attrs[f"ax{_i}_indices"] = _i
-                    _file[_parent].create_dataset(
-                        f"ax{_i}", data=np.arange(_data.shape[_i])
-                    )
-            _file[dset] = _data
+        for _dset, _ndim in _NXS_DSETS.items():
+            _parent, _name = os.path.split(_dset)
+            _file.create_group(_parent)
+            _file[_parent].attrs["NX_class"] = "NXdata"
+            _file[_parent].attrs["signal"] = _name
+            _file[_parent].attrs["axes"] = ["ax0", "ax1", "ax2", "ax3"]
+            for _i in range(4):
+                _file[_parent].attrs[f"ax{_i}_indices"] = _i
+                _file[_parent].create_dataset(f"ax{_i}", data=np.ones(_data.shape[_i]))
+            print(f"Creating dataset {_dset} with ndim {_ndim}")
+            print(_data[(slice(0, 1),) * (4 - _ndim)].squeeze().shape)
+            _file[_dset] = _data[(slice(0, 1),) * (4 - _ndim)].squeeze()
 
     yield {
         "fname": _fname(1),
@@ -124,6 +123,54 @@ def hdf5_test_data(temp_path):
         "ref": _ref,
         "data": _data,
     }
+
+
+@pytest.fixture(scope="module")
+def hdf5_external_test_data(hdf5_test_data, temp_path):
+    """Extend the test data with additional datasets for testing."""
+    # Get the main filename
+    _fname = temp_path / "hdf5_utils" / "large_file_test.h5"
+    _ext_fname = _fname.parent / "test_external_data.h5"
+    _all_dsets = []
+
+    # Create external data file with 5 datasets
+    with h5py.File(_ext_fname, "w") as _ext_file:
+        _group = _ext_file.create_group("ext_test")
+        _group.create_dataset("ext_data_1d", data=np.random.random(10))
+        _group.create_dataset("ext_data_2d", data=np.random.random((8, 8)))
+        _group.create_dataset("ext_data_3d", data=np.random.random((5, 5, 5)))
+        _group.create_dataset("ext_data_scalar", data=42.0)
+        _group.create_dataset("ext_data_large", data=np.random.random((15, 15)))
+        _group2 = _ext_file.create_group("ext/nested/group")
+        _group2.create_dataset("nested_data", data=np.random.random((3, 3)))
+        _group2.create_dataset("nested_data_2", data=np.random.random((4, 4)))
+
+    with h5py.File(_fname, "w") as _file:
+        for _i in range(2):
+            for _j in range(2):
+                _group_name = f"/root/stem_{_i}/branch_{_j}"
+                _group = _file.create_group(_group_name)
+                for _k in range(2):
+                    _group.create_dataset(f"data_{_k}", data=np.ones((3, 2, 4)))
+                    _all_dsets.append(f"{_group_name}/data_{_k}")
+
+        # Add external links to the nested structure
+        ext_links_group = _file.create_group("/external_links")
+        ext_links_group["group"] = h5py.ExternalLink(
+            _ext_fname.name, "/ext/nested/group"
+        )
+        _all_dsets.append("/external_links/group/nested_data")
+        _all_dsets.append("/external_links/group/nested_data_2")
+        for _key in ["1d", "2d", "3d", "scalar", "large"]:
+            ext_links_group[f"link_to_{_key}"] = h5py.ExternalLink(
+                _ext_fname.name, f"/ext_test/ext_data_{_key}"
+            )
+            _all_dsets.append(f"/external_links/link_to_{_key}")
+    # Add external file path to test data
+    hdf5_test_data["ext_ref_fname"] = _ext_fname
+    hdf5_test_data["ext_fname"] = _fname
+    hdf5_test_data["ext_all_dsets"] = set(_all_dsets)
+    yield hdf5_test_data
 
 
 @pytest.fixture
@@ -213,6 +260,13 @@ def test_hdf5_dataset_filter_check__ignore_keys(hdf5_test_data):
         )
 
 
+def test_get_hdf5_populated_dataset__w_external_link(hdf5_external_test_data):
+    _res = get_hdf5_populated_dataset_keys(
+        hdf5_external_test_data["ext_fname"], min_dim=0
+    )
+    assert set(_res) == hdf5_external_test_data["ext_all_dsets"]
+
+
 def test_get_hdf5_populated_dataset__unknown_extension(hdf5_test_data):
     with pytest.raises(FileReadError):
         get_hdf5_populated_dataset_keys(str(hdf5_test_data["fname"]) + ".other")
@@ -254,19 +308,22 @@ def test_get_hdf5_populated_dataset_keys__test_sizes(hdf5_test_data, min_size):
     assert set(_res) == _reference
 
 
-@pytest.mark.parametrize("nxsignal_only", [False])
-def test_get_hdf5_populated_dataset_keys__nxsignal_only(hdf5_test_data, nxsignal_only):
+@pytest.mark.parametrize("nxsignal_only", [True, False])
+@pytest.mark.parametrize("min_dim", [3])
+def test_get_hdf5_populated_dataset_keys__nxsignal_only(
+    hdf5_test_data, nxsignal_only, min_dim
+):
     _res = get_hdf5_populated_dataset_keys(
-        hdf5_test_data["nxs_fname"], nxdata_signal_only=nxsignal_only, min_dim=1
+        hdf5_test_data["nxs_fname"], nxdata_signal_only=nxsignal_only, min_dim=min_dim
     )
+    _expected = set(k for k, v in _NXS_DSETS.items() if v >= min_dim)
     if nxsignal_only:
-        assert set(_res) == set(_NXS_DSETS)
+        assert set(_res) == _expected
     else:
-        _expected = []
-        for _dset in _NXS_DSETS:
-            _expected.append(_dset)
-            for _i in range(4):
-                _expected.append(os.path.split(_dset)[0] + f"/ax{_i}")
+        if min_dim <= 1:
+            for _dset in _NXS_DSETS:
+                _parent = os.path.split(_dset)[0]
+                _expected.update([f"{_parent}/ax{_i}" for _i in range(4)])
         assert set(_res) == set(_expected)
 
 

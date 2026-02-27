@@ -23,6 +23,8 @@ Programmatic changes
 - Updated the code of the FileDialog
 - Changed the default saving extension for processing results to .nxs
   (was .h5)
+- Added support for following groups in external files in the 
+  hdf5_dataset_utils
 
 Bugfixes
 --------

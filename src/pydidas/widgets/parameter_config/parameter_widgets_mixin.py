@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ParameterWidgetsMixIn class used to edit plugin
-Parameters.
+Module with the ParameterWidgetsMixIn class used to edit Parameters through widgets.
 """
 
 __author__ = "Malte Storm"
@@ -170,8 +169,8 @@ class ParameterWidgetsMixIn:
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(
-                f'No parameter with the key `{key}` and associated widget is "'
-                f'"registered in this class.'
+                f"No parameter with the key `{key}` and associated widget "
+                f"is registered in this class."
             )
         _old_val = self.params[key].value
         with QtCore.QSignalBlocker(self.param_widgets[key]):
@@ -205,7 +204,7 @@ class ParameterWidgetsMixIn:
             and choices (if the value has changed). The default is True.
         """
         # not using ParameterCollectionMixIn.set_param_value_and_choices method
-        # to have allow using this mixin independently
+        # to allow using this mixin independently
         _old_val = self.params[key].value
         self.params[key].set_value_and_choices(value, choices)
         self.param_composite_widgets[key].update_choices_from_param()

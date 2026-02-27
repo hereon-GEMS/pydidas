@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import os
 from pathlib import Path
 from typing import Any
@@ -36,9 +37,7 @@ from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5 import (
     convert_data_for_writing_to_hdf5_dataset,
     create_hdf5_dataset,
-    create_nx_dataset,
-    create_nx_entry_groups,
-    create_nxdata_entry,
+    get_generic_dataset,
     get_hdf5_metadata,
     get_hdf5_populated_dataset_keys,
     read_and_decode_hdf5_dataset,
@@ -48,7 +47,6 @@ from pydidas.core.utils.hdf5.hdf5_dataset_utils import (
     _dataset_selection_valid_check,
     _split_hdf5_file_and_dataset_names,
 )
-from pydidas.core.utils.hdf5.nxs_export import _get_nx_class_for_ndarray
 
 
 _scalar_DSETS = ["/test/scalar/data", "/entry/scalar/data"]
@@ -110,12 +108,18 @@ def hdf5_test_data(temp_path):
             _file[_parent].attrs["NX_class"] = "NXdata"
             _file[_parent].attrs["signal"] = _name
             _file[_parent].attrs["axes"] = ["ax0", "ax1", "ax2", "ax3"]
-            for _i in range(4):
+            for _i in range(_ndim):
                 _file[_parent].attrs[f"ax{_i}_indices"] = _i
                 _file[_parent].create_dataset(f"ax{_i}", data=np.ones(_data.shape[_i]))
-            print(f"Creating dataset {_dset} with ndim {_ndim}")
-            print(_data[(slice(0, 1),) * (4 - _ndim)].squeeze().shape)
             _file[_dset] = _data[(slice(0, 1),) * (4 - _ndim)].squeeze()
+        _parent = _file.create_group("invalid/nxdata/signal")
+        _parent.attrs["NX_class"] = "NXdata"
+        _parent.attrs["signal"] = "random"
+        _parent.attrs["axes"] = ["ax0", "ax1", "ax2", "ax3"]
+        for _i in range(_ndim):
+            _parent.attrs[f"ax{_i}_indices"] = _i
+            _parent.create_dataset(f"ax{_i}", data=np.ones(_data.shape[_i]))
+        _parent.create_dataset("other_signal", data=np.ones(_data.shape))
 
     yield {
         "fname": _fname(1),
@@ -247,16 +251,16 @@ def test_hdf5_dataset_filter_check__no_dset():
 @pytest.mark.parametrize("min_dim", [1, 2, 3, 4, 5])
 def test_hdf5_dataset_filter_check__dim(hdf5_test_data, min_dim):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
-        assert _dataset_selection_valid_check(_file[_4d_DSETS[0]], min_dim=min_dim) == (
-            min_dim <= 4
-        )
+        assert _dataset_selection_valid_check(
+            _file[_4d_DSETS[0]], dict(min_dim=min_dim)
+        ) == (min_dim <= 4)
 
 
 def test_hdf5_dataset_filter_check__ignore_keys(hdf5_test_data):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
         assert "4ddata" in _file["/test/path/"].keys()
         assert not _dataset_selection_valid_check(
-            _file["/test/path/4ddata"], ignore_keys=("test/path")
+            _file["/test/path/4ddata"], dict(ignore_keys="/test/path")
         )
 
 
@@ -309,7 +313,7 @@ def test_get_hdf5_populated_dataset_keys__test_sizes(hdf5_test_data, min_size):
 
 
 @pytest.mark.parametrize("nxsignal_only", [True, False])
-@pytest.mark.parametrize("min_dim", [3])
+@pytest.mark.parametrize("min_dim", [1, 3])
 def test_get_hdf5_populated_dataset_keys__nxsignal_only(
     hdf5_test_data, nxsignal_only, min_dim
 ):
@@ -321,9 +325,11 @@ def test_get_hdf5_populated_dataset_keys__nxsignal_only(
         assert set(_res) == _expected
     else:
         if min_dim <= 1:
-            for _dset in _NXS_DSETS:
+            for _dset, _ndim in _NXS_DSETS.items():
                 _parent = os.path.split(_dset)[0]
-                _expected.update([f"{_parent}/ax{_i}" for _i in range(4)])
+                _expected.update([f"{_parent}/ax{_i}" for _i in range(_ndim)])
+            _expected.update([f"/invalid/nxdata/signal/ax{_i}" for _i in range(4)])
+        _expected.add("/invalid/nxdata/signal/other_signal")
         assert set(_res) == set(_expected)
 
 
@@ -438,160 +444,6 @@ def test_create_hdf5_dataset__no_group(hdf5_file):
     assert np.allclose(_out, _input)
 
 
-def test_create_nx_entry_groups__basic(hdf5_file):
-    group_name = "entry/test"
-    group_type = "NXdata"
-    attributes = {"attr1": "value1", "attr2": "value2"}
-    group = create_nx_entry_groups(hdf5_file, group_name, group_type, **attributes)
-    assert group_name in hdf5_file
-    assert group.attrs["NX_class"] == group_type
-    for key, value in attributes.items():
-        assert group.attrs[key] == value
-
-
-def test_create_nx_entry_groups__nested(hdf5_file):
-    group_name = "entry/test/nested"
-    group_type = "NXentry"
-    attributes = {"attr1": "value1"}
-    group = create_nx_entry_groups(hdf5_file, group_name, group_type, **attributes)
-    assert group_name in hdf5_file
-    assert group.attrs["NX_class"] == group_type
-    for key, value in attributes.items():
-        assert group.attrs[key] == value
-
-
-def test_create_nx_entry_groups__no_attributes(hdf5_file):
-    group_name = "entry/test"
-    group_type = "NXdata"
-    group = create_nx_entry_groups(hdf5_file, group_name, group_type)
-    assert group_name in hdf5_file
-    assert group.attrs["NX_class"] == group_type
-
-
-def test_create_nx_entry_groups__w_existing_group(hdf5_file):
-    group_name = "entry/test/group/name"
-    group_type = "NXentry"
-    group = create_nx_entry_groups(hdf5_file, group_name, group_type)
-    group2 = create_nx_entry_groups(hdf5_file, group_name, group_type)
-    assert group == group2
-
-
-def test_create_nx_entry_groups__w_nxclass(hdf5_file):
-    _cases = [
-        ["entry", "NXtest"],
-        ["entry/data", "NXdata"],
-        ["entry/instrument", "NXinstrument"],
-    ]
-
-    for _key, _group in _cases:
-        _ = create_nx_entry_groups(hdf5_file, _key, group_type=_group)
-    for _key, _group in _cases:
-        assert hdf5_file[_key].attrs["NX_class"] == _group
-
-
-def test_create_nx_entry_groups__w_existing_group_different_type(hdf5_file):
-    group_name = "entry/test/group/name"
-    group_type = "NXentry"
-    _ = create_nx_entry_groups(hdf5_file, group_name, group_type)
-    with pytest.raises(ValueError):
-        create_nx_entry_groups(hdf5_file, group_name, "AnotherEntry")
-
-
-def test_create_nxdata_entry__basic(hdf5_file):
-    name = "entry/test"
-    data = np.random.random((10, 10))
-    attributes = {"attr1": "value1", "attr2": "value2"}
-    group = create_nxdata_entry(hdf5_file, name, data, **attributes)
-    assert name in hdf5_file
-    assert group.attrs["NX_class"] == "NXdata"
-    for key, value in attributes.items():
-        assert group.attrs[key] == value
-
-
-def test_create_nxdata_entry__w_axes(hdf5_file):
-    name = "entry/test"
-    data = Dataset(
-        np.random.random((10, 10)),
-        axis_labels=["x", "y"],
-        axis_units=["m", "s"],
-        axis_ranges=[np.arange(10), np.arange(10)],
-    )
-    attributes = {"attr1": "value1"}
-    group = create_nxdata_entry(hdf5_file, name, data, **attributes)
-    assert name in hdf5_file
-    assert group.attrs["NX_class"] == "NXdata"
-    for key, value in attributes.items():
-        assert group.attrs[key] == value
-    for dim in range(data.ndim):
-        assert f"axis_{dim}" in group
-        assert np.allclose(group[f"axis_{dim}"][()], data.axis_ranges[dim])
-        _ax = group[f"axis_{dim}"]
-        assert _ax.attrs["long_name"] == data.axis_labels[dim]
-        assert _ax.attrs["units"] == data.axis_units[dim]
-        assert np.allclose(_ax[()], data.axis_ranges[dim])
-
-
-def test_create_nx_dataset__basic(hdf5_file):
-    group = hdf5_file.create_group("entry")
-    name = "test_dataset"
-    test_data = [np.random.random((10, 10)), "a test string", 1, 12.2]
-    for data in test_data:
-        if name in group:
-            del group[name]
-        dataset = create_nx_dataset(group, name, data)
-        assert name in group
-        if isinstance(data, str):
-            assert dataset[()].decode() == data
-        else:
-            assert np.array_equal(dataset[()], data)
-
-
-def test_create_nx_dataset__w_dict(hdf5_file):
-    group = hdf5_file.create_group("entry")
-    name = "test_dataset"
-    attrs = {"attr1": "value1", "attr2": "value2"}
-    test_data = [
-        {"data": np.random.random((10, 10))},
-        {"shape": (10, 10)},
-    ]
-    for data in test_data:
-        if name in group:
-            del group[name]
-        dataset = create_nx_dataset(group, name, data, **attrs)
-        assert name in group
-        assert np.array_equal(dataset[()].shape, (10, 10))
-        for key, value in attrs.items():
-            assert dataset.attrs[key] == value
-
-
-def test_create_nx_dataset__w_attributes(hdf5_file):
-    group = hdf5_file.create_group("entry")
-    name = "test_dataset"
-    data = np.random.random((10, 10))
-    attributes = {"units": "meters", "long_name": "Test Dataset"}
-    dataset = create_nx_dataset(group, name, data, **attributes)
-    assert name in group
-    assert np.array_equal(dataset[()], data)
-    for key, value in attributes.items():
-        assert dataset.attrs[key] == value
-
-
-@pytest.mark.parametrize(
-    "arr, expected_val",
-    [
-        (np.array([1, 2, 3]), "NX_INT"),
-        (Dataset([1, 2, 3]), "NX_INT"),
-        (np.ones(10, dtype=np.uint8), "NX_INT"),
-        (np.array([1.0, 2.0, 3.0]), "NX_FLOAT"),
-        (Dataset([1.0, 2.0, 3.0]), "NX_FLOAT"),
-        (np.ones(10, dtype=np.float32), "NX_FLOAT"),
-        (np.asarray([[0], [1]], dtype=object), "NX_CHAR"),
-    ],
-)
-def test_get_nx_class_for_ndarray(arr, expected_val):
-    assert _get_nx_class_for_ndarray(arr) == expected_val
-
-
 def test_verify_hdf5_dset_exists_in_file(hdf5_test_data):
     verify_hdf5_dset_exists_in_file(hdf5_test_data["fname"], _3d_DSETS[0])
 
@@ -605,6 +457,111 @@ def test_verify_hdf5_dset_exists_in_file__group_not_dset(hdf5_test_data):
 def test_verify_hdf5_dset_exists_in_file__wrong_key(hdf5_test_data):
     with pytest.raises(UserConfigError):
         verify_hdf5_dset_exists_in_file(hdf5_test_data["fname"], "no/dataset")
+
+
+@pytest.mark.parametrize(
+    "datasets, expected",
+    [
+        (  # NeXus standard path is returned:
+            ["/entry/other/data", "/entry/data/data", "/something/else"],
+            "/entry/data/data",
+        ),
+        (  # Eiger standard path is returned:
+            ["/entry/other/data", "/entry/data/data_000001", "/something"],
+            "/entry/data/data_000001",
+        ),
+        (  # LAMBDA detector standard path is returned:
+            ["/entry/other/data", "/entry/instrument/detector/data"],
+            "/entry/instrument/detector/data",
+        ),
+        # Priority order tests
+        (  # NeXus path prioritized over Eiger path
+            ["/entry/data/data", "/entry/data/data_000001"],
+            "/entry/data/data",
+        ),
+        (  # Eiger path prioritized over LAMBDA path
+            ["/entry/data/data_000001", "/entry/instrument/detector/data"],
+            "/entry/data/data_000001",
+        ),
+        (  # LAMBDA path prioritized over arbitrary first item
+            ["/some/random/data", "/entry/instrument/detector/data"],
+            "/entry/instrument/detector/data",
+        ),
+        (  # NeXus prioritized with all standard paths present
+            [
+                "/entry/instrument/detector/data",
+                "/entry/data/data_000001",
+                "/entry/data/data",
+                "/other/data",
+            ],
+            "/entry/data/data",
+        ),
+        # Fallback behavior
+        (  # First item returned if no standard paths match
+            ["/custom/data", "/other/path", "/third/item"],
+            "/custom/data",
+        ),
+        (  # Single standard dataset
+            ["/entry/data/data"],
+            "/entry/data/data",
+        ),
+        (  # Single non-standard dataset
+            ["/my/custom/dataset"],
+            "/my/custom/dataset",
+        ),
+        # Case sensitivity
+        (  # Path matching is case-sensitive (finds correct case)
+            ["/Entry/Data/Data", "/entry/data/data"],
+            "/entry/data/data",
+        ),
+        (  # Case mismatch doesn't match standard paths
+            ["/Entry/Data/Data", "/other/path"],
+            "/Entry/Data/Data",
+        ),
+        # Path matching precision
+        (  # Trailing slashes don't match standards
+            ["/entry/data/data/", "/other/data"],
+            "/entry/data/data/",
+        ),
+        (  # Substrings of standard paths don't match
+            ["/entry/data", "/other/data"],
+            "/entry/data",
+        ),
+        (  # NeXus-like path with different entry name doesn't match
+            ["/my_entry/data/data", "/other/path"],
+            "/my_entry/data/data",
+        ),
+        # Special characters
+        (  # Path separators must be exact (forward slashes)
+            ["/entry\\data\\data", "/entry/data/data"],
+            "/entry/data/data",
+        ),
+    ],
+)
+def test_get_generic_dataset(datasets, expected) -> None:
+    """Test get_generic_dataset with various inputs and expected outputs."""
+    result = get_generic_dataset(datasets)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "datasets, expected",
+    [
+        (["/entry/data/data", "/other/path"], "/entry/data/data"),
+        (("/entry/data/data", "/other/path"), "/entry/data/data"),
+        ({"/entry/data/data", "/other/path"}, "/entry/data/data"),
+    ],
+)
+def test_get_generic_dataset__input_types(datasets, expected) -> None:
+    """Test get_generic_dataset with different input sequence types."""
+    result = get_generic_dataset(datasets)
+    assert result == expected
+
+
+def test_get_generic_dataset__empty_list_raises_error() -> None:
+    """Test that empty list raises ValueError."""
+    with pytest.raises(ValueError):
+        get_generic_dataset([])
 
 
 if __name__ == "__main__":

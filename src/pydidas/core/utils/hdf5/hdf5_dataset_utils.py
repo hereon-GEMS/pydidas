@@ -109,7 +109,7 @@ def get_hdf5_populated_dataset_keys(
         criteria.
     """
     if isinstance(item, h5py.Dataset):
-        return [item.name] if _dataset_selection_valid_check(item, **kwargs) else []
+        return [item.name] if _dataset_selection_valid_check(item, kwargs) else []
 
     _file_to_open = isinstance(item, (str, Path))
     if _file_to_open:
@@ -131,10 +131,9 @@ def get_hdf5_populated_dataset_keys(
     _nxdata_signal_only = kwargs.get("nxdata_signal_only", False)
     if _nxdata_signal_only and item.attrs.get("NX_class", "") == "NXdata":
         _signal_key = item.attrs.get("signal", "")
-        if _signal_key not in item:
-            pass
-        if _dataset_selection_valid_check(item[_signal_key], **kwargs):
-            _datasets.append(f"{_item_name}/{_signal_key}")
+        if _signal_key in item:
+            if _dataset_selection_valid_check(item[_signal_key], kwargs):
+                _datasets.append(f"{_item_name}/{_signal_key}")
     else:
         for _key in item:
             _item = item[_key]
@@ -161,7 +160,9 @@ def get_hdf5_populated_dataset_keys(
     return _datasets
 
 
-def _dataset_selection_valid_check(item: Any, **kwargs: Any) -> bool:
+def _dataset_selection_valid_check(
+    item: Any, options: dict[str, Any] | None = None
+) -> bool:
     """
     Check if a h5py item is a valid selection based on kwargs settings.
 
@@ -174,8 +175,10 @@ def _dataset_selection_valid_check(item: Any, **kwargs: Any) -> bool:
     item : Any
         This is the object to be checked for being an instance of
         h5py.Dataset.
-    **kwargs : Any
-        Any optional keyword arguments. Supported keywords are:
+    options : dict[str, Any] or None, optional
+        Dictionary with options for the check. If no options are given,
+        the default values for the check are used. Supported keywords in the
+        dictionary are:
 
         min_size : int, optional
             The minimum data size of the item. This is the total size of
@@ -205,27 +208,30 @@ def _dataset_selection_valid_check(item: Any, **kwargs: Any) -> bool:
     """
     if not isinstance(item, h5py.Dataset):
         return False
+    if options is None:
+        options = {}
     # Check size first (cheapest check)
-    min_size = kwargs.get("min_size", 0)
+    min_size = options.get("min_size", 0)
     if item.size < min_size:
         return False
     # Check shape/dimensionality
-    min_dim = kwargs.get("min_dim", 2)
-    max_dim = kwargs.get("max_dim", None)
+    min_dim = options.get("min_dim", 2)
+    max_dim = options.get("max_dim", None)
     ndim = item.ndim
     if ndim < min_dim or (max_dim is not None and ndim > max_dim):
         return False
     # Check name filtering (potentially expensive with startswith)
-    ignore_keys = kwargs.get("ignore_keys", ())
+    ignore_keys = options.get("ignore_keys", ())
     if ignore_keys:
-        ignore_key_exceptions = kwargs.get("ignore_key_exceptions", ())
+        if not isinstance(ignore_keys, tuple):
+            if isinstance(ignore_keys, str):
+                ignore_keys = (ignore_keys,)
+            options["ignore_keys"] = ignore_keys = tuple(ignore_keys)
+        ignore_key_exceptions = options.get("ignore_key_exceptions", ())
         item_name = item.name
         if ignore_key_exceptions and item_name in ignore_key_exceptions:
             return True
-        if "ignore_keys_tuple" not in kwargs:
-            # Cache tuple conversion if not already cached
-            kwargs["ignore_keys_tuple"] = tuple(ignore_keys)
-        if item_name.startswith(kwargs["ignore_keys_tuple"]):
+        if item_name.startswith(ignore_keys):
             return False
 
     return True
@@ -475,7 +481,7 @@ def get_generic_dataset(datasets: Sequence[str]) -> str:
     """
     if len(datasets) == 0:
         raise ValueError(
-            "The datasets list is empty. Cannot determine generic dataset."
+            "The datasets sequence is empty. Cannot determine generic dataset."
         )
     if "/entry/data/data" in datasets:
         # this is the standard NeXus path for generic data

@@ -27,38 +27,37 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Hdf5DatasetSelector"]
 
-
+import html
 from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore
 
 from pydidas.core import Parameter
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
+from pydidas.core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
+    HDF5_EXTENSIONS,
+)
 from pydidas.core.utils import (
     ShowBusyMouse,
-    get_extension,
     update_child_qobject,
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
+from pydidas.core.utils.hdf5.hdf5_filter_keys import (
+    FILTER_EXCEPTIONS,
+    FILTER_KEY_DEFAULT_ACTIVE,
+    FILTER_KEY_TITLE,
+    FILTER_KEY_TOOLTIP,
+    FILTER_KEYS,
+)
 from pydidas.widgets.utilities import (
-    get_max_pixel_width_of_entries,
     get_pyqt_icon_from_str,
 )
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
 
-
-DEFAULT_FILTERS = {
-    "/entry/instrument/detector/detectorSpecific/": (
-        "Dectris (e.g. Eiger)\n `detectorSpecific` keys"
-    ),
-    "/entry/instrument/detector/": ("X-Spectrum (e.g. Lambda)\n `specific` keys"),
-}
-FILTER_EXCEPTIONS = {
-    "/entry/instrument/detector/": ["/entry/instrument/detector/data"],
-}
 
 DATA_DIMENSION_PARAM = Parameter(
     "min_datadim",
@@ -78,9 +77,8 @@ DATASET_PARAM = Parameter(
 )
 _CHECK_BOX_CREATE_KWARGS = {
     "font_metric_height_factor": 2,
-    "font_metric_width_factor": 40,
+    "font_metric_width_factor": FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
     "parent_widget": "filter_container",
-    "checked": True,
 }
 
 
@@ -116,8 +114,6 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
     sig_request_hdf5_browser = QtCore.Signal()
 
     def __init__(self, **kwargs: Any) -> None:
-        _filter_keys = kwargs.pop("dataset_filter_keys", DEFAULT_FILTERS)
-        _filter_exceptions = kwargs.pop("dataset_filter_exceptions", FILTER_EXCEPTIONS)
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_params(DATA_DIMENSION_PARAM.copy(), DATASET_PARAM.copy())
 
@@ -126,8 +122,6 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             "current_filename": "",
             "min_datadim": 1,
             "display_details": False,
-            "dset_filters": _filter_keys,
-            "dset_filter_exceptions": _filter_exceptions,
         }
         self.__create_widgets()
         self.__connect_slots()
@@ -167,20 +161,32 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.create_check_box(
             "check_nxsignal",
             " Show only NXdata\n 'signal' datasets",
+            checked=True,
             gridPos=(0, 0, 1, 1),
+            toolTip=(
+                "<qt>Show only datasets which are marked as 'signal' in a NXdata "
+                "group. This filter is useful to quickly find the main dataset in "
+                "NeXus files which follow the NXdata convention. Note that this "
+                "filter does not hide any datasets which are not in a NXdata group."
+                "</qt>"
+            ),
             **_CHECK_BOX_CREATE_KWARGS,
         )
-        for _index, (_key, _text) in enumerate(self._config["dset_filters"].items()):
+        for _index, _key in enumerate(FILTER_KEYS):
             self.create_check_box(
                 f"check_filter_{_key}",
-                f" Hide {_text}",
+                FILTER_KEY_TITLE[_key],
+                checked=FILTER_KEY_DEFAULT_ACTIVE[_key],
                 gridPos=((_index + 1) // 3, (_index + 1) % 3, 1, 1),
+                toolTip=f"<qt>{html.escape(FILTER_KEY_TOOLTIP[_key])}</qt>",
                 **_CHECK_BOX_CREATE_KWARGS,
             )
         self.create_param_widget(
             self.get_param("min_datadim"),
+            font_metric_width_factor=FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
             gridPos=(-1, 0, 1, 1),
             parent_widget="filter_container",
+            width_text=0.7,
         )
         self.create_spacer("spacer_bottom", fixedHeight=15, gridPos=(-1, 0, 1, 1))
 
@@ -189,7 +195,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.param_composite_widgets["min_datadim"].sig_new_value.connect(
             self.__process_new_min_datadim
         )
-        for _key in self._config["dset_filters"]:
+        for _key in FILTER_KEYS:
             self._widgets[f"check_filter_{_key}"].sig_check_state_changed.connect(
                 self.__populate_dataset_list
             )
@@ -207,7 +213,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         """Get the list of currently active dataset filters."""
         return [
             _key
-            for _key in self._config["dset_filters"]
+            for _key in FILTER_KEYS
             if self._widgets[f"check_filter_{_key}"].isChecked()
         ]
 
@@ -216,7 +222,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         """Get the list of dataset keys which are exceptions to the active filters."""
         _filter_exceptions = []
         for _key in self.active_filters:
-            for _exception in self._config["dset_filter_exceptions"].get(_key, []):
+            for _exception in FILTER_EXCEPTIONS[_key]:
                 if _exception not in _filter_exceptions:
                     _filter_exceptions.append(_exception)
         return _filter_exceptions
@@ -261,9 +267,6 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
             self.set_param_and_widget_value_and_choices(
                 "dataset", _new_choice, _datasets
             )
-            self.param_composite_widgets["dataset"].io_widget.view().setMinimumWidth(
-                get_max_pixel_width_of_entries(_datasets) + 50
-            )  # type: ignore[attr-defined]
 
     @property
     def dataset(self) -> str:
@@ -287,7 +290,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.sig_new_dataset_selected.emit(_dset)  # type: ignore[attr-defined]
 
     @QtCore.Slot(str)
-    def new_filename(self, filename: str) -> None:
+    def new_filename(self, filename: str | Path) -> None:
         """
         Process the new filename.
 
@@ -296,11 +299,11 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
 
         Parameters
         ----------
-        filename : str
+        filename : str or Path
             The full file system path to the new file.
         """
         _filename = Path(filename)
-        _is_hdf5 = get_extension(_filename) in HDF5_EXTENSIONS
+        _is_hdf5 = _filename.suffix in HDF5_EXTENSIONS
         self.setVisible(_is_hdf5)
         if not _is_hdf5:
             return

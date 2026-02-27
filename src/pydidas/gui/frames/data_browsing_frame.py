@@ -162,19 +162,24 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         filename : str
             The full file name (including directory) of the selected file.
         """
-        if not Path(filename).is_file():
-            self._widgets["viewer"].set_data(None)
-            self.current_filename = ""
-            return
         if self.current_filename == filename:
             return
-        if get_extension(filename) not in self.__supported_extensions:
+        self.current_filename = filename
+        if (
+            get_extension(filename) not in self.__supported_extensions
+            or not Path(filename).is_file()
+        ):
+            self._widgets["filename"].setText(self.current_filename)
+            self._widgets["viewer"].set_data(None)
+            if self.__browser_window is not None:
+                self.__browser_window.hide()
+            if self.__metadata_window is not None:
+                self.__metadata_window.hide()
             return
         if self.__browser_window is not None:
             self.__browser_window.hide()
         if self.__metadata_window is not None:
             self.__metadata_window.hide()
-        self.current_filename = filename
         self._widgets["viewer"].set_data(None)
         self._widgets["filename"].setText(self.current_filename)
         self._widgets["ascii_widgets"].setVisible(self.ascii_file)

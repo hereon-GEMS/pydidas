@@ -71,7 +71,7 @@ def remove_pydidas():
         _qs_dir = _qs_file.parent
         if _qs_file.exists():
             shutil.remove(_qs_file)
-        if len(os.listdir(str(_qs_dir))) == 0:
+        if len(os.listdir(_qs_dir)) == 0:
             shutil.remove(_qs_dir)
     else:
         raise TypeError("The system architecture is not supported by pydidas!")
@@ -87,7 +87,7 @@ def remove_pydidas():
     if _path.exists():
         shutil.rmtree(_path)
     _top_path = _path.parent
-    if _top_path.exists() and len(os.listdir(str(_top_path))) == 0:
+    if _top_path.exists() and len(os.listdir(_top_path)) == 0:
         shutil.rmtree(_top_path)
     print("done!")
 

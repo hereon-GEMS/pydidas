@@ -133,8 +133,8 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
         """
         self._mask = None
         _mask_file = self._EXP.get_param_value("detector_mask_file")
-        if _mask_file != pathlib.Path():
-            if Path(_mask_file).is_file():
+        if _mask_file != Path():
+            if _mask_file.is_file():
                 self._mask = import_data(_mask_file)
             else:
                 raise UserConfigError(

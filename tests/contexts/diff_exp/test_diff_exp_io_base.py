@@ -43,7 +43,7 @@ EXP_IO = DiffractionExperimentIoBase
 
 class TestDiffractionExperimentIoBase(unittest.TestCase):
     def setUp(self):
-        _test_dir = Path(__file__).parent.parent.parent
+        _test_dir = Path(__file__).parents[2]
         self._path = str(_test_dir / "_data" / "load_test_exp_settings_")
         self._tmppath = tempfile.mkdtemp()
         EXP_IO.imported_params = {}

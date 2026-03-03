@@ -146,7 +146,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             "You can simply use the button on the bottom left to coyy the\n"
             "exception trace to your clipboard and open the webpage in your"
             " default browser."
-            f"\n\nA log has been written to:\n\t{str(_logfile)}\n\n"
+            f"\n\nA log has been written to:\n\t{_logfile}\n\n"
             + "-" * 20
             + "\n"
             + "Exception trace:\n\n"

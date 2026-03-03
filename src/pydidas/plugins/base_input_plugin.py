@@ -113,7 +113,7 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        _basepath = Path(self._SCAN.get_param_value("scan_base_directory", dtype=str))
+        _basepath = self._SCAN.get_param_value("scan_base_directory")
         _pattern = self._SCAN.processed_file_naming_pattern
         self.filepath = _basepath / _pattern
 

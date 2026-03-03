@@ -83,7 +83,7 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
         _pattern = self._SCAN.processed_file_naming_pattern
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
-        _basepath = Path(self._SCAN.get_param_value("scan_base_directory", dtype=str))
+        _basepath = self._SCAN.get_param_value("scan_base_directory")
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
         self.filename_string = f".{os.sep}" + str(

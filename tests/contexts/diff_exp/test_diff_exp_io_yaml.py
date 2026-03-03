@@ -43,7 +43,7 @@ EXP_IO_YAML = DiffractionExperimentIoYaml
 
 class TestDiffractionExperimentIoYaml(unittest.TestCase):
     def setUp(self):
-        _test_dir = Path(__file__).parent.parent.parent
+        _test_dir = Path(__file__).parents[2]
         self._path = str(_test_dir / "_data" / "load_test_diffraction_exp_context_")
         self._tmppath = tempfile.mkdtemp()
 

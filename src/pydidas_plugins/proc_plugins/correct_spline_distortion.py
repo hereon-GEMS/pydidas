@@ -106,7 +106,7 @@ class CorrectSplineDistortion(ProcPlugin):
         """
         Initialize the detector and modify the spline, if necessary.
         """
-        _spline = Path(self.get_param_value("spline_file"))
+        _spline = self.get_param_value("spline_file")
         if not _spline.is_file():
             raise UserConfigError(
                 f"The given path `{str(_spline)}` is not a valid file."

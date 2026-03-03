@@ -87,16 +87,16 @@ def get_logging_dir() -> Path:
     """
     _docs_dir = Path()
     if PydidasQsettings().value("user/custom_logging_dir", str) is not None:
-        _docs_dir = Path(PydidasQsettings().value("user/custom_logging_dir", str))
-    if not _docs_dir.is_dir():
+        _docs_dir = PydidasQsettings().value("user/custom_logging_dir", Path)
+    if _docs_dir == Path():
         _docs_dir = Path(
             QtCore.QStandardPaths.standardLocations(
                 QtCore.QStandardPaths.DocumentsLocation
             )[0]
         )
-    if not _docs_dir.is_dir():
+    if _docs_dir == Path():
         _docs_dir = Path(os.path.expanduser("~"))
-    if not _docs_dir.is_dir():
+    if _docs_dir == Path():
         from pydidas.core.exceptions import UserConfigError
 
         raise UserConfigError(
@@ -148,7 +148,7 @@ def clear_logging_dir() -> List[str]:
     for _file in os.listdir(_log_file_dir):
         _fname = _log_file_dir / _file
         try:
-            os.remove(str(_fname))
+            _fname.unlink()
         except PermissionError:
             _files_wo_permission.append(str(_fname))
 

@@ -120,7 +120,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
 
     def test_pre_execute__wrong_filename(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("CorrectSplineDistortion")()
-        plugin.set_param_value("spline_file", str(self._temppath))
+        plugin.set_param_value("spline_file", self._temppath)
         with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 

@@ -28,6 +28,7 @@ __all__ = ["QtPathsWindow"]
 
 
 from functools import partial
+from multiprocessing import get_logger
 from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -38,6 +39,7 @@ from pydidas.core.constants import (
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
+from pydidas.core.utils import get_logging_dir
 from pydidas.resources import logos
 from pydidas.version import VERSION
 from pydidas.widgets.framework import PydidasWindow
@@ -52,15 +54,7 @@ class QtPathsWindow(PydidasWindow):
     show_frame = False
 
     def __init__(self, **kwargs: dict):
-        self._log_path = (
-            Path(
-                QtCore.QStandardPaths.standardLocations(
-                    QtCore.QStandardPaths.DocumentsLocation
-                )[0]
-            )
-            / "pydidas"
-            / VERSION
-        )
+        self._log_path = get_logging_dir()
         self._config_path = Path(
             QtCore.QStandardPaths.standardLocations(
                 QtCore.QStandardPaths.ConfigLocation

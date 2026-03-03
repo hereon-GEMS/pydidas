@@ -223,7 +223,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         UserConfigError
             If the naming pattern could not be interpreted.
         """
-        self._config["path"] = Path(self.get_param_value("directory_path", dtype=str))
+        self._config["path"] = self.get_param_value("directory_path")
         if self.get_param_value("scan_for_all"):
             self._config["glob_pattern"] = "*"
             self._fname = lambda x: ""

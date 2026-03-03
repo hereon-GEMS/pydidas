@@ -315,17 +315,18 @@ class ProcessingResultIoMeta(GenericIoMeta):
         _scan = Scan()
         _exp = DiffractionExperiment()
         _tree = ProcessingTree()
+        dir_name = Path(dir_name)
         _files = [
             _file
             for _file in os.listdir(dir_name)
-            if ((Path(dir_name) / _file).exists() and _file.startswith("node_"))
+            if (dir_name / _file).exists() and _file.startswith("node_")
         ]
         for _file in _files:
             _ext = get_extension(_file)
             cls.verify_extension_is_registered(_ext)
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
-            _path = Path(dir_name) / _file
+            _path = dir_name / _file
             _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
                 _path
             )

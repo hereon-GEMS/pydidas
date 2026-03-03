@@ -61,7 +61,7 @@ class TestMaskImage(unittest.TestCase):
         shutil.rmtree(self._temppath)
 
     def create_mask(self):
-        _maskfilename = str(self._temppath / "mask.npy")
+        _maskfilename = self._temppath / "mask.npy"
         np.save(_maskfilename, self._mask)
         return _maskfilename
 

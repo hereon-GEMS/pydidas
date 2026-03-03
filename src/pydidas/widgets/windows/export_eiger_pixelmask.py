@@ -127,8 +127,8 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         """
         _master_fname = self.get_param_value("master_filename", str)
         _export_fname = self.get_param_value("output_filename", str)
-        _out_dir = Path(_export_fname).parent
-        if not Path(_master_fname).exists():
+        _out_dir = _export_fname.parent
+        if not _master_fname.exists():
             critical_warning(
                 "Input file not found",
                 (f'The specified input file "{_master_fname}" could not be found.'),

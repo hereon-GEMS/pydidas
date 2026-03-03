@@ -426,7 +426,7 @@ class PydidasFileDialog(
             item = item.parent
         elif not item.is_dir():
             raise UserConfigError(
-                f"The given entry {str(item)} is neither a valid directory "
+                f"The given entry {item} is neither a valid directory "
                 "nor file. Please check the input and try again."
             )
         self._stored_dirs[reference] = str(item)

@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasWindow"]
 
 
-from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets

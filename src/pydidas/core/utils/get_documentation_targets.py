@@ -107,7 +107,7 @@ def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
 
     Parameters
     ----------
-    rel_address : str | Path
+    rel_address : str or Path
         The relative address to the documentation file starting from the
         build directory.
 

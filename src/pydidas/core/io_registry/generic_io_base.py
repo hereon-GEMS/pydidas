@@ -71,7 +71,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str | Path | list[Path | str]
+        filename : str or Path or list[Path or str]
             The filename of the file to be imported.
         """
         raise NotImplementedError
@@ -85,7 +85,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str | Path
+        filename : str or Path
             The full filename and path.
         **kwargs : Any
             Any keyword arguments. Supported are:

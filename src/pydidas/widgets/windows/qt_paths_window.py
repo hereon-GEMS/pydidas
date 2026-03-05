@@ -28,7 +28,6 @@ __all__ = ["QtPathsWindow"]
 
 
 from functools import partial
-from multiprocessing import get_logger
 from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -41,7 +40,6 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import get_logging_dir
 from pydidas.resources import logos
-from pydidas.version import VERSION
 from pydidas.widgets.framework import PydidasWindow
 
 

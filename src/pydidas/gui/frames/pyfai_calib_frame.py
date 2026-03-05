@@ -34,7 +34,7 @@ __all__ = ["PyfaiCalibFrame"]
 import argparse
 import functools
 from pathlib import Path
-from typing import Self, Union
+from typing import Self
 
 import numpy as np
 import pyFAI
@@ -374,13 +374,13 @@ class PyfaiCalibFrame(BaseFrame):
             _fname, diffraction_exp=_experiment, overwrite=True
         )
 
-    def _get_mask_filename(self) -> Union[str, None]:
+    def _get_mask_filename(self) -> str | None:
         """
         Get the filename of the mask file from the fitted model.
 
         Returns
         -------
-        Union[str, None]
+        str or None
             The filename of the mask file. If no mask file has been, returns None.
         """
         _maskfile = self._model.experimentSettingsModel().mask().filename()

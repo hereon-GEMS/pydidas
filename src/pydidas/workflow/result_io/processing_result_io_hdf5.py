@@ -462,7 +462,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The full filename of the file to be imported.
 
         Returns

@@ -30,7 +30,6 @@ __all__ = ["CorrectSplineDistortion"]
 
 import warnings
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 import pyFAI
@@ -123,14 +122,14 @@ class CorrectSplineDistortion(ProcPlugin):
             self._nan_mask = np.where(_dummy < 0.8, 1, 0)
 
     def execute(
-        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+        self, data: Dataset | np.ndarray, **kwargs: dict
     ) -> tuple[Dataset, dict]:
         """
         Apply a distortion correction to an image (2d data-array).
 
         Parameters
         ----------
-        data : Union[pydidas.core.Dataset, np.ndarray]
+        data : pydidas.core.Dataset or np.ndarray
             The image / frame data.
         **kwargs : dict
             Any calling keyword arguments.

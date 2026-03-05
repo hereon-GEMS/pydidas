@@ -479,7 +479,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         ----------
         node_id : int
             The node ID for which results should be returned.
-        *slices : int | slice
+        *slices : int or slice
             The tuple used for slicing/indexing the np.ndarray.
         flattened_scan_dim : bool, optional
             Keyword to process flattened Scan dimensions. If True, the Scan
@@ -568,7 +568,7 @@ class ProcessingResults(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        save_dir : Union[str, pathlib.Path]
+        save_dir : str or Path
             The basepath for all saved data.
         save_formats : str
             Strings of all formats to be written. Individual formats can be
@@ -578,7 +578,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             Flag to enable overwriting of existing files. The default is False.
         squeeze_results : bool, optional
             Flag to enable squeezing of empty dimensions. The default is False.
-        node_id : int | None, optional
+        node_id : int or None, optional
             The node ID for which data shall be saved. If None, this defaults
             to all nodes. The default is None.
         """
@@ -618,7 +618,7 @@ class ProcessingResults(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        save_dir : Union[str, pathlib.Path]
+        save_dir : str or Path
             The basepath for all saved data.
         save_formats : str
             A string of all formats to be written. Individual formats can be
@@ -626,7 +626,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
-        single_node: int | None, optional
+        single_node: int or None, optional
             Keyword to select a single node. If None, all nodes will be
             selected. The default is None.
         squeeze_results : bool, optional
@@ -754,7 +754,7 @@ class ProcessingResults(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        directory : Path | str
+        directory : Path or str
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()

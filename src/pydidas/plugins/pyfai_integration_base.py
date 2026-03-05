@@ -29,7 +29,6 @@ __all__ = ["pyFAIintegrationBase"]
 
 
 import multiprocessing as mp
-import pathlib
 from pathlib import Path
 from typing import Any, Literal
 
@@ -373,7 +372,7 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
 
         Parameters
         ----------
-        mask : ndarray | None, optional
+        mask : ndarray or None, optional
             The custom mask to be checked. If None, the stored default mask is used.
         """
         if self._ai is None:

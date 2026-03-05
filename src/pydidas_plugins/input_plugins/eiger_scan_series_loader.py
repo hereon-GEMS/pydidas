@@ -29,7 +29,6 @@ __all__ = ["EigerScanSeriesLoader"]
 
 
 import os
-from pathlib import Path
 
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 

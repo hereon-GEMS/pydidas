@@ -72,7 +72,6 @@ class InputPlugin(BasePlugin):
         """
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
-        self.filepath = Path("")
         self._config["pre_executed"] = False
         if self.base_output_data_dim == 2:
             self.add_params(
@@ -113,9 +112,8 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        _basepath = self._SCAN.get_param_value("scan_base_directory")
-        _pattern = self._SCAN.processed_file_naming_pattern
-        self.filepath = _basepath / _pattern
+        self._base_dir = self._SCAN.get_param_value("scan_base_directory")
+        self._filename = self._SCAN.processed_file_naming_pattern
 
     def input_available(self, ordinal: int) -> bool:
         """
@@ -164,7 +162,7 @@ class InputPlugin(BasePlugin):
         _file_index = _file_counter * self._SCAN.get_param_value(
             "pattern_number_delta"
         ) + self._SCAN.get_param_value("pattern_number_offset")
-        return Path(str(self.filepath).format(index=_file_index))
+        return self._base_dir / self._filename.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """

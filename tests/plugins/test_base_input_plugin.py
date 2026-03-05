@@ -54,7 +54,8 @@ class _TestInputPlugin(InputPlugin):
     def __init__(self, filename="", ndim=2):
         self.base_output_data_dim = ndim
         InputPlugin.__init__(self)
-        self.filepath = Path(filename)
+        self._base_dir = Path(filename).parent
+        self._filename = Path(filename).name
 
     def get_frame(self, index, **kwargs):
         _shape = _DUMMY_SHAPE if self.base_output_data_dim == 2 else _DUMMY_SHAPE_1d
@@ -68,7 +69,7 @@ class _TestInputPlugin(InputPlugin):
         return _frame, kwargs
 
     def read_frame(self, index, **kwargs):
-        return import_data(self.filepath, **kwargs)
+        return import_data(self._base_dir / self._filename, **kwargs)
 
     def update_filepath(self):
         pass
@@ -173,7 +174,7 @@ def test_update_filepath__valid_pattern(
         _target = _target.replace(
             "#" * pattern.count("#"), "{index:0" + str(pattern.count("#")) + "d}"
         )
-    assert plugin.filepath == Path(_target)
+    assert plugin._base_dir / plugin._filename == Path(_target)
 
 
 @pytest.mark.parametrize("frame_index", [0, 1, 37])

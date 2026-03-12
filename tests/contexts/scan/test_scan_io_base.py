@@ -44,7 +44,7 @@ SCAN_IO = ScanIoBase
 
 class TestScanIoBase(unittest.TestCase):
     def setUp(self):
-        _test_dir = Path(__file__).parent.parent.parent
+        _test_dir = Path(__file__).parents[2]
         self._path = str(_test_dir / "_data" / "load_test_scan_context_")
         self._tmppath = tempfile.mkdtemp()
         SCAN_IO.imported_params = {}

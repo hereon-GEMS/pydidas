@@ -158,7 +158,8 @@ class PydidasFileDialog(
             ]
         )
         _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
-        _sidebar.setMinimumWidth(180)
+        if _sidebar:
+            _sidebar.setMinimumWidth(180)
         self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
     def _insert_buttons_into_sidebar(self) -> None:
@@ -166,6 +167,8 @@ class PydidasFileDialog(
         _splitter = self.findChild(QtWidgets.QSplitter)
         _sidebar = _splitter.widget(0)
         _fileview = _splitter.widget(1)
+        if _sidebar is None or _fileview is None:
+            return
         # Create a container widget for the sidebar to hold the buttons and the
         # original sidebar content:
         _sidebar.setMinimumWidth(180)

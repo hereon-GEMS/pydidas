@@ -116,15 +116,13 @@ class WorkerController(QtCore.QThread):
         }
         self._processor = {
             "func": processor_func,
-            "args": (None, self._mp_kwargs, tuple()),
+            "args": (None, self._mp_kwargs),
             "kwargs": {},
         }
         self._progress_done = 0
         self._progress_target = 0
         if function is not None:
-            self.change_function(
-                function, *func_args, *(func_kwargs if func_kwargs is not None else {})
-            )
+            self.change_function(function, *func_args, *(func_kwargs or {}))
 
     @contextmanager
     def write_lock(self):

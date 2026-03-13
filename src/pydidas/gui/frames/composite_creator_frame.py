@@ -271,7 +271,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["plot_scale"] = None
         self._config["plot_origin"] = None
         self._config["plot_aspect"] = None
-        self._image_metadata.update_final_image()
+        self._image_metadata.update()
         self.set_status("Started composite image creation.")
 
     def _prepare_plot_params(self) -> None:

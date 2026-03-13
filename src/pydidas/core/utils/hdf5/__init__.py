@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+from . import hdf5_dataset_utils, hdf5_filter_keys, nxs_export
 from .hdf5_dataset_utils import *
 from .nxs_export import *
 
@@ -35,6 +36,7 @@ __all__ = nxs_export.__all__ + hdf5_dataset_utils.__all__
 
 # Clean up the namespace
 del (
-    nxs_export,
     hdf5_dataset_utils,
+    hdf5_filter_keys,
+    nxs_export,
 )

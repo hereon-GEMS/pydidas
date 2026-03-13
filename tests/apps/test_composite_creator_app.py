@@ -326,7 +326,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         np.save(_bg_fname, np.ones((10, 10)))
         app = self.get_default_app()
         app.set_param_value("use_bg_file", True)
-        app.set_param_value("bg_file", str(_bg_fname))
+        app.set_param_value("bg_file", _bg_fname)
         app.run()
         self.assertTrue((app._composite.image <= self._bgvalue).all())
 

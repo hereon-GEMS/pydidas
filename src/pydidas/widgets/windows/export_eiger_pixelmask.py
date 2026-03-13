@@ -125,8 +125,8 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         """
         Export the pixelmask.
         """
-        _master_fname = self.get_param_value("master_filename", str)
-        _export_fname = self.get_param_value("output_filename", str)
+        _master_fname = self.get_param_value("master_filename")
+        _export_fname = self.get_param_value("output_filename")
         _out_dir = _export_fname.parent
         if not _master_fname.exists():
             critical_warning(

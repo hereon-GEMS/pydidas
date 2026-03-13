@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasFileDialog"]
 
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -424,16 +423,15 @@ class PydidasFileDialog(
         item : Path or str
             The filename or directory name.
         """
-        if isinstance(item, Path):
-            item = str(item)
-        if os.path.isfile(item):
-            item = os.path.dirname(item)
-        elif not os.path.isdir(item):
+        item = Path(item)
+        if item.is_file():
+            item = item.parent
+        elif not item.is_dir():
             raise UserConfigError(
                 f"The given entry {item} is neither a valid directory "
                 "nor file. Please check the input and try again."
             )
-        self._stored_dirs[reference] = item
+        self._stored_dirs[reference] = str(item)
 
     # ========================================================================
     # Private helper methods

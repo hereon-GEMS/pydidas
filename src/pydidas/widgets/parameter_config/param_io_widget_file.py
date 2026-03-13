@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetFile"]
 
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -94,7 +93,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         if _selection is not None:
             if self._flag_pattern:
                 self.io_dialog.set_curr_dir(id(self), _selection)
-                _selection = os.path.basename(_selection)
+                _selection = Path(_selection).name
             self.set_value(_selection)
 
     def set_value(self, value: Path | str) -> None:
@@ -104,7 +103,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method changes the QLineEdit selection to the specified value.
         """
         super().set_value(value)
-        if not self._flag_pattern and value != Path() and os.path.exists(value):
+        if not self._flag_pattern and value != Path() and Path(value).exists():
             self.io_dialog.set_curr_dir(id(self), value)
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:

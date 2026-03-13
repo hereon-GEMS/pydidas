@@ -31,7 +31,6 @@ __all__ = ["FilelistManager"]
 import copy
 import os
 from pathlib import Path
-from typing import Union
 
 from pydidas.core import (
     ObjectWithParameterCollection,
@@ -135,27 +134,27 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def update(
         self,
-        first_file: Union[None, str, Path] = None,
-        last_file: Union[None, str, Path] = None,
-        live_processing: Union[None, bool] = None,
-        file_stepping: Union[None, int] = None,
+        first_file: None | str | Path = None,
+        last_file: None | str | Path = None,
+        live_processing: None | bool = None,
+        file_stepping: None | int = None,
     ):
         """
         Create a filelist with updated parameters.
 
         Parameters
         ----------
-        first_file : Union[None, str, Path], optional
+        first_file : None or str or Path, optional
             The path to the first file. If None, the stored Parameter for
             'first_file' will be used. The default is None.
-        last_file : Union[None, str, Path], optional
+        last_file : None or str or Path, optional
             The path to the last file. If None, the stored Parameter for
             'last_file' will be used. The default is None.
-        live_processing : Union[None. bool], optional
+        live_processing : None or bool, optional
             Flag for live processing (i.e. disable file system checks.)
             If None, the stored Parameter 'live_processing' will be used.
             The default is None.
-        file_stepping : Union[None, int], optional
+        file_stepping : None or int, optional
             The file stepping number. If None, the stored Parameter
             'file_stepping' will be used. The default is None.
         """
@@ -165,10 +164,10 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _update_params(
         self,
-        first_file: Union[None, str, Path] = None,
-        last_file: Union[None, str, Path] = None,
-        live_processing: Union[None, bool] = None,
-        file_stepping: Union[None, int] = None,
+        first_file: None | str | Path = None,
+        last_file: None | str | Path = None,
+        live_processing: None | bool = None,
+        file_stepping: None | int = None,
     ):
         if first_file is not None:
             self.set_param_value("first_file", first_file)
@@ -274,7 +273,8 @@ class FilelistManager(ObjectWithParameterCollection):
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
         self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
-        self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
+        _path, _name = _fnames.parent, _fnames.name
+        self._config["file_list"] = [_path / _name.format(index=i) for i in _range]
         self._config["n_files"] = len(_range)
 
     def get_filename(self, index: int) -> Path:

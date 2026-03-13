@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,13 +18,12 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import time
@@ -166,14 +165,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_export_image_png(self):
         app = self.get_default_app()
         app.run()
-        _path = os.path.join(self._path, "test_image.png")
+        _path = self._path / "test_image.png"
         app.export_image(_path)
-        self.assertTrue(os.path.exists(_path))
+        self.assertTrue(_path.exists())
 
     def test_export_image_npy(self):
         app = self.get_default_app()
         app.run()
-        _path = os.path.join(self._path, "test_image.npy")
+        _path = self._path / "test_image.npy"
         app.export_image(_path)
         _data = np.load(_path)
         self.assertTrue((_data == app.composite).all())
@@ -287,7 +286,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertTrue((_image == self._data[0]).all())
 
     def test_image_exists_check(self):
-        _last_file = os.path.join(self._fname(20))
+        _last_file = self._fname(20)
         app = self.get_default_app()
         app.run()
         self.assertTrue(app._image_exists_check(_last_file, timeout=0.1))
@@ -297,7 +296,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertFalse(app._image_exists_check("", timeout=0.1))
 
     def test_image_exists_check__wrong_size(self):
-        _last_file = os.path.join(self._path, "test_bg.npy")
+        _last_file = self._path / "test_bg.npy"
         np.save(_last_file, np.ones((2, 2)))
         app = CompositeCreatorApp()
         self.assertFalse(app._image_exists_check(_last_file, timeout=0.1))
@@ -323,7 +322,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertFalse(app.multiprocessing_carryon())
 
     def test_multiprocessing_store_with_bg(self):
-        _bg_fname = os.path.join(self._path, "bg.npy")
+        _bg_fname = self._path / "bg.npy"
         np.save(_bg_fname, np.ones((10, 10)))
         app = self.get_default_app()
         app.set_param_value("use_bg_file", True)

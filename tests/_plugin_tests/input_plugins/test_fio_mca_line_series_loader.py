@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -105,11 +105,11 @@ def test__creation():
 @pytest.mark.parametrize("pattern", ["name_#####", "spam_###_ham", "eggs_#_bacon"])
 @pytest.mark.parametrize("i0", [1, 3])
 @pytest.mark.parametrize("i1", [5, 17])
-def test_update_filename_string(temp_dir_w_files, fio_suffix, pattern, plugin, i0, i1):
+def test_update_filepath(temp_dir_w_files, fio_suffix, pattern, plugin, i0, i1):
     SCAN.set_param_value("scan_name_pattern", pattern)
     plugin.set_param_value("fio_suffix", fio_suffix)
-    plugin.update_filename_string()
-    _fname = plugin.filename_string.format(index0=i0, index1=i1)
+    plugin.update_filepath()
+    _fname = str(plugin.filepath).format(index0=i0, index1=i1)
     _nhash = pattern.count("#")
     assert _fname == str(
         temp_dir_w_files[0]
@@ -124,7 +124,7 @@ def test_update_filename_string(temp_dir_w_files, fio_suffix, pattern, plugin, i
 @pytest.mark.parametrize("n_files", [-1, 1, 7])
 def test_check_files_per_directory(temp_dir_w_files, plugin, n_files):
     plugin.set_param_value("files_per_directory", n_files)
-    plugin.update_filename_string()
+    plugin.update_filepath()
     plugin._check_files_per_directory()
     assert plugin.get_param_value("_counted_files_per_directory") == (
         n_files if n_files > 0 else _N_FILES
@@ -133,7 +133,7 @@ def test_check_files_per_directory(temp_dir_w_files, plugin, n_files):
 
 def test_check_files_per_directory__no_dir(temp_dir_w_files, plugin):
     plugin._SCAN.set_param_value("scan_base_directory", temp_dir_w_files[0] / "test123")
-    plugin.update_filename_string()
+    plugin.update_filepath()
     with pytest.raises(UserConfigError):
         plugin._check_files_per_directory()
 
@@ -142,7 +142,7 @@ def test_check_files_per_directory__empty_dir(temp_path, plugin):
     _new_dir = temp_path / get_random_string(6) / get_random_string(6)
     (_new_dir / "test_00001").mkdir(parents=True)
     plugin._SCAN.set_param_value("scan_base_directory", _new_dir)
-    plugin.update_filename_string()
+    plugin.update_filepath()
     with pytest.raises(UserConfigError):
         plugin._check_files_per_directory()
 
@@ -151,18 +151,18 @@ def test_check_files_per_directory__empty_dir(temp_path, plugin):
 @pytest.mark.parametrize("frame_index", [0, 2, 39, 117])
 def test_get_filename(plugin, n_files, frame_index):
     plugin.set_param_value("files_per_directory", n_files)
-    plugin.update_filename_string()
+    plugin.update_filepath()
     plugin._check_files_per_directory()
     _expected_i0 = frame_index // n_files + 1
     _expected_i1 = frame_index % n_files + 1
-    assert plugin.get_filename(frame_index) == plugin.filename_string.format(
-        index0=_expected_i0, index1=_expected_i1
+    assert plugin.get_filename(frame_index) == Path(
+        str(plugin.filepath).format(index0=_expected_i0, index1=_expected_i1)
     )
 
 
 def test_get_frame__no_file(plugin):
     plugin.set_param_value("fio_suffix", "_something_s#.fio")
-    plugin.update_filename_string()
+    plugin.update_filepath()
     with pytest.raises(FileReadError):
         _data, _ = plugin.get_frame(37)
 

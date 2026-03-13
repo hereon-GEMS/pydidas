@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ URLs for the documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,7 +40,6 @@ __all__ = [
 ]
 
 
-import os
 from pathlib import Path
 
 from qtpy import QtCore
@@ -65,7 +64,7 @@ def doc_qurl_for_window_manual(name: str) -> QtCore.QUrl:
     return _url
 
 
-def doc_filename_for_window_manual(name: str) -> str:
+def doc_filename_for_window_manual(name: str) -> Path:
     """
     Get the file system path for the filename of the manual for the given window class.
 
@@ -76,11 +75,11 @@ def doc_filename_for_window_manual(name: str) -> str:
 
     Returns
     -------
-    str
+    Path
         The full filename for the window manual.
     """
-    _docdir = os.path.join(DOC_BUILD_DIRECTORY, "html", "manuals", "gui", "windows")
-    return os.path.join(_docdir, f"{name}.html")
+    _docdir = DOC_BUILD_DIRECTORY / "html" / "manuals" / "gui" / "windows"
+    return _docdir / f"{name}.html"
 
 
 def doc_qurl_for_frame_manual(name: str) -> QtCore.QUrl:
@@ -108,7 +107,7 @@ def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
 
     Parameters
     ----------
-    rel_address : str | Path
+    rel_address : str or Path
         The relative address to the documentation file starting from the
         build directory.
 
@@ -119,12 +118,12 @@ def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
     """
     if isinstance(rel_address, Path):
         rel_address = str(rel_address)
-    _path = os.path.join(DOC_BUILD_DIRECTORY, "html", rel_address).replace("\\", "/")
+    _path = str(DOC_BUILD_DIRECTORY / "html" / rel_address).replace("\\", "/")
     _url = QtCore.QUrl("file:///" + _path)
     return _url
 
 
-def doc_filename_for_frame_manual(name: str) -> str:
+def doc_filename_for_frame_manual(name: str) -> Path:
     """
     Get the file system path for the filename of the frame manual for the given class.
 
@@ -135,12 +134,10 @@ def doc_filename_for_frame_manual(name: str) -> str:
 
     Returns
     -------
-    str
+    Path
         The full filename for the frame manual.
     """
-    return os.path.join(
-        DOC_BUILD_DIRECTORY, "html", "manuals", "gui", "frames", f"{name}.html"
-    )
+    return DOC_BUILD_DIRECTORY / "html" / "manuals" / "gui" / "frames" / f"{name}.html"
 
 
 def _doc_home_address() -> str:
@@ -152,52 +149,52 @@ def _doc_home_address() -> str:
     _address : str
         The address of the documentation index.html.
     """
-    _address = "file:///" + _doc_home_filename()
+    _address = "file:///" + str(_doc_home_filename())
     _address = _address.replace("\\", "/")
     return _address
 
 
-def _doc_home_filename() -> str:
+def _doc_home_filename() -> Path:
     """
     Get the filename of the pydidas documentation homepage.
 
     Returns
     -------
-    _docfile : str
+    _docfile : Path
         The full path and filename of the index.html file.
     """
-    _docfile = os.path.join(_doc_make_directory(), "html", "index.html")
+    _docfile = _doc_make_directory() / "html" / "index.html"
     return _docfile
 
 
-def _doc_make_directory() -> str:
+def _doc_make_directory() -> Path:
     """
     Get the output directory for the sphinx documentation.
 
     Returns
     -------
-    str
+    Path
         The sphinx output directory.
     """
     _name = __file__
     for _ in range(3):
-        _name = os.path.dirname(_name)
-    return os.path.join(_name, "sphinx")
+        _name = Path(_name).parent
+    return _name / "sphinx"
 
 
-def _doc_source_directory() -> str:
+def _doc_source_directory() -> Path:
     """
     Get the source directory of the sphinx documentation.
 
     Returns
     -------
-    str
+    Path
         The directory with name of the directory with the make files.
     """
     _name = __file__
     for _ in range(3):
-        _name = os.path.dirname(_name)
-    return os.path.join(_name, "docs")
+        _name = Path(_name).parent
+    return _name / "docs"
 
 
 def _get_doc_home_qurl() -> QtCore.QUrl:
@@ -214,7 +211,7 @@ def _get_doc_home_qurl() -> QtCore.QUrl:
 
 DOC_HOME_QURL = _get_doc_home_qurl()
 DOC_BUILD_DIRECTORY = _doc_make_directory()
-DOC_BUILD_PATH = Path(DOC_BUILD_DIRECTORY)
+DOC_BUILD_PATH = DOC_BUILD_DIRECTORY
 DOC_SOURCE_DIRECTORY = _doc_source_directory()
 DOC_HOME_FILENAME = _doc_home_filename()
 DOC_HOME_ADDRESS = _doc_home_address()

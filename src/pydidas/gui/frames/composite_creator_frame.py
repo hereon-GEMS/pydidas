@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["CompositeCreatorFrame"]
 
 
-import os
 import time
 from functools import partial
 from pathlib import Path
@@ -414,7 +413,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         bool
             The flag whether the file is valid.
         """
-        if self.get_param_value("live_processing") or os.path.isfile(fname):
+        if self.get_param_value("live_processing") or Path(fname).is_file():
             return True
         if fname not in ["", "."]:
             dialogues.critical_warning(
@@ -556,7 +555,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        keys : Union[Literal["all"], Iterable[str], None], optional
+        keys : Literal["all"] or Iterable[str] or None], optional
             An iterable of keys which reference the Parameters. If 'all',
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
@@ -576,7 +575,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         try:
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
-                assert os.path.isfile(self.get_param_value("bg_file"))
+                assert Path(self.get_param_value("bg_file")).is_file()
                 assert self._config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):

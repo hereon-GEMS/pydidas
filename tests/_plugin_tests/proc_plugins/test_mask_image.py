@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import random
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 from qtpy import QtCore
@@ -49,7 +49,7 @@ class TestMaskImage(unittest.TestCase):
         qs.remove("unittesting")
 
     def setUp(self):
-        self._temppath = tempfile.mkdtemp()
+        self._temppath = Path(tempfile.mkdtemp())
         self._shape = (20, 20)
         _n = self._shape[0] * self._shape[1]
         self._mask = np.asarray([random.choice([0, 1]) for _ in range(_n)]).reshape(
@@ -61,7 +61,7 @@ class TestMaskImage(unittest.TestCase):
         shutil.rmtree(self._temppath)
 
     def create_mask(self):
-        _maskfilename = os.path.join(self._temppath, "mask.npy")
+        _maskfilename = self._temppath / "mask.npy"
         np.save(_maskfilename, self._mask)
         return _maskfilename
 

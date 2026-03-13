@@ -47,6 +47,7 @@ from pydidas.gui.frames.builders.define_scan_frame_builder import (
 )
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import ItemInListSelectionWidget
+from pydidas.widgets.dialogues.question_box import QuestionBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication
 
@@ -255,6 +256,12 @@ class DefineScanFrame(BaseFrame):
     @QtCore.Slot()
     def reset_entries(self) -> None:
         """Reset all Scan parameter entries to their default values."""
+        _reply = QuestionBox(
+            "Reset confirmation",
+            "Do you want to reset all scan parameters to their default values?",
+        ).exec_()
+        if not _reply:
+            return
         SCAN.restore_all_defaults(True)
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)

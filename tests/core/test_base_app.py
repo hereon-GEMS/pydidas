@@ -25,11 +25,11 @@ __status__ = "Production"
 
 
 import multiprocessing as mp
-import os
 import shutil
 import tempfile
 import unittest
 from multiprocessing import managers
+from pathlib import Path
 
 import yaml
 
@@ -71,7 +71,7 @@ class _TestApp(BaseApp):
 class TestBaseApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._tempdir = tempfile.mkdtemp()
+        cls._tempdir = Path(tempfile.mkdtemp())
 
     @classmethod
     def tearDownClass(cls):
@@ -175,7 +175,7 @@ class TestBaseApp(unittest.TestCase):
         self.assertEqual(_state["config"]["new_key"], True)
         self.assertEqual(_state["config"]["item1"], _item1)
         self.assertIsInstance(_state["config"]["item2"], str)
-        with open(os.path.join(self._tempdir, "dummy.yaml"), "w") as _file:
+        with (self._tempdir / "dummy.yaml").open("w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
     def test_import_state(self):

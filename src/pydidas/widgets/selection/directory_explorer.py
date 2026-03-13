@@ -29,7 +29,6 @@ __status__ = "Production"
 __all__ = ["DirectoryExplorer"]
 
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -216,9 +215,9 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _filter_index = self._widgets["explorer"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
-        if os.path.isfile(_name):
-            _name = os.path.dirname(_name)
-        self.q_settings_set("directory_explorer/path", _name)
+        if Path(_name).is_file():
+            _name = Path(_name).parent
+        self.q_settings_set("directory_explorer/path", str(_name))
 
     @QtCore.Slot()
     def __file_selected(self) -> None:
@@ -226,9 +225,9 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _filter_index = self._widgets["explorer"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
-        if os.path.isfile(_name):
+        if Path(_name).is_file():
             self.sig_new_file_selected.emit(_name)  # type: ignore[attr-defined]
-        elif os.path.isdir(_name):
+        elif Path(_name).is_dir():
             self.set_param_and_widget_value("current_directory", _name)
 
     @QtCore.Slot(str)

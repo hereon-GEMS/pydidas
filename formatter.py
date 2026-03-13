@@ -386,7 +386,7 @@ class CopyrightYearUpdater:
                 ):
                     _unversioned_files.append(_fname)
         return {
-            _fname: datetime.fromtimestamp(os.path.getmtime(_fname)).year
+            _fname: datetime.fromtimestamp(Path(_fname).stat().st_mtime).year
             for _fname in _unversioned_files
         }
 

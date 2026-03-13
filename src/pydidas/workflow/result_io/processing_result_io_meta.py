@@ -33,7 +33,6 @@ __all__ = ["ProcessingResultIoMeta"]
 
 import os
 from pathlib import Path
-from typing import Union
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
@@ -116,11 +115,11 @@ class ProcessingResultIoMeta(GenericIoMeta):
     @classmethod
     def prepare_active_savers(
         cls,
-        save_dir: Union[Path, str],
+        save_dir: Path | str,
         node_information: dict,
-        scan_context: Union[Scan, None] = None,
-        diffraction_exp: Union[DiffractionExperiment, None] = None,
-        workflow_tree: Union[ProcessingTree, None] = None,
+        scan_context: Scan | None = None,
+        diffraction_exp: DiffractionExperiment | None = None,
+        workflow_tree: ProcessingTree | None = None,
     ):
         """
         Prepare the active savers for storing data.
@@ -129,7 +128,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
         Parameters
         ----------
-        save_dir : Union[Path, str]
+        save_dir : Path or str
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -138,14 +137,14 @@ class ProcessingResultIoMeta(GenericIoMeta):
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
-        scan_context : Union[Scan, None], optional
+        scan_context : Scan or None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
-        diffraction_exp : Union[DiffractionExp, None], optional
+        diffraction_exp : DiffractionExp or None, optional
             The diffraction experiment context. If None, the generic context will be
             used. Only specify this, if you explicitly require a different context. The
             default is None.
-        workflow_tree : Union[WorkflowTree, None], optional
+        workflow_tree : WorkflowTree or None, optional
             The WorkflowTree. If None, the generic WorkflowTree will be used. Only
             specify this, if you explicitly require a different context. The default is
             None.
@@ -162,9 +161,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             )
 
     @classmethod
-    def push_metadata_to_active_savers(
-        cls, metadata: dict, scan: Union[Scan, None] = None
-    ):
+    def push_metadata_to_active_savers(cls, metadata: dict, scan: Scan | None = None):
         """
         Push the metadata to all active savers.
 
@@ -177,7 +174,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         ----------
         metadata : dict
             The dictionary with the metadata.
-        scan : Union[Scan, None], optional
+        scan : Scan or None, optional
             The Scan instance. If None, this will default to the generic ScanContext.
             The default is None.
         """
@@ -209,7 +206,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
     def export_full_data_to_active_savers(
         cls,
         data: dict[int, Dataset],
-        scan_context: Union[Scan, None] = None,
+        scan_context: Scan | None = None,
         squeeze_results: bool = False,
     ):
         """
@@ -219,7 +216,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         ----------
         data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
+        scan_context : Scan or None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
         squeeze_results : bool, optional
@@ -235,7 +232,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         cls,
         extension: str,
         data: dict[int, Dataset],
-        scan_context: Union[Scan, None] = None,
+        scan_context: Scan | None = None,
     ):
         """
         Export the full data to all active savers.
@@ -246,7 +243,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             The file extension for the saver.
         data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
+        scan_context : Scan or None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
         """
@@ -283,7 +280,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
     @classmethod
     def import_data_from_directory(
-        cls, dir_name: Union[Path, str]
+        cls, dir_name: Path | str
     ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import data from files in a directory.
@@ -293,7 +290,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
         Parameters
         ----------
-        dir_name : Union[Path, str]
+        dir_name : Path or String
             The name of the directory from which data shall be imported.
 
         Returns
@@ -315,20 +312,18 @@ class ProcessingResultIoMeta(GenericIoMeta):
         _scan = Scan()
         _exp = DiffractionExperiment()
         _tree = ProcessingTree()
+        dir_name = Path(dir_name)
         _files = [
             _file
             for _file in os.listdir(dir_name)
-            if (
-                os.path.isfile(os.path.join(dir_name, _file))
-                and _file.startswith("node_")
-            )
+            if (dir_name / _file).exists() and _file.startswith("node_")
         ]
         for _file in _files:
             _ext = get_extension(_file)
             cls.verify_extension_is_registered(_ext)
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
-            _path = os.path.join(dir_name, _file)
+            _path = dir_name / _file
             _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
                 _path
             )

@@ -33,8 +33,8 @@ __all__ = ["PyfaiCalibFrame"]
 
 import argparse
 import functools
-import os
-from typing import Self, Union
+from pathlib import Path
+from typing import Self
 
 import numpy as np
 import pyFAI
@@ -157,8 +157,8 @@ class PyfaiCalibFrame(BaseFrame):
     available.
     """
 
-    menu_icon = "path::" + os.path.join(
-        os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"
+    menu_icon = "path::" + str(
+        Path(pyFAI.__file__).parent / "resources" / "gui" / "images" / "icon.png"
     )
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
@@ -374,13 +374,13 @@ class PyfaiCalibFrame(BaseFrame):
             _fname, diffraction_exp=_experiment, overwrite=True
         )
 
-    def _get_mask_filename(self) -> Union[str, None]:
+    def _get_mask_filename(self) -> str | None:
         """
         Get the filename of the mask file from the fitted model.
 
         Returns
         -------
-        Union[str, None]
+        str or None
             The filename of the mask file. If no mask file has been, returns None.
         """
         _maskfile = self._model.experimentSettingsModel().mask().filename()

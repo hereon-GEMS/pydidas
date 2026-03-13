@@ -11,6 +11,8 @@ Improvements
   (e.g. necessary for Lambda files)
 - Added an info field to the DefineScanFrame to show the required total 
   number of frames/spectra for the configured scan.
+- Added an option to show only NXdata signal datasets and hide the 
+  axis datasets.
 
 Programmatic changes
 --------------------

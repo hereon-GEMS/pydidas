@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,60 +21,32 @@ basic checks for existence, size and same directory.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "check_hdf5_key_exists_in_file",
-    "check_file_exists",
-    "verify_files_in_same_directory",
+    "verify_file_exists",
+    "verify_file_exists_and_extension_matches",
+    "verify_filenames_have_same_parent",
     "verify_files_of_range_are_same_size",
-    "file_is_writable",
 ]
 
 
-import os
 from pathlib import Path
-from typing import List, Union
 
 from numpy import array
 
-from pydidas.core.exceptions import UserConfigError
-from pydidas.core.utils.hdf5_dataset_utils import get_hdf5_populated_dataset_keys
+from pydidas.core.exceptions import FileReadError, UserConfigError
 
 
-def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
-    """
-    Verify that the selected file has a dataset with key.
-
-    Parameters
-    ----------
-    fname : Union[Path, str]
-        The filename and path.
-    key : str
-        The dataset key.
-
-    Raises
-    ------
-    UserConfigError
-        If the dataset key is not found in the hdf5 file.
-    """
-    key = key if key.startswith("/") else f"/{key}"
-    dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
-    if key not in dsets:
-        raise UserConfigError(
-            f"hdf5_key `{key}` is not a valid key for the file `{fname}`."
-        )
-
-
-def check_file_exists(fname: Union[Path, str]):
+def verify_file_exists(fname: Path | str) -> bool:
     """
     Check that a file exists and raise an Exception if not.
 
     Parameters
     ----------
-    fname : Union[Path, str]
+    fname : Path or str
         The filename and path.
 
     Raises
@@ -82,35 +54,66 @@ def check_file_exists(fname: Union[Path, str]):
     UserConfigError
         If the selected filename does not exist.
     """
-    if isinstance(fname, str):
-        fname = Path(fname)
+    fname = Path(fname)
     if not fname.is_file():
         raise UserConfigError(
             f"The selected filename `{fname}` does not point to a valid file."
         )
+    return True
 
 
-def verify_files_in_same_directory(
-    filename1: Union[Path, str], filename2: Union[Path, str]
-):
+def verify_file_exists_and_extension_matches(
+    fname: Path, extensions: str | list[str]
+) -> None:
+    """
+    Check that a file exists and has one of the given extensions.
+
+    Parameters
+    ----------
+    fname : Path
+        The full filename (including the path).
+    extensions : str or list[str]
+        The allowed file extension(s). A string can be given for a single
+        extension or multiple extensions can be separated by a `;;' in a
+        single string. Alternatively, a list of strings can be provided.
+
+    Raises
+    ------
+    FileReadError
+        If the selected filename does not exist or has an invalid
+        extension.
+    """
+    if isinstance(extensions, str):
+        extensions = [_ext.strip() for _ext in extensions.split(";;")]
+    if not fname.is_file():
+        raise FileReadError(f"The selected filename `{fname}` does not exist.")
+    if fname.suffix not in extensions:
+        raise FileReadError(
+            f"The selected file `{fname.name}` does not have a valid "
+            f"extension. Allowed extensions are: {extensions}"
+        )
+
+
+def verify_filenames_have_same_parent(
+    filename1: Path | str, filename2: Path | str
+) -> None:
     """
     Verify the given files are in the same directory.
 
     Parameters
     ----------
-    filename1 : Union[Path, str]
+    filename1 : Path or str
         The path or filename of the first file.
-    filename2 : Union[Path, str]
+    filename2 : Path or str
         The path or filename of the second file.
 
     Raises
     ------
-    OSError
+    UserConfigError
         If the two files are not in the same directory.
     """
-
-    filename1 = Path(filename1) if isinstance(filename1, str) else filename1
-    filename2 = Path(filename2) if isinstance(filename2, str) else filename2
+    filename1 = Path(filename1)
+    filename2 = Path(filename2)
     if filename2.parent not in [filename1.parent, Path()]:
         raise UserConfigError(
             "The selected files are not in the same directory:\n"
@@ -118,13 +121,13 @@ def verify_files_in_same_directory(
         )
 
 
-def verify_files_of_range_are_same_size(files: List[Path]):
+def verify_files_of_range_are_same_size(files: list[Path]) -> None:
     """
     Verify a range of files are all the same size.
 
     Parameters
     ----------
-    files : List[Path]
+    files : list[Path]
         The list of Path objects with the file references.
 
     Raises
@@ -135,35 +138,3 @@ def verify_files_of_range_are_same_size(files: List[Path]):
     _fsizes = array([_f.stat().st_size for _f in files])
     if _fsizes.std() > 0.0:
         raise UserConfigError("The selected files are not all of the same size.")
-
-
-def file_is_writable(filename: Union[Path, str], overwrite=False) -> bool:
-    """
-    Check whether a file exists and the file is writable.
-
-    If the filename does not exist, the function checks whether write
-    permissions are granted for the directory in which the file would
-    be created.
-
-    Parameters
-    ----------
-    filename : Union[Path, str]
-        The path or filename of the file to be checked.
-    overwrite: bool
-        Keyword to allow overwriting of existing files. Default: False
-
-    Returns
-    -------
-    bool
-        True if file exists and is writeable and overwrite or
-        directory is writable. False in other cases.
-    """
-    filename = Path(filename) if isinstance(filename, str) else filename
-    # check for existing files:
-    if filename.is_file():
-        return os.access(filename, os.W_OK) and overwrite
-    # check if directory is writable:
-    if not filename.is_dir():
-        filename = filename.parent
-    # if directory, check if writable:
-    return filename.is_dir() and os.access(filename, os.W_OK)

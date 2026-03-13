@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ImageSeriesOperationsWindow"]
 
+
 import numbers
 from pathlib import Path
 from typing import Any
@@ -36,7 +37,8 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
-from pydidas.core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
+from pydidas.core.utils import ShowBusyMouse, get_extension
+from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, export_data, import_data
 from pydidas.managers import FilelistManager
 from pydidas.widgets import dialogues
@@ -86,7 +88,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Build the frame and create all widgets.
         """
 
-        def get_config(param_key):
+        def get_config(param_key: str) -> dict[str, Any]:
             _config = {
                 "linebreak": param_key
                 in ["first_file", "last_file", "hdf5_key", "output_fname"],
@@ -152,7 +154,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self.process_new_font_metrics()
 
     def connect_signals(self) -> None:
-        """Build the frame and create all child widgets."""
+        """Connect the signals of the widgets to the slots."""
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].sig_new_value.connect(
             self.__selected_first_file
@@ -218,9 +220,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Update widget visibility after selecting the first file based on the
         file format (hdf5 or not).
         """
-        hdf5_flag = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
+        _is_hdf5 = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
         for _key in _HDF5_PARAM_KEYS:
-            self.toggle_param_widget_visibility(_key, hdf5_flag)
+            self.toggle_param_widget_visibility(_key, _is_hdf5)
         self.toggle_param_widget_visibility("last_file", True)
 
     def __update_file_selection(self) -> None:
@@ -237,7 +239,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
         Parameters
         ----------
-        fname : str or Path
+        fname : Path or str
             The filename to the hdf5 data file.
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
@@ -294,7 +296,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self._config["hdf5_frames"] = [_start_index, _max_index]
         self._config["num_frames_per_file"] = _max_index - _start_index
 
-    def _get_fname_and_frame_number(self, index: int) -> tuple:
+    def _get_fname_and_frame_number(self, index: int) -> tuple[Path, int]:
         """
         Get the filename and frame number for an image index.
 
@@ -305,7 +307,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
         Returns
         -------
-        tuple
+        tuple[Path, int]
             The filename and frame number for the selected index.
         """
         _i_file = index // self._config["num_frames_per_file"]

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,11 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ParameterWidgetsMixIn class used to edit plugin
-Parameters.
+Module with the ParameterWidgetsMixIn class used to edit Parameters through widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -61,7 +60,7 @@ class ParameterWidgetsMixIn:
 
         Parameters
         ----------
-        param : Parameter | str
+        param : Parameter or str
             A Parameter class instance.
         **kwargs : Any
             Optional keyword arguments. Supported keys are:
@@ -85,10 +84,10 @@ class ParameterWidgetsMixIn:
             halign_text : QtCore.Qt.Alignment, optional
                 The horizontal alignment for the text (label) widget. The default
                 is QtCore.Qt.AlignRight.
-            parent_widget : Union[QWidget, str, None], optional
-                The widget to which the label is added. If a string, this picks up the
-                calling class's ._widgets dictionary and selects the string key's value.
-                The default is self.
+            parent_widget : QWidget or str or None, optional
+                The widget to which the label is added. If a string,
+                this picks up the calling class's ._widgets dictionary
+                and selects the string key's value. The default is self.
         """
         _parent = kwargs.get("parent_widget", self)
         if isinstance(_parent, str):
@@ -170,8 +169,8 @@ class ParameterWidgetsMixIn:
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(
-                f'No parameter with the key `{key}` and associated widget is "'
-                f'"registered in this class.'
+                f"No parameter with the key `{key}` and associated widget "
+                f"is registered in this class."
             )
         _old_val = self.params[key].value
         with QtCore.QSignalBlocker(self.param_widgets[key]):
@@ -198,14 +197,14 @@ class ParameterWidgetsMixIn:
         value : Any
             The new value for the Parameter.
         choices : None or Sequence[Any]
-            The new list of choices for the Parameter. If None, the choices
-            for the Parameter will be disabled.
+            The new list of choices for the Parameter. If None, the
+            choices for the Parameter will be disabled.
         emit_signal : bool
             Flag to toggle emitting a changed signal after updating the value
             and choices (if the value has changed). The default is True.
         """
         # not using ParameterCollectionMixIn.set_param_value_and_choices method
-        # to have allow using this mixin independently
+        # to allow using this mixin independently
         _old_val = self.params[key].value
         self.params[key].set_value_and_choices(value, choices)
         self.param_composite_widgets[key].update_choices_from_param()

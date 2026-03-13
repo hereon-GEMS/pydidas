@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,20 +21,20 @@ worker processes and run in parallel to an event thread.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AppRunner"]
 
 
-from typing import Union
+from typing import Any
 
 from qtpy import QtCore
 
 from pydidas.core import BaseApp
 from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
-from pydidas.multiprocessing.app_processor_ import app_processor
+from pydidas.multiprocessing.app_processor import app_processor_func
 from pydidas.multiprocessing.worker_controller import WorkerController
 
 
@@ -64,9 +64,10 @@ class AppRunner(WorkerController):
     ----------
     app : pydidas.core.BaseApp
         The instance of the application to be run.
-    n_workers : int, optional
-        The number of spawned worker processes. The default is None which will
-        use the globally defined pydidas setting for the number of workers.
+    n_workers : int or None, optional
+        The number of spawned worker processes. The default is None which
+        will use the globally defined pydidas setting for the number of
+        workers.
     use_app_tasks : bool, optional
         Flag to toggle if the app works with tasks. The default is True.
     """
@@ -77,21 +78,23 @@ class AppRunner(WorkerController):
     def __init__(
         self,
         app: BaseApp,
-        n_workers: Union[None, int] = None,
+        n_workers: int | None = None,
         use_app_tasks: bool = True,
-    ):
+    ) -> None:
         logger.debug("AppRunner: Starting AppRunner")
         WorkerController.__init__(self, n_workers=n_workers)
         if not app._config["run_prepared"]:
             app.multiprocessing_pre_run()
         self.sig_results.connect(app.multiprocessing_store_results)
-        self.sig_post_run_called.connect(app.multiprocessing_post_run)
+        self.sig_post_run_called.connect(  # type: ignore[attr-defined]
+            app.multiprocessing_post_run
+        )
         self.__app = app.copy(clone_mode=True)
         self.__check_app_is_set()
         self._use_app_tasks = use_app_tasks
-        self._processor["func"] = app_processor
+        self._processor["func"] = app_processor_func
 
-    def call_app_method(self, method_name: str, *args: tuple, **kwargs: dict) -> object:
+    def call_app_method(self, method_name: str, *args: Any, **kwargs: Any) -> Any:
         """
         Call a method of the app on the AppRunner's copy.
 
@@ -99,9 +102,9 @@ class AppRunner(WorkerController):
         ----------
         method_name : str
             The name of the Application method.
-        *args : tuple
+        *args : Any
             Any arguments which need to be passed to the method.
-        **kwargs : kwargs
+        **kwargs : Any
             Any keyword arguments which need to be passed to the method.
 
         Raises
@@ -111,7 +114,7 @@ class AppRunner(WorkerController):
 
         Returns
         -------
-        result : object
+        result : Any
             The return object(s) from the App method call.
         """
         self.__check_is_running()
@@ -120,7 +123,7 @@ class AppRunner(WorkerController):
         _result = method(*args, **kwargs)
         return _result
 
-    def set_app_param(self, param_name: str, value: object):
+    def set_app_param(self, param_name: str, value: Any) -> None:
         """
         Set a Parameter of the Application.
 
@@ -128,7 +131,7 @@ class AppRunner(WorkerController):
         ----------
         param_name : str
             The name of the Application Parameter.
-        value : object
+        value : Any
             The new value for the selected Parameter.
         """
         self.__check_app_is_set()
@@ -145,7 +148,7 @@ class AppRunner(WorkerController):
         """
         return self.__app.copy()
 
-    def cycle_pre_run(self):
+    def cycle_pre_run(self) -> None:
         """
         Perform pre-multiprocessing operations.
 
@@ -170,25 +173,27 @@ class AppRunner(WorkerController):
         self.sig_progress.connect(self.__check_progress)
         WorkerController.cycle_pre_run(self)
 
-    def cycle_post_run(self, timeout: float = 10):
+    def cycle_post_run(self, timeout: float = 10) -> None:
         """
         Perform the app's final operations and shut down the workers.
 
         Parameters
         ----------
-        timeout: float
-            The timeout while waiting for the worker processes.
+        timeout : float, optional
+            The timeout while waiting for the worker processes. The
+            default is 10.
         """
         WorkerController.cycle_post_run(self, timeout)
         self.__app.multiprocessing_post_run()
-        self.sig_final_app_state.emit(self.__app.copy())
-        self.sig_post_run_called.emit()
+        self.sig_final_app_state.emit(self.__app.copy())  # type: ignore[attr-defined]
+        self.sig_post_run_called.emit()  # type: ignore[attr-defined]
         logger.debug("AppRunner: Finished cycle post run")
 
     @QtCore.Slot(float)
-    def __check_progress(self, progress: float):
+    def __check_progress(self, progress: float) -> None:
         """
-        Check the progress and finish processing if all results have been received.
+        Check the progress and finish processing if all results have been
+        received.
 
         Parameters
         ----------
@@ -200,10 +205,8 @@ class AppRunner(WorkerController):
             self.suspend()
             self.stop()
 
-    def __check_is_running(self):
-        """
-        Verify that the Thread is not actively running.
-        """
+    def __check_is_running(self) -> None:
+        """Verify that the Thread is not actively running."""
         if self.flags["running"]:
             raise RuntimeError(
                 "Cannot call Application methods while the"
@@ -211,7 +214,7 @@ class AppRunner(WorkerController):
                 " on the AppRunner first."
             )
 
-    def __check_app_method_name(self, method_name: str):
+    def __check_app_method_name(self, method_name: str) -> None:
         """
         Verify the Application has a method with the given name.
 
@@ -223,10 +226,8 @@ class AppRunner(WorkerController):
         if not hasattr(self.__app, method_name):
             raise KeyError(f"The App does not have a method with name '{method_name}'.")
 
-    def __check_app_is_set(self):
-        """
-        Verify that the stored app is a BaseApp instance.
-        """
+    def __check_app_is_set(self) -> None:
+        """Verify that the stored app is a BaseApp instance."""
         if not isinstance(self.__app, BaseApp):
             raise TypeError(
                 "Application is not an instance of BaseApp. "

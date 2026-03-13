@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CoordinateTransformButton to change the image coordinate system.
+Module with the SpecialPlotTypesButton to change the plot type of data.
 """
 
 __author__ = "Malte Storm"
@@ -28,7 +28,7 @@ __all__ = ["SpecialPlotTypesButton"]
 
 
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Literal, Union
+from typing import TYPE_CHECKING, Callable, Literal
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -50,10 +50,10 @@ class SpecialPlotTypesButton(PlotToolButton):
     """
 
     PLOT_TYPE = {
-        ("generic", "icon"): icons.get_pydidas_qt_icon("silx_plot_type_generic.png"),
+        ("generic", "icon"): icons.create_pydidas_icon("silx_plot_type_generic.png"),
         ("generic", "state"): "Generic f(x) = y",
         ("generic", "action"): "Plot generic data",
-        ("kratky", "icon"): icons.get_pydidas_qt_icon("silx_plot_type_kratky.png"),
+        ("kratky", "icon"): icons.create_pydidas_icon("silx_plot_type_kratky.png"),
         ("kratky", "state"): "Kratky plot f(x) = y * x^2",
         ("kratky", "action"): "Use Kratky plot f(x) = y * x^2",
     }
@@ -62,14 +62,24 @@ class SpecialPlotTypesButton(PlotToolButton):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
-        plot: Union["PydidasPlot1D", None] = None,
-    ):
+        plot: "PydidasPlot1D | None" = None,
+    ) -> None:
+        """
+        Initialize the SpecialPlotTypesButton.
+
+        Parameters
+        ----------
+        parent : QtWidgets.QWidget or None, optional
+            The parent widget. The default is None.
+        plot : PydidasPlot1D or None, optional
+            The plot instance. The default is None.
+        """
         PlotToolButton.__init__(self, parent=parent, plot=plot)
         self.__define_actions_and_create_menu()
         self._current_yfunc = self.func_generic
         self._current_ylabel = self.label_generic
 
-    def __define_actions_and_create_menu(self):
+    def __define_actions_and_create_menu(self) -> None:
         """Define the required actions and create the button menu."""
         menu = QtWidgets.QMenu(self)
 
@@ -77,7 +87,7 @@ class SpecialPlotTypesButton(PlotToolButton):
             _action = QtWidgets.QAction(
                 self.PLOT_TYPE[_key, "icon"], self.PLOT_TYPE[_key, "action"], self
             )
-            _action.triggered.connect(partial(self.set_plot_type, _key))
+            _action.triggered.connect(partial(self.set_plot_type, _key))  # type: ignore[attr-defined]
             _action.setIconVisibleInMenu(True)
             menu.addAction(_action)
 
@@ -86,7 +96,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
     @QtCore.Slot()
-    def set_plot_type(self, plot_type: Literal["generic", "kratky"]):
+    def set_plot_type(self, plot_type: Literal["generic", "kratky"]) -> None:
         """
         Set the coordinate system associated with the given name.
 
@@ -99,7 +109,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         self.setToolTip(self.PLOT_TYPE[plot_type, "state"])
         self._current_yfunc = getattr(self, f"func_{plot_type}")
         self._current_ylabel = getattr(self, f"label_{plot_type}")
-        self.sig_new_plot_type.emit(plot_type)
+        self.sig_new_plot_type.emit(plot_type)  # type: ignore[attr-defined]
 
     @staticmethod
     def func_generic(x: np.ndarray, y: np.ndarray) -> np.ndarray:  # noqa ARG001
@@ -173,7 +183,7 @@ class SpecialPlotTypesButton(PlotToolButton):
             The original x label.
         xunit : str
             The original x unit name.
-        ylabel :
+        ylabel : str
             The original y label.
         yunit : str
             The original y unit name.
@@ -203,6 +213,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         """
         return self._current_yfunc
 
+    @property
     def plot_ylabel(self) -> Callable:
         """
         Return the function for mapping the input data to the plot type.

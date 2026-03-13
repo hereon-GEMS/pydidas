@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ dedicated filesystem tree and show file data in a view window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -100,6 +100,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         Connect all required signals and slots between widgets and class methods.
         """
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
+        self._widgets["filename"].returnPressed.connect(self.__filename_input)
         self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
@@ -163,13 +164,22 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         """
         if self.current_filename == filename:
             return
-        if get_extension(filename) not in self.__supported_extensions:
+        self.current_filename = filename
+        if (
+            get_extension(filename) not in self.__supported_extensions
+            or not Path(filename).is_file()
+        ):
+            self._widgets["filename"].setText(self.current_filename)
+            self._widgets["viewer"].set_data(None)
+            if self.__browser_window is not None:
+                self.__browser_window.hide()
+            if self.__metadata_window is not None:
+                self.__metadata_window.hide()
             return
         if self.__browser_window is not None:
             self.__browser_window.hide()
         if self.__metadata_window is not None:
             self.__metadata_window.hide()
-        self.current_filename = filename
         self._widgets["viewer"].set_data(None)
         self._widgets["filename"].setText(self.current_filename)
         self._widgets["ascii_widgets"].setVisible(self.ascii_file)
@@ -182,6 +192,9 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         elif self.generic_file:
             _data = import_data(filename)
             self.__display_dataset(_data)
+
+    def __filename_input(self):
+        self.__file_selected(self._widgets["filename"].text())
 
     def __open_hdf5_file(self) -> None:
         """Process the input file and check whether it is a hdf5 file."""

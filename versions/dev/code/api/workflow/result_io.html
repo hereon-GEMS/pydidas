@@ -666,7 +666,7 @@ to the extension of the filename.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
-<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+<li><p><strong>scan_context</strong> (<a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
 this, if you explicitly require a different context. The default is None.</p></li>
 <li><p><strong>squeeze_results</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to toggle squeezing of the data. If True, any empty dimensions will
 be squeezed from the data. The default is False.</p></li>
@@ -684,7 +684,7 @@ be squeezed from the data. The default is False.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>extension</strong> (<em>str</em>) – The file extension for the saver.</p></li>
 <li><p><strong>data</strong> (<em>dict</em>) – The result dictionary with nodeID keys and result values.</p></li>
-<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+<li><p><strong>scan_context</strong> (<a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
 this, if you explicitly require a different context. The default is None.</p></li>
 </ul>
 </dd>
@@ -717,7 +717,7 @@ keys and label values.</p>
 the ProcessingResults to update itself.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dir_name</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The name of the directory from which data shall be imported.</p>
+<dd class="field-odd"><p><strong>dir_name</strong> (<em>Path</em><em> or </em><em>String</em>) – The name of the directory from which data shall be imported.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
@@ -741,19 +741,19 @@ values is the imported data.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>save_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – The full path for the data to be saved.</p></li>
+<li><p><strong>save_dir</strong> (<em>Path</em><em> or </em><em>str</em>) – The full path for the data to be saved.</p></li>
 <li><p><strong>node_information</strong> (<em>dict</em>) – A dictionary with nodeID keys and dictionary values. Each value dictionary
 must have the following keys: shape, node_label, data_label, plugin_name
 and the respective values. The shape (tuple) determines the shape of the
 Dataset, the node_label is the user’s name for the processing node. The
 data_label gives the description of what the data shows (e.g. intensity)
 and the plugin_name is simply the name of the plugin.</p></li>
-<li><p><strong>scan_context</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
+<li><p><strong>scan_context</strong> (<a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The scan context. If None, the generic context will be used. Only specify
 this, if you explicitly require a different context. The default is None.</p></li>
-<li><p><strong>diffraction_exp</strong> (<em>Union</em><em>[</em><em>DiffractionExp</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The diffraction experiment context. If None, the generic context will be
+<li><p><strong>diffraction_exp</strong> (<em>DiffractionExp</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The diffraction experiment context. If None, the generic context will be
 used. Only specify this, if you explicitly require a different context. The
 default is None.</p></li>
-<li><p><strong>workflow_tree</strong> (<em>Union</em><em>[</em><a class="reference internal" href="workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree"><em>WorkflowTree</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The WorkflowTree. If None, the generic WorkflowTree will be used. Only
+<li><p><strong>workflow_tree</strong> (<a class="reference internal" href="workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree"><em>WorkflowTree</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The WorkflowTree. If None, the generic WorkflowTree will be used. Only
 specify this, if you explicitly require a different context. The default is
 None.</p></li>
 </ul>
@@ -773,7 +773,7 @@ frame data.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>metadata</strong> (<em>dict</em>) – The dictionary with the metadata.</p></li>
-<li><p><strong>scan</strong> (<em>Union</em><em>[</em><a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The Scan instance. If None, this will default to the generic ScanContext.
+<li><p><strong>scan</strong> (<a class="reference internal" href="../contexts.html#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The Scan instance. If None, this will default to the generic ScanContext.
 The default is None.</p></li>
 </ul>
 </dd>

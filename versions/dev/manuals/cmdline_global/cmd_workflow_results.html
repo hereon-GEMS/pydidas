@@ -708,7 +708,7 @@ dimension of length 1.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>*slices</strong> (<em>int</em><em> | </em><em>slice</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
+<li><p><strong>*slices</strong> (<em>int</em><em> or </em><em>slice</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
 <li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><em>optional</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
@@ -788,13 +788,13 @@ node_id keyword.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>save_dir</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The basepath for all saved data.</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – The basepath for all saved data.</p></li>
 <li><p><strong>save_formats</strong> (<em>str</em>) – Strings of all formats to be written. Individual formats can be
 also be given in a single string if they are separated by comma
 (“,”), ampersand (”&amp;”) or slash (“/”) characters.</p></li>
 <li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to enable overwriting of existing files. The default is False.</p></li>
 <li><p><strong>squeeze_results</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to enable squeezing of empty dimensions. The default is False.</p></li>
-<li><p><strong>node_id</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – The node ID for which data shall be saved. If None, this defaults
+<li><p><strong>node_id</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The node ID for which data shall be saved. If None, this defaults
 to all nodes. The default is None.</p></li>
 </ul>
 </dd>

@@ -1202,7 +1202,7 @@ x-range calculations and custom x-scale settings.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.get_filename">
-<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.get_filename" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#pydidas.plugins.InputPlugin.get_filename" title="Link to this definition">#</a></dt>
 <dd><p>Get the filename of the file associated with the frame index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1212,7 +1212,7 @@ x-range calculations and custom x-scale settings.</p>
 <dd class="field-even"><p>The filename.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>Path</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1305,8 +1305,8 @@ used only for checks during live processing.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.update_filename_string">
-<span class="sig-name descname"><span class="pre">update_filename_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.update_filename_string" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pydidas.plugins.InputPlugin.update_filepath">
+<span class="sig-name descname"><span class="pre">update_filepath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.InputPlugin.update_filepath" title="Link to this definition">#</a></dt>
 <dd><p>Set up the generator that can create the full file names to load images.</p>
 <p>The generic implementation only joins the base directory and filename pattern,
 as defined in the ScanContext class.</p>
@@ -1689,7 +1689,7 @@ will be used.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.output_data_dim"><code class="docutils literal notranslate"><span class="pre">InputPlugin.output_data_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.pre_execute"><code class="docutils literal notranslate"><span class="pre">InputPlugin.pre_execute</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.read_multi_image"><code class="docutils literal notranslate"><span class="pre">InputPlugin.read_multi_image</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_filename_string"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_filename_string</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.InputPlugin.update_filepath"><code class="docutils literal notranslate"><span class="pre">InputPlugin.update_filepath</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.OutputPlugin"><code class="docutils literal notranslate"><span class="pre">OutputPlugin</span></code></a><ul class="nav section-nav flex-column">

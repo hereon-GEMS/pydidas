@@ -821,7 +821,7 @@ the result shapes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_func">
-<span class="sig-name descname"><span class="pre">multiprocessing_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_func" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_func" title="Link to this definition">#</a></dt>
 <dd><p>Read the latest image. If the latest image cannot be read (e.g. the
 file is currently being written), the 2nd latest file will be read.</p>
 <dl class="field-list simple">
@@ -830,7 +830,7 @@ file is currently being written), the 2nd latest file will be read.</p>
 <li><p><strong>index</strong> (<em>int or None</em>) – The input index. As this parameter is not used for this app and
 only implemented for compatibility, this will generally be None
 for the DirectorySpyApp. The default is None.</p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – The full filename of the file being read.</p></li>
+<li><p><strong>filename</strong> (<em>Path</em>) – The full filename of the file being read.</p></li>
 </ul>
 </p>
 </dd>
@@ -869,14 +869,14 @@ list.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_store_results">
-<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store the multiprocessing results for other pydidas apps and processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<em>int</em>) – The frame index. This entry is kept for compatibility and not used
 in this app.</p></li>
-<li><p><strong>fname</strong> (<em>str</em>) – The filename</p></li>
+<li><p><strong>fname</strong> (<em>Path</em>) – The filename</p></li>
 </ul>
 </dd>
 </dl>

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ mosaics.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["CompositeCreatorFrame"]
 
 
-import os
 import time
 from functools import partial
 from pathlib import Path
@@ -373,7 +372,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str | Path
+        fname : str or Path
             The filename of the first image file.
         """
         self.__clear_entries(
@@ -419,7 +418,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str | Path
+        fname : str or Path
             The filename
 
         Returns
@@ -427,7 +426,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         bool
             The flag whether the file is valid.
         """
-        if self.get_param_value("live_processing") or os.path.isfile(fname):
+        if self.get_param_value("live_processing") or Path(fname).is_file():
             return True
         if fname not in ["", "."]:
             dialogues.critical_warning(
@@ -473,7 +472,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str | Path
+        fname : str or Path
             The filename to the hdf5 data file.
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
@@ -507,7 +506,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        fname : str | Path
+        fname : str or Path
             The filename of the background image file.
         """
         self.__clear_entries("bg_hdf5_key", "bg_hdf5_frame")
@@ -573,7 +572,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        keys : Union[Literal["all"], Iterable[str], None], optional
+        keys : Literal["all"] or Iterable[str] or None], optional
             An iterable of keys which reference the Parameters. If 'all',
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
@@ -595,7 +594,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         try:
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
-                assert os.path.isfile(self.get_param_value("bg_file"))
+                assert Path(self.get_param_value("bg_file")).is_file()
                 assert self._config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):
@@ -611,7 +610,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        flag : str | bool
+        flag : str or bool
             The show / hide boolean flag.
         """
         if isinstance(flag, str):
@@ -640,7 +639,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        flag : bool | str
+        flag : bool or str
             The flag with visibility information for the ROI selection.
         """
         if isinstance(flag, str):
@@ -656,7 +655,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        flag : str | bool
+        flag : str or bool
             The flag with visibility information for the threshold selection.
         """
         if isinstance(flag, str):
@@ -672,7 +671,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        flag : str | bool
+        flag : str or bool
             The flag with visibility information for the threshold selection.
         """
         if isinstance(flag, str):

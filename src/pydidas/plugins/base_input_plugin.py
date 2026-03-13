@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Module with the InputPlugin base class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["InputPlugin"]
 
 
-import os
 import time
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -72,7 +72,6 @@ class InputPlugin(BasePlugin):
         """
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
-        self.filename_string = ""
         self._config["pre_executed"] = False
         if self.base_output_data_dim == 2:
             self.add_params(
@@ -103,19 +102,18 @@ class InputPlugin(BasePlugin):
         """
         Run generic pre-execution routines.
         """
-        self.update_filename_string()
+        self.update_filepath()
         self._config["pre_executed"] = True
 
-    def update_filename_string(self):
+    def update_filepath(self):
         """
         Set up the generator that can create the full file names to load images.
 
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = self._SCAN.processed_file_naming_pattern
-        self.filename_string = os.path.join(_basepath, _pattern)
+        self._base_dir = self._SCAN.get_param_value("scan_base_directory")
+        self._filename = self._SCAN.processed_file_naming_pattern
 
     def input_available(self, ordinal: int) -> bool:
         """
@@ -137,7 +135,7 @@ class InputPlugin(BasePlugin):
         _frame_indices = self._SCAN.get_frame_indices_from_ordinal(ordinal)
         _last_index = _frame_indices[-1]
         _fname = self.get_filename(_last_index)
-        if os.path.exists(_fname):
+        if _fname.exists():
             try:
                 _ = self.get_frame(_last_index)
             except FileReadError:
@@ -146,7 +144,7 @@ class InputPlugin(BasePlugin):
             return True
         return False
 
-    def get_filename(self, frame_index: int) -> str:
+    def get_filename(self, frame_index: int) -> Path:
         """
         Get the filename of the file associated with the frame index.
 
@@ -157,14 +155,14 @@ class InputPlugin(BasePlugin):
 
         Returns
         -------
-        str
+        Path
             The filename.
         """
         _file_counter = frame_index // self.get_param_value("_counted_images_per_file")
         _file_index = _file_counter * self._SCAN.get_param_value(
             "pattern_number_delta"
         ) + self._SCAN.get_param_value("pattern_number_offset")
-        return self.filename_string.format(index=_file_index)
+        return self._base_dir / self._filename.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -40,19 +40,19 @@ class TestImportExport(unittest.TestCase):
         self._data = np.random.random(self._shape)
         self._2dshape = np.array((37, 15))
         self._2dimage = np.random.random(self._2dshape)
-        self._dir = tempfile.mkdtemp()
+        self._dir = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._dir)
 
     def test_export_data(self):
-        _fname = os.path.join(self._dir, "test.npy")
+        _fname = self._dir / "test.npy"
         export_data(_fname, self._data)
         _data = np.load(_fname)
         self.assertTrue(np.allclose(_data, self._data))
 
     def test_import_data(self):
-        _fname = os.path.join(self._dir, "test.npy")
+        _fname = self._dir / "test.npy"
         np.save(_fname, self._data)
         _data = import_data(_fname)
         self.assertTrue(np.allclose(_data, self._data))

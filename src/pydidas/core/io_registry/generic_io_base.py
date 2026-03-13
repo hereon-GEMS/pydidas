@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["GenericIoBase"]
 
 
-import os
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -72,7 +71,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str | Path | list[Path | str]
+        filename : str or Path or list[Path or str]
             The filename of the file to be imported.
         """
         raise NotImplementedError
@@ -86,7 +85,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str | Path
+        filename : str or Path
             The full filename and path.
         **kwargs : Any
             Any keyword arguments. Supported are:
@@ -100,7 +99,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
             If a file with filename exists and the overwrite flag is not True.
         """
         _overwrite = kwargs.get("overwrite", False)
-        if os.path.exists(filename) and not _overwrite:
+        if Path(filename).exists() and not _overwrite:
             raise FileExistsError(
                 f"The file `{filename}` exists and overwriting has not been confirmed."
             )

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,13 +18,12 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
@@ -40,13 +39,13 @@ from pydidas.managers import ImageMetadataManager
 class TestImageMetadataManager(unittest.TestCase):
     def setUp(self):
         self._dsize = 40
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda _i: Path(os.path.join(self._path, f"test_{_i:03d}.npy"))
+        self._path = Path(tempfile.mkdtemp())
+        self._fname = lambda _i: self._path / f"test_{_i:03d}.npy"
         self._img_shape = (32, 35)
         self._data = np.random.random((self._dsize,) + self._img_shape)
         for i in range(self._dsize):
             np.save(self._fname(i), self._data[i])
-        self._hdf5_fname = Path(os.path.join(self._path, "test_000.h5"))
+        self._hdf5_fname = self._path / "test_000.h5"
         with h5py.File(self._hdf5_fname, "w") as f:
             f["/entry/data/data"] = self._data
 
@@ -54,11 +53,11 @@ class TestImageMetadataManager(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def create_second_dataset(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f"test_{i:03d}.npy"))
+        self._path = Path(tempfile.mkdtemp())
+        self._fname = lambda i: self._path / f"test_{i:03d}.npy"
         _img_shape = (47, 35)
         _data = np.random.random((self._dsize,) + _img_shape)
-        _hdf5_fname = Path(os.path.join(self._path, "test_001.h5"))
+        _hdf5_fname = self._path / "test_001.h5"
         with h5py.File(_hdf5_fname, "w") as f:
             f["/entry/data/data"] = _data
         self._hdf5_fname2 = _hdf5_fname

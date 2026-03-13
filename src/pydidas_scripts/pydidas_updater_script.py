@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ pydidas from GitHub and replace the available version.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -326,8 +326,8 @@ def remove_temp_data(path: Path):
             shutil.rmtree(path, ignore_errors=True)
             for _root, _dirs, _files in os.walk(path):
                 for _name in _files:
-                    _fname = os.path.join(_root, _name)
-                    os.chmod(_fname, stat.S_IWUSR)
+                    _fname = Path(_root) / _name
+                    _fname.chmod(stat.S_IWUSR)
         if path.is_dir():
             shutil.rmtree(path, ignore_errors=False)
     except PermissionError:

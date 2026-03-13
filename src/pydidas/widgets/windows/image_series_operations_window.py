@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ operations on a number of images.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ImageSeriesOperationsWindow"]
 
 import numbers
-import os
 from pathlib import Path
 from typing import Any
 
@@ -185,7 +184,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             The filename of the first image file.
         """
         self.__clear_entries(["last_file", *_HDF5_PARAM_KEYS])
-        if not os.path.isfile(fname):
+        if not Path(fname).is_file():
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()

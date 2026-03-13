@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ to stand-alone Qt windows.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasWindow"]
 
 
-import os
 from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -73,7 +72,7 @@ class PydidasWindow(BaseFrame):
         _window_class = self.__class__.__name__
         _doc_file = doc_filename_for_window_manual(_window_class)
 
-        if os.path.exists(_doc_file):
+        if _doc_file.exists():
             _url = doc_qurl_for_window_manual(_window_class)
         else:
             _url = DOC_HOME_QURL

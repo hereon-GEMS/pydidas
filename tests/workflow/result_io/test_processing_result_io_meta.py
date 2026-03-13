@@ -24,10 +24,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -74,9 +74,9 @@ def prepare_files_and_directories(
 
 
 def import_results(saver, fname):
-    if os.path.basename(fname) == "node_01.TEST":
+    if Path(fname).name == "node_01.TEST":
         _id = 1
-    elif os.path.basename(fname) == "node_03.TEST":
+    elif Path(fname).name == "node_03.TEST":
         _id = 3
     _data = {
         1: Dataset(np.arange(100).reshape((10, 10)) + 42.1),
@@ -106,7 +106,7 @@ def update_metadata(saver, metadata, scan):
 class TestProcessingResultsSaverMeta(unittest.TestCase):
     def setUp(self):
         self._meta_registry = META.registry.copy()
-        self._dir = tempfile.mkdtemp()
+        self._dir = Path(tempfile.mkdtemp())
 
         META.reset()
 
@@ -268,7 +268,7 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         _Saver = self.create_saver_class("SAVER", ".Test")
         _Saver.import_results_from_file = classmethod(import_results)
         for _id in [1, 3]:
-            with open(os.path.join(self._dir, f"node_{_id:02d}.TEST"), "w") as _file:
+            with (self._dir / f"node_{_id:02d}.TEST").open("w") as _file:
                 _file.write("dummy")
         _data, _node_info, _scan, exp, _tree = META.import_data_from_directory(
             self._dir

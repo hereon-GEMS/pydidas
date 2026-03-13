@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ to store the pixel mask.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ExportEigerPixelmaskWindow"]
 
 
-import os
 from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
@@ -126,19 +125,19 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         """
         Export the pixelmask.
         """
-        _master_fname = self.get_param_value("master_filename", str)
-        _export_fname = self.get_param_value("output_filename", str)
-        _out_dir = os.path.dirname(_export_fname)
-        if not os.path.exists(_master_fname):
+        _master_fname = self.get_param_value("master_filename")
+        _export_fname = self.get_param_value("output_filename")
+        _out_dir = _export_fname.parent
+        if not _master_fname.exists():
             critical_warning(
                 "Input file not found",
                 (f'The specified input file "{_master_fname}" could not be found.'),
             )
             return
-        if not os.path.exists(_out_dir):
+        if not _out_dir.exists():
             critical_warning(
                 "Output directory not found",
-                f"The specified output directory '{_out_dir}' could not be found.",
+                f"The specified output directory '{str(_out_dir)}' could not be found.",
             )
             return
         store_eiger_pixel_mask_from_master_file(_master_fname, _export_fname)

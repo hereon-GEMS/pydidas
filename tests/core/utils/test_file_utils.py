@@ -117,9 +117,7 @@ class Test_file_utils(unittest.TestCase):
     def test_find_valid_python_files__simple_path(self):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
-        _target = set(
-            [Path(os.path.join(self._path, _file)) for _file in self._good_filenames]
-        )
+        _target = set([self._path / _file for _file in self._good_filenames])
         self.assertEqual(_files, _target)
 
     def test_find_valid_python_files__path_tree(self):
@@ -128,7 +126,7 @@ class Test_file_utils(unittest.TestCase):
         _target = set(
             flatten(
                 [
-                    [Path(_dir.joinpath(_file)) for _file in self._good_filenames]
+                    [Path(_dir) / _file for _file in self._good_filenames]
                     for _dir in _dirs
                 ]
             )
@@ -171,7 +169,7 @@ class Test_file_utils(unittest.TestCase):
         _fnames, _range = get_file_naming_scheme(_file1, _file2)
         self.assertEqual(_range[0], _index0)
         self.assertEqual(_range[-1], _index1)
-        self.assertEqual(_fnames.format(index=0).replace("\\", "/"), _file1)
+        self.assertEqual(str(_fnames).format(index=0).replace("\\", "/"), _file1)
 
     def test_get_file_naming_scheme__wrong_ext(self):
         _index0 = 0
@@ -205,7 +203,7 @@ class Test_file_utils(unittest.TestCase):
         _fnames, _range = get_file_naming_scheme(
             _file1, _file2, ignore_leading_zeros=True
         )
-        self.assertEqual(_fnames.format(index=0).replace("\\", "/"), _file1)
+        self.assertEqual(str(_fnames).format(index=0).replace("\\", "/"), _file1)
 
     def test_get_file_naming_scheme__wrong_number_length(self):
         _index0 = 0

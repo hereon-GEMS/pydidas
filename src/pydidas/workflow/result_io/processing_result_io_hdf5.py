@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ProcessingResultIoHdf5"]
 
 
-import os
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -198,9 +197,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
         _tree = kwargs.get("workflow_tree", WorkflowTree())
-        cls._save_dir = save_dir if isinstance(save_dir, Path) else Path(save_dir)
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+        cls._save_dir = Path(save_dir)
+        if not cls._save_dir.exists():
+            cls._save_dir.mkdir(parents=True)
 
         cls._node_information = node_information
         cls._filenames = cls.get_filenames_from_labels()
@@ -463,7 +462,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The full filename of the file to be imported.
 
         Returns

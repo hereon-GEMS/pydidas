@@ -119,7 +119,6 @@ def get_hdf5_populated_dataset_keys(
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
 
-    # Update kwargs with default values if not already set:
     file_ref = kwargs.get("file_ref")
     # Ensure file_ref is in kwargs for recursive calls
     if not file_ref:
@@ -149,7 +148,11 @@ def get_hdf5_populated_dataset_keys(
                 _ext_kwargs = kwargs.copy()
                 _ext_kwargs["file_ref"] = _item.file
                 _external_name = _item.name
-                _local_name = f"{_item_name}/{_key}"
+                _local_name = (
+                    f"{_item_name}{_key}"
+                    if _item_name.endswith("/")
+                    else f"{_item_name}/{_key}"
+                )
                 _ext_dsets = [
                     _dset.replace(_external_name, _local_name)
                     for _dset in get_hdf5_populated_dataset_keys(_item, **_ext_kwargs)
@@ -210,17 +213,14 @@ def _dataset_selection_valid_check(
         return False
     if options is None:
         options = {}
-    # Check size first (cheapest check)
     min_size = options.get("min_size", 0)
     if item.size < min_size:
         return False
-    # Check shape/dimensionality
     min_dim = options.get("min_dim", 2)
     max_dim = options.get("max_dim", None)
     ndim = item.ndim
     if ndim < min_dim or (max_dim is not None and ndim > max_dim):
         return False
-    # Check name filtering (potentially expensive with startswith)
     ignore_keys = options.get("ignore_keys", ())
     if ignore_keys:
         if not isinstance(ignore_keys, tuple):
@@ -233,7 +233,6 @@ def _dataset_selection_valid_check(
             return True
         if item_name.startswith(ignore_keys):
             return False
-
     return True
 
 

@@ -34,7 +34,7 @@ import h5py
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import (
+from pydidas.core.utils.hdf5 import (
     create_nx_dataset,
     create_nx_entry_groups,
     read_and_decode_hdf5_dataset,
@@ -68,10 +68,12 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file to be written.
         tree : ProcessingTree
             The workflow tree instance.
+        **kwargs : Any
+            Additional keyword arguments.
         """
         cls.check_for_existing_file(filename, **kwargs)
         _group_name = "entry/pydidas_config"
@@ -89,7 +91,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file to be read.
 
         Returns

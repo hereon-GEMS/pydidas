@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
+# Copyright 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,21 +16,26 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas.multiprocessing module includes functionalities to run scripts and
-applications in parallel procesing.
+The core.utils sub-package provides generic convenience functions and classes
+which are used throughout the package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .app_processor import app_processor_func
-from .app_runner import AppRunner
-from .processor import processor_func
-from .worker_controller import WorkerController
+from . import hdf5_dataset_utils, hdf5_filter_keys, nxs_export
+from .hdf5_dataset_utils import *
+from .nxs_export import *
 
 
-__all__ = ["app_processor_func", "processor_func", "AppRunner", "WorkerController"]
+__all__ = nxs_export.__all__ + hdf5_dataset_utils.__all__
+
+del (
+    hdf5_dataset_utils,
+    hdf5_filter_keys,
+    nxs_export,
+)

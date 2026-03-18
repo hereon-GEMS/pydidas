@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,16 @@ multiprocessing calls to a pydidas Application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["app_processor"]
+__all__ = ["app_processor_func"]
 
 
 import queue
 import time
-from typing import Union
+from typing import Any
 
 from pydidas.core import BaseApp, ParameterCollection
 from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
@@ -48,21 +48,36 @@ def _run_taskless_cycle(app: BaseApp, output_queue: queue.Queue) -> bool:
     return _app_carryon
 
 
-def _wait_for_app_response(app: BaseApp, results: Union[None, object]):
+def _wait_for_app_response(app: BaseApp, current_results: Any | None) -> Any:
+    """
+    Wait for the app to process a signal and continue.
+
+    Parameters
+    ----------
+    app : BaseApp
+        The application instance.
+    current_results : Any or None
+        The results object or None.
+
+    Returns
+    -------
+    Any
+        The app result.
+    """
     while not app.signal_processed_and_can_continue():
         time.sleep(0.005)
-    if results is None:
-        results = app.get_latest_results()
-    return results
+    if current_results is None:
+        current_results = app.get_latest_results()
+    return current_results
 
 
-def app_processor(
+def app_processor_func(
     multiprocessing_config: dict,
-    app: type,
+    app_class: type,
     app_params: ParameterCollection,
     app_config: dict,
-    **kwargs: dict,
-):
+    **kwargs: Any,
+) -> None:
     """
     Start a loop to process function calls on individual frames.
 
@@ -75,24 +90,24 @@ def app_processor(
     multiprocessing_config : dict
         The multiprocessing configuration dictionary. It includes information
         about the logging level as well as queue objects.
-    app : type
-        The Application class to be called in the process. The App must have a
-        multiprocessing_func method.
+    app_class : type
+        The Application class to be called in the process. The App must have
+        a multiprocessing_func method.
     app_params : ParameterCollection
         The App ParameterCollection used for creating the app.
     app_config : dict
         The dictionary which is used for overwriting the app._config
         dictionary.
-    **kwargs : dict
+    **kwargs : Any
         Supported keyword arguments are:
 
         wait_for_output_queue : bool, optional
-            Flag to wait for the output queue to be empty before shutting down the
-            worker. The default is True.
+            Flag to wait for the output queue to be empty before shutting
+            down the worker. The default is True.
         use_tasks : bool, optional
-            Flag that the app uses tasks instead of running continuously. The default
-            is True.
-        app_mp_manager : dict, optional
+            Flag that the app uses tasks instead of running continuously.
+            The default is True.
+        app_mp_manager : dict or None, optional
             Additional multiprocessing configuration or attributes for the
             app. The default is None.
     """
@@ -108,19 +123,19 @@ def app_processor(
     _signal_queue = multiprocessing_config.get("queue_signal")
     _io_lock = multiprocessing_config.get("lock")
 
-    def _debug_message(msg: str):
+    def _debug_message(msg: str) -> None:
         with _io_lock:
             logger.debug(msg)
 
     _debug_message("Started process")
 
-    _app = app(app_params, clone_mode=True)
+    _app = app_class(app_params, clone_mode=True)
     _app._config = app_config
     _app_mp_manager = kwargs.get("app_mp_manager", None)
     if _app_mp_manager:
         _app.mp_manager = _app_mp_manager
     _app.multiprocessing_pre_run()
-
+    _arg = None
     _app_carryon = True
     while True:
         # check for stop signal
@@ -155,10 +170,12 @@ def app_processor(
                     _results = _wait_for_app_response(_app, _results)
                 _output_queue.put([_arg, _results])
                 _debug_message("Finished computation of item %s" % _arg)
+            else:
+                time.sleep(0.005)
         else:
             _app_carryon = _run_taskless_cycle(_app, _output_queue)
-        if not _app_carryon:
-            time.sleep(0.005)
+            if not _app_carryon:
+                time.sleep(0.005)
     _debug_message("Worker finished with all tasks.")
 
     _app_carryon = False

@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["CropAndBinImage"]
 
 
+from typing import Any
+
 from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
@@ -35,7 +37,7 @@ from pydidas.plugins import ProcPlugin
 
 class CropAndBinImage(ProcPlugin):
     """
-    Crop and bin an image (i.e. 2d input data).
+    Crop and bin an image (i.e. a 2d input dataset).
     """
 
     plugin_subtype = PROC_PLUGIN_IMAGE
@@ -50,23 +52,23 @@ class CropAndBinImage(ProcPlugin):
     output_data_label = "Image intensity"
     output_data_unit = "counts"
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict[str, Any]]:
         """
         Apply the given cropping and binning to the input data.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             Input data.
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments passed to the execute method.
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        Dataset
             The image data frame.
-        kwargs : dict
-            The updated input keyword arguments.
+        dict[str, Any]
+            The updated input keyword dictionary.
         """
         _roi = self._get_own_roi()
         _binning = self.get_param_value("binning")

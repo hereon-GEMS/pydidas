@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with PydidasPlot1D class which adds configurations to the base silx Plot1
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -113,7 +113,7 @@ class PydidasPlot1D(Plot1D):
         """
         self.clear_plot(clear_data=False)
         self._y_function = self._plot_type.plot_yfunc
-        self._y_label = self._plot_type.plot_ylabel()
+        self._y_label = self._plot_type.plot_ylabel
         for _legend, (_data, _kwargs) in self._current_raw_data.items():
             _kwargs["legend"] = _legend
             self.plot_pydidas_dataset(_data, **_kwargs)

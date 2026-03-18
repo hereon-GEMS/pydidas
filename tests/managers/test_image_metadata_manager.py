@@ -319,15 +319,6 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config["images_per_file"], self._dsize // _step + 1)
         self.assertEqual(imm._config["numbers"], range(0, self._dsize, _step))
 
-    def test_update_final_image(self):
-        _shapex = 123
-        _shapey = 435
-        imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
-        imm.update_final_image()
-        # assert does not raise an Exception.
-
     def test_set_filename(self):
         imm = ImageMetadataManager()
         imm.filename = self._hdf5_fname

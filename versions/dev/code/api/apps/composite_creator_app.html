@@ -452,22 +452,22 @@
 <p>Compose mosaic images of a large number of individual image files.</p>
 <p>Parameters can be passed either through the argparse module during
 command line calls or through keyword arguments in scripts.</p>
-<p>The names of the parameters are similar for both cases, only the calling
-syntax changes slightly, based on the underlying structure used.
-For the command line, parameters must be passed as -&lt;parameter name&gt;
-&lt;value&gt;.
-For keyword arguments, parameters must be passed during instantiation
-using the standard &lt;parameter name&gt;=&lt;value&gt;.</p>
+<p>The names of the parameters are similar for both cases, only the
+calling syntax changes slightly, based on the underlying structure
+used. For the command line, parameters must be passed as
+-&lt;parameter name&gt; &lt;value&gt;. For keyword arguments, parameters must
+be passed during instantiation using the standard
+&lt;parameter name&gt;=&lt;value&gt;.</p>
 <p class="rubric">Notes</p>
-<p>Please refer to the help for the full list and explanation of Parameters used by
-the CompositeCreatorApp.</p>
+<p>Please refer to the help for the full list and explanation of
+Parameters used by the CompositeCreatorApp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> (<em>tuple</em>) – Any number of Parameters. These will be added to the app’s
+<li><p><strong>*args</strong> (<em>Any</em>) – Any number of Parameters. These will be added to the app’s
 ParameterCollection.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters supplied with their reference key as dict key and the
-Parameter itself as value.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Parameters supplied with their reference key as dict key and
+the Parameter itself as value.</p></li>
 </ul>
 </dd>
 </dl>
@@ -529,8 +529,8 @@ None will be ignored.</p></li>
 <dd><p>Get the composite image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The composite image in np.ndarray format. If no composite has been
-created, this property returns None.</p>
+<dd class="field-odd"><p>The composite image in np.ndarray format. If no composite has
+been created, this property returns None.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None or np.ndarray</p>

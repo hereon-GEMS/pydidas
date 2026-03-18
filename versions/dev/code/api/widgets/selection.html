@@ -507,7 +507,7 @@ file system model to display the contents of directories.</p>
 <dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keywords are any keywords that are supported by QTreeView
 as well as:</p>
 <dl class="simple">
-<dt>parent<span class="classifier">Union[QWidget, None], optional</span></dt><dd><p>The parent widget, if applicable. The default is None.</p>
+<dt>parent<span class="classifier">QtWidgets.QWidget or None, optional</span></dt><dd><p>The parent widget, if applicable. The default is None.</p>
 </dd>
 <dt>current_path<span class="classifier">str, optional</span></dt><dd><p>The default path in the file system. The default is ‘’.</p>
 </dd>
@@ -533,7 +533,7 @@ as well as:</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_key_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.selection.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base.html#pydidas.widgets.WidgetWithParameterCollection" title="pydidas.widgets.widget_with_parameter_collection.WidgetWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameterCollection</span></code></a></p>
 <p>A compound widget to select datasets in Hdf5 files.</p>
 <p>The Hdf5DatasetSelector is a compound widget which allows to select
@@ -542,18 +542,30 @@ dimension of an n-dimensional (n &gt;= 3) dataset is the frame number. Any
 2-dimensional datasets will be interpreted as single frames.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset_key_filters</strong> (<em>Union</em><em>[</em><em>dict</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – A dictionary with dataset keys to be filtered from the list
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any additional keyword arguments. See below for supported arguments.</p>
+<dl class="simple">
+<dt>dataset_filter_keys<span class="classifier">dict, optional</span></dt><dd><p>A dictionary with dataset keys to be filtered from the list
 of displayed datasets. Entries must be in the format
 {&lt;Key to filter&gt;: &lt;Descriptive text for checkbox&gt;}.
-The default is None.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any additional keyword arguments. See below for supported arguments.</p></li>
-<li><p><strong>**QtAttribute</strong> (<em>depends on the attribute</em>) – Any Qt attributes which are supported by the generic QWidget. Use the
-Qt attribute name with a lowercase first character. Examples are
-<code class="docutils literal notranslate"><span class="pre">fixedWidth</span></code>, <code class="docutils literal notranslate"><span class="pre">fixedHeight</span></code>.</p></li>
-</ul>
+The default is the built-in dict with detector-specific filter
+keys.</p>
+</dd>
+<dt>dataset_filter_exceptions<span class="classifier">dict, optional</span></dt><dd><p>A dictionary with lists of dataset keys which are exceptions
+to the filter keys. Entries must be in the format
+{&lt;Filter key&gt;: [&lt;Exception key 1&gt;, &lt;Exception key 2&gt;, …]}.
+The default is the built-in dict with detector-specific
+exceptions.</p>
 </dd>
 </dl>
+</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.active_filters">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_filters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.active_filters" title="Link to this definition">#</a></dt>
+<dd><p>Get the list of currently active dataset filters.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear" title="Link to this definition">#</a></dt>
@@ -576,15 +588,21 @@ a different dataset to be visualized. This method also updates the
 accepted frame range for the sliders.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.dset_filter_exceptions">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dset_filter_exceptions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dset_filter_exceptions" title="Link to this definition">#</a></dt>
+<dd><p>Get the list of dataset keys which are exceptions to the active filters.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.selection.Hdf5DatasetSelector.new_filename">
-<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">new_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename" title="Link to this definition">#</a></dt>
 <dd><p>Process the new filename.</p>
 <p>If the new filename has a suffix associated with hdf5 files,
 show the widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The full file system path to the new file.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The full file system path to the new file.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -693,9 +711,11 @@ for the used Parameter widgets is applied. The default is None.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.active_filters"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.active_filters</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.clear"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.clear</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.dataset</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.display_dataset"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.display_dataset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.dset_filter_exceptions"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.dset_filter_exceptions</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.selection.Hdf5DatasetSelector.new_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5DatasetSelector.new_filename</span></code></a></li>
 </ul>
 </li>

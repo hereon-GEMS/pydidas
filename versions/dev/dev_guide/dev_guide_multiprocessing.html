@@ -469,12 +469,12 @@ the <a class="reference internal" href="../code/api/multiprocessing.html#pydidas
 <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.WorkerController.send_stop_signal" title="pydidas.multiprocessing.WorkerController.send_stop_signal"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_stop_signal</span></code></a> method:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">WorkerController.</span></span><span class="sig-name descname"><span class="pre">send_stop_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-prename descclassname"><span class="pre">WorkerController.</span></span><span class="sig-name descname"><span class="pre">send_stop_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Send stop signal to workers.</p>
 <p>This method will send stop signals to all workers.
-Note that the runtime of the workers will be determined by the runtime
-of the called function. The current call will be finished before the stop
-signal will be processed.</p>
+Note that the runtime of the workers will be determined by the
+runtime of the called function. The current call will be finished
+before the stop signal will be processed.</p>
 </dd></dl>
 
 </section>
@@ -731,13 +731,13 @@ loop.</p></td>
 </section>
 <section id="the-app-processor">
 <h3>The app_processor<a class="headerlink" href="#the-app-processor" title="Link to this heading">#</a></h3>
-<p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.app_processor" title="pydidas.multiprocessing.app_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor</span></code></a> is the
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor</span></code> is the
 pydidas function which runs App tasks in a separate process. Tasks and result
 notifications are exchanged via queues. The transfer of results to the AppRunner
 process must be handled by the app and can be implemented to the developer’s own
 taste. Because all queued data is pickled, it is not advisable to send large
 data over the queue but instead to use the multiprocessing shared memory.</p>
-<p>The <a class="reference internal" href="../code/api/multiprocessing.html#pydidas.multiprocessing.app_processor" title="pydidas.multiprocessing.app_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor's</span></code></a> event
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">app_processor's</span></code> event
 loop is summarized in the flowchart below:</p>
 <a class="reference internal image-reference" href="../_images/app_proc_logic_flow_chart.png"><img alt="../_images/app_proc_logic_flow_chart.png" class="align-center" src="../_images/app_proc_logic_flow_chart.png" style="width: 400px;" />
 </a>

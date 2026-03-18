@@ -676,7 +676,7 @@ The default is None.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.managers.</span></span><span class="sig-name descname"><span class="pre">ImageMetadataManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.managers.</span></span><span class="sig-name descname"><span class="pre">ImageMetadataManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager" title="Link to this definition">#</a></dt>
 <dd><p>Class to handle image metadata.</p>
 <p>The ImageMetadataManager is responsible for keeping track of the
 metadata (shape, datatype, imager per file) of image files. All the
@@ -709,8 +709,9 @@ will be applied to the cropped images. The default is 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> (<em>tuple</em>) – Any of the Parameters in use can be given as instances.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters can also be supplied as kwargs, referencey by their refkey.</p></li>
+<li><p><strong>*args</strong> (<a class="reference internal" href="core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a>) – Any of the Parameters in use can be given as instances.</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference internal" href="core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a>) – Parameters can also be supplied as kwargs, referenced by their
+refkey.</p></li>
 </ul>
 </dd>
 </dl>
@@ -793,7 +794,7 @@ will be applied to the cropped images. The default is 1.</p>
 <dd class="field-odd"><p>The selected frame numbers.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[range, int]</p>
+<dd class="field-even"><p>range or int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -832,18 +833,18 @@ will be applied to the cropped images. The default is 1.</p>
 <dd><p>Get the ROI object required to achieve the final image shape.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Either None, if no ROI has been defined or a tuple with the slice
-objects for y and x dimensions.</p>
+<dd class="field-odd"><p>Either None, if no ROI has been defined or a tuple with the
+slice objects for y and x dimensions.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Union[None, tuple[slice, slice]]</p>
+<dd class="field-even"><p>None or tuple[slice, slice]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.store_image_data">
-<span class="sig-name descname"><span class="pre">store_image_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.store_image_data" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">store_image_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.store_image_data" title="Link to this definition">#</a></dt>
 <dd><p>Store the data about the image shape and datatype.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -858,27 +859,21 @@ objects for y and x dimensions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update">
-<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update" title="Link to this definition">#</a></dt>
 <dd><p>Perform a full update.</p>
-<p>If a new filename is specified, it will be set as first action. Otherwise,
-the metadata will be extracted from the current file.</p>
+<p>If a new filename is specified, it will be set as first action.
+Otherwise, the metadata will be extracted from the current file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>, </em><em>None</em><em>]</em><em>, </em><em>optional</em>) – The filename to be updated. If None, the current filename will be used.
-The default is None.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The filename to be updated. If None, the current filename will
+be used. The default is None.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update_final_image">
-<span class="sig-name descname"><span class="pre">update_final_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update_final_image" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the dimensions of the final image.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.managers.ImageMetadataManager.update_input_data">
-<span class="sig-name descname"><span class="pre">update_input_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update_input_data" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_input_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.managers.ImageMetadataManager.update_input_data" title="Link to this definition">#</a></dt>
 <dd><p>Update the image metadata from new input.</p>
 </dd></dl>
 
@@ -964,7 +959,6 @@ The default is None.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.managers.ImageMetadataManager.roi"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.roi</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.managers.ImageMetadataManager.store_image_data"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.store_image_data</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.managers.ImageMetadataManager.update"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.managers.ImageMetadataManager.update_final_image"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update_final_image</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.managers.ImageMetadataManager.update_input_data"><code class="docutils literal notranslate"><span class="pre">ImageMetadataManager.update_input_data</span></code></a></li>
 </ul>
 </li>

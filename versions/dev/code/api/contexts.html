@@ -1318,6 +1318,20 @@ starting with zero.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.Scan.n_frames_required">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_frames_required</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.contexts.Scan.n_frames_required" title="Link to this definition">#</a></dt>
+<dd><p>Get the total number of frames/spectra required to process the full Scan.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of frames/spectra to be processed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.n_points">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.contexts.Scan.n_points" title="Link to this definition">#</a></dt>
 <dd><p>Get the total number of points in the Scan.</p>
@@ -1870,7 +1884,7 @@ keys.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.instance">
-<span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.diff_exp.diff_exp_context.DiffractionExperimentContext(0x555ddc6de090)&gt;</span></em><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.instance" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.diff_exp.diff_exp_context.DiffractionExperimentContext(0x55974d530f40)&gt;</span></em><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.instance" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2600,8 +2614,22 @@ starting with zero.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.instance">
-<span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.scan.scan_context.ScanContext(0x555ddc5ed370)&gt;</span></em><a class="headerlink" href="#pydidas.contexts.ScanContext.instance" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.scan.scan_context.ScanContext(0x55974d675e90)&gt;</span></em><a class="headerlink" href="#pydidas.contexts.ScanContext.instance" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.ScanContext.n_frames_required">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_frames_required</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pydidas.contexts.ScanContext.n_frames_required" title="Link to this definition">#</a></dt>
+<dd><p>Get the total number of frames/spectra required to process the full Scan.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of frames/spectra to be processed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.n_points">
@@ -3202,6 +3230,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.get_params"><code class="docutils literal notranslate"><span class="pre">Scan.get_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.get_range_for_dim"><code class="docutils literal notranslate"><span class="pre">Scan.get_range_for_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.import_from_file"><code class="docutils literal notranslate"><span class="pre">Scan.import_from_file</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.n_frames_required"><code class="docutils literal notranslate"><span class="pre">Scan.n_frames_required</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.n_points"><code class="docutils literal notranslate"><span class="pre">Scan.n_points</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.ndim"><code class="docutils literal notranslate"><span class="pre">Scan.ndim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.param_keys"><code class="docutils literal notranslate"><span class="pre">Scan.param_keys</span></code></a></li>
@@ -3299,6 +3328,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.get_range_for_dim"><code class="docutils literal notranslate"><span class="pre">ScanContext.get_range_for_dim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.import_from_file"><code class="docutils literal notranslate"><span class="pre">ScanContext.import_from_file</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.instance"><code class="docutils literal notranslate"><span class="pre">ScanContext.instance</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.n_frames_required"><code class="docutils literal notranslate"><span class="pre">ScanContext.n_frames_required</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.n_points"><code class="docutils literal notranslate"><span class="pre">ScanContext.n_points</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.ndim"><code class="docutils literal notranslate"><span class="pre">ScanContext.ndim</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.non_context_class"><code class="docutils literal notranslate"><span class="pre">ScanContext.non_context_class</span></code></a></li>

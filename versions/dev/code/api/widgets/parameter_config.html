@@ -607,7 +607,7 @@ convenience functions for settings Parameter values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> | </em><em>str</em>) – A Parameter class instance.</p></li>
+<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> or </em><em>str</em>) – A Parameter class instance.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keys are:</p>
 <dl class="simple">
 <dt>gridPos<span class="classifier">tuple, optional</span></dt><dd><p>The grid position in the layout. The default is (-1, 0, 1, 1)</p>
@@ -629,9 +629,9 @@ QtCore.Qt.AlignRight.</p>
 <dt>halign_text<span class="classifier">QtCore.Qt.Alignment, optional</span></dt><dd><p>The horizontal alignment for the text (label) widget. The default
 is QtCore.Qt.AlignRight.</p>
 </dd>
-<dt>parent_widget<span class="classifier">Union[QWidget, str, None], optional</span></dt><dd><p>The widget to which the label is added. If a string, this picks up the
-calling class’s ._widgets dictionary and selects the string key’s value.
-The default is self.</p>
+<dt>parent_widget<span class="classifier">QWidget or str or None, optional</span></dt><dd><p>The widget to which the label is added. If a string,
+this picks up the calling class’s ._widgets dictionary
+and selects the string key’s value. The default is self.</p>
 </dd>
 </dl>
 </p></li>
@@ -672,8 +672,8 @@ Parameter datatype (or supported by a converter).</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key</strong> (<em>str</em>) – The reference key for the Parameter.</p></li>
 <li><p><strong>value</strong> (<em>Any</em>) – The new value for the Parameter.</p></li>
-<li><p><strong>choices</strong> (<em>None</em><em> or </em><em>Sequence</em><em>[</em><em>Any</em><em>]</em>) – The new list of choices for the Parameter. If None, the choices
-for the Parameter will be disabled.</p></li>
+<li><p><strong>choices</strong> (<em>None</em><em> or </em><em>Sequence</em><em>[</em><em>Any</em><em>]</em>) – The new list of choices for the Parameter. If None, the
+choices for the Parameter will be disabled.</p></li>
 <li><p><strong>emit_signal</strong> (<em>bool</em>) – Flag to toggle emitting a changed signal after updating the value
 and choices (if the value has changed). The default is True.</p></li>
 </ul>

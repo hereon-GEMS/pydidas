@@ -118,7 +118,7 @@ def test_new_filename(hdf5_test_file: Path) -> None:
     assert widget.isVisible()
     assert widget._config["current_filename"] == str(hdf5_test_file)
     assert len(_choices) > 0
-    assert _choices[0] == "/entry/data/data"  # Should be prioritized
+    assert _choices[0] == "/entry/data/data"
 
 
 @pytest.mark.gui
@@ -170,7 +170,6 @@ def test_nxsignal_filtering(
     qtbot, widget: Hdf5DatasetSelector, hdf5_test_file: Path, nx_filter: bool
 ) -> None:
     """Test NXdata signal-only filtering."""
-    # Get datasets with NXsignal filtering on
     widget._widgets["check_nxsignal"].setChecked(nx_filter)
     _choices = widget.get_param("dataset").choices
     assert "/entry/nx/data/signal_data" in _choices
@@ -222,7 +221,6 @@ def test_display_dataset_signal_not_emitted_on_same_dataset(
     _n0 = widget.spy_sig_new_dataset_selected.n
     current = widget.dataset
     widget.set_param_and_widget_value("dataset", current)
-    # Count should not increase significantly
     assert widget.spy_sig_new_dataset_selected.n == _n0
 
 
@@ -269,11 +267,9 @@ def test_empty_hdf5_file(temp_path: Path) -> None:
     empty_file = temp_path / "empty.h5"
     with h5py.File(empty_file, "w") as _:
         pass  # Create empty file
-
     widget = Hdf5DatasetSelector()
     widget.new_filename(str(empty_file))
     choices = widget.get_param("dataset").choices
-    # Should have at least empty string
     assert len(choices) >= 1
 
 
@@ -284,11 +280,9 @@ def test_hdf5_file_with_only_groups(temp_path: Path) -> None:
     with h5py.File(groups_file, "w") as f:
         f.create_group("group1")
         f.create_group("group1/subgroup")
-
     widget = Hdf5DatasetSelector()
     widget.new_filename(str(groups_file))
     choices = widget.get_param("dataset").choices
-    # Should handle gracefully
     assert len(choices) >= 1
 
 
@@ -298,7 +292,6 @@ def test_hdf5_file_with_scalars(widget: Hdf5DatasetSelector, temp_path: Path) ->
     scalar_file = temp_path / "scalars.h5"
     with h5py.File(scalar_file, "w") as f:
         f.create_dataset("scalar", data=42)
-
     widget.new_filename(scalar_file)
     widget.set_param_and_widget_value("min_datadim", "any")
     choices = widget.get_param("dataset").choices
@@ -311,17 +304,13 @@ def test_switching_between_files(widget: Hdf5DatasetSelector, temp_path: Path) -
     _file1 = temp_path / "file1.h5"
     with h5py.File(_file1, "w") as f:
         f.create_dataset("data_a", data=np.random.rand(10, 10))
-
-    # Create second file
     _file2 = temp_path / "file2.h5"
     with h5py.File(_file2, "w") as f:
         f.create_dataset("data_b", data=np.random.rand(10, 10))
 
-    # Load first file
     widget.new_filename(_file1)
     assert "/data_a" in widget.get_param("dataset").choices
 
-    # Switch to second file
     widget.new_filename(_file2)
     _new_choices = widget.get_param("dataset").choices
     assert "/data_b" in _new_choices
@@ -330,9 +319,8 @@ def test_switching_between_files(widget: Hdf5DatasetSelector, temp_path: Path) -
 
 @pytest.mark.gui
 def test_non_existent_file(widget: Hdf5DatasetSelector, temp_path: Path) -> None:
-    """Test with non-existent file."""
+    """Test with non-existent file; should not raise an exception."""
     non_existent = temp_path / "does_not_exist.h5"
-    # Should not raise, just handle gracefully
     widget.new_filename(non_existent)
 
 

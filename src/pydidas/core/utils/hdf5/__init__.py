@@ -34,7 +34,6 @@ from .nxs_export import *
 
 __all__ = nxs_export.__all__ + hdf5_dataset_utils.__all__
 
-# Clean up the namespace
 del (
     hdf5_dataset_utils,
     hdf5_filter_keys,

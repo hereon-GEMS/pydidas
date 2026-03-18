@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,14 @@ points (i.e. x/y tuples) in a plot.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PointsForBeamcenterWidget"]
 
+
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -38,14 +40,12 @@ from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
 
 class _TableWithXYPositions(QtWidgets.QTableWidget):
-    """
-    A QTableWidget used for displaying a single column of (x, y) points.
-    """
+    """A QTableWidget used for displaying a single column of (x, y) points."""
 
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         QtWidgets.QTableWidget.__init__(self, kwargs.get("parent", None))
         apply_qt_properties(
             self,
@@ -58,7 +58,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.selectionModel().selectionChanged.connect(self.emit_new_selection)
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent) -> None:
         """
         Extend the generic keyPressEvent to add a binding for the Del key.
 
@@ -73,17 +73,13 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             super().keyPressEvent(event)
 
     @QtCore.Slot()
-    def emit_new_selection(self):
-        """
-        Emit
-        """
+    def emit_new_selection(self) -> None:
+        """Emit the selected points via the sig_new_selection signal."""
         self.sig_new_selection.emit(self._get_selected_points())
 
     @QtCore.Slot()
-    def remove_selected_points(self):
-        """
-        Remove the selected points.
-        """
+    def remove_selected_points(self) -> None:
+        """Remove all the manually selected points."""
         _points_to_remove = self._get_selected_points()
         _rows_to_remove = self.get_rows_of_selected_points()
         _new_row_count = self.rowCount() - len(_rows_to_remove)
@@ -94,10 +90,8 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         self.sig_remove_points.emit(_points_to_remove)
 
     @QtCore.Slot()
-    def remove_all_points(self):
-        """
-        Remove all points.
-        """
+    def remove_all_points(self) -> None:
+        """Remove all points from the table."""
         _points_to_remove = self._get_all_points()
         with QtCore.QSignalBlocker(self.selectionModel()):
             while self.rowCount() > 0:
@@ -105,13 +99,13 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         self.setRowCount(0)
         self.sig_remove_points.emit(_points_to_remove)
 
-    def _get_selected_points(self) -> list[tuple[float, float], ...]:
+    def _get_selected_points(self) -> list[tuple[float, float]]:
         """
         Get the selected points.
 
         Returns
         -------
-        list[tuple[float, float], ...]
+        list[tuple[float, float]]
             List of the (x, y) position tuples.
         """
         _indices = self.selectedIndexes()
@@ -122,13 +116,13 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             _selected_points.append(_pos)
         return _selected_points
 
-    def _get_all_points(self) -> list[tuple[float, float], ...]:
+    def _get_all_points(self) -> list[tuple[float, float]]:
         """
         Get a list of all points.
 
         Returns
         -------
-        list[tuple[float, float], ...]
+        list[tuple[float, float]]
             The list with all points (tuples of (x, y) positions).
         """
         _points = []
@@ -139,7 +133,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             _points.append(_pos)
         return _points
 
-    def get_rows_of_selected_points(self) -> list[int, ...]:
+    def get_rows_of_selected_points(self) -> list[int]:
         """
         Get the row numbers of the selected points, sorted in inverse order.
 
@@ -156,15 +150,13 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
 class PointsForBeamcenterWidget(
     QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidgetsMixIn
 ):
-    """
-    A widget to display a list of points in an associated plot.
-    """
+    """A widget to display a list of points in an associated plot."""
 
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
     sig_2click_usage = QtCore.Signal(bool)
 
-    def __init__(self, plot, parent=None, **kwargs):
+    def __init__(self, plot: Any, parent: Any = None, **kwargs: Any) -> None:
         QtWidgets.QWidget.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
@@ -213,11 +205,11 @@ class PointsForBeamcenterWidget(
         )
         self._widgets["table"].sig_new_selection.connect(self.sig_new_selection)
         self._widgets["table"].sig_remove_points.connect(self.sig_remove_points)
-        self._widgets["two_click_selection"].stateChanged.connect(
+        self._widgets["two_click_selection"].sig_new_check_state.connect(
             self._toggle_2click_selection
         )
 
-    def add_point_to_table(self, xpos: float, ypos: float):
+    def add_point_to_table(self, xpos: float, ypos: float) -> None:
         """
         Add a newly selected point to the table.
 
@@ -226,7 +218,7 @@ class PointsForBeamcenterWidget(
         xpos : float
             The x position.
         ypos : float
-            The y position
+            The y position.
         """
         _table = self._widgets["table"]
         _row = _table.rowCount()
@@ -236,7 +228,7 @@ class PointsForBeamcenterWidget(
         _table.setItem(_row, 0, _widget)
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Adjust the widget's width based on the font metrics.
 
@@ -255,7 +247,7 @@ class PointsForBeamcenterWidget(
         )
 
     @QtCore.Slot(int)
-    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState):
+    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState) -> None:
         """
         Toggle the two-click selection option.
 

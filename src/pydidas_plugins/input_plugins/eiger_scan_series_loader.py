@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -82,9 +82,9 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
         _pattern = self._SCAN.processed_file_naming_pattern
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
-        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory")
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
-        self.filename_string = os.path.join(
-            _basepath, _pattern, _eigerkey, _pattern + _suffix
+        self.filename_string = f".{os.sep}" + str(
+            _basepath / _pattern / _eigerkey / (_pattern + _suffix)
         )

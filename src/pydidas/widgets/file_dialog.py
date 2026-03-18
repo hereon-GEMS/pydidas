@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasFileDialog"]
 
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -158,6 +157,9 @@ class PydidasFileDialog(
                 QtCore.QUrl.fromLocalFile(_docs),
             ]
         )
+        _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
+        if _sidebar:
+            _sidebar.setMinimumWidth(180)
         self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
     def _insert_buttons_into_sidebar(self) -> None:
@@ -165,6 +167,8 @@ class PydidasFileDialog(
         _splitter = self.findChild(QtWidgets.QSplitter)
         _sidebar = _splitter.widget(0)
         _fileview = _splitter.widget(1)
+        if _sidebar is None or _fileview is None:
+            return
         # Create a container widget for the sidebar to hold the buttons and the
         # original sidebar content:
         _sidebar.setMinimumWidth(180)
@@ -174,6 +178,7 @@ class PydidasFileDialog(
             font_metric_width_factor=FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH,
             parent_widget=None,
         )
+        self.create_empty_widget("fileview_frame", parent_widget=None)
         self.create_button(
             "but_latest_location",
             "Open latest selected location",
@@ -183,7 +188,7 @@ class PydidasFileDialog(
         self.create_button(
             "but_scan_home",
             "Open scan base directory",
-            icon=icons.get_pydidas_qt_icon("scan_home.png"),
+            icon=icons.create_pydidas_icon("scan_home.png"),
             parent_widget=self._widgets["sidebar_container"],
         )
         self.add_any_widget(
@@ -374,8 +379,7 @@ class PydidasFileDialog(
             Optional keyword arguments. Supported keywords are:
 
             caption : str, optional
-                The window title caption. The default is 'Select
-                filename'.
+                The window title caption. The default is 'Select filename'.
             reference : str or int, optional
                 A reference key to store the selection only during the
                 active instance. The default is None.
@@ -422,16 +426,15 @@ class PydidasFileDialog(
         item : Path or str
             The filename or directory name.
         """
-        if isinstance(item, Path):
-            item = str(item)
-        if os.path.isfile(item):
-            item = os.path.dirname(item)
-        elif not os.path.isdir(item):
+        item = Path(item)
+        if item.is_file():
+            item = item.parent
+        elif not item.is_dir():
             raise UserConfigError(
                 f"The given entry {item} is neither a valid directory "
                 "nor file. Please check the input and try again."
             )
-        self._stored_dirs[reference] = item
+        self._stored_dirs[reference] = str(item)
 
     # ========================================================================
     # Private helper methods

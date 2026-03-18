@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -44,8 +44,8 @@ _IMG_SHAPE = (20, 20)
 _SHARE_SHAPE = (100, 100)
 
 
-def _glob_pattern(path: os.PathLike) -> str:
-    _full_path = os.path.join(str(path), _FNAME_PATTERN)
+def _glob_pattern(path: Path) -> str:
+    _full_path = str(path / _FNAME_PATTERN)
     return _full_path.replace("#####", "*")
 
 
@@ -64,7 +64,7 @@ def create_pattern_files(path: Path, pattern=None, n=20) -> list[Path]:
         _data = np.random.random(_IMG_SHAPE)
         _fpath = path / pattern.format(_index)
         np.save(_fpath, _data)
-        _names.append(str(_fpath))
+        _names.append(_fpath)
         time.sleep(0.005)
     return _names
 
@@ -182,7 +182,7 @@ def test_find_current_index__missing_inbetween(empty_temp_path, app, missing_ind
     _names = create_pattern_files(empty_temp_path, n=_num)
     for _index in missing_indices:
         os.remove(_names[_index])
-    app._config["path"] = str(empty_temp_path)
+    app._config["path"] = empty_temp_path
     app._config["glob_pattern"] = _FNAME_GLOB_STR
     app._DirectorySpyApp__find_current_index()
     assert app._index == _num - 1
@@ -190,7 +190,7 @@ def test_find_current_index__missing_inbetween(empty_temp_path, app, missing_ind
 
 def test_find_current_index__empty(empty_temp_path, app):
     app._index = None
-    app._config["path"] = str(empty_temp_path)
+    app._config["path"] = empty_temp_path
     app._config["glob_pattern"] = "*"
     app._DirectorySpyApp__find_current_index()
     assert app._index == -1
@@ -329,7 +329,7 @@ def test_load_bg_file__wrong_shape(empty_temp_path, app):
 def test_define_path_and_name__with_scan_for_all(empty_temp_path, app):
     app.set_param_value("scan_for_all", True)
     app.define_path_and_name()
-    assert app._config["path"] == str(empty_temp_path)
+    assert app._config["path"] == empty_temp_path
 
 
 def test_define_path_and_name__with_pattern_no_wildcard(empty_temp_path, app):
@@ -350,10 +350,10 @@ def test_define_path_and_name__with_pattern_correct(empty_temp_path, app):
     _pattern = str(app.get_param_value("filename_pattern"))
     app.define_path_and_name()
     assert app._config["glob_pattern"] == _pattern.replace("#####", "*")
-    assert app._fname(42) == os.path.join(app._config["path"], _pattern).replace(
+    assert str(app._fname(42)) == str(app._config["path"] / _pattern).replace(
         "#####", "00042"
     )
-    assert app._config["path"] == str(empty_temp_path)
+    assert app._config["path"] == empty_temp_path
 
 
 def test_multiprocessing_carryon(app):
@@ -364,7 +364,7 @@ def test_multiprocessing_carryon(app):
 def test_prepare_run__master(empty_temp_path, app):
     app.prepare_run()
     assert app._fname(42) != ""
-    assert app._config["path"] == str(empty_temp_path)
+    assert app._config["path"] == empty_temp_path
     assert isinstance(app._shared_array, np.ndarray)
     assert app._shared_array.shape == _SHARE_SHAPE
 
@@ -384,7 +384,7 @@ def test_multiprocessing_pre_run(empty_temp_path, app):
     app.multiprocessing_pre_run()
     # these tests are the same as for the prepare_run method:
     assert app._fname(42) != ""
-    assert app._config["path"] == str(empty_temp_path)
+    assert app._config["path"] == empty_temp_path
     assert isinstance(app._shared_array, np.ndarray)
     assert app._shared_array.shape == _SHARE_SHAPE
 
@@ -406,7 +406,7 @@ def test_multiprocessing_pre_cycle(app):
 def test_update_hdf5_metadata(empty_temp_path, app):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
     app.set_param_value("hdf5_key", _dset)
-    app.current_filename = _fname
+    app.current_filepath = _fname
     app._DirectorySpyApp__update_hdf5_metadata()
     _meta = app._DirectorySpyApp__read_image_meta
     assert _meta["indices"] == (_shape[0] - 1,)
@@ -416,7 +416,7 @@ def test_update_hdf5_metadata(empty_temp_path, app):
 @pytest.mark.parametrize("axis", [1, 2, None])
 def test_update_hdf5_metadata__w_slice_ax(empty_temp_path, app, axis):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
-    app.current_filename = _fname
+    app.current_filepath = _fname
     app.set_param_value("hdf5_key", _dset)
     app.set_param_value("hdf5_slicing_axis", axis)
     app._DirectorySpyApp__update_hdf5_metadata()
@@ -428,7 +428,7 @@ def test_update_hdf5_metadata__w_slice_ax(empty_temp_path, app, axis):
 
 def test_get_image__simple_image(empty_temp_path, app):
     _fname = create_pattern_files(empty_temp_path, n=1)[0]
-    app.current_filename = _fname
+    app.current_filepath = _fname
     _data = np.load(_fname)
     _image = app.get_image()
     assert np.allclose(_data, _image)
@@ -436,7 +436,7 @@ def test_get_image__simple_image(empty_temp_path, app):
 
 def test_get_image__high_dim_image(empty_temp_path, app):
     _fname = create_pattern_files(empty_temp_path, n=1)[0]
-    app.current_filename = _fname
+    app.current_filepath = _fname
     np.save(_fname, np.zeros((10, 10, 10)))
     with pytest.raises(UserConfigError):
         app.get_image()
@@ -445,7 +445,7 @@ def test_get_image__high_dim_image(empty_temp_path, app):
 def test_get_image__hdf5_image(empty_temp_path, app):
     _fname, _dset, _shape = create_hdf5_image(empty_temp_path)
     app.set_param_value("hdf5_key", _dset)
-    app.current_filename = _fname
+    app.current_filepath = _fname
     with h5py.File(_fname, "r") as f:
         _data = f[_dset][()]
     _image = app.get_image()
@@ -526,7 +526,7 @@ def test_multiprocessing_store_results(empty_temp_path, app):
     _index, _fname = app.multiprocessing_func(None)
     app.multiprocessing_store_results(_index, _fname)
     assert np.allclose(app._DirectorySpyApp__current_image, np.load(_names[1]))
-    assert app.current_filename == _names[1]
+    assert app.current_filepath == _names[1]
 
 
 def test_image_property(app):

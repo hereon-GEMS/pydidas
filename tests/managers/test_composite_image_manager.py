@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
 import copy
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -39,7 +39,7 @@ from pydidas.managers import CompositeImageManager
 class TestCompositeImage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
+        cls._path = Path(tempfile.mkdtemp())
         q_settings = PydidasQsettings()
         cls._maxsize = q_settings.value("global/max_image_size", float)
         cls._border = q_settings.value("user/mosaic_border_width", float)
@@ -253,7 +253,7 @@ class TestCompositeImage(unittest.TestCase):
         obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
-        _fname = os.path.join(self._path, "test.npy")
+        _fname = self._path / "test.npy"
         obj.save(_fname)
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())
@@ -262,7 +262,7 @@ class TestCompositeImage(unittest.TestCase):
         obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
-        _fname = os.path.join(self._path, "test.npy")
+        _fname = self._path / "test.npy"
         obj.export(_fname)
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())

@@ -33,7 +33,6 @@ __all__ = [
 ]
 
 
-import os
 import re
 from numbers import Integral
 from pathlib import Path
@@ -143,7 +142,7 @@ def get_file_naming_scheme(
     filename1: Path | str,
     filename2: Path | str,
     ignore_leading_zeros: bool = False,
-) -> tuple[str, range]:
+) -> tuple[Path, range]:
     """
     Get the naming scheme (formattable string with 'index' variable) from two filenames.
 
@@ -163,15 +162,15 @@ def get_file_naming_scheme(
 
     Returns
     -------
-    fnames : str
+    fnames : Path
         The formattable string (keyword "index") to get the file name.
     range : range
         The range iterable which points to all file names.
     """
-    _path1, _fname1 = os.path.split(filename1)
-    _fname2 = os.path.split(filename2)[1]
-    _name_parts_1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
-    _name_parts_2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
+    _path1, _fname1 = Path(filename1).parent, Path(filename1).name
+    _fname2 = Path(filename2).name
+    _name_parts_1 = re.split(FILENAME_DELIMITERS, Path(_fname1).stem)
+    _name_parts_2 = re.split(FILENAME_DELIMITERS, Path(_fname2).stem)
     _ext_1 = get_extension(_fname1)
     _ext_2 = get_extension(_fname2)
     if len(_name_parts_1) != len(_name_parts_2) or _ext_1 != _ext_2:
@@ -185,10 +184,8 @@ def get_file_naming_scheme(
     _change_index = _different_parts[0]
     _n = len(_name_parts_1[_change_index])
     _strindex = len("".join(_name_parts_1[:_change_index])) + _change_index
-    _fnames = (
-        _path1
-        + os.sep
-        + _fname1[:_strindex]
+    _fnames = _path1 / (
+        _fname1[:_strindex]
         + "{index:"
         + (f"0{_n}" if not ignore_leading_zeros else "")
         + "d}"

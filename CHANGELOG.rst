@@ -2,14 +2,21 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-
-
 v26.mm.dd
 =========
 
+Improvements
+------------
+- Added an option to exclude specific HDF5 dataset keys from filters
+  (e.g. necessary for Lambda files)
+- Added an info field to the DefineScanFrame to show the required total 
+  number of frames/spectra for the configured scan.
+- Added an option to show only NXdata signal datasets and hide the 
+  axis datasets.
 
 Programmatic changes
 --------------------
+- Refactored the HDF5 processing tools.
 - Changed from plain extensions to file suffixed with the leading dot to
   be consistent with pathlib.Path
 - Added an option to remove a QSettings key to PydidasQsettings.
@@ -18,9 +25,17 @@ Programmatic changes
 - Updated the code of the FileDialog
 - Changed the default saving extension for processing results to .nxs
   (was .h5)
+- Added support for following groups in external files in the 
+  hdf5_dataset_utils
 
 Bugfixes
 --------
+- Fixed an isssue with QCheckBox signals in Qt6.
+- Fixed an issue with loading the correct Qt version when running a script 
+  from pydidas_scripts through legacy calling (on Windows standalone systems).
+- Fixed an issue when selecting a Kratky-type plot.
+- Fixed an issue in the calculation of the required number of frames/spectra
+  for a scan with multiple images per point.
 - Fixed an issue in the ParamIoWidgetHdf5 where two leading dots
   were added to extensions.
 - Fixed an issue in the PydidasFileDialog where the extension for 
@@ -32,7 +47,8 @@ Bugfixes
 - Fixed an issue in the GUI where the parameters for auto-saving in the 
   WorkflowRunFrame where to large which prevented the user from opening
   the selection file dialog.
-
+- Fixed an issue in the ParamIoWidgetCombobox which was slow in updating
+  long lists of choices
 
 
 v26.01.27

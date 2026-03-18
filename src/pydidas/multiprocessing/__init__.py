@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,23 +21,16 @@ applications in parallel procesing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .app_processor_ import *
-from .app_runner import *
-from .processor_ import *
-from .worker_controller import *
+from .app_processor import app_processor_func
+from .app_runner import AppRunner
+from .processor import processor_func
+from .worker_controller import WorkerController
 
 
-__all__ = (
-    app_processor_.__all__
-    + processor_.__all__
-    + app_runner.__all__
-    + worker_controller.__all__
-)
-
-del app_processor_, processor_, app_runner, worker_controller
+__all__ = ["app_processor_func", "processor_func", "AppRunner", "WorkerController"]

@@ -28,14 +28,14 @@ __all__ = ["CoordinateTransformButton"]
 
 
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal, Union
+from typing import TYPE_CHECKING, Any, Literal
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core.constants import ASCII_TO_UNI
-from pydidas.resources.pydidas_icons import get_pydidas_qt_icon
+from pydidas.resources.pydidas_icons import create_pydidas_icon
 
 
 if TYPE_CHECKING:
@@ -52,16 +52,16 @@ class CoordinateTransformButton(PlotToolButton):
     """
 
     CS_CONFIG = {
-        ("cartesian", "icon"): get_pydidas_qt_icon("silx_coordinates_xy_cartesian.png"),
+        ("cartesian", "icon"): create_pydidas_icon("silx_coordinates_xy_cartesian.png"),
         ("cartesian", "state"): "Cartesian x/y coordinates",
         ("cartesian", "action"): "Use cartesian x / y coordinates [px]",
-        ("r_chi", "icon"): get_pydidas_qt_icon("silx_coordinates_r_chi.png"),
+        ("r_chi", "icon"): create_pydidas_icon("silx_coordinates_r_chi.png"),
         ("r_chi", "state"): f"Polar r / {CHI} coordinates",
         ("r_chi", "action"): f"Use polar r / {CHI} coordinates [mm, deg]",
-        ("2theta_chi", "icon"): get_pydidas_qt_icon("silx_coordinates_2theta_chi.png"),
+        ("2theta_chi", "icon"): create_pydidas_icon("silx_coordinates_2theta_chi.png"),
         ("2theta_chi", "state"): f"Polar 2{THETA} / {CHI} coordinates",
         ("2theta_chi", "action"): f"Use polar 2{THETA} / {CHI} coordinates [deg, deg]",
-        ("q_chi", "icon"): get_pydidas_qt_icon("silx_coordinates_q_chi.png"),
+        ("q_chi", "icon"): create_pydidas_icon("silx_coordinates_q_chi.png"),
         ("q_chi", "state"): f"Polar q / {CHI} coordinates",
         ("q_chi", "action"): f"Use polar q / {CHI} coordinates [nm^-1, deg]",
     }
@@ -70,19 +70,34 @@ class CoordinateTransformButton(PlotToolButton):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
-        plot: Union["PydidasPlot2D", None] = None,
+        plot: "PydidasPlot2D | None" = None,
         **kwargs: Any,
     ) -> None:
+        """
+        Initialize the CoordinateTransformButton.
+
+        Parameters
+        ----------
+        parent : QtWidgets.QWidget or None, optional
+            The parent widget. The default is None.
+        plot : PydidasPlot2D or None, optional
+            The plot instance. The default is None.
+        **kwargs : Any
+            Keyword arguments. Supported keywords are:
+
+            diffraction_exp : DiffractionExperimentContext, optional
+                The diffraction experiment context.
+        """
         PlotToolButton.__init__(self, parent=parent, plot=plot)
         self.__diff_exp = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         self.__current_cs = ""
         self._data_shape = (-1, -1)
         self._data_linear = True
         self.__define_actions_and_create_menu()
-        self.__diff_exp.sig_params_changed.connect(self._check_and_enable_button)
+        self.__diff_exp.sig_params_changed.connect(self._check_and_enable_button)  # type: ignore[attr-defined]
 
     def __define_actions_and_create_menu(self) -> None:
-        """the required actions and create the button menu."""
+        """Define the required actions and create the button menu."""
         _menu = QtWidgets.QMenu(self)
         for _key in ["cartesian", "r_chi", "2theta_chi", "q_chi"]:
             self._create_action(_menu, _key)
@@ -104,7 +119,7 @@ class CoordinateTransformButton(PlotToolButton):
         _icon = self.CS_CONFIG[coordinate_system, "icon"]
         _text = self.CS_CONFIG[coordinate_system, "action"]
         _action = QtWidgets.QAction(_icon, _text, self)
-        _action.triggered.connect(partial(self.set_coordinates, coordinate_system))
+        _action.triggered.connect(partial(self.set_coordinates, coordinate_system))  # type: ignore[attr-defined]
         _action.setIconVisibleInMenu(True)
         menu.addAction(_action)
 
@@ -123,7 +138,7 @@ class CoordinateTransformButton(PlotToolButton):
         if cs_name != self.__current_cs:
             self.setIcon(self.CS_CONFIG[cs_name, "icon"])
             self.setToolTip(self.CS_CONFIG[cs_name, "state"])
-            self.sig_new_coordinate_system.emit(cs_name)
+            self.sig_new_coordinate_system.emit(cs_name)  # type: ignore[attr-defined]
             self.__current_cs = cs_name
 
     @QtCore.Slot()

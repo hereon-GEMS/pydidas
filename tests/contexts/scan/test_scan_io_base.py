@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
 from numbers import Integral, Real
+from pathlib import Path
 
 import numpy as np
 
@@ -44,8 +44,8 @@ SCAN_IO = ScanIoBase
 
 class TestScanIoBase(unittest.TestCase):
     def setUp(self):
-        _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_scan_context_")
+        _test_dir = Path(__file__).parents[2]
+        self._path = str(_test_dir / "_data" / "load_test_scan_context_")
         self._tmppath = tempfile.mkdtemp()
         SCAN_IO.imported_params = {}
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Module with the QtPathsWindow class which shows the generic paths used in pydida
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["QtPathsWindow"]
 
 
-import os
 from functools import partial
+from pathlib import Path
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -38,8 +38,8 @@ from pydidas.core.constants import (
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
+from pydidas.core.utils import get_logging_dir
 from pydidas.resources import logos
-from pydidas.version import VERSION
 from pydidas.widgets.framework import PydidasWindow
 
 
@@ -52,16 +52,12 @@ class QtPathsWindow(PydidasWindow):
     show_frame = False
 
     def __init__(self, **kwargs: dict):
-        self._log_path = os.path.join(
+        self._log_path = get_logging_dir()
+        self._config_path = Path(
             QtCore.QStandardPaths.standardLocations(
-                QtCore.QStandardPaths.DocumentsLocation
-            )[0],
-            "pydidas",
-            VERSION,
+                QtCore.QStandardPaths.ConfigLocation
+            )[0]
         )
-        self._config_path = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )[0]
         PydidasWindow.__init__(self, title="pydidas paths", **kwargs)
 
     def build_frame(self):

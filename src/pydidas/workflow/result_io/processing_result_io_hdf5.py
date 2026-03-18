@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ProcessingResultIoHdf5"]
 
 
-import os
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -40,14 +39,12 @@ from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import (
+from pydidas.core.utils.hdf5 import (
     create_nx_dataset,
     create_nx_entry_groups,
     read_and_decode_hdf5_dataset,
 )
-from pydidas.core.utils.hdf5_dataset_utils import (
-    get_nx_class_for_param,
-)
+from pydidas.core.utils.hdf5.nxs_export import nx_dataset_config_from_param
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -75,17 +72,17 @@ def _get_pydidas_context_config_entries(
 
     Parameters
     ----------
-    scan : pydidas.contexts.Scan
+    scan : Scan
         The scan (context).
-    exp : pydidas.contexts.DiffractionExperiment
+    exp : DiffractionExperiment
         The diffraction experiment (context).
-    tree : WorkflowTree
+    tree : ProcessingTree
         The workflow tree.
 
     Returns
     -------
-    list[list[str, str, dict]]
-        List with writable entries for the contexts.
+    list[list[str, dict]]
+        The writable entries for the contexts.
     """
     _dsets = []
     for _key, _param in scan.params.items():
@@ -93,8 +90,7 @@ def _get_pydidas_context_config_entries(
             [
                 "entry/pydidas_config/scan",
                 _key,
-                {"data": _param.value_for_export},
-                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
+                *nx_dataset_config_from_param(_param),
             ]
         )
     for _key, _param in exp.params.items():
@@ -102,8 +98,7 @@ def _get_pydidas_context_config_entries(
             [
                 "entry/pydidas_config/diffraction_exp",
                 _key,
-                {"data": _param.value_for_export},
-                {"NX_class": get_nx_class_for_param(_param), "units": _param.unit},
+                *nx_dataset_config_from_param(_param),
             ]
         )
     _dsets += [
@@ -181,26 +176,25 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         **kwargs : Any
             Supported kwargs are:
 
-            scan_context : pydidas.contexts.Scan or None
+            scan_context : Scan or None, optional
                 The scan context. If None, the generic context will be
-                used. Only specify this, if you explicitly require a
+                used. Only specify this if you explicitly require a
                 different context. The default is None.
-            diffraction_exp_context : (
-                pydidas.contexts.DiffractionExperiment or None)
+            diffraction_exp_context : DiffractionExperiment or None, optional
                 The diffraction experiment context. If None, the generic
-                context will be used. Only specify this, if you explicitly
+                context will be used. Only specify this if you explicitly
                 require a different context. The default is None.
             workflow_tree : WorkflowTree or None, optional
-                The WorkflowTree. If None, the generic WorkflowTree will be
-                used. Only specify this, if you explicitly require a
+                The WorkflowTree. If None, the generic WorkflowTree will
+                be used. Only specify this if you explicitly require a
                 different context. The default is None.
         """
         _scan = kwargs.get("scan_context", ScanContext())
         _exp = kwargs.get("diffraction_exp_context", DiffractionExperimentContext())
         _tree = kwargs.get("workflow_tree", WorkflowTree())
-        cls._save_dir = save_dir if isinstance(save_dir, Path) else Path(save_dir)
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+        cls._save_dir = Path(save_dir)
+        if not cls._save_dir.exists():
+            cls._save_dir.mkdir(parents=True)
 
         cls._node_information = node_information
         cls._filenames = cls.get_filenames_from_labels()
@@ -223,15 +217,16 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         node_id : int
             The nodeID.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The scan (context).
-        exp : pydidas.contexts.DiffractionExperiment
+        exp : DiffractionExperiment
             The diffraction experiment (context).
-        workflow : WorkflowTree
+        workflow : ProcessingTree
             The workflow tree.
         """
         _dsets = cls._get_datasets_to_be_written(node_id, scan, exp, workflow)
-        with h5py.File(cls._save_dir / cls._filenames[node_id], "w") as _file:
+        _file_path = cls._save_dir / cls._filenames[node_id]
+        with h5py.File(_file_path, "w") as _file:  # type: ignore[operator]
             for _group_key, _type in _DEFAULT_GROUPS:
                 create_nx_entry_groups(_file, _group_key, group_type=_type)
             for _group, _name, kws, _nxs_attrs in _dsets:
@@ -252,17 +247,17 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         ----------
         node_id : int
             The nodeID.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The scan (context).
-        exp : pydidas.contexts.DiffractionExperiment
+        exp : DiffractionExperiment
             The diffraction experiment (context).
-        workflow : WorkflowTree
+        workflow : ProcessingTree
             The workflow tree.
 
         Returns
         -------
-        list[list[str, str, dict, dict]]
-            List with the dataset information to be written.
+        list[list[str, dict]]
+            The list with the dataset information to be written.
         """
 
         _node_attribute = partial(cls.get_node_attribute, node_id)
@@ -297,7 +292,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 {"shape": _node_attribute("shape")},
                 {"NX_class": "NX_INT", "units": ""},
             ],
-        ] + _get_pydidas_context_config_entries(scan, exp, workflow)
+        ]
+        _dsets = _dsets + _get_pydidas_context_config_entries(scan, exp, workflow)  # type: ignore[operator]
         return _dsets
 
     @classmethod
@@ -329,7 +325,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             _metadata = cls.update_with_scan_metadata(frame_result_dict, _scan)
             cls.update_metadata(_metadata)
         for _node_id, _data in frame_result_dict.items():
-            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_node_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][_indices] = _data
 
     @classmethod
@@ -347,9 +344,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         full_data : dict
             The result dictionary with nodeID keys and result values.
         scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used.
-            Only specify this, if you explicitly require a different
-            context. The default is None.
+            The scan context. If None, the generic context will be used. Only
+            specify this if you explicitly require a different context. The
+            default is None.
         squeeze : bool, optional
             Flag to toggle squeezing of empty dimensions. If True, the data
             will be squeezed to remove empty dimensions. The default is False.
@@ -359,7 +356,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         for _node_id, _data in full_data.items():
             if squeeze:
                 _data = _data.squeeze()
-            with h5py.File(cls._save_dir / cls._filenames[_node_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_node_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][()] = _data.array
 
     @classmethod
@@ -369,7 +367,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         """
         Update the frame metadata with the scan metadata.
 
-        This method updates the metadata of the frame with the scan metadata.
+        This method updates the metadata of the frame with the scan
+        metadata.
 
         Parameters
         ----------
@@ -426,8 +425,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         squeeze : bool, optional
-            Flag to toggle squeezing of empty dimensions. If True, the data will
-            be squeezed to remove empty dimensions. The default is False.
+            Flag to toggle squeezing of empty dimensions. If True, the data
+            will be squeezed to remove empty dimensions. The default is False.
         """
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
@@ -435,8 +434,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     _metadata = _metadata.squeeze()
                 _metadata = _metadata.property_dict
             _ndim = len(_metadata["axis_labels"])
-            _shape = tuple(_range.size for _range in _metadata["axis_ranges"].values())
-            with h5py.File(cls._save_dir / cls._filenames[_id], "r+") as _file:
+            _file_path = cls._save_dir / cls._filenames[_id]
+            with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _nxdata_group = _file["entry/data"]
                 _nxdata_group.attrs["title"] = _metadata.get("data_label", "")
                 _nxdata_group.attrs["signal"] = "data"
@@ -463,7 +462,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The full filename of the file to be imported.
 
         Returns
@@ -471,8 +470,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         data : pydidas.core.Dataset
             The dataset with the imported data.
         node_info : dict
-            A dictionary with node_label, data_label, plugin_name keys and the
-            respective values.
+            A dictionary with node_label, data_label, plugin_name keys and
+            the respective values.
         scan : pydidas.contexts.Scan
             The imported scan configuration.
         diffraction_exp : pydidas.contexts.DiffractionExperiment
@@ -489,7 +488,11 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         with h5py.File(filename, "r") as _file:
             try:
                 _tree.restore_from_string(
-                    read_and_decode_hdf5_dataset(_file["entry/pydidas_config/workflow"])
+                    str(
+                        read_and_decode_hdf5_dataset(
+                            _file["entry/pydidas_config/workflow"]
+                        )
+                    )  # type: ignore[arg-type]
                 )
             except KeyError:
                 raise UserConfigError(
@@ -497,9 +500,9 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     "standard and cannot be imported. Please check the input file."
                 )
             _info = {
-                "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),
-                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
-                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),
+                "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),  # type: ignore[arg-type]
+                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),  # type: ignore[arg-type]
+                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),  # type: ignore[arg-type]
             }
             _info["result_title"] = (
                 f"{_info['node_label']} (node #{_info['node_id']:03d})"

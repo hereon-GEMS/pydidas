@@ -211,7 +211,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         Update the configuration widgets based on the current plugin parameters.
         """
         for param in self.plugin.params.values():
-            self.update_widget_value(param.refkey, param.value)
+            self.update_param_widget_value(param.refkey, param.value)
 
     @QtCore.Slot(str)
     def _label_updated(self, label: str):

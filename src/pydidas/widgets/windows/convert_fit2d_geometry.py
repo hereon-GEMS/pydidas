@@ -197,7 +197,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             fit2d_image_orientation=self.get_param_value("use_fit2d_image_orientation"),
         )
         for _key in _PYFAI_PARAM_KEYS:
-            self.update_widget_value(_key, self._exp.get_param_value(_key))
+            self.update_param_widget_value(_key, self._exp.get_param_value(_key))
         self._widgets["button_accept"].setEnabled(True)
 
     @QtCore.Slot()

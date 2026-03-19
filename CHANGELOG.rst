@@ -53,6 +53,8 @@ Bugfixes
   the selection file dialog.
 - Fixed an issue in the ParamIoWidgetCombobox which was slow in updating
   long lists of choices
+- Fixed occurences of the deprecated method update_widget_value in two
+  widgets (ConvertFit2dGeometry and GenericPluginConfigWidget)
 
 
 v26.01.27

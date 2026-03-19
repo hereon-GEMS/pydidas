@@ -28,8 +28,6 @@ __status__ = "Production"
 __all__ = ["EigerScanSeriesLoader"]
 
 
-import os
-
 from pydidas_plugins.input_plugins.hdf5_file_series_loader import Hdf5fileSeriesLoader
 
 from pydidas.core import get_generic_param_collection
@@ -75,7 +73,7 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
     )
     advanced_parameters = Hdf5fileSeriesLoader.advanced_parameters.copy()
 
-    def update_filename_string(self):
+    def update_filepath(self):
         """
         Set up the generator that can create the full file names to load images.
         """
@@ -84,7 +82,6 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
         _basepath = self._SCAN.get_param_value("scan_base_directory")
         if _pattern.endswith(_suffix):
-            _pattern = _pattern[: -len(_suffix)]
-        self.filename_string = f".{os.sep}" + str(
-            _basepath / _pattern / _eigerkey / (_pattern + _suffix)
-        )
+            _pattern = _pattern.removesuffix(_suffix)
+        self._base_dir = _basepath
+        self._filename = f"{_pattern}/{_eigerkey}/{_pattern}{_suffix}"

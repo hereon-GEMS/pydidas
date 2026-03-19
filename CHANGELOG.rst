@@ -27,6 +27,8 @@ Programmatic changes
   (was .h5)
 - Added support for following groups in external files in the 
   hdf5_dataset_utils
+- Updated CI pipelines to run tests only when other tests (formatting etc)
+  passed.
 
 Bugfixes
 --------

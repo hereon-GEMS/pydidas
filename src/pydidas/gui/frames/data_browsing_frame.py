@@ -101,6 +101,9 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         """
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         self._widgets["filename"].returnPressed.connect(self.__filename_input)
+        self._widgets["filename"].editingFinished.connect(
+            self.__set_filename_input_text
+        )
         self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
@@ -169,7 +172,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             get_extension(filename) not in self.__supported_extensions
             or not Path(filename).is_file()
         ):
-            self._widgets["filename"].setText(self.current_filename)
+            self.__set_filename_input_text()
             self._widgets["viewer"].set_data(None)
             if self.__browser_window is not None:
                 self.__browser_window.hide()
@@ -181,7 +184,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         if self.__metadata_window is not None:
             self.__metadata_window.hide()
         self._widgets["viewer"].set_data(None)
-        self._widgets["filename"].setText(self.current_filename)
+        self.__set_filename_input_text()
         self._widgets["ascii_widgets"].setVisible(self.ascii_file)
         self._widgets["hdf5_dataset_selector"].setVisible(self.hdf5_file)
         self._widgets["configure_binary_decoding"].set_new_filename(filename)
@@ -195,6 +198,15 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
 
     def __filename_input(self):
         self.__file_selected(self._widgets["filename"].text())
+
+    def __set_filename_input_text(self):
+        """
+        Update filename input text only if it does not already match the current
+        filename. This is to prevent the text cursor from jumping to the end of
+        the filename when using the filename input field.
+        """
+        if self._widgets["filename"].text() != self.current_filename:
+            self._widgets["filename"].setText(self.current_filename)
 
     def __open_hdf5_file(self) -> None:
         """Process the input file and check whether it is a hdf5 file."""

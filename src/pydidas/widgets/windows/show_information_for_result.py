@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ information about a datapoint from a pydidas result.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -136,7 +136,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             If True, the timeline index will be used to get the frame index.
         """
         self._loader_plugin = loader_plugin.copy()
-        self._loader_plugin.update_filename_string()
+        self._loader_plugin.update_filepath()
         _scan = self._loader_plugin._SCAN  # noqa W0212
         _ax_ranges = result_metadata["axis_ranges"]
         _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
@@ -181,7 +181,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             )
         self._widgets["info_field"].setText(_info_str)
         self._widgets["edit_filename"].setText(
-            loader_plugin.get_filename(self._ordinal)
+            str(loader_plugin.get_filename(self._ordinal))
         )
         self._widgets["but_show_input"].setEnabled(True)
         self._widgets["plot"].setVisible(False)
@@ -190,7 +190,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
     @QtCore.Slot()
     def show_input_image(self):
         """Show the input image as loaded from the loader plugin."""
-        if not Path(self._loader_plugin.get_filename(self._ordinal)).is_file():
+        if not self._loader_plugin.get_filename(self._ordinal).is_file():
             self._widgets["but_show_input"].setEnabled(False)
             raise UserConfigError(
                 "Cannot display the input image because the filename does not point to "

@@ -61,6 +61,8 @@ Bugfixes
   handle derived interal Parameters correctly
 - Fixed an issue in the ViewResultsFrame which called a deprecated method
   in the input plugin.
+- Fixed an issue in the ShowInformationForResult window when calling the
+  get_filename() on the loader plugin which returned a Path
 
 
 v26.01.27

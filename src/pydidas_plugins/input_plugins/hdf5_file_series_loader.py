@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,20 +16,22 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Hdf5singleFileLoader Plugin which can be used to load
-images from single Hdf5 files.
+Module with the Hdf5fileSeriesLoader Plugin which can be used to load
+images from HDF5 file series.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Hdf5fileSeriesLoader"]
 
 
+from typing import Any
+
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.utils import get_hdf5_metadata
+from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
 
@@ -76,10 +78,8 @@ class Hdf5fileSeriesLoader(InputPlugin):
         "images_per_file",
     ]
 
-    def pre_execute(self):
-        """
-        Prepare loading images from a file series.
-        """
+    def pre_execute(self) -> None:
+        """Prepare loading images from a file series."""
         InputPlugin.pre_execute(self)
         _i_per_file = self.get_param_value("images_per_file")
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
@@ -100,7 +100,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
             None if _slice_ax is None else ((None,) * _slice_ax + (i,))
         )
 
-    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Load a frame and pass it on.
 
@@ -108,7 +108,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         ----------
         frame_index : int
             The frame index.
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments. Can be used to apply a ROI or
             binning to the raw image.
 

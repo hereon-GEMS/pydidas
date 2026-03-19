@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for peak fitting plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,6 +37,7 @@ from pydidas.core import Hdf5key
 from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, OUTPUT_PLUGIN
 from pydidas.core.utils import apply_qt_properties
 from pydidas.plugins import BasePlugin
+from pydidas.widgets.dialogues.question_box import QuestionBox
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
 
@@ -197,8 +198,13 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         This method will update both the plugin Parameters and the displayed
         widget values.
         """
-        self.plugin.restore_all_defaults(confirm=True)
-        self.update_edits()
+        _reply = QuestionBox(
+            "Restore defaults confirmation",
+            "Do you want to restore all plugin parameters to their default values?",
+        ).exec_()
+        if _reply:
+            self.plugin.restore_all_defaults(confirm=True)
+            self.update_edits()
 
     def update_edits(self):
         """

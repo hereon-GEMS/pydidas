@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
 import shutil
 import tempfile
 import unittest
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pyFAI
@@ -45,7 +45,7 @@ PLUGIN_COLLECTION = LocalPluginCollection()
 class TestCorrectSplineDistortion(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._temppath = tempfile.mkdtemp()
+        cls._temppath = Path(tempfile.mkdtemp())
         cls.data_shape = (512, 512)
         cls._spline_files = {}
         cls._detectors = {}
@@ -62,9 +62,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         }
         for _dir, _ext in enumerate(["shrink", "expand"]):
             _factor = 1 - 2 * _dir
-            cls._spline_files[_ext] = os.path.join(
-                cls._temppath, f"spline_file_{_ext}.txt"
-            )
+            cls._spline_files[_ext] = cls._temppath / f"spline_file_{_ext}.txt"
             _spline = pyFAI.spline.Spline()
             _spline.zeros(
                 xmax=cls.data_shape[1], ymax=cls.data_shape[0], pixSize=(1, 1)

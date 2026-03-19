@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,12 +37,13 @@ from pydidas.contexts import Scan, ScanContext
 from pydidas.contexts.scan.scan import SCAN_LEGACY_PARAMS
 from pydidas.contexts.scan.scan_io_hdf5 import ScanIoHdf5
 from pydidas.core import UserConfigError
-from pydidas.core.utils import create_nx_entry_groups, get_random_string
-from pydidas.core.utils.hdf5_dataset_utils import (
-    export_context_to_hdf5,
+from pydidas.core.utils import get_random_string
+from pydidas.core.utils.hdf5 import (
+    create_nx_entry_groups,
     get_hdf5_populated_dataset_keys,
     read_and_decode_hdf5_dataset,
 )
+from pydidas.core.utils.hdf5.nxs_export import export_context_to_nxs
 
 
 SCAN = ScanContext()
@@ -109,7 +110,7 @@ def _randomize_scan(scan: Scan):
 def create_hdf5_file(temp_dir) -> Path:
     """Fixture to create a temporary HDF5 file."""
     hdf5_filename = temp_dir / "scan_io_hdf5.h5"
-    export_context_to_hdf5(hdf5_filename, SCAN, "entry/pydidas_config/scan")
+    export_context_to_nxs(hdf5_filename, SCAN, "entry/pydidas_config/scan")
     return hdf5_filename
 
 

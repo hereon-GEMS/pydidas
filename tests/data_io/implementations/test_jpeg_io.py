@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -38,8 +38,8 @@ from pydidas.data_io.implementations.jpeg_io import JpegIo
 class TestJpegIo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._path = tempfile.mkdtemp()
-        cls._fname = os.path.join(cls._path, "test.jpg")
+        cls._path = Path(tempfile.mkdtemp())
+        cls._fname = cls._path / "test.jpg"
         cls._data_shape = (127, 137)
         cls._data = np.random.random(cls._data_shape)
         cls._index = 0
@@ -68,15 +68,15 @@ class TestJpegIo(unittest.TestCase):
             JpegIo.export_to_file(self._fname, self._data)
 
     def test_export_to_file__file_exists_and_overwrite(self):
-        _fname = os.path.join(self._path, self.get_fname())
+        _fname = self._path / self.get_fname()
         JpegIo.export_to_file(_fname, self._data)
-        _size = os.stat(_fname).st_size
+        _size = _fname.stat().st_size
         JpegIo.export_to_file(_fname, self._data[:57], overwrite=True)
-        _size_new = os.stat(_fname).st_size
+        _size_new = _fname.stat().st_size
         self.assertNotEqual(_size, _size_new)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._path, self.get_fname())
+        _fname = self._path / self.get_fname()
         JpegIo.export_to_file(_fname, self._data)
 
 

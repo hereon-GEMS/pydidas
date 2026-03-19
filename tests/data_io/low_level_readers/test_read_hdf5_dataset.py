@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,17 +18,16 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import h5py
 import numpy as np
@@ -41,8 +40,8 @@ from pydidas.data_io.low_level_readers.read_hdf5_dataset_ import (
 
 class TestReadHdf5Dataset(unittest.TestCase):
     def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, "test.h5")
+        self._path = Path(tempfile.mkdtemp())
+        self._fname = self._path / "test.h5"
         self._img_shape = (10, 10, 10, 10)
         self._data = np.random.random(self._img_shape)
         with h5py.File(self._fname, "w") as _file:

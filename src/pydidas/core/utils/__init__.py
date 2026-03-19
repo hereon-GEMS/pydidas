@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,21 +21,20 @@ which are used throughout the package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
 # import __all__ items from modules:
-from . import converters, scattering_geometry
+from . import converters, hdf5, scattering_geometry
 from .clipboard_ import *
 from .decorators import *
 from .file_checks import *
 from .file_utils import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
-from .hdf5_dataset_utils import *
 from .image_utils import *
 from .iterable_utils import *
 from .logger import *
@@ -49,7 +48,7 @@ from .str_utils import *
 from .timer import *
 
 
-__all__ = (
+__all__ = ["hdf5", "converters", "scattering_geometry"] + (
     clipboard_.__all__
     + decorators.__all__
     + file_checks.__all__
@@ -57,7 +56,6 @@ __all__ = (
     + iterable_utils.__all__
     + format_arguments_.__all__
     + get_documentation_targets.__all__
-    + hdf5_dataset_utils.__all__
     + logger.__all__
     + image_utils.__all__
     + numpy_parser.__all__
@@ -79,7 +77,6 @@ del (
     iterable_utils,
     format_arguments_,
     get_documentation_targets,
-    hdf5_dataset_utils,
     logger,
     image_utils,
     numpy_parser,

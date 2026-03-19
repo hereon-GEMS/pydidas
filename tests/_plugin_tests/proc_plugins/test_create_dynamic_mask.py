@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,16 +18,16 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 import scipy.ndimage
@@ -45,7 +45,7 @@ PLUGIN_COLLECTION = LocalPluginCollection()
 class TestCreateDynamicMask(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._temppath = tempfile.mkdtemp()
+        cls._temppath = Path(tempfile.mkdtemp())
         cls._data = np.zeros((40, 40), dtype=np.uint8)
         cls._data[7:12, 7:12] = 42
         cls._data[20:30, 12:14] = 32
@@ -53,7 +53,7 @@ class TestCreateDynamicMask(unittest.TestCase):
         cls._data[0:10, 30:] = 35
         cls._mask = np.zeros((40, 40), dtype=np.uint8)
         cls._mask[0:10, 30:] = 1
-        cls._maskfilename = os.path.join(cls._temppath, "mask.npy")
+        cls._maskfilename = str(cls._temppath / "mask.npy")
         np.save(cls._maskfilename, cls._mask)
         cls._exp = DiffractionExperiment()
         cls._exp.set_param_value("detector_mask_file", cls._maskfilename)

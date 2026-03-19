@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the Hdf5Io class for importing and exporting Hdf5 data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,7 +39,7 @@ from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors, str_repr_of_slice
 from pydidas.core.utils.converters import convert_to_slice
-from pydidas.core.utils.hdf5_dataset_utils import (
+from pydidas.core.utils.hdf5 import (
     create_nxdata_entry,
 )
 from pydidas.data_io.implementations.io_base import IoBase
@@ -57,45 +57,48 @@ class Hdf5Io(IoBase):
         """
         Read data from an Hdf5 file.
 
-        A subset of an Hdf5 dataset can be imported with giving sli
+        A subset of an Hdf5 dataset can be imported with giving indices
+        for slicing.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file with the data to be imported.
         **kwargs : Any
             The following kwargs are supported:
 
             dataset : str, optional
-                The full path to the hdf dataset within the file. The default is
-                "entry/data/data".
+                The full path to the hdf dataset within the file. The
+                default is "entry/data/data".
             indices : tuple, optional
-                Ranges for each axis. Can be given as a single data point, a tuple
-                of (min, max) or None to use the full range for each axis. The
-                default is an empty tuple ().
-            roi : tuple | None, optional
-                A region of interest for cropping. Acceptable are both 4-tuples
-                of integers in the format (y_low, y_high, x_low, x_high) or
-                2-tuples of integers or slice objects. If None, the full image
-                will be returned. The default is None.
-            returnType : type | 'auto', optional
-                If 'auto', the image will be returned in its native data type.
-                If a specific datatype has been selected, the image is converted
-                to this type. The default is 'auto'.
+                Ranges for each axis. Can be given as a single data
+                point, a tuple of (min, max) or None to use the full
+                range for each axis. The default is an empty tuple ().
+            roi : tuple or None, optional
+                A region of interest for cropping. Acceptable are both
+                4-tuples of integers in the format (y_low, y_high,
+                x_low, x_high) or 2-tuples of integers or slice
+                objects. If None, the full image will be returned. The
+                default is None.
+            returnType : type or 'auto', optional
+                If 'auto', the image will be returned in its native data
+                type. If a specific datatype has been selected, the image
+                is converted to this type. The default is 'auto'.
             binning : int, optional
-                The re-binning factor to be applied to the image. The default
-                is 1.
+                The re-binning factor to be applied to the image. The
+                default is 1.
             auto_squeeze : bool, optional
-                Flag to automatically squeeze data dimensions before returning
-                the data. The default is True.
+                Flag to automatically squeeze data dimensions before
+                returning the data. The default is True.
             import_metadata : bool, optional
-                Flag to get the nexus metadata from the hdf5 file, if supplied.
-                The default is True.
+                Flag to get the nexus metadata from the hdf5 file, if
+                supplied. The default is True.
 
         Returns
         -------
         data : pydidas.core.Dataset
-            The data in the form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded
+            metadata)
         """
         _input_indices = kwargs.get("indices", slice(None))
         if not isinstance(_input_indices, Iterable):
@@ -137,7 +140,7 @@ class Hdf5Io(IoBase):
     @staticmethod
     def _update_dataset_metadata(
         data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
-    ):
+    ) -> None:
         """
         Check the hdf5 file for Dataset metadata and update the data's properties.
 
@@ -197,7 +200,7 @@ class Hdf5Io(IoBase):
     @staticmethod
     def __read_legacy_metadata(
         data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
-    ):
+    ) -> None:
         """
         Read legacy metadata from hdf5 files.
 
@@ -218,7 +221,6 @@ class Hdf5Io(IoBase):
         _data_group_name, _dset_name = dataset.rsplit("/", 1)
         if _dset_name.startswith("axis_"):
             return
-        _root = os.path.dirname(_data_group_name)
         _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         _metadata = data.metadata
         _valid_metadata = _metadata.pop("valid_metadata", [])
@@ -245,18 +247,19 @@ class Hdf5Io(IoBase):
                 )
                 _meth = getattr(data, f"update_axis_{_key}")
                 _meth(_idx, _val if _val is not None else "None")
+        _root = os.path.dirname(_data_group_name)
         for _key in ["data_label", "data_unit"]:
             if _key in h5file[_root] and getattr(data, _key) == "":
                 setattr(data, _key, h5file[_root][_key][()].decode())
 
     @classmethod
-    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: Any):
+    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: Any) -> None:
         """
         Export data to an Hdf5 file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
@@ -264,10 +267,11 @@ class Hdf5Io(IoBase):
             Additional keyword arguments. Supported keyword arguments are:
 
             dataset : str, optional
-                The full path to the hdf dataset within the file. The default is
-                "entry/data/data".
+                The full path to the hdf dataset within the file. The
+                default is "entry/data/data".
             overwrite : bool, optional
-                Flag to allow overwriting of existing files. The default is False.
+                Flag to allow overwriting of existing files. The default
+                is False.
         """
         cls.check_for_existing_file(filename, **kwargs)
         _dataset = kwargs.get("dataset", "entry/data/data")
@@ -275,9 +279,9 @@ class Hdf5Io(IoBase):
         _root_group_name = os.path.dirname(_data_group_name)
         if _root_group_name == "":
             raise UserConfigError(
-                "The hdf5 dataset path is too shallow to allow writing all metadata. "
-                "Please specify a dataset path with at least two groups levels, e.g. "
-                "`entry/data/data`."
+                "The hdf5 dataset path is too shallow to allow writing all "
+                "metadata. Please specify a dataset path with at least two "
+                "groups levels, e.g. `entry/data/data`."
             )
         if not isinstance(data, Dataset):
             data = Dataset(data)

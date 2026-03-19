@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,7 @@ import pytest
 
 import pydidas
 from pydidas.core import UserConfigError
-from pydidas.core.utils import read_and_decode_hdf5_dataset
+from pydidas.core.utils.hdf5 import read_and_decode_hdf5_dataset
 from pydidas.workflow import ProcessingTree, WorkflowTree
 from pydidas.workflow.processing_tree_io.processing_tree_io_hdf5 import (
     ProcessingTreeIoHdf5,

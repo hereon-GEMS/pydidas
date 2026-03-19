@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ integration plugins using pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,8 +29,7 @@ __all__ = ["pyFAIintegrationBase"]
 
 
 import multiprocessing as mp
-import os
-import pathlib
+from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
@@ -133,8 +132,8 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
         """
         self._mask = None
         _mask_file = self._EXP.get_param_value("detector_mask_file")
-        if _mask_file != pathlib.Path():
-            if os.path.isfile(_mask_file):
+        if _mask_file != Path():
+            if _mask_file.is_file():
                 self._mask = import_data(_mask_file)
             else:
                 raise UserConfigError(
@@ -373,7 +372,7 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
 
         Parameters
         ----------
-        mask : ndarray | None, optional
+        mask : ndarray or None, optional
             The custom mask to be checked. If None, the stored default mask is used.
         """
         if self._ai is None:

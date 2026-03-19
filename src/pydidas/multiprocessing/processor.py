@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,24 +21,24 @@ multiprocessing function calls.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["processor"]
+__all__ = ["processor_func"]
 
 
 import queue
 import time
-from typing import Callable
+from typing import Any, Callable
 
 
-def processor(
+def processor_func(
     function: Callable,
     multiprocessing_config: dict,
-    *func_args: tuple,
-    **func_kwargs: dict,
-):
+    *func_args: Any,
+    **func_kwargs: Any,
+) -> None:
     """
     Start a loop to process function calls on individual frames.
 
@@ -54,10 +54,10 @@ def processor(
         keyword arguments from the calling arguments of processor.
     multiprocessing_config : dict
         The multiprocessing configuration dictionary. It includes information
-        about the logging level as well as queue objects
-    *func_args : tuple
-        The function calling arguments save the first.
-    **func_kwargs : dict
+        about the logging level as well as queue objects.
+    *func_args : Any
+        The function calling arguments except the first.
+    **func_kwargs : Any
         The keyword arguments for the function.
     """
     input_queue = multiprocessing_config.get("queue_input")

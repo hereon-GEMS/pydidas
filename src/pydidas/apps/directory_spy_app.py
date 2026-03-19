@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,15 @@ file or file of a specific pattern.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
 
-import glob
 import multiprocessing as mp
-import os
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -46,13 +45,12 @@ from pydidas.core import (
 )
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import (
-    check_file_exists,
-    check_hdf5_key_exists_in_file,
     get_extension,
-    get_hdf5_metadata,
     pydidas_logger,
+    verify_file_exists,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
+from pydidas.core.utils.hdf5 import get_hdf5_metadata, verify_hdf5_dset_exists_in_file
 from pydidas.data_io import import_data
 
 
@@ -137,10 +135,25 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
     ]
     AVAILABLE_IMAGE_SIZE = (10000, 10000)
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initialize the DirectorySpyApp.
+
+        Parameters
+        ----------
+        *args : Any
+            Any number of Parameters.
+        **kwargs : Any
+            Keyword arguments for Parameters with their reference key.
+            Additional supplied keyword arguments:
+
+            image_size : tuple, optional
+                The maximum size of the images to be stored in shared memory.
+                The default is (10000, 10000).
+        """
+        self.__image_size = kwargs.pop("image_size", self.AVAILABLE_IMAGE_SIZE)
         BaseApp.__init__(self, *args, **kwargs)
         AssociatedFileMixin.__init__(self)
-        self.__image_size = kwargs.get("image_size", self.AVAILABLE_IMAGE_SIZE)
         self._det_mask = None
         self._bg_image = None
         self._fname = lambda x: ""
@@ -224,7 +237,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         UserConfigError
             If the naming pattern could not be interpreted.
         """
-        self._config["path"] = self.get_param_value("directory_path", dtype=str)
+        self._config["path"] = self.get_param_value("directory_path")
         if self.get_param_value("scan_for_all"):
             self._config["glob_pattern"] = "*"
             self._fname = lambda x: ""
@@ -247,9 +260,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         _pattern_str = _pattern_str.replace(
             "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
         )
-        self._fname = lambda index: os.path.join(
-            self._config["path"], _pattern_str
-        ).format(index)
+        self._fname = lambda index: self._config["path"] / _pattern_str.format(index)
 
     def _load_bg_file(self) -> None:
         """
@@ -259,10 +270,12 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         background image is stored.
         """
         _bg_file = self.get_param_value("bg_file")
-        check_file_exists(_bg_file)
+        verify_file_exists(_bg_file)
         _params = {}
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
+            verify_hdf5_dset_exists_in_file(
+                _bg_file, self.get_param_value("bg_hdf5_key")
+            )
             _slice_ax = self.get_param_value("hdf5_slicing_axis")
             _params = {
                 "dataset": self.get_param_value("bg_hdf5_key"),
@@ -301,7 +314,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         _val = self.get_param_value("detector_mask_val")
         return np.where(self._det_mask, _val, image)
 
-    def initialize_shared_memory(self):
+    def initialize_shared_memory(self) -> None:
         """
         Initialize the shared memory arrays based on the buffer size and
         the result shapes.
@@ -340,15 +353,15 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         """
         Find the file with the last timestamp in a directory.
         """
-        _files = glob.glob(self._config["path"] + os.sep + "*")
-        _files = [_f for _f in _files if os.path.isfile(_f)]
-        _files.sort(key=os.path.getmtime)
+        _files = list(self._config["path"].glob("*"))
+        _files = [_f for _f in _files if _f.is_file()]
+        _files.sort(key=lambda _f: _f.stat().st_mtime)
         _file_one = _files[-1] if len(_files) > 0 else None
         _file_two = _files[-2] if len(_files) >= 2 else None
         _new_items = self.__process_filenames(_file_one, _file_two)
         return _new_items
 
-    def __process_filenames(self, latest: str, second_latest: str) -> bool:
+    def __process_filenames(self, latest: Path, second_latest: Path) -> bool:
         """
         Process the filenames.
 
@@ -358,9 +371,9 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
 
         Parameters
         ----------
-        latest : str
+        latest : Path
             The filename of the latest file.
-        2nd_latest : str
+        second_latest : Path
             The filename of the 2nd latest file.
 
         Returns
@@ -368,8 +381,8 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         bool
             Flag whether any changes have been detected.
         """
-        _size_one = os.path.getsize(latest) if latest is not None else -1
-        _size_two = os.path.getsize(second_latest) if second_latest is not None else -1
+        _size_one = latest.stat().st_size if latest is not None else -1
+        _size_two = second_latest.stat().st_size if second_latest is not None else -1
         self._config["latest_file"] = latest
         self._config["2nd_latest_file"] = second_latest
         _hash = hash((latest, _size_one, second_latest, _size_two))
@@ -382,9 +395,9 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         """
         Find the latest file matching the defined file pattern.
         """
-        while os.path.isfile(self._fname(self._index + 1)):
+        while self._fname(self._index + 1).is_file():
             self._index += 1
-        if not os.path.isfile(self._fname(self._index)):
+        if not self._fname(self._index).is_file():
             self.__find_current_index()
         _file_one = self._fname(self._index) if self._index >= 0 else None
         _file_two = self._fname(self._index - 1) if self._index > 0 else None
@@ -395,7 +408,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         """
         Find the current index of files matching the pattern.
         """
-        _files = glob.glob(self._config["path"] + os.sep + self._config["glob_pattern"])
+        _files = self._config["path"].glob(self._config["glob_pattern"])
         _index = self._config["glob_pattern"].find("*")
         _prefix = self._config["glob_pattern"][:_index]
         _suffix = self._config["glob_pattern"][_index + 1 :]
@@ -403,9 +416,9 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
             _f
             for _f in _files
             if (
-                os.path.isfile(_f)
-                and os.path.basename(_f).startswith(_prefix)
-                and _f.endswith(_suffix)
+                _f.is_file()
+                and _f.name.startswith(_prefix)
+                and _f.name.endswith(_suffix)
             )
         ]
         if len(_files) == 0:
@@ -413,9 +426,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
             return
         _files.sort()
         if len(_files) > 0:
-            _index = (
-                os.path.basename(_files[-1]).removeprefix(_prefix).removesuffix(_suffix)
-            )
+            _index = _files[-1].name.removeprefix(_prefix).removesuffix(_suffix)
             self._index = int(_index)
 
     def multiprocessing_post_run(self) -> None:
@@ -442,7 +453,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         """
         return
 
-    def multiprocessing_func(self, index: int | None = -1) -> tuple[int | None, str]:
+    def multiprocessing_func(self, index: int | None = -1) -> tuple[int | None, Path]:
         """
         Read the latest image. If the latest image cannot be read (e.g. the
         file is currently being written), the 2nd latest file will be read.
@@ -453,17 +464,17 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
             The input index. As this parameter is not used for this app and
             only implemented for compatibility, this will generally be None
             for the DirectorySpyApp. The default is None.
-        filename : str
+        filename : Path
             The full filename of the file being read.
         """
         try:
-            self.current_filename = self._config["latest_file"]
+            self.current_filepath = self._config["latest_file"]
             _image = self.get_image()
             if _image.shape == 0:
                 raise ValueError("Empty image.")
         except (ValueError, KeyError, FileNotFoundError, FileReadError):
             try:
-                self.current_filename = self._config["2nd_latest_file"]
+                self.current_filepath = self._config["2nd_latest_file"]
                 _image = self.get_image()
             except (ValueError, KeyError, FileNotFoundError, FileReadError):
                 raise FileReadError(
@@ -474,7 +485,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         if self.get_param_value("use_bg_file"):
             _image -= self._bg_image
         self.__store_image_in_shared_memory(_image)
-        return index, self.current_filename
+        return index, self.current_filepath
 
     def get_image(self) -> Dataset:
         """
@@ -484,19 +495,19 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
 
         Returns
         -------
-        np.ndarray
+        Dataset
             The image.
         """
         self.__read_image_meta = {"forced_dimension": 2}
         if self.hdf5_file:
             self.__update_hdf5_metadata()
-        _data = import_data(self.current_filename, **self.__read_image_meta)
+        _data = import_data(self.current_filepath, **self.__read_image_meta)
         return _data
 
-    def __update_hdf5_metadata(self):
+    def __update_hdf5_metadata(self) -> None:
         """Set the metadata parameters to read a frame from an HDF5 file."""
         _dataset = self.get_param_value("hdf5_key")
-        _shape = get_hdf5_metadata(self.current_filename, meta="shape", dset=_dataset)
+        _shape = get_hdf5_metadata(self.current_filepath, meta="shape", dset=_dataset)
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
         self.__read_image_meta["dataset"] = _dataset
         self.__read_image_meta["indices"] = (
@@ -506,14 +517,14 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         )
         self.__read_image_meta["import_metadata"] = False
 
-    def __store_image_in_shared_memory(self, image: np.ndarray):
+    def __store_image_in_shared_memory(self, image: np.ndarray) -> None:
         """
         Store the image data in the shared memory.
 
         Parameters
         ----------
         image : np.ndarray
-            The image data
+            The image data.
         """
         _meta = self.__get_image_metadata_string()
         _flag_lock = self._config["shared_memory"]["flag"]
@@ -542,7 +553,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         )
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index: int, fname: str, *args):
+    def multiprocessing_store_results(self, index: int, fname: Path, *args) -> None:
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
@@ -551,15 +562,17 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         index : int
             The frame index. This entry is kept for compatibility and not used
             in this app.
-        fname : str
+        fname : Path
             The filename
+        *args : Any
+            Additional positional arguments (unused).
         """
         _flag_lock = self._config["shared_memory"]["flag"]
         with _flag_lock.get_lock():
             _width = self._config["shared_memory"]["width"].value
             _height = self._config["shared_memory"]["height"].value
             self.__current_image = self._shared_array[:_height, :_width]
-            self.current_filename = fname
+            self.current_filepath = fname
             self.__current_metadata = self._config["shared_memory"][
                 "metadata"
             ].value.decode()

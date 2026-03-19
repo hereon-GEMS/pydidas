@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,17 +21,15 @@ metaclass-based registry should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["IoBase"]
 
 
-import os
 from numbers import Integral
 from pathlib import Path
-from typing import Union
 
 from numpy import amax, amin, ndarray
 
@@ -56,7 +54,7 @@ class IoBase(metaclass=IoManager):
     _data = None
 
     @classmethod
-    def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
+    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: dict):
         """
         Write the content to a file.
 
@@ -64,7 +62,7 @@ class IoBase(metaclass=IoManager):
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
         data : ndarray
             The data to be written to the file. Pydidas Dataset objects will
@@ -76,7 +74,7 @@ class IoBase(metaclass=IoManager):
         raise NotImplementedError
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
+    def import_from_file(cls, filename: Path | str, **kwargs: dict) -> Dataset:
         """
         Restore the content from a file
 
@@ -84,19 +82,19 @@ class IoBase(metaclass=IoManager):
 
         Parameters
         ----------
-        filename: Union[Path, str]
+        filename: Path or str
             The filename of the data file to be imported.
         """
         raise NotImplementedError
 
     @classmethod
-    def check_for_existing_file(cls, filename: Union[Path, str], **kwargs: dict):
+    def check_for_existing_file(cls, filename: Path | str, **kwargs: dict):
         """
         Check if the file exists and if the overwrite flag has been set.
 
         Parameters
         ----------
-        filename: Union[Path, str]
+        filename: Path or str
             The full filename and path.
         **kwargs : dict
             Any keyword arguments. Supported is 'overwrite' [bool], a flag to allow
@@ -108,7 +106,7 @@ class IoBase(metaclass=IoManager):
             If a file with a filename exists and the overwrite flag is not True.
         """
         _overwrite = kwargs.get("overwrite", False)
-        if os.path.exists(filename) and not _overwrite:
+        if Path(filename).exists() and not _overwrite:
             raise FileExistsError(
                 f"The file `{filename}` exists and overwriting has not been confirmed."
             )

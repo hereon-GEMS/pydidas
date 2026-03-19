@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,12 @@ Module with ErrorMessageBox class for exception output.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ErrorMessageBox"]
 
-
-import os
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -141,7 +139,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         text : str
             The text to be displayed.
         """
-        _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
+        _logfile = get_logging_dir() / "pydidas_exception.log"
         _note = (
             "Please report the bug online using the form available on:\n"
             "\thttps://pydidas.hereon.de/\n\n"

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,12 +18,11 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import os
 import random
 import shutil
 import string
@@ -32,6 +31,7 @@ import tempfile
 import time
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 
 from pydidas.core.utils import formatted_str_repr_of_dict
 from pydidas.core.utils.str_utils import (
@@ -54,7 +54,7 @@ from pydidas.core.utils.str_utils import (
 class Test_str_utils(unittest.TestCase):
     def setUp(self):
         self.length = 20
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
@@ -182,21 +182,21 @@ class Test_str_utils(unittest.TestCase):
 
     def test_timed_print(self):
         _teststr = "afs 4-2 version 1.0"
-        _fname = os.path.join(self._tmpdir, "out.txt")
-        with open(_fname, "w") as _f:
+        _fname = self._tmpdir / "out.txt"
+        with _fname.open("w") as _f:
             with redirect_stdout(_f):
                 timed_print(_teststr)
-        with open(_fname, "r") as _f:
+        with _fname.open("r") as _f:
             _text = _f.read()
         self.assertIn(_teststr, _text)
 
     def test_timed_print_verbose_false(self):
         _teststr = "afs 4-2 version 1.0"
-        _fname = os.path.join(self._tmpdir, "out.txt")
-        with open(_fname, "w") as _f:
+        _fname = self._tmpdir / "out.txt"
+        with _fname.open("w") as _f:
             with redirect_stdout(_f):
                 timed_print(_teststr, verbose=False)
-        with open(_fname, "r") as _f:
+        with _fname.open("r") as _f:
             _text = _f.read()
         self.assertNotIn(_teststr, _text)
 
@@ -212,11 +212,11 @@ class Test_str_utils(unittest.TestCase):
 
     def test_print_warning(self):
         _teststr = "test"
-        _fname = os.path.join(self._tmpdir, "out.txt")
-        with open(_fname, "w") as _f:
+        _fname = self._tmpdir / "out.txt"
+        with _fname.open("w") as _f:
             with redirect_stdout(_f):
                 print_warning(_teststr)
-        with open(_fname, "r") as _f:
+        with _fname.open("r") as _f:
             _text = _f.read().strip()
         w_parts = _text.split("\n")
         w_lens = [len(_w) for _w in w_parts]

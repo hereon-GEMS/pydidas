@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with access to pydidas icons.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,6 @@ __all__ = [
     "pydidas_error_svg",
 ]
 
-import os
 
 import qtpy
 
@@ -51,7 +50,7 @@ def pydidas_logo_svg() -> QSvgWidget:
     QSvgWidget
         The QSvgWidget with the pydidas logo.
     """
-    return QSvgWidget(os.path.join(ICON_PATH, "pydidas_snakes.svg"))
+    return QSvgWidget(str(ICON_PATH / "pydidas_snakes.svg"))
 
 
 def pydidas_error_svg() -> QSvgWidget:
@@ -63,4 +62,4 @@ def pydidas_error_svg() -> QSvgWidget:
     QSvgWidget
         The QSvgWidget with the pydidas error image.
     """
-    return QSvgWidget(os.path.join(ICON_PATH, "pydidas_error.svg"))
+    return QSvgWidget(str(ICON_PATH / "pydidas_error.svg"))

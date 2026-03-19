@@ -30,7 +30,7 @@ import threading
 import time
 import unittest
 
-from pydidas.multiprocessing import app_processor
+from pydidas.multiprocessing import app_processor_func
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 from pydidas.unittest_objects.mp_test_app_wo_tasks import MpTestAppWoTasks
 
@@ -49,7 +49,7 @@ class _ProcThread(threading.Thread):
         self._use_tasks = use_tasks
 
     def run(self):
-        app_processor(
+        app_processor_func(
             self._mp_config,
             self.app,
             self.app_params,
@@ -111,7 +111,7 @@ class Test_app_processor(unittest.TestCase):
         self.app = MpTestApp()
         self.app.multiprocessing_pre_run()
         self.put_ints_in_queue()
-        app_processor(
+        app_processor_func(
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),

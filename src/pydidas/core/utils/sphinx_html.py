@@ -118,7 +118,7 @@ def run_sphinx_html_build(
             "sphinx",
             "-b",
             "html",
-            os.path.join(DOC_SOURCE_DIRECTORY, "src"),
+            str(DOC_SOURCE_DIRECTORY / "src"),
             build_dir,
         ]
     )

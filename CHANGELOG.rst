@@ -55,6 +55,8 @@ Bugfixes
   long lists of choices
 - Fixed occurences of the deprecated method update_widget_value in two
   widgets (ConvertFit2dGeometry and GenericPluginConfigWidget)
+- Fixed an issue where the derived beamcenter would not be correctly displayed
+  in the DefineDiffractionExpFrame
 
 
 v26.01.27

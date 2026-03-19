@@ -388,6 +388,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 for _key, _param in EXP.params.items():
                     self.update_param_widget_value(_key, _param.value)
                 self._config["exp_hash"] = hash(self.params)
+                self._update_beamcenter()
         else:
             self._config["exp_hash"] = hash(self.params)
 

@@ -59,6 +59,8 @@ Bugfixes
   in the DefineDiffractionExpFrame
 - Fixed an issue when resetting Parameters in InputPlugins which did not 
   handle derived interal Parameters correctly
+- Fixed an issue in the ViewResultsFrame which called a deprecated method
+  in the input plugin.
 
 
 v26.01.27

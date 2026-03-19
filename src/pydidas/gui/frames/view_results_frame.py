@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -74,7 +74,14 @@ class ViewResultsFrame(BaseFrameWithApp):
         self._TREE = kwargs.get("processing_tree", ProcessingTree())
         self._EXP = kwargs.get("diffraction_exp", DiffractionExperiment())
         BaseFrameWithApp.__init__(self, **kwargs)
-        self._RESULTS = kwargs.get("workflow_results", ProcessingResults())
+        self._RESULTS = kwargs.get(
+            "workflow_results",
+            ProcessingResults(
+                diffraction_exp_context=self._EXP,
+                scan_context=self._SCAN,
+                workflow_tree=self._TREE,
+            ),
+        )
         self._active_node_id = -1
         self._result_window = None
         self.__export_dialog = PydidasFileDialog()
@@ -148,7 +155,7 @@ class ViewResultsFrame(BaseFrameWithApp):
         if _dir is not None:
             self._RESULTS.import_data_from_directory(_dir)  # noqa W0212
             self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN  # noqa W0212
-            self._RESULTS._TREE.root.plugin.update_filename_string()  # noqa W0212
+            self._RESULTS._TREE.root.plugin.update_filepath()  # noqa W0212
             self.update_choices_of_selected_results()
 
     def update_choices_of_selected_results(self):
@@ -240,7 +247,7 @@ class ViewResultsFrame(BaseFrameWithApp):
             )
         _loader_plugin = self._RESULTS.frozen_tree.root.plugin.copy()
         _loader_plugin._SCAN = self._RESULTS.frozen_scan
-        if _loader_plugin.filename_string == "":
+        if _loader_plugin._filename == "":
             # if the result has been imported from disk, set the local
             # images_per_file parameter to the counted value in case the file
             # is not available under the stored path.

@@ -79,7 +79,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         BaseParamIoWidgetMixIn.__init__(self, param)
         self.setText(param.name)
         self.setEnabled(True in param.choices and False in param.choices)
-        self.update_widget_value(param.value)
+        self.update_display_value(param.value)
         self.sig_check_state_changed.connect(self.emit_signal)
 
     @property
@@ -94,7 +94,7 @@ class ParamIoWidgetCheckBox(BaseParamIoWidgetMixIn, PydidasCheckBox):
         """
         return "True" if self.isChecked() else "False"
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         """
         Update the widget value without emitting signals.
 

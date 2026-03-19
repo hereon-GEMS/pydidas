@@ -57,6 +57,8 @@ Bugfixes
   widgets (ConvertFit2dGeometry and GenericPluginConfigWidget)
 - Fixed an issue where the derived beamcenter would not be correctly displayed
   in the DefineDiffractionExpFrame
+- Fixed an issue when resetting Parameters in InputPlugins which did not 
+  handle derived interal Parameters correctly
 
 
 v26.01.27

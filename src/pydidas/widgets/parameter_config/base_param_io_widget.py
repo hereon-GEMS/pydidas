@@ -97,7 +97,7 @@ class BaseParamIoWidgetMixIn:
         """
         return None
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         """
         Update the widget display to show the given value.
 
@@ -191,7 +191,7 @@ class BaseParamIoWidgetMixIn:
             and np.isfinite(value)
         ):
             value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
-        self.update_widget_value(value)
+        self.update_display_value(value)
         self.emit_signal()
 
     def set_unique_ref_name(self, name: str) -> None:

@@ -100,7 +100,7 @@ class ParamIoWidgetWithButton(
         """
         return self._io_lineedit.text().strip()
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         """
         Update the widget value without emitting signals.
 

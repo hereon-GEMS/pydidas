@@ -336,7 +336,7 @@ class ParameterWidget(EmptyWidget):
         value : Any
             The new value to be displayed.
         """
-        self._widgets["io"].update_widget_value(value)
+        self._widgets["io"].update_display_value(value)
 
     def set_value(self, value: Any) -> None:
         """

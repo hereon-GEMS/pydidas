@@ -15,8 +15,14 @@ jobs:
   unittests:
     name: Test ${{ matrix.os }} Python ${{ matrix.python-version }} ${{ matrix.tests }}
     runs-on: ${{ matrix.os }}
+    needs:
+      - formatting_checks_passed
+      - version_checks_passed
+    if: >-
+      needs.formatting_checks_passed.result == 'success' &&
+      needs.version_checks_passed.result == 'success'
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
         QT_API: ["pyqt5", "pyside6"]

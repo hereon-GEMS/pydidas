@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to view and modify the global settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 
 import pydidas_qtcore
 from pydidas.core import SingletonObject, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, QSETTINGS_GLOBAL_KEYS
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.framework import PydidasWindow
 
@@ -87,7 +87,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options

@@ -38,7 +38,7 @@ from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import (
     COLOR_GREEN,
     COLOR_RED,
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     POLICY_EXP_FIX,
 )
 from pydidas.core.constants.numpy_names import NUMPY_HUMAN_READABLE_DATATYPES
@@ -92,7 +92,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "show_decoding_details",
             "Show binary decoder settings",
             checked=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self._widgets["show_decoding_details"].clicked.connect(self._toggle_details)
         for _key in ["raw_datatype", "raw_n_y", "raw_n_x", "raw_header_size"]:
@@ -104,7 +104,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "decode_info",
             "",
             font_metric_height_factor=2,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             policy=POLICY_EXP_FIX,
         )
         self.create_spacer(None, fixedWidth=1, gridPos=(0, 1, 1, 1))

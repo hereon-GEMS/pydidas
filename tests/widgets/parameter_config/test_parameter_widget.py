@@ -34,7 +34,7 @@ from qtpy import QtCore
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
@@ -113,7 +113,7 @@ def test__creation__w__bool_choices(
 ) -> None:
     qapp.font_size = font_size
     _expected_width = qapp.font_char_width * (
-        width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
+        width if width is not None else FONT_METRIC_CONFIG_WIDTH
     )
     _expected_height = int(
         max(np.ceil(qapp.font_height * 1.05), MINIMUM_WIDGET_DIMENSIONS)
@@ -215,7 +215,7 @@ def test__creation__check_layout(qtbot, qapp, kwargs, width, unit) -> None:
     )
     # determine the expected widths first in characters
     # then convert to pixels (required for calc of relative I/O width)
-    _width_in_chars = width if width is not None else FONT_METRIC_PARAM_EDIT_WIDTH
+    _width_in_chars = width if width is not None else FONT_METRIC_CONFIG_WIDTH
     _expected_global_width = int(qapp.font_char_width * _width_in_chars)
     _expected_global_height = (
         (2 + _linebreak) * LAYOUT_VERTICAL_SPACING

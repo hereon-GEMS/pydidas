@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Function to define the build configuration for the WorkflowTestFrame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = ["get_WorkflowTestFrame_build_config"]
 
 from qtpy import QtCore
 
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import ScrollArea
 from pydidas.widgets.data_viewer import DataViewer, TableWithResultDatasets
 from pydidas.widgets.framework import BaseFrame
@@ -101,7 +101,7 @@ def get_WorkflowTestFrame_build_config(
                 "create_empty_widget",
                 ("config",),
                 {
-                    "font_metric_width_factor": FONT_METRIC_PARAM_EDIT_WIDTH,
+                    "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
                     "parent_widget": None,
                     "sizePolicy": POLICY_FIX_EXP,
                 },
@@ -176,7 +176,7 @@ def get_WorkflowTestFrame_build_config(
                 "create_any_widget",
                 ("result_table", TableWithResultDatasets),
                 {
-                    "font_metric_width_factor": FONT_METRIC_PARAM_EDIT_WIDTH,
+                    "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
                     "font_metric_height_factor": 10,
                     "parent_widget": "config",
                     "visible": False,
@@ -192,7 +192,7 @@ def get_WorkflowTestFrame_build_config(
                 ("result_info", ReadOnlyTextWidget),
                 {
                     "alignment": QtCore.Qt.AlignTop,
-                    "font_metric_width_factor": FONT_METRIC_PARAM_EDIT_WIDTH,
+                    "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
                     "font_metric_height_factor": 24,
                     "parent_widget": "config",
                     "visible": False,

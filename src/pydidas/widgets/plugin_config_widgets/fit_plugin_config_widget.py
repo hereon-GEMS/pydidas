@@ -32,7 +32,7 @@ from functools import partial
 
 from qtpy import QtCore
 
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_EXP_FIX
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_EXP_FIX
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
@@ -60,21 +60,21 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         self.create_label(
             "label_fit_output",
             "Fit output values:",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             gridPos=(0, 0, 1, 2),
             parent_widget="checkbox_widget",
         )
         self.create_empty_widget(
             "spacer_fit_output",
             parent_widget="checkbox_widget",
-            font_metric_width_factor=0.1 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.1 * FONT_METRIC_CONFIG_WIDTH,
         )
         for _index, _key in enumerate(FIT_OUTPUT_OPTIONS):
             self.create_check_box(
                 f"checkbox_{_key}",
                 _key,
                 checked=_key in _plugin_output,
-                font_metric_width_factor=0.9 * FONT_METRIC_PARAM_EDIT_WIDTH,
+                font_metric_width_factor=0.9 * FONT_METRIC_CONFIG_WIDTH,
                 gridPos=(_index + 1, 1, 1, 1),
                 parent_widget="checkbox_widget",
             )

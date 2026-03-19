@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ mask editor in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,7 +33,7 @@ from typing import Any
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.data_io import import_data
 from pydidas.widgets import parameter_config, silx_plot
@@ -60,21 +60,21 @@ class MaskEditorWindow(PydidasWindow):
         self.create_any_widget(
             "param_frame",
             parameter_config.ParameterEditCanvas,
-            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.8 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(0, 0, 1, 1),
         )
         self.create_label(
             "title",
             "Input reference file (not the mask)",
             fontsize_offset=1,
-            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.8 * FONT_METRIC_CONFIG_WIDTH,
             bold=True,
             parent_widget=self._widgets["param_frame"],
         )
-        self.add_any_widget(
+        self.create_any_widget(
             "file_selector",
-            SelectDataFrameWidget(),
-            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            SelectDataFrameWidget,
+            font_metric_width_factor=0.8 * FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["param_frame"],
         )
         self.create_spacer(None, parent_widget=self._widgets["param_frame"])
@@ -83,7 +83,7 @@ class MaskEditorWindow(PydidasWindow):
             "Mask parameters",
             fontsize_offset=1,
             bold=True,
-            font_metric_width_factor=0.5 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.5 * FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["param_frame"],
         )
 

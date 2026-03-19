@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to modify and store the Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.data_viewer import DataViewer
@@ -87,7 +87,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             gridPos=(0, 0, 1, 2),
         )
         self._widgets["config_area"] = ParameterEditCanvas(
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH
         )
         self.create_any_widget(
             "config_scroll_area",
@@ -99,7 +99,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.create_any_widget(
             "plugin_param_edit",
             EditPluginParametersWidget,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["config_area"],
         )
         self.create_line(

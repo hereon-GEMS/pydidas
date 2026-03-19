@@ -29,6 +29,8 @@ Programmatic changes
   hdf5_dataset_utils
 - Updated CI pipelines to run tests only when other tests (formatting etc)
   passed.
+- Removed FONT_METRIC_PARAM_EDIT_WIDTH and modified all occurrences to
+  use FONT_METRIC_CONFIG_WIDTH to fix formatting issues.
 
 Bugfixes
 --------

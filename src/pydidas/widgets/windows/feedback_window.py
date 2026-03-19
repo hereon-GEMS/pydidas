@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ form which they can copy and paste to submit feedback.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ __all__ = ["FeedbackWindow"]
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Parameter, ParameterCollection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYDIDAS_FEEDBACK_URL
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, PYDIDAS_FEEDBACK_URL
 from pydidas.core.utils import apply_qt_properties, copy_text_to_system_clipbord
 from pydidas.widgets.framework import PydidasWindow
 
@@ -77,13 +77,13 @@ class FeedbackWindow(PydidasWindow):
             "pydidas Feedback",
             bold=True,
             fontsize_offset=2,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_label(
             "label_title",
             INFO_TEXT,
             font_metric_height_factor=8,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             gridPos=(-1, 0, 1, 1),
             wordWrap=True,
         )
@@ -93,7 +93,7 @@ class FeedbackWindow(PydidasWindow):
             "label_title",
             "type of feedback",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_radio_button_group(
             "type",
@@ -107,11 +107,11 @@ class FeedbackWindow(PydidasWindow):
             "label_title",
             "feedback information",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_param_widget(
             self.get_param("email"),
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             width_io=0.5,
             width_text=0.5,
         )
@@ -119,18 +119,18 @@ class FeedbackWindow(PydidasWindow):
         self.create_label(
             "label_details",
             "Detailed feedback:",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.add_any_widget(
             "details",
             QtWidgets.QPlainTextEdit(),
-            fixedWidth=_font_width * FONT_METRIC_PARAM_EDIT_WIDTH,
+            fixedWidth=_font_width * FONT_METRIC_CONFIG_WIDTH,
             fixedHeight=_font_height * 15,
         )
         self.create_button(
             "button_copy",
             "Copy to clipboard and open feedback webpage.",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         _default_font = self._widgets["details"].document().defaultFont()
         _default_font.setFamily(QtWidgets.QApplication.instance().font_family)
@@ -160,10 +160,10 @@ class FeedbackWindow(PydidasWindow):
         char_height : float
             The average metrics height of a char.
         """
-        self.setFixedWidth(int(char_width * FONT_METRIC_PARAM_EDIT_WIDTH + 20))
+        self.setFixedWidth(int(char_width * FONT_METRIC_CONFIG_WIDTH + 20))
         apply_qt_properties(
             self._widgets["details"],
-            fixedWidth=int(char_width * FONT_METRIC_PARAM_EDIT_WIDTH),
+            fixedWidth=int(char_width * FONT_METRIC_CONFIG_WIDTH),
             fixedHeight=char_height * 15,
         )
         self.adjustSize()

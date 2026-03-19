@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Fit2D geometry parameters to pyFAI geometry.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,7 +34,7 @@ from qtpy import QtCore, QtGui
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import Parameter, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.widgets.framework import PydidasWindow
 
 
@@ -88,7 +88,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "Convert Fit2D geometry to pyFAI",
             bold=True,
             fontsize_offset=2,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_label(
             "label_note",
@@ -108,7 +108,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "label_title",
             "Fit2d parameter input:",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _param_key in _FIT2D_PARAM_KEYS:
             self.create_param_widget(self.params[_param_key])
@@ -121,7 +121,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "label_title",
             "Resulting pyFAI geometry:",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _param_key in _PYFAI_PARAM_KEYS:
             self.create_param_widget(self.params[_param_key])

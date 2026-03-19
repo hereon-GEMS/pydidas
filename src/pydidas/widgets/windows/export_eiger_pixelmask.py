@@ -33,7 +33,7 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter, ParameterCollection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
 from pydidas.data_io import IoManager
 from pydidas.widgets.dialogues import critical_warning
@@ -73,7 +73,7 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         """
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
 
         self.create_label(

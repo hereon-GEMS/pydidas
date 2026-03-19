@@ -35,7 +35,7 @@ from qtpy import QtCore
 
 from pydidas.core import Parameter
 from pydidas.core.constants import (
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
     HDF5_EXTENSIONS,
 )
@@ -143,7 +143,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         )
         self.create_param_widget(
             self.get_param("dataset"),
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             gridPos=(2, 0, 1, 2),
             width_text=0.275,
             width_io=0.725,
@@ -153,7 +153,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         self.create_button(
             "button_toggle_details",
             "Show detailed dataset selection options",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             icon="qt-std::SP_TitleBarUnshadeButton",
             gridPos=(2, 2, 1, 1),
         )

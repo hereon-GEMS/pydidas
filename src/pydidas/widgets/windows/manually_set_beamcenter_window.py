@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ in an image to define the beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,7 +36,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, PYFAI_DETECTOR_NAMES
 from pydidas.data_io import import_data
 from pydidas.widgets.controllers import ManuallySetBeamcenterController
 from pydidas.widgets.dialogues import QuestionBox
@@ -92,7 +92,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_empty_widget(
             "left_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 1, 2, 1),
             minimumHeight=400,
         )

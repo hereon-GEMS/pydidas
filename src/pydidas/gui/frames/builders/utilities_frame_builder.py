@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the UtilitiesFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -119,7 +119,7 @@ class UtilitiesFrameBuilder:
             frame.create_empty_widget(
                 f"utility_{_key}",
                 gridPos=(_ypos, _xpos, 1, 1),
-                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+                font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
                 layout_kwargs={"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
             )
             frame.create_label(
@@ -135,7 +135,7 @@ class UtilitiesFrameBuilder:
                 _entries["text"],
                 alignment=constants.ALIGN_TOP_LEFT,
                 font_metric_height_factor=4,
-                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+                font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
                 gridPos=(1, 0, 1, 1),
                 parent_widget=frame._widgets[f"utility_{_key}"],
                 sizePolicy=constants.POLICY_FIX_EXP,

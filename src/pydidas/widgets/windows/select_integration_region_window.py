@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ integration region for a plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,7 +34,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
 from pydidas.plugins import pyFAIintegrationBase
@@ -103,11 +103,11 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             ),
             bold=True,
             fontsize_offset=1,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_empty_widget(
             "left_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             minimumHeight=400,
             parent_widget=None,
         )
@@ -135,7 +135,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             ),
             bold=True,
             font_metric_height_factor=2,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["left_container"],
             wordWrap=True,
         )
@@ -144,7 +144,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             "label_file",
             "Select input file:",
             fontsize_offset=1,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["left_container"],
             underline=True,
         )

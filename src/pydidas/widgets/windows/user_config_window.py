@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to view and modify user-specific settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,7 +38,7 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 from pydidas.core import SingletonObject, get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     GENERIC_PLUGIN_PATH,
     GENERIC_STANDARD_WIDGET_WIDTH,
     POLICY_EXP_FIX,
@@ -94,7 +94,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         _section_options = dict(
             bold=True,
@@ -116,7 +116,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.create_label("section_font", "Font settings", **_section_options)
         self.create_empty_widget(
             "fontsize_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
             toolTip=(
                 "Pydidas supports font sizes from 5 pt up to 20 pt. Any entries "
@@ -127,7 +127,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "label_font_size",
             "Standard font size:",
             parent_widget="fontsize_container",
-            font_metric_width_factor=0.7 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.7 * FONT_METRIC_CONFIG_WIDTH,
             wordWrap=False,
         )
         self.add_any_widget(
@@ -216,7 +216,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "colormap_editor",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             layout_column_stretches={0: 10, 1: 90},
             parent_widget="config_canvas",
         )
@@ -234,7 +234,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "cmap_nan_color_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
             toolTip=GENERIC_PARAMS_SETTINGS["cmap_nan_color"]["tooltip"],
         )
@@ -249,7 +249,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.create_label(
             "cmap_nan_display_label",
             "Currently selected invalid data color:",
-            font_metric_width_factor=0.75 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.75 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 0, 1, 1),
             parent_widget="cmap_nan_color_container",
         )
@@ -257,7 +257,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "cmap_nan_display_current",
             "",
             autoFillBackground=True,
-            font_metric_width_factor=0.25 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.25 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 1, 1, 1),
             parent_widget="cmap_nan_color_container",
         )
@@ -265,7 +265,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "but_select_cmap_nan_color",
             "Pick a new color for invalid data / no data / NaN",
             parent_widget="cmap_nan_color_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
 
         self.create_spacer("spacer_4", parent_widget="config_canvas")
@@ -277,7 +277,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "generic_plugin_box",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             layout_column_stretches={0: 10, 1: 90},
             parent_widget="config_canvas",
         )
@@ -339,7 +339,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
         self.setFixedWidth(int(self._widgets["config_canvas"].sizeHint().width() + 20))
         self._widgets["font_family_box"].setFixedWidth(
-            int(0.9 * FONT_METRIC_PARAM_EDIT_WIDTH * self.__qtapp.font_char_width)
+            int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
         _default_cmap = self.q_settings_get("user/cmap_name", default="Gray")
         with QtCore.QSignalBlocker(self._widgets["cmap_combobox"]):
@@ -461,7 +461,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.__qtapp.font_size = float(self._widgets["edit_fontsize"].text())
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self._widgets["font_family_box"].setFixedWidth(
-            int(0.9 * FONT_METRIC_PARAM_EDIT_WIDTH * self.__qtapp.font_char_width)
+            int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
         self.adjustSize()
 

@@ -36,7 +36,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, HDF5_EXTENSIONS
 from pydidas.core.utils import ShowBusyMouse, get_extension
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, export_data, import_data
@@ -116,13 +116,13 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
         _sub_section_config = {
             "fontsize_offset": 1,
-            "font_metric_width_factor": FONT_METRIC_PARAM_EDIT_WIDTH,
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
             "bold": True,
             "parent_widget": "config_canvas",
         }
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
 
         self.create_label(
@@ -130,7 +130,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             "Image series operations",
             fontsize_offset=4,
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
         )
         self.create_spacer(None, parent_widget="config_canvas")

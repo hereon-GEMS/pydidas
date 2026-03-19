@@ -34,7 +34,7 @@ from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Hdf5key
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, OUTPUT_PLUGIN
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, OUTPUT_PLUGIN
 from pydidas.core.utils import apply_qt_properties
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.dialogues.question_box import QuestionBox
@@ -141,7 +141,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             "but_toggle_advanced_params",
             "Display advanced Parameters",
             icon="qt-std::SP_TitleBarUnshadeButton",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)

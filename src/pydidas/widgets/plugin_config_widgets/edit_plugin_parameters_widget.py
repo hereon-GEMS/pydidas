@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,7 @@ __all__ = ["EditPluginParametersWidget"]
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
 from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
@@ -66,7 +66,7 @@ class EditPluginParametersWidget(
             The parent widget. The default is None.
         """
         if "font_metric_width_factor" not in kwargs:
-            kwargs["font_metric_width_factor"] = FONT_METRIC_PARAM_EDIT_WIDTH
+            kwargs["font_metric_width_factor"] = FONT_METRIC_CONFIG_WIDTH
         EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
@@ -75,7 +75,7 @@ class EditPluginParametersWidget(
         self.setFixedWidth(
             int(
                 QtWidgets.QApplication.instance().font_char_width
-                * FONT_METRIC_PARAM_EDIT_WIDTH
+                * FONT_METRIC_CONFIG_WIDTH
             )
         )
         self.__qtapp = QtWidgets.QApplication.instance()

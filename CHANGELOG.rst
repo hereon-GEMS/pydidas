@@ -63,6 +63,8 @@ Bugfixes
   in the input plugin.
 - Fixed an issue in the ShowInformationForResult window when calling the
   get_filename() on the loader plugin which returned a Path
+- Fixed an issue where importing results into a sandbox would reset the 
+  global context instances.
 
 
 v26.01.27

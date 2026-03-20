@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the DataViewer which allows to slice a Dataset by its metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -276,6 +276,7 @@ class DataViewer(WidgetWithParameterCollection):
             the data can be read from the H5Node.
         """
         self._widgets["container_for_buttons"].setVisible(data is not None)
+        self._widgets["axes_selector"].setEnabled(data is not None)
         # Remove the data reference from the h5 view:
         if "view-h5" in self._widgets:
             self._widgets["view-h5"].setData(None)

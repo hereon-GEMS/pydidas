@@ -67,6 +67,8 @@ Bugfixes
   global context instances.
 - Fixed an issue where importing different results would not clear the display
   of the old results.
+- Fixed an issue where the DataViewer allowed to slice the data after the 
+  data has been set to zero which caused an exception.
 
 
 v26.01.27

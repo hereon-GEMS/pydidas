@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ShowInformationForResult"]
 
 
-from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore

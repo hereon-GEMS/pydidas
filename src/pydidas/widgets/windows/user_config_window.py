@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the UserConfigWindow class which is a PydidasWindow widget
-to view and modify user-specific settings in a separate Window.
+Module with UserConfigWindow class to view and modify user-specific
+settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
@@ -46,10 +46,15 @@ from pydidas.core.constants import (
     QSETTINGS_USER_KEYS,
     QT_REG_EXP_RGB_VALIDATOR,
 )
-from pydidas.core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
+from pydidas.core.generic_params.generic_params_settings import (
+    GENERIC_PARAMS_SETTINGS,
+)
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
-from pydidas.widgets.dialogues import PydidasExceptionMessageBox, QuestionBox
+from pydidas.widgets.dialogues import (
+    PydidasExceptionMessageBox,
+    QuestionBox,
+)
 from pydidas.widgets.factory import SquareButton
 from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
@@ -119,8 +124,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
             toolTip=(
-                "Pydidas supports font sizes from 5 pt up to 20 pt. Any entries "
-                "outside of this range will be ignored."
+                "Pydidas supports font sizes from 5 pt up to 20 pt. Any "
+                "entries outside of this range will be ignored."
             ),
         )
         self.create_label(
@@ -180,7 +185,9 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_spacer(None, parent_widget="config_canvas")
         self.create_label(
-            "section_mosaic", "Composite creator settings", **_section_options
+            "section_mosaic",
+            "Composite creator settings",
+            **_section_options,
         )
         self.create_param_widget(
             self.get_param("mosaic_border_width"),
@@ -337,7 +344,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """Finalize the UI initialization."""
         self._config["cmap_nan_palette"] = QtGui.QPalette()
         self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
-        self.setFixedWidth(int(self._widgets["config_canvas"].sizeHint().width() + 20))
+        _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
+        self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
             int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
@@ -348,12 +356,12 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot(object)
     def update_qsetting(self, param_key: str, value: Any) -> None:
         """
-        Update a QSettings value
+        Update a QSettings value.
 
         Parameters
         ----------
         param_key : str
-            The QSettings reference key. A "global/" prefix will be applied
+            The QSettings reference key. A "user/" prefix will be applied
             to it.
         value : Any
             The new value.
@@ -411,19 +419,21 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot()
     def update_plugin_collection(self) -> None:
         """
-        Update the plugin collection from the updated QSetting values for the
+        Update the plugin collection from updated QSetting values for the
         plugin directories.
         """
         _reply = QuestionBox(
             "Update plugin paths",
             (
-                "Do you want to update the custom plugin paths? This will clear the "
-                "current workflow tree and all un-saved changed will be lost."
+                "Do you want to update the custom plugin paths? This will "
+                "clear the current workflow tree and all un-saved changed "
+                "will be lost."
             ),
         ).exec_()
         if _reply:
             PLUGINS.clear_collection(True)
-            PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
+            _paths = PLUGINS.get_q_settings_plugin_paths()
+            PLUGINS.find_and_register_plugins(*_paths)
 
     @QtCore.Slot(str)
     def update_cmap(self, cmap_name: str) -> None:
@@ -445,7 +455,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         Parameters
         ----------
         change : int
-            The change direction.
+            The change direction (-1 for decrease, 1 for increase).
         """
         _new_fontsize = self.__qtapp.font_size
         if change == 1:
@@ -458,8 +468,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot()
     def process_new_fontsize_setting(self) -> None:
         """Process the user input of the new font size."""
-        self.__qtapp.font_size = float(self._widgets["edit_fontsize"].text())
-        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        _fontsize = float(self._widgets["edit_fontsize"].text())
+        self.__qtapp.font_size = _fontsize
+        _width = self._widgets["config_canvas"].sizeHint().width() + 20
+        self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
             int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
@@ -468,7 +480,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot(QtGui.QFont)
     def new_font_family_selected(self, font: QtGui.QFont) -> None:
         """
-        Handle the selection of the new font and notify the PydidasQApplication.
+        Handle the selection of the new font and notify the
+        PydidasQApplication.
 
         Parameters
         ----------
@@ -505,7 +518,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
-            None, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
+            None,
+            "",
+            "Are you sure to reset all the values?",
+            _qm.Yes | _qm.No,
         )
         if answer == _qm.Yes:
             self.restore_all_defaults(True)
@@ -531,7 +547,6 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     def mpl_font_not_supported(error: str) -> None:
         """
         Handle the signal that matplotlib does not support the chosen font.
-
 
         Parameters
         ----------

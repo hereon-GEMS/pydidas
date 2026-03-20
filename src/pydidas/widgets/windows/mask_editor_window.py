@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the MaskEditorWindow class which is a wrapper window to use the pyFAI
-mask editor in pydidas.
+Module with MaskEditorWindow class to wrap the pyFAI mask editor in pydidas.
 """
 
 __author__ = "Malte Storm"
@@ -43,17 +42,19 @@ from pydidas.widgets.selection import SelectDataFrameWidget
 
 class MaskEditorWindow(PydidasWindow):
     """
-    Window with a simple dialogue to select a number of files and
+    Window with a dialogue to select a reference file and edit masks.
     """
 
     show_frame = False
     default_params = get_generic_param_collection(
-        "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis"
+        "filename",
+        "hdf5_key",
+        "hdf5_frame",
+        "hdf5_slicing_axis",
     )
 
     def __init__(self, **kwargs: Any) -> None:
-        PydidasWindow.__init__(self, title="Average images", **kwargs)
-        self.setWindowTitle("Mask editor")
+        PydidasWindow.__init__(self, title="Mask editor", **kwargs)
 
     def build_frame(self) -> None:
         """Build the frame and create all widgets."""
@@ -96,11 +97,13 @@ class MaskEditorWindow(PydidasWindow):
         self._widgets["mask_tools"].setDirection(QtWidgets.QBoxLayout.TopToBottom)
         self._widgets["mask_tools"].setMultipleMasks("single")
         self.add_any_widget(
-            "mask_tools", self._widgets["mask_tools"], gridPos=(1, 0, 1, 1)
+            "mask_tools",
+            self._widgets["mask_tools"],
+            gridPos=(1, 0, 1, 1),
         )
 
     def connect_signals(self) -> None:
-        """Build the frame and create all widgets."""
+        """Connect signals for file selection and plotting."""
         self._widgets["file_selector"].sig_new_selection.connect(self._open_new_file)
 
     @QtCore.Slot(str, dict)

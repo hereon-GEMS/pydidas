@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FitPluginConfigWidget which is a custom configuration widget
-for peak fitting plugins.
+Module with FitPluginConfigWidget class for peak fitting plugin
+configuration.
 """
 
 __author__ = "Malte Storm"
@@ -32,7 +32,10 @@ from functools import partial
 
 from qtpy import QtCore
 
-from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_EXP_FIX
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    POLICY_EXP_FIX,
+)
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
@@ -47,6 +50,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
     """
 
     def create_param_config_widgets(self) -> None:
+        """Create parameter widgets and fit output checkboxes."""
         self._params_already_added = ["fit_output"]
         _plugin_output = self.plugin.get_param_value("fit_output").split("; ")
         self._fit_output = {
@@ -104,10 +108,8 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         self._update_fit_output()
 
     def _update_fit_output(self) -> None:
-        """
-        Update the fit output parameter from the checkboxes.
-        """
-        _active = [_key for _key, _value in self._fit_output.items() if _value is True]
+        """Update the fit output parameter from the checkboxes."""
+        _active = [_key for _key, _value in self._fit_output.items() if _value]
         if _active == []:
             self.plugin.set_param_value("fit_output", "no output")
         else:

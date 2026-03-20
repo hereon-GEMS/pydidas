@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ImageSeriesOperationsWindow class which allows to perform mathematical
+Module with ImageSeriesOperationsWindow class to perform mathematical
 operations on a number of images.
 """
 
@@ -35,8 +35,15 @@ from typing import Any
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import Parameter, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, HDF5_EXTENSIONS
+from pydidas.core import (
+    Parameter,
+    UserConfigError,
+    get_generic_param_collection,
+)
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    HDF5_EXTENSIONS,
+)
 from pydidas.core.utils import ShowBusyMouse, get_extension
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, export_data, import_data
@@ -65,8 +72,10 @@ _HDF5_PARAM_KEYS = [
 
 class ImageSeriesOperationsWindow(PydidasWindow):
     """
-    Window with a simple dialogue to select a number of files and perform basic
-    mathematical operations on them.
+    Window to select files and perform mathematical operations on them.
+
+    A simple dialogue to select a number of files and perform basic
+    mathematical operations on the image series.
     """
 
     show_frame = False
@@ -84,14 +93,17 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self._config["num_frames_per_file"] = 1
 
     def build_frame(self) -> None:
-        """
-        Build the frame and create all widgets.
-        """
+        """Build the frame and create all widgets."""
 
         def get_config(param_key: str) -> dict[str, Any]:
             _config = {
                 "linebreak": param_key
-                in ["first_file", "last_file", "hdf5_key", "output_fname"],
+                in [
+                    "first_file",
+                    "last_file",
+                    "hdf5_key",
+                    "output_fname",
+                ],
                 "visible": param_key
                 in [
                     "first_file",
@@ -148,13 +160,15 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         )
         self.create_spacer(None)
         self.create_check_box(
-            "check_keep_open", "Close window after processing", checked=True
+            "check_keep_open",
+            "Close window after processing",
+            checked=True,
         )
         self.create_button("but_exec", "Process and export image")
         self.process_new_font_metrics()
 
     def connect_signals(self) -> None:
-        """Connect the signals of the widgets to the slots."""
+        """Connect button and signal handlers."""
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].sig_new_value.connect(
             self.__selected_first_file
@@ -166,7 +180,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     @QtCore.Slot()
     def process_new_font_metrics(self) -> None:
         """Process the user input of the new font size."""
-        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        _width = self._widgets["config_canvas"].sizeHint().width() + 20
+        self.setFixedWidth(_width)
         self.adjustSize()
 
     @QtCore.Slot(str)
@@ -174,9 +189,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         Perform required actions after selecting the first image file.
 
-        This method checks whether a hdf5 file has been selected and shows/
-        hides the required fields for selecting the dataset or the last file
-        in case of a file series.
+        This method checks whether a hdf5 file has been selected and
+        shows/hides the required fields for selecting the dataset or the
+        last file in case of a file series.
         If a hdf5 image file has been selected, this method also opens a
         pop-up for dataset selection.
 
@@ -190,37 +205,43 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        if get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS:
+        _ext = get_extension(self.get_param_value("first_file"))
+        if _ext in HDF5_EXTENSIONS:
             self.__popup_select_hdf5_key(fname)
 
     def __clear_entries(
-        self, keys: list | str | tuple = "all", hide: bool = True
+        self,
+        keys: list[str] | str | tuple = "all",
+        hide: bool = True,
     ) -> None:
         """
         Clear the Parameter entries and reset to default for selected keys.
 
         Parameters
         ----------
-        keys : list or str or tuple, optional
-            The keys for the Parameters to be reset. The default is 'all'.
+        keys : list[str] or str or tuple, optional
+            The keys for the Parameters to be reset. The default is "all".
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
         """
-        keys = keys if keys != "all" else list(self.params.keys())
-        for _key in keys:
+        _keys = keys if keys != "all" else list(self.params.keys())
+        for _key in _keys:
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
         for _key in ["last_file", *_HDF5_PARAM_KEYS]:
-            if _key in keys:
+            if _key in _keys:
                 self.toggle_param_widget_visibility(_key, not hide)
 
-    def __update_widgets_after_selecting_first_file(self) -> None:
+    def __update_widgets_after_selecting_first_file(
+        self,
+    ) -> None:
         """
-        Update widget visibility after selecting the first file based on the
-        file format (hdf5 or not).
+        Update widget visibility after selecting the first file based on
+        the file format (hdf5 or not).
         """
-        _is_hdf5 = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
+        _ext = get_extension(self.get_param_value("first_file"))
+        _is_hdf5 = _ext in HDF5_EXTENSIONS
         for _key in _HDF5_PARAM_KEYS:
             self.toggle_param_widget_visibility(_key, _is_hdf5)
         self.toggle_param_widget_visibility("last_file", True)
@@ -231,15 +252,16 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self._filelist.update()
         except UserConfigError as _ex:
             self.__clear_entries(["last_file"], hide=False)
-            QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
+            _msg = "Could not create filelist."
+            QtWidgets.QMessageBox.critical(self, _msg, str(_ex))
 
-    def __popup_select_hdf5_key(self, fname: Path | str) -> None:
+    def __popup_select_hdf5_key(self, fname: str | Path) -> None:
         """
         Create a popup window which asks the user to select a dataset.
 
         Parameters
         ----------
-        fname : Path or str
+        fname : str or Path
             The filename to the hdf5 data file.
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
@@ -249,15 +271,15 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     @QtCore.Slot()
     def process_file_series(self) -> None:
         """Process the file series."""
-        if not IoManager.is_extension_registered(
-            self.get_param_value("output_fname").suffix
-        ):
+        _fname = self.get_param_value("output_fname")
+        if not IoManager.is_extension_registered(_fname.suffix):
             raise UserConfigError(
-                "The output filename does not have a valid extension. Please choose "
-                "a valid filename."
+                "The output filename does not have a valid extension. "
+                "Please choose a valid filename."
             )
         self._filelist.update()
-        if get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS:
+        _first_ext = get_extension(self.get_param_value("first_file"))
+        if _first_ext in HDF5_EXTENSIONS:
             self._calculate_hdf5_frame_limits()
         _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
         _hdf5_dset = self.get_param_value("hdf5_key")
@@ -268,7 +290,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             for _index in range(0, _n_frames):
                 _fname, _i_frame = self._get_fname_and_frame_number(_index)
                 _frame = import_data(
-                    _fname, dataset=_hdf5_dset, indices=_base_indices + (_i_frame,)
+                    _fname,
+                    dataset=_hdf5_dset,
+                    indices=_base_indices + (_i_frame,),
                 )
                 if self._data is None:
                     self._data = _frame.astype(np.uint64)
@@ -278,7 +302,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self._final_operation()
             self._reduce_integer_dtype()
             export_data(
-                self.get_param_value("output_fname"), self._data, overwrite=True
+                self.get_param_value("output_fname"),
+                self._data,
+                overwrite=True,
             )
         if self._widgets["check_keep_open"].isChecked():
             self.close()
@@ -290,9 +316,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         _key = self.get_param_value("hdf5_key")
         if _max_index == 0:
             _fname = self._filelist.get_filename(0)
-            _max_index = get_hdf5_metadata(_fname, "shape", dset=_key)[
-                self.get_param_value("hdf5_slicing_axis")
-            ]
+            _slice_axis = self.get_param_value("hdf5_slicing_axis")
+            _max_index = get_hdf5_metadata(_fname, "shape", dset=_key)[_slice_axis]
         self._config["hdf5_frames"] = [_start_index, _max_index]
         self._config["num_frames_per_file"] = _max_index - _start_index
 
@@ -317,7 +342,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
     def _apply_operation(self, frame: np.ndarray) -> None:
         """
-        Apply the selected operation on the input frame and the global data.
+        Apply the selected operation on the input frame and the global
+        data.
 
         Parameters
         ----------
@@ -332,7 +358,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
     def _final_operation(self) -> None:
         """
-        Apply the final operation to the data, e.g. normalization for average.
+        Apply the final operation to the data, e.g. normalization for
+        average.
         """
         _op = self.get_param_value("operation")
         if _op == "mean":
@@ -341,7 +368,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
     def _reduce_integer_dtype(self) -> None:
         """
-        Reduce the datatype of integer values to use as little disk space as possible.
+        Reduce the datatype of integer values to use as little disk space
+        as possible.
         """
         if not issubclass(self._data.dtype.type, numbers.Integral):
             return
@@ -357,7 +385,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         # handle signed case:
         else:
             for _bytes in [8, 16, 32]:
-                if -(2 ** (_bytes - 1)) <= _min and _max < 2 ** (_bytes - 1):
+                _signed_min = -(2 ** (_bytes - 1))
+                _signed_max = 2 ** (_bytes - 1)
+                if _signed_min <= _min and _max < _signed_max:
                     _type = getattr(np, f"int{_bytes}")
                     self._data = self._data.astype(_type)
                     return

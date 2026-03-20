@@ -16,8 +16,8 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ShowIntegrationRoiParamsWidget class which allows to show the
-integration region of an associated Plugin in the linked plot.
+Module with ShowIntegrationRoiParamsWidget class to display integration
+region Parameters.
 """
 
 __author__ = "Malte Storm"
@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ShowIntegrationRoiParamsWidget"]
 
 
-from typing import Literal
+from typing import Any, Literal
 
 from qtpy import QtCore
 
@@ -46,17 +46,17 @@ from pydidas.widgets.widget_with_parameter_collection import (
 
 class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
     """
-    A widget which allows to show the Parameters for the integration region.
+    Widget to display Parameters for the integration region.
 
-    The Parameter widgets are created for an associated plugin which is not owned
-    by this widget.
+    The Parameter widgets are created for an associated plugin which is not
+    owned by this widget.
     """
 
     default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_edits = QtCore.Signal(bool)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.setSizePolicy(*POLICY_MIN_MIN)
         self.set_default_params()
@@ -83,7 +83,9 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 stretch=(1, 1),
             )
 
-    def create_widgets_for_axis(self, plugin: BasePlugin, axis: Literal["rad", "azi"]):
+    def create_widgets_for_axis(
+        self, plugin: BasePlugin, axis: Literal["rad", "azi"]
+    ) -> None:
         """
         Create the widgets for the given axis.
 
@@ -103,13 +105,17 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
             parent_widget=self._widgets["plugin_container"],
         )
         if axis == "azi":
+            _note_text = (
+                "Note: For an upward-oriented axis (i.e. the origin at the "
+                "bottom of the image), the positive angular is "
+                "counter-clockwise. For a downward-oriented-axis (i.e. the "
+                "origin at the top of the image), the positive angular "
+                "direction is clockwise. \nThe zero position is at the "
+                "positive x-axis, i.e. right of the beamcenter."
+            )
             self.create_label(
                 "label_azi_note",
-                "Note: For an upward-oriented axis (i.e. the origin at the bottom of "
-                "the image), the positive angular is counter-clockwise. For a downward-"
-                "oriented-axis (i.e. the origin at the top of the image), the positive "
-                "angular direction is clockwise. \nThe zero position is at the positive"
-                " x-axis, i.e. right of the beamcenter.",
+                _note_text,
                 font_metric_height_factor=7,
                 font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
                 parent_widget=self._widgets["plugin_container"],
@@ -136,7 +142,7 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
             )
         self.create_line(None, parent_widget=self._widgets["plugin_container"])
 
-    def toggle_enable(self, enabled: bool):
+    def toggle_enable(self, enabled: bool) -> None:
         """
         Toggle the selection mode and enable/disable the Parameter widgets.
 
@@ -157,10 +163,8 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 self.param_widgets[f"{_type}_unit"].setEnabled(enabled)
         self._widgets["but_reset_to_start_values"].setEnabled(enabled)
 
-    def clear_plugin_widgets(self):
-        """
-        Clear the plugin_container widget to create new widgets.
-        """
+    def clear_plugin_widgets(self) -> None:
+        """Clear the plugin_container widget to create new widgets."""
         _layout = self._widgets["plugin_container"].layout()
         for i in reversed(range(_layout.count())):
             _item = _layout.itemAt(i)
@@ -171,7 +175,12 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
         for _name in ["but_select_azimuthal", "but_select_radial"]:
             if _name in self._widgets:
                 self._widgets.pop(_name)
-        for _suffix in ["use_range", "unit", "range_lower", "range_upper"]:
+        for _suffix in [
+            "use_range",
+            "unit",
+            "range_lower",
+            "range_upper",
+        ]:
             for _prefix in ["rad", "azi"]:
                 _name = f"{_prefix}_{_suffix}"
                 if _name in self.param_widgets:

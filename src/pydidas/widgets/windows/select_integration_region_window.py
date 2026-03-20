@@ -16,8 +16,8 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SelectIntegrationRegionWindow class which allows to select an
-integration region for a plugin.
+Module with SelectIntegrationRegionWindow class to select an integration
+region for a plugin.
 """
 
 __author__ = "Malte Storm"
@@ -27,33 +27,49 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SelectIntegrationRegionWindow"]
 
+
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
+from pydidas.core import (
+    Dataset,
+    UserConfigError,
+    get_generic_param_collection,
+)
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
 from pydidas.plugins import pyFAIintegrationBase
-from pydidas.widgets.controllers import ManuallySetIntegrationRoiController
+from pydidas.widgets.controllers import (
+    ManuallySetIntegrationRoiController,
+)
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
 from pydidas.widgets.scroll_area import ScrollArea
 from pydidas.widgets.selection import SelectDataFrameWidget
-from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
+from pydidas.widgets.silx_plot import (
+    PydidasPlot2DwithIntegrationRegions,
+)
 
 
 class SelectIntegrationRegionWindow(PydidasWindow):
     """
-    A pydidas window which allows to open a file
+    Window to open and select an integration region.
+
+    A pydidas window which allows opening a file and selecting an integration
+    region for a plugin.
     """
 
     default_params = get_generic_param_collection(
-        "filename", "hdf5_key", "hdf5_frame", "hdf5_slicing_axis", "overlay_color"
+        "filename",
+        "hdf5_key",
+        "hdf5_frame",
+        "hdf5_slicing_axis",
+        "overlay_color",
     )
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
@@ -75,7 +91,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
         self._plugin = plugin
-        self._EXP = plugin._EXP
+        self._EXP = plugin._EXP  # noqa: N806
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
         self._config = self._config | {
@@ -91,9 +107,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.frame_activated(self.frame_index)
 
     def build_frame(self) -> None:
-        """
-        Build the frame and create widgets.
-        """
+        """Build the frame and create widgets."""
         self.create_label(
             "label_title",
             (
@@ -130,8 +144,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.create_label(
             "label_note",
             (
-                "Note: The math for calculating the angles is only defined for "
-                "detectors with square pixels."
+                "Note: The math for calculating the angles is only defined "
+                "for detectors with square pixels."
             ),
             bold=True,
             font_metric_height_factor=2,
@@ -153,9 +167,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             SelectDataFrameWidget(import_reference="SelectIntegrationRegion__import"),
             parent_widget=self._widgets["left_container"],
         )
-
         self.create_line(None, parent_widget=self._widgets["left_container"])
-
         self.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(
@@ -172,26 +184,25 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.create_spacer(None, parent_widget=self._widgets["left_container"])
 
     def connect_signals(self) -> None:
-        """
-        Connect all signals.
-        """
+        """Connect all signals."""
         self._roi_controller = ManuallySetIntegrationRoiController(
-            self._widgets["roi_selector"], self._widgets["plot"], plugin=self._plugin
+            self._widgets["roi_selector"],
+            self._widgets["plot"],
+            plugin=self._plugin,
         )
         self._widgets["file_selector"].sig_new_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
         self._widgets["but_confirm"].clicked.connect(self._confirm_changes)
 
     def finalize_ui(self) -> None:
-        """
-        Finalize the UI and update the input widgets.
-        """
-        _nx = self._EXP.get_param_value("detector_npixx")
-        _ny = self._EXP.get_param_value("detector_npixy")
+        """Finalize the UI and update the input widgets."""
+        _nx = self._EXP.get_param_value("detector_npixx")  # noqa: N806
+        _ny = self._EXP.get_param_value("detector_npixy")  # noqa: N806
         if _nx == 0 or _ny == 0:
             raise UserConfigError(
-                "No detector has been defined in the DiffractionExperiment setup. "
-                "Cannot display and edit the integration region."
+                "No detector has been defined in the "
+                "DiffractionExperiment setup. Cannot display and edit the "
+                "integration region."
             )
         self._image = Dataset(np.zeros((_ny, _ny)))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
@@ -214,7 +225,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._widgets["plot"].setEnabled(is_valid)
 
     @QtCore.Slot(str, object)
-    def open_image(self, filename, kwargs) -> None:
+    def open_image(self, filename: str | Path, kwargs: dict) -> None:
         """
         Open an image with the given filename and display it in the plot.
 
@@ -235,16 +246,14 @@ class SelectIntegrationRegionWindow(PydidasWindow):
 
     @QtCore.Slot()
     def _confirm_changes(self) -> None:
-        """
-        Confirm all changes made to the plugin and close the window.
-        """
+        """Confirm all changes made to the plugin and close the window."""
         self._config["closing_confirmed"] = True
         self.sig_roi_changed.emit()
         self.close()
 
     def closeEvent(self, event: QtCore.QEvent) -> None:
         """
-        Handle the Qt close event and add a question if closing without saving results.
+        Handle the Qt close event and confirm closing without saving results.
 
         Parameters
         ----------
@@ -257,9 +266,11 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             return
         _reply = QuestionBox(
             "Exit confirmation",
-            "Do you want to close the Select integration region "
-            "window and discard all changes? To accept the changes, please use the "
-            "'Confirm integration region' button.",
+            (
+                "Do you want to close the Select integration region window "
+                "and discard all changes? To accept the changes, please use "
+                "the 'Confirm integration region' button."
+            ),
         ).exec_()
         if not _reply:
             event.ignore()
@@ -269,9 +280,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         event.accept()
 
     def show(self) -> None:
-        """
-        Overload the generic show to also update the input widgets.
-        """
+        """Overload the generic show to update the input widgets."""
         for _key in self.param_widgets:
             self.update_param_widget_value(_key, self.get_param_value(_key))
         self._roi_controller.update_input_widgets()

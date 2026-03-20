@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FeedbackWindow class which allows users to create a quick feedback
-form which they can copy and paste to submit feedback.
+Module with FeedbackWindow class to allow users to create and submit feedback.
 """
 
 __author__ = "Malte Storm"
@@ -28,32 +27,35 @@ __status__ = "Production"
 __all__ = ["FeedbackWindow"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Parameter, ParameterCollection
-from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, PYDIDAS_FEEDBACK_URL
-from pydidas.core.utils import apply_qt_properties, copy_text_to_system_clipbord
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    PYDIDAS_FEEDBACK_URL,
+)
+from pydidas.core.utils import (
+    apply_qt_properties,
+    copy_text_to_system_clipbord,
+)
 from pydidas.widgets.framework import PydidasWindow
 
 
 INFO_TEXT = (
-    "Please enter information about the problem/suggestion below and fill out "
-    "the form. \nUsing the button at the bottom of the window will copy the "
-    "given information to the clipboard. Please paste the information in the "
-    "field on the webpage and submit the feedback on the webpage.\n"
-    "(You can use only the 'detailed feedback' field, all information will be "
-    "encoded in the detailed feedback.)"
+    "Please enter information about the problem/suggestion below and fill "
+    "out the form. \nUsing the button at the bottom of the window will copy "
+    "the given information to the clipboard. Please paste the information in "
+    "the field on the webpage and submit the feedback on the webpage.\n"
+    "(You can use only the 'detailed feedback' field, all information will "
+    "be encoded in the detailed feedback.)"
 )
 
 
 class FeedbackWindow(PydidasWindow):
     """
-    Create all widgets and initialize their state.
-
-    Parameters
-    ----------
-    self : pydidas.gui.DefineScanFrame
-        The DefineScanFrame instance.
+    Window to create a feedback form for users to submit feedback.
     """
 
     show_frame = False
@@ -61,13 +63,11 @@ class FeedbackWindow(PydidasWindow):
         Parameter("email", str, "", name="E-mail address (optional)")
     )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="pydidas feedback", **kwargs)
 
-    def build_frame(self):
-        """
-        Create all widgets for the frame and place them in the layout.
-        """
+    def build_frame(self) -> None:
+        """Create all widgets for the frame and place them in the layout."""
         _metrics = QtWidgets.QApplication.instance().font_metrics
         _font_width = int(_metrics[0])
         _font_height = int(_metrics[1])
@@ -136,10 +136,8 @@ class FeedbackWindow(PydidasWindow):
         _default_font.setFamily(QtWidgets.QApplication.instance().font_family)
         self._widgets["details"].document().setDefaultFont(_default_font)
 
-    def connect_signals(self):
-        """
-        Connect the signals.
-        """
+    def connect_signals(self) -> None:
+        """Connect the signals."""
         self._widgets["button_copy"].clicked.connect(self._submit_feedback)
         QtWidgets.QApplication.instance().sig_new_font_metrics.connect(
             self.process_new_font_metrics
@@ -149,7 +147,7 @@ class FeedbackWindow(PydidasWindow):
         )
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Process the user input of the new font size.
 
@@ -169,7 +167,7 @@ class FeedbackWindow(PydidasWindow):
         self.adjustSize()
 
     @QtCore.Slot(str)
-    def process_new_font_family(self, family: str):
+    def process_new_font_family(self, family: str) -> None:
         """
         Update the TextEdit font family.
 
@@ -183,7 +181,8 @@ class FeedbackWindow(PydidasWindow):
         self._widgets["details"].document().setDefaultFont(_default_font)
 
     @QtCore.Slot()
-    def _submit_feedback(self):
+    def _submit_feedback(self) -> None:
+        """Copy feedback text to clipboard and open feedback webpage."""
         _text = (
             f"Sender: {self.get_param_value('email')}\n\n"
             f"Type: {self._widgets['type'].active_label}\n\n"

@@ -65,6 +65,8 @@ Bugfixes
   get_filename() on the loader plugin which returned a Path
 - Fixed an issue where importing results into a sandbox would reset the 
   global context instances.
+- Fixed an issue where importing different results would not clear the display
+  of the old results.
 
 
 v26.01.27

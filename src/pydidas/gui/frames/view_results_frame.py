@@ -157,6 +157,7 @@ class ViewResultsFrame(BaseFrameWithApp):
             self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN  # noqa W0212
             self._RESULTS._TREE.root.plugin.update_filepath()  # noqa W0212
             self.update_choices_of_selected_results()
+            self._selected_new_node(-1)
 
     def update_choices_of_selected_results(self):
         """

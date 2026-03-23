@@ -44,7 +44,7 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     HDF5_EXTENSIONS,
 )
-from pydidas.core.utils import ShowBusyMouse, get_extension
+from pydidas.core.utils import ShowBusyMouse, has_extension
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, export_data, import_data
 from pydidas.managers import FilelistManager
@@ -205,8 +205,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        _ext = get_extension(self.get_param_value("first_file"))
-        if _ext in HDF5_EXTENSIONS:
+        if has_extension(self.get_param_value("first_file"), HDF5_EXTENSIONS):
             self.__popup_select_hdf5_key(fname)
 
     def __clear_entries(
@@ -240,8 +239,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         Update widget visibility after selecting the first file based on
         the file format (hdf5 or not).
         """
-        _ext = get_extension(self.get_param_value("first_file"))
-        _is_hdf5 = _ext in HDF5_EXTENSIONS
+        _is_hdf5 = has_extension(self.get_param_value("first_file"), HDF5_EXTENSIONS)
         for _key in _HDF5_PARAM_KEYS:
             self.toggle_param_widget_visibility(_key, _is_hdf5)
         self.toggle_param_widget_visibility("last_file", True)
@@ -278,8 +276,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
                 "Please choose a valid filename."
             )
         self._filelist.update()
-        _first_ext = get_extension(self.get_param_value("first_file"))
-        if _first_ext in HDF5_EXTENSIONS:
+        if has_extension(self.get_param_value("first_file"), HDF5_EXTENSIONS):
             self._calculate_hdf5_frame_limits()
         _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
         _hdf5_dset = self.get_param_value("hdf5_key")

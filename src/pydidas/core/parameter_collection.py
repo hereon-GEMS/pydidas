@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ get and set values of Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,10 +31,10 @@ __all__ = ["ParameterCollection"]
 
 
 from collections.abc import Iterable
-from itertools import chain
 from typing import Any, Self
 
 from pydidas.core.parameter import Parameter
+from pydidas.core.utils.iterable_utils import flatten
 
 
 class ParameterCollection(dict):
@@ -211,6 +211,18 @@ class ParameterCollection(dict):
             if not isinstance(_param, (Parameter, ParameterCollection)):
                 self.__raise_type_error(_param)
 
+    @property
+    def param_keys(self) -> list:
+        """
+        Get the Parameter reference keys of the ParameterCollection.
+
+        Returns
+        -------
+        list[str]
+            The Parameter reference keys in a list.
+        """
+        return list(self.keys())
+
     def add_params(self, *args: tuple[Parameter, Self, dict]):
         """
         Add parameters to the ParameterCollection.
@@ -229,7 +241,7 @@ class ParameterCollection(dict):
         self.__check_duplicate_keys(*args)
         self.__add_arg_params(*args)
 
-    def __check_duplicate_keys(self, *args: dict | Parameter | Self):
+    def __check_duplicate_keys(self, *args: dict[str, Parameter] | Parameter | Self):
         """
         Check for duplicate keys and raise an error if a duplicate key is found.
 
@@ -238,7 +250,7 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : dict | Parameter | Self
+        *args : dict[str, Parameter] | Parameter | Self
             Any number of Parameters or ParameterCollections or dictionaries
             with key: Parameter pairs.
 
@@ -248,11 +260,9 @@ class ParameterCollection(dict):
             If the kwargs key of a Parameter differs from the Parameter
             reference key.
         """
-        # flatten arguments and add them to a list
-        _flattened_params = list(
-            chain.from_iterable(
-                [p] if isinstance(p, Parameter) else list(p.values()) for p in args
-            )
+        _flattened_params = flatten(
+            [_arg] if isinstance(_arg, Parameter) else list(_arg.values())
+            for _arg in args
         )
         _original_keys = tuple(self.keys())
         for _param in _flattened_params:

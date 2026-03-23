@@ -69,11 +69,12 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
     """
 
     plugin_name = "Eiger scan series loader"
-    default_params = (
-        get_generic_param_collection("eiger_dir", "eiger_filename_suffix")
+    default_params = get_generic_param_collection(
+        "eiger_dir",
+        "eiger_filename_suffix",
+        *Hdf5fileSeriesLoader.default_params.param_keys,
     )
-    raise Exception("Must edit")
-    Hdf5fileSeriesLoader.default_params.copy()
+
     advanced_parameters = Hdf5fileSeriesLoader.advanced_parameters.copy()
 
     def update_filepath(self) -> None:

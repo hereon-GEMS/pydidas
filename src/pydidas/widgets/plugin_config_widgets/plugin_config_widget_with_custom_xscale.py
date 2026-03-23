@@ -54,8 +54,8 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
         )
 
     def finalize_init(self) -> None:
-        self._toggle_custom_scale(self.plugin.get_param_value("use_custom_xscale"))
         """Finalize the initialization of the widget."""
+        self._toggle_custom_scale(self.plugin.get_param_value("use_custom_xscale"))
 
     @QtCore.Slot(str)
     def _toggle_custom_scale(self, value: str) -> None:

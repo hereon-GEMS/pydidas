@@ -160,7 +160,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         )
         self.create_spacer(None)
         self.create_check_box(
-            "check_keep_open",
+            "check_close_on_finish",
             "Close window after processing",
             checked=True,
         )
@@ -303,7 +303,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
                 self._data,
                 overwrite=True,
             )
-        if self._widgets["check_keep_open"].isChecked():
+        if self._widgets["check_close_on_finish"].isChecked():
             self.close()
 
     def _calculate_hdf5_frame_limits(self) -> None:

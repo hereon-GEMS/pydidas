@@ -426,7 +426,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "Update plugin paths",
             (
                 "Do you want to update the custom plugin paths? This will "
-                "clear the current workflow tree and all unsaved changed "
+                "clear the current workflow tree and all unsaved changes "
                 "will be lost."
             ),
         ).exec_()

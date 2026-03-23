@@ -51,10 +51,10 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     For subclassing, the following modifications should be considered:
 
-    1. The subclass needs an `update_edits` method that resets the
-       configuration widgets to be in sync with the plugin parameters.
-       The default implementation only updates the widget values based
-       on the current plugin parameters.
+    1. The subclass can override the `update_plugin_config_edits` method
+       to reset the configuration widgets so they are in sync with the plugin
+       parameters. The default implementation of `update_plugin_config_edits`
+       only updates the widget values based on the current plugin parameters.
     2. The init calls the `create_all_widgets` and `connect_signals`
        methods. Any customization of the widget should be done in these
        methods while leaving the init method untouched.

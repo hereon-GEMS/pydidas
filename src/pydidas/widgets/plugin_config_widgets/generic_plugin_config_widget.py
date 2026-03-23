@@ -161,6 +161,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         This method is called at the end of the initialization process
         and can be used to perform any additional setup or configuration.
         """
+        pass
 
     def connect_signals(self) -> None:
         """Connect the basic signals to the widgets."""

@@ -34,7 +34,7 @@ Programmatic changes
 
 Bugfixes
 --------
-- Fixed an isssue with QCheckBox signals in Qt6.
+- Fixed an issue with QCheckBox signals in Qt6.
 - Fixed an issue with loading the correct Qt version when running a script 
   from pydidas_scripts through legacy calling (on Windows standalone systems).
 - Fixed an issue when selecting a Kratky-type plot.
@@ -53,12 +53,12 @@ Bugfixes
   the selection file dialog.
 - Fixed an issue in the ParamIoWidgetCombobox which was slow in updating
   long lists of choices
-- Fixed occurences of the deprecated method update_widget_value in two
+- Fixed occurrences of the deprecated method update_widget_value in two
   widgets (ConvertFit2dGeometry and GenericPluginConfigWidget)
 - Fixed an issue where the derived beamcenter would not be correctly displayed
   in the DefineDiffractionExpFrame
 - Fixed an issue when resetting Parameters in InputPlugins which did not 
-  handle derived interal Parameters correctly
+  handle derived internal Parameters correctly
 - Fixed an issue in the ViewResultsFrame which called a deprecated method
   in the input plugin.
 - Fixed an issue in the ShowInformationForResult window when calling the

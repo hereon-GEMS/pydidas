@@ -196,15 +196,13 @@ class SelectIntegrationRegionWindow(PydidasWindow):
 
     def finalize_ui(self) -> None:
         """Finalize the UI and update the input widgets."""
-        _nx = self._EXP.get_param_value("detector_npixx")  # noqa: N806
-        _ny = self._EXP.get_param_value("detector_npixy")  # noqa: N806
-        if _nx == 0 or _ny == 0:
+        _shape = self._EXP.det_shape
+        if 0 in _shape:
             raise UserConfigError(
-                "No detector has been defined in the "
-                "DiffractionExperiment setup. Cannot display and edit the "
-                "integration region."
+                "No detector has been defined in the DiffractionExperiment setup. "
+                "Cannot display and edit the integration region."
             )
-        self._image = Dataset(np.zeros((_ny, _ny)))
+        self._image = Dataset(np.zeros(_shape))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
         self._roi_controller.show_plot_items("roi")
@@ -224,7 +222,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         """
         self._widgets["plot"].setEnabled(is_valid)
 
-    @QtCore.Slot(str, object)
+    @QtCore.Slot(str, dict)
     def open_image(self, filename: str | Path, kwargs: dict) -> None:
         """
         Open an image with the given filename and display it in the plot.

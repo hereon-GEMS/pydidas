@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ another image as background.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ __all__ = ["SubtractBackgroundImage"]
 from typing import Any
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import (
     Dataset,
@@ -126,14 +126,14 @@ class SubtractBackgroundImage(ProcPlugin):
 
         Parameters
         ----------
-        data :Dataset
+        data : Dataset
             The image / frame data.
         **kwargs : Any
             Any calling keyword arguments.
 
         Returns
         -------
-        _corrected_data : pydidas.core.Dataset
+        _corrected_data : Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
@@ -151,7 +151,7 @@ class SubtractBackgroundImage(ProcPlugin):
             )
         return _corrected_data, kwargs
 
-    def get_parameter_config_widget(self):
+    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
         """
         Get the unique configuration widget associated with this Plugin.
 
@@ -171,14 +171,14 @@ class SubtractBackgroundImageConfigWidget(GenericPluginConfigWidget):
     dataset based on the file extension of the selected file.
     """
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """Connect the signals of the widgets to the appropriate slots."""
         GenericPluginConfigWidget.connect_signals(self)
         self.param_composite_widgets["bg_file"].sig_new_value.connect(
             self._toggle_hdf5_plugin_visibility
         )
 
-    def finalize_init(self):
+    def finalize_init(self) -> None:
         self._toggle_hdf5_plugin_visibility(self.plugin.get_param_value("bg_file"))
 
     @QtCore.Slot(str)
@@ -195,9 +195,8 @@ class SubtractBackgroundImageConfigWidget(GenericPluginConfigWidget):
         self.toggle_param_widget_visibility("bg_hdf5_key", _visibility)
         self.toggle_param_widget_visibility("bg_hdf5_frame", _visibility)
 
-    def update_edits(self):
-        """
-        Update the configuration fields of the plugin.
-        """
-        GenericPluginConfigWidget.update_edits(self)
+    @QtCore.Slot()
+    def update_plugin_config_edits(self) -> None:
+        """Update the configuration fields of the plugin."""
+        super().update_plugin_config_edits()
         self._toggle_hdf5_plugin_visibility(self.plugin.get_param_value("bg_file"))

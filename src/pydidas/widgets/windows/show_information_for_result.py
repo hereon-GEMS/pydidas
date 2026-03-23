@@ -99,7 +99,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa: E0602
         )
         PydidasQApplication.instance().sig_font_metrics_changed.connect(
-            self.process_new_font_metrics
+            self.process_font_metrics_changed
         )
         self.layout().setColumnStretch(1, 1)  # noqa: E0602
 
@@ -123,13 +123,13 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         active_dims : tuple
             A 2-tuple with the active dimensions of the selection,
             i.e. the dimensions in which the position is defined.
-        selected_indices : list[int or None]
+        selected_indices : list[int | None]
             The selected indices of the full result dataset. This will be
             integers for inactive dimensions and None for the active
             dimensions.
         result_metadata : dict
             The metadata of the results.
-        loader_plugin : pydidas.plugins.BaseInputPlugin
+        loader_plugin : InputPlugin
             The input plugin associated with the results. Required to
             display the input image.
         use_timeline : bool, optional
@@ -205,10 +205,10 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         self._widgets["plot"].setVisible(True)
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
-            _input, _kwargs = self._loader_plugin.execute(self._ordinal)
+            _input, _ = self._loader_plugin.execute(self._ordinal)
             self._widgets["plot"].plot_data(_input)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self) -> None:
+    def process_font_metrics_changed(self) -> None:
         """Process the user input of the new font size."""
         self.adjustSize()

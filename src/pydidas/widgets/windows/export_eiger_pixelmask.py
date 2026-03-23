@@ -103,16 +103,16 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
             "Export pixelmask",
             parent_widget="config_canvas",
         )
-        self.process_new_font_metrics()
+        self.process_font_metrics_changed()
 
     def connect_signals(self) -> None:
         """Connect signals for button clicks and font changes."""
         self._widgets["but_exec"].clicked.connect(self._export)
         _app = QtWidgets.QApplication.instance()
-        _app.sig_font_metrics_changed.connect(self.process_new_font_metrics)
+        _app.sig_font_metrics_changed.connect(self.process_font_metrics_changed)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self) -> None:
+    def process_font_metrics_changed(self) -> None:
         """Process the user input of the new font size."""
         _width = self._widgets["config_canvas"].sizeHint().width() + 20
         self.setFixedWidth(_width)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FitPluginConfigWidget which is a custom configuration widget
-for peak fitting plugins.
+Module with the PluginConfigWidgetWithCustomXscale which is a custom
+configuration widget for plugins with custom xscale parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -46,23 +46,19 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
     on the value of the custom xscale parameter.
     """
 
-    def connect_signals(self):
-        """
-        Connect the signals to the slots.
-        """
+    def connect_signals(self) -> None:
+        """Connect the signals to the slots."""
         GenericPluginConfigWidget.connect_signals(self)
         self.param_widgets["use_custom_xscale"].sig_new_value.connect(
             self._toggle_custom_scale
         )
 
-    def finalize_init(self):
-        """
-        Finalize the initialization of the widget.
-        """
+    def finalize_init(self) -> None:
         self._toggle_custom_scale(self.plugin.get_param_value("use_custom_xscale"))
+        """Finalize the initialization of the widget."""
 
     @QtCore.Slot(str)
-    def _toggle_custom_scale(self, value: str):
+    def _toggle_custom_scale(self, value: str) -> None:
         """
         Toggle the visibility of the custom xscale parameters.
 
@@ -75,9 +71,8 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
         for param in CUSTOM_X_PARAMS:
             self.toggle_param_widget_visibility(param, _show)
 
-    def update_edits(self):
-        """
-        Update the configuration fields of the plugin.
-        """
-        GenericPluginConfigWidget.update_edits(self)
+    @QtCore.Slot()
+    def update_plugin_config_edits(self) -> None:
+        """Update the configuration fields of the plugin."""
+        super().update_plugin_config_edits()
         self._toggle_custom_scale(self.plugin.get_param_value("use_custom_xscale"))

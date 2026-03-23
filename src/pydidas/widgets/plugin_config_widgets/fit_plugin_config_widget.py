@@ -115,7 +115,8 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         else:
             self.plugin.set_param_value("fit_output", "; ".join(_active))
 
-    def update_edits(self) -> None:
+    @QtCore.Slot()
+    def update_plugin_config_edits(self) -> None:
         """
         Update the configuration fields of the plugin.
 

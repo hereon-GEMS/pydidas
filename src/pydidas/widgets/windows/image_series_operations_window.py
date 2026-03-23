@@ -165,7 +165,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             checked=True,
         )
         self.create_button("but_exec", "Process and export image")
-        self.process_new_font_metrics()
+        self.process_font_metrics_changed()
 
     def connect_signals(self) -> None:
         """Connect button and signal handlers."""
@@ -174,11 +174,11 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.__selected_first_file
         )
         PydidasQApplication.instance().sig_font_metrics_changed.connect(
-            self.process_new_font_metrics
+            self.process_font_metrics_changed
         )
 
     @QtCore.Slot()
-    def process_new_font_metrics(self) -> None:
+    def process_font_metrics_changed(self) -> None:
         """Process the user input of the new font size."""
         _width = self._widgets["config_canvas"].sizeHint().width() + 20
         self.setFixedWidth(_width)

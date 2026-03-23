@@ -69,6 +69,8 @@ Bugfixes
   of the old results.
 - Fixed an issue where the DataViewer allowed to slice the data after the 
   data has been set to zero which caused an exception.
+- Fixed an issue in naming where some widgets had a method update_font_metrics
+  with a different signature that the base method.
 
 
 v26.01.27

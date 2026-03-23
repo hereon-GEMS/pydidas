@@ -42,6 +42,7 @@ from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
 )
 from pydidas.widgets.utilities import delete_all_items_in_layout
+from pydidas_qtcore import PydidasQApplication
 
 
 class EditPluginParametersWidget(
@@ -79,7 +80,7 @@ class EditPluginParametersWidget(
             )
         )
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
+        self.__qtapp.sig_new_font_metrics.connect(self.process_font_metrics_changed)
 
     def configure_plugin(
         self,
@@ -146,9 +147,10 @@ class EditPluginParametersWidget(
             gridPos=(-1, 0, 1, 2),
         )
 
-    def process_new_font_metrics(self) -> None:
+    @QtCore.Slot()
+    def process_font_metrics_changed(self) -> None:
         """Process the user input of the new font size."""
         _width = (
-            QtWidgets.QApplication.instance().font_char_width * FONT_METRIC_CONFIG_WIDTH
+            PydidasQApplication.instance().font_char_width * FONT_METRIC_CONFIG_WIDTH
         )
         self.setFixedWidth(int(_width))

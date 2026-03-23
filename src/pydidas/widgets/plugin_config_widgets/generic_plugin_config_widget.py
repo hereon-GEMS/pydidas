@@ -206,10 +206,19 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         ).exec_()
         if _reply:
             self.plugin.restore_all_defaults(confirm=True)
-            for _key, _param in self.plugin.params.items():
-                if _key.startswith("_"):
-                    continue
-                self.update_param_widget_value(_key, _param.value)
+            self.update_plugin_config_edits()
+
+    @QtCore.Slot()
+    def update_plugin_config_edits(self) -> None:
+        """
+        Update the edit widgets.
+
+        This method is separated to allow different implementations in subclasses.
+        """
+        for _key, _param in self.plugin.params.items():
+            if _key.startswith("_"):
+                continue
+            self.update_param_widget_value(_key, _param.value)
 
     @QtCore.Slot(str)
     def _label_updated(self, label: str) -> None:

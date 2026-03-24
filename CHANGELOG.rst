@@ -31,6 +31,8 @@ Programmatic changes
   passed.
 - Removed FONT_METRIC_PARAM_EDIT_WIDTH and modified all occurrences to
   use FONT_METRIC_CONFIG_WIDTH to fix formatting issues.
+- Added a ToggleOptionsButton which allows to show/hide an associated
+  widget.
 
 Bugfixes
 --------

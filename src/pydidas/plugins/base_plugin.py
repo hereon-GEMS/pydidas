@@ -302,6 +302,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["test_mode"]: bool = False
         self._config["input_data"]: int | Dataset | None = None
         self.node_id = None
+        self.advanced_params_visible = False
 
     def __copy__(self) -> Self:
         """

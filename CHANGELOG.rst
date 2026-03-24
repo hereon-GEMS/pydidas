@@ -13,6 +13,8 @@ Improvements
   number of frames/spectra for the configured scan.
 - Added an option to show only NXdata signal datasets and hide the 
   axis datasets.
+- When editing advanced Parameters, the GUI now remembers the settings
+  for each plugin.
 
 Programmatic changes
 --------------------

@@ -31,7 +31,6 @@ from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore
-from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Hdf5key
 from pydidas.core.constants import (
@@ -43,6 +42,7 @@ from pydidas.plugins import BasePlugin
 from pydidas.widgets.dialogues.question_box import QuestionBox
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
+from pydidas.widgets.selection import ToggleOptionsButton
 
 
 class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
@@ -69,6 +69,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
 
     sig_new_label = QtCore.Signal(int, str)
+    sig_advanced_params_visibility = QtCore.Signal(bool)
 
     def __init__(self, plugin: BasePlugin, node_id: int, **kwargs: Any) -> None:
         ParameterEditCanvas.__init__(self, **kwargs)
@@ -80,6 +81,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         )
         self.plugin = plugin
         self.node_id = node_id
+        self.__advanced_params_visible = kwargs.get("advanced_params_visible", False)
         self._use_advanced_params = len(self.plugin.advanced_parameters) > 0
         self.create_all_widgets()
         self.connect_signals()
@@ -139,18 +141,34 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     def create_advanced_param_config_widgets(self) -> None:
         """Create the widgets for the advanced parameters."""
-        self._advanced_params_hidden = True
-        self.create_button(
-            "but_toggle_advanced_params",
-            "Display advanced Parameters",
-            icon="qt-std::SP_TitleBarUnshadeButton",
+        self.create_empty_widget(
+            "advanced_params_container",
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+        )
+        self.create_spacer(
+            "spacer", fixedHeight=15, parent_widget="advanced_params_container"
+        )
+        self.create_any_widget(
+            "but_toggle_advanced_params",
+            ToggleOptionsButton,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+            linked_widget=self._widgets["advanced_params_container"],
+            linked_widget_visible=self.__advanced_params_visible,
+            toggle_text_shown="Hide advanced parameters",
+            toggle_text_hidden="Show advanced parameters",
+        )
+        self.create_label(
+            "advanced_params_label",
+            "Advanced parameters:",
+            bold=True,
+            underline=True,
+            parent_widget="advanced_params_container",
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)
             _kwargs = {
                 "linebreak": _param.dtype in [Hdf5key, Path],
-                "visible": False,
+                "parent_widget": "advanced_params_container",
             }
             self.create_param_widget(_param, **_kwargs)
 
@@ -167,30 +185,8 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """Connect the basic signals to the widgets."""
         self._widgets["restore_defaults"].clicked.connect(self.restore_defaults)
         self.param_widgets["label"].sig_new_value.connect(self._label_updated)
-        if self._use_advanced_params:
-            self._widgets["but_toggle_advanced_params"].clicked.connect(
-                self.toggle_advanced_params
-            )
-
-    @QtCore.Slot()
-    def toggle_advanced_params(self) -> None:
-        """Toggle the visibility of the advanced Parameters."""
-        self._advanced_params_hidden = not self._advanced_params_hidden
-        for _key in self.plugin.advanced_parameters:
-            self.toggle_param_widget_visibility(_key, not self._advanced_params_hidden)
-        _text = (
-            "Display advanced Parameters"
-            if self._advanced_params_hidden
-            else "Hide advanced Parameters"
-        )
-        self._widgets["but_toggle_advanced_params"].setText(_text)
-        _icon_style = (
-            QStyle.SP_TitleBarUnshadeButton
-            if self._advanced_params_hidden
-            else QStyle.SP_TitleBarShadeButton
-        )
-        self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(_icon_style)
+        self._widgets["but_toggle_advanced_params"].sig_visibility_changed.connect(
+            self.sig_advanced_params_visibility
         )
 
     @QtCore.Slot()

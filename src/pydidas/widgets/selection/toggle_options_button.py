@@ -91,10 +91,10 @@ class ToggleOptionsButton(PydidasPushButton):
                 Default is None.
         """
         PydidasPushButton.__init__(self, *args, **kwargs)
-        self._linked_widget_visible = kwargs.get("linked_widget_visible", False)
+        self._linked_widget_visible = bool(kwargs.get("linked_widget_visible", False))
         self._toggle_text_for_state = {
-            True: kwargs.get("toggle_text_shown", "Show advanced options"),
-            False: kwargs.get("toggle_text_hidden", "Hide advanced options"),
+            True: kwargs.get("toggle_text_shown", "Hide advanced options"),
+            False: kwargs.get("toggle_text_hidden", "ShowN advanced options"),
         }
         self.linked_widget = kwargs.get("linked_widget", None)
         self.clicked.connect(self.toggle_state)
@@ -106,7 +106,7 @@ class ToggleOptionsButton(PydidasPushButton):
 
         Returns
         -------
-        str :
+        QtGui.QIcon :
             The icon corresponding to the current status.
         """
         if self._linked_widget_visible:
@@ -138,7 +138,7 @@ class ToggleOptionsButton(PydidasPushButton):
         if value not in [0, 1]:
             raise UserConfigError(
                 "`ToggleOptionsButton.linked_widget_visible` must be called with "
-                "a boolean value."
+                "a value of 0 or 1 (i.e. boolean)."
             )
         value = bool(value)
         _new_value = self._linked_widget_visible != value

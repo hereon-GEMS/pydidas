@@ -146,7 +146,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_spacer(
-            "spacer", fixedHeight=15, parent_widget="advanced_params_container"
+            "spacer_b", fixedHeight=15, parent_widget="advanced_params_container"
         )
         self.create_any_widget(
             "but_toggle_advanced_params",
@@ -185,9 +185,10 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """Connect the basic signals to the widgets."""
         self._widgets["restore_defaults"].clicked.connect(self.restore_defaults)
         self.param_widgets["label"].sig_new_value.connect(self._label_updated)
-        self._widgets["but_toggle_advanced_params"].sig_visibility_changed.connect(
-            self.sig_advanced_params_visibility
-        )
+        if self._use_advanced_params:
+            self._widgets["but_toggle_advanced_params"].sig_visibility_changed.connect(
+                self.sig_advanced_params_visibility
+            )
 
     @QtCore.Slot()
     def restore_defaults(self) -> None:

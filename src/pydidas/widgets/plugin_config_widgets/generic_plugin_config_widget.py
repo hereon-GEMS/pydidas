@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FitPluginConfigWidget which is a custom configuration widget
-for peak fitting plugins.
+Module with GenericPluginConfigWidget class for plugin configuration.
 """
 
 __author__ = "Malte Storm"
@@ -29,12 +28,16 @@ __all__ = ["GenericPluginConfigWidget"]
 
 
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Hdf5key
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, OUTPUT_PLUGIN
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    OUTPUT_PLUGIN,
+)
 from pydidas.core.utils import apply_qt_properties
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.dialogues.question_box import QuestionBox
@@ -48,17 +51,17 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     For subclassing, the following modifications should be considered:
 
-    1. The subclass needs a `update_edits` method that resets the
-       configuration widgets to be in sync with the plugin parameters.
-       The default implementation only updates the widget values based
-       on the current plugin parameters.
-    2. The init calls the `create_all_widgets` and `connect_signals` methods.
-       Any customization of the widget should be done in these methods while
-       leaving the init method untouched.
-       Please bear in mind that the default `connect_signals` includes important
-       signal connections. If you want to change the signal connections,
-       please also call the default `connect_signals` method from the custom
-       `connect_signals` method.
+    1. The subclass can override the `update_plugin_config_edits` method
+       to reset the configuration widgets so they are in sync with the plugin
+       parameters. The default implementation of `update_plugin_config_edits`
+       only updates the widget values based on the current plugin parameters.
+    2. The init calls the `create_all_widgets` and `connect_signals`
+       methods. Any customization of the widget should be done in these
+       methods while leaving the init method untouched.
+       Please bear in mind that the default `connect_signals` includes
+       important signal connections. If you want to change the signal
+       connections, please also call the default `connect_signals` method
+       from the custom `connect_signals` method.
     3. The `create_all_widgets` method includes the creation of the header
        and the parameter configuration widgets, including for advanced
        parameters. If you want to change only the regular parameters,
@@ -67,11 +70,13 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     sig_new_label = QtCore.Signal(int, str)
 
-    def __init__(self, plugin: BasePlugin, node_id: int, **kwargs: dict):
+    def __init__(self, plugin: BasePlugin, node_id: int, **kwargs: Any) -> None:
         ParameterEditCanvas.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(
-            self.layout(), contentsMargins=(0, 0, 0, 0), horizontalSpacing=0
+            self.layout(),
+            contentsMargins=(0, 0, 0, 0),
+            horizontalSpacing=0,
         )
         self.plugin = plugin
         self.node_id = node_id
@@ -79,17 +84,15 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_all_widgets()
         self.connect_signals()
 
-    def create_all_widgets(self):
-        """
-        Create all widgets for the plugin configuration.
-        """
+    def create_all_widgets(self) -> None:
+        """Create all widgets for the plugin configuration."""
         self.create_header()
         self.create_param_config_widgets()
         if self._use_advanced_params:
             self.create_advanced_param_config_widgets()
         self.finalize_init()
 
-    def create_header(self):
+    def create_header(self) -> None:
         """Create the header for the plugin configuration widget."""
         self.create_label(
             "plugin_name",
@@ -119,7 +122,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             icon="qt-std::SP_BrowserReload",
         )
 
-    def create_param_config_widgets(self):
+    def create_param_config_widgets(self) -> None:
         """Instantiate the parameter widgets for the plugin parameters."""
         for param in self.plugin.params.values():
             if (
@@ -134,14 +137,14 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         if self.plugin.plugin_type == OUTPUT_PLUGIN:
             self.param_composite_widgets["keep_results"].setVisible(False)
 
-    def create_advanced_param_config_widgets(self):
+    def create_advanced_param_config_widgets(self) -> None:
         """Create the widgets for the advanced parameters."""
         self._advanced_params_hidden = True
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
             icon="qt-std::SP_TitleBarUnshadeButton",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)
@@ -151,7 +154,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             }
             self.create_param_widget(_param, **_kwargs)
 
-    def finalize_init(self):
+    def finalize_init(self) -> None:
         """
         Finalize the initialization of the widget.
 
@@ -160,7 +163,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """
         pass
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """Connect the basic signals to the widgets."""
         self._widgets["restore_defaults"].clicked.connect(self.restore_defaults)
         self.param_widgets["label"].sig_new_value.connect(self._label_updated)
@@ -170,33 +173,33 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             )
 
     @QtCore.Slot()
-    def toggle_advanced_params(self):
-        """
-        Toggle the visibility of the advanced Parameters.
-        """
+    def toggle_advanced_params(self) -> None:
+        """Toggle the visibility of the advanced Parameters."""
         self._advanced_params_hidden = not self._advanced_params_hidden
         for _key in self.plugin.advanced_parameters:
             self.toggle_param_widget_visibility(_key, not self._advanced_params_hidden)
-        self._widgets["but_toggle_advanced_params"].setText(
+        _text = (
             "Display advanced Parameters"
             if self._advanced_params_hidden
             else "Hide advanced Parameters"
         )
+        self._widgets["but_toggle_advanced_params"].setText(_text)
+        _icon_style = (
+            QStyle.SP_TitleBarUnshadeButton
+            if self._advanced_params_hidden
+            else QStyle.SP_TitleBarShadeButton
+        )
         self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(
-                QStyle.SP_TitleBarUnshadeButton
-                if self._advanced_params_hidden
-                else QStyle.SP_TitleBarShadeButton
-            )
+            self.style().standardIcon(_icon_style)
         )
 
     @QtCore.Slot()
-    def restore_defaults(self):
+    def restore_defaults(self) -> None:
         """
         Restore the default values to all Plugin Parameters.
 
-        This method will update both the plugin Parameters and the displayed
-        widget values.
+        This method will update both the plugin Parameters and the
+        displayed widget values.
         """
         _reply = QuestionBox(
             "Restore defaults confirmation",
@@ -204,17 +207,22 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         ).exec_()
         if _reply:
             self.plugin.restore_all_defaults(confirm=True)
-            self.update_edits()
+            self.update_plugin_config_edits()
 
-    def update_edits(self):
+    @QtCore.Slot()
+    def update_plugin_config_edits(self) -> None:
         """
-        Update the configuration widgets based on the current plugin parameters.
+        Update the edit widgets.
+
+        This method is separated to allow different implementations in subclasses.
         """
-        for param in self.plugin.params.values():
-            self.update_widget_value(param.refkey, param.value)
+        for _key, _param in self.plugin.params.items():
+            if _key.startswith("_"):
+                continue
+            self.update_param_widget_value(_key, _param.value)
 
     @QtCore.Slot(str)
-    def _label_updated(self, label: str):
+    def _label_updated(self, label: str) -> None:
         """
         Process the updated label and emit a signal.
 

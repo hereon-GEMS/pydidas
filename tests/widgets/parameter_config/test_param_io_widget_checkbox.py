@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -96,14 +96,14 @@ def test__creation__w_one_choice_entry(qtbot, local_param):
 @pytest.mark.gui
 @pytest.mark.parametrize("checked", [True, False])
 def test_current_text(widget, param, checked):
-    widget.update_widget_value(checked)
+    widget.update_display_value(checked)
     assert widget.current_text == ("True" if checked else "False")
 
 
 @pytest.mark.gui
-def test__update_widget_value(widget):
+def test_update_display_value(widget):
     _orig_value = widget.get_value()
-    widget.update_widget_value(not _orig_value)
+    widget.update_display_value(not _orig_value)
     assert widget.spy_new_value.n == 0
     assert widget.current_text == str(not _orig_value)
 

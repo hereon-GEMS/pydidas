@@ -196,10 +196,10 @@ def test_drop_event(qtbot, test_dir, n_files):
 
 @pytest.mark.gui
 @pytest.mark.parametrize("value", [Path("/some/other/path"), Path(), None])
-def test_update_widget_value(qtbot, test_dir, value):
+def test_update_display_value(qtbot, test_dir, value):
     widget = widget_from_param(qtbot, param_existing_file)
-    widget.update_widget_value(test_dir / "test_file.npy")
-    widget.update_widget_value(value)
+    widget.update_display_value(test_dir / "test_file.npy")
+    widget.update_display_value(value)
     assert Path(widget.current_text) == (value if value is not None else Path(""))
     assert widget.spy_new_value.n == 0
     assert widget.spy_value_changed.n == 0

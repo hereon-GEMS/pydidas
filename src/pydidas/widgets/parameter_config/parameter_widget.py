@@ -38,7 +38,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     ALIGN_CENTER_LEFT,
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
     PARAM_WIDGET_TEXT_WIDTH,
     PARAM_WIDGET_UNIT_WIDTH,
@@ -103,7 +103,7 @@ class ParameterWidget(EmptyWidget):
         font_metric_width_factor : int or None
             The width of the widget in multiples of the font metric width.
             If None, the widget will use the default size policy. The
-            default is FONT_METRIC_PARAM_EDIT_WIDTH.
+            default is FONT_METRIC_CONFIG_WIDTH.
         validator : QValidator or None
             A custom validator to be used in the I/O widget, if applicable.
             The default is None.
@@ -121,7 +121,7 @@ class ParameterWidget(EmptyWidget):
     ) -> None:
         EmptyWidget.__init__(self, parent, **kwargs)
         if not isinstance(self.font_metric_width_factor, Real):
-            self.font_metric_width_factor = FONT_METRIC_PARAM_EDIT_WIDTH
+            self.font_metric_width_factor = FONT_METRIC_CONFIG_WIDTH
         self.setSizePolicy(*POLICY_EXP_FIX)  # type: ignore[arg-type]
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
@@ -336,7 +336,7 @@ class ParameterWidget(EmptyWidget):
         value : Any
             The new value to be displayed.
         """
-        self._widgets["io"].update_widget_value(value)
+        self._widgets["io"].update_display_value(value)
 
     def set_value(self, value: Any) -> None:
         """

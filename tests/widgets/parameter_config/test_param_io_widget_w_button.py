@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -113,8 +113,8 @@ def test_current_text(widget):
 
 @pytest.mark.gui
 @pytest.mark.parametrize("text", ["", "sample_text", 123, 42.1])
-def test_update_widget_value(widget, text):
-    widget.update_widget_value(text)
+def test_update_display_value(widget, text):
+    widget.update_display_value(text)
     assert widget._io_lineedit.text() == str(text)
     assert widget.spy_new_value.n == 0
     assert widget.spy_value_changed.n == 0

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the UserConfigWindow class which is a PydidasWindow widget
-to view and modify user-specific settings in a separate Window.
+Module with UserConfigWindow class to view and modify user-specific
+settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,7 +38,7 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 from pydidas.core import SingletonObject, get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
-    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_CONFIG_WIDTH,
     GENERIC_PLUGIN_PATH,
     GENERIC_STANDARD_WIDGET_WIDTH,
     POLICY_EXP_FIX,
@@ -46,10 +46,15 @@ from pydidas.core.constants import (
     QSETTINGS_USER_KEYS,
     QT_REG_EXP_RGB_VALIDATOR,
 )
-from pydidas.core.generic_params.generic_params_settings import GENERIC_PARAMS_SETTINGS
+from pydidas.core.generic_params.generic_params_settings import (
+    GENERIC_PARAMS_SETTINGS,
+)
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
-from pydidas.widgets.dialogues import PydidasExceptionMessageBox, QuestionBox
+from pydidas.widgets.dialogues import (
+    PydidasExceptionMessageBox,
+    QuestionBox,
+)
 from pydidas.widgets.factory import SquareButton
 from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
@@ -94,7 +99,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         _section_options = dict(
             bold=True,
@@ -116,18 +121,18 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.create_label("section_font", "Font settings", **_section_options)
         self.create_empty_widget(
             "fontsize_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
             toolTip=(
-                "Pydidas supports font sizes from 5 pt up to 20 pt. Any entries "
-                "outside of this range will be ignored."
+                "Pydidas supports font sizes from 5 pt up to 20 pt. Any "
+                "entries outside of this range will be ignored."
             ),
         )
         self.create_label(
             "label_font_size",
             "Standard font size:",
             parent_widget="fontsize_container",
-            font_metric_width_factor=0.7 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.7 * FONT_METRIC_CONFIG_WIDTH,
             wordWrap=False,
         )
         self.add_any_widget(
@@ -180,7 +185,9 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_spacer(None, parent_widget="config_canvas")
         self.create_label(
-            "section_mosaic", "Composite creator settings", **_section_options
+            "section_mosaic",
+            "Composite creator settings",
+            **_section_options,
         )
         self.create_param_widget(
             self.get_param("mosaic_border_width"),
@@ -216,7 +223,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "colormap_editor",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             layout_column_stretches={0: 10, 1: 90},
             parent_widget="config_canvas",
         )
@@ -234,7 +241,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "cmap_nan_color_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget="config_canvas",
             toolTip=GENERIC_PARAMS_SETTINGS["cmap_nan_color"]["tooltip"],
         )
@@ -249,7 +256,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         self.create_label(
             "cmap_nan_display_label",
             "Currently selected invalid data color:",
-            font_metric_width_factor=0.75 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.75 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 0, 1, 1),
             parent_widget="cmap_nan_color_container",
         )
@@ -257,7 +264,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "cmap_nan_display_current",
             "",
             autoFillBackground=True,
-            font_metric_width_factor=0.25 * FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=0.25 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 1, 1, 1),
             parent_widget="cmap_nan_color_container",
         )
@@ -265,7 +272,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             "but_select_cmap_nan_color",
             "Pick a new color for invalid data / no data / NaN",
             parent_widget="cmap_nan_color_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
 
         self.create_spacer("spacer_4", parent_widget="config_canvas")
@@ -277,7 +284,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "generic_plugin_box",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             layout_column_stretches={0: 10, 1: 90},
             parent_widget="config_canvas",
         )
@@ -337,9 +344,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """Finalize the UI initialization."""
         self._config["cmap_nan_palette"] = QtGui.QPalette()
         self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
-        self.setFixedWidth(int(self._widgets["config_canvas"].sizeHint().width() + 20))
+        _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
+        self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
-            int(0.9 * FONT_METRIC_PARAM_EDIT_WIDTH * self.__qtapp.font_char_width)
+            int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
         _default_cmap = self.q_settings_get("user/cmap_name", default="Gray")
         with QtCore.QSignalBlocker(self._widgets["cmap_combobox"]):
@@ -348,12 +356,12 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot(object)
     def update_qsetting(self, param_key: str, value: Any) -> None:
         """
-        Update a QSettings value
+        Update a QSettings value.
 
         Parameters
         ----------
         param_key : str
-            The QSettings reference key. A "global/" prefix will be applied
+            The QSettings reference key. A "user/" prefix will be applied
             to it.
         value : Any
             The new value.
@@ -411,19 +419,21 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot()
     def update_plugin_collection(self) -> None:
         """
-        Update the plugin collection from the updated QSetting values for the
+        Update the plugin collection from updated QSetting values for the
         plugin directories.
         """
         _reply = QuestionBox(
             "Update plugin paths",
             (
-                "Do you want to update the custom plugin paths? This will clear the "
-                "current workflow tree and all un-saved changed will be lost."
+                "Do you want to update the custom plugin paths? This will "
+                "clear the current workflow tree and all unsaved changes "
+                "will be lost."
             ),
         ).exec_()
         if _reply:
             PLUGINS.clear_collection(True)
-            PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
+            _paths = PLUGINS.get_q_settings_plugin_paths()
+            PLUGINS.find_and_register_plugins(*_paths)
 
     @QtCore.Slot(str)
     def update_cmap(self, cmap_name: str) -> None:
@@ -445,7 +455,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         Parameters
         ----------
         change : int
-            The change direction.
+            The change direction (-1 for decrease, 1 for increase).
         """
         _new_fontsize = self.__qtapp.font_size
         if change == 1:
@@ -458,17 +468,20 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot()
     def process_new_fontsize_setting(self) -> None:
         """Process the user input of the new font size."""
-        self.__qtapp.font_size = float(self._widgets["edit_fontsize"].text())
-        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        _fontsize = float(self._widgets["edit_fontsize"].text())
+        self.__qtapp.font_size = _fontsize
+        _width = self._widgets["config_canvas"].sizeHint().width() + 20
+        self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
-            int(0.9 * FONT_METRIC_PARAM_EDIT_WIDTH * self.__qtapp.font_char_width)
+            int(0.9 * FONT_METRIC_CONFIG_WIDTH * self.__qtapp.font_char_width)
         )
         self.adjustSize()
 
     @QtCore.Slot(QtGui.QFont)
     def new_font_family_selected(self, font: QtGui.QFont) -> None:
         """
-        Handle the selection of the new font and notify the PydidasQApplication.
+        Handle the selection of the new font and notify the
+        PydidasQApplication.
 
         Parameters
         ----------
@@ -505,7 +518,10 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         """
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
-            None, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
+            None,
+            "",
+            "Are you sure to reset all the values?",
+            _qm.Yes | _qm.No,
         )
         if answer == _qm.Yes:
             self.restore_all_defaults(True)
@@ -531,7 +547,6 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     def mpl_font_not_supported(error: str) -> None:
         """
         Handle the signal that matplotlib does not support the chosen font.
-
 
         Parameters
         ----------

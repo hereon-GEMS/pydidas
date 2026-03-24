@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for pyFAI integration plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -131,17 +131,16 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
             _window = SelectIntegrationRegionWindow(
                 self.plugin, only_show_roi=not allow_edit
             )
-            _window.sig_roi_changed.connect(self.update_edits)
+            _window.sig_roi_changed.connect(self.update_plugin_config_edits)
             _window.sig_about_to_close.connect(partial(self._toggle_io_mode, True))
             setattr(self, "_window_edit" if allow_edit else "_window_show", _window)
         self._toggle_io_mode(False)
         _window.show()
 
     @QtCore.Slot()
-    def update_edits(self) -> None:
+    def update_plugin_config_edits(self) -> None:
         """Update the configuration fields of the plugin."""
-        for param in self.plugin.params.values():
-            self.update_param_widget_value(param.refkey, param.value)
+        super().update_plugin_config_edits()
         self._toggle_azimuthal_ranges_visibility(
             self.plugin.get_param_value("azi_use_range")
         )

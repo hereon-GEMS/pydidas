@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with pydidas unittests
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -57,7 +57,7 @@ class _TestBaseParamWidget(BaseParamIoWidget):
     def current_text(self):
         return str(self._val)
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         self._val = value
 
 
@@ -250,7 +250,7 @@ def test_update_io_directory(widget, has_io_dialog, temp_path):
 
 @pytest.mark.gui
 def test_emit_signal(widget):
-    widget.update_widget_value("dummy")
+    widget.update_display_value("dummy")
     assert widget.spy_value_changed.n == 0
     assert widget.spy_new_value.n == 0
     widget.emit_signal()
@@ -274,10 +274,10 @@ def test_current_text_property():
 
 
 @pytest.mark.gui
-def test_update_widget_value():
+def test_update_display_value():
     widget = BaseParamIoWidget(Parameter("test", str, "entry"))
     with pytest.raises(NotImplementedError):
-        widget.update_widget_value("default")
+        widget.update_display_value("default")
 
 
 @pytest.mark.gui

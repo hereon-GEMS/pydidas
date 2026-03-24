@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -105,8 +105,8 @@ def test_current_text(widget, index, item):
 @pytest.mark.parametrize(
     "index, new_value", [(_i, _v) for _i, _v in enumerate(_PARAM_CHOICES)]
 )
-def test_update_widget_value(widget, index, new_value):
-    widget.update_widget_value(new_value)
+def test_update_display_value(widget, index, new_value):
+    widget.update_display_value(new_value)
     assert widget.current_text == new_value
     assert widget.currentText() == _UNICODE_CHOICES[index]
     assert widget.spy_new_value.n == 0
@@ -115,9 +115,9 @@ def test_update_widget_value(widget, index, new_value):
 
 @pytest.mark.gui
 @pytest.mark.parametrize("value", [0, 1])
-def test_update_widget_value__w_bool(widget, value):
+def test_update_display_value__w_bool(widget, value):
     widget.update_choices(["True", "False", "other"])
-    widget.update_widget_value(value)
+    widget.update_display_value(value)
     assert widget.current_text == ("True" if value else "False")
 
 

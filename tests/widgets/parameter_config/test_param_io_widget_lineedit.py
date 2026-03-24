@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -136,10 +136,10 @@ def test__lost_focus(qtbot):
 
 
 @pytest.mark.gui
-def test__update_widget_value(qtbot):
+def test_update_display_value(qtbot):
     param = Parameter("test_float", float, 0.0, name="Test Float")
     widget = widget_instance(qtbot, param)
-    widget.update_widget_value(3.14159)
+    widget.update_display_value(3.14159)
     assert widget.spy_new_value.n == 0
     assert widget.current_text == "3.14159"
 

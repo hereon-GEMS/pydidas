@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,21 +16,23 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the EditPluginParametersWidget widget used to display and edit the
-Parameters of a Plugin.
+Module with EditPluginParametersWidget class to display and edit Plugin
+Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["EditPluginParametersWidget"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
 from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
@@ -40,33 +42,32 @@ from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
 )
 from pydidas.widgets.utilities import delete_all_items_in_layout
+from pydidas_qtcore import PydidasQApplication
 
 
 class EditPluginParametersWidget(
     EmptyWidget, ParameterWidgetsMixIn, CreateWidgetsMixIn
 ):
     """
-    The EditPluginParametersWidget widget creates the composite widget for
-    updating and changing values of all Parameters in a Plugin.
+    Widget to update and change values of all Parameters in a Plugin.
 
-    Depending on the Parameter types, automatic typechecks are implemented.
+    Depending on the Parameter types, automatic typechecks are
+    implemented.
     """
 
     sig_new_label = QtCore.Signal(int, str)
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         """
-        Setup method.
-
-        Create an instance on the EditPluginParametersWidget class.
+        Initialize the EditPluginParametersWidget.
 
         Parameters
         ----------
-        parent : QtWidget, optional
-            The parent widget. The default is None.
+        **kwargs : Any
+            Additional keyword arguments passed to parent classes.
         """
         if "font_metric_width_factor" not in kwargs:
-            kwargs["font_metric_width_factor"] = FONT_METRIC_PARAM_EDIT_WIDTH
+            kwargs["font_metric_width_factor"] = FONT_METRIC_CONFIG_WIDTH
         EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
@@ -75,20 +76,23 @@ class EditPluginParametersWidget(
         self.setFixedWidth(
             int(
                 QtWidgets.QApplication.instance().font_char_width
-                * FONT_METRIC_PARAM_EDIT_WIDTH
+                * FONT_METRIC_CONFIG_WIDTH
             )
         )
-        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp = PydidasQApplication.instance()
         self.__qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
     def configure_plugin(
-        self, node_id: int, plugin: BasePlugin, allow_restore_defaults: bool = True
-    ):
+        self,
+        node_id: int,
+        plugin: BasePlugin,
+        allow_restore_defaults: bool = True,
+    ) -> None:
         """
         Update the panel to show the Parameters of a different Plugin.
 
         This method clears the widget and populates it again with the
-        Parameters of the new Plugin, defined by the Plugin node_id
+        Parameters of the new Plugin, defined by the Plugin node_id.
 
         Parameters
         ----------
@@ -113,11 +117,10 @@ class EditPluginParametersWidget(
             allow_restore_defaults
         )
 
-    def clear_layout(self):
-        """
-        Clear all items from the layout and generate a new layout.
-        """
-        if isinstance(self._widgets.get("plugin_widget", None), QtWidgets.QWidget):
+    def clear_layout(self) -> None:
+        """Clear all items from the layout and generate a new layout."""
+        _widget = self._widgets.get("plugin_widget", None)
+        if isinstance(_widget, QtWidgets.QWidget):
             try:
                 self._widgets["plugin_widget"].sig_new_label.disconnect()
             except RuntimeError:
@@ -127,10 +130,8 @@ class EditPluginParametersWidget(
             None, QtCore.QEvent.DeferredDelete
         )
 
-    def __add_unique_config_widget(self):
-        """
-        Add the unique config widget for the selected plugin.
-        """
+    def __add_unique_config_widget(self) -> None:
+        """Add the unique config widget for the selected plugin."""
         _class = self.plugin.get_parameter_config_widget()
         self.add_any_widget(
             "plugin_widget",
@@ -138,12 +139,24 @@ class EditPluginParametersWidget(
             gridPos=(-1, 0, 1, 2),
         )
 
-    def __add_generic_param_widgets(self):
-        """
-        Add the generic param widgets for standard plugins.
-        """
+    def __add_generic_param_widgets(self) -> None:
+        """Add the generic param widgets for standard plugins."""
         self.add_any_widget(
             "plugin_widget",
             GenericPluginConfigWidget(self.plugin, self.node_id),
             gridPos=(-1, 0, 1, 2),
         )
+
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, width: float, height: float) -> None:
+        """
+        Process the user input of the new font size.
+
+        Parameters
+        ----------
+        width : float
+            The new font width.
+        height : float
+            The new font height.
+        """
+        self.setFixedWidth(int(width * FONT_METRIC_CONFIG_WIDTH))

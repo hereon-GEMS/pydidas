@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,13 +18,12 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import os
 from pathlib import Path
 
 import pytest
@@ -71,29 +70,26 @@ def test_pre_execute__no_input():
 @pytest.mark.parametrize(
     "scan_name_pattern", ["test_scan", "test_###_a1", "###_scan", "test_#####"]
 )
-def test_update_filename_string(
-    plugin, eiger_dir, eiger_filename_suffix, scan_name_pattern
+@pytest.mark.parametrize("include_suffix_in_name", [True, False])
+def test_update_filepath(
+    plugin, eiger_dir, eiger_filename_suffix, scan_name_pattern, include_suffix_in_name
 ):
     plugin.set_param_value("eiger_dir", eiger_dir)
     plugin.set_param_value("eiger_filename_suffix", eiger_filename_suffix)
-    SCAN.set_param_value("scan_name_pattern", scan_name_pattern)
+    if include_suffix_in_name:
+        SCAN.set_param_value(
+            "scan_name_pattern", scan_name_pattern + eiger_filename_suffix
+        )
+    else:
+        SCAN.set_param_value("scan_name_pattern", scan_name_pattern)
     _proc_pattern = SCAN.processed_file_naming_pattern
-    plugin.update_filename_string()
-    assert plugin.filename_string == f".{os.sep}" + str(
-        Path() / _proc_pattern / eiger_dir / f"{_proc_pattern}{eiger_filename_suffix}"
-    )
-
-
-def test_update_filename_string__w_suffix_in_name(plugin):
-    _eiger_dir = "eiger4x"
-    _eiger_filename_suffix = "_data_007.h5"
-    plugin.set_param_value("eiger_dir", _eiger_dir)
-    plugin.set_param_value("eiger_filename_suffix", _eiger_filename_suffix)
-    SCAN.set_param_value("scan_name_pattern", "test_###_a1" + _eiger_filename_suffix)
-    _proc_pattern = SCAN.processed_file_naming_pattern
-    plugin.update_filename_string()
-    assert plugin.filename_string == os.sep.join(
-        [".", "test_{index:03d}_a1", "eiger4x", "test_{index:03d}_a1_data_007.h5"]
+    if _proc_pattern.endswith(eiger_filename_suffix):
+        _proc_pattern = _proc_pattern.removesuffix(eiger_filename_suffix)
+    plugin.update_filepath()
+    assert plugin._base_dir == Path()
+    assert (
+        plugin._filename
+        == f"{_proc_pattern}/{eiger_dir}/{_proc_pattern}{eiger_filename_suffix}"
     )
 
 

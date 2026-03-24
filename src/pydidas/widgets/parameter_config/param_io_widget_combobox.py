@@ -91,7 +91,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         """
         return [convert_unicode_to_ascii(_item) for _item in self.__items]
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         """
         Update the widget value without emitting signals.
 
@@ -156,9 +156,9 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             self.clear()
             self.addItems(self.__items)
             if selection is not None and selection in new_choices:
-                self.update_widget_value(selection)
+                self.update_display_value(selection)
             else:
-                self.update_widget_value(new_choices[0])
+                self.update_display_value(new_choices[0])
         if emit_signal:
             self.emit_signal()
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)

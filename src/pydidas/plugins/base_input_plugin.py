@@ -73,6 +73,8 @@ class InputPlugin(BasePlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
         self._config["pre_executed"] = False
+        self._base_dir = Path()
+        self._filename = ""
         if self.base_output_data_dim == 2:
             self.add_params(
                 get_generic_parameter("roi_ylow"),

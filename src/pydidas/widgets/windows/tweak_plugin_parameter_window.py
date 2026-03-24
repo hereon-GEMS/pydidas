@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the TweakPluginParameterWindow class which is a stand-alone frame
-to modify and store the Parameters of a Plugin.
+Module with TweakPluginParameterWindow class to modify and store Plugin
+Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,15 +35,15 @@ import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.parameter_config import (
-    ParameterEditCanvas,
+from pydidas.widgets.parameter_config import ParameterEditCanvas
+from pydidas.widgets.plugin_config_widgets import (
+    EditPluginParametersWidget,
 )
-from pydidas.widgets.plugin_config_widgets import EditPluginParametersWidget
 from pydidas.widgets.scroll_area import ScrollArea
 from pydidas.widgets.windows.show_detailed_plugin_results_window import (
     ShowDetailedPluginResultsWindow,
@@ -54,8 +54,9 @@ class TweakPluginParameterWindow(PydidasWindow):
     """
     Window to modify Plugin Parameters on the fly and inspect results.
 
-    The TweakPluginParameterWindow displays detailed plugin results in combination
-    with all Plugin Parameters to allow running the Plugin with different values.
+    The TweakPluginParameterWindow displays detailed plugin results in
+    combination with all Plugin Parameters to allow running the Plugin with
+    different values.
     """
 
     show_frame = False
@@ -63,7 +64,7 @@ class TweakPluginParameterWindow(PydidasWindow):
     sig_new_params = QtCore.Signal(int)
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
         self.__qtapp = QtWidgets.QApplication.instance()
@@ -75,10 +76,8 @@ class TweakPluginParameterWindow(PydidasWindow):
             "accept_changes": False,
         }
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def build_frame(self) -> None:
+        """Populate the window and create all widgets."""
         self.create_label(
             "label_title",
             "Tweak plugin parameters",
@@ -87,7 +86,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             gridPos=(0, 0, 1, 2),
         )
         self._widgets["config_area"] = ParameterEditCanvas(
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH
         )
         self.create_any_widget(
             "config_scroll_area",
@@ -99,7 +98,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.create_any_widget(
             "plugin_param_edit",
             EditPluginParametersWidget,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=self._widgets["config_area"],
         )
         self.create_line(
@@ -136,21 +135,17 @@ class TweakPluginParameterWindow(PydidasWindow):
         )
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
 
-    def connect_signals(self):
-        """
-        Connect the signals for the buttons to their respective slots.
-        """
+    def connect_signals(self) -> None:
+        """Connect button click signals to their respective slots."""
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
         self._widgets["but_confirm"].clicked.connect(self.confirm_parameters)
         self._widgets["but_cancel"].clicked.connect(self.discard_parameter_changes)
 
-    def finalize_ui(self):
-        """
-        finalize the UI initialization.
-        """
+    def finalize_ui(self) -> None:
+        """Finalize the UI initialization."""
         self._widgets["config_scroll_area"].force_width_from_size_hint()
 
-    def tweak_plugin(self, plugin: BasePlugin, results: Dataset):
+    def tweak_plugin(self, plugin: BasePlugin, results: Dataset) -> None:
         """
         Tweak the selected plugin.
 
@@ -174,10 +169,9 @@ class TweakPluginParameterWindow(PydidasWindow):
         )
         self.__process_detailed_results()
 
-    def __process_detailed_results(self):
+    def __process_detailed_results(self) -> None:
         """
-        Process the detailed results for the plugin, if it has the respective
-        attribute.
+        Process the detailed results for the plugin, if it has the respective attribute.
         """
         if hasattr(self.__plugin, "detailed_results"):
             _details = self.__plugin.detailed_results
@@ -197,16 +191,8 @@ class TweakPluginParameterWindow(PydidasWindow):
             self._widgets["detailed_results"].setVisible(False)
 
     @QtCore.Slot()
-    def __update_scroll_area_width(self):
-        """
-        Update the width of the scroll area based on the ParameterEditWidget.
-        """
-
-    @QtCore.Slot()
-    def run_plugin(self):
-        """
-        Run the plugin with the current Parameters.
-        """
+    def run_plugin(self) -> None:
+        """Run the plugin with the current Parameters."""
         with ShowBusyMouse():
             _arg = self.__plugin._config["input_data"]
             if isinstance(_arg, np.ndarray):
@@ -217,14 +203,11 @@ class TweakPluginParameterWindow(PydidasWindow):
             self._widgets["plot"].set_data(
                 _res, title=f"{self.__plugin.plugin_name} results"
             )
-
             self.__process_detailed_results()
 
     @QtCore.Slot()
-    def confirm_parameters(self):
-        """
-        Confirm the selected Parameters and hide the TweakPluginParameters window.
-        """
+    def confirm_parameters(self) -> None:
+        """Confirm the selected Parameters and hide the TweakPluginParameterWindow."""
         self._config["accept_changes"] = True
         self.setVisible(False)
         self.sig_new_params.emit(self.__plugin.node_id)
@@ -232,10 +215,10 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.sig_closed.emit()
 
     @QtCore.Slot()
-    def discard_parameter_changes(self):
+    def discard_parameter_changes(self) -> None:
         """
-        Discard the made changes to the Plugin Parameters and reset them to the
-        original values.
+        Discard the made changes to the Plugin Parameters and reset them
+        to the original values.
         """
         self._config["accept_changes"] = False
         self.setVisible(False)
@@ -245,7 +228,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.sig_closed.emit()
 
     @QtCore.Slot()
-    def closeEvent(self, event: QtGui.QCloseEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         Handle the close event and discard any possible changes.
 
@@ -259,9 +242,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["detailed_results"].close()
         QtWidgets.QWidget.closeEvent(self, event)
 
-    def hide(self):
-        """
-        Overload the generic hide method to hide the details window as well.
-        """
+    def hide(self) -> None:
+        """Overload the generic hide method to hide the details window as well."""
         self._widgets["detailed_results"].setVisible(False)
         QtWidgets.QWidget.hide(self)

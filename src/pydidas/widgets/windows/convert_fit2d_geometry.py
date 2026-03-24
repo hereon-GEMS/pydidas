@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ConvertFit2dGeometryWindow class which allows users to convert
-Fit2D geometry parameters to pyFAI geometry.
+Module with ConvertFit2dGeometryWindow class to convert Fit2D geometry
+parameters to pyFAI geometry.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,7 +34,7 @@ from qtpy import QtCore, QtGui
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import Parameter, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.widgets.framework import PydidasWindow
 
 
@@ -88,17 +88,18 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "Convert Fit2D geometry to pyFAI",
             bold=True,
             fontsize_offset=2,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+        )
+        _note_text = (
+            "Note that Fit2D inverts the detector image along the "
+            "vertical (y) axis\non loading. Therefore, the beamcenter "
+            "pixel coordinates in\nFit2D do not directly correspond to "
+            "those in pyFAI.\nThe pyFAI beamcenter-y coordinate is thus "
+            "calculated as\n(detector_pixels_y - beamcenter_y_from_Fit2D)."
         )
         self.create_label(
             "label_note",
-            (
-                "Note that Fit2D inverts the detector image along the vertical (y) axis\n"
-                "on loading. Therefore, the beamcenter pixel coordinates in\n"
-                "Fit2D do not directly correspond to those in pyFAI.\n"
-                "The pyFAI beamcenter-y coordinate is thus calculated as\n"
-                "(detector_pixels_y - beamcenter_y_from_Fit2D)."
-            ),
+            _note_text,
             bold=True,
         )
         self.create_param_widget("use_fit2d_image_orientation")
@@ -108,7 +109,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "label_title",
             "Fit2d parameter input:",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _param_key in _FIT2D_PARAM_KEYS:
             self.create_param_widget(self.params[_param_key])
@@ -121,20 +122,20 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             "label_title",
             "Resulting pyFAI geometry:",
             bold=True,
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         for _param_key in _PYFAI_PARAM_KEYS:
             self.create_param_widget(self.params[_param_key])
             self.param_widgets[_param_key].setReadOnly(True)
         self.create_spacer(None)
         self.create_button(
-            "button_accept", "Accept and store pyFAI geometry", enabled=False
+            "button_accept",
+            "Accept and store pyFAI geometry",
+            enabled=False,
         )
 
     def connect_signals(self) -> None:
-        """
-        Connect the signals.
-        """
+        """Connect the signals."""
         self._widgets["button_convert_to_pyfai"].clicked.connect(
             self._convert_inputs_to_pyfai
         )
@@ -153,16 +154,15 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
         super().closeEvent(event)
 
     def show(self) -> None:
-        """
-        Show the window in a clean state.
-        """
+        """Show the window in a clean state."""
         self._widgets["button_accept"].setEnabled(False)
         for _key in _FIT2D_PARAM_KEYS:
             self.set_param_and_widget_value(
                 _key, 100.0 if _key == "detector_dist_fit2d" else 0
             )
         for _key in _PYFAI_PARAM_KEYS:
-            self.set_param_and_widget_value(_key, 0.1 if _key == "detector_dist" else 0)
+            _value = 0.1 if _key == "detector_dist" else 0
+            self.set_param_and_widget_value(_key, _value)
         super().show()
 
     def update_detector(self, exp: DiffractionExperiment) -> None:
@@ -185,9 +185,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
 
     @QtCore.Slot()
     def _convert_inputs_to_pyfai(self) -> None:
-        """
-        Convert the inputs from Fit2D to pyFAI geometry.
-        """
+        """Convert the inputs from Fit2D to pyFAI geometry."""
         self._exp.set_beamcenter_from_fit2d_params(
             self.get_param_value("beamcenter_x"),
             self.get_param_value("beamcenter_y"),
@@ -197,7 +195,7 @@ class ConvertFit2dGeometryWindow(PydidasWindow):
             fit2d_image_orientation=self.get_param_value("use_fit2d_image_orientation"),
         )
         for _key in _PYFAI_PARAM_KEYS:
-            self.update_widget_value(_key, self._exp.get_param_value(_key))
+            self.update_param_widget_value(_key, self._exp.get_param_value(_key))
         self._widgets["button_accept"].setEnabled(True)
 
     @QtCore.Slot()

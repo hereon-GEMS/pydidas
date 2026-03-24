@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExportEigerPixelmaskWindow class which is a stand-alone frame
-to store the pixel mask.
+Module with ExportEigerPixelmaskWindow class to export pixel mask from
+Eiger master file.
 """
 
 __author__ = "Malte Storm"
@@ -29,12 +29,15 @@ __all__ = ["ExportEigerPixelmaskWindow"]
 
 
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter, ParameterCollection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
-from pydidas.core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
+from pydidas.core.utils.dectris_utils import (
+    store_eiger_pixel_mask_from_master_file,
+)
 from pydidas.data_io import IoManager
 from pydidas.widgets.dialogues import critical_warning
 from pydidas.widgets.framework import PydidasWindow
@@ -42,8 +45,7 @@ from pydidas.widgets.framework import PydidasWindow
 
 class ExportEigerPixelmaskWindow(PydidasWindow):
     """
-    Window with a simple dialogue to export the Pixelmask from an Eiger
-    "master" file.
+    Window to export the Pixelmask from an Eiger master file.
     """
 
     show_frame = False
@@ -60,20 +62,18 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
             Path,
             Path(),
             name="Export filename",
-            tooltip="The filename (and path) for the new pixel mask file.",
+            tooltip=("The filename (and path) for the new pixel mask file."),
         ),
     )
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Export Eiger pixelmask", **kwargs)
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def build_frame(self) -> None:
+        """Build the frame and create all widgets."""
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
 
         self.create_label(
@@ -99,32 +99,28 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         self.param_widgets["output_filename"]._file_selection = _supported_formats
 
         self.create_button(
-            "but_exec", "Export pixelmask", parent_widget="config_canvas"
+            "but_exec",
+            "Export pixelmask",
+            parent_widget="config_canvas",
         )
-        self.process_new_font_metrics()
+        self.process_font_metrics_changed()
 
-    def connect_signals(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def connect_signals(self) -> None:
+        """Connect signals for button clicks and font changes."""
         self._widgets["but_exec"].clicked.connect(self._export)
-        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
-            self.process_new_font_metrics
-        )
+        _app = QtWidgets.QApplication.instance()
+        _app.sig_font_metrics_changed.connect(self.process_font_metrics_changed)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self):
-        """
-        Process the user input of the new font size.
-        """
-        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+    def process_font_metrics_changed(self) -> None:
+        """Process the user input of the new font size."""
+        _width = self._widgets["config_canvas"].sizeHint().width() + 20
+        self.setFixedWidth(_width)
         self.adjustSize()
 
     @QtCore.Slot()
-    def _export(self):
-        """
-        Export the pixelmask.
-        """
+    def _export(self) -> None:
+        """Export the pixelmask."""
         _master_fname = self.get_param_value("master_filename")
         _export_fname = self.get_param_value("output_filename")
         _out_dir = _export_fname.parent
@@ -137,7 +133,7 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         if not _out_dir.exists():
             critical_warning(
                 "Output directory not found",
-                f"The specified output directory '{str(_out_dir)}' could not be found.",
+                f"The specified output directory `{_out_dir}` could not be found.",
             )
             return
         store_eiger_pixel_mask_from_master_file(_master_fname, _export_fname)

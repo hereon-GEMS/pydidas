@@ -34,6 +34,8 @@ import unittest
 from collections.abc import Iterable
 from pathlib import Path
 
+import pytest
+
 from pydidas.core import FileReadError, UserConfigError
 from pydidas.core.utils import (
     CatchFileErrors,
@@ -42,6 +44,7 @@ from pydidas.core.utils import (
     get_extension,
     get_file_naming_scheme,
     get_random_string,
+    has_extension,
 )
 
 
@@ -244,5 +247,20 @@ class Test_file_utils(unittest.TestCase):
                 raise RuntimeError("dummy")
 
 
+@pytest.mark.parametrize("ext", [".aa", ".aA", ".AA", ".Aa"])
+@pytest.mark.parametrize("use_path", [True, False])
+@pytest.mark.parametrize("check", [".aa", "aa", [".bc", ".aa", ".ab"]])
+def test_has_extension(ext, use_path, check):
+    _name = f"test/test{ext}"
+    if use_path:
+        _name = Path(_name)
+    assert has_extension(_name, check)
+
+
+@pytest.mark.parametrize("check", [".aa", [".bc", ".aa", ".ab"]])
+def test_has_extension__no_ext(check):
+    assert has_extension("test", check) is False
+
+
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

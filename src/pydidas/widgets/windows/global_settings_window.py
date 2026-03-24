@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to view and modify the global settings in a separate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,14 +33,10 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-import pydidas_qtcore
 from pydidas.core import SingletonObject, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
-from pydidas.plugins import PluginCollection
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, QSETTINGS_GLOBAL_KEYS
 from pydidas.widgets.framework import PydidasWindow
-
-
-PLUGINS = PluginCollection()
+from pydidas_qtcore import PydidasQApplication
 
 
 class GlobalSettingsWindow(SingletonObject, PydidasWindow):
@@ -87,7 +83,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
         )
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options
@@ -105,7 +101,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
 
         self.create_label("section_gui", "GUI behaviour", **_section_options)
         self.create_param_widget("plot_update_time", **_param_options)
-        self.process_new_font_metrics()
+        self.process_font_metrics_changed()
 
     def connect_signals(self) -> None:
         """Connect the signals for Parameter updates."""
@@ -114,8 +110,8 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
-        _app = pydidas_qtcore.PydidasQApplication.instance()
-        _app.sig_font_metrics_changed.connect(self.process_new_font_metrics)
+        _app = PydidasQApplication.instance()
+        _app.sig_font_metrics_changed.connect(self.process_font_metrics_changed)
 
     @QtCore.Slot(str)
     def update_qsetting(self, param_key: str, value: str) -> None:
@@ -168,7 +164,7 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
                 self.value_changed_signal.emit(_param_key, _value)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self) -> None:
+    def process_font_metrics_changed(self) -> None:
         """Process the user input of the new font size."""
         self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.adjustSize()

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,19 +16,18 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ShowInformationForResult class which is a widget to display detailed
-information about a datapoint from a pydidas result.
+Module with ShowInformationForResult class to display detailed information
+about a datapoint from a pydidas result.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ShowInformationForResult"]
 
 
-from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore
@@ -51,7 +50,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
     sig_closed = QtCore.Signal()
     sig_this_frame_activated = QtCore.Signal()
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
 
@@ -97,12 +96,12 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             visible=False,
             minimumHeight=800,
             minimumWidth=800,
-            gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa E0602
+            gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa: E0602
         )
         PydidasQApplication.instance().sig_font_metrics_changed.connect(
-            self.process_new_font_metrics
+            self.process_font_metrics_changed
         )
-        self.layout().setColumnStretch(1, 1)  # noqa E0602
+        self.layout().setColumnStretch(1, 1)  # noqa: E0602
 
     def display_information(
         self,
@@ -112,7 +111,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         result_metadata: dict,
         loader_plugin: InputPlugin,
         use_timeline: bool = False,
-    ):
+    ) -> None:
         """
         Display the information about the selected datapoint.
 
@@ -125,19 +124,21 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             A 2-tuple with the active dimensions of the selection,
             i.e. the dimensions in which the position is defined.
         selected_indices : list[int | None]
-            The selected indices of the full result dataset. This will be integers
-            for inactive dimensions and None for the active dimensions.
+            The selected indices of the full result dataset. This will be
+            integers for inactive dimensions and None for the active
+            dimensions.
         result_metadata : dict
             The metadata of the results.
-        loader_plugin : pydidas.plugins.BaseInputPlugin
-            The input plugin associated with the results. Required to display the
-            input image.
-        use_timeline : bool
-            If True, the timeline index will be used to get the frame index.
+        loader_plugin : InputPlugin
+            The input plugin associated with the results. Required to
+            display the input image.
+        use_timeline : bool, optional
+            If True, the timeline index will be used to get the frame
+            index. The default is False.
         """
         self._loader_plugin = loader_plugin.copy()
-        self._loader_plugin.update_filename_string()
-        _scan = self._loader_plugin._SCAN  # noqa W0212
+        self._loader_plugin.update_filepath()
+        _scan = self._loader_plugin._SCAN  # noqa: W0212
         _ax_ranges = result_metadata["axis_ranges"]
         _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
         selected_indices[active_dims[0]] = _index_y
@@ -146,10 +147,15 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
 
         _info_str = "Selected data position:\n" + "\n".join(
             get_fixed_length_str(
-                f"{result_metadata['axis_labels'][_dim]}:", 18, final_space=False
+                f"{result_metadata['axis_labels'][_dim]}:",
+                18,
+                final_space=False,
             )
             + get_fixed_length_str(
-                _ax_ranges[_dim][_index], 12, formatter="{:.5f}", fill_back=False
+                _ax_ranges[_dim][_index],
+                12,
+                formatter="{:.5f}",
+                fill_back=False,
             )
             + f" {result_metadata['axis_units'][_dim]}"
             for _dim, _index in enumerate(selected_indices)
@@ -181,30 +187,28 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             )
         self._widgets["info_field"].setText(_info_str)
         self._widgets["edit_filename"].setText(
-            loader_plugin.get_filename(self._ordinal)
+            str(loader_plugin.get_filename(self._ordinal))
         )
         self._widgets["but_show_input"].setEnabled(True)
         self._widgets["plot"].setVisible(False)
         self.show()
 
     @QtCore.Slot()
-    def show_input_image(self):
+    def show_input_image(self) -> None:
         """Show the input image as loaded from the loader plugin."""
-        if not Path(self._loader_plugin.get_filename(self._ordinal)).is_file():
+        if not self._loader_plugin.get_filename(self._ordinal).is_file():
             self._widgets["but_show_input"].setEnabled(False)
             raise UserConfigError(
-                "Cannot display the input image because the filename does not point to "
-                "a valid file on this system."
+                "Cannot display the input image because the filename "
+                "does not point to a valid file on this system."
             )
         self._widgets["plot"].setVisible(True)
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
-            _input, _kwargs = self._loader_plugin.execute(self._ordinal)
+            _input, _ = self._loader_plugin.execute(self._ordinal)
             self._widgets["plot"].plot_data(_input)
 
     @QtCore.Slot()
-    def process_new_font_metrics(self):
-        """
-        Process the user input of the new font size.
-        """
+    def process_font_metrics_changed(self) -> None:
+        """Process the user input of the new font size."""
         self.adjustSize()

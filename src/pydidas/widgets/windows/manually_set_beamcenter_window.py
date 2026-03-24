@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ManuallySetBeamcenterWindow class which allows to select points
-in an image to define the beamcenter.
+Module with ManuallySetBeamcenterWindow class to select points in an
+image to define the beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,9 +36,14 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    PYFAI_DETECTOR_NAMES,
+)
 from pydidas.data_io import import_data
-from pydidas.widgets.controllers import ManuallySetBeamcenterController
+from pydidas.widgets.controllers import (
+    ManuallySetBeamcenterController,
+)
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.framework import PydidasWindow
 from pydidas.widgets.misc import PointsForBeamcenterWidget
@@ -48,7 +53,7 @@ from pydidas.widgets.silx_plot import PydidasPlot2D
 
 class ManuallySetBeamcenterWindow(PydidasWindow):
     """
-    A window which allows to open a file and select points to determine the beam center.
+    Window to open a file and select points to determine the beam center.
     """
 
     show_frame = False
@@ -80,9 +85,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.frame_activated(self.frame_index)
 
     def build_frame(self) -> None:
-        """
-        Build the frame and create all widgets.
-        """
+        """Build the frame and create all widgets."""
         self.create_label(
             "label_title",
             "Define beamcenter through selected points",
@@ -92,7 +95,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_empty_widget(
             "left_container",
-            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             gridPos=(1, 1, 2, 1),
             minimumHeight=400,
         )
@@ -100,7 +103,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.add_any_widget(
             "plot",
             PydidasPlot2D(
-                cs_transform=False, diffraction_exp=self._config["diffraction_exp"]
+                cs_transform=False,
+                diffraction_exp=self._config["diffraction_exp"],
             ),
             gridPos=(1, 3, 2, 1),
             minimumHeight=700,
@@ -167,9 +171,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
 
     def connect_signals(self) -> None:
-        """
-        Build the frame and create all widgets.
-        """
+        """Connect signals for button clicks and file selection."""
         self._bc_controller = ManuallySetBeamcenterController(
             self, self._widgets["plot"], self._widgets["point_table"]
         )
@@ -188,25 +190,22 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
 
     def finalize_ui(self) -> None:
-        """
-        Finalize the user interface.
-        """
+        """Finalize the user interface."""
         self._update_image_if_required()
         self._bc_controller.manual_beamcenter_update()
         self._bc_controller.show_plot_items("beamcenter")
 
-    @QtCore.Slot(str, object)
-    def _selected_new_file(self, filename: str, kwargs: dict) -> None:
+    @QtCore.Slot(str, dict)
+    def _selected_new_file(self, filename: str, kwargs: dict[str, Any]) -> None:
         """
-        Open a new file / frame based on the selected file input Parameters.
+        Open a new file or frame based on selected Parameters.
 
         Parameters
         ----------
         filename : str
             The filename of the new image file to be opened.
-        kwargs : dict
-            The dictionary with additional parameters (hdf5 frame and dataset) for
-            file opening.
+        kwargs : dict[str, Any]
+            Additional parameters (hdf5 frame and dataset) for file opening.
         """
         self._image = import_data(filename, **kwargs)
         _path = Path(filename)
@@ -240,8 +239,10 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         if not self._bc_controller.beamcenter_is_set:
             _reply = QuestionBox(
                 "Beamcenter not set",
-                "No beamcenter has been set. Do you want to close the window without "
-                "setting a beamcenter?",
+                (
+                    "No beamcenter has been set. Do you want to close the "
+                    "window without setting a beamcenter?"
+                ),
             ).exec_()
             if _reply:
                 self.close()
@@ -252,13 +253,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.close()
 
     def _update_image_if_required(self) -> None:
-        """
-        Check the dimensions of the current image with respect to the Detector size.
-        """
-        _shape = (
-            self._config["diffraction_exp"].get_param_value("detector_npixy"),
-            self._config["diffraction_exp"].get_param_value("detector_npixx"),
-        )
+        """Check the image dimensions against the Detector size."""
+        _shape = self._config["diffraction_exp"].det_shape
         if _shape == self._image.shape:
             return
         self._image = Dataset(np.zeros(_shape))
@@ -268,19 +264,17 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
-        Handle the close event and also emit a signal.
+        Handle the close event and emit a signal.
 
         Parameters
         ----------
-        event : QCloseEvent
+        event : QtGui.QCloseEvent
             The calling event.
         """
         self.sig_about_to_close.emit()
         super().closeEvent(event)
 
     def show(self) -> None:
-        """
-        Show the window and check the image shape.
-        """
+        """Show the window and check the image shape."""
         self._update_image_if_required()
         super().show()

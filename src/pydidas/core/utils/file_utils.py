@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = [
     "get_directory",
     "get_extension",
+    "has_extension",
     "find_valid_python_files",
     "get_file_naming_scheme",
     "CatchFileErrors",
@@ -86,10 +87,31 @@ def get_extension(path: Path | str) -> str:
         return ""
     if isinstance(path, str):
         path = Path(path)
-    _ext = path.suffix
-    if _ext.startswith("."):
-        _ext = _ext.lower()
-    return _ext
+    return path.suffix.lower()
+
+
+def has_extension(path: Path | str, extensions: str | list[str]) -> bool:
+    """
+    Check if the file in the given path has one of the specified extensions.
+
+    Parameters
+    ----------
+    path : Path or str
+        The full filename and path.
+    extensions : str or list[str]
+        The extension(s) to be checked for. If a string is given, it will be converted
+        to a list with one item.
+
+    Returns
+    -------
+    bool
+        True if the file has one of the specified extensions, False otherwise.
+    """
+    if isinstance(extensions, str):
+        if not extensions.startswith("."):
+            extensions = "." + extensions
+        extensions = [extensions]
+    return get_extension(path) in extensions
 
 
 def find_valid_python_files(path: Path | str) -> list[Path]:

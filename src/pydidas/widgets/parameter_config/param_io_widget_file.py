@@ -127,7 +127,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             return
         self.set_value(_path)
 
-    def update_widget_value(self, value: Any) -> None:
+    def update_display_value(self, value: Any) -> None:
         """
         Update the widget value without emitting signals.
 

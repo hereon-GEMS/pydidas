@@ -492,6 +492,71 @@ scan points is given by <code class="docutils literal notranslate"><span class="
 <span class="pre">delta</span></code>, rounded down to the nearest integer. Please consult the table below
 for examples of how the number of scan points must be adjusted depending on
 the parameters:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Total number
+of frames</p></th>
+<th class="head"><p>Frame index stepping
+per scan point</p></th>
+<th class="head"><p>Frames to process
+per scan point</p></th>
+<th class="head"><p>Maximum number
+of scan points</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>30</p></td>
+</tr>
+<tr class="row-odd"><td><p>30</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td colspan="3"><p>If only every third frame is used, the maximum number of
+scan points must be divided by 3.</p></td>
+</tr>
+<tr class="row-odd"><td><p>30</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>28</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td colspan="3"><p>If 3 frames are processed at each scan point, the maximum
+number of scan points must be reduced by 2. The scan
+point #27 (*) will use the frames #27, #28, and #29 and
+scan point #29 would require up to frame #30.</p>
+<p>(*) Note that counting starts at 0, i.e. #27 is the 28th
+scan point.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p>30</p></td>
+<td><p>4</p></td>
+<td><p>6</p></td>
+<td><p>6</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td colspan="3"><p>Because 6 frames are processed at each scan point, the
+maximum number of scan points must be reduced by 6. Since
+the frame index is incremented by 4 for each scan point,
+the maximum number of scan points must be divided by 4.
+Finally, add one for the initial point. Therefore, a
+total of 1 + (30 - 6) / 4 = 1 + 6 = 7 scan points can be
+used. The last scan point #6 (*) will use the frames #24,
+#25, #26, #27, #28, and #29. The scan point #7 would
+require images up to frame #33 which are not available
+(**).</p>
+<p>(*) Note that counting starts at 0, i.e. #6 is the 7th
+scan point.</p>
+<p>(**) The 30 frames include the frames #0 to #29.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>

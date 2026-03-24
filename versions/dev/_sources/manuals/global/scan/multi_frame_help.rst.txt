@@ -78,7 +78,6 @@ is larger than 1. The options are:
     |              | number of scan points must be reduced by 2. The scan      |
     |              | point #27 (*) will use the frames #27, #28, and #29 and   |
     |              | scan point #29 would require up to frame #30.             |
-    |              |
     |              |                                                           |
     |              | (*) Note that counting starts at 0, i.e. #27 is the 28th  |
     |              | scan point.                                               |

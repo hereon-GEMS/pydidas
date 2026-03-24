@@ -39,7 +39,7 @@ from pydidas.widgets.misc import (
     PointsForBeamcenterWidget,
     ShowIntegrationRoiParamsWidget,
 )
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets.selection import SelectDataFrameWidget, ToggleOptionsButton
 from pydidas.widgets.silx_plot import (
     PydidasPlot2DwithIntegrationRegions,
 )
@@ -158,14 +158,18 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         {"icon": "pydidas::generic_copy", "parent_widget": "config"},
     ],
     [
-        "create_button",
-        ("but_show_exp_section", "Show detailed experiment section"),
-        {"icon": "qt-std::SP_TitleBarUnshadeButton", "parent_widget": "config"},
-    ],
-    [
         "create_empty_widget",
         ("exp_section",),
         {"parent_widget": "config", "visible": False},
+    ],
+    [
+        "create_any_widget",
+        ("but_toggle_exp_section", ToggleOptionsButton),
+        {
+            "parent_widget": "config",
+            "toggle_text_shown": "Hide detailed experiment section",
+            "toggle_text_hidden": "Show detailed experiment section",
+        },
     ],
     [
         "create_button",
@@ -184,11 +188,6 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         {"parent_widget": "exp_section", "linebreak": True},
     ],
     ["create_spacer", (None,), {"fixedHeight": 15, "parent_widget": "exp_section"}],
-    [
-        "create_button",
-        ("but_hide_exp_section", "Hide detailed experiment section"),
-        {"icon": "qt-std::SP_TitleBarShadeButton", "parent_widget": "exp_section"},
-    ],
     [
         "create_param_widget",
         ("detector_model",),
@@ -245,11 +244,13 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         {"parent_widget": "config", "visible": False},
     ],
     [
-        "create_button",
-        ("but_show_integration_section", "Show integration ROI section"),
+        "create_any_widget",
+        ("but_toggle_integration_section", ToggleOptionsButton),
         {
-            "icon": "qt-std::SP_TitleBarUnshadeButton",
             "parent_widget": "config",
+            "linked_widget_visible": False,
+            "toggle_text_shown": "Hide integration ROI section",
+            "toggle_text_hidden": "Show integration ROI section",
             "visible": False,
         },
     ],
@@ -266,24 +267,6 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
             "add_bottom_spacer": False,
             "parent_widget": "integration_section",
         },
-    ],
-    [
-        "create_spacer",
-        (None,),
-        {"fixedHeight": 15, "parent_widget": "integration_section"},
-    ],
-    [
-        "create_button",
-        ("but_hide_integration_section", "Hide integration ROI section"),
-        {
-            "icon": "qt-std::SP_TitleBarShadeButton",
-            "parent_widget": "integration_section",
-        },
-    ],
-    [
-        "create_spacer",
-        (None,),
-        {"fixedHeight": 15, "parent_widget": "integration_section"},
     ],
     [
         "create_empty_widget",

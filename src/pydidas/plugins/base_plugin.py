@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ and OutputPlugin base classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -71,7 +71,25 @@ EXP = DiffractionExperimentContext()
 SCAN = ScanContext()
 
 
-def _data_dim(entry):
+def _data_dim(entry: Any) -> str:
+    """
+    Get the formatted string representation of data dimensionality.
+
+    Parameters
+    ----------
+    entry : Any
+        The dimensionality value to format.
+
+    Returns
+    -------
+    str
+        The formatted dimensionality string.
+
+    Raises
+    ------
+    TypeError
+        If entry type is not understood.
+    """
     if entry is None:
         return "None"
     if entry == -1:
@@ -139,7 +157,7 @@ class BasePlugin(ObjectWithParameterCollection):
     base_classes = []
 
     @classmethod
-    def register_as_base_class(cls):
+    def register_as_base_class(cls) -> None:
         """
         Register a base class for the plugin.
         """
@@ -200,11 +218,12 @@ class BasePlugin(ObjectWithParameterCollection):
         This method can generate a description of the plugin with name,
         plugin type, class name and Parameters and the docstring.
         The return is a list of entries with keys and entries. Keys determine
-        the formatting of the entry and can be "header", "section" or "subsection".
+        the formatting of the entry and can be "header", "section" or
+        "subsection".
 
         Returns
         -------
-        dict
+        list
             The description of the plugin.
         """
         _description = [
@@ -284,7 +303,7 @@ class BasePlugin(ObjectWithParameterCollection):
             return "None"
         return str(cls.output_data_dim)
 
-    def __init__(self, *args: Parameter, **kwargs: Any):
+    def __init__(self, *args: Parameter, **kwargs: Any) -> None:
         super().__init__()
         if self.plugin_type not in [
             BASE_PLUGIN,
@@ -361,7 +380,7 @@ class BasePlugin(ObjectWithParameterCollection):
         }
         return _state
 
-    def __setstate__(self, state: dict):
+    def __setstate__(self, state: dict) -> None:
         """
         Set the Plugin state after pickling.
 
@@ -401,20 +420,20 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         return copy.copy(self)
 
-    def execute(self, data: int | Dataset, **kwargs: dict):
+    def execute(self, data: int | Dataset, **kwargs: Any):
         """
         Execute the processing step.
 
         Parameters
         ----------
-        data : int | Dataset
+        data : int or Dataset
             The input data to be processed.
-        kwargs : dict
+        **kwargs : Any
             Keyword arguments passed to the processing.
         """
         raise NotImplementedError("Execute method has not been implemented.")
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Run the pre-execution code before processing individual datapoints.
         """
@@ -470,7 +489,7 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        int | Dataset | None
+        int or Dataset or None
             The input data passed to the plugin.
         """
         return self._config["input_data"]
@@ -507,16 +526,16 @@ class BasePlugin(ObjectWithParameterCollection):
             else f"[{self.plugin_name}] (node #{_id:03d})"
         )
 
-    def store_input_data_copy(self, data: Dataset, **kwargs: dict):
+    def store_input_data_copy(self, data: Dataset, **kwargs: Any) -> None:
         """
         Store a copy of the input data internally in the plugin.
 
         Parameters
         ----------
-        data : Union[int, np.ndarray]
+        data : Dataset
             The input data for the plugin.
-        **kwargs : dict
-            The calling keyword arguments
+        **kwargs : Any
+            The calling keyword arguments.
         """
         self._config["input_data"] = copy.deepcopy(data)
         self._config["input_kwargs"] = copy.deepcopy(kwargs)
@@ -531,10 +550,10 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        Union[tuple[slice, slice], None]
-            The tuple with one or two slice objects
-            (depending on the data dimensionality) which define the image ROI
-            or None if the Plugin does not define a ROI.
+        slice or tuple[slice, slice] or None
+            The tuple with one or two slice objects (depending on the data
+            dimensionality) which define the image ROI or None if the Plugin
+            does not define a ROI.
         """
         if "use_roi" not in self.params.keys() or not self.get_param_value("use_roi"):
             return None

@@ -15,6 +15,7 @@ Improvements
   axis datasets.
 - When editing advanced Parameters, the GUI now remembers the settings
   for each plugin.
+- Added an option to select a file by its filename in the DataBrowsingFrame.
 
 Programmatic changes
 --------------------

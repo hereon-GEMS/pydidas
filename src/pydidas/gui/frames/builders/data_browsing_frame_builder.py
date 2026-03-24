@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the DataBrowsingFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -92,7 +92,7 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] 
         {
             "gridPos": (0, 1, 1, 2),
             "parent_widget": "plot_header",
-            "readOnly": True,
+            "readOnly": False,
             "sizePolicy": POLICY_EXP_EXP,
         },
     ],

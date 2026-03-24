@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The pydidas_pushbutton includes a subclassed QPushButton with automatic font for
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,6 +28,7 @@ __all__ = ["PydidasPushButton"]
 
 
 from functools import partial
+from typing import Any
 
 from qtpy import QtWidgets
 
@@ -43,7 +44,7 @@ class PydidasPushButton(PydidasWidgetMixin, QtWidgets.QPushButton):
 
     init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["icon"]
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         QtWidgets.QPushButton.__init__(self, *args)
         if isinstance(kwargs.get("icon", None), str):
             kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))

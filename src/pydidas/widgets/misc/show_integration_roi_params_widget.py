@@ -52,6 +52,10 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
     owned by this widget.
     """
 
+    init_kwargs = WidgetWithParameterCollection.init_kwargs + [
+        "add_bottom_spacer",
+        "show_reset_button",
+    ]
     default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_edits = QtCore.Signal(bool)

@@ -107,11 +107,11 @@ class EditPluginParametersWidget(
         self.clear_layout()
         self.plugin = plugin
         self.node_id = node_id
-        if self.plugin.has_unique_parameter_config_widget:
-            self.__add_unique_config_widget()
-        else:
-            self.__add_generic_param_widgets()
+        self.__add_param_config_widget()
         self._widgets["plugin_widget"].sig_new_label.connect(self.sig_new_label)
+        self._widgets["plugin_widget"].sig_advanced_params_visibility.connect(
+            self._store_advanced_params_visibility
+        )
         self.create_empty_widget("final_spacer", sizePolicy=POLICY_FIX_EXP)
         self._widgets["plugin_widget"]._widgets["restore_defaults"].setVisible(
             allow_restore_defaults
@@ -122,7 +122,8 @@ class EditPluginParametersWidget(
         _widget = self._widgets.get("plugin_widget", None)
         if isinstance(_widget, QtWidgets.QWidget):
             try:
-                self._widgets["plugin_widget"].sig_new_label.disconnect()
+                _widget.sig_new_label.disconnect()
+                _widget.sig_advanced_params_visibility.disconnect()
             except RuntimeError:
                 pass
         delete_all_items_in_layout(self.layout())
@@ -130,20 +131,16 @@ class EditPluginParametersWidget(
             None, QtCore.QEvent.DeferredDelete
         )
 
-    def __add_unique_config_widget(self) -> None:
-        """Add the unique config widget for the selected plugin."""
-        _class = self.plugin.get_parameter_config_widget()
+    def __add_param_config_widget(self) -> None:
+        """Add the Parameter config widget for the selected plugin."""
+        if self.plugin.has_unique_parameter_config_widget:
+            _class = self.plugin.get_parameter_config_widget()
+        else:
+            _class = GenericPluginConfigWidget
+        _adv_params_vis = self.plugin.advanced_params_visible
         self.add_any_widget(
             "plugin_widget",
-            _class(self.plugin, self.node_id),
-            gridPos=(-1, 0, 1, 2),
-        )
-
-    def __add_generic_param_widgets(self) -> None:
-        """Add the generic param widgets for standard plugins."""
-        self.add_any_widget(
-            "plugin_widget",
-            GenericPluginConfigWidget(self.plugin, self.node_id),
+            _class(self.plugin, self.node_id, advanced_params_visible=_adv_params_vis),
             gridPos=(-1, 0, 1, 2),
         )
 
@@ -160,3 +157,15 @@ class EditPluginParametersWidget(
             The new font height.
         """
         self.setFixedWidth(int(width * FONT_METRIC_CONFIG_WIDTH))
+
+    @QtCore.Slot(bool)
+    def _store_advanced_params_visibility(self, visibility: bool) -> None:
+        """
+        Store the advanced parameters visibility for each plugin.
+
+        Parameters
+        ----------
+        visibility : bool
+            The new advanced parameters visibility flag.
+        """
+        self.plugin.advanced_params_visible = visibility

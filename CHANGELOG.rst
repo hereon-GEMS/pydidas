@@ -13,6 +13,9 @@ Improvements
   number of frames/spectra for the configured scan.
 - Added an option to show only NXdata signal datasets and hide the 
   axis datasets.
+- When editing advanced Parameters, the GUI now remembers the settings
+  for each plugin.
+- Added an option to select a file by its filename in the DataBrowsingFrame.
 
 Programmatic changes
 --------------------
@@ -31,6 +34,8 @@ Programmatic changes
   passed.
 - Removed FONT_METRIC_PARAM_EDIT_WIDTH and modified all occurrences to
   use FONT_METRIC_CONFIG_WIDTH to fix formatting issues.
+- Added a ToggleOptionsButton which allows to show/hide an associated
+  widget.
 
 Bugfixes
 --------

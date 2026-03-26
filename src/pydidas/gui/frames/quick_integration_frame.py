@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ without fully defining Scan, DiffractionExperiment and Workflow.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -125,6 +125,14 @@ class QuickIntegrationFrame(BaseFrame):
             getattr(self, _method)(*_args, **_kwargs)
         self._widgets["tabs"].addTab(self._widgets["tab_plot"], "Input image")
         self._widgets["tabs"].addTab(self._widgets["res_plot"], "Integration results")
+        self._widgets["but_toggle_exp_section"].linked_widget = self._widgets[
+            "exp_section"
+        ]
+        self._widgets["but_toggle_integration_section"].linked_widget = self._widgets[
+            "integration_section"
+        ]
+        _n = self._widgets["config"].layout().rowCount()
+        self._widgets["config"].layout().setRowStretch(_n - 1, 1)
 
     def connect_signals(self) -> None:
         """
@@ -167,20 +175,6 @@ class QuickIntegrationFrame(BaseFrame):
             self._changed_plugin_direction
         )
         self._widgets["but_run_integration"].clicked.connect(self._run_integration)
-
-        for _section in ["exp", "integration"]:
-            for _type in ["hide", "show"]:
-                self._widgets[f"but_{_type}_{_section}_section"].clicked.connect(
-                    partial(
-                        self._widgets[f"{_section}_section"].setVisible, _type == "show"
-                    )
-                )
-                self._widgets[f"but_{_type}_{_section}_section"].clicked.connect(
-                    partial(
-                        self._widgets[f"but_show_{_section}_section"].setVisible,
-                        _type == "hide",
-                    )
-                )
         for _param_key in ["xray_energy", "xray_wavelength"]:
             _w = self.param_widgets[_param_key]
             _w.sig_value_changed.disconnect()
@@ -231,10 +225,11 @@ class QuickIntegrationFrame(BaseFrame):
         for _key in [
             "beamcenter_section",
             "integration_header",
-            "integration_section",
+            "but_toggle_integration_section",
             "run_integration",
         ]:
             self._widgets[_key].setVisible(is_valid)
+        self._widgets["but_toggle_integration_section"].linked_widget_visible = is_valid
         self.toggle_param_widget_visibility("detector_model", is_valid)
         self._widgets["res_plot"].set_data(None)
         if not is_valid:

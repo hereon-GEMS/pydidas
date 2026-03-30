@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,11 +20,14 @@ Module with the Sum2dData Plugin which can be used to sum over 2D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AverageDataDimension"]
+
+
+from typing import Any
 
 import numpy as np
 
@@ -45,7 +48,7 @@ class AverageDataDimension(ProcPlugin):
 
     default_params = get_generic_param_collection("process_data_dim")
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Average over the given data dimension.
 
@@ -58,9 +61,9 @@ class AverageDataDimension(ProcPlugin):
 
         Returns
         -------
-        pydidas.core.Dataset
+        Dataset
             The data sum in form of an array of shape (1,).
-        kwargs : dict
+        kwargs : Any
             Any calling kwargs, appended by any changes in the function.
         """
         _res = data.mean(axis=self.get_param_value("process_data_dim"))

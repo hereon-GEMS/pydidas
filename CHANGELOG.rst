@@ -76,6 +76,8 @@ Bugfixes
   data has been set to zero which caused an exception.
 - Fixed an issue in naming where some widgets had a method update_font_metrics
   with a different signature than the base method.
+- Fixed an issue in the SubtractBackgroundImage plugin which did not return
+  the correct datatype when a threshold was set.
 
 
 v26.01.27

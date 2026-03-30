@@ -139,14 +139,6 @@ def _create_str_description_of_node_result(
     return _str
 
 
-class _ResultsMock:
-    """Mock class to store result titles."""
-
-    def __init__(self) -> None:
-        """Initialize the _ResultsMock."""
-        self.result_titles = {}
-
-
 class WorkflowTestFrame(BaseFrame):
     """
     The WorkflowTestFrame allows to run / test the workflow on a single datapoint.
@@ -187,7 +179,6 @@ class WorkflowTestFrame(BaseFrame):
         self._tree = None
         self._active_node = -1
         self._results = {}
-        self._local_results_mock = _ResultsMock()
         self._config.update(
             {
                 "shapes": {},
@@ -447,7 +438,7 @@ class WorkflowTestFrame(BaseFrame):
         Store the WorkflowTree results in a local dictionary.
         """
         _meta = self._tree.get_complete_plugin_metadata()
-        self._local_results_mock.result_titles = _meta["result_titles"]
+        self._result_titles = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
             if _data is not None:
@@ -459,9 +450,7 @@ class WorkflowTestFrame(BaseFrame):
 
     def __update_selection_choices(self) -> None:
         """Update the choice of results to display"""
-        self._widgets["result_table"].update_choices_from_workflow_results(
-            self._local_results_mock
-        )
+        self._widgets["result_table"].update_node_descriptions(self._result_titles)
 
     @QtCore.Slot(int)
     def _selected_new_node(self, index: int) -> None:
@@ -489,7 +478,7 @@ class WorkflowTestFrame(BaseFrame):
     def clear_results(self) -> None:
         """Clear all stored results."""
         self._results = {}
-        self._local_results_mock.result_titles = {}
+        self._result_titles = {}
         self.__update_selection_choices()
         self.__set_derived_widget_visibility(False)
 

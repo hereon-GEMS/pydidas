@@ -31,7 +31,7 @@ from qtpy import QtCore
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import ScrollArea
-from pydidas.widgets.data_viewer import DataViewer, TableWithResultDatasets
+from pydidas.widgets.data_viewer import DataViewer, TableWithNodeLabels
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.misc import ReadOnlyTextWidget
 
@@ -174,7 +174,7 @@ def get_WorkflowTestFrame_build_config(
             ],
             [
                 "create_any_widget",
-                ("result_table", TableWithResultDatasets),
+                ("result_table", TableWithNodeLabels),
                 {
                     "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
                     "font_metric_height_factor": 10,

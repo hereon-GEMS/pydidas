@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,15 +16,16 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the TableWithResultDatasets class which is a table to select result datasets.
+Module with the TableWithNodeLabels class which is a table to select result datasets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["TableWithResultDatasets"]
+__all__ = ["TableWithNodeLabels"]
+
 
 from typing import Any
 
@@ -35,16 +36,10 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory.pydidas_table import PydidasQTable
-from pydidas.workflow import ProcessingResults, WorkflowResults
 
 
-RESULTS = WorkflowResults()
-
-
-class TableWithResultDatasets(PydidasQTable):
-    """
-    A QTableWidget used for selecting a dataset from the workflow results.
-    """
+class TableWithNodeLabels(PydidasQTable):
+    """A QTableWidget used for selecting a node result from their titles."""
 
     sig_node_selected = QtCore.Signal(int)
 
@@ -66,20 +61,19 @@ class TableWithResultDatasets(PydidasQTable):
         if self.selected_row_id >= 0:
             self.sig_node_selected.emit(self._row_items[self.selected_row_id])
 
-    def update_choices_from_workflow_results(self, results: ProcessingResults):
+    def update_node_descriptions(self, titles: dict[int, str]):
         """
         Update the available choices from the WorkflowResults.
 
         Parameters
         ----------
-        results : ProcessingResults
-            The ProcessingResults instance.
+        titles: dict[int, str]
+            The dictionary with node ids and their corresponding labels.
         """
-        _labels = results.result_titles
         self.remove_all_rows()
-        self._row_items = {_i: _node_id for _i, _node_id in enumerate(_labels)}
-        self.setRowCount(len(_labels))
-        for _i_row, (_node_id, _label) in enumerate(_labels.items()):
+        self._row_items = {_i: _node_id for _i, _node_id in enumerate(titles)}
+        self.setRowCount(len(titles))
+        for _i_row, (_node_id, _label) in enumerate(titles.items()):
             self.setItem(_i_row, 0, QtWidgets.QTableWidgetItem(_label))
         self.setVisible(True)
         self.setFixedHeight(self.table_display_height)

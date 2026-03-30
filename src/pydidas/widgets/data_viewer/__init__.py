@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Package with subclassed silx widgets and actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,20 +29,15 @@ __status__ = "Production"
 from .axes_selector import AxesSelector
 from .data_axis_selector import DataAxisSelector
 from .data_viewer import DataViewer
-from .table_with_result_datasets import TableWithResultDatasets
+from .table_with_node_labels import TableWithNodeLabels
 
 
-__all__ = [
-    axes_selector.__all__
-    + data_axis_selector.__all__
-    + data_viewer.__all__
-    + table_with_result_datasets.__all__
-]
+__all__ = ["AxesSelector", "DataAxisSelector", "DataViewer", "TableWithNodeLabels"]
 
 # Clean up the namespace:
 del (
     axes_selector,
     data_axis_selector,
     data_viewer,
-    table_with_result_datasets,
+    table_with_node_labels,
 )

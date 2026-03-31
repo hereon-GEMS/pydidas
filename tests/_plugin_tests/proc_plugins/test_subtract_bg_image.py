@@ -133,17 +133,21 @@ def test_pre_execute__outputs(temp_path, multiplicator, threshold, ROI, use_roi)
 @pytest.mark.parametrize("multiplicator", [0.1, 1.0, 2.5])
 @pytest.mark.parametrize("threshold", [None, -1, 0, 1.5])
 def test_execute(temp_path, bg_image_dtype, data_dtype, multiplicator, threshold):
+    if data_dtype == np.uint16 and threshold == -1:
+        return
+        # skip this test because the threshold is invalid for uint data
     plugin = SubtractBackgroundImage()
     image_file = get_image_file(temp_path, "test.npy", bg_image_dtype)
     plugin.set_param_value("bg_file", image_file)
     plugin.set_param_value("multiplicator", multiplicator)
     plugin.set_param_value("threshold_low", threshold)
     plugin.pre_execute()
-    _data = np.ones(_IMAGE.shape, dtype=data_dtype) * 400
+    _data = np.ones(_IMAGE.shape, dtype=data_dtype) * 1500
     _res, _kws = plugin.execute(_data)
-    _ref = _data - multiplicator * _IMAGE
+    _ref = (_data - multiplicator * _IMAGE).astype(data_dtype)
     if threshold is not None:
-        _ref = np.where(_ref < threshold, threshold, _ref)
+        _ref = np.where(_ref < threshold, threshold, _ref).astype(data_dtype)
+    assert _res.dtype == data_dtype
     assert np.allclose(_res, _ref)
 
 

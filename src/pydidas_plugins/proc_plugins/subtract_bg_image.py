@@ -145,6 +145,8 @@ class SubtractBackgroundImage(ProcPlugin):
                 f"Input data: {data.shape}\nBackground image: {self._bg_image.shape}"
             )
         _corrected_data = data - self._bg_image
+        if _corrected_data.dtype != data.dtype:
+            _corrected_data = _corrected_data.astype(data.dtype)
         if self._thresh is not None:
             _corrected_data[_corrected_data < self._thresh] = self._thresh
         return _corrected_data, kwargs

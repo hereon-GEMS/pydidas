@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,13 +33,9 @@ from numbers import Integral, Real
 from typing import Any, Self
 
 from pydidas.core import Dataset
-from pydidas.core.utils import LOGGING_LEVEL, TimerSaveRuntime, pydidas_logger
+from pydidas.core.utils import TimerSaveRuntime
 from pydidas.plugins import BasePlugin
 from pydidas.workflow.generic_node import GenericNode
-
-
-logger = pydidas_logger()
-logger.setLevel(LOGGING_LEVEL)
 
 
 class WorkflowNode(GenericNode):
@@ -61,7 +57,7 @@ class WorkflowNode(GenericNode):
         self.result_kws = None
         self.runtime = -1
 
-    def __preprocess_kwargs(self, kwargs: dict):
+    def __preprocess_kwargs(self, kwargs: dict) -> None:
         """
         Store and remove the node_id key from the calling kwargs.
 
@@ -76,7 +72,7 @@ class WorkflowNode(GenericNode):
         self.plugin = None
         self.__tmp_node_id = kwargs.pop("node_id", None)
 
-    def __confirm_plugin_existence_and_type(self):
+    def __confirm_plugin_existence_and_type(self) -> None:
         """
         Verify that a plugin exists and is of the correct type.
 
@@ -97,7 +93,7 @@ class WorkflowNode(GenericNode):
         self.plugin.node_id = self.__tmp_node_id
 
     @property
-    def node_id(self) -> Integral | None:
+    def node_id(self) -> int | None:
         """
         Get the node_id.
 
@@ -106,19 +102,19 @@ class WorkflowNode(GenericNode):
 
         Returns
         -------
-        node_id : Integral | None
+        node_id : int | None
             The node_id.
         """
         return self._node_id
 
     @node_id.setter
-    def node_id(self, new_id: Integral | None):
+    def node_id(self, new_id: int | None):
         """
         Set the node_id.
 
         Parameters
         ----------
-        new_id : Integral | None
+        new_id : int | None
             The new node ID.
 
         Raises
@@ -151,22 +147,23 @@ class WorkflowNode(GenericNode):
             _parent_out == _plugin_in or _parent_out == -1 or _plugin_in == -1
         )
 
-    def prepare_execution(self, **kwargs: dict):
+    def prepare_execution(self, **kwargs: Any) -> None:
         """
         Prepare the execution of the plugin chain.
 
-        This method recursively calls the pre_execute methods of all (child) plugins.
+        This method recursively calls the pre_execute methods of all (child)
+        plugins.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments that need to be passed to the plugin.
             Supported keywords are:
 
             test : bool, optional
-                Flag to indicate that the plugin should be executed in test mode.
-                This flag will prevent the plugin from storing any data to the
-                file system.
+                Flag to indicate that the plugin should be executed in test
+                mode. This flag will prevent the plugin from storing any
+                data to the file system.
         """
         _test_mode = kwargs.get("test", False)
         self.results = None
@@ -175,20 +172,22 @@ class WorkflowNode(GenericNode):
         for _child in self._children:
             _child.prepare_execution(**kwargs)
 
-    def execute_plugin(self, arg: Dataset | Integral, **kwargs: dict):
+    def execute_plugin(
+        self, arg: Dataset | int, **kwargs: Any
+    ) -> tuple[Dataset | float, dict]:
         """
         Execute the plugin associated with the node.
 
         Parameters
         ----------
-        arg : Dataset | Integral
+        arg : Dataset or int
             The argument which needs to be passed to the plugin.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments that need to be passed to the plugin.
 
         Returns
         -------
-        results : Dataset
+        results : Dataset or float
             The result of the plugin.execute method.
         kwargs : dict
             Any keywords required for calling the next plugin.
@@ -201,32 +200,41 @@ class WorkflowNode(GenericNode):
         self.runtime = _runtime()
         return _results, kwargs
 
-    def execute_plugin_chain(self, arg: Dataset | Integral, **kwargs: dict):
+    def execute_plugin_chain(self, arg: Dataset | int, **kwargs: Any) -> None:
         """
         Execute the full plugin chain recursively.
 
         This method will call the plugin.execute method and pass the results
         to the node's children and call their execute_plugin_chain methods.
         Note: No result callback is intended. It is assumed that plugin chains
-        are responsible for saving their own data at the end of the processing.
+        are responsible for saving their own data at the end of processing.
+
+        Uses copy-on-write strategy for multi-child nodes to minimize memory
+        usage by sharing data between siblings until a mutation is detected.
 
         Parameters
         ----------
-        arg : Dataset | Integral
+        arg : Dataset or int
             The argument which needs to be passed to the plugin.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments that need to be passed to the plugin.
         """
         res, reskws = self.execute_plugin(arg, **kwargs)
-        for _child in self._children:
-            if len(self._children) > 1:
-                _child.execute_plugin_chain(deepcopy(res), **reskws)
-            else:
-                _child.execute_plugin_chain(
-                    res, **self._get_deep_copy_of_kwargs(reskws)
-                )
+        if not self.children:
+            return
+        if self.n_children == 1:
+            # Single child path: pass directly without deep copying kwargs
+            self._children[0].execute_plugin_chain(
+                res, **self._get_deep_copy_of_kwargs(reskws)
+            )
+        else:
+            # Multi-child path: use copy-on-write strategy
+            for _child in self.children:
+                _child_kwargs = self._get_deep_copy_of_kwargs(reskws)
+                _child_data = res.copy()
+                _child.execute_plugin_chain(_child_data, **_child_kwargs)
 
-    def _store_results_if_required(self, results: Dataset, reskws: dict):
+    def _store_results_if_required(self, results: Dataset, reskws: dict) -> None:
         """
         Store the results of the plugin if required.
 
@@ -237,13 +245,18 @@ class WorkflowNode(GenericNode):
         reskws : dict
             The keyword arguments as returned from the plugin execution
         """
+        if self.plugin.output_data_dim is None:
+            return
         if (
             self.is_leaf
             or self.plugin.get_param_value("keep_results")
             or reskws.get("force_store_results", False)
-        ) and self.plugin.output_data_dim is not None:
-            self.results = deepcopy(results)
-            self.result_kws = self._get_deep_copy_of_kwargs(reskws)
+        ):
+            self.results = results
+            if self.is_leaf:
+                self.result_kws = reskws
+            else:
+                self.result_kws = self._get_deep_copy_of_kwargs(reskws)
 
     @staticmethod
     def _get_deep_copy_of_kwargs(kwargs: dict) -> dict:
@@ -293,18 +306,18 @@ class WorkflowNode(GenericNode):
         }
 
     @property
-    def result_shape(self) -> tuple[Integral] | None:
+    def result_shape(self) -> tuple[int, ...] | None:
         """
         Get the result shape of the plugin if it has already been calculated.
 
         Returns
         -------
-        tuple[Integral] | None
+        tuple[int, ...] or None
             Returns the shape of the Plugin's results, if it has been
             calculated. Else, returns None.
         """
         if isinstance(self.results, Dataset):
-            return self.results.shape
+            return self.results.shape  # type: ignore[return-value]
         if isinstance(self.results, Real):
             return (1,)
         return None
@@ -334,6 +347,6 @@ class WorkflowNode(GenericNode):
         Self
             The WorkflowNode instance copy.
         """
-        _copy = GenericNode.__copy__(self)
-        _copy.plugin.node_id = _copy.node_id
+        _copy = super().__copy__()
+        _copy.plugin.node_id = _copy.node_id  # noinspection PyUnresolvedAttribute
         return _copy

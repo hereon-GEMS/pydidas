@@ -29,6 +29,7 @@ __all__ = ["WorkflowTestFrame"]
 
 
 import copy
+import gc
 from typing import Any
 
 from qtpy import QtCore
@@ -144,7 +145,7 @@ class WorkflowTestFrame(BaseFrame):
     The WorkflowTestFrame allows to run / test the workflow on a single datapoint.
 
     The selection of a frame can be done either using the absolute frame number
-    (if the ``image_selection`` Parameter equals "Use global index") or by
+    (if the ``image_selection`` Parameter equals "Use global index"), or by
     supplying scan indices for all active scan dimensions (if the
     ``image_selection`` Parameter equals "Use scan dimensional indices").
     """
@@ -322,8 +323,9 @@ class WorkflowTestFrame(BaseFrame):
         Reload the local WorkflowTree from the global one, e.g. to propagate changes
         to global settings.
         """
-        self._tree = TREE.deepcopy()
         self.clear_results()
+        self._tree = TREE.deepcopy()
+        gc.collect()
 
     @staticmethod
     def _check_tree_is_populated() -> bool:

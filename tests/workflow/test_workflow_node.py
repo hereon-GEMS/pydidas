@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,22 +18,33 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
 import unittest
+from typing import Any
 
 import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext
+from pydidas.core import Dataset
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.workflow import WorkflowNode
 
 
 EXP = DiffractionExperimentContext()
+
+
+class _PluginModifyInPlace(DummyProc):
+    """Plugin to test modifying input data in place."""
+
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
+        data[0] = self.node_id
+        kwargs[self.node_id] = "::called::"
+        return data, kwargs
 
 
 class TestWorkflowNode(unittest.TestCase):
@@ -111,6 +122,28 @@ class TestWorkflowNode(unittest.TestCase):
         self.assertIsInstance(_dump, dict)
         for key in ("node_id", "parent", "children", "plugin_class", "plugin_params"):
             self.assertTrue(key in _dump.keys())
+
+    def test_execute_plugin_chain__w_plugin_modify_in_place(self):
+        root = WorkflowNode(node_id=0, plugin=DummyLoader())
+        child1 = WorkflowNode(node_id=1, plugin=_PluginModifyInPlace())
+        child2 = WorkflowNode(node_id=2, plugin=_PluginModifyInPlace())
+        child3 = WorkflowNode(node_id=3, plugin=DummyProc())
+        root.add_child(child1)
+        root.add_child(child2)
+        root.add_child(child3)
+        root.execute_plugin_chain(0, force_store_results=True, offset=3)
+        _root_data = root.results
+        _child1_data = child1.results
+        _child2_data = child2.results
+        _child3_data = child3.results
+        self.assertTrue(np.all(_root_data > 0))
+        self.assertTrue(np.allclose(_root_data + 3, _child3_data))
+        self.assertTrue(np.allclose(_child1_data[0], 1))
+        self.assertTrue(np.allclose(_child2_data[0], 2))
+        for _key, _node in [[1, child1], [2, child2], ["offset_03", child3]]:
+            self.assertEqual(
+                set(_node.result_kws), {_key, "offset", "index", "force_store_results"}
+            )
 
     def test_execute_plugin_chain(self):
         _depth = 3

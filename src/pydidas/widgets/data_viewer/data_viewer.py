@@ -254,6 +254,7 @@ class DataViewer(WidgetWithParameterCollection):
             _data = self._data
         if not isinstance(_data, Dataset):
             _data = Dataset(_data)
+        _view.clear()
         _view.display_data(_data, title=self._config["plot_title"])
 
     def set_data(
@@ -268,8 +269,8 @@ class DataViewer(WidgetWithParameterCollection):
         Parameters
         ----------
         data : H5Node or h5py.Dataset or np.ndarray or None
-            The data to display. A ndarray is acceptable but will be converted to a
-            pydidas.core.Dataset object.
+            The data to display. A ndarray is acceptable but will be converted
+            to a pydidas.core.Dataset object.
         title : str or None, optional
             The title of the data. If None, the title will not be updated.
         h5node : H5Node or None, optional
@@ -281,6 +282,9 @@ class DataViewer(WidgetWithParameterCollection):
         # Remove the data reference from the h5 view:
         if "view-h5" in self._widgets:
             self._widgets["view-h5"].setData(None)
+        # Explicitly clear old data references to break circular refs
+        self._data = None
+        self._h5node = None
         if data is None:
             if self._active_view is not None:
                 self._widgets[self._active_view].clear()
@@ -288,7 +292,6 @@ class DataViewer(WidgetWithParameterCollection):
             return
         if isinstance(data, H5Node):
             h5node = data
-        # if isinstance(h5node, H5Node):
         self._h5node = h5node
         if title is not None:
             self._config["plot_title"] = title

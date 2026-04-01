@@ -467,6 +467,9 @@ class WorkflowTestFrame(BaseFrame):
         self._active_node = index
         if index == -1:
             self._config["has_details"] = False
+            self._config["plot_active"] = False
+            if self._widgets["plot"].data_is_set:
+                self._widgets["plot"].set_data(None)
             return
         else:
             self._config["plot_active"] = True
@@ -479,7 +482,8 @@ class WorkflowTestFrame(BaseFrame):
 
     def clear_results(self) -> None:
         """Clear all stored results."""
-        self._widgets["plot"].set_data(None)
+        if self._widgets["plot"].data_is_set:
+            self._widgets["plot"].set_data(None)
         self._results = {}
         self._result_titles = {}
         self.__update_selection_choices()
@@ -515,12 +519,7 @@ class WorkflowTestFrame(BaseFrame):
         self._widgets["result_info"].setText(_str)
 
     def __plot_results(self) -> None:
-        """
-        Update the plot.
-
-        This method will get the latest result (subset) from the
-        ProcessingResults and update the plot.
-        """
+        """Update the plot with the latest data"""
         if self._active_node == -1 or not self._config["plot_active"]:
             return
         self._widgets["plot"].set_data(self._results[self._active_node])

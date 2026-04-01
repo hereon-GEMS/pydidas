@@ -32,6 +32,7 @@ from functools import partial
 import h5py
 import numpy as np
 from qtpy import QtCore, QtWidgets
+from qtpy.QtWidgets import QWidget
 from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
@@ -322,6 +323,10 @@ class DataViewer(WidgetWithParameterCollection):
                 "The data to display must be a numpy array, a h5py.Dataset or a "
                 "H5Node object."
             )
+        for _key in DATA_VIEW_CONFIG:
+            _widget = self._widgets.get(_key)
+            if isinstance(_widget, QWidget):
+                _widget.clear()
         self._data = data
 
     def _update_widgets_from_data(self) -> None:

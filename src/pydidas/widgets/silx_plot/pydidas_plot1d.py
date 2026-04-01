@@ -250,6 +250,11 @@ class PydidasPlot1D(Plot1D):
         if clear_data:
             self._current_raw_data = {}
 
+    def clear(self) -> None:
+        """Override clear to also clear the stored data."""
+        super().clear()
+        self.clear_plot()
+
     @QtCore.Slot()
     def update_mpl_fonts(self) -> None:
         """Update the plot's fonts."""

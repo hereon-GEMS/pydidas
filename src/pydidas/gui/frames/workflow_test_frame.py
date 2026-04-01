@@ -29,7 +29,6 @@ __all__ = ["WorkflowTestFrame"]
 
 
 import copy
-import gc
 from typing import Any
 
 from qtpy import QtCore
@@ -303,6 +302,7 @@ class WorkflowTestFrame(BaseFrame):
         if not self._check_tree_is_populated():
             return
         with utils.ShowBusyMouse():
+            self.clear_results()
             _index = self.__get_index()
             self._tree.execute_process(
                 _index,
@@ -323,9 +323,10 @@ class WorkflowTestFrame(BaseFrame):
         Reload the local WorkflowTree from the global one, e.g. to propagate changes
         to global settings.
         """
+        if self._tree:
+            self._tree.clear()
         self.clear_results()
         self._tree = TREE.deepcopy()
-        gc.collect()
 
     @staticmethod
     def _check_tree_is_populated() -> bool:
@@ -478,6 +479,7 @@ class WorkflowTestFrame(BaseFrame):
 
     def clear_results(self) -> None:
         """Clear all stored results."""
+        self._widgets["plot"].set_data(None)
         self._results = {}
         self._result_titles = {}
         self.__update_selection_choices()

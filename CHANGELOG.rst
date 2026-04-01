@@ -78,6 +78,7 @@ Bugfixes
   with a different signature than the base method.
 - Fixed an issue in the SubtractBackgroundImage plugin which did not return
   the correct datatype when a threshold was set.
+- Fixed a memory leak in the TestWorkflowFrame
 
 
 v26.01.27

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ embedded metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -1253,7 +1253,7 @@ class Dataset(ndarray):
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
-        Overload the generic nd.ndarray copy method to copy metadata as well.
+        Create a FULL/DEEP copy of the Dataset, similar to ndarray.copy.
 
         Parameters
         ----------
@@ -1263,7 +1263,8 @@ class Dataset(ndarray):
         Returns
         -------
         Dataset
-            The copied dataset.
+            A fully independent copy with separate array data and independent
+            metadata.
         """
         _new = ndarray.copy(self, order)
         _new._meta = {
@@ -1280,6 +1281,10 @@ class Dataset(ndarray):
             except AttributeError:
                 _new._meta["metadata"][_key] = _val
         return _new
+
+    def __copy__(self) -> Self:
+        """Create a full/deep copy of the Dataset via copy.copy()."""
+        return self.copy()
 
     def __repr__(self) -> str:
         """

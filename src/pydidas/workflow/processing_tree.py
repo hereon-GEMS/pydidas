@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Any, Self
+from typing import Any, Literal, Self
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -457,25 +457,38 @@ class ProcessingTree(GenericTree):
         ]
         return _nodes_w_results
 
-    def get_complete_plugin_metadata(self) -> dict:
+    def get_plugin_metadata(
+        self,
+        *identifiers: Literal[
+            "all", "shapes", "labels", "names", "data_labels", "result_titles"
+        ],
+    ) -> dict:
         """
         Get the metadata (e.g. shapes, labels, names) for all the tree's plugins.
 
         Note that the shapes are only available after running the plugin chain at
         least once. Otherwise, the shapes will be set to None.
 
+        Parameters
+        ----------
+        *identifiers : Literal["all", "shapes", "labels", "names",
+        "data_labels", "result_titles"]
+
+            The identifiers for the metadata to be returned. If "all" is given, all
+            metadata will be returned. Otherwise, only the specified metadata will
+            be returned.
+
         Returns
         -------
-        dict
-            The dictionary with the metadata.
+        dict[int, Any] or dict[str, dict[int, Any]]
+            The dictionary with the metadata. If only a single metadata is requested,
+            the dictionary with node IDs and metadata is returned, otherwise
+            a dictionary with the metadata keys and the respective dictionaries
+            with node IDs and metadata is returned.
         """
-        _meta = {
-            "shapes": {},
-            "labels": {},
-            "names": {},
-            "data_labels": {},
-            "result_titles": {},
-        }
+        if "all" in identifiers:
+            identifiers = ("shapes", "labels", "names", "data_labels", "result_titles")
+        _meta = {_key: {} for _key in identifiers}
         if self.root is None:
             return _meta
         _shapes = [_node.result_shape for _node in self.nodes.values()]
@@ -484,11 +497,18 @@ class ProcessingTree(GenericTree):
         for _node_id, _node in self.nodes.items():
             if _node.plugin.output_data_dim is None or _node.result_shape is None:
                 continue
-            _label = _node.plugin.get_param_value("label")
-            _plugin_name = _node.plugin.__class__.plugin_name
-            _meta["shapes"][_node_id] = _node.result_shape
-            _meta["labels"][_node_id] = _label
-            _meta["names"][_node_id] = _plugin_name
-            _meta["data_labels"][_node_id] = _node.plugin.result_data_label
-            _meta["result_titles"][_node_id] = _node.plugin.result_title
+            if "labels" in identifiers:
+                _label = _node.plugin.get_param_value("label")
+                _meta["labels"][_node_id] = _label
+            if "names" in identifiers:
+                _plugin_name = _node.plugin.__class__.plugin_name
+                _meta["names"][_node_id] = _plugin_name
+            if "shapes" in identifiers:
+                _meta["shapes"][_node_id] = _node.result_shape
+            if "data_labels" in identifiers:
+                _meta["data_labels"][_node_id] = _node.plugin.result_data_label
+            if "result_titles" in identifiers:
+                _meta["result_titles"][_node_id] = _node.plugin.result_title
+        if len(identifiers) == 1:
+            _meta = _meta[identifiers[0]]
         return _meta

@@ -439,12 +439,11 @@ class WorkflowTestFrame(BaseFrame):
         """
         Store the WorkflowTree results in a local dictionary.
         """
-        _meta = self._tree.get_complete_plugin_metadata()
-        self._result_titles = _meta["result_titles"]
+        self._result_titles = self._tree.get_plugin_metadata("result_titles")
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
             if _data is not None:
-                if 1 in set(_data.shape) and _data.shape != (1,):
+                if 1 in _data.shape and _data.ndim > 1:
                     _data = _data.squeeze()
                 self._results[_node_id] = _data
         if self._active_node not in self._results:

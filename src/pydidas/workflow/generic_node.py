@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -236,6 +236,17 @@ class GenericNode:
             The list of children IDs.
         """
         return [_child.node_id for _child in self._children]
+
+    @property
+    def recursive_child_ids(self) -> list[int]:
+        """
+        Get a recursive list of the children's IDs.
+        """
+        _ids = self.children_ids
+        print("node ID / children", self.node_id, self.children_ids)
+        for _child in self.children:
+            _ids += _child.recursive_child_ids
+        return _ids
 
     def get_children(self) -> list:
         """

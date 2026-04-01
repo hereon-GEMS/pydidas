@@ -50,9 +50,7 @@ class WorkflowNode(GenericNode):
 
     def __init__(self, **kwargs: Any):
         self.__preprocess_kwargs(kwargs)
-        GenericNode.__init__(self, **kwargs)
-        self.__confirm_plugin_existence_and_type()
-        self.node_id = self.__tmp_node_id
+        super().__init__(**kwargs)
         self.results = None
         self.result_kws = None
         self.runtime = -1
@@ -69,28 +67,40 @@ class WorkflowNode(GenericNode):
         kwargs : dict
             The calling keyword arguments from init.
         """
-        self.plugin = None
-        self.__tmp_node_id = kwargs.pop("node_id", None)
-
-    def __confirm_plugin_existence_and_type(self) -> None:
-        """
-        Verify that a plugin exists and is of the correct type.
-
-        Raises
-        ------
-        KeyError
-            If no plugin has been selected.
-        TypeError
-            If the plugin is not an instance of BasePlugin.
-        """
+        self._node_id: int | None = None
+        self._plugin: BasePlugin | None = None
+        self.plugin = kwargs.pop("plugin", None)
+        self.node_id = kwargs.get("node_id", None)
         if self.plugin is None:
             raise KeyError(
                 "No plugin has been supplied for the WorkflowNode. "
                 "The node has not been created."
             )
-        if not isinstance(self.plugin, BasePlugin):
+
+    @property
+    def plugin(self) -> BasePlugin:
+        """
+        Get the plugin of the node.
+
+        Returns
+        -------
+        BasePlugin
+            The plugin of the node.
+        """
+        return self._plugin
+
+    @plugin.setter
+    def plugin(self, new_plugin: BasePlugin):
+        """
+        Set the plugin of the node.
+        """
+        if new_plugin is None:
+            self._plugin = None
+            return
+        if not isinstance(new_plugin, BasePlugin):
             raise TypeError("Plugin must be an instance of BasePlugin (or subclass).")
-        self.plugin.node_id = self.__tmp_node_id
+        self._plugin = new_plugin
+        self._plugin.node_id = self.node_id
 
     @property
     def node_id(self) -> int | None:
@@ -127,7 +137,8 @@ class WorkflowNode(GenericNode):
                 "The new node_id is not of a correct type and has not been set."
             )
         self._node_id = new_id
-        self.plugin.node_id = new_id
+        if self.plugin:
+            self.plugin.node_id = new_id
 
     def consistency_check(self) -> bool:
         """
@@ -317,7 +328,7 @@ class WorkflowNode(GenericNode):
             calculated. Else, returns None.
         """
         if isinstance(self.results, Dataset):
-            return self.results.shape  # type: ignore[return-value]
+            return self.results.shape
         if isinstance(self.results, Real):
             return (1,)
         return None
@@ -338,15 +349,15 @@ class WorkflowNode(GenericNode):
         _hashes = tuple(hash(_item) for _item in _hashables)
         return hash(_hashes)
 
-    def __copy__(self) -> Self:
+    def __copy__(self) -> "WorkflowNode":
         """
-        Return a copy of the WorkflowNode.
+        Return a copy of the WorkflowNode instance.
 
         Returns
         -------
-        Self
+        WorkflowNode
             The WorkflowNode instance copy.
         """
-        _copy = super().__copy__()
-        _copy.plugin.node_id = _copy.node_id  # noinspection PyUnresolvedAttribute
+        _copy: Self = super().__copy__()
+        _copy.plugin.node_id = _copy.node_id
         return _copy

@@ -315,7 +315,7 @@ class TestProcessingTree(unittest.TestCase):
         for _node in tree2.root._children:
             self.assertTrue(_node in tree2.nodes.values())
         for key in set(self._curr_tree.__dict__.keys()) - {
-            "root",
+            "_root",
             "nodes",
             "_start_hash",
         }:

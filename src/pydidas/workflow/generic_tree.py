@@ -388,14 +388,19 @@ class GenericTree:
         new_parent_id : int
             The id of the selected node's new parent.
         """
-        _new_parent = self.nodes[new_parent_id]
-        self.nodes[node_id].change_node_parent(_new_parent)
+        _new_parent_node = self.nodes[new_parent_id]
+        self.nodes[node_id].change_node_parent(_new_parent_node)
         if new_parent_id > node_id:
-            _active_node = self.nodes[node_id]
-            _active_node.node_id = new_parent_id
-            _new_parent.node_id = node_id
-            self.nodes[new_parent_id] = _active_node
-            self.nodes[node_id] = _new_parent
+            _active_node = self.active_node
+            _child_node = self.nodes[node_id]
+            _child_node.node_id = new_parent_id
+            _new_parent_node.node_id = node_id
+            self.nodes[new_parent_id] = _child_node
+            self.nodes[node_id] = _new_parent_node
+            if _active_node == _child_node:
+                self.active_node_id = _child_node.node_id
+            if _active_node == _new_parent_node:
+                self.active_node_id = _new_parent_node.node_id
         self._config["tree_changed"] = True
 
     def order_node_ids(self) -> None:

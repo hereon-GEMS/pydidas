@@ -354,6 +354,7 @@ class TestGenericTree(unittest.TestCase):
         _child2 = tree.root.get_children()[1]
         _id2 = _child2.node_id
         _original_ids = set(tree.node_ids)
+        tree.active_node_id = _child2.node_id
         tree.change_node_parent(_child2.node_id, _child1.node_id)
         _new_ids = set(tree.node_ids)
         self.assertTrue(tree.tree_has_changed)
@@ -363,6 +364,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(_original_ids, _new_ids)
         self.assertEqual(_child1.node_id, _id1)
         self.assertEqual(_child2.node_id, _id2)
+        self.assertEqual(tree.active_node, _child2)
 
     def test_change_node_parent__swap_ids(self):
         tree = GenericTree()
@@ -373,6 +375,7 @@ class TestGenericTree(unittest.TestCase):
         _child2 = tree.root.get_children()[1]
         _id2 = _child2.node_id
         _original_ids = set(tree.node_ids)
+        tree.active_node_id = _child2.node_id
         tree.change_node_parent(_child1.node_id, _child2.node_id)
         _new_ids = set(tree.node_ids)
         self.assertTrue(tree.tree_has_changed)
@@ -382,6 +385,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(_original_ids, _new_ids)
         self.assertEqual(_child1.node_id, _id2)
         self.assertEqual(_child2.node_id, _id1)
+        self.assertEqual(tree.active_node, _child2)
 
     def test_order_node_ids__empty_tree(self):
         tree = GenericTree()

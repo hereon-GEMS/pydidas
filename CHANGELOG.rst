@@ -84,6 +84,8 @@ Bugfixes
   in branching workflow trees.
 - Fixed an issue in the WorkflowTestFrame where the results were kept in memory
   which used a higher peak memory.
+- Fixed an isssue where the active node was not properly updated when a node
+  was moved in a Tree.
 
 
 v26.01.27

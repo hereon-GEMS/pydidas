@@ -331,6 +331,87 @@ def test_hash_differs_on_config_change(
         assert hash(_item1) != hash(_item2)
 
 
+def test_clear_data_():
+    obj = WorkflowNode(plugin=DummyLoader())
+    obj.results = np.random.random((10, 10))
+    obj.result_kws = {"key": "value"}
+    obj.plugin._config["input_data"] = np.random.random((5, 5))
+    obj.plugin._config["input_kwargs"] = {"test": "data"}
+    obj.clear_data()
+    assert obj.results is None
+    assert obj.result_kws is None
+    assert obj.plugin._config["input_data"] is None
+    assert obj.plugin._config["input_kwargs"] == {}
+
+
+def test_clear_data__non_recursive_only_clears_self():
+    """Test that non-recursive clear_data does not affect children."""
+    nodes = create_node_tree(depth=2, width=2)
+    _root = nodes[0]
+    _root.results = np.random.random((10, 10))
+    _root.result_kws = {"root": "data"}
+    for _child in [nodes[1], nodes[2]]:
+        _child.results = np.random.random((10, 10))
+        _child.result_kws = {f"child{_child.node_id}": "data"}
+    _root.clear_data(recursive=False)
+    assert _root.results is None
+    assert _root.result_kws is None
+    for _child in [nodes[1], nodes[2]]:
+        assert _child.results is not None
+        assert _child.result_kws is not None
+
+
+def test_clear_data__recursive_clears_all():
+    """Test that recursive clear_data clears root and all descendants."""
+    nodes = create_node_tree(depth=2, width=2)
+    _root = nodes[0]
+    for _node in nodes.values():
+        _node.results = np.random.random((10, 10))
+        _node.result_kws = {"key": "value"}
+        _node.plugin._config["input_data"] = np.random.random((5, 5))
+        _node.plugin._config["input_kwargs"] = {"test": "data"}
+    _root.clear_data(recursive=True)
+    for _node in nodes.values():
+        assert _node.results is None
+        assert _node.result_kws is None
+        assert _node.plugin._config["input_data"] is None
+        assert _node.plugin._config["input_kwargs"] == {}
+
+
+def test_clear_data__recursive_intermediate_node():
+    """Test recursive clear_data from intermediate node and its descendants."""
+    nodes = create_node_tree(depth=3, width=2)
+    _root = nodes[0]
+    for _node in nodes.values():
+        _node.results = np.random.random((10, 10))
+        _node.result_kws = {"key": "value"}
+    _intermediate = _root.children[0]
+    _intermediate.clear_data(recursive=True)
+    assert _root.results is not None
+    assert _root.result_kws is not None
+    assert _intermediate.results is None
+    assert _intermediate.result_kws is None
+    for _child in _intermediate.children:
+        assert _child.results is None
+        assert _child.result_kws is None
+
+
+def test_clear_data__repeat_calls():
+    """Test that calling clear_data multiple times is safe."""
+    obj = WorkflowNode(plugin=DummyLoader())
+    obj.results = np.random.random((10, 10))
+    obj.result_kws = {"key": "value"}
+    obj.plugin._config["input_data"] = np.random.random((5, 5))
+    obj.plugin._config["input_kwargs"] = {"test": "data"}
+    obj.clear_data()
+    assert obj.results is None
+    obj.clear_data()
+    assert obj.results is None
+    assert obj.result_kws is None
+    assert obj.plugin._config["input_data"] is None
+    assert obj.plugin._config["input_kwargs"] == {}
+
+
 # ---------------------
 # - Integration tests -
 # ---------------------
@@ -338,10 +419,8 @@ def test_delete_note_references():
     """Test delete_note_references with children."""
     nodes = create_node_tree()
     _root = nodes[0]
-    print("\nRoot children", _root.children)
     _root.delete_node_references(recursive=True)
     for _id, _node in nodes.items():
-        print(_id, _node.children)
         assert _node.parent is None
         assert _node.children == []
 

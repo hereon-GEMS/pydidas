@@ -441,7 +441,7 @@ def test_connect_parent_to_children():
     assert nodes[1].children == [nodes[2]]
     nodes[1].connect_parent_to_children()
     assert nodes[1].children == []
-    assert nodes[1].parent == None
+    assert nodes[1].parent is None
     assert nodes[0].children == [nodes[2]]
     assert nodes[2].parent == nodes[0]
 

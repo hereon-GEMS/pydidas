@@ -78,10 +78,12 @@ Bugfixes
   with a different signature than the base method.
 - Fixed an issue in the SubtractBackgroundImage plugin which did not return
   the correct datatype when a threshold was set.
-- Fixed a memory leak in the TestWorkflowFrame.
+- Fixed a memory leak in the WorkflowTestFrame.
 - Fixed an issue which increased memory consumption when switching between plots.
 - Fixed an issue in the GenericNode which did not dereference children correctly
   in branching workflow trees.
+- Fixed an issue in the WorkflowTestFrame where the results were kept in memory
+  which used a higher peak memory.
 
 
 v26.01.27

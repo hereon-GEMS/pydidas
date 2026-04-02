@@ -277,7 +277,7 @@ def test_confirm_plugin_existence_and_type__correct_plugin():
 def test_consistency_check(ndim_parent_out, ndim_plugin_in, expected_check):
     """Test consistency_check with various dimension configurations."""
     _root = WorkflowNode(plugin=DummyLoader())
-    assert _root.consistency_check() == True
+    assert _root.consistency_check()
     _child = WorkflowNode(plugin=DummyProc(), parent=_root)
     _root.plugin.base_output_data_dim = ndim_parent_out
     _child.plugin.input_data_dim = ndim_plugin_in

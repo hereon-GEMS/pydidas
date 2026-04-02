@@ -484,6 +484,8 @@ class WorkflowTestFrame(BaseFrame):
         """Clear all stored results."""
         if self._widgets["plot"].data_is_set:
             self._widgets["plot"].set_data(None)
+        if self._tree and self._tree.root:
+            self._tree.root.clear_data(recursive=True)
         self._results = {}
         self._result_titles = {}
         self.__update_selection_choices()

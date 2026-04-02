@@ -204,6 +204,7 @@ class WorkflowNode(GenericNode):
             Any keywords required for calling the next plugin.
         """
         with TimerSaveRuntime() as _runtime:
+            self.clear_data()
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
             _results, kwargs = self.plugin.execute(arg, **kwargs)
@@ -230,6 +231,7 @@ class WorkflowNode(GenericNode):
         **kwargs : Any
             Any keyword arguments that need to be passed to the plugin.
         """
+        self.clear_data(recursive=True)
         res, reskws = self.execute_plugin(arg, **kwargs)
         if not self.children:
             return
@@ -268,6 +270,24 @@ class WorkflowNode(GenericNode):
                 self.result_kws = reskws
             else:
                 self.result_kws = self._get_deep_copy_of_kwargs(reskws)
+
+    def clear_data(self, recursive: bool = False) -> None:
+        """
+        Clear the results of the plugin from the memory.
+
+        Parameters
+        ----------
+        recursive : bool, optional
+            Flag whether to clear the results of the child nodes as well. The
+            default is False.
+        """
+        self.results = None
+        self.result_kws = None
+        self.plugin._config["input_data"] = None
+        self.plugin._config["input_kwargs"] = {}
+        if recursive:
+            for _child in self._children:
+                _child.clear_data(recursive=True)
 
     @staticmethod
     def _get_deep_copy_of_kwargs(kwargs: dict) -> dict:

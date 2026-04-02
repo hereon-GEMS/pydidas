@@ -31,7 +31,7 @@ __all__ = ["GenericTree"]
 import copy
 import time
 import warnings
-from typing import Iterable, Self, Type
+from typing import Any, Iterable, Self
 
 from qtpy import QtCore
 
@@ -45,8 +45,8 @@ class GenericTree:
     A generic tree used for organizing items.
     """
 
-    def __init__(self, **kwargs: dict):
-        self.root = None
+    def __init__(self, **kwargs: Any) -> None:
+        self._root = None
         self.node_ids = []
         self.nodes = {}
         self._config = {"tree_changed": False, "active_node_id": None} | kwargs
@@ -81,19 +81,19 @@ class GenericTree:
         return self.nodes[self.active_node_id]
 
     @property
-    def active_node_id(self) -> int:
+    def active_node_id(self) -> int | None:
         """
         Get the active node ID.
 
         Returns
         -------
-        Union[int, None]
+        int or None
             The id of the active node.
         """
         return self._config["active_node_id"]
 
     @active_node_id.setter
-    def active_node_id(self, new_id: int | None):
+    def active_node_id(self, new_id: int | None) -> None:
         """
         Set the active node ID.
 
@@ -115,11 +115,20 @@ class GenericTree:
             f"The given node ID '{new_id}' is not included in the stored node ids."
         )
 
-    def reset_tree_changed_flag(self):
-        """Reset the "has changed" flag for this Tree."""
-        self._config["tree_changed"] = False
+    @property
+    def root(self) -> GenericNode | None:
+        """
+        Retrieve the root node.
 
-    def set_root(self, node: GenericNode):
+        Returns
+        -------
+        GenericNode or None
+            The tree root node, or None if the tree is empty.
+        """
+        return self._root
+
+    @root.setter
+    def root(self, node: GenericNode | None) -> None:
         """
         Set the tree root node.
 
@@ -128,17 +137,38 @@ class GenericTree:
 
         Parameters
         ----------
-        node : GenericNode
-            The node to become the new root node
+        node : GenericNode or None
+            The node to become the new root node, or None to clear the tree.
         """
+        if node is None:
+            self.clear()
+            return
         self.verify_node_type(node)
-        self.clear()
         node.parent = None
         node.node_id = 0
+        self.clear()
         self.register_node(node)
 
+    def set_root(self, node: GenericNode | None) -> None:
+        """
+        Set the tree root node.
+
+        Note that this method will remove any references to the old parent in
+        the node!
+
+        Parameters
+        ----------
+        node : GenericNode or None
+            The node to become the new root node.
+        """
+        self.root = node
+
+    def reset_tree_changed_flag(self) -> None:
+        """Reset the "has changed" flag for this Tree."""
+        self._config["tree_changed"] = False
+
     @staticmethod
-    def verify_node_type(node):
+    def verify_node_type(node) -> None:
         """
         Check that the node is a GenericNode.
 
@@ -157,7 +187,7 @@ class GenericTree:
                 "Can only register GenericNodes (or subclasses) in the tree."
             )
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear all items from the tree."""
         if self.root:
             self.delete_node_by_id(self.root.node_id)
@@ -166,14 +196,14 @@ class GenericTree:
         self._config["active_node_id"] = None
         self._config["tree_changed"] = True
         self._start_hash = hash((get_random_string(12), time.time()))
-        self.root = None
+        self._root = None
 
     def register_node(
         self,
         node: GenericNode,
         node_id: int | None = None,
         check_ids: bool = True,
-    ):
+    ) -> None:
         """
         Register a node with the tree.
 
@@ -190,21 +220,22 @@ class GenericTree:
         ----------
         node : GenericNode
             The node object to be registered.
-        node_id : int | None, optional
+        node_id : int or None, optional
             A supplied node_id. If None, the tree will select the next
             suitable node_id automatically. The default is None.
         check_ids : bool, optional
-            Keyword to enable/disable node_id checking. By default, this should always
-            be on if called by the user. If node trees are added to the GenericTree,
-            the check will only be performed once for the newly added node and not
-            again during registering of its children. The default is True.
+            Keyword to enable/disable node_id checking. By default, this should
+            always be on if called by the user. If node trees are added to the
+            GenericTree, the check will only be performed once for the newly
+            added node and not again during registering of its children. The
+            default is True.
         """
         self.verify_node_type(node)
         _ids = node.get_recursive_ids()
         if check_ids:
             self._check_node_ids(_ids)
         if self.root is None:
-            self.root = node
+            self._root = node
         if node_id is None and node.node_id is None:
             node.node_id = self.get_new_node_id()
         elif node_id is not None:
@@ -216,7 +247,7 @@ class GenericTree:
             self.register_node(_child, _child.node_id, check_ids=False)
         self._config["tree_changed"] = True
 
-    def _check_node_ids(self, node_ids: Iterable[int]):
+    def _check_node_ids(self, node_ids: Iterable[int]) -> None:
         """
         Check the compatibility of a node's (and its children) ID with the tree.
 
@@ -280,7 +311,7 @@ class GenericTree:
 
     def delete_node_by_id(
         self, node_id: int, recursive: bool = True, keep_children: bool = False
-    ):
+    ) -> None:
         """
         Remove a node from the tree and delete its object.
 
@@ -315,9 +346,12 @@ class GenericTree:
             )
         if self.nodes[node_id] == self.root:
             if self.root.n_children == 0 or recursive:
-                self.root = None
+                self._root = None
             elif self.root.n_children == 1 and keep_children:
-                self.root = self.root.get_children()[0]
+                # need to unlink the new root to prevent recursive deletion:
+                _new_root = self.root.children[0]
+                _new_root.parent = None
+                self._root = _new_root
             else:
                 raise UserConfigError(
                     "Cannot delete the root node of the tree because it has multiple "
@@ -343,7 +377,7 @@ class GenericTree:
                 self.node_ids.remove(_id)
         self._config["tree_changed"] = True
 
-    def change_node_parent(self, node_id: int, new_parent_id: int):
+    def change_node_parent(self, node_id: int, new_parent_id: int) -> None:
         """
         Change the parent of the selected node.
 
@@ -365,25 +399,29 @@ class GenericTree:
         self._config["tree_changed"] = True
 
     def order_node_ids(self) -> None:
-        """Order All the node ids of the tree's nodes."""
-        _root = self.root
-        _active_node = self.active_node
-        if _root is None:
+        """Order all the node ids of the tree's nodes."""
+        if self.root is None:
             return
-        for _node in self.nodes.values():
-            _node.node_id = None
-        self.clear()
-        self.set_root(_root)
+        _active_node = self.active_node
+        self.root.reset_all_node_ids()
+        self.node_ids = []
+        _new_nodes = {}
+        _nodes = [self.root] + self.root.get_children(recursive=True)
+        for _id, _node in enumerate(_nodes):
+            _node.node_id = _id
+            _new_nodes[_id] = _node
+            self.node_ids.append(_id)
+        self.nodes = _new_nodes
         if _active_node is not None:
             self.active_node_id = _active_node.node_id
 
-    def get_all_leaves(self) -> list[int]:
+    def get_all_leaves(self) -> list[GenericNode]:
         """
         Get all tree nodes that are leaves.
 
         Returns
         -------
-        list[int]
+        list[GenericNode]
             A list of all leaf nodes.
         """
         _leaves = []
@@ -392,21 +430,25 @@ class GenericTree:
                 _leaves.append(_node)
         return _leaves
 
-    def copy(self, as_type: Type | None = None) -> Self:
+    def copy(self, as_type=None) -> Self:
         """Wrapper for __copy__"""
         return self.__copy__(as_type=as_type)
 
     deepcopy = copy
 
-    def __copy__(self, as_type: Type | None = None) -> Self:
+    def __copy__(self, as_type: Self | None = None) -> Self:
         """
         Get a copy of the current tree.
 
+        The `as_type` argument is necessary to allow creating copies of
+        context objects which are only instances of the base object, not
+        the context.
+
         Parameters
         ----------
-        as_type : Type | None
-            The type of the object to be created. If None, the type of the
-            current instance will be used. The default is None.
+        as_type : Self | None
+            The type to which the copy should be cast. If None, the copy will be
+            of the same type as the original object. The default is None.
 
         Returns
         -------
@@ -415,14 +457,14 @@ class GenericTree:
         """
         if as_type is None:
             as_type = self.__class__
-        _copy = type(as_type.__name__, (as_type,), {})()
+        _copy = as_type()
         _copy.__dict__.update(
             {
                 _key: copy.deepcopy(_value)
                 for _key, _value in self.__dict__.items()
                 if not (
                     isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
-                    or _key in ["nodes", "root"]
+                    or _key in ["nodes", "_root"]
                 )
             }
         )
@@ -433,7 +475,7 @@ class GenericTree:
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
-    def __deepcopy__(self, memo: dict) -> Self:
+    def __deepcopy__(self, memo: dict | None = None) -> Self:
         """Wrapper for __copy__"""
         return self.__copy__()
 

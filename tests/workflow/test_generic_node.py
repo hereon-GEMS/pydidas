@@ -248,6 +248,23 @@ class TestGenericNode(unittest.TestCase):
         _ids = root.get_recursive_ids()
         self.assertEqual(_ids, [0])
 
+    def test_reset_all_node_ids__no_children(self):
+        root = GenericNode(node_id=0)
+        root.reset_all_node_ids()
+        self.assertIsNone(root.node_id)
+
+    def test_reset_all_node_ids__w_children(self):
+        _nodes, _target_conns, _n_nodes = self.create_node_tree()
+        _all_node_ids = _nodes[0][0].get_recursive_ids()
+        _node_child_ids = _nodes[1][0].get_recursive_ids()
+        _valid_ids = [_id for _id in _all_node_ids if _id not in _node_child_ids]
+        _nodes[1][0].reset_all_node_ids()
+        for _tier in _nodes:
+            for _node in _tier:
+                _node_id = _node.node_id
+                if _node_id not in _valid_ids:
+                    self.assertIsNone(_node_id)
+
     def test_delete_node_references__no_children_not_recursive(self):
         root = GenericNode(node_id=0)
         node = GenericNode(node_id=1, parent=root)

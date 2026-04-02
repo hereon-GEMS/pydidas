@@ -456,5 +456,12 @@ def test_change_node_parent():
     assert nodes[3] in nodes[2].children
 
 
+def test_reset_all_node_ids():
+    nodes = create_node_tree(depth=2, width=2)
+    nodes[0].reset_all_node_ids()
+    for _node in nodes.values():
+        assert _node.node_id is None
+        assert _node.plugin.node_id is None
+
 if __name__ == "__main__":
     pytest.main([__file__])

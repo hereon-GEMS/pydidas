@@ -247,18 +247,28 @@ class GenericNode:
             _ids += _child.recursive_child_ids
         return _ids
 
-    def get_children(self) -> list:
+    def get_children(self, recursive: bool = False) -> list:
         """
         Get the child objects.
 
-        This method will return the child objects themselves.
+        This method will return the child objects themselves. The recursive
+        keyword allows to get all the children recursively.
+
+        Parameters
+        ----------
+        recursive : bool, optional
+            Keyword to toggle recursive get of the children. The default is False.
 
         Returns
         -------
         list
             A list with the children.
         """
-        return self._children
+        _children = self._children[:]
+        if recursive:
+            for _child in self.children:
+                _children += _child.get_children(recursive=True)
+        return _children
 
     def get_recursive_connections(self) -> list[list[int, int]]:
         """

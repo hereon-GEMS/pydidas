@@ -203,6 +203,14 @@ class TestGenericNode(unittest.TestCase):
         obj._children = _children
         self.assertEqual(obj.get_children(), _children)
 
+    def test_get_children__recursively(self):
+        _nodes, _target_conns, _n_nodes = self.create_node_tree()
+        _children = _nodes[0][0].get_children(recursive=True)
+        for _tier in _nodes:
+            for _node in _tier:
+                if _node != _nodes[0][0]:
+                    self.assertIn(_node, _children)
+
     def test_set_parent(self):
         _parent = GenericNode()
         obj = GenericNode()

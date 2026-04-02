@@ -412,9 +412,9 @@ def test_clear_data__repeat_calls():
     assert obj.plugin._config["input_kwargs"] == {}
 
 
-# --------------------------------------------
-# - Integration tests of GenericNode methods -
-# --------------------------------------------
+# -------------------------------------------
+# - Regression tests of GenericNode methods -
+# -------------------------------------------
 
 
 def test_delete_note_references():

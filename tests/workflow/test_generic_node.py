@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -270,12 +270,22 @@ class TestGenericNode(unittest.TestCase):
             _nodes[1][0].delete_node_references(recursive=False)
 
     def test_delete_node_references__with_children_recursive(self):
-        _nodes, _target_conns, _n_nodes = self.create_node_tree(5, 1)
+        _nodes, _target_conns, _n_nodes = self.create_node_tree(5, 2)
         _root = _nodes[0][0]
-        _nodes[1][0].delete_node_references(recursive=True)
-        self.assertFalse(_nodes[1][0] in _root._children)
-        self.assertEqual(_nodes[1][0].n_children, 0)
-        self.assertIsNone(_nodes[2][0].parent)
+        _child = _nodes[1][0]
+        _child_ids = _child.get_recursive_ids()
+        _child.delete_node_references(recursive=True)
+        for _tier, _tiernodes in enumerate(_nodes):
+            for _node in _tiernodes:
+                _node_id = _node.node_id
+                if _node_id == 0:
+                    self.assertNotIn(_child, _root.children)
+                elif _node_id in _child_ids:
+                    self.assertIsNone(_node.parent)
+                    self.assertEqual(_node.children, [])
+                else:
+                    self.assertIsNotNone(_node.parent)
+                    self.assertEqual(_node.n_children, 2 if _tier <= 4 else 0)
 
     def test_connect_parent_to_children__no_parent_no_children(self):
         root = GenericNode(node_id=0)

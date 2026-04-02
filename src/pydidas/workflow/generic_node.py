@@ -326,8 +326,8 @@ class GenericNode:
                 "Node children detected but deletion is not recursive."
             )
         self.parent = None
-        for _child in self._children:
-            _child.delete_node_references(recursive)
+        while self.children:
+            self.children[0].delete_node_references(recursive)
 
     def connect_parent_to_children(self):
         """

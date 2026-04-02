@@ -331,5 +331,20 @@ def test_hash_differs_on_config_change(
         assert hash(_item1) != hash(_item2)
 
 
+# ---------------------
+# - Integration tests -
+# ---------------------
+def test_delete_note_references():
+    """Test delete_note_references with children."""
+    nodes = create_node_tree()
+    _root = nodes[0]
+    print("\nRoot children", _root.children)
+    _root.delete_node_references(recursive=True)
+    for _id, _node in nodes.items():
+        print(_id, _node.children)
+        assert _node.parent is None
+        assert _node.children == []
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

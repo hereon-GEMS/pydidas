@@ -80,6 +80,8 @@ Bugfixes
   the correct datatype when a threshold was set.
 - Fixed a memory leak in the TestWorkflowFrame.
 - Fixed an issue which increased memory consumption when switching between plots.
+- Fixed an issue in the GenericNode which did not dereference children correctly
+  in branching workflow trees.
 
 
 v26.01.27

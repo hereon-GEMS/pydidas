@@ -412,17 +412,48 @@ def test_clear_data__repeat_calls():
     assert obj.plugin._config["input_kwargs"] == {}
 
 
-# ---------------------
-# - Integration tests -
-# ---------------------
+# --------------------------------------------
+# - Integration tests of GenericNode methods -
+# --------------------------------------------
+
+
 def test_delete_note_references():
-    """Test delete_note_references with children."""
     nodes = create_node_tree()
     _root = nodes[0]
     _root.delete_node_references(recursive=True)
     for _id, _node in nodes.items():
         assert _node.parent is None
         assert _node.children == []
+
+
+def test_get_recursive_ids():
+    nodes = create_node_tree()
+    _root = nodes[0]
+    _ids = _root.get_recursive_ids()
+    assert set(_ids) == set(nodes)
+
+
+def test_connect_parent_to_children():
+    nodes = create_node_tree(depth=5, width=1)
+    assert nodes[1].parent == nodes[0]
+    assert nodes[2].parent == nodes[1]
+    assert nodes[0].children == [nodes[1]]
+    assert nodes[1].children == [nodes[2]]
+    nodes[1].connect_parent_to_children()
+    assert nodes[1].children == []
+    assert nodes[1].parent == None
+    assert nodes[0].children == [nodes[2]]
+    assert nodes[2].parent == nodes[0]
+
+
+def test_change_node_parent():
+    nodes = create_node_tree(depth=2, width=2)
+    assert nodes[3].parent == nodes[1]
+    assert nodes[3] in nodes[1].children
+    nodes[3].change_node_parent(nodes[2])
+    assert nodes[3].parent == nodes[2]
+    assert nodes[3] not in nodes[1].children
+    assert nodes[3] in nodes[2].children
 
 
 if __name__ == "__main__":

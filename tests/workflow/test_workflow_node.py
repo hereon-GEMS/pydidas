@@ -463,5 +463,6 @@ def test_reset_all_node_ids():
         assert _node.node_id is None
         assert _node.plugin.node_id is None
 
+
 if __name__ == "__main__":
     pytest.main([__file__])

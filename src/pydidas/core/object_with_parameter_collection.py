@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ It includes a ParameterCollection object.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -56,7 +56,7 @@ class ObjectWithParameterCollection(
     QObject is not possible.
     """
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         QtCore.QObject.__init__(self, parent=kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)
@@ -109,7 +109,7 @@ class ObjectWithParameterCollection(
             _state["_config"]["shared_memory"] = {}
         return _state
 
-    def __setstate__(self, state: dict):
+    def __setstate__(self, state: dict) -> None:
         """
         Set the ObjectWithParameterCollection state from a pickled state.
 
@@ -133,19 +133,36 @@ class ObjectWithParameterCollection(
         int
             The hash value.
         """
+        _param_hash = hash(self.params)
+        _config_hash = self.__hash_dict(self._config)
+        return hash((_param_hash, _config_hash))
+
+    def __hash_dict(self, item: dict) -> int:
+        """
+        Get a hash value for a dictionary.
+
+        Parameters
+        ----------
+        item : dict
+            The dictionary to hash.
+        """
+        if item == {}:
+            return 0
         _config_keys = []
         _config_vals = []
-        _param_hash = hash(self.params)
-        for _key, _val in self._config.items():
+        for _key, _val in item.items():
             _config_keys.append(hash(_key))
             try:
-                if isinstance(_val, list):
-                    _val = tuple(_val)
-                _hash = hash(_val)
+                if isinstance(_val, dict):
+                    _hash = self.__hash_dict(_val)
+                else:
+                    if isinstance(_val, list):
+                        _val = tuple(_val)
+                    _hash = hash(_val)
                 _config_vals.append(_hash)
             except TypeError:
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
-        return hash((_param_hash, tuple(_config_keys), tuple(_config_vals)))
+        return hash((tuple(_config_keys), tuple(_config_vals)))
 
     def copy(self) -> Self:
         """

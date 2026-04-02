@@ -57,9 +57,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
     sig_row_selected = QtCore.Signal(int)
 
     def __init__(self, **kwargs: Any) -> None:
-        kwargs["font_metric_height_factor"] = kwargs.get(
-            "font_metric_height_factor", 6
-        )
+        kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 6)
         self._rel_column_widths = kwargs.pop("relative_column_widths", None)
         self._autoscale_height = kwargs.pop("autoscale_height", False)
         self._qtapp = PydidasQApplication.instance()
@@ -117,9 +115,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self.sig_row_selected.emit(self.selected_row_id)
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(
-        self, char_width: float, char_height: float
-    ) -> None:
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Adjust the widget's width based on the font metrics.
 

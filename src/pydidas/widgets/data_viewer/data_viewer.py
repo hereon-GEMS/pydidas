@@ -28,6 +28,7 @@ __all__ = ["DataViewer"]
 
 
 from functools import partial
+from typing import Any
 
 import h5py
 import numpy as np
@@ -65,7 +66,7 @@ class DataViewer(WidgetWithParameterCollection):
     ]
     sig_plot2d_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
         self._data = None
@@ -387,7 +388,7 @@ class DataViewer(WidgetWithParameterCollection):
             self._config["plot_title"] = title
         if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
             raise UserConfigError(
-                "Can only update data if both the stored data and the new data"
+                "Can only update data if both the stored data and the new data "
                 "are np.ndarrays."
             )
         if data.shape != self._data.shape:

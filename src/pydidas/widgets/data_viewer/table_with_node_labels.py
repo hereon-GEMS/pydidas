@@ -43,7 +43,7 @@ class TableWithNodeLabels(PydidasQTable):
 
     sig_node_selected = QtCore.Signal(int)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs["font_metric_width_factor"] = kwargs.get(
             "font_metric_width_factor", FONT_METRIC_CONFIG_WIDTH
         )
@@ -54,14 +54,14 @@ class TableWithNodeLabels(PydidasQTable):
         self.selectionModel().selectionChanged.connect(self.emit_new_node_selection)
 
     @QtCore.Slot()
-    def emit_new_node_selection(self):
+    def emit_new_node_selection(self) -> None:
         """
         Emit the signal of a new selection.
         """
         if self.selected_row_id >= 0:
             self.sig_node_selected.emit(self._row_items[self.selected_row_id])
 
-    def update_node_descriptions(self, titles: dict[int, str]):
+    def update_node_descriptions(self, titles: dict[int, str]) -> None:
         """
         Update the available choices from the WorkflowResults.
 

@@ -1253,7 +1253,10 @@ class Dataset(ndarray):
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
-        Create a FULL/DEEP copy of the Dataset, similar to ndarray.copy.
+        Create a full copy of the Dataset, similar to ndarray.copy.
+
+        The copy method duplicates the underlying array data and metadata and
+        creates a fully independent copy.
 
         Parameters
         ----------

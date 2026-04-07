@@ -48,7 +48,7 @@ class WorkflowNode(GenericNode):
 
     kwargs_for_copy_creation = ["plugin", "node_id"]
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         self.__preprocess_kwargs(kwargs)
         super().__init__(**kwargs)
         self.results = None
@@ -90,7 +90,7 @@ class WorkflowNode(GenericNode):
         return self._plugin
 
     @plugin.setter
-    def plugin(self, new_plugin: BasePlugin):
+    def plugin(self, new_plugin: BasePlugin) -> None:
         """
         Set the plugin of the node.
         """
@@ -118,13 +118,13 @@ class WorkflowNode(GenericNode):
         return self._node_id
 
     @node_id.setter
-    def node_id(self, new_id: int | None):
+    def node_id(self, new_id: int | None) -> None:
         """
         Set the node_id.
 
         Parameters
         ----------
-        new_id : int | None
+        new_id : int or None
             The new node ID.
 
         Raises

@@ -52,7 +52,7 @@ class ProcessingTree(GenericTree):
     class instances but through the WorkflowTree singleton instance.
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
@@ -116,7 +116,7 @@ class ProcessingTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
-    def set_root(self, node: WorkflowNode):
+    def set_root(self, node: WorkflowNode) -> None:
         """
         Set the tree root node.
 
@@ -131,7 +131,7 @@ class ProcessingTree(GenericTree):
         GenericTree.set_root(self, node)
         self.root.plugin.node_id = 0
 
-    def replace_node_plugin(self, node_id: int, new_plugin: BasePlugin):
+    def replace_node_plugin(self, node_id: int, new_plugin: BasePlugin) -> None:
         """
         Replace the plugin of the selected node with the new Plugin.
 
@@ -146,16 +146,14 @@ class ProcessingTree(GenericTree):
         self.nodes[node_id].plugin = new_plugin
         self._config["tree_changed"] = True
 
-    def get_consistent_and_inconsistent_nodes(self) -> (list, list):
+    def get_consistent_and_inconsistent_nodes(self) -> tuple[list, list]:
         """
         Get the consistency flags for all plugins in the WorkflowTree.
 
         Returns
         -------
-        list
-            The IDs of consistent nodes
-        list
-            The IDs of nodes with inconsistent data.
+        tuple[list, list]
+            A tuple with (consistent_node_ids, inconsistent_node_ids)
         """
         _consistent = []
         _inconsistent = []
@@ -186,7 +184,7 @@ class ProcessingTree(GenericTree):
         self.execute_process(arg, **kwargs)
         return self.get_current_results()
 
-    def execute_process(self, arg: object, **kwargs: dict):
+    def execute_process(self, arg: object, **kwargs: Any) -> None:
         """
         Execute the process defined in the WorkflowTree for data analysis.
 
@@ -194,13 +192,13 @@ class ProcessingTree(GenericTree):
         ----------
         arg : object
             Any argument that need to be passed to the plugin chain.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments which need to be passed to the plugin chain.
         """
         self.prepare_execution(**kwargs)
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
-    def prepare_execution(self, **kwargs: dict):
+    def prepare_execution(self, **kwargs: Any) -> None:
         """
         Prepare the execution of the ProcessingTree.
 
@@ -210,7 +208,7 @@ class ProcessingTree(GenericTree):
 
         Parameters
         ----------
-        **kwargs : dict, optional
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             forced : bool, optional
@@ -231,8 +229,8 @@ class ProcessingTree(GenericTree):
         self.reset_tree_changed_flag()
 
     def execute_single_plugin(
-        self, node_id: int, arg: object, **kwargs: dict
-    ) -> (object, dict):
+        self, node_id: int, arg: object, **kwargs: Any
+    ) -> tuple[object, dict]:
         """
         Execute a single node Plugin and get the return.
 
@@ -242,7 +240,7 @@ class ProcessingTree(GenericTree):
             The ID of the node in the tree.
         arg : object
             The input argument for the Plugin.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments for the Plugin execution.
 
         Raises
@@ -264,13 +262,13 @@ class ProcessingTree(GenericTree):
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
 
-    def import_from_file(self, filename: Path | str):
+    def import_from_file(self, filename: Path | str) -> None:
         """
         Import the ProcessingTree from a configuration file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename which holds the ProcessingTree configuration.
         """
         _new_tree = ProcessingTreeIoMeta.import_from_file(filename)
@@ -278,13 +276,13 @@ class ProcessingTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._config["tree_changed"] = True
 
-    def export_to_file(self, filename: Path | str, **kwargs: Any):
+    def export_to_file(self, filename: Path | str, **kwargs: Any) -> None:
         """
         Export the WorkflowTree to a file using any of the registered exporters.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file with the export.
         """
         ProcessingTreeIoMeta.export_to_file(filename, self, **kwargs)
@@ -311,7 +309,7 @@ class ProcessingTree(GenericTree):
         """
         return [node.dump() for node in self.nodes.values()]
 
-    def restore_from_string(self, string: str):
+    def restore_from_string(self, string: str) -> None:
         """
         Restore the ProcessingTree from a string representation.
 
@@ -334,7 +332,7 @@ class ProcessingTree(GenericTree):
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 
-    def update_from_tree(self, tree: Self):
+    def update_from_tree(self, tree: Self) -> None:
         """
         Update this tree from another ProcessingTree instance.
 
@@ -348,14 +346,14 @@ class ProcessingTree(GenericTree):
         """
         self.restore_from_string(tree.export_to_string())
 
-    def restore_from_list_of_nodes(self, list_of_nodes: list | tuple):
+    def restore_from_list_of_nodes(self, list_of_nodes: list | tuple) -> None:
         """
         Restore the ProcessingTree from a list of Nodes with the required
         information.
 
         Parameters
         ----------
-        list_of_nodes : list | tuple
+        list_of_nodes : list or tuple
             A list of nodes with a dictionary entry for each node holding all
             the required information (plugin_class, node_id and plugin
             Parameters).

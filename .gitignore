@@ -3,6 +3,10 @@
 
 # local IDE metadata files
 .idea
+.vscode
+
+# local files for AI agents
+AGENTS.md
 
 # local files from running pydidas
 .pylint.d

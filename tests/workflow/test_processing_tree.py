@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -315,7 +315,7 @@ class TestProcessingTree(unittest.TestCase):
         for _node in tree2.root._children:
             self.assertTrue(_node in tree2.nodes.values())
         for key in set(self._curr_tree.__dict__.keys()) - {
-            "root",
+            "_root",
             "nodes",
             "_start_hash",
         }:
@@ -415,7 +415,7 @@ class TestProcessingTree(unittest.TestCase):
         self.assertEqual(self._curr_tree.nodes, dict())
 
     def test_get_complete_plugin_metadata__empty_tree(self):
-        _meta = self._curr_tree.get_complete_plugin_metadata()
+        _meta = self._curr_tree.get_plugin_metadata("all")
         self.assertEqual(list(_meta["shapes"].keys()), [])
         self.assertIsInstance(_meta, dict)
         for _key in ["shapes", "labels", "names", "data_labels", "result_titles"]:
@@ -424,7 +424,7 @@ class TestProcessingTree(unittest.TestCase):
     def test_get_complete_plugin_metadata__populated_tree__no_results(self):
         _nodes, _index = self.create_node_tree(width=1, depth=3)
         self._curr_tree.set_root(_nodes[0][0])
-        _meta = self._curr_tree.get_complete_plugin_metadata()
+        _meta = self._curr_tree.get_plugin_metadata("all")
         self.assertEqual(list(_meta["shapes"].keys()), [])
 
     def test_get_complete_plugin_metadata__populated_tree__w_single_result(self):
@@ -432,7 +432,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.set_root(_nodes[0][0])
         self._curr_tree.prepare_execution()
         self._curr_tree.execute_process(0)
-        _meta = self._curr_tree.get_complete_plugin_metadata()
+        _meta = self._curr_tree.get_plugin_metadata("all")
         self.assertEqual(list(_meta["shapes"].keys()), [3])
         self.assertEqual(self._curr_tree.nodes[3].result_shape, _meta["shapes"][3])
 
@@ -441,7 +441,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.set_root(_nodes[0][0])
         self._curr_tree.prepare_execution()
         self._curr_tree.execute_process(0, force_store_results=True)
-        _meta = self._curr_tree.get_complete_plugin_metadata()
+        _meta = self._curr_tree.get_plugin_metadata("all")
         self.assertEqual(
             list(_meta["shapes"].keys()), list(self._curr_tree.nodes.keys())
         )

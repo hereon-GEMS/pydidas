@@ -135,7 +135,7 @@ class SubtractBackgroundImage(ProcPlugin):
         -------
         _corrected_data : Dataset
             The image data.
-        kwargs : dict
+        **kwargs : Any
             Any calling kwargs, appended by any changes in the function.
         """
         if data.shape != self._bg_image.shape:
@@ -145,20 +145,20 @@ class SubtractBackgroundImage(ProcPlugin):
                 f"Input data: {data.shape}\nBackground image: {self._bg_image.shape}"
             )
         _corrected_data = data - self._bg_image
+        if _corrected_data.dtype != data.dtype:
+            _corrected_data = _corrected_data.astype(data.dtype)
         if self._thresh is not None:
-            _corrected_data = np.where(
-                _corrected_data < self._thresh, self._thresh, _corrected_data
-            )
+            _corrected_data[_corrected_data < self._thresh] = self._thresh
         return _corrected_data, kwargs
 
-    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
+    def get_parameter_config_widget(self) -> type[QtWidgets.QWidget]:
         """
         Get the unique configuration widget associated with this Plugin.
 
         Returns
         -------
-        QtWidgets.QWidget
-            The unique ParameterConfig widget
+        type[QtWidgets.QWidget]
+            The unique ParameterConfig widget for the SubtractBackgroundImage plugin.
         """
         return SubtractBackgroundImageConfigWidget
 
@@ -179,10 +179,11 @@ class SubtractBackgroundImageConfigWidget(GenericPluginConfigWidget):
         )
 
     def finalize_init(self) -> None:
+        """Initialize the configuration widget."""
         self._toggle_hdf5_plugin_visibility(self.plugin.get_param_value("bg_file"))
 
     @QtCore.Slot(str)
-    def _toggle_hdf5_plugin_visibility(self, new_file: str):
+    def _toggle_hdf5_plugin_visibility(self, new_file: str) -> None:
         """
         Toggle the visibility of the plugins for Hdf5 dataset and frame number.
 

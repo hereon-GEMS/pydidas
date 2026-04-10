@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ embedded metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -178,7 +178,7 @@ class Dataset(ndarray):
             self._meta["_get_item_key"] = ()
         return _item
 
-    def __array_finalize__(self, obj: Self):
+    def __array_finalize__(self, obj: Self) -> None:
         """
         Finalization of numpy.ndarray object creation.
 
@@ -193,7 +193,7 @@ class Dataset(ndarray):
             obj._meta["_get_item_key"] = ()
         self._meta["_get_item_key"] = ()
 
-    def __update_keys_from_object(self, obj: ndarray):  # noqa C901
+    def __update_keys_from_object(self, obj: ndarray) -> None:  # noqa C901
         """
         Update the axis keys from the original object.
 
@@ -249,7 +249,7 @@ class Dataset(ndarray):
                 for _dim, (_key, _item) in enumerate(sorted(self._meta[_item].items()))
             }
 
-    def __insert_axis_keys(self, dim: int):
+    def __insert_axis_keys(self, dim: int) -> None:
         """
         Insert a new axis key at the specified dimension.
 
@@ -265,7 +265,7 @@ class Dataset(ndarray):
             _vals.insert(dim, _new_entry)
             self._meta[_item] = {_i: _val for _i, _val in enumerate(_vals)}
 
-    def flatten_dims(self, *args: tuple[int], **kwargs: Any):
+    def flatten_dims(self, *args: int, **kwargs: Any) -> None:
         """
         Flatten the specified dimensions **in place** in the Dataset.
 
@@ -277,9 +277,9 @@ class Dataset(ndarray):
 
         Parameters
         ----------
-        *args : tuple[int]
-            The tuple of the dimensions to be flattened. Each dimension must
-            be an integer entry.
+        *args : int
+            The dimensions to be flattened. Each dimension must be an integer
+            entry.
         **kwargs: Any
             Additional keyword arguments. Supported keywords are:
 
@@ -288,9 +288,9 @@ class Dataset(ndarray):
                 'Flattened'.
             new_dim_unit : str, optional
                 The unit for the new, flattened dimension. The default is ''.
-            new_dim_range : Union[None, ndarray, Iterable], optional
-                The new range for the flattened dimension. If None, a simple The
-                default is None.
+            new_dim_range : None or ndarray or Iterable, optional
+                The new range for the flattened dimension. If None, a default
+                range is used. The default is None.
         """
         if len(args) < 2:
             return
@@ -607,7 +607,7 @@ class Dataset(ndarray):
         _ranges = get_input_as_dict(ranges, self.shape, "axis_ranges")
         self._meta["axis_ranges"] = convert_ranges_and_check_length(_ranges, self.shape)
 
-    def __check_property_length(self, key: str):
+    def __check_property_length(self, key: str) -> None:
         """
         Check the length of the axis properties.
 
@@ -631,7 +631,7 @@ class Dataset(ndarray):
     # Update methods for the axis properties
     # ######################################
 
-    def update_axis_range(self, index: int, item: ArrayLike):
+    def update_axis_range(self, index: int, item: ArrayLike) -> None:
         """
         Update a single axis range value.
 
@@ -651,7 +651,7 @@ class Dataset(ndarray):
         _new = convert_ranges_and_check_length({index: item}, self.shape)
         self._meta["axis_ranges"][index] = _new[index]
 
-    def update_axis_label(self, index: int, item: str):
+    def update_axis_label(self, index: int, item: str) -> None:
         """
         Update a single axis label value.
 
@@ -675,7 +675,7 @@ class Dataset(ndarray):
             )
         self._meta["axis_labels"][index] = item
 
-    def update_axis_unit(self, index: int, item: str):
+    def update_axis_unit(self, index: int, item: str) -> None:
         """
         Update a single axis unit value.
 
@@ -1253,7 +1253,10 @@ class Dataset(ndarray):
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
-        Overload the generic nd.ndarray copy method to copy metadata as well.
+        Create a full copy of the Dataset, similar to ndarray.copy.
+
+        The copy method duplicates the underlying array data and metadata and
+        creates a fully independent copy.
 
         Parameters
         ----------
@@ -1263,7 +1266,8 @@ class Dataset(ndarray):
         Returns
         -------
         Dataset
-            The copied dataset.
+            A fully independent copy with separate array data and independent
+            metadata.
         """
         _new = ndarray.copy(self, order)
         _new._meta = {
@@ -1280,6 +1284,10 @@ class Dataset(ndarray):
             except AttributeError:
                 _new._meta["metadata"][_key] = _val
         return _new
+
+    def __copy__(self) -> Self:
+        """Create a full/deep copy of the Dataset via copy.copy()."""
+        return self.copy()
 
     def __repr__(self) -> str:
         """
@@ -1389,7 +1397,7 @@ class Dataset(ndarray):
         ndarray.__setstate__(self, state[0:-1])
 
     def __array_wrap__(
-        self, obj: ndarray, context: object | None = None, return_scalar=False
+        self, obj: ndarray, context: object | None = None, return_scalar: bool = False
     ) -> Self:
         """
         Return 0-d results from ufuncs as single values.

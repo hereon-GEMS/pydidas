@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -13,14 +13,14 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with pydidas If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the PydidasQTable class which is a table which scales in size with the font.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -56,7 +56,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
 
     sig_row_selected = QtCore.Signal(int)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 6)
         self._rel_column_widths = kwargs.pop("relative_column_widths", None)
         self._autoscale_height = kwargs.pop("autoscale_height", False)
@@ -108,14 +108,14 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         return _rows[0]
 
     @QtCore.Slot()
-    def emit_row_selection(self):
+    def emit_row_selection(self) -> None:
         """
         Emit the signal of a new row selection.
         """
         self.sig_row_selected.emit(self.selected_row_id)
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Adjust the widget's width based on the font metrics.
 
@@ -142,7 +142,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
                         _width_i -= self._qtapp.scrollbar_width
                     self.setColumnWidth(_i_col, _width_i)
 
-    def _set_new_height(self):
+    def _set_new_height(self) -> None:
         """Set the new height of the table based on the number of rows."""
         if self._autoscale_height:
             self.resizeRowsToContents()
@@ -153,7 +153,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
             _height = self.table_display_height
         self.setFixedHeight(_height)
 
-    def _handle_wrapped_cell_heights(self):
+    def _handle_wrapped_cell_heights(self) -> None:
         """
         Handle the heights of wrapped cells in the table.
 
@@ -229,8 +229,9 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
             The label of the spanned row.
         start_col : int, optional
             The column index at which the spanned cell starts, by default 0.
-        n_col : int, optional
-            The number of columns to span, by default None which spans all columns.
+        n_col : int or None, optional
+            The number of columns to span, by default None which spans all
+            columns.
         """
         self._wrapped_cells = True
         self.setVisible(True)

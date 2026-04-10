@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -66,7 +66,7 @@ class TestGenericTree(unittest.TestCase):
         tree = GenericTree()
         tree.nodes = dict(a=1, b="c")
         tree.node_ids = [0, 1]
-        tree.root = 12
+        tree.root = GenericNode()
         tree.clear()
         self.assertEqual(tree.nodes, {})
         self.assertEqual(tree.node_ids, [])
@@ -260,9 +260,11 @@ class TestGenericTree(unittest.TestCase):
         node = GenericNode(node_id=0)
         child = GenericNode(parent=node)
         tree.register_node(node)
+        self.assertEqual(tree.nodes, {0: node, 1: child})
         tree.delete_node_by_id(0, recursive=False, keep_children=True)
         self.assertFalse(node in tree.nodes.values())
         self.assertIsNone(child.parent)
+        self.assertEqual(node.n_children, 0)
         self.assertEqual(tree.root, child)
         self.assertEqual(tree.nodes, {1: child})
 
@@ -352,6 +354,7 @@ class TestGenericTree(unittest.TestCase):
         _child2 = tree.root.get_children()[1]
         _id2 = _child2.node_id
         _original_ids = set(tree.node_ids)
+        tree.active_node_id = _child2.node_id
         tree.change_node_parent(_child2.node_id, _child1.node_id)
         _new_ids = set(tree.node_ids)
         self.assertTrue(tree.tree_has_changed)
@@ -361,6 +364,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(_original_ids, _new_ids)
         self.assertEqual(_child1.node_id, _id1)
         self.assertEqual(_child2.node_id, _id2)
+        self.assertEqual(tree.active_node, _child2)
 
     def test_change_node_parent__swap_ids(self):
         tree = GenericTree()
@@ -371,6 +375,7 @@ class TestGenericTree(unittest.TestCase):
         _child2 = tree.root.get_children()[1]
         _id2 = _child2.node_id
         _original_ids = set(tree.node_ids)
+        tree.active_node_id = _child2.node_id
         tree.change_node_parent(_child1.node_id, _child2.node_id)
         _new_ids = set(tree.node_ids)
         self.assertTrue(tree.tree_has_changed)
@@ -380,6 +385,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(_original_ids, _new_ids)
         self.assertEqual(_child1.node_id, _id2)
         self.assertEqual(_child2.node_id, _id1)
+        self.assertEqual(tree.active_node, _child2)
 
     def test_order_node_ids__empty_tree(self):
         tree = GenericTree()
@@ -429,7 +435,7 @@ class TestGenericTree(unittest.TestCase):
             self.assertFalse(_node in _copy.nodes.values())
         for _node in _copy.root._children:
             self.assertTrue(_node in _copy.nodes.values())
-        for key in set(tree.__dict__.keys()) - {"root", "nodes", "_start_hash"}:
+        for key in set(tree.__dict__.keys()) - {"_root", "nodes", "_start_hash"}:
             self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
     def test_copy(self):
@@ -439,7 +445,7 @@ class TestGenericTree(unittest.TestCase):
         _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
         tree.register_node(_nodes[0][0])
         _copy = tree.copy()
-        for _key in ["root", "nodes", "_start_hash", "node_ids", "_config"]:
+        for _key in ["_root", "nodes", "_start_hash", "node_ids", "_config"]:
             self.assertIn(_key, _copy.__dict__.keys())
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
@@ -455,7 +461,7 @@ class TestGenericTree(unittest.TestCase):
         _copy = tree.copy(as_type=TestTree)
         self.assertIsInstance(_copy, TestTree)
         self.assertIsInstance(_copy, GenericTree)
-        for _key in ["root", "nodes", "_start_hash", "node_ids", "_config"]:
+        for _key in ["_root", "nodes", "_start_hash", "node_ids", "_config"]:
             self.assertIn(_key, _copy.__dict__.keys())
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
@@ -466,7 +472,7 @@ class TestGenericTree(unittest.TestCase):
         _copy = tree.copy()
         self.assertIsInstance(_copy, GenericTree)
         self.assertEqual(tree.dummy, _copy.dummy)
-        for _key in ["root", "nodes", "_start_hash", "node_ids", "_config"]:
+        for _key in ["_root", "nodes", "_start_hash", "node_ids", "_config"]:
             self.assertIn(_key, _copy.__dict__.keys())
 
     def test_hash___empty_tree(self):

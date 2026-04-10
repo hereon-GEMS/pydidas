@@ -28,10 +28,12 @@ __all__ = ["DataViewer"]
 
 
 from functools import partial
+from typing import Any
 
 import h5py
 import numpy as np
 from qtpy import QtCore, QtWidgets
+from qtpy.QtWidgets import QWidget
 from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
@@ -64,7 +66,7 @@ class DataViewer(WidgetWithParameterCollection):
     ]
     sig_plot2d_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: dict):
+    def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
 
         self._data = None
@@ -253,6 +255,7 @@ class DataViewer(WidgetWithParameterCollection):
             _data = self._data
         if not isinstance(_data, Dataset):
             _data = Dataset(_data)
+        _view.clear()
         _view.display_data(_data, title=self._config["plot_title"])
 
     def set_data(
@@ -267,8 +270,8 @@ class DataViewer(WidgetWithParameterCollection):
         Parameters
         ----------
         data : H5Node or h5py.Dataset or np.ndarray or None
-            The data to display. A ndarray is acceptable but will be converted to a
-            pydidas.core.Dataset object.
+            The data to display. A ndarray is acceptable but will be converted
+            to a pydidas.core.Dataset object.
         title : str or None, optional
             The title of the data. If None, the title will not be updated.
         h5node : H5Node or None, optional
@@ -280,6 +283,9 @@ class DataViewer(WidgetWithParameterCollection):
         # Remove the data reference from the h5 view:
         if "view-h5" in self._widgets:
             self._widgets["view-h5"].setData(None)
+        # Explicitly clear old data references to break circular refs
+        self._data = None
+        self._h5node = None
         if data is None:
             if self._active_view is not None:
                 self._widgets[self._active_view].clear()
@@ -287,7 +293,6 @@ class DataViewer(WidgetWithParameterCollection):
             return
         if isinstance(data, H5Node):
             h5node = data
-        # if isinstance(h5node, H5Node):
         self._h5node = h5node
         if title is not None:
             self._config["plot_title"] = title
@@ -322,6 +327,10 @@ class DataViewer(WidgetWithParameterCollection):
                 "The data to display must be a numpy array, a h5py.Dataset or a "
                 "H5Node object."
             )
+        for _key in DATA_VIEW_CONFIG:
+            _widget = self._widgets.get(_key)
+            if isinstance(_widget, QWidget):
+                _widget.clear()
         self._data = data
 
     def _update_widgets_from_data(self) -> None:
@@ -379,7 +388,7 @@ class DataViewer(WidgetWithParameterCollection):
             self._config["plot_title"] = title
         if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
             raise UserConfigError(
-                "Can only update data if both the stored data and the new data"
+                "Can only update data if both the stored data and the new data "
                 "are np.ndarrays."
             )
         if data.shape != self._data.shape:

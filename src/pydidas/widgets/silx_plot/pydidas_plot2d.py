@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ additional actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -465,10 +465,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     # uniform interface call to display data in DataViewer-like classes
     display_data = plot_pydidas_dataset
 
+    def clear(self) -> None:
+        """Override clear to also clear the stored data."""
+        super().clear()
+        self.clear_plot()
+
     def clear_plot(self) -> None:
-        """
-        Clear the plot and remove all items.
-        """
+        """Clear the plot and remove all items."""
         self.remove()
         self.setGraphTitle("")
         self.setGraphYLabel("")

@@ -76,6 +76,16 @@ Bugfixes
   data has been set to zero which caused an exception.
 - Fixed an issue in naming where some widgets had a method update_font_metrics
   with a different signature than the base method.
+- Fixed an issue in the SubtractBackgroundImage plugin which did not return
+  the correct datatype when a threshold was set.
+- Fixed a memory leak in the WorkflowTestFrame.
+- Fixed an issue which increased memory consumption when switching between plots.
+- Fixed an issue in the GenericNode which did not dereference children correctly
+  in branching workflow trees.
+- Fixed an issue in the WorkflowTestFrame where the results were kept in memory
+  which used a higher peak memory.
+- Fixed an isssue where the active node was not properly updated when a node
+  was moved in a Tree.
 
 
 v26.01.27

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ workflow on a single data frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -139,20 +139,12 @@ def _create_str_description_of_node_result(
     return _str
 
 
-class _ResultsMock:
-    """Mock class to store result titles."""
-
-    def __init__(self) -> None:
-        """Initialize the _ResultsMock."""
-        self.result_titles = {}
-
-
 class WorkflowTestFrame(BaseFrame):
     """
     The WorkflowTestFrame allows to run / test the workflow on a single datapoint.
 
     The selection of a frame can be done either using the absolute frame number
-    (if the ``image_selection`` Parameter equals "Use global index") or by
+    (if the ``image_selection`` Parameter equals "Use global index"), or by
     supplying scan indices for all active scan dimensions (if the
     ``image_selection`` Parameter equals "Use scan dimensional indices").
     """
@@ -187,7 +179,6 @@ class WorkflowTestFrame(BaseFrame):
         self._tree = None
         self._active_node = -1
         self._results = {}
-        self._local_results_mock = _ResultsMock()
         self._config.update(
             {
                 "shapes": {},
@@ -311,6 +302,7 @@ class WorkflowTestFrame(BaseFrame):
         if not self._check_tree_is_populated():
             return
         with utils.ShowBusyMouse():
+            self.clear_results()
             _index = self.__get_index()
             self._tree.execute_process(
                 _index,
@@ -331,8 +323,10 @@ class WorkflowTestFrame(BaseFrame):
         Reload the local WorkflowTree from the global one, e.g. to propagate changes
         to global settings.
         """
-        self._tree = TREE.deepcopy()
+        if self._tree:
+            self._tree.clear()
         self.clear_results()
+        self._tree = TREE.deepcopy()
 
     @staticmethod
     def _check_tree_is_populated() -> bool:
@@ -446,12 +440,11 @@ class WorkflowTestFrame(BaseFrame):
         """
         Store the WorkflowTree results in a local dictionary.
         """
-        _meta = self._tree.get_complete_plugin_metadata()
-        self._local_results_mock.result_titles = _meta["result_titles"]
+        self._result_titles = self._tree.get_plugin_metadata("result_titles")
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
             if _data is not None:
-                if 1 in set(_data.shape) and _data.shape != (1,):
+                if 1 in _data.shape and _data.ndim > 1:
                     _data = _data.squeeze()
                 self._results[_node_id] = _data
         if self._active_node not in self._results:
@@ -459,9 +452,7 @@ class WorkflowTestFrame(BaseFrame):
 
     def __update_selection_choices(self) -> None:
         """Update the choice of results to display"""
-        self._widgets["result_table"].update_choices_from_workflow_results(
-            self._local_results_mock
-        )
+        self._widgets["result_table"].update_node_descriptions(self._result_titles)
 
     @QtCore.Slot(int)
     def _selected_new_node(self, index: int) -> None:
@@ -476,6 +467,9 @@ class WorkflowTestFrame(BaseFrame):
         self._active_node = index
         if index == -1:
             self._config["has_details"] = False
+            self._config["plot_active"] = False
+            if self._widgets["plot"].data_is_set:
+                self._widgets["plot"].set_data(None)
             return
         else:
             self._config["plot_active"] = True
@@ -488,8 +482,12 @@ class WorkflowTestFrame(BaseFrame):
 
     def clear_results(self) -> None:
         """Clear all stored results."""
+        if self._widgets["plot"].data_is_set:
+            self._widgets["plot"].set_data(None)
+        if self._tree and self._tree.root:
+            self._tree.root.clear_data(recursive=True)
         self._results = {}
-        self._local_results_mock.result_titles = {}
+        self._result_titles = {}
         self.__update_selection_choices()
         self.__set_derived_widget_visibility(False)
 
@@ -523,12 +521,7 @@ class WorkflowTestFrame(BaseFrame):
         self._widgets["result_info"].setText(_str)
 
     def __plot_results(self) -> None:
-        """
-        Update the plot.
-
-        This method will get the latest result (subset) from the
-        ProcessingResults and update the plot.
-        """
+        """Update the plot with the latest data"""
         if self._active_node == -1 or not self._config["plot_active"]:
             return
         self._widgets["plot"].set_data(self._results[self._active_node])

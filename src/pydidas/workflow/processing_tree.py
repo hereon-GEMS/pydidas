@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,7 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Any, Self
+from typing import Any, Literal, Self
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -52,7 +52,7 @@ class ProcessingTree(GenericTree):
     class instances but through the WorkflowTree singleton instance.
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
@@ -116,7 +116,7 @@ class ProcessingTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
-    def set_root(self, node: WorkflowNode):
+    def set_root(self, node: WorkflowNode) -> None:
         """
         Set the tree root node.
 
@@ -131,7 +131,7 @@ class ProcessingTree(GenericTree):
         GenericTree.set_root(self, node)
         self.root.plugin.node_id = 0
 
-    def replace_node_plugin(self, node_id: int, new_plugin: BasePlugin):
+    def replace_node_plugin(self, node_id: int, new_plugin: BasePlugin) -> None:
         """
         Replace the plugin of the selected node with the new Plugin.
 
@@ -146,16 +146,14 @@ class ProcessingTree(GenericTree):
         self.nodes[node_id].plugin = new_plugin
         self._config["tree_changed"] = True
 
-    def get_consistent_and_inconsistent_nodes(self) -> (list, list):
+    def get_consistent_and_inconsistent_nodes(self) -> tuple[list, list]:
         """
         Get the consistency flags for all plugins in the WorkflowTree.
 
         Returns
         -------
-        list
-            The IDs of consistent nodes
-        list
-            The IDs of nodes with inconsistent data.
+        tuple[list, list]
+            A tuple with (consistent_node_ids, inconsistent_node_ids)
         """
         _consistent = []
         _inconsistent = []
@@ -186,7 +184,7 @@ class ProcessingTree(GenericTree):
         self.execute_process(arg, **kwargs)
         return self.get_current_results()
 
-    def execute_process(self, arg: object, **kwargs: dict):
+    def execute_process(self, arg: object, **kwargs: Any) -> None:
         """
         Execute the process defined in the WorkflowTree for data analysis.
 
@@ -194,13 +192,13 @@ class ProcessingTree(GenericTree):
         ----------
         arg : object
             Any argument that need to be passed to the plugin chain.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments which need to be passed to the plugin chain.
         """
         self.prepare_execution(**kwargs)
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
-    def prepare_execution(self, **kwargs: dict):
+    def prepare_execution(self, **kwargs: Any) -> None:
         """
         Prepare the execution of the ProcessingTree.
 
@@ -210,7 +208,7 @@ class ProcessingTree(GenericTree):
 
         Parameters
         ----------
-        **kwargs : dict, optional
+        **kwargs : Any
             Optional keyword arguments. Supported keywords are:
 
             forced : bool, optional
@@ -231,8 +229,8 @@ class ProcessingTree(GenericTree):
         self.reset_tree_changed_flag()
 
     def execute_single_plugin(
-        self, node_id: int, arg: object, **kwargs: dict
-    ) -> (object, dict):
+        self, node_id: int, arg: object, **kwargs: Any
+    ) -> tuple[object, dict]:
         """
         Execute a single node Plugin and get the return.
 
@@ -242,7 +240,7 @@ class ProcessingTree(GenericTree):
             The ID of the node in the tree.
         arg : object
             The input argument for the Plugin.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments for the Plugin execution.
 
         Raises
@@ -264,13 +262,13 @@ class ProcessingTree(GenericTree):
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
 
-    def import_from_file(self, filename: Path | str):
+    def import_from_file(self, filename: Path | str) -> None:
         """
         Import the ProcessingTree from a configuration file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename which holds the ProcessingTree configuration.
         """
         _new_tree = ProcessingTreeIoMeta.import_from_file(filename)
@@ -278,13 +276,13 @@ class ProcessingTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._config["tree_changed"] = True
 
-    def export_to_file(self, filename: Path | str, **kwargs: Any):
+    def export_to_file(self, filename: Path | str, **kwargs: Any) -> None:
         """
         Export the WorkflowTree to a file using any of the registered exporters.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file with the export.
         """
         ProcessingTreeIoMeta.export_to_file(filename, self, **kwargs)
@@ -311,7 +309,7 @@ class ProcessingTree(GenericTree):
         """
         return [node.dump() for node in self.nodes.values()]
 
-    def restore_from_string(self, string: str):
+    def restore_from_string(self, string: str) -> None:
         """
         Restore the ProcessingTree from a string representation.
 
@@ -334,7 +332,7 @@ class ProcessingTree(GenericTree):
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 
-    def update_from_tree(self, tree: Self):
+    def update_from_tree(self, tree: Self) -> None:
         """
         Update this tree from another ProcessingTree instance.
 
@@ -348,14 +346,14 @@ class ProcessingTree(GenericTree):
         """
         self.restore_from_string(tree.export_to_string())
 
-    def restore_from_list_of_nodes(self, list_of_nodes: list | tuple):
+    def restore_from_list_of_nodes(self, list_of_nodes: list | tuple) -> None:
         """
         Restore the ProcessingTree from a list of Nodes with the required
         information.
 
         Parameters
         ----------
-        list_of_nodes : list | tuple
+        list_of_nodes : list or tuple
             A list of nodes with a dictionary entry for each node holding all
             the required information (plugin_class, node_id and plugin
             Parameters).
@@ -457,25 +455,38 @@ class ProcessingTree(GenericTree):
         ]
         return _nodes_w_results
 
-    def get_complete_plugin_metadata(self) -> dict:
+    def get_plugin_metadata(
+        self,
+        *identifiers: Literal[
+            "all", "shapes", "labels", "names", "data_labels", "result_titles"
+        ],
+    ) -> dict:
         """
         Get the metadata (e.g. shapes, labels, names) for all the tree's plugins.
 
         Note that the shapes are only available after running the plugin chain at
         least once. Otherwise, the shapes will be set to None.
 
+        Parameters
+        ----------
+        *identifiers : Literal["all", "shapes", "labels", "names",
+        "data_labels", "result_titles"]
+
+            The identifiers for the metadata to be returned. If "all" is given, all
+            metadata will be returned. Otherwise, only the specified metadata will
+            be returned.
+
         Returns
         -------
-        dict
-            The dictionary with the metadata.
+        dict[int, Any] or dict[str, dict[int, Any]]
+            The dictionary with the metadata. If only a single metadata is requested,
+            the dictionary with node IDs and metadata is returned, otherwise
+            a dictionary with the metadata keys and the respective dictionaries
+            with node IDs and metadata is returned.
         """
-        _meta = {
-            "shapes": {},
-            "labels": {},
-            "names": {},
-            "data_labels": {},
-            "result_titles": {},
-        }
+        if "all" in identifiers:
+            identifiers = ("shapes", "labels", "names", "data_labels", "result_titles")
+        _meta = {_key: {} for _key in identifiers}
         if self.root is None:
             return _meta
         _shapes = [_node.result_shape for _node in self.nodes.values()]
@@ -484,11 +495,18 @@ class ProcessingTree(GenericTree):
         for _node_id, _node in self.nodes.items():
             if _node.plugin.output_data_dim is None or _node.result_shape is None:
                 continue
-            _label = _node.plugin.get_param_value("label")
-            _plugin_name = _node.plugin.__class__.plugin_name
-            _meta["shapes"][_node_id] = _node.result_shape
-            _meta["labels"][_node_id] = _label
-            _meta["names"][_node_id] = _plugin_name
-            _meta["data_labels"][_node_id] = _node.plugin.result_data_label
-            _meta["result_titles"][_node_id] = _node.plugin.result_title
+            if "labels" in identifiers:
+                _label = _node.plugin.get_param_value("label")
+                _meta["labels"][_node_id] = _label
+            if "names" in identifiers:
+                _plugin_name = _node.plugin.__class__.plugin_name
+                _meta["names"][_node_id] = _plugin_name
+            if "shapes" in identifiers:
+                _meta["shapes"][_node_id] = _node.result_shape
+            if "data_labels" in identifiers:
+                _meta["data_labels"][_node_id] = _node.plugin.result_data_label
+            if "result_titles" in identifiers:
+                _meta["result_titles"][_node_id] = _node.plugin.result_title
+        if len(identifiers) == 1:
+            _meta = _meta[identifiers[0]]
         return _meta

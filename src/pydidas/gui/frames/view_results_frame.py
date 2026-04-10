@@ -42,7 +42,7 @@ from pydidas.gui.frames.builders.view_results_frame_builder import (
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.dialogues import critical_warning
-from pydidas.widgets.framework import BaseFrame, BaseFrameWithApp
+from pydidas.widgets.framework import BaseFrameWithApp
 from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import (
     ProcessingResults,
@@ -108,7 +108,7 @@ class ViewResultsFrame(BaseFrameWithApp):
             gridPos=(1, 1, 2, 1),
         )
         _layout = self.layout()
-        _layout.setRowStretch(_layout.rowCount() - 1, 1)  # noqa: E0602
+        _layout.setRowStretch(_layout.rowCount() - 1, 1)  # type: ignore[attr-defined]
         if self._config["enable_import"]:
             self.__import_dialog = PydidasFileDialog()
         self._widgets["import_container"].setVisible(self._config["enable_import"])
@@ -128,22 +128,6 @@ class ViewResultsFrame(BaseFrameWithApp):
         self._widgets["but_export_current"].clicked.connect(self._export_current)
         self._widgets["but_export_all"].clicked.connect(self._export_all)
 
-    @QtCore.Slot(int)
-    def frame_activated(self, index: int) -> None:
-        """
-        Received a signal that a new frame has been selected.
-
-        This method checks whether the selected frame is the current class
-        and if yes, it will call some updates.
-
-        Parameters
-        ----------
-        index : int
-            The index of the newly activated frame.
-        """
-        BaseFrame.frame_activated(self, index)
-        self._config["frame_active"] = index == self.frame_index
-
     def import_data_to_workflow_results(self) -> None:
         """Import data to the workflow results."""
         _dir = self.__import_dialog.get_existing_directory(
@@ -151,10 +135,10 @@ class ViewResultsFrame(BaseFrameWithApp):
             qsettings_ref="WorkflowResults__import",
         )
         if _dir is not None:
-            self._RESULTS.import_data_from_directory(_dir)  # noqa: W0212
-            _tree = self._RESULTS._TREE  # noqa: W0212
-            _tree.root.plugin._SCAN = self._RESULTS._SCAN  # noqa: W0212
-            _tree.root.plugin.update_filepath()  # noqa: W0212
+            self._RESULTS.import_data_from_directory(_dir)
+            _tree = self._RESULTS._TREE
+            _tree.root.plugin._SCAN = self._RESULTS._SCAN
+            _tree.root.plugin.update_filepath()
             self.update_choices_of_selected_results()
             self._selected_new_node(-1)
 
@@ -163,8 +147,8 @@ class ViewResultsFrame(BaseFrameWithApp):
         _should_be_visible = len(self._RESULTS.result_titles) > 0
         self._widgets["label_select_header"].setVisible(_should_be_visible)
         self._widgets["result_table"].setVisible(_should_be_visible)
-        self._widgets["result_table"].update_choices_from_workflow_results(
-            self._RESULTS
+        self._widgets["result_table"].update_node_descriptions(
+            self._RESULTS.result_titles
         )
 
     def update_export_setting_visibility(self) -> None:
@@ -270,7 +254,7 @@ class ViewResultsFrame(BaseFrameWithApp):
         if self._active_node_id == -1:
             critical_warning(
                 "No node selected",
-                ("No node has been selected. Please select a node and try again."),
+                "No node has been selected. Please select a node and try again.",
             )
             return
         self._export(self._active_node_id)

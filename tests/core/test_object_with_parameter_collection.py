@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -354,7 +354,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         self.assertIsInstance(obj2, ObjectWithParameterCollection)
         self.assertNotEqual(id(obj), id(obj2))
 
-    def test_explicity_copy(self):
+    def test_copy__w_config(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj._config = {"a": "123", "b": [1, 2, 3], "c": ("A", "C")}
@@ -392,7 +392,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         for _key, _val in obj.param_values.items():
             self.assertEqual(_val, obj2.get_param_value(_key))
 
-    def test_explicity_deepcopy(self):
+    def test_deepcopy(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj._config = {"a": 123, "b": [1, 2, 3], "c": ("A", "C")}

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -43,7 +43,7 @@ class GenericNode:
     kwargs_for_copy_creation = []
 
     @staticmethod
-    def _verify_type(item: object, allowNone: bool = False):
+    def _verify_type(item: Any, allowNone: bool = False) -> None:
         """
         Check that an item is of the type class and raise a TypeError if not.
 
@@ -66,7 +66,7 @@ class GenericNode:
                 "Cannot add objects which are not of type GenericNode (or subclasses)."
             )
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Set up the generic node.
 
@@ -84,7 +84,7 @@ class GenericNode:
             setattr(self, _key, _value)
         self._children = []
 
-    def add_child(self, child: Self):
+    def add_child(self, child: Self) -> None:
         """
         Add a child to the node.
 
@@ -193,7 +193,7 @@ class GenericNode:
         return self._parent
 
     @parent.setter
-    def parent(self, parent: Self | None):
+    def parent(self, parent: Self | None) -> None:
         """
         Set the node's parent.
 
@@ -237,18 +237,38 @@ class GenericNode:
         """
         return [_child.node_id for _child in self._children]
 
-    def get_children(self) -> list:
+    @property
+    def recursive_child_ids(self) -> list[int]:
+        """
+        Get a recursive list of the children's IDs.
+        """
+        _ids = self.children_ids
+        for _child in self.children:
+            _ids += _child.recursive_child_ids
+        return _ids
+
+    def get_children(self, recursive: bool = False) -> list:
         """
         Get the child objects.
 
-        This method will return the child objects themselves.
+        This method will return the child objects themselves. The recursive
+        keyword allows to get all the children recursively.
+
+        Parameters
+        ----------
+        recursive : bool, optional
+            Keyword to toggle recursive get of the children. The default is False.
 
         Returns
         -------
         list
             A list with the children.
         """
-        return self._children
+        _children = self._children[:]
+        if recursive:
+            for _child in self.children:
+                _children += _child.get_children(recursive=True)
+        return _children
 
     def get_recursive_connections(self) -> list[list[int, int]]:
         """
@@ -288,7 +308,13 @@ class GenericNode:
             res += child.get_recursive_ids()
         return res
 
-    def delete_node_references(self, recursive: bool = True):
+    def reset_all_node_ids(self) -> None:
+        """Reset the node_id of the node and all children in its branch to None."""
+        self.node_id = None
+        for child in self._children:
+            child.reset_all_node_ids()
+
+    def delete_node_references(self, recursive: bool = True) -> None:
         """
         Delete all references to the node from its parent and children.
 
@@ -315,10 +341,10 @@ class GenericNode:
                 "Node children detected but deletion is not recursive."
             )
         self.parent = None
-        for _child in self._children:
-            _child.delete_node_references(recursive)
+        while self.children:
+            self.children[0].delete_node_references(recursive)
 
-    def connect_parent_to_children(self):
+    def connect_parent_to_children(self) -> None:
         """
         Connect the node's parent to the node's children.
 
@@ -342,7 +368,7 @@ class GenericNode:
         self._children = []
         self.parent = None
 
-    def remove_child_reference(self, child: Self):
+    def remove_child_reference(self, child: Self) -> None:
         """
         Remove reference to an object from the node.
 
@@ -366,13 +392,13 @@ class GenericNode:
             raise ValueError("Instance is not a child!")
         self._children.remove(child)
 
-    def change_node_parent(self, new_parent: Self):
+    def change_node_parent(self, new_parent: Self) -> None:
         """
         Change the parent of the selected node.
 
         Parameters
         ----------
-        new_parent : Union[pydidas.workflow.GenericNode, None]
+        new_parent : GenericNode
             The new parent of the node.
         """
         if new_parent in [self._parent, self]:

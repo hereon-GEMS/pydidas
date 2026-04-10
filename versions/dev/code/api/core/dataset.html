@@ -633,13 +633,16 @@ dimension in the array and respective values.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'C'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'F'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'A'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'K'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'C'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.copy" title="Link to this definition">#</a></dt>
-<dd><p>Overload the generic nd.ndarray copy method to copy metadata as well.</p>
+<dd><p>Create a full copy of the Dataset, similar to ndarray.copy.</p>
+<p>The copy method duplicates the underlying array data and metadata and
+creates a fully independent copy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>order</strong> (<em>Literal</em><em>[</em><em>&quot;C&quot;</em><em>, </em><em>&quot;F&quot;</em><em>, </em><em>&quot;A&quot;</em><em>, </em><em>&quot;K&quot;</em><em>]</em><em>, </em><em>optional</em>) – The memory layout. The default is “C”.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The copied dataset.</p>
+<dd class="field-even"><p>A fully independent copy with separate array data and independent
+metadata.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
@@ -707,7 +710,7 @@ The default is ‘C’.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.flatten_dims">
-<span class="sig-name descname"><span class="pre">flatten_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.flatten_dims" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">flatten_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.flatten_dims" title="Link to this definition">#</a></dt>
 <dd><p>Flatten the specified dimensions <strong>in place</strong> in the Dataset.</p>
 <p>This method will reduce the dimensionality of the Dataset by len(args).</p>
 <p>Warning: Flattening distributed dimensions throughout the dataset will
@@ -716,8 +719,8 @@ processed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> (<em>tuple</em><em>[</em><em>int</em><em>]</em>) – The tuple of the dimensions to be flattened. Each dimension must
-be an integer entry.</p></li>
+<li><p><strong>*args</strong> (<em>int</em>) – The dimensions to be flattened. Each dimension must be an integer
+entry.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Additional keyword arguments. Supported keywords are:</p>
 <dl class="simple">
 <dt>new_dim_label<span class="classifier">str, optional</span></dt><dd><p>The label for the new, flattened dimension. The default is
@@ -725,8 +728,8 @@ be an integer entry.</p></li>
 </dd>
 <dt>new_dim_unit<span class="classifier">str, optional</span></dt><dd><p>The unit for the new, flattened dimension. The default is ‘’.</p>
 </dd>
-<dt>new_dim_range<span class="classifier">Union[None, ndarray, Iterable], optional</span></dt><dd><p>The new range for the flattened dimension. If None, a simple The
-default is None.</p>
+<dt>new_dim_range<span class="classifier">None or ndarray or Iterable, optional</span></dt><dd><p>The new range for the flattened dimension. If None, a default
+range is used. The default is None.</p>
 </dd>
 </dl>
 </p></li>
@@ -1098,7 +1101,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.update_axis_label">
-<span class="sig-name descname"><span class="pre">update_axis_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_label" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_axis_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_label" title="Link to this definition">#</a></dt>
 <dd><p>Update a single axis label value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1116,7 +1119,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.update_axis_range">
-<span class="sig-name descname"><span class="pre">update_axis_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_range" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_axis_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_range" title="Link to this definition">#</a></dt>
 <dd><p>Update a single axis range value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1133,7 +1136,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.update_axis_unit">
-<span class="sig-name descname"><span class="pre">update_axis_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_unit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_axis_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.update_axis_unit" title="Link to this definition">#</a></dt>
 <dd><p>Update a single axis unit value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

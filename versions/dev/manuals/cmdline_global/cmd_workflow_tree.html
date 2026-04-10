@@ -555,14 +555,14 @@ methods to run either the full Workflow or just individual plugins for testing.<
 <p>To test individual plugins, users can use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">execute_single_plugin</span></code> method.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">execute_single_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg:</span> <span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs:</span> <span class="pre">dict)</span> <span class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span class="pre">'object'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'dict'&gt;</span></span></em><span class="sig-paren">)</span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingTree.</span></span><span class="sig-name descname"><span class="pre">execute_single_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">object</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span></dt>
 <dd><p>Execute a single node Plugin and get the return.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The ID of the node in the tree.</p></li>
 <li><p><strong>arg</strong> (<em>object</em>) – The input argument for the Plugin.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Any keyword arguments for the Plugin execution.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any keyword arguments for the Plugin execution.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

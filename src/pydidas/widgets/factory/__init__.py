@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ to simplified widget creation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,6 +34,7 @@ from .pydidas_checkbox import PydidasCheckBox
 from .pydidas_combobox import PydidasComboBox
 from .pydidas_label import PydidasLabel
 from .pydidas_lineedit import PydidasLineEdit
+from .pydidas_list_widget import PydidasListWidget
 from .pydidas_pushbutton import PydidasPushButton
 from .radio_button_group import RadioButtonGroup
 from .square_button import SquareButton
@@ -46,6 +47,7 @@ __all__ = [
     "PydidasComboBox",
     "PydidasLabel",
     "PydidasLineEdit",
+    "PydidasListWidget",
     "PydidasPushButton",
     "SquareButton",
     "RadioButtonGroup",

@@ -34,7 +34,7 @@ __all__ = ["PyfaiCalibFrame"]
 import argparse
 import functools
 from pathlib import Path
-from typing import Self
+from typing import Any
 
 import numpy as np
 import pyFAI
@@ -42,42 +42,31 @@ from pyFAI.app import calib2
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.model import MarkerModel
+from pyFAI.gui.tasks.ExperimentTask import ExperimentTask
+from pyFAI.gui.tasks.GeometryTask import GeometryTask
+from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
+from pyFAI.gui.tasks.MaskTask import MaskTask
+from pyFAI.gui.tasks.PeakPickingTask import PeakPickingTask
 from pyFAI.gui.utils import projecturl
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
+from silx.gui.qt import QToolBar
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
+from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
-from pydidas.widgets.dialogues import WarningBox
-from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.silx_plot import actions
 
 
 EXP = DiffractionExperimentContext()
-_ILLEGAL_DET_STR = (
-    "The detector configuration was illegal or no detector has been selelcted and "
-    "the detector has been reset.\n\n"
-    "Please repeat the selection and check that all a detector has been selected "
-    "and all necessary detector parameters have been entered."
-)
 
 
-class _List(PydidasWidgetMixin, QtWidgets.QListWidget):
-    """
-    A list with automatic width scaling.
-
-    The scaling is handled automatically based on the font settings.
-    """
-
-    def __init__(self, **kwargs: dict):
-        QtWidgets.QListWidget.__init__(self, parent=kwargs.get("parent", None))
-        PydidasWidgetMixin.__init__(self, **kwargs)
-
-
-def _create_calib_tasks() -> list[QtWidgets.QWidget]:
+def _create_calib_tasks() -> list[
+    ExperimentTask | MaskTask | PeakPickingTask | GeometryTask | IntegrationTask
+]:
     """
     Create the tasks for the calibration.
 
@@ -88,32 +77,29 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
     Returns
     -------
     tasks : list
-        The list with the tasks.
+        The list with the task instances.
 
     """
-    from pyFAI.gui.tasks import (
-        ExperimentTask,
-        GeometryTask,
-        IntegrationTask,
-        MaskTask,
-        PeakPickingTask,
-    )
-    from silx.gui.qt import QToolBar
-
-    tasks = [
-        ExperimentTask.ExperimentTask(),
-        MaskTask.MaskTask(),
-        PeakPickingTask.PeakPickingTask(),
-        GeometryTask.GeometryTask(),
-        IntegrationTask.IntegrationTask(),
+    _experiment_task: ExperimentTask = ExperimentTask()
+    _mask_task: MaskTask = MaskTask()
+    _peak_task: PeakPickingTask = PeakPickingTask()
+    _geometry_task: GeometryTask = GeometryTask()
+    _integration_task: IntegrationTask = IntegrationTask()
+    _tasks = [
+        _experiment_task,
+        _mask_task,
+        _peak_task,
+        _geometry_task,
+        _integration_task,
     ]
+
     for _item in ["_imageLoader", "_maskLoader", "_darkLoader", "_flatLoader"]:
-        _obj = getattr(tasks[0], _item)
+        _obj = getattr(_experiment_task, _item)
         _action = actions.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
         _obj.addAction(_action)
         _obj.setDefaultAction(_action)
         _obj.setText("...")
-    for _task in tasks[0:4]:
+    for _task in [_experiment_task, _mask_task, _peak_task, _geometry_task]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
         _histo_crop_action = actions.CropHistogramOutliers(
@@ -132,17 +118,22 @@ def _create_calib_tasks() -> list[QtWidgets.QWidget]:
         _toolbar.insertAction(_widget_action, _histo_crop_action)
         _toolbar.insertAction(_widget_action, _autoscale_action)
     # explicitly hide the toolbar with the 3D visualization:
-    tasks[0]._ExperimentTask__plot.findChildren(QToolBar)[2].setVisible(False)
-    tasks[3]._GeometryTask__plot.findChildren(QToolBar)[2].setVisible(False)
+    getattr(_experiment_task, "_ExperimentTask__plot").findChildren(QToolBar)[
+        2
+    ].setVisible(False)
+    getattr(_geometry_task, "_GeometryTask__plot").findChildren(QToolBar)[2].setVisible(
+        False
+    )
     # disable the default ring option in the peak picking task:
-    tasks[2]._PeakPickingTask__createNewRingOption.setChecked(False)
+    getattr(_peak_task, "_PeakPickingTask__createNewRingOption").setChecked(False)
     # insert a button for exporting to DiffractionExperimentContext:
-    _parent = tasks[4]._savePoniButton.parent()
-    tasks[4]._update_context_button = QtWidgets.QPushButton(
+    _save_poni_button = getattr(_integration_task, "_savePoniButton")
+    _parent = _save_poni_button.parent()
+    _integration_task._update_context_button = QtWidgets.QPushButton(
         "Update pydidas diffraction setup from calibration"
     )
-    _parent.layout().addWidget(tasks[4]._update_context_button)
-    return tasks
+    _parent.layout().addWidget(_integration_task._update_context_button)
+    return _tasks
 
 
 class PyfaiCalibFrame(BaseFrame):
@@ -163,20 +154,15 @@ class PyfaiCalibFrame(BaseFrame):
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
 
-    def __init__(self, **kwargs: dict) -> Self:
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         self._setup_pyfai_context()
         self._tasks = _create_calib_tasks()
         self.__export_dialog = PydidasFileDialog()
 
-    def _setup_pyfai_context(self):
-        """
-        Set up the context for the pyfai calibration.
-
-        """
-        import silx.gui.utils.matplotlib  # noqa F401
-
-        pyFAI.resources.silx_integration()
+    def _setup_pyfai_context(self) -> None:
+        """Set up the context for the pyfai calibration."""
+        pyFAI.resources.silx_integration()  # type: ignore[attr-defined]
 
         _settings = QtCore.QSettings(
             QtCore.QSettings.IniFormat,
@@ -190,15 +176,14 @@ class PyfaiCalibFrame(BaseFrame):
         _calib_context.restoreSettings()
         parser = argparse.ArgumentParser()
         calib2.configure_parser_arguments(parser)
-        options, _unknown = parser.parse_known_args()
+        options, _ = parser.parse_known_args()
         calib2.setup_model(_calib_context.getCalibrationModel(), options)
         self._calibration_context = _calib_context
         self._calibration_context.setParent(self)
+        self._calibration_model = _calib_context.getCalibrationModel()
 
-    def build_frame(self):
-        """
-        Build the frame with all required widgets.
-        """
+    def build_frame(self) -> None:
+        """Build the frame with all required widgets."""
         self.setUpdatesEnabled(False)
         self.create_label(
             "title",
@@ -207,132 +192,96 @@ class PyfaiCalibFrame(BaseFrame):
             bold=True,
             gridPos=(0, 0, 1, 2),
         )
-        self.create_any_widget(
+        self.create_list_widget(
             "task_list",
-            _List,
             font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
             sizePolicy=POLICY_FIX_EXP,
             gridPos=(1, 0, 1, 1),
         )
-        _text = (
-            "Online help"
-            if projecturl.get_documentation_url("").startswith("http")
-            else "Help"
-        )
         self.create_button(
             "but_help",
-            _text,
+            "Help",
             gridPos=(2, 0, 1, 1),
             font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
         )
         self.add_any_widget(
             "task_stack",
-            QtWidgets.QStackedWidget(),
+            QtWidgets.QStackedWidget(),  # type: ignore[arg-type]
             gridPos=(1, 1, 2, 1),
         )
         for task in self._tasks:
             self._widgets["task_stack"].addWidget(task)
         self.setUpdatesEnabled(True)
 
-    def connect_signals(self):
-        """
-        Connect the required signals to run the pyFAI calibration.
-        """
+    def connect_signals(self) -> None:
+        """Connect the required signals to run the pyFAI calibration."""
         self._widgets["task_list"].currentRowChanged.connect(
             self._widgets["task_stack"].setCurrentIndex
         )
         self._widgets["but_help"].clicked.connect(self._display_help)
-        for task in self._tasks:
-            task.nextTaskRequested.connect(self.display_next_task)
-            _inverted_icon = icon_with_inverted_colors(task.windowIcon())
+        for _task in self._tasks:
+            _task.nextTaskRequested.connect(self.display_next_task)
+            _inverted_icon = icon_with_inverted_colors(_task.windowIcon())
             _menu_item = MenuItem(self._widgets["task_list"])
-            _menu_item.setText(task.windowTitle())
+            _menu_item.setText(_task.windowTitle())
             _menu_item.setIcon(_inverted_icon)
-            task.warningUpdated.connect(
-                functools.partial(self._update_task_state, task, _menu_item)
+            _task.warningUpdated.connect(
+                functools.partial(self._update_task_state, _task, _menu_item)
             )
         if len(self._tasks) > 0:
             self._widgets["task_list"].setCurrentRow(0)
             # Hide the nextStep button of the last task
-            task.setNextStepVisible(False)
-        self._tasks[4]._savePoniButton.clicked.disconnect()
-        self._tasks[4]._savePoniButton.clicked.connect(self._export_poni)
-        self._tasks[4]._update_context_button.clicked.connect(
+            _last_task: Any = self._tasks[-1]
+            _last_task.setNextStepVisible(False)
+        _integration_task: IntegrationTask = self._tasks[4]
+        _integration_task._savePoniButton.clicked.disconnect()
+        _integration_task._savePoniButton.clicked.connect(self._export_poni)
+        _integration_task._update_context_button.clicked.connect(
             self._update_pydidas_diffraction_exp_context
         )
-        # TODO: Remove when issue fixed in pyFAI latest release
-        self._tasks[0]._customDetector.clicked.disconnect()
-        self._tasks[0]._customDetector.clicked.connect(
-            self._ExperimentTask__customDetector
-        )
 
-    def _ExperimentTask__customDetector(self):
-        """
-        Wrap the custom detector button to catch illegal entries.
-
-        This is a temporary workaround for an issue in pyFAI which raises
-        an AttributeError when the detector configuration is illegal.
-        """
-        try:
-            self._tasks[0]._ExperimentTask__customDetector()
-        except AttributeError:
-            WarningBox("Detector configuration error", _ILLEGAL_DET_STR)
-
-    def finalize_ui(self):
-        """
-        Run the UI finalization after creating widgets and connecting signals.
-        """
-        self.setup_calibration_model()
-
-    def setup_calibration_model(self):
-        """
-        Set up the calibration model from the context.
-        """
-        self._model = self._calibration_context.getCalibrationModel()
-        if len(self._model.markerModel()) == 0:
+    def finalize_ui(self) -> None:
+        """Run the UI finalization after creating widgets and connecting signals."""
+        if len(self._calibration_model.markerModel()) == 0:
             origin = MarkerModel.PixelMarker("Origin", 0, 0)
-            self._model.markerModel().add(origin)
+            self._calibration_model.markerModel().add(origin)
         for task in self._tasks:
-            task.setModel(self._model)
+            task.setModel(self._calibration_model)
 
     @QtCore.Slot()
-    def _display_help(self):
-        """
-        Display the help for the pyFAI calibration.
-        """
+    def _display_help(self) -> None:
+        """Display the help for the pyFAI calibration."""
         _url = projecturl.get_documentation_url("usage/cookbook/calib-gui/index.html")
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(_url))
 
     @QtCore.Slot(object, object)
-    def _update_task_state(self, task: QtWidgets.QWidget, item: MenuItem):
+    def _update_task_state(self, task: Any, item: MenuItem) -> None:
         """
         Update the task state.
 
-        This method re-implements the generic pyFAI method.
+        This method re-implements the generic CalibrationWindow method which
+        would be missing in the pydidas implementation.
 
         Parameters
         ----------
-        task : QtWidgets.QWidget
+        task : Any
             The associated task widget.
         item : MenuItem
             The associated menu item.
         """
-        item.setWarnings(task.nextStepWarning())
+        _task: Any = task
+        item.setWarnings(_task.nextStepWarning())
 
     @QtCore.Slot()
-    def display_next_task(self):
-        """
-        Display the next task in the QStackedWidget.
-        """
+    def display_next_task(self) -> None:
+        """Display the next task in the QStackedWidget."""
         _index = self._widgets["task_list"].currentRow() + 1
         if _index < self._widgets["task_list"].count():
             self._widgets["task_list"].setCurrentRow(_index)
 
     @QtCore.Slot()
-    def _export_poni(self):
-        """
-        Export the poni settings to a file.
-        """
+    def _export_poni(self) -> None:
+        """Export the poni settings to a file."""
         _fname = self.__export_dialog.get_saving_filename(
             caption="Export experiment context file",
             formats=DiffractionExperimentIo.get_string_of_formats(),
@@ -340,15 +289,15 @@ class PyfaiCalibFrame(BaseFrame):
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="PyfaiCalibFrame__export",
             info_string=(
-                "<b>Note:</b> Using yaml format allows to export the mask file name as "
-                "well. pyFAI's poni format does not include the mask file."
+                "<b>Note:</b> Using yaml format allows to export the mask file name "
+                "as well. pyFAI's poni format does not include the mask file."
             ),
         )
         if _fname is None:
             return
         _experiment = DiffractionExperiment()
-        _det = self._model.experimentSettingsModel().detector()
-        _geo = self._model.fittedGeometry()
+        _det = self._calibration_model.experimentSettingsModel().detector()
+        _geo = self._calibration_model.fittedGeometry()
         _experiment.set_param_value("detector_name", _det.name)
         _experiment.set_param_value("detector_npixx", _det.shape[1])
         _experiment.set_param_value("detector_npixy", _det.shape[0])
@@ -356,7 +305,12 @@ class PyfaiCalibFrame(BaseFrame):
         _experiment.set_param_value("detector_pxsizey", 1e6 * _det.pixel1)
         _wavelength = float(np.round(_geo.wavelength().value() * 1e10, 12))
         _experiment.set_param_value("xray_wavelength", _wavelength)
-
+        if not len(_det.shape) == 2 or _det.shape[0] == 0 or _det.shape[1] == 0:
+            raise UserConfigError(
+                "Cannot export the geometry to a PONI file because the detector shape "
+                "is not valid. Please check that a valid detector has been selected "
+                "and all necessary parameters have been entered."
+            )
         _mask = self._get_mask_filename()
         if _mask is not None:
             _experiment.set_param_value("detector_mask_file", _mask)
@@ -383,18 +337,16 @@ class PyfaiCalibFrame(BaseFrame):
         str or None
             The filename of the mask file. If no mask file has been, returns None.
         """
-        _maskfile = self._model.experimentSettingsModel().mask().filename()
+        _maskfile = self._calibration_model.experimentSettingsModel().mask().filename()
         if _maskfile is not None:
             _maskfile = _maskfile.removeprefix("fabio:///")
         return _maskfile
 
     @QtCore.Slot()
-    def _update_pydidas_diffraction_exp_context(self):
-        """
-        Store the fitted geometry in the DiffractionExperimentContext.
-        """
-        geo = self._model.fittedGeometry()
-        det = self._model.experimentSettingsModel().detector()
+    def _update_pydidas_diffraction_exp_context(self) -> None:
+        """Store the fitted geometry in the DiffractionExperimentContext."""
+        geo = self._calibration_model.fittedGeometry()
+        det = self._calibration_model.experimentSettingsModel().detector()
         EXP.set_param_value(
             "xray_wavelength", float(np.round(geo.wavelength().value() * 1e10, 12))
         )

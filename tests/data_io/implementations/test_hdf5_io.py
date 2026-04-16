@@ -62,6 +62,8 @@ def config(temp_path):
         for _path in ["test/path/res", "entry/data/data"]:
             _local_data = data if _path == "test/path/res" else data[data_slice]
             create_nxdata_entry(_file, _path, _local_data)
+        create_nxdata_entry(_file, "entry/scalar/data", 1.5)
+        create_nxdata_entry(_file, "entry/0d/data", [1.5])
     yield {
         "path": temp_path,
         "fname": fname,
@@ -184,6 +186,33 @@ def test_import_from_file__complex_indexing(config, indices, slicing, squeeze):
     if squeeze:
         _ref = _ref.squeeze()
     assert np.allclose(_data, _ref)
+
+
+@pytest.mark.parametrize("dset", ["entry/scalar/data", "entry/0d/data"])
+def test_import_from_file__w_0d_and_scalar_data(config, dset):
+    _data = Hdf5Io.import_from_file(config["fname"], dataset=dset, import_metadata=True)
+    assert isinstance(_data, np.ndarray)
+    assert _data == pytest.approx(1.5)
+    assert _data.size == 1
+
+
+def test_import_from_file__w_scalar_data_and_slicing(config):
+    with pytest.raises(FileReadError):
+        _ = Hdf5Io.import_from_file(
+            config["fname"],
+            dataset="entry/scalar/data",
+            import_metadata=False,
+            indices=0,
+        )
+
+
+def test_import_from_file__w_0d_data_and_slicing(config):
+    _data = Hdf5Io.import_from_file(
+        config["fname"], dataset="entry/0d/data", import_metadata=False, indices=0
+    )
+    assert isinstance(_data, np.ndarray)
+    assert _data == pytest.approx(1.5)
+    assert _data.size == 1
 
 
 def test_import_from_file__w_dataset(config):

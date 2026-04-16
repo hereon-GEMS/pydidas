@@ -113,6 +113,8 @@ class Hdf5Io(IoBase):
             CatchFileErrors(filename),
             h5py.File(filename, "r") as _h5file,
         ):
+            if _h5file[dataset].shape == () and _indices == (slice(None),):
+                _indices = ()
             _raw_data = _h5file[dataset][_indices]
             _human_readable_indices = (
                 "[" + ", ".join(str_repr_of_slice(_item) for _item in _indices) + "]"

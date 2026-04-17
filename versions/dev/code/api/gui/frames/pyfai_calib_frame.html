@@ -458,7 +458,7 @@
 <span id="own-methods-pyfaicalibframe"></span><h2>PyfaiCalibFrame with own methods only<a class="headerlink" href="#class-name-with-own-methods-only" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">PyfaiCalibFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">PyfaiCalibFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame" title="Link to this definition">#</a></dt>
 <dd><p>A pyFAI Calibration frame similar to the “pyfai-calib2”, adapted to be
 used within pydidas.</p>
 <p>Note: Because this code is adapted from pyFAI, the names, nomenclature and
@@ -467,32 +467,26 @@ code structure are different from the rest of pydidas.</p>
 available.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame.build_frame">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.build_frame" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.build_frame" title="Link to this definition">#</a></dt>
 <dd><p>Build the frame with all required widgets.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame.connect_signals">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.connect_signals" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.connect_signals" title="Link to this definition">#</a></dt>
 <dd><p>Connect the required signals to run the pyFAI calibration.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame.display_next_task">
-<span class="sig-name descname"><span class="pre">display_next_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.display_next_task" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">display_next_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.display_next_task" title="Link to this definition">#</a></dt>
 <dd><p>Display the next task in the QStackedWidget.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame.finalize_ui">
-<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.finalize_ui" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.finalize_ui" title="Link to this definition">#</a></dt>
 <dd><p>Run the UI finalization after creating widgets and connecting signals.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.PyfaiCalibFrame.setup_calibration_model">
-<span class="sig-name descname"><span class="pre">setup_calibration_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.PyfaiCalibFrame.setup_calibration_model" title="Link to this definition">#</a></dt>
-<dd><p>Set up the calibration model from the context.</p>
 </dd></dl>
 
 </dd></dl>
@@ -502,7 +496,7 @@ available.</p>
 <span id="all-methods-pyfaicalibframe"></span><h2>PyfaiCalibFrame with inherited methods too<a class="headerlink" href="#class-name-with-inherited-methods-too" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">PyfaiCalibFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.</span></span><span class="sig-name descname"><span class="pre">PyfaiCalibFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>A pyFAI Calibration frame similar to the “pyfai-calib2”, adapted to be
 used within pydidas.</p>
 <p>Note: Because this code is adapted from pyFAI, the names, nomenclature and
@@ -566,7 +560,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Build the frame with all required widgets.</p>
 </dd></dl>
 
@@ -583,7 +577,7 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Connect the required signals to run the pyFAI calibration.</p>
 </dd></dl>
 
@@ -761,6 +755,22 @@ are valid kwargs. In addition, the ‘gridPos’ keyword can be used
 to specify the LineEdit’s position in its parent’s layout.
 The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
 be used to control the font properties.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_list_widget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span></dt>
+<dd><p>Create a list widget with automatic font scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
+will automatically get a unique reference number.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any additional keyword arguments. All PydidasWidgetsMixin kwargs
+are supported.</p></li>
 </ul>
 </dd>
 </dl>
@@ -954,7 +964,7 @@ implementation are valid kwargs.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">display_next_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">display_next_task</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Display the next task in the QStackedWidget.</p>
 </dd></dl>
 
@@ -976,7 +986,7 @@ frame’s state.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Run the UI finalization after creating widgets and connecting signals.</p>
 </dd></dl>
 
@@ -1300,12 +1310,6 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">setup_calibration_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
-<dd><p>Set up the calibration model from the context.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">toggle_param_widget_visibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visible</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Toggle the visibility of widgets referenced with the key.</p>
 <p>This method allows showing/hiding the label and input widget for a
@@ -1422,7 +1426,6 @@ converted to string for display purposes.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.PyfaiCalibFrame.connect_signals"><code class="docutils literal notranslate"><span class="pre">PyfaiCalibFrame.connect_signals</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.PyfaiCalibFrame.display_next_task"><code class="docutils literal notranslate"><span class="pre">PyfaiCalibFrame.display_next_task</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.PyfaiCalibFrame.finalize_ui"><code class="docutils literal notranslate"><span class="pre">PyfaiCalibFrame.finalize_ui</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.PyfaiCalibFrame.setup_calibration_model"><code class="docutils literal notranslate"><span class="pre">PyfaiCalibFrame.setup_calibration_model</span></code></a></li>
 </ul>
 </li>
 </ul>

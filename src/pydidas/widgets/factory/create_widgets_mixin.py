@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ add convenience widget creation methods to other classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,6 +40,7 @@ from pydidas.widgets.factory.pydidas_checkbox import PydidasCheckBox
 from pydidas.widgets.factory.pydidas_combobox import PydidasComboBox
 from pydidas.widgets.factory.pydidas_label import PydidasLabel
 from pydidas.widgets.factory.pydidas_lineedit import PydidasLineEdit
+from pydidas.widgets.factory.pydidas_list_widget import PydidasListWidget
 from pydidas.widgets.factory.pydidas_pushbutton import PydidasPushButton
 from pydidas.widgets.factory.pydidas_svgwidget import PydidasSvgWidget
 from pydidas.widgets.factory.pydidas_table import PydidasQTable
@@ -139,6 +140,21 @@ class CreateWidgetsMixIn:
         kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
         kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
         self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
+
+    def create_list_widget(self, ref: str | None, **kwargs: Any):
+        """
+        Create a list widget with automatic font scaling.
+
+        Parameters
+        ----------
+        ref : str | None
+            The reference string for storing the widget. If None, the widget
+            will automatically get a unique reference number.
+        **kwargs : Any
+            Any additional keyword arguments. All PydidasWidgetsMixin kwargs
+            are supported.
+        """
+        self.create_any_widget(ref, PydidasListWidget, **kwargs)
 
     def create_vertical_line(self, ref: str | None, **kwargs: Any):
         """

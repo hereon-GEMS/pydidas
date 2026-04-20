@@ -32,13 +32,11 @@ import numbers
 import pathlib
 from typing import Any, Type
 
-import numpy as np
 from numpy import nan, ndarray
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
-    FLOAT_DISPLAY_ACCURACY,
     POLICY_EXP_FIX,
 )
 from pydidas.core.utils import NumpyParser
@@ -187,12 +185,6 @@ class BaseParamIoWidgetMixIn:
         value : Any
             The new value to be displayed in the widget.
         """
-        if (
-            self._linked_param.dtype == numbers.Real
-            and value is not None
-            and np.isfinite(value)
-        ):
-            value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
         self.update_display_value(value)
         self.emit_signal()
 

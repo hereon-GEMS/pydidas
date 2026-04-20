@@ -34,7 +34,6 @@ import pytest
 from numpy import nan
 
 from pydidas.core import Hdf5key, Parameter, UserConfigError
-from pydidas.core.constants import FLOAT_DISPLAY_ACCURACY
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.parameter_config.base_param_io_widget import BaseParamIoWidget
@@ -192,12 +191,7 @@ def test_get_value__converter_error(qtbot):
         (str, "entry", "new_entry", "new_entry"),
         (float, 12, nan, nan),
         (float, 12, None, None),
-        (
-            float,
-            4,
-            12.0123456789876,
-            np.round(12.0123456789876, decimals=FLOAT_DISPLAY_ACCURACY),
-        ),
+        (float, 4, 12.0123456789876, 12.0123456789876),
         (Hdf5key, "/entry/data/data", "/entry/other/data", "/entry/other/data"),
         (Path, Path("/some/path"), "/another/path", "/another/path"),
         (np.ndarray, (1, 2, 3), (2, 3, 4), (2, 3, 4)),

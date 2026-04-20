@@ -38,6 +38,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.core.constants import (
     ALIGN_CENTER_LEFT,
+    FLOAT_DISPLAY_ACCURACY,
     FONT_METRIC_CONFIG_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
     PARAM_WIDGET_TEXT_WIDTH,
@@ -107,6 +108,9 @@ class ParameterWidget(EmptyWidget):
         validator : QValidator or None
             A custom validator to be used in the I/O widget, if applicable.
             The default is None.
+        precision : int or None
+            The precision for floating point values. Values will be rounded
+            to precision digits.
     """
 
     sig_new_value = QtCore.Signal(str)
@@ -207,6 +211,7 @@ class ParameterWidget(EmptyWidget):
             "layout_io": (_linebreak, 1, 1, 2 - (_unit_width > 0), ALIGN_CENTER_LEFT),
             "layout_unit": (_linebreak, 2, 1, 1, ALIGN_CENTER_LEFT),
             "validator": kwargs.get("validator", None),
+            "precision": kwargs.get("precision", FLOAT_DISPLAY_ACCURACY),
         }
 
     def __create_name_widget_if_required(self) -> None:
@@ -243,6 +248,7 @@ class ParameterWidget(EmptyWidget):
             "linebreak": self._config["linebreak"],
             "font_metric_height_factor": 1,
             "font_metric_width_factor": self._config["width_io"],
+            "precision": self._config["precision"],
         }
         self._widgets["io"] = self._param_widget_class(self.param, **kwargs)
         if self._config["validator"] is not None and hasattr(

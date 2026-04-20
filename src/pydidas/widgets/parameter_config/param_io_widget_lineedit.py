@@ -32,9 +32,10 @@ __all__ = ["ParamIoWidgetLineEdit"]
 import numbers
 from typing import Any
 
-from qtpy import QtGui
+import numpy as np
+from qtpy import QtCore, QtGui
 
-from pydidas.core import Parameter
+from pydidas.core import Parameter, UserConfigError
 from pydidas.core.constants import (
     FLOAT_VALIDATOR,
     POLICY_EXP_FIX,
@@ -61,12 +62,46 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
     """
 
     def __init__(self, param: Parameter, **kwargs: Any) -> None:
+        self._precision = kwargs.pop("precision", 10)
+        self._current_text_value: Any = None
+        if param.dtype is not numbers.Real:
+            self._precision = None
         PydidasLineEdit.__init__(self, **kwargs)
         BaseParamIoWidgetMixIn.__init__(self, param)
         self.update_validator()
         self.setText(f"{param.value}")
-        self.editingFinished.connect(self.emit_signal)
+        self.editingFinished.connect(self.round_on_editing_finished)
         self.setSizePolicy(*POLICY_EXP_FIX)  # noqa E1120, E1121
+
+    def setText(self, value: Any) -> None:
+        """
+        Set the text in the line edit.
+
+        This implementation also sets the precision if the linked Parameter
+        holds a floating point value.
+
+        Parameters
+        –---------
+        value : Any
+            The text to be set in the line edit.
+        """
+        display_value = value
+        if self._precision is not None and value not in [None, "None"]:
+            try:
+                _float_val = float(value)
+                if np.isfinite(_float_val):
+                    display_value = np.round(_float_val, self._precision)
+            except (TypeError, ValueError):
+                raise UserConfigError(
+                    f"The given value `{value}` for the Parameter "
+                    f"`{self._linked_param.refkey}` is not a valid floating point "
+                    "value and cannot be converted to a floating point value."
+                )
+        self._current_text_value = str(value)
+        super().setText(f"{display_value}")
+
+    # in this case, the update_display_value is an alias for setText
+    update_display_value = setText
 
     @property
     def current_text(self) -> str:
@@ -78,19 +113,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         str
             The current text in the line edit.
         """
-        return self.text()
-
-    def update_display_value(self, value: Any) -> None:
-        """
-        Update the widget value without emitting signals.
-
-        Parameters
-        ----------
-        value : Any
-            The new value to set in the widget.
-        """
-        # the setText method only emits the textChanged signal, not editingFinished
-        self.setText(f"{value}")
+        return self._current_text_value
 
     def update_validator(self) -> None:
         """Update the widget's validator based on the Parameter's configuration."""
@@ -107,3 +130,13 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
                 _validator = FLOAT_VALIDATOR
         if _validator is not None:
             self.setValidator(_validator)
+
+    @QtCore.Slot()
+    def round_on_editing_finished(self) -> None:
+        """
+        Apply the precision fix, if necessary, before emitting signals for the
+        new value.
+        """
+        if self._precision is not None:
+            self.setText(self.text())
+        self.emit_signal()

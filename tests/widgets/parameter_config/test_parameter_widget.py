@@ -70,7 +70,6 @@ LAYOUT_TOP_BOTTOM_MARGIN = ParameterWidget.LAYOUT_TOP_BOTTOM_MARGIN
 
 
 def widget_instance(qtbot, param, **kwargs) -> ParameterWidget:
-    param.restore_default()
     widget = ParameterWidget(param, **kwargs)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)  # type: ignore[attr-defined]
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)  # type: ignore[attr-defined]
@@ -435,6 +434,22 @@ def test_update_choices_from_param__choices_removed(qtbot, selection) -> None:
     assert widget.display_value == selection
     assert widget.spy_new_value.n == 0  # type: ignore[attr-defined]
     assert widget.spy_value_changed.n == 0  # type: ignore[attr-defined]
+
+
+@pytest.mark.gui
+def test__integration__float_w_precision(qtbot) -> None:
+    param = Parameter("test", float, -1, name="Test")
+    _value = 1.2365242424
+    _new_value = 42.523673
+    param.value = _value
+    widget = widget_instance(qtbot, param, precision=3)
+    assert param.value == _value
+    assert widget.display_value == str(_value)
+    assert widget.io_widget.text() == f"{_value:.3f}"
+    widget.io_widget.set_value(_new_value)
+    assert param.value == _new_value
+    assert widget.display_value == str(_new_value)
+    assert widget.io_widget.text() == f"{_new_value:.3f}"
 
 
 if __name__ == "__main__":

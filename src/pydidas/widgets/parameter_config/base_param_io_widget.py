@@ -178,7 +178,9 @@ class BaseParamIoWidgetMixIn:
 
         This method changes the IO widget selection to the specified value.
 
-        Warning: This method will *not* update the connected Parameter value.
+        Warning: This method itself will *not* update the connected Parameter
+        value. In the composite ParameterWidget, this case is handled through
+        signals and mitigated.
 
         Parameters
         ----------

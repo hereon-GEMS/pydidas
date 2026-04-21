@@ -63,15 +63,17 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
 
     def __init__(self, param: Parameter, **kwargs: Any) -> None:
         self._precision = kwargs.pop("precision", 10)
-        self._current_text_value: Any = None
-        if param.dtype is not numbers.Real:
-            self._precision = None
         PydidasLineEdit.__init__(self, **kwargs)
         BaseParamIoWidgetMixIn.__init__(self, param)
+        self._current_text_value: Any = None
+        self._user_edited: bool = False
+        if param.dtype is not numbers.Real:
+            self._precision = None
         self.update_validator()
-        self.setText(f"{param.value}")
-        self.editingFinished.connect(self.round_on_editing_finished)
+        self.textEdited.connect(self._mark_as_user_edited)
+        self.editingFinished.connect(self._round_on_editing_finished)
         self.setSizePolicy(*POLICY_EXP_FIX)  # noqa E1120, E1121
+        self.setText(param.value)
 
     def setText(self, value: Any) -> None:
         """
@@ -81,7 +83,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         holds a floating point value.
 
         Parameters
-        –---------
+        ----------
         value : Any
             The text to be set in the line edit.
         """
@@ -100,8 +102,15 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         self._current_text_value = str(value)
         super().setText(f"{display_value}")
 
-    # in this case, the update_display_value is an alias for setText
-    update_display_value = setText
+    def update_display_value(self, value: Any) -> None:
+        """
+        Update the displayed value in the line edit.
+
+        This method is defined in the BaseParamIoWidgetMixIn and is called
+        by the ParameterWidget when the Parameter value is updated.
+        Therefore, this alias is required.
+        """
+        self.setText(value)
 
     @property
     def current_text(self) -> str:
@@ -131,12 +140,35 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         if _validator is not None:
             self.setValidator(_validator)
 
+    @QtCore.Slot(str)
+    def _mark_as_user_edited(self, _text: str) -> None:
+        """
+        Mark the QLineEdit input as being edited by the user.
+
+        The `textEdited` signal - which is connected to this slot - is
+        only emitted on manual edits, not on programmatic changes like
+        `setText`.
+
+        Parameters
+        ----------
+        _text : str
+            The current text in the line edit (unused; received from the
+            `textEdited` signal).
+        """
+        self._user_edited = True
+
     @QtCore.Slot()
-    def round_on_editing_finished(self) -> None:
+    def _round_on_editing_finished(self) -> None:
         """
-        Apply the precision fix, if necessary, before emitting signals for the
-        new value.
+        Apply the precision fix, if necessary, before emitting signals.
+
+        For all ParameterWidgets without precision or on programmatic changes,
+        simply skip this step and emit the signal directly.
         """
-        if self._precision is not None:
+        if not self._user_edited or self._precision is None:
+            self.emit_signal()
+            return
+        self._user_edited = False
+        with QtCore.QSignalBlocker(self):
             self.setText(self.text())
         self.emit_signal()

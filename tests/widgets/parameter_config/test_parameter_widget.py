@@ -67,10 +67,12 @@ _TEST_DTYPE_VAL_NEW_VALS = [
 ]
 LAYOUT_VERTICAL_SPACING = ParameterWidget.LAYOUT_VERTICAL_SPACING
 LAYOUT_TOP_BOTTOM_MARGIN = ParameterWidget.LAYOUT_TOP_BOTTOM_MARGIN
+__widgets = []
 
 
 def widget_instance(qtbot, param, **kwargs) -> ParameterWidget:
     widget = ParameterWidget(param, **kwargs)
+    __widgets.append(widget)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)  # type: ignore[attr-defined]
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)  # type: ignore[attr-defined]
     qtbot.add_widget(widget)
@@ -84,13 +86,13 @@ def _cleanup() -> Generator[None, None, None]:
     app = PydidasQApplication.instance()
     _starting_fontsize = app.font_size
     yield
-    with QtCore.QSignalBlocker(app):
-        app.font_size = _starting_fontsize
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParameterWidget)
-    ]:
-        widget.deleteLater()
-    app.processEvents()
+    if app.font_size != _starting_fontsize:
+        with QtCore.QSignalBlocker(app):
+            app.font_size = _starting_fontsize
+        app.processEvents()
+    while __widgets:
+        _w = __widgets.pop()
+        _w.deleteLater()
 
 
 @pytest.mark.gui
@@ -453,4 +455,4 @@ def test__integration__float_w_precision(qtbot) -> None:
 
 
 if __name__ == "__main__":
-    pytest.main([])
+    pytest.main([__file__])

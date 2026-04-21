@@ -110,7 +110,11 @@ class ParameterWidget(EmptyWidget):
             The default is None.
         precision : int or None
             The precision for floating point values. Values will be rounded
-            to precision digits.
+            to precision digits. The default is FLOAT_DISPLAY_ACCURACY.
+        persistent_qsettings_ref : str or None
+            An optional QSettings reference key passed to the I/O widget for
+            persisting file-dialog directories across sessions. The default
+            is None.
     """
 
     sig_new_value = QtCore.Signal(str)
@@ -173,7 +177,7 @@ class ParameterWidget(EmptyWidget):
         Set the widget display value.
 
         This method will emit a signal if the value was actually changed.
-        It is similar in its effects to the `set_value(value)` method.
+        It is equivalent in its effects to the `set_value(value)` method.
 
         Parameters
         ----------
@@ -249,7 +253,7 @@ class ParameterWidget(EmptyWidget):
         if self._param_widget_class == ParamIoWidgetCheckBox:
             return
         _display_txt = convert_special_chars_to_unicode(self.param.name) + ":"
-        self._widgets["label"] = PydidasLabel(
+        self._widgets["label"] = PydidasLabel(  # type: ignore[assignment]
             _display_txt,
             font_metric_height_factor=1,
             font_metric_width_factor=self._config["width_text"],
@@ -309,7 +313,7 @@ class ParameterWidget(EmptyWidget):
         """
         if self._config["width_unit"] == 0:
             return
-        self._widgets["unit"] = PydidasLabel(
+        self._widgets["unit"] = PydidasLabel(  # type: ignore[assignment]
             convert_special_chars_to_unicode(self.param.unit),
             font_metric_height_factor=1,
             font_metric_width_factor=self._config["width_unit"],
@@ -346,9 +350,11 @@ class ParameterWidget(EmptyWidget):
         """
         Update the Parameter value with the entry from the widget.
 
-        This method tries to update the Parameter value with the entry from
-        the widget. If unsuccessful, an exception box will be opened and
-        the widget input will be reset to the stored Parameter value.
+        This method tries to update the Parameter value with the string
+        representation received from the I/O widget signal. If the value
+        cannot be applied (``ValueError`` or ``UserConfigError``), the widget
+        display is reset to the currently stored Parameter value and the
+        exception is re-raised to the caller.
 
         Parameters
         ----------
@@ -396,3 +402,7 @@ class ParameterWidget(EmptyWidget):
             self._widgets["io"].update_choices(
                 self.param.choices, selection=self.param.value, emit_signal=False
             )
+
+    def update_from_param(self) -> None:
+        """Update the display value from the current Parameter value"""
+        self._widgets["io"].update_display_value(self.param.value)

@@ -350,7 +350,9 @@ def test_update_param_value__through_widget_signal(
         (Hdf5key, Hdf5key("/entry/A"), -1.0),
     ],
 )
-def test_update_param_value__illegal_new_value(qtbot, dtype, default, new_value) -> None:
+def test_update_param_value__illegal_new_value(
+    qtbot, dtype, default, new_value
+) -> None:
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
     assert widget.param.value == default

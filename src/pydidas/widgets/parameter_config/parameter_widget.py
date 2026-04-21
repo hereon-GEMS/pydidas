@@ -155,6 +155,34 @@ class ParameterWidget(EmptyWidget):
         return self._widgets["io"].current_text  # type: ignore[attr-defined]
 
     @property
+    def value(self) -> Any:
+        """
+        Get the displayed value from the I/O widget in the native Parameter format.
+
+        Returns
+        -------
+        Any
+            The displayed value, formatted to the type of the associated
+            Parameter
+        """
+        return self.io_widget.get_value()
+
+    @value.setter
+    def value(self, value: Any) -> None:
+        """
+        Set the widget display value.
+
+        This method will emit a signal if the value was actually changed.
+        It is similar in its effects to the `set_value(value)` method.
+
+        Parameters
+        ----------
+        value : Any
+            The new value to be displayed.
+        """
+        self._widgets["io"].set_value(value)
+
+    @property
     def _param_widget_class(self) -> type[BaseParamIoWidget]:
         """Get the class of the Parameter I/O widget based on the Parameter."""
         if self.param.choices:
@@ -271,7 +299,7 @@ class ParameterWidget(EmptyWidget):
             self.layout().addWidget(  # type: ignore[arg-type]
                 self._widgets["io_spacer"], 1, 0, 1, 1
             )
-        self._widgets["io"].sig_new_value.connect(self.set_param_value)
+        self._widgets["io"].sig_new_value.connect(self._update_param_value)
         self._widgets["io"].sig_new_value.connect(self.sig_new_value)
         self._widgets["io"].sig_value_changed.connect(self.sig_value_changed)
 
@@ -314,7 +342,7 @@ class ParameterWidget(EmptyWidget):
         return QtCore.QSize(_width, max(_height, MINIMUM_WIDGET_DIMENSIONS))
 
     @QtCore.Slot(str)
-    def set_param_value(self, value_str_repr: str) -> None:
+    def _update_param_value(self, value_str_repr: str) -> None:
         """
         Update the Parameter value with the entry from the widget.
 

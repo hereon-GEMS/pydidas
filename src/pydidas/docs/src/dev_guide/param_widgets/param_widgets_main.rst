@@ -11,7 +11,8 @@ Developers guide for Parameter config widget
 
 .. note::
 
-    This documentation page has been partially created using the AI-tool GPT-5.3-Codex.
+    This documentation page has been partially created using the AI-tool
+    GPT-5.3-Codex.
 
 .. contents::
     :depth: 1
@@ -22,46 +23,47 @@ This page is the quick reference for the public API.
 Public Module Interface
 -----------------------
 
-The package ``pydidas.widgets.parameter_config`` exports the following main public
-entry classes:
+The package ``pydidas.widgets.parameter_config`` exports the following main
+public entry classes:
 
 - :py:class:`ParameterWidget <pydidas.widgets.parameter_config.ParameterWidget>`:
-  The standard widget to display and edit a single
-  :py:class:`Parameter <pydidas.core.Parameter>` in the GUI.
+  The standard widget to display and edit a single :py:class:`Parameter
+  <pydidas.core.Parameter>` in the GUI.
 - :py:class:`ParameterWidgetsMixIn <pydidas.widgets.parameter_config.ParameterWidgetsMixIn>`:
   A mix-in to add ParameterWidget management to any QWidget subclass.
 - :py:class:`ParameterEditCanvas <pydidas.widgets.parameter_config.ParameterEditCanvas>`:
-  An empty widget with access to the
-  :py:class:`ParameterWidgetsMixIn <pydidas.widgets.parameter_config.ParameterWidgetsMixIn>`
-  functionality for dynamic ParameterWidget creation and layout.
+  An empty widget with access to the :py:class:`ParameterWidgetsMixIn
+  <pydidas.widgets.parameter_config.ParameterWidgetsMixIn>` functionality for
+  dynamic ParameterWidget creation and layout.
 
 ``ParameterWidget`` is the user-facing composite widget for one
 :py:class:`Parameter <pydidas.core.Parameter>`.
 
-All ``QWidgets`` used in the ``pydidas`` user interface which require manipulations
-of :py:class:`Parameters <pydidas.core.Parameter>` should inherit from the
-:py:class:`ParameterWidgetsMixIn <pydidas.widgets.parameter_config.ParameterWidgetsMixIn>`
-class and use its :ref:`public API <dev_guide_parameter_widgets_mixin_api>`.
+All ``QWidgets`` used in the ``pydidas`` user interface which require
+manipulations of :py:class:`Parameters <pydidas.core.Parameter>` should inherit
+from the :py:class:`ParameterWidgetsMixIn
+<pydidas.widgets.parameter_config.ParameterWidgetsMixIn>` class and use its
+:ref:`public API <dev_guide_parameter_widgets_mixin_api>`.
 
 .. _dev_guide_parameter_widgets_mixin_api:
 
 ParameterWidgetsMixIn public API
 ---------------------------------
 
-:py:class:`ParameterWidgetsMixIn <pydidas.widgets.parameter_config.ParameterWidgetsMixIn>`
-is a mixin class that can be added to any ``QWidget`` subclass to provide
-managed creation, access, and synchronization of
-:py:class:`ParameterWidget <pydidas.widgets.parameter_config.ParameterWidget>`
-instances.
+:py:class:`ParameterWidgetsMixIn
+<pydidas.widgets.parameter_config.ParameterWidgetsMixIn>` is a mixin class that
+can be added to any ``QWidget`` subclass to provide managed creation, access,
+and synchronization of :py:class:`ParameterWidget
+<pydidas.widgets.parameter_config.ParameterWidget>` instances.
 
 .. note::
 
     ``ParameterWidgetsMixIn`` assumes the host class has a ``params``
-    (:py:class:`ParameterCollection <pydidas.core.ParameterCollection>`) and is a
-    (subclass of) ``QWidget`` with a layout manager that supports adding widgets
-    (e.g. ``QGridLayout``).
-    :py:class:`ParameterEditCanvas <pydidas.widgets.parameter_config.ParameterEditCanvas>`
-    provides a ready-to-use base class combining both.
+    (:py:class:`ParameterCollection <pydidas.core.ParameterCollection>`) and is
+    a (subclass of) ``QWidget`` with a layout manager that supports adding
+    widgets (e.g. ``QGridLayout``). :py:class:`ParameterEditCanvas
+    <pydidas.widgets.parameter_config.ParameterEditCanvas>` provides a
+    ready-to-use base class combining both.
 
 Methods
 ^^^^^^^
@@ -93,8 +95,8 @@ All user interaction
     * - ``set_param_and_widget_value_and_choices(key, value, choices, emit_signal=True)``
       - Update the ``Parameter`` value and its choices, then synchronize the
         widget (rebuilding the I/O widget if the widget type needs to change).
-        ``choices`` can be ``None`` to remove all choices. Emits signals only
-        if the value changed and ``emit_signal`` is ``True``.
+        ``choices`` can be ``None`` to remove all choices. Emits signals only if
+        the value changed and ``emit_signal`` is ``True``.
 
 
 Attributes
@@ -112,24 +114,28 @@ For accessing the widgets, the following attributes are available:
     * - ``param_widgets``
       - Dictionary mapping Parameter ``refkey`` to the raw I/O widget instance.
     * - ``param_composite_widgets``
-      - Dictionary mapping Parameter ``refkey`` to the full ``ParameterWidget`` instance.
+      - Dictionary mapping Parameter ``refkey`` to the full ``ParameterWidget``
+        instance.
 
 These dictionaries are populated when widgets are created through the
-:py:meth:`create_param_widget <pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget>`
+:py:meth:`create_param_widget
+<pydidas.widgets.parameter_config.ParameterWidgetsMixIn.create_param_widget>`
 method.
 
 ParameterWidget public API
 --------------------------
 
-All user-interaction with the :py:class:`ParameterWidget <pydidas.widgets.parameter_config.ParameterWidget>`
-should happen through the following API contract. For internal behavior and signal/data flow, see
+All user-interaction with the :py:class:`ParameterWidget
+<pydidas.widgets.parameter_config.ParameterWidget>` should happen through the
+following API contract. For internal behavior and signal/data flow, see
 :ref:`dev_guide_parameter_widget`.
 
 Signals
 ^^^^^^^
 
 The following signals are emitted by the ``ParameterWidget`` simultaneously
-to support both direct access to the new value and a generic change notification:
+to support both direct access to the new value and a generic change
+notification:
 
 - ``sig_new_value(str)``: emitted with string representation of new input.
 - ``sig_value_changed()``: emitted when a value was changed.
@@ -145,7 +151,8 @@ Properties
     * - Property
       - Description
     * - ``io_widget``
-      - [read-only] The currently selected I/O widget instance for the linked Parameter.
+      - [read-only] The currently selected I/O widget instance for the linked
+        Parameter.
     * - ``display_value``
       - [read-only] Current displayed value from the underlying I/O widget.
     * - ``value``
@@ -175,8 +182,8 @@ Methods
 Example Usage
 -------------
 
-This short example creates a Parameter and an associated ParameterWidget,
-then performs different operations to demonstrate the API. Note that all other
+This short example creates a Parameter and an associated ParameterWidget, then
+performs different operations to demonstrate the API. Note that all other
 necessary imports and application setup are assumed to be in place.
 
 .. code-block:: python
@@ -240,5 +247,3 @@ Further reading
 
     param_widget.rst
     param_widgets_mixin.rst
-
-

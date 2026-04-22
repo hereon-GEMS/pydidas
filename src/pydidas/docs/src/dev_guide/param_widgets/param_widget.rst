@@ -15,7 +15,8 @@ ParameterWidget full structure and API
 
 .. note::
 
-    This documentation page has been partially created using the AI-tool GPT-5.3-Codex.
+    This documentation page has been partially created using the AI-tool
+    GPT-5.3-Codex.
 
 .. contents::
     :depth: 2
@@ -25,20 +26,21 @@ ParameterWidget internal widget structure
 -----------------------------------------
 
 The |ParameterWidget|
-is a composite widget designed to display and edit a single :py:class:`Parameter <pydidas.core.Parameter>`.
-It is composed of three main widgets:
+is a composite widget designed to display and edit a single :py:class:`Parameter
+<pydidas.core.Parameter>`. It is composed of three main widgets:
 
 1. A label widget (:py:class:`PydidasLabel <pydidas.widgets.base.PydidasLabel>`)
-   to show the Parameter name. Its text corresponds to the Parameter's ``name`` property.
+   to show the Parameter name. Its text corresponds to the Parameter's ``name``
+   property.
 2. The concrete I/O widget (see below)
-3. A label widget (:py:class:`PydidasLabel <pydidas.widgets.base.PydidasLabel>`) to show
-   the Parameter's unit, if defined. Its text corresponds to the Parameter's ``unit``
-   property and is hidden if no unit is defined.
+3. A label widget (:py:class:`PydidasLabel <pydidas.widgets.base.PydidasLabel>`)
+to show the Parameter's unit, if defined. Its text corresponds to the
+Parameter's ``unit`` property and is hidden if no unit is defined.
 
 
 .. code-block::
 
-    +------------------------------------------------------------------------+
+    +-------------------------------------------------------------------------+
     |                        ParameterWidget                                  |
     |              (composite wrapper for one Parameter)                      |
     |                                                                         |
@@ -61,9 +63,9 @@ It is composed of three main widgets:
 ParameterWidget args and kwargs
 -------------------------------
 
-The :|ParameterWidget| constructor takes a single argument: The associated |Parameter|
-instance. The widget behaviour will be determined by the keyword arguments. The
-following keyword arguments are supported:
+The :|ParameterWidget| constructor takes a single argument: The associated
+|Parameter| instance. The widget behaviour will be determined by the keyword
+arguments. The following keyword arguments are supported:
 
 .. list-table::
     :widths: 20 10 70
@@ -76,13 +78,13 @@ following keyword arguments are supported:
     * - ``width_text``
       - float, optional
       - Relative width of the Parameter name label, as a fraction of the global
-        ``font_metric_width_factor``. The default is set to 55% of the total width,
-        (defined in ``pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH``).
+        ``font_metric_width_factor``. The default is set to 55% of the total
+        width, (defined in ``pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH``).
     * - ``width_unit``
       - float, optional
       - Relative width of the unit label, as a fraction of the global
-        ``font_metric_width_factor``. The default is set to 7% of the total width,
-        if the unit field is not empty. This default is defined in
+        ``font_metric_width_factor``. The default is set to 7% of the total
+        width, if the unit field is not empty. This default is defined in
         ``pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH``. A value of ``0``
         will disable the unit label entirely.
     * - ``linebreak``
@@ -97,8 +99,8 @@ following keyword arguments are supported:
         ``pydidas.core.constants.FONT_METRIC_CONFIG_WIDTH``.
     * - ``validator``
       - QValidator, optional
-      - A custom validator to be used in the I/O widget, if applicable.
-        The default is None.
+      - A custom validator to be used in the I/O widget, if applicable. The
+        default is None.
     * - ``precision``
       - int, optional
       - The precision for floating point values. Values will be rounded to
@@ -115,8 +117,8 @@ constructor.
 
 Signals
 -------
-The following signals are emitted by the ``ParameterWidget`` simultaneously
-to support both direct access to the new value and a generic change notification:
+The following signals are emitted by the ``ParameterWidget`` simultaneously to
+support both direct access to the new value and a generic change notification:
 
 - ``sig_new_value(str)``: emitted with string representation of new input.
 - ``sig_value_changed()``: emitted when a value was changed.
@@ -125,36 +127,37 @@ These signals are passed through from the underlying I/O widget:
 
 .. code-block::
 
-    +-----------------+
-    |    User input   |
-    +-----------------+
+    +---------------+
+    |   User input  |
+    +---------------+
             |
             v
-    +-----------------+
-    |   <I/O widget>  |         +--------------------+
-    |   emit_signal() |  ---->  |    <I/O widget>    |         +-------------------+
-    +-----------------+         | sig_new_value(str) |  ---->  |  ParameterWidget  |
-       |                        +--------------------+         | update associated |
-       |                                      |                |  Parameter value  |
-       |      +----------------------+        |                +-------------------+
+    +---------------+
+    | <I/O widget>  |        +--------------------+
+    | emit_signal() |  --->  |    <I/O widget>    |        +-------------------+
+    +---------------+        | sig_new_value(str) |  --->  |  ParameterWidget  |
+       |                     +--------------------+        | update associated |
+       |                                      |            |  Parameter value  |
+       |      +----------------------+        |            +-------------------+
        +--->  |      <I/O widget>    |        |
               |  sig_value_changed() |        |      +--------------------+
               +----------------------+        +--->  |  ParameterWidget   |
                         |                            | sig_new_value(str) |
                         |                            +--------------------+
                         |
-                        |       +---------------------+
-                        +---->  |   ParameterWidget   |
-                                | sig_value_changed() |
-                                +---------------------+
+                        |      +---------------------+
+                        +--->  |   ParameterWidget   |
+                               | sig_value_changed() |
+                               +---------------------+
 
 
 .. note::
 
-    Note that programmatic updates to the |Parameter| value are not automatically
-    reflected in the widget display. To synchronize the display with the current
-    Parameter value, use the :py:meth:`update_from_param
-    <pydidas.widgets.parameter_config.ParameterWidget.update_from_param>` method.
+    Note that programmatic updates to the |Parameter| value are not
+    automatically reflected in the widget display. To synchronize the display
+    with the current Parameter value, use the :py:meth:`update_from_param
+    <pydidas.widgets.parameter_config.ParameterWidget.update_from_param>`
+    method.
 
 Signal and Data Flow: User Edit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -222,7 +225,8 @@ Properties
     * - Property
       - Description
     * - ``io_widget``
-      - [read-only] The currently selected I/O widget instance for the linked Parameter.
+      - [read-only] The currently selected I/O widget instance for the linked
+        Parameter.
     * - ``display_value``
       - [read-only] Current displayed value from the underlying I/O widget.
     * - ``value``
@@ -259,15 +263,22 @@ Widget Selection Rules
 
 |ParameterWidget| chooses the I/O widget class from the Parameter metadata:
 
-- bool-like choices -> :py:class`ParamIoWidgetCheckBox <pydidas.widgets.parameter_config.ParamIoWidgetCheckBox>`
-- list of choices -> :py:class:`ParamIoWidgetComboBox <pydidas.widgets.parameter_config.ParamIoWidgetComboBox>`
-- ``Path`` dtype -> :py:class:`ParamIoWidgetFile <pydidas.widgets.parameter_config.ParamIoWidgetFile>`
-- ``Hdf5key`` dtype -> :py:class:`ParamIoWidgetHdf5Key <pydidas.widgets.parameter_config.ParamIoWidgetHdf5Key>`
-- other -> :py:class:`ParamIoWidgetLineEdit <pydidas.widgets.parameter_config.ParamIoWidgetLineEdit>`
+- bool-like choices -> :py:class:`ParamIoWidgetCheckBox
+  <pydidas.widgets.parameter_config.ParamIoWidgetCheckBox>`
+- list of choices -> :py:class:`ParamIoWidgetComboBox
+  <pydidas.widgets.parameter_config.ParamIoWidgetComboBox>`
+- ``Path`` dtype -> :py:class:`ParamIoWidgetFile
+  <pydidas.widgets.parameter_config.ParamIoWidgetFile>`
+- ``Hdf5key`` dtype -> :py:class:`ParamIoWidgetHdf5Key
+  <pydidas.widgets.parameter_config.ParamIoWidgetHdf5Key>`
+- other -> :py:class:`ParamIoWidgetLineEdit
+  <pydidas.widgets.parameter_config.ParamIoWidgetLineEdit>`
 
 The selection is dynamic and can be updated to accommodate for changes in the
 Parameter's metadata (e.g. new choices list) through the
-:py:meth:`update_choices_from_param <pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param>` method.
+:py:meth:`update_choices_from_param
+<pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param>`
+method.
 
 Subclass Behavior Matrix
 ^^^^^^^^^^^^^^^^^^^^^^^^

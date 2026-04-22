@@ -1,7 +1,7 @@
 # Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: CC0-1.0
 
-pyFAI==2025.12.1
+pyFAI==2026.3.0
 silx==2.2.2
 scikit-image>=0.26.0
 sphinx>=8.2.3
@@ -12,10 +12,10 @@ pyopencl>=2024.1
 qtpy>=2.4.0
 hdf5plugin>=4.4.0
 pyyaml>=6.0
-requests>=2.31.0
+requests>=2.33.0
 PyQt5==5.15.11
-PySide6==6.10.0
+PySide6==6.11.0
 build>=1.4.0
 siphash24>=1.6
-imagecodecs>=2025.8
+imagecodecs>=2026.3
 pyqtgraph>=0.14.0

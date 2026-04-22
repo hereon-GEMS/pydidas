@@ -71,35 +71,3 @@ Methods
         widget (rebuilding the I/O widget if the widget type needs to change).
         ``choices`` can be ``None`` to remove all choices. Emits signals only
         if the value changed and ``emit_signal`` is ``True``.
-
-
-BaseParamIoWidgetMixIn Contract
--------------------------------
-
-All parameter I/O widgets implement the behavior from ``BaseParamIoWidgetMixIn``.
-
-Signals
-^^^^^^^
-
-- ``sig_new_value(str)``
-- ``sig_value_changed()``
-
-Required or key methods
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. list-table::
-    :widths: 30 70
-    :header-rows: 1
-
-    * - Method / property
-      - Purpose
-    * - ``current_text``
-      - String representation used for conversion and signal emission.
-    * - ``update_display_value(value)``
-      - Set displayed value without emitting change signals.
-    * - ``get_value()``
-      - Convert ``current_text`` into typed value using converters.
-    * - ``set_value(value)``
-      - Update display value and emit change signals.
-    * - ``emit_signal(force_update=False)``
-      - Emit standardized change signals when value changed.

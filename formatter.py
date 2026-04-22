@@ -210,7 +210,7 @@ def check_version_tags(directory: Optional[Path] = None):
         _timed_print("The pydidas/version.py differs from the src version.")
     if not (_citation_okay and _changelog_okay and _updater_version_okay):
         sys.exit(1)
-    _timed_print("Version tag check sucessfully concluded.")
+    _timed_print("Version tag check successfully concluded.")
 
 
 class CopyrightYearUpdater:
@@ -285,7 +285,8 @@ class CopyrightYearUpdater:
         if not fname.is_file():
             return fname, -1
         try:
-            _commit_epoch = self.__repo.git.log("-1", "--format=%at", fname)
+            _rel_fname = str(fname.relative_to(self._directory))
+            _commit_epoch = self.__repo.git.log("-1", "--format=%at", _rel_fname)
             if _commit_epoch.strip():
                 _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year
                 return fname, _commit_year
@@ -373,9 +374,9 @@ class CopyrightYearUpdater:
         # TODO : change to pathlib.Path.walk when dropping python 3.11 support
         for _base, _dirs, _files in os.walk(self._directory):
             _base = Path(_base)
-            for _dirname in _DIRS_TO_SKIP:
-                if _dirname in _dirs:
-                    _dirs.remove(_dirname)
+            for _dir_name in _DIRS_TO_SKIP:
+                if _dir_name in _dirs:
+                    _dirs.remove(_dir_name)
             for _item in _files:
                 _fname = _base / _item
                 if (

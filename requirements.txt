@@ -108,7 +108,7 @@ platformdirs==4.5.1
     # via
     #   pyopencl
     #   pytools
-pydata-sphinx-theme==0.16.1
+pydata-sphinx-theme==0.17.1
     # via -r requirements.in
 pyfai==2026.3.0
     # via -r requirements.in
@@ -183,7 +183,7 @@ snowballstemmer==3.0.1
     # via sphinx
 soupsieve==2.8.1
     # via beautifulsoup4
-sphinx==8.2.3
+sphinx==9.0.4
     # via
     #   -r requirements.in
     #   pydata-sphinx-theme
@@ -191,13 +191,15 @@ sphinx==8.2.3
     #   sphinx-design
 sphinx-copybutton==0.5.2
     # via -r requirements.in
-sphinx-design==0.6.1
+sphinx-design==0.7.0
     # via -r requirements.in
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
 sphinxcontrib-devhelp==2.0.0
     # via sphinx
 sphinxcontrib-htmlhelp==2.1.0
+    # via sphinx
+sphinxcontrib-jquery==4.1
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx

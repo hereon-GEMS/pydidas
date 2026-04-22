@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath("./../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2021 - 2025, Helmholtz-Zentrum Hereon"
+copyright = "2021 - 2026, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 
@@ -129,7 +129,7 @@ html_context = {
     "github_user": "hereon-GEMS",
     "github_repo": "pydidas",
     "github_version": "master",
-    "doc_path": "pydidas/docs/src",
+    "doc_path": "src/pydidas/docs/src",
 }
 
 # dynamically create documentation for generic parameters:

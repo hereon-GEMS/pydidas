@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2021 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify

@@ -22,3 +22,4 @@ It will be expanded as required by the user community.
     dev_guide_multiprocessing.rst
     dev_guide_list_of_signals.rst
     dev_guide_list_of_generic_params.rst
+    param_widgets/param_widgets_main.rst

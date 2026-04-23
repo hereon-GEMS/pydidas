@@ -61,7 +61,8 @@ class ParameterWidgetsMixIn:
         Parameters
         ----------
         param : Parameter or str
-            A Parameter class instance.
+            A Parameter class instance or the string refkey of a Parameter
+            registered in ``.params``.
         **kwargs : Any
             Optional keyword arguments. Supported keys are:
 
@@ -78,16 +79,22 @@ class ParameterWidgetsMixIn:
             linebreak : bool, optional
                 Keyword to toggle a line break between the text label and the
                 input widget. The default is False.
-            halign_io : QtCore.Qt.Alignment, optional
-                The horizontal alignment for the input widget. The default is
-                QtCore.Qt.AlignRight.
-            halign_text : QtCore.Qt.Alignment, optional
-                The horizontal alignment for the text (label) widget. The default
-                is QtCore.Qt.AlignRight.
             parent_widget : QWidget or str or None, optional
                 The widget to which the label is added. If a string,
-                this picks up the calling class's ._widgets dictionary
+                this picks up the calling class's ``._widgets`` dictionary
                 and selects the string key's value. The default is self.
+            validator : QValidator or None, optional
+                A custom validator applied to the I/O widget, if it supports
+                one. The default is None.
+            precision : int or None, optional
+                Rounding precision for float Parameters. The default is
+                defined in ``pydidas.core.constants.FLOAT_DISPLAY_ACCURACY``.
+            font_metric_width_factor : int or None, optional
+                Total widget width in multiples of the font metric character
+                width. The default is FONT_METRIC_CONFIG_WIDTH.
+            persistent_qsettings_ref : str or None, optional
+                QSettings reference key for persisting file-dialog directories
+                across sessions. The default is None.
         """
         _parent = kwargs.get("parent_widget", self)
         if isinstance(_parent, str):

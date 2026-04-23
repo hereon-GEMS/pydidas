@@ -114,10 +114,10 @@ class DefineDiffractionExpFrame(BaseFrame):
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
             # disconnect directly setting the parameters and route
-            # through update_param method to catch wavelength/energy
+            # through update_param method to catch wavelength/energy updates
             _w = self.param_widgets[param.refkey]
             _w.sig_new_value.disconnect(
-                self.param_composite_widgets[_param_key].set_param_value
+                self.param_composite_widgets[_param_key]._update_param_value
             )
             _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)

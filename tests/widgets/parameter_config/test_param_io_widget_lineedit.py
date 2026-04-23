@@ -26,8 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 import os
-from numbers import Integral
+from numbers import Integral, Real
+from typing import Any
 
+import numpy as np
 import pytest
 from qtpy import QtCore, QtGui
 
@@ -53,9 +55,8 @@ param_str = Parameter("test_str", str, "default", name="Test Str")
 _PARAM_LIST = [param_int, param_int_w_None, param_float, param_float_w_None, param_str]
 
 
-def widget_instance(qtbot, param):
-    param.restore_default()
-    widget = ParamIoWidgetLineEdit(param)
+def widget_instance(qtbot, param, **kwargs: Any):
+    widget = ParamIoWidgetLineEdit(param, **kwargs)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     qtbot.add_widget(widget)
@@ -71,6 +72,8 @@ def widget_instance(qtbot, param):
 @pytest.fixture(autouse=True)
 def _cleanup():
     yield
+    for _param in _PARAM_LIST:
+        _param.restore_default()
     app = PydidasQApplication.instance()
     for widget in [
         _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetLineEdit)
@@ -81,22 +84,30 @@ def _cleanup():
 
 @pytest.mark.gui
 @pytest.mark.parametrize("param", _PARAM_LIST)
-def test__creation(qtbot, param):
-    widget = widget_instance(qtbot, param)
+@pytest.mark.parametrize("precision", [None, 4])
+def test__creation(qtbot, param, precision):
+    widget = widget_instance(qtbot, param, precision=precision)
     assert isinstance(widget, ParamIoWidgetLineEdit)
+    if param.dtype == Real and precision is not None:
+        assert widget._precision == precision
+    else:
+        assert widget._precision is None
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert widget.current_text == str(param.value)
+
     if param.dtype == str:
         assert widget.validator() is None
     elif param.dtype == Integral and param.allow_None:
         assert widget.validator() == QT_REG_EXP_INT_VALIDATOR
     elif param.dtype == Integral:
         assert isinstance(widget.validator(), QtGui.QIntValidator)
-    elif param.dtype == float and param.allow_None:
+    elif param.dtype == Real and param.allow_None:
         assert widget.validator() == QT_REG_EXP_FLOAT_VALIDATOR
-    elif param.dtype == float:
+    elif param.dtype == Real:
         assert isinstance(widget.validator(), QtGui.QDoubleValidator)
+    else:
+        raise TypeError("Unhandled test case")
 
 
 @pytest.mark.gui
@@ -104,6 +115,55 @@ def test_current_text(qtbot):
     param_str.value = "new test value"
     widget = widget_instance(qtbot, param_str)
     assert widget.current_text == param_str.value
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("precision", [None, 2, 13])
+def test_current_text__w_precision(qtbot, precision):
+    _value = 1.234573532424162344
+    param = param_float.copy()
+    param.value = _value
+    widget = widget_instance(qtbot, param, precision=precision)
+    assert widget._linked_param.value == _value
+    _expected = np.round(_value, precision) if precision is not None else _value
+    assert float(widget.text()) == _expected
+    assert float(widget.current_text) == _value
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("precision", [None, 2, 13])
+@pytest.mark.parametrize(
+    "value", [1.234573532424162344, np.nan, np.inf, None, "None", "nan"]
+)
+def test_set_text__w_precision(qtbot, precision, value):
+    widget = widget_instance(qtbot, param_float_w_None, precision=precision)
+    widget.setText(value)
+    widget.clearFocus()
+    if value in [None, "None"]:
+        assert widget.text() == "None"
+        assert widget.current_text == "None"
+        widget.spy_new_value.results[0][0] is None
+    elif value in [np.nan, "nan"]:
+        assert widget.text() == "nan"
+        assert widget.current_text == "nan"
+        assert widget.spy_new_value.results == [["nan"]]
+    elif value is np.inf:
+        assert widget.text() == "inf"
+        assert widget.current_text == "inf"
+        assert widget.spy_new_value.results == [["inf"]]
+    else:
+        _expected = np.round(value, precision) if precision is not None else value
+        assert float(widget.text()) == _expected
+        assert widget.current_text == str(value)
+        assert widget.spy_new_value.results == [[str(value)]]
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("param, value", [[param_str, "new val"], [param_int, -7]])
+def test__setText__w_non_float_and_precision(qtbot, param, value):
+    widget = widget_instance(qtbot, param, precision=4)
+    widget.setText(value)
+    assert widget.text() == str(value)
 
 
 @pytest.mark.gui

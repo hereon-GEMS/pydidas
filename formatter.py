@@ -285,7 +285,7 @@ class CopyrightYearUpdater:
         if not fname.is_file():
             return fname, -1
         try:
-            _rel_fname = fname.relative_to(self._directory)
+            _rel_fname = str(fname.relative_to(self._directory))
             _commit_epoch = self.__repo.git.log("-1", "--format=%at", _rel_fname)
             if _commit_epoch.strip():
                 _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year

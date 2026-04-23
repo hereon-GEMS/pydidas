@@ -67,11 +67,12 @@ _TEST_DTYPE_VAL_NEW_VALS = [
 ]
 LAYOUT_VERTICAL_SPACING = ParameterWidget.LAYOUT_VERTICAL_SPACING
 LAYOUT_TOP_BOTTOM_MARGIN = ParameterWidget.LAYOUT_TOP_BOTTOM_MARGIN
+__widgets = []
 
 
 def widget_instance(qtbot, param, **kwargs) -> ParameterWidget:
-    param.restore_default()
     widget = ParameterWidget(param, **kwargs)
+    __widgets.append(widget)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)  # type: ignore[attr-defined]
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)  # type: ignore[attr-defined]
     qtbot.add_widget(widget)
@@ -85,13 +86,13 @@ def _cleanup() -> Generator[None, None, None]:
     app = PydidasQApplication.instance()
     _starting_fontsize = app.font_size
     yield
-    with QtCore.QSignalBlocker(app):
-        app.font_size = _starting_fontsize
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParameterWidget)
-    ]:
-        widget.deleteLater()
-    app.processEvents()
+    if app.font_size != _starting_fontsize:
+        with QtCore.QSignalBlocker(app):
+            app.font_size = _starting_fontsize
+        app.processEvents()
+    while __widgets:
+        _w = __widgets.pop()
+        _w.deleteLater()
 
 
 @pytest.mark.gui
@@ -306,16 +307,16 @@ def test__creation__w_visible_kwarg(qtbot, qapp) -> None:
 
 @pytest.mark.gui
 @pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
-def test_set_param_value(qtbot, dtype, default, new_value) -> None:
+def test_update_param_value(qtbot, dtype, default, new_value) -> None:
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
-    widget.set_param_value(str(new_value))
+    widget._update_param_value(str(new_value))
     assert widget.param.value == new_value
 
 
 @pytest.mark.gui
 @pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
-def test_set_param_value__through_widget_signal(
+def test_update_param_value__through_widget_signal(
     qtbot, dtype, default, new_value
 ) -> None:
     param = Parameter("test", dtype, default, name="Test param")
@@ -349,13 +350,15 @@ def test_set_param_value__through_widget_signal(
         (Hdf5key, Hdf5key("/entry/A"), -1.0),
     ],
 )
-def test_set_param_value__illegal_new_value(qtbot, dtype, default, new_value) -> None:
+def test_update_param_value__illegal_new_value(
+    qtbot, dtype, default, new_value
+) -> None:
     param = Parameter("test", dtype, default, name="Test param")
     widget = widget_instance(qtbot, param)
     assert widget.param.value == default
     assert widget.display_value == str(default)
     with pytest.raises((ValueError, UserConfigError)):  # type: ignore[arg-type]
-        widget.set_param_value(new_value)
+        widget._update_param_value(new_value)
     assert widget.param.value == default
     assert widget.display_value == str(default)
     assert widget.spy_new_value.n == 0  # type: ignore[attr-defined]
@@ -372,6 +375,47 @@ def test_update_display_value(qtbot, dtype, default, new_value) -> None:
     assert widget.display_value == str(new_value)
     assert widget.spy_new_value.n == 0  # type: ignore[attr-defined]
     assert widget.spy_value_changed.n == 0  # type: ignore[attr-defined]
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
+def test_value_property(qtbot, dtype, default, new_value) -> None:
+    param = Parameter("test", dtype, default, name="Test param")
+    widget = widget_instance(qtbot, param)
+    assert widget.value == default
+    widget.update_display_value(str(new_value))
+    assert widget.value == new_value
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("value", ["None", "nan"])
+def test_value_property__special_values(qtbot, value) -> None:
+    param = Parameter("test", float, 0.0, name="Test param", allow_None=True)
+    widget = widget_instance(qtbot, param)
+    widget.update_display_value(value)
+    result = widget.value
+    if value == "None":
+        assert result is None
+    else:
+        assert np.isnan(result)
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("dtype, default, new_value", _TEST_DTYPE_VAL_NEW_VALS)
+def test_value_property__setter(qtbot, dtype, default, new_value) -> None:
+    param = Parameter("test", dtype, default, name="Test param")
+    widget = widget_instance(qtbot, param)
+    with qtbot.waitSignal(widget.sig_new_value, timeout=500):
+        widget.value = new_value
+    qtbot.wait(5)  # wait for signal processing
+    assert param.value == new_value
+    assert widget.display_value == str(new_value)
+    assert widget.spy_new_value.n == 1  # type: ignore[attr-defined]
+    assert widget.spy_value_changed.n == 1  # type: ignore[attr-defined]
+    widget.value = new_value
+    qtbot.wait(5)  # wait for signal processing
+    assert widget.spy_new_value.n == 1  # type: ignore[attr-defined]
+    assert widget.spy_value_changed.n == 1  # type: ignore[attr-defined]
 
 
 @pytest.mark.gui
@@ -437,5 +481,21 @@ def test_update_choices_from_param__choices_removed(qtbot, selection) -> None:
     assert widget.spy_value_changed.n == 0  # type: ignore[attr-defined]
 
 
+@pytest.mark.gui
+def test__integration__float_w_precision(qtbot) -> None:
+    param = Parameter("test", float, -1, name="Test")
+    _value = 1.2365242424
+    _new_value = 42.523673
+    param.value = _value
+    widget = widget_instance(qtbot, param, precision=3)
+    assert param.value == _value
+    assert widget.display_value == str(_value)
+    assert widget.io_widget.text() == f"{_value:.3f}"
+    widget.io_widget.set_value(_new_value)
+    assert param.value == _new_value
+    assert widget.display_value == str(_new_value)
+    assert widget.io_widget.text() == f"{_new_value:.3f}"
+
+
 if __name__ == "__main__":
-    pytest.main([])
+    pytest.main([__file__])

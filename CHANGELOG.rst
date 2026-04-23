@@ -36,6 +36,8 @@ Programmatic changes
   use FONT_METRIC_CONFIG_WIDTH to fix formatting issues.
 - Added a ToggleOptionsButton which allows to show/hide an associated
   widget.
+- Added an option to specify the display precision for floating point
+  Parameters.
 
 Bugfixes
 --------

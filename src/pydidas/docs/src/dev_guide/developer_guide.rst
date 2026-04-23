@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _developer_guide:
@@ -22,3 +22,4 @@ It will be expanded as required by the user community.
     dev_guide_multiprocessing.rst
     dev_guide_list_of_signals.rst
     dev_guide_list_of_generic_params.rst
+    param_widgets/param_widgets_main.rst

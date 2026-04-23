@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ graphical user interface of the application.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -79,13 +79,14 @@ QT_COMBO_BOX_SIZE_POLICY = QtWidgets.QComboBox.AdjustToMinimumContentsLengthWith
 
 QT_REG_EXP_FLOAT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        r"-?\d*\.?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+        r"-?\d*\.?\d*|None|nan|inf|-inf",
+        QtCore.QRegularExpression.CaseInsensitiveOption,
     )
 )
 
 QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        r"-?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+        r"-?\d*|None|nan|inf|-inf", QtCore.QRegularExpression.CaseInsensitiveOption
     )
 )
 

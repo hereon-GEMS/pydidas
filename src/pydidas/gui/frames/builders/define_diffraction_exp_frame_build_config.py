@@ -119,8 +119,16 @@ DIFFRACTION_EXP_FRAME_BUILD_CONFIG = [
         (None, "\nBeamline X-ray energy:"),
         {"bold": True, "fontsize_offset": 1, "parent_widget": "config_left"},
     ],
-    ["create_param_widget", ("xray_wavelength",), {"parent_widget": "config_left"}],
-    ["create_param_widget", ("xray_energy",), {"parent_widget": "config_left"}],
+    [
+        "create_param_widget",
+        ("xray_wavelength",),
+        {"parent_widget": "config_left", "precision": 6},
+    ],
+    [
+        "create_param_widget",
+        ("xray_energy",),
+        {"parent_widget": "config_left", "precision": 6},
+    ],
     [
         "create_label",
         (None, "\nX-ray detector:"),
@@ -134,8 +142,16 @@ DIFFRACTION_EXP_FRAME_BUILD_CONFIG = [
     ["create_param_widget", ("detector_name",), {"parent_widget": "config_left"}],
     ["create_param_widget", ("detector_npixx",), {"parent_widget": "config_left"}],
     ["create_param_widget", ("detector_npixy",), {"parent_widget": "config_left"}],
-    ["create_param_widget", ("detector_pxsizex",), {"parent_widget": "config_left"}],
-    ["create_param_widget", ("detector_pxsizey",), {"parent_widget": "config_left"}],
+    [
+        "create_param_widget",
+        ("detector_pxsizex",),
+        {"parent_widget": "config_left", "precision": 4},
+    ],
+    [
+        "create_param_widget",
+        ("detector_pxsizey",),
+        {"parent_widget": "config_left", "precision": 4},
+    ],
     [
         "create_param_widget",
         ("detector_mask_file",),
@@ -156,12 +172,36 @@ DIFFRACTION_EXP_FRAME_BUILD_CONFIG = [
         ("but_convert_fit2d", "Convert Fit2D geometry"),
         {"parent_widget": "config_right"},
     ],
-    ["create_param_widget", ("detector_dist",), {"parent_widget": "config_right"}],
-    ["create_param_widget", ("detector_poni1",), {"parent_widget": "config_right"}],
-    ["create_param_widget", ("detector_poni2",), {"parent_widget": "config_right"}],
-    ["create_param_widget", ("detector_rot1",), {"parent_widget": "config_right"}],
-    ["create_param_widget", ("detector_rot2",), {"parent_widget": "config_right"}],
-    ["create_param_widget", ("detector_rot3",), {"parent_widget": "config_right"}],
+    [
+        "create_param_widget",
+        ("detector_dist",),
+        {"parent_widget": "config_right", "precision": 8},
+    ],
+    [
+        "create_param_widget",
+        ("detector_poni1",),
+        {"parent_widget": "config_right", "precision": 8},
+    ],
+    [
+        "create_param_widget",
+        ("detector_poni2",),
+        {"parent_widget": "config_right", "precision": 8},
+    ],
+    [
+        "create_param_widget",
+        ("detector_rot1",),
+        {"parent_widget": "config_right", "precision": 6},
+    ],
+    [
+        "create_param_widget",
+        ("detector_rot2",),
+        {"parent_widget": "config_right", "precision": 6},
+    ],
+    [
+        "create_param_widget",
+        ("detector_rot3",),
+        {"parent_widget": "config_right", "precision": 6},
+    ],
     [
         "create_label",
         (None, "\nDerived beamcenter pixel position:"),

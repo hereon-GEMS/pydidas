@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -36,25 +36,26 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="../../../_static/documentation_options.js?v=fb14c2b1"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/core/dataset';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.01.27"';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Other core classes and functions" href="others.html" />
@@ -62,20 +63,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="26.01.27" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -101,7 +108,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -353,7 +360,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -447,7 +461,7 @@
 <h1>Dataset<a class="headerlink" href="#class-name" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.core.Dataset">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArrayLike</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 <p>Dataset class, a subclass of a numpy.ndarray with metadata.</p>
 <p>The Dataset creates a new ndarray object from the array-like input and provides a
@@ -538,7 +552,7 @@ dimensions. The default is None.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.T">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Self</span></em><a class="headerlink" href="#pydidas.core.Dataset.T" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">T</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Self</span></span><a class="headerlink" href="#pydidas.core.Dataset.T" title="Link to this definition">#</a></dt>
 <dd><p>Get the transposed Dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -557,12 +571,12 @@ dimensions. The default is None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis to sort the array. The default is -1.</p></li>
-<li><p><strong>kind</strong> (<em>str</em><em>, </em><em>optional</em>) – Please see the numpy.argsort documentation for more information on the
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis to sort the array. The default is -1.</p></li>
+<li><p><strong>kind</strong> (<em>str</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.argsort documentation for more information on the
 <cite>kind</cite> parameter.</p></li>
-<li><p><strong>order</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em><em>, </em><em>optional</em>) – Please see the numpy.argsort documentation for more information on the
+<li><p><strong>order</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.argsort documentation for more information on the
 <cite>order</cite> parameter.</p></li>
-<li><p><strong>stable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Please see the numpy.argsort documentation for more information on the
+<li><p><strong>stable</strong> (<em>bool</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.argsort documentation for more information on the
 <cite>stable</cite> parameter.</p></li>
 </ul>
 </dd>
@@ -571,7 +585,7 @@ dimensions. The default is None.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.array">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">array</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#pydidas.core.Dataset.array" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">array</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#pydidas.core.Dataset.array" title="Link to this definition">#</a></dt>
 <dd><p>Get the raw array data of the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -585,7 +599,7 @@ dimensions. The default is None.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.axis_labels">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">axis_labels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.core.Dataset.axis_labels" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">axis_labels</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.core.Dataset.axis_labels" title="Link to this definition">#</a></dt>
 <dd><p>Get the axis_labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -600,7 +614,7 @@ dimension in the array and respective values.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.axis_ranges">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">axis_ranges</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.core.Dataset.axis_ranges" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">axis_ranges</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.core.Dataset.axis_ranges" title="Link to this definition">#</a></dt>
 <dd><p>Get the axis ranges.</p>
 <p>These arrays for every dimension give the range of the data
 (in conjunction with the units).</p>
@@ -617,7 +631,7 @@ dimension in the array and respective values.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.axis_units">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">axis_units</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.core.Dataset.axis_units" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">axis_units</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.axis_units" title="Link to this definition">#</a></dt>
 <dd><p>Get the axis units.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -652,7 +666,7 @@ metadata.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.data_description">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Dataset.data_description" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data_description</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pydidas.core.Dataset.data_description" title="Link to this definition">#</a></dt>
 <dd><p>Get a descriptive string for the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -666,7 +680,7 @@ metadata.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.data_label">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_label</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Dataset.data_label" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data_label</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pydidas.core.Dataset.data_label" title="Link to this definition">#</a></dt>
 <dd><p>Get the data label.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -680,7 +694,7 @@ metadata.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.data_unit">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pydidas.core.Dataset.data_unit" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">data_unit</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pydidas.core.Dataset.data_unit" title="Link to this definition">#</a></dt>
 <dd><p>Get the data unit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -843,7 +857,7 @@ It will also modify the ranges, if required.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<em>int</em>) – The axis index.</p></li>
-<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The threshold for the standard deviation of the range differences. The
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The threshold for the standard deviation of the range differences. The
 default is 1e-4.</p></li>
 </ul>
 </dd>
@@ -858,7 +872,7 @@ default is 1e-4.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.max">
-<span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where=&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.max" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.max" title="Link to this definition">#</a></dt>
 <dd><p>Return the maximum along a given axis.</p>
 <p>Refer to <cite>numpy.amax</cite> for full documentation.</p>
 <div class="admonition seealso">
@@ -872,7 +886,7 @@ default is 1e-4.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.mean">
-<span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where=&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.mean" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.mean" title="Link to this definition">#</a></dt>
 <dd><p>Returns the average of the array elements along given axis.</p>
 <p>Refer to <cite>numpy.mean</cite> for full documentation.</p>
 <div class="admonition seealso">
@@ -886,7 +900,7 @@ default is 1e-4.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.metadata">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.core.Dataset.metadata" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.core.Dataset.metadata" title="Link to this definition">#</a></dt>
 <dd><p>Get the dataset metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -901,7 +915,7 @@ dictionary.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.min">
-<span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where=&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.min" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.min" title="Link to this definition">#</a></dt>
 <dd><p>Return the minimum along a given axis.</p>
 <p>Refer to <cite>numpy.amin</cite> for full documentation.</p>
 <div class="admonition seealso">
@@ -915,7 +929,7 @@ dictionary.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.property_dict">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">property_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#pydidas.core.Dataset.property_dict" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">property_dict</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.core.Dataset.property_dict" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the property dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -935,7 +949,7 @@ dictionary.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>repeats</strong> (<em>int</em>) – The number of repetitions.</p></li>
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis along which to repeat. If None, the flattened array is returned.
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis along which to repeat. If None, the flattened array is returned.
 The default is None.</p></li>
 </ul>
 </dd>
@@ -976,7 +990,7 @@ The default is None.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>shift</strong> (<em>int</em>) – The number of places by which elements are shifted.</p></li>
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis along which to roll. If None, the flattened array is rolled.
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis along which to roll. If None, the flattened array is rolled.
 The default is None.</p></li>
 </ul>
 </dd>
@@ -991,7 +1005,7 @@ The default is None.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.shape">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pydidas.core.Dataset.shape" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.core.Dataset.shape" title="Link to this definition">#</a></dt>
 <dd><p>Get the shape of the array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1010,12 +1024,12 @@ The default is None.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis to sort the array. The default is -1.</p></li>
-<li><p><strong>kind</strong> (<em>str</em><em>, </em><em>optional</em>) – Please see the numpy.sort documentation for more information on the
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis to sort the array. The default is -1.</p></li>
+<li><p><strong>kind</strong> (<em>str</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.sort documentation for more information on the
 <cite>kind</cite> parameter.</p></li>
-<li><p><strong>order</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Please see the numpy.sort documentation for more information on the
+<li><p><strong>order</strong> (<em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.sort documentation for more information on the
 <cite>order</cite> parameter.</p></li>
-<li><p><strong>stable</strong> (<em>bool</em><em>, </em><em>optional</em>) – Please see the numpy.sort documentation for more information on the
+<li><p><strong>stable</strong> (<em>bool</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Please see the numpy.sort documentation for more information on the
 <cite>stable</cite> parameter.</p></li>
 </ul>
 </dd>
@@ -1028,7 +1042,7 @@ The default is None.</p></li>
 <dd><p>Squeeze the array and remove dimensions of length one.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis to be squeezed. If None, all axes of length one will be
+<dd class="field-odd"><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis to be squeezed. If None, all axes of length one will be
 squeezed. The default is None.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1042,7 +1056,7 @@ squeezed. The default is None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.Dataset.sum">
-<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where=&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.sum" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;no</span> <span class="pre">value&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Dataset.sum" title="Link to this definition">#</a></dt>
 <dd><p>Return the sum of the array elements over the given axis.</p>
 <p>Refer to <cite>numpy.sum</cite> for full documentation.</p>
 <div class="admonition seealso">
@@ -1064,11 +1078,11 @@ as well.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>indices</strong> (<em>int</em><em> | </em><em>ArrayLike</em>) – The indices of the values to extract.</p></li>
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional</em>) – The axis to take the data from. If None, data will be taken from the
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The axis to take the data from. If None, data will be taken from the
 flattened array. The default is None.</p></li>
-<li><p><strong>out</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – An optional output array. If None, a new array is created. The default is
+<li><p><strong>out</strong> (<em>ndarray</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – An optional output array. If None, a new array is created. The default is
 None.</p></li>
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies how out-of-bounds indices will behave. The default is “raise”.</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Specifies how out-of-bounds indices will behave. The default is “raise”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1201,8 +1215,8 @@ data and not only a view to prevent inconsistent metadata.</p>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Dataset"><code class="docutils literal notranslate"><span class="pre">Dataset</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Dataset.T"><code class="docutils literal notranslate"><span class="pre">Dataset.T</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Dataset.argsort"><code class="docutils literal notranslate"><span class="pre">Dataset.argsort</span></code></a></li>
@@ -1248,7 +1262,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/core/dataset.rst">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/src/pydidas/docs/src/code/api/core/dataset.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -1261,13 +1275,13 @@ data and not only a view to prevent inconsistent metadata.</p>
 </div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../../_sources/code/api/core/dataset.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/code/api/core/dataset.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1282,8 +1296,8 @@ data and not only a view to prevent inconsistent metadata.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1294,7 +1308,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 
   <p class="copyright">
     
-      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      © Copyright 2021 - 2026, Helmholtz-Zentrum Hereon.
       <br/>
     
   </p>
@@ -1303,7 +1317,7 @@ data and not only a view to prevent inconsistent metadata.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>
@@ -1317,7 +1331,7 @@ data and not only a view to prevent inconsistent metadata.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

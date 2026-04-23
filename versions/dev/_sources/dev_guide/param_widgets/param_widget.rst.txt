@@ -34,8 +34,8 @@ is a composite widget designed to display and edit a single :py:class:`Parameter
    property.
 2. The concrete I/O widget (see below)
 3. A label widget (:py:class:`PydidasLabel <pydidas.widgets.base.PydidasLabel>`)
-to show the Parameter's unit, if defined. Its text corresponds to the
-Parameter's ``unit`` property and is hidden if no unit is defined.
+   to show the Parameter's unit, if defined. Its text corresponds to the
+   Parameter's ``unit`` property and is hidden if no unit is defined.
 
 
 .. code-block::

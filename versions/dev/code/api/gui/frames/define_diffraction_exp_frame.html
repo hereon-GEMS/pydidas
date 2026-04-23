@@ -949,7 +949,8 @@ are supported.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> or </em><em>str</em>) – A Parameter class instance.</p></li>
+<li><p><strong>param</strong> (<a class="reference internal" href="../../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> or </em><em>str</em>) – A Parameter class instance or the string refkey of a Parameter
+registered in <code class="docutils literal notranslate"><span class="pre">.params</span></code>.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keys are:</p>
 <dl class="simple">
 <dt>gridPos<span class="classifier">tuple, optional</span></dt><dd><p>The grid position in the layout. The default is (-1, 0, 1, 1)</p>
@@ -965,15 +966,21 @@ pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.</p>
 <dt>linebreak<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle a line break between the text label and the
 input widget. The default is False.</p>
 </dd>
-<dt>halign_io<span class="classifier">QtCore.Qt.Alignment, optional</span></dt><dd><p>The horizontal alignment for the input widget. The default is
-QtCore.Qt.AlignRight.</p>
-</dd>
-<dt>halign_text<span class="classifier">QtCore.Qt.Alignment, optional</span></dt><dd><p>The horizontal alignment for the text (label) widget. The default
-is QtCore.Qt.AlignRight.</p>
-</dd>
 <dt>parent_widget<span class="classifier">QWidget or str or None, optional</span></dt><dd><p>The widget to which the label is added. If a string,
-this picks up the calling class’s ._widgets dictionary
+this picks up the calling class’s <code class="docutils literal notranslate"><span class="pre">._widgets</span></code> dictionary
 and selects the string key’s value. The default is self.</p>
+</dd>
+<dt>validator<span class="classifier">QValidator or None, optional</span></dt><dd><p>A custom validator applied to the I/O widget, if it supports
+one. The default is None.</p>
+</dd>
+<dt>precision<span class="classifier">int or None, optional</span></dt><dd><p>Rounding precision for float Parameters. The default is
+defined in <code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.FLOAT_DISPLAY_ACCURACY</span></code>.</p>
+</dd>
+<dt>font_metric_width_factor<span class="classifier">int or None, optional</span></dt><dd><p>Total widget width in multiples of the font metric character
+width. The default is FONT_METRIC_CONFIG_WIDTH.</p>
+</dd>
+<dt>persistent_qsettings_ref<span class="classifier">str or None, optional</span></dt><dd><p>QSettings reference key for persisting file-dialog directories
+across sessions. The default is None.</p>
 </dd>
 </dl>
 </p></li>

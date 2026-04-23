@@ -508,6 +508,13 @@ default is FONT_METRIC_CONFIG_WIDTH.</p>
 <dt>validator<span class="classifier">QValidator or None</span></dt><dd><p>A custom validator to be used in the I/O widget, if applicable.
 The default is None.</p>
 </dd>
+<dt>precision<span class="classifier">int or None</span></dt><dd><p>The precision for floating point values. Values will be rounded
+to precision digits. The default is FLOAT_DISPLAY_ACCURACY.</p>
+</dd>
+<dt>persistent_qsettings_ref<span class="classifier">str or None</span></dt><dd><p>An optional QSettings reference key passed to the I/O widget for
+persisting file-dialog directories across sessions. The default
+is None.</p>
+</dd>
 </dl>
 </p></li>
 </ul>
@@ -531,20 +538,6 @@ The default is None.</p>
 <dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.io_widget">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">io_widget</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">BaseParamIoWidget</span></em><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.io_widget" title="Link to this definition">#</a></dt>
 <dd><p>Returns the I/O widget for the Parameter.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_str_repr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value" title="Link to this definition">#</a></dt>
-<dd><p>Update the Parameter value with the entry from the widget.</p>
-<p>This method tries to update the Parameter value with the entry from
-the widget. If unsuccessful, an exception box will be opened and
-the widget input will be reset to the stored Parameter value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value_str_repr</strong> (<em>str</em>) – The new value as string representation.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -591,6 +584,27 @@ PARAMETER’S CHOICES. IT ONLY UPDATES THE WIDGET IN PLACE.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.update_from_param">
+<span class="sig-name descname"><span class="pre">update_from_param</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.update_from_param" title="Link to this definition">#</a></dt>
+<dd><p>Update the display value from the current Parameter value</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.parameter_config.ParameterWidget.value">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#pydidas.widgets.parameter_config.ParameterWidget.value" title="Link to this definition">#</a></dt>
+<dd><p>Get the displayed value from the I/O widget in the native Parameter format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The displayed value, formatted to the type of the associated
+Parameter</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -607,7 +621,8 @@ convenience functions for settings Parameter values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> or </em><em>str</em>) – A Parameter class instance.</p></li>
+<li><p><strong>param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> or </em><em>str</em>) – A Parameter class instance or the string refkey of a Parameter
+registered in <code class="docutils literal notranslate"><span class="pre">.params</span></code>.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported keys are:</p>
 <dl class="simple">
 <dt>gridPos<span class="classifier">tuple, optional</span></dt><dd><p>The grid position in the layout. The default is (-1, 0, 1, 1)</p>
@@ -623,15 +638,21 @@ pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH.</p>
 <dt>linebreak<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle a line break between the text label and the
 input widget. The default is False.</p>
 </dd>
-<dt>halign_io<span class="classifier">QtCore.Qt.Alignment, optional</span></dt><dd><p>The horizontal alignment for the input widget. The default is
-QtCore.Qt.AlignRight.</p>
-</dd>
-<dt>halign_text<span class="classifier">QtCore.Qt.Alignment, optional</span></dt><dd><p>The horizontal alignment for the text (label) widget. The default
-is QtCore.Qt.AlignRight.</p>
-</dd>
 <dt>parent_widget<span class="classifier">QWidget or str or None, optional</span></dt><dd><p>The widget to which the label is added. If a string,
-this picks up the calling class’s ._widgets dictionary
+this picks up the calling class’s <code class="docutils literal notranslate"><span class="pre">._widgets</span></code> dictionary
 and selects the string key’s value. The default is self.</p>
+</dd>
+<dt>validator<span class="classifier">QValidator or None, optional</span></dt><dd><p>A custom validator applied to the I/O widget, if it supports
+one. The default is None.</p>
+</dd>
+<dt>precision<span class="classifier">int or None, optional</span></dt><dd><p>Rounding precision for float Parameters. The default is
+defined in <code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.FLOAT_DISPLAY_ACCURACY</span></code>.</p>
+</dd>
+<dt>font_metric_width_factor<span class="classifier">int or None, optional</span></dt><dd><p>Total widget width in multiples of the font metric character
+width. The default is FONT_METRIC_CONFIG_WIDTH.</p>
+</dd>
+<dt>persistent_qsettings_ref<span class="classifier">str or None, optional</span></dt><dd><p>QSettings reference key for persisting file-dialog directories
+across sessions. The default is None.</p>
 </dd>
 </dl>
 </p></li>
@@ -771,11 +792,12 @@ converted to string for display purposes.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.display_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.display_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.io_widget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.io_widget</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.set_param_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_param_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.set_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_value</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.sizeHint"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.sizeHint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_choices_from_param</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.update_display_value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_display_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.update_from_param"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_from_param</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidget.value"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.value</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.parameter_config.ParameterWidgetsMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterWidgetsMixIn</span></code></a><ul class="nav section-nav flex-column">

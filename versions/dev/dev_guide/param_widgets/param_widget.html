@@ -1,0 +1,958 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ParameterWidget full structure and API &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=fb14c2b1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'dev_guide/param_widgets/param_widget';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.01.27"';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ParameterWidgetsMixin structure and API" href="param_widgets_mixin.html" />
+    <link rel="prev" title="Developers guide for Parameter config widget" href="param_widgets_main.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="26.01.27" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../code/code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide_plugins.html">Developers guide to pydidas Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide_apps.html">Developers guide to pydidas applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide_multiprocessing.html">Developers guide to pydidas multiprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide_list_of_signals.html">Developers guide to pydidas signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guide_list_of_generic_params.html">Generic Parameters</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="param_widgets_main.html">Developers guide for Parameter config widget</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">ParameterWidget full structure and API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_widgets_mixin.html">ParameterWidgetsMixin structure and API</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../developer_guide.html" class="nav-link">Developer guide</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="param_widgets_main.html" class="nav-link">Developers guide for Parameter config widget</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">ParameterWidget full structure and API</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="parameterwidget-full-structure-and-api">
+<span id="dev-guide-parameter-widget"></span><h1>ParameterWidget full structure and API<a class="headerlink" href="#parameterwidget-full-structure-and-api" title="Link to this heading">#</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This documentation page has been partially created using the AI-tool
+GPT-5.3-Codex.</p>
+</div>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#parameterwidget-internal-widget-structure" id="id1">ParameterWidget internal widget structure</a></p></li>
+<li><p><a class="reference internal" href="#parameterwidget-args-and-kwargs" id="id2">ParameterWidget args and kwargs</a></p></li>
+<li><p><a class="reference internal" href="#signals" id="id3">Signals</a></p>
+<ul>
+<li><p><a class="reference internal" href="#signal-and-data-flow-user-edit" id="id4">Signal and Data Flow: User Edit</a></p></li>
+<li><p><a class="reference internal" href="#signal-and-data-flow-programmatic-update" id="id5">Signal and Data Flow: Programmatic Update</a></p></li>
+<li><p><a class="reference internal" href="#choice-update-flow" id="id6">Choice Update Flow</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#properties" id="id7">Properties</a></p></li>
+<li><p><a class="reference internal" href="#methods" id="id8">Methods</a></p></li>
+<li><p><a class="reference internal" href="#i-o-subclasses" id="id9">I/O subclasses</a></p>
+<ul>
+<li><p><a class="reference internal" href="#widget-selection-rules" id="id10">Widget Selection Rules</a></p></li>
+<li><p><a class="reference internal" href="#subclass-behavior-matrix" id="id11">Subclass Behavior Matrix</a></p></li>
+<li><p><a class="reference internal" href="#file-and-hdf5-specialized-flow" id="id12">File and HDF5 Specialized Flow</a></p></li>
+<li><p><a class="reference internal" href="#contributor-extension-checklist" id="id13">Contributor Extension Checklist</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="parameterwidget-internal-widget-structure">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">ParameterWidget internal widget structure</a><a class="headerlink" href="#parameterwidget-internal-widget-structure" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a>
+is a composite widget designed to display and edit a single <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. It is composed of three main widgets:</p>
+<ol class="arabic simple">
+<li><p>A label widget (<code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasLabel</span></code>)
+to show the Parameter name. Its text corresponds to the Parameter’s <code class="docutils literal notranslate"><span class="pre">name</span></code>
+property.</p></li>
+<li><p>The concrete I/O widget (see below)</p></li>
+</ol>
+<p>3. A label widget (<code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasLabel</span></code>)
+to show the Parameter’s unit, if defined. Its text corresponds to the
+Parameter’s <code class="docutils literal notranslate"><span class="pre">unit</span></code> property and is hidden if no unit is defined.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-------------------------------------------------------------------------+</span>
+<span class="o">|</span>                        <span class="n">ParameterWidget</span>                                  <span class="o">|</span>
+<span class="o">|</span>              <span class="p">(</span><span class="n">composite</span> <span class="n">wrapper</span> <span class="k">for</span> <span class="n">one</span> <span class="n">Parameter</span><span class="p">)</span>                      <span class="o">|</span>
+<span class="o">|</span>                                                                         <span class="o">|</span>
+<span class="o">|</span>  <span class="o">+------------------+</span>  <span class="o">+-------------------------+</span>  <span class="o">+----------------+</span>  <span class="o">|</span>
+<span class="o">|</span>  <span class="o">|</span> <span class="n">Label</span> <span class="n">widget</span>     <span class="o">|</span>  <span class="o">|</span> <span class="n">I</span><span class="o">/</span><span class="n">O</span> <span class="n">widget</span>              <span class="o">|</span>  <span class="o">|</span> <span class="n">Unit</span> <span class="n">widget</span>    <span class="o">|</span>  <span class="o">|</span>
+<span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">PydidasLabel</span><span class="p">)</span>   <span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">BaseParamIoWidget</span><span class="o">*</span><span class="p">)</span>    <span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">PydidasLabel</span><span class="p">)</span> <span class="o">|</span>  <span class="o">|</span>
+<span class="o">|</span>  <span class="o">|</span>                  <span class="o">|</span>  <span class="o">|</span>                         <span class="o">|</span>  <span class="o">|</span> <span class="p">(</span><span class="n">Label</span><span class="p">)</span>        <span class="o">|</span>  <span class="o">|</span>
+<span class="o">|</span>  <span class="o">+------------------+</span>  <span class="o">+-------------------------+</span>  <span class="o">+----------------+</span>  <span class="o">|</span>
+<span class="o">|</span>                             <span class="o">^</span>                                           <span class="o">|</span>
+<span class="o">|</span>                             <span class="o">|</span> <span class="n">selected</span> <span class="n">by</span> <span class="n">dtype</span><span class="o">/</span><span class="n">choices</span>                 <span class="o">|</span>
+<span class="o">|</span>                             <span class="o">|</span>                                           <span class="o">|</span>
+<span class="o">|</span>         <span class="o">+--------------------------------------------------+</span>            <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span> <span class="n">ParamIoWidgetCheckBox</span> <span class="o">/</span> <span class="n">ParamIoWidgetComboBox</span> <span class="o">/</span>  <span class="o">|</span>            <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span> <span class="n">ParamIoWidgetFile</span> <span class="o">/</span> <span class="n">ParamIoWidgetHdf5Key</span> <span class="o">/</span>       <span class="o">|</span>            <span class="o">|</span>
+<span class="o">|</span>         <span class="o">|</span> <span class="n">ParamIoWidgetLineEdit</span>                            <span class="o">|</span>            <span class="o">|</span>
+<span class="o">|</span>         <span class="o">+--------------------------------------------------+</span>            <span class="o">|</span>
+<span class="o">+-------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+</section>
+<section id="parameterwidget-args-and-kwargs">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">ParameterWidget args and kwargs</a><a class="headerlink" href="#parameterwidget-args-and-kwargs" title="Link to this heading">#</a></h2>
+<p>The :<a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a> constructor takes a single argument: The associated
+<a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> instance. The widget behaviour will be determined by the keyword
+arguments. The following keyword arguments are supported:</p>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>kwarg</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">width_text</span></code></p></td>
+<td><p>float, optional</p></td>
+<td><p>Relative width of the Parameter name label, as a fraction of the global
+<code class="docutils literal notranslate"><span class="pre">font_metric_width_factor</span></code>. The default is set to 55% of the total
+width, (defined in <code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.PARAM_WIDGET_TEXT_WIDTH</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">width_unit</span></code></p></td>
+<td><p>float, optional</p></td>
+<td><p>Relative width of the unit label, as a fraction of the global
+<code class="docutils literal notranslate"><span class="pre">font_metric_width_factor</span></code>. The default is set to 7% of the total
+width, if the unit field is not empty. This default is defined in
+<code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.PARAM_WIDGET_UNIT_WIDTH</span></code>. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code>
+will disable the unit label entirely.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">linebreak</span></code></p></td>
+<td><p>bool, optional</p></td>
+<td><p>When <code class="docutils literal notranslate"><span class="pre">True</span></code>, the name label is placed on its own row above the I/O
+widget instead of side-by-side. This is useful for <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> with long
+values like file system paths. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">font_metric_width_factor</span></code></p></td>
+<td><p>int, optional</p></td>
+<td><p>The width of the widget in multiples of the font metric width. If None,
+the widget will use the default size policy. The default is
+<code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.FONT_METRIC_CONFIG_WIDTH</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validator</span></code></p></td>
+<td><p>QValidator, optional</p></td>
+<td><p>A custom validator to be used in the I/O widget, if applicable. The
+default is None.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code></p></td>
+<td><p>int, optional</p></td>
+<td><p>The precision for floating point values. Values will be rounded to
+precision digits. The default is defined in
+<code class="docutils literal notranslate"><span class="pre">pydidas.core.constants.FLOAT_DISPLAY_ACCURACY</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>persistent_qsettings_ref</p></td>
+<td><p>str, optional</p></td>
+<td><p>An optional QSettings reference key passed to the I/O widget for
+persisting file-dialog directories across sessions. The default is None.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In addition, all kwargs supported by the parent class <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code> are also supported and passed to the
+constructor.</p>
+</section>
+<section id="signals">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Signals</a><a class="headerlink" href="#signals" title="Link to this heading">#</a></h2>
+<p>The following signals are emitted by the <code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code> simultaneously to
+support both direct access to the new value and a generic change notification:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sig_new_value(str)</span></code>: emitted with string representation of new input.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sig_value_changed()</span></code>: emitted when a value was changed.</p></li>
+</ul>
+<p>These signals are passed through from the underlying I/O widget:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+---------------+</span>
+<span class="o">|</span>   <span class="n">User</span> <span class="nb">input</span>  <span class="o">|</span>
+<span class="o">+---------------+</span>
+        <span class="o">|</span>
+        <span class="n">v</span>
+<span class="o">+---------------+</span>
+<span class="o">|</span> <span class="o">&lt;</span><span class="n">I</span><span class="o">/</span><span class="n">O</span> <span class="n">widget</span><span class="o">&gt;</span>  <span class="o">|</span>        <span class="o">+--------------------+</span>
+<span class="o">|</span> <span class="n">emit_signal</span><span class="p">()</span> <span class="o">|</span>  <span class="o">---&gt;</span>  <span class="o">|</span>    <span class="o">&lt;</span><span class="n">I</span><span class="o">/</span><span class="n">O</span> <span class="n">widget</span><span class="o">&gt;</span>    <span class="o">|</span>        <span class="o">+-------------------+</span>
+<span class="o">+---------------+</span>        <span class="o">|</span> <span class="n">sig_new_value</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">|</span>  <span class="o">---&gt;</span>  <span class="o">|</span>  <span class="n">ParameterWidget</span>  <span class="o">|</span>
+   <span class="o">|</span>                     <span class="o">+--------------------+</span>        <span class="o">|</span> <span class="n">update</span> <span class="n">associated</span> <span class="o">|</span>
+   <span class="o">|</span>                                      <span class="o">|</span>            <span class="o">|</span>  <span class="n">Parameter</span> <span class="n">value</span>  <span class="o">|</span>
+   <span class="o">|</span>      <span class="o">+----------------------+</span>        <span class="o">|</span>            <span class="o">+-------------------+</span>
+   <span class="o">+---&gt;</span>  <span class="o">|</span>      <span class="o">&lt;</span><span class="n">I</span><span class="o">/</span><span class="n">O</span> <span class="n">widget</span><span class="o">&gt;</span>    <span class="o">|</span>        <span class="o">|</span>
+          <span class="o">|</span>  <span class="n">sig_value_changed</span><span class="p">()</span> <span class="o">|</span>        <span class="o">|</span>      <span class="o">+--------------------+</span>
+          <span class="o">+----------------------+</span>        <span class="o">+---&gt;</span>  <span class="o">|</span>  <span class="n">ParameterWidget</span>   <span class="o">|</span>
+                    <span class="o">|</span>                            <span class="o">|</span> <span class="n">sig_new_value</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span> <span class="o">|</span>
+                    <span class="o">|</span>                            <span class="o">+--------------------+</span>
+                    <span class="o">|</span>
+                    <span class="o">|</span>      <span class="o">+---------------------+</span>
+                    <span class="o">+---&gt;</span>  <span class="o">|</span>   <span class="n">ParameterWidget</span>   <span class="o">|</span>
+                           <span class="o">|</span> <span class="n">sig_value_changed</span><span class="p">()</span> <span class="o">|</span>
+                           <span class="o">+---------------------+</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that programmatic updates to the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> value are not
+automatically reflected in the widget display. To synchronize the display
+with the current Parameter value, use the <a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget.update_from_param" title="pydidas.widgets.parameter_config.ParameterWidget.update_from_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_from_param</span></code></a>
+method.</p>
+</div>
+<section id="signal-and-data-flow-user-edit">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Signal and Data Flow: User Edit</a><a class="headerlink" href="#signal-and-data-flow-user-edit" title="Link to this heading">#</a></h3>
+<p>The typical interactive edit flow is:</p>
+<ol class="arabic simple">
+<li><p>User edits text/selection in a concrete I/O widget.</p></li>
+<li><p>I/O widget calls <code class="docutils literal notranslate"><span class="pre">emit_signal()</span></code> from <code class="docutils literal notranslate"><span class="pre">BaseParamIoWidgetMixIn</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">emit_signal()</span></code> compares against <code class="docutils literal notranslate"><span class="pre">_old_value</span></code> and emits:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sig_new_value(str)</span></code> with <code class="docutils literal notranslate"><span class="pre">current_text</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sig_value_changed()</span></code></p></li>
+</ul>
+</li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">ParameterWidget.__create_param_io_widget()</span></code>, <code class="docutils literal notranslate"><span class="pre">sig_new_value</span></code> is
+connected to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_param_value</span></code> (state update)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterWidget.sig_new_value</span></code> (forwarding)</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_param_value</span></code> applies the new value to <code class="docutils literal notranslate"><span class="pre">param.value</span></code>.</p></li>
+<li><p>On conversion/config errors, the widget resets to old Parameter value and
+re-raises.</p></li>
+</ol>
+<p>This keeps data conversion authoritative in the <code class="docutils literal notranslate"><span class="pre">Parameter</span></code> layer while the
+widget layer stays responsible for display and signal semantics.</p>
+</section>
+<section id="signal-and-data-flow-programmatic-update">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Signal and Data Flow: Programmatic Update</a><a class="headerlink" href="#signal-and-data-flow-programmatic-update" title="Link to this heading">#</a></h3>
+<p>Programmatic update without changing Parameter state:</p>
+<ol class="arabic simple">
+<li><p>Caller invokes <code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_display_value(value)</span></code>.</p></li>
+<li><p>Composite widget forwards to <code class="docutils literal notranslate"><span class="pre">io_widget.update_display_value(value)</span></code>.</p></li>
+<li><p>I/O widget updates display in a non-emitting way (often using
+<code class="docutils literal notranslate"><span class="pre">QSignalBlocker</span></code> or a signal-free setter path).</p></li>
+<li><p>Parameter object remains unchanged.</p></li>
+</ol>
+<p>Programmatic update with Parameter state change:</p>
+<ol class="arabic simple">
+<li><p>Caller invokes <code class="docutils literal notranslate"><span class="pre">ParameterWidget.set_value(value)</span></code>.</p></li>
+<li><p>Underlying I/O widget <code class="docutils literal notranslate"><span class="pre">set_value</span></code> updates display and emits change signals.</p></li>
+<li><p>Connected <code class="docutils literal notranslate"><span class="pre">set_param_value</span></code> updates the Parameter.</p></li>
+</ol>
+</section>
+<section id="choice-update-flow">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Choice Update Flow</a><a class="headerlink" href="#choice-update-flow" title="Link to this heading">#</a></h3>
+<p>When Parameter choices change dynamically:</p>
+<ol class="arabic simple">
+<li><p>Parameter receives new value and choices.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_choices_from_param()</span></code> is called.</p></li>
+<li><p>If current I/O widget class no longer matches requirements, the widget is
+recreated in <code class="docutils literal notranslate"><span class="pre">__create_param_io_widget()</span></code>.</p></li>
+<li><p>For choice widgets, <code class="docutils literal notranslate"><span class="pre">update_choices(...,</span> <span class="pre">emit_signal=False)</span></code> syncs display
+without broadcasting unintended edits.</p></li>
+</ol>
+</section>
+</section>
+<section id="properties">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Properties</a><a class="headerlink" href="#properties" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">io_widget</span></code></p></td>
+<td><p>[read-only] The currently selected I/O widget instance for the linked
+Parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">display_value</span></code></p></td>
+<td><p>[read-only] Current displayed value from the underlying I/O widget.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></td>
+<td><p>The linked display (and Parameter) value in its native datatype. This
+property is read/write and will trigger updates to the display and emit
+change signals when set.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="methods">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Methods</a><a class="headerlink" href="#methods" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="tight-table table">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">update_display_value(value)</span></code></p></td>
+<td><p>Refresh only the widget display without updating Parameter state or
+emitting signals.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">set_value(value)</span></code></p></td>
+<td><p>Set value through the I/O widget, including normal signal behavior.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">update_choices_from_param()</span></code></p></td>
+<td><p>Rebuild or update selection widget choices from the choices of the
+underlying and linked Parameter.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">update_from_param()</span></code></p></td>
+<td><p>Update the widget display value from the linked <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="i-o-subclasses">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">I/O subclasses</a><a class="headerlink" href="#i-o-subclasses" title="Link to this heading">#</a></h2>
+<section id="widget-selection-rules">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Widget Selection Rules</a><a class="headerlink" href="#widget-selection-rules" title="Link to this heading">#</a></h3>
+<p><a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a> chooses the I/O widget class from the Parameter metadata:</p>
+<ul class="simple">
+<li><p>bool-like choices -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetCheckBox</span></code></p></li>
+<li><p>list of choices -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetComboBox</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Path</span></code> dtype -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetFile</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Hdf5key</span></code> dtype -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetHdf5Key</span></code></p></li>
+<li><p>other -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetLineEdit</span></code></p></li>
+</ul>
+<p>The selection is dynamic and can be updated to accommodate for changes in the
+Parameter’s metadata (e.g. new choices list) through the
+<a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param" title="pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_choices_from_param</span></code></a>
+method.</p>
+</section>
+<section id="subclass-behavior-matrix">
+<h3><a class="toc-backref" href="#id11" role="doc-backlink">Subclass Behavior Matrix</a><a class="headerlink" href="#subclass-behavior-matrix" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 25.0%" />
+<col style="width: 51.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Primary UI control</p></th>
+<th class="head"><p>Key behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetCheckBox</span></code></p></td>
+<td><p>Checkbox</p></td>
+<td><p>Converts bool-like values and emits on check-state changes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetComboBox</span></code></p></td>
+<td><p>Combo box</p></td>
+<td><p>Handles choices list updates and emits on index changes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetLineEdit</span></code></p></td>
+<td><p>Line edit</p></td>
+<td><p>Free text, optional float rounding for displayed values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetWithButton</span></code></p></td>
+<td><p>Line edit plus button</p></td>
+<td><p>Base class for action-backed value selection widgets.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetFile</span></code></p></td>
+<td><p>File picker button</p></td>
+<td><p>Integrates dialogs and drag-and-drop path selection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetHdf5Key</span></code></p></td>
+<td><p>File plus dataset picker</p></td>
+<td><p>Selects HDF5 datasets and stores key string values.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="file-and-hdf5-specialized-flow">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">File and HDF5 Specialized Flow</a><a class="headerlink" href="#file-and-hdf5-specialized-flow" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetWithButton</span></code> is the base for chooser widgets.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetFile</span></code>: button opens a path dialog and writes selected path.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ParamIoWidgetHdf5Key</span></code>: button opens file selection, then dataset chooser,
+then writes selected dataset key.</p></li>
+</ul>
+<p>Both subclasses rely on the same output contract: writing value through the
+common I/O path so <code class="docutils literal notranslate"><span class="pre">sig_new_value</span></code> and <code class="docutils literal notranslate"><span class="pre">sig_value_changed</span></code> stay consistent.</p>
+</section>
+<section id="contributor-extension-checklist">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">Contributor Extension Checklist</a><a class="headerlink" href="#contributor-extension-checklist" title="Link to this heading">#</a></h3>
+<p>When adding a new <code class="docutils literal notranslate"><span class="pre">param_io_widget_*</span></code> class:</p>
+<ol class="arabic simple">
+<li><p>Inherit from <code class="docutils literal notranslate"><span class="pre">BaseParamIoWidgetMixIn</span></code> and a QWidget-compatible class.</p></li>
+<li><p>Implement <code class="docutils literal notranslate"><span class="pre">current_text</span></code> and <code class="docutils literal notranslate"><span class="pre">update_display_value</span></code>.</p></li>
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">update_display_value</span></code> does not emit user-change signals.</p></li>
+<li><p>Connect the widget’s native interaction signal to <code class="docutils literal notranslate"><span class="pre">emit_signal</span></code>.</p></li>
+<li><p>If choices are supported, implement <code class="docutils literal notranslate"><span class="pre">update_choices</span></code>.</p></li>
+<li><p>If action button is needed, derive from <code class="docutils literal notranslate"><span class="pre">ParamIoWidgetWithButton</span></code> and
+implement <code class="docutils literal notranslate"><span class="pre">button_function</span></code>.</p></li>
+<li><p>Add tests in <code class="docutils literal notranslate"><span class="pre">tests/widgets/parameter_config</span></code> for conversion, display
+update semantics, and signal counts.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="param_widgets_main.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Developers guide for Parameter config widget</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="param_widgets_mixin.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ParameterWidgetsMixin structure and API</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameterwidget-internal-widget-structure">ParameterWidget internal widget structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameterwidget-args-and-kwargs">ParameterWidget args and kwargs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#signals">Signals</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#signal-and-data-flow-user-edit">Signal and Data Flow: User Edit</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#signal-and-data-flow-programmatic-update">Signal and Data Flow: Programmatic Update</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choice-update-flow">Choice Update Flow</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties">Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#methods">Methods</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#i-o-subclasses">I/O subclasses</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#widget-selection-rules">Widget Selection Rules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#subclass-behavior-matrix">Subclass Behavior Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#file-and-hdf5-specialized-flow">File and HDF5 Specialized Flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#contributor-extension-checklist">Contributor Extension Checklist</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/dev_guide/param_widgets/param_widget.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/dev_guide/param_widgets/param_widget.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

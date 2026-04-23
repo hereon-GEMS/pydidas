@@ -63,7 +63,7 @@ kiwisolver==1.4.9
     # via matplotlib
 lazy-loader==0.4
     # via scikit-image
-lxml==6.0.2
+lxml==6.1.0
     # via fabio
 markupsafe==3.0.3
     # via jinja2
@@ -89,7 +89,7 @@ numpy==2.4.1
     #   scipy
     #   silx
     #   tifffile
-packaging==25.0
+packaging==26.1
     # via
     #   build
     #   lazy-loader
@@ -98,7 +98,7 @@ packaging==25.0
     #   scikit-image
     #   silx
     #   sphinx
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   fabio
     #   imageio
@@ -112,7 +112,7 @@ pydata-sphinx-theme==0.17.1
     # via -r requirements.in
 pyfai==2026.3.0
     # via -r requirements.in
-pygments==2.19.2
+pygments==2.20.0
     # via
     #   accessible-pygments
     #   pydata-sphinx-theme

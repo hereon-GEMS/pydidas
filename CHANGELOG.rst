@@ -16,6 +16,8 @@ Improvements
 - When editing advanced Parameters, the GUI now remembers the settings
   for each plugin.
 - Added an option to select a file by its filename in the DataBrowsingFrame.
+- Removed the gui and widget packages from the generic 'import pydidas'
+  to speed-up loading for background processes.
 
 Programmatic changes
 --------------------

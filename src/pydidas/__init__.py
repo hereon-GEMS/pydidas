@@ -45,13 +45,11 @@ from . import (
     contexts,
     core,
     data_io,
-    gui,
     managers,
     multiprocessing,
     plugins,
     resources,
     unittest_objects,
-    widgets,
     workflow,
 )
 from .core.utils.qt_utilities import IS_QT6

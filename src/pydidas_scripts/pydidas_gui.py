@@ -37,7 +37,7 @@ def open_gui():
     _splash = PydidasSplashScreen.instance()
     _splash.show_aligned_message("Importing packages")
 
-    import pydidas
+    import pydidas.gui
 
     pydidas.gui.start_pydidas_gui(use_default_frames=True, splash_screen=_splash)
 

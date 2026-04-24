@@ -69,7 +69,7 @@ def get_directory(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
-def path_as_formatted_str(path: Path) -> str:
+def path_as_str_for_uri(path: Path) -> str:
     """
     Get the pathlib.Path input as a string with only forward slashes.
 
@@ -88,7 +88,10 @@ def path_as_formatted_str(path: Path) -> str:
             "Only pathlib.Path instances are allowed as input for "
             "`path_as_formatted_str`."
         )
-    return str(path).replace("\\", "/")
+    _repr = str(path).replace("\\", "/")
+    if not _repr.startswith("/"):
+        _repr = f"/{_repr}"
+    return f"file://{_repr}"
 
 
 def get_extension(path: Path | str) -> str:

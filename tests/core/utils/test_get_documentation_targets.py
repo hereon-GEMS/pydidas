@@ -31,14 +31,13 @@ import pytest
 from pydidas.core.utils import (
     DOC_BUILD_PATH,
     DOC_HOME_ADDRESS,
-    DOC_HOME_FILENAME_STR,
     DOC_HOME_QURL,
     DOC_SOURCE_DIRECTORY,
 )
 from pydidas.core.utils import (
     get_documentation_targets as doc_targets,
 )
-from pydidas.core.utils.file_utils import path_as_formatted_str
+from pydidas.core.utils.file_utils import path_as_str_for_uri
 from pydidas.core.utils.get_documentation_targets import (
     doc_path_for_gui_manual,
     doc_qurl_for_gui_manual,
@@ -47,9 +46,9 @@ from pydidas.core.utils.get_documentation_targets import (
 
 
 def _expected_gui_fname_str(name: str, class_type: str) -> str:
-    return path_as_formatted_str(
+    return str(
         DOC_BUILD_PATH / "html" / "manuals" / "gui" / f"{class_type}s" / f"{name}.html"
-    )
+    ).replace("\\", "/")
 
 
 def test_documentation_constants_are_consistent_with_module_location():
@@ -57,9 +56,8 @@ def test_documentation_constants_are_consistent_with_module_location():
     assert DOC_BUILD_PATH == (Path(doc_targets.__file__).parents[2] / "sphinx")
     assert DOC_SOURCE_DIRECTORY == (Path(doc_targets.__file__).parents[2] / "docs")
 
-    expected_home = path_as_formatted_str(DOC_BUILD_PATH / "html" / "index.html")
-    assert DOC_HOME_FILENAME_STR == expected_home
-    assert DOC_HOME_ADDRESS == f"file:///{expected_home}"
+    _expected_address = path_as_str_for_uri(DOC_BUILD_PATH / "html" / "index.html")
+    assert DOC_HOME_ADDRESS == _expected_address
     assert DOC_HOME_QURL.isValid()
     assert DOC_HOME_QURL.toString() == DOC_HOME_ADDRESS
 
@@ -84,20 +82,18 @@ def test_doc_qurl_for_gui_manual(name, class_type):
 def test_doc_qurl_for_rel_address(address):
     _qurl = doc_qurl_for_rel_address(address)
 
-    _expected = path_as_formatted_str(
-        DOC_BUILD_PATH / "html" / "man" / "gui" / "intro.html"
-    )
+    _expected = Path(DOC_BUILD_PATH / "html" / "man" / "gui" / "intro.html")
     assert _qurl.isValid()
     assert _qurl.isValid()
-    assert _qurl.toLocalFile() == _expected
+    assert Path(_qurl.toLocalFile()) == _expected
 
 
 def test_doc_qurl_for_rel_address__test_empty_relative_address():
     _qurl = doc_qurl_for_rel_address("")
 
-    _expected = path_as_formatted_str(DOC_BUILD_PATH / "html")
+    _expected = DOC_BUILD_PATH / "html"
     assert _qurl.isValid()
-    assert _qurl.toLocalFile() == _expected
+    assert Path(_qurl.toLocalFile()) == _expected
 
 
 if __name__ == "__main__":

@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = [
     "DOC_BUILD_PATH",
     "DOC_SOURCE_DIRECTORY",
-    "DOC_HOME_FILENAME_STR",
     "DOC_HOME_ADDRESS",
     "DOC_HOME_QURL",
     "doc_qurl_for_gui_manual",
@@ -42,7 +41,7 @@ from typing import Literal
 
 from qtpy import QtCore
 
-from pydidas.core.utils.file_utils import path_as_formatted_str
+from pydidas.core.utils.file_utils import path_as_str_for_uri
 
 
 def doc_qurl_for_gui_manual(
@@ -64,8 +63,7 @@ def doc_qurl_for_gui_manual(
     url : QtCore.QUrl
         The QUrl object with the encoded path to the window manual.
     """
-    _fname = path_as_formatted_str(doc_path_for_gui_manual(name, class_type))
-    return QtCore.QUrl(f"file:///{_fname}")
+    return QtCore.QUrl(path_as_str_for_uri(doc_path_for_gui_manual(name, class_type)))
 
 
 def doc_path_for_gui_manual(name: str, class_type: Literal["frame", "window"]) -> Path:
@@ -106,12 +104,10 @@ def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
     """
     if isinstance(rel_address, Path):
         rel_address = str(rel_address)
-    _path = path_as_formatted_str(DOC_BUILD_PATH / "html" / rel_address)
-    return QtCore.QUrl(f"file:///{_path}")
+    return QtCore.QUrl(path_as_str_for_uri(DOC_BUILD_PATH / "html" / rel_address))
 
 
 DOC_BUILD_PATH = Path(__file__).parents[2] / "sphinx"
 DOC_SOURCE_DIRECTORY = Path(__file__).parents[2] / "docs"
-DOC_HOME_FILENAME_STR = path_as_formatted_str(DOC_BUILD_PATH / "html" / "index.html")
-DOC_HOME_ADDRESS = f"file:///{DOC_HOME_FILENAME_STR}"
+DOC_HOME_ADDRESS = path_as_str_for_uri(DOC_BUILD_PATH / "html" / "index.html")
 DOC_HOME_QURL = QtCore.QUrl(DOC_HOME_ADDRESS)

@@ -26,45 +26,47 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "DOC_BUILD_DIRECTORY",
     "DOC_BUILD_PATH",
     "DOC_SOURCE_DIRECTORY",
-    "DOC_HOME_FILENAME",
     "DOC_HOME_ADDRESS",
     "DOC_HOME_QURL",
-    "doc_filename_for_frame_manual",
-    "doc_qurl_for_frame_manual",
-    "doc_qurl_for_window_manual",
-    "doc_filename_for_window_manual",
+    "doc_qurl_for_gui_manual",
+    "doc_path_for_gui_manual",
     "doc_qurl_for_rel_address",
 ]
 
 
 from pathlib import Path
+from typing import Literal
 
 from qtpy import QtCore
 
+from pydidas.core.utils.file_utils import path_as_str_for_uri
 
-def doc_qurl_for_window_manual(name: str) -> QtCore.QUrl:
+
+def doc_qurl_for_gui_manual(
+    name: str, class_type: Literal["frame", "window"]
+) -> QtCore.QUrl:
     """
-    Get the QUrl for the window manual html file.
+    Get the QUrl for the window manual HTML file.
 
     Parameters
     ----------
     name : str
         The class name of the window.
+    class_type : Literal["frame", "window"], optional
+        The type of the class for which the manual is requested. This can be either
+        "frame" or "window".
 
     Returns
     -------
     url : QtCore.QUrl
         The QUrl object with the encoded path to the window manual.
     """
-    _path = doc_filename_for_window_manual(name).replace("\\", "/")
-    _url = QtCore.QUrl("file:///" + _path)
-    return _url
+    return QtCore.QUrl(path_as_str_for_uri(doc_path_for_gui_manual(name, class_type)))
 
 
-def doc_filename_for_window_manual(name: str) -> Path:
+def doc_path_for_gui_manual(name: str, class_type: Literal["frame", "window"]) -> Path:
     """
     Get the file system path for the filename of the manual for the given window class.
 
@@ -72,33 +74,17 @@ def doc_filename_for_window_manual(name: str) -> Path:
     ----------
     name : str
         The class name of the window.
+    class_type : Literal["frame", "window"], optional
+        The type of the class for which the manual is requested. This can be either
+        "frame" or "window".
 
     Returns
     -------
     Path
         The full filename for the window manual.
     """
-    _docdir = DOC_BUILD_DIRECTORY / "html" / "manuals" / "gui" / "windows"
-    return _docdir / f"{name}.html"
-
-
-def doc_qurl_for_frame_manual(name: str) -> QtCore.QUrl:
-    """
-    Get the QUrl for the frame manual html.
-
-    Parameters
-    ----------
-    name : str
-        The class name of the Frame.
-
-    Returns
-    -------
-    url : QtCore.QUrl
-        The QUrl object with the encoded path to the frame manual.
-    """
-    _path = doc_filename_for_frame_manual(name)
-    _url = QtCore.QUrl("file:///" + _path.replace("\\", "/"))
-    return _url
+    _doc_dir = DOC_BUILD_PATH / "html" / "manuals" / "gui" / f"{class_type}s"
+    return _doc_dir / f"{name}.html"
 
 
 def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
@@ -118,100 +104,10 @@ def doc_qurl_for_rel_address(rel_address: str | Path) -> QtCore.QUrl:
     """
     if isinstance(rel_address, Path):
         rel_address = str(rel_address)
-    _path = str(DOC_BUILD_DIRECTORY / "html" / rel_address).replace("\\", "/")
-    _url = QtCore.QUrl("file:///" + _path)
-    return _url
+    return QtCore.QUrl(path_as_str_for_uri(DOC_BUILD_PATH / "html" / rel_address))
 
 
-def doc_filename_for_frame_manual(name: str) -> Path:
-    """
-    Get the file system path for the filename of the frame manual for the given class.
-
-    Parameters
-    ----------
-    name : str
-        The class name of the Frame.
-
-    Returns
-    -------
-    Path
-        The full filename for the frame manual.
-    """
-    return DOC_BUILD_DIRECTORY / "html" / "manuals" / "gui" / "frames" / f"{name}.html"
-
-
-def _doc_home_address() -> str:
-    """
-    Get the pydidas documentation home address in a browser-readable format.
-
-    Returns
-    -------
-    _address : str
-        The address of the documentation index.html.
-    """
-    _address = "file:///" + str(_doc_home_filename())
-    _address = _address.replace("\\", "/")
-    return _address
-
-
-def _doc_home_filename() -> Path:
-    """
-    Get the filename of the pydidas documentation homepage.
-
-    Returns
-    -------
-    _docfile : Path
-        The full path and filename of the index.html file.
-    """
-    _docfile = _doc_make_directory() / "html" / "index.html"
-    return _docfile
-
-
-def _doc_make_directory() -> Path:
-    """
-    Get the output directory for the sphinx documentation.
-
-    Returns
-    -------
-    Path
-        The sphinx output directory.
-    """
-    _name = __file__
-    for _ in range(3):
-        _name = Path(_name).parent
-    return _name / "sphinx"
-
-
-def _doc_source_directory() -> Path:
-    """
-    Get the source directory of the sphinx documentation.
-
-    Returns
-    -------
-    Path
-        The directory with name of the directory with the make files.
-    """
-    _name = __file__
-    for _ in range(3):
-        _name = Path(_name).parent
-    return _name / "docs"
-
-
-def _get_doc_home_qurl() -> QtCore.QUrl:
-    """
-    Get the full filepath & -name of the index.html for the pydidas documentation.
-
-    Returns
-    -------
-    url : QtCore.QUrl
-        The QUrl object with the path to the index.html file.
-    """
-    return QtCore.QUrl(_doc_home_address())
-
-
-DOC_HOME_QURL = _get_doc_home_qurl()
-DOC_BUILD_DIRECTORY = _doc_make_directory()
-DOC_BUILD_PATH = DOC_BUILD_DIRECTORY
-DOC_SOURCE_DIRECTORY = _doc_source_directory()
-DOC_HOME_FILENAME = _doc_home_filename()
-DOC_HOME_ADDRESS = _doc_home_address()
+DOC_BUILD_PATH = Path(__file__).parents[2] / "sphinx"
+DOC_SOURCE_DIRECTORY = Path(__file__).parents[2] / "docs"
+DOC_HOME_ADDRESS = path_as_str_for_uri(DOC_BUILD_PATH / "html" / "index.html")
+DOC_HOME_QURL = QtCore.QUrl(DOC_HOME_ADDRESS)

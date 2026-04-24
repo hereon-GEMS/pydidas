@@ -16,6 +16,8 @@ Improvements
 - When editing advanced Parameters, the GUI now remembers the settings
   for each plugin.
 - Added an option to select a file by its filename in the DataBrowsingFrame.
+- Removed the gui and widget packages from the generic 'import pydidas'
+  to speed-up loading for background processes.
 
 Programmatic changes
 --------------------
@@ -89,6 +91,9 @@ Bugfixes
 - Fixed an issue where the active node was not properly updated when a node
   was moved in a Tree.
 - Fixed an issue which prevented to import scalar HDF5 datasets.
+- Added a workaround for silx issue #4472 until next silx release.
+- Fixed an issue in the documentation paths which arose from changing from
+  str to pathlib.Path objects.
 
 
 v26.01.27

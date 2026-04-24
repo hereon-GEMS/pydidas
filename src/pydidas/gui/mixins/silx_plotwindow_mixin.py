@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the SilxPlotWindowMixIn which allows to control a silx PlotWindow.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["SilxPlotWindowMixIn"]
 
 import warnings
 
+import matplotlib
 import numpy as np
 from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
 
@@ -36,6 +37,13 @@ from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger(LOGGING_LEVEL)
+
+# TODO: Remove on next silx release. The lines below are a workaround for issue
+# silx #4472 [https://github.com/silx-kit/silx/issues/4472] which was solved
+# with PR #4481 [https://github.com/silx-kit/silx/pull/4481] but has not yet
+# been released.
+matplotlib.use("QtAgg", force=True)
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg  # noqa
 
 
 class SilxPlotWindowMixIn:

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The pydidas_gui module includes a function to run the default pydidas processing
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,7 +37,7 @@ def open_gui():
     _splash = PydidasSplashScreen.instance()
     _splash.show_aligned_message("Importing packages")
 
-    import pydidas
+    import pydidas.gui
 
     pydidas.gui.start_pydidas_gui(use_default_frames=True, splash_screen=_splash)
 

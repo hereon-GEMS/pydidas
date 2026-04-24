@@ -42,8 +42,8 @@ from pydidas.core import PydidasQsettingsMixin, UserConfigError
 from pydidas.core.constants import MAIN_MENU_MENU_ACTIONS, PYDIDAS_STANDARD_CONFIG_PATH
 from pydidas.core.utils import (
     DOC_HOME_QURL,
-    doc_filename_for_frame_manual,
-    doc_qurl_for_frame_manual,
+    doc_path_for_gui_manual,
+    doc_qurl_for_gui_manual,
 )
 from pydidas.gui import utils
 from pydidas.gui.gui_excepthook_ import gui_excepthook
@@ -686,10 +686,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         the respective help file if it exits or the main documentation if it does not.
         """
         _frame_class = self.centralWidget().currentWidget().__class__.__name__
-        _doc_file = doc_filename_for_frame_manual(_frame_class)
+        _doc_file = doc_path_for_gui_manual(_frame_class, "frame")
 
         if os.path.exists(_doc_file):
-            _url = doc_qurl_for_frame_manual(_frame_class)
+            _url = doc_qurl_for_gui_manual(_frame_class, "frame")
         else:
             _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)

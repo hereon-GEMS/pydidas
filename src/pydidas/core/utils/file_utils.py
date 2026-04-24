@@ -69,6 +69,28 @@ def get_directory(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
+def path_as_formatted_str(path: Path) -> str:
+    """
+    Get the pathlib.Path input as a string with only forward slashes.
+
+    Parameters
+    ----------
+    path : Path
+        The file system path to be converted.
+
+    Returns
+    -------
+    str
+        The path as a string with only forward slashes.
+    """
+    if not isinstance(path, Path):
+        raise UserConfigError(
+            "Only pathlib.Path instances are allowed as input for "
+            "`path_as_formatted_str`."
+        )
+    return str(path).replace("\\", "/")
+
+
 def get_extension(path: Path | str) -> str:
     """
     Get the extension to a file in the given path.
@@ -250,6 +272,7 @@ class CatchFileErrors:
             OSError,
             PermissionError,
         )
+        self._exception_msg = ""
         self._filename = str(filename)
         self._raised_exception = False
         self._raise_file_read_error = raise_file_read_error

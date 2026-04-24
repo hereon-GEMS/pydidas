@@ -34,8 +34,8 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core.utils import (
     DOC_HOME_QURL,
-    doc_filename_for_window_manual,
-    doc_qurl_for_window_manual,
+    doc_path_for_gui_manual,
+    doc_qurl_for_gui_manual,
 )
 from pydidas.resources import icons
 from pydidas.widgets.framework.base_frame import BaseFrame
@@ -70,10 +70,10 @@ class PydidasWindow(BaseFrame):
         the respective helpfile if it exits or the main documentation if it does not.
         """
         _window_class = self.__class__.__name__
-        _doc_file = doc_filename_for_window_manual(_window_class)
+        _doc_file = doc_path_for_gui_manual(_window_class, "window")
 
         if _doc_file.exists():
-            _url = doc_qurl_for_window_manual(_window_class)
+            _url = doc_qurl_for_gui_manual(_window_class, "window")
         else:
             _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)

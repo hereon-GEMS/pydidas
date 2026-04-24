@@ -89,6 +89,7 @@ Bugfixes
 - Fixed an issue where the active node was not properly updated when a node
   was moved in a Tree.
 - Fixed an issue which prevented to import scalar HDF5 datasets.
+- Added a workaround for silx issue #4472 until next silx release.
 
 
 v26.01.27

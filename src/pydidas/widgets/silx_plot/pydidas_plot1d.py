@@ -31,6 +31,7 @@ import warnings
 from typing import Any
 
 import numpy as np
+from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
@@ -205,7 +206,7 @@ class PydidasPlot1D(Plot1D):
             "resetzoom": False,
             "legend": kwargs.get("legend", "Curve"),
         } | get_allowed_kwargs(Plot1D.addCurve, kwargs)
-        self.setGraphXLabel(data.get_axis_description(_i_data) or "index")
+        self.set_axis_labels(1, _i_data, data)
         self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
         if kwargs.get("title"):
             self.setGraphTitle(kwargs.get("title"))
@@ -230,6 +231,84 @@ class PydidasPlot1D(Plot1D):
         if _reset_zoom:
             self.resetZoom()
 
+    def set_axis_labels(self, label_axis: int, data_axis: int, data: Dataset) -> None:
+        """
+        Set the axis labels for the given axis.
+
+        Parameters
+        ----------
+        axis : int
+            The axis index to set the labels for.
+        data : Dataset
+            The dataset to get the labels from.
+        """
+        if self.axis_is_columns(data_axis, data):
+            labels = self.get_column_labels(data_axis, data)
+            backend = self.getBackend()
+            ax = backend.ax
+            if label_axis == 0:
+                ax.set_yticks(list(range(len(labels))), labels)
+            elif label_axis == 1:
+                ax.set_xticks(list(range(len(labels))), labels, rotation=90)
+            backend.fig.canvas.draw_idle()
+        else:
+            axis_desc = data.get_axis_description(data_axis)
+            if label_axis == 0:
+                self.setGraphYLabel(axis_desc)
+            elif label_axis == 1:
+                self.setGraphXLabel(axis_desc)
+
+    def axis_is_columns(self, axis: int, data: Dataset) -> bool:
+        """
+        Check if the given axis is structured in columns rather than continous
+        data. This is not a definitive check, it just looks at the axis labels.
+
+        Parameters
+        ----------
+        axis : int
+            The axis index to check.
+        data : Dataset
+            The dataset to check.
+
+        Returns
+        -------
+        bool
+            True if the axis is structured in columns rather than continous data
+        """
+        axis_label = data.get_axis_description(axis)
+        if ";" in axis_label:
+            column_labels = axis_label.split(";")
+            colon_in_label = True
+            for label in column_labels:
+                if ":" not in label:
+                    colon_in_label = False
+            return colon_in_label
+        return False
+
+    def get_column_labels(self, axis: int, data: Dataset) -> list[str]:
+        """
+        Get the column labels for the given axis. Assumes the axis is structured
+        in columns.
+
+        Parameters
+        ----------
+        axis : int
+            The axis index to get the column labels for.
+        data : Dataset
+            The dataset to get the column labels from.
+
+        Returns
+        -------
+        list[str]
+            The column labels for the given axis.
+        """
+        if self.axis_is_columns(axis, data):
+            return [
+                part.split(":", 1)[1].strip()
+                for part in data.get_axis_description(axis).split(";")
+            ]
+        raise ValueError(f"Axis {axis} does not contain columns.")
+
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes
     display_data = plot_pydidas_dataset
@@ -243,6 +322,12 @@ class PydidasPlot1D(Plot1D):
         clear_data : bool, optional
             Flag to remove all items from the stored data dictionary as well.
         """
+        backend = self._backend
+        ax = backend.ax
+        ax.xaxis.set_major_locator(AutoLocator())
+        ax.xaxis.set_major_formatter(ScalarFormatter())
+        ax.yaxis.set_major_locator(AutoLocator())
+        ax.yaxis.set_major_formatter(ScalarFormatter())
         self.setGraphTitle("")
         self.setGraphYLabel("Y")
         self.setGraphXLabel("X")

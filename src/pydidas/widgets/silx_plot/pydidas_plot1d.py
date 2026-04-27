@@ -37,7 +37,11 @@ from silx.gui.plot import Plot1D
 
 from pydidas.core import Dataset, PydidasQsettings, UserConfigError
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
-from pydidas.widgets.silx_plot.utilities import get_allowed_kwargs
+from pydidas.widgets.silx_plot.utilities import (
+    axis_is_columns,
+    get_allowed_kwargs,
+    get_column_labels,
+)
 
 
 _QSETTINGS = PydidasQsettings()
@@ -242,8 +246,8 @@ class PydidasPlot1D(Plot1D):
         data : Dataset
             The dataset to get the labels from.
         """
-        if self.axis_is_columns(data_axis, data):
-            labels = self.get_column_labels(data_axis, data)
+        if axis_is_columns(data_axis, data):
+            labels = get_column_labels(data_axis, data)
             backend = self.getBackend()
             ax = backend.ax
             if label_axis == 0:
@@ -257,57 +261,6 @@ class PydidasPlot1D(Plot1D):
                 self.setGraphYLabel(axis_desc)
             elif label_axis == 1:
                 self.setGraphXLabel(axis_desc)
-
-    def axis_is_columns(self, axis: int, data: Dataset) -> bool:
-        """
-        Check if the given axis is structured in columns rather than continous
-        data. This is not a definitive check, it just looks at the axis labels.
-
-        Parameters
-        ----------
-        axis : int
-            The axis index to check.
-        data : Dataset
-            The dataset to check.
-
-        Returns
-        -------
-        bool
-            True if the axis is structured in columns rather than continous data
-        """
-        axis_label = data.get_axis_description(axis)
-        if ";" in axis_label:
-            column_labels = axis_label.split(";")
-            colon_in_label = True
-            for label in column_labels:
-                if ":" not in label:
-                    colon_in_label = False
-            return colon_in_label
-        return False
-
-    def get_column_labels(self, axis: int, data: Dataset) -> list[str]:
-        """
-        Get the column labels for the given axis. Assumes the axis is structured
-        in columns.
-
-        Parameters
-        ----------
-        axis : int
-            The axis index to get the column labels for.
-        data : Dataset
-            The dataset to get the column labels from.
-
-        Returns
-        -------
-        list[str]
-            The column labels for the given axis.
-        """
-        if self.axis_is_columns(axis, data):
-            return [
-                part.split(":", 1)[1].strip()
-                for part in data.get_axis_description(axis).split(";")
-            ]
-        raise ValueError(f"Axis {axis} does not contain columns.")
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes

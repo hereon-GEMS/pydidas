@@ -27,7 +27,7 @@ __status__ = "Production"
 import pytest
 
 from pydidas.unittest_objects import create_dataset
-from pydidas.widgets.silx_plot import PydidasPlot1D, PydidasPlot2D
+from pydidas.widgets.silx_plot.utilities import axis_is_columns, get_column_labels
 
 
 @pytest.fixture
@@ -37,12 +37,8 @@ def data():
 
 def test_axis_is_columns__continuous_data(data):
     data.axis_labels = {0: "axis1", 1: "axis2"}
-    plot1d = PydidasPlot1D()
-    assert not plot1d.axis_is_columns(0, data)
-    assert not plot1d.axis_is_columns(1, data)
-    plot2d = PydidasPlot2D()
-    assert not plot2d.axis_is_columns(0, data)
-    assert not plot2d.axis_is_columns(1, data)
+    assert not axis_is_columns(0, data)
+    assert not axis_is_columns(1, data)
 
 
 def test_axis_is_columns__columns(data):
@@ -50,23 +46,25 @@ def test_axis_is_columns__columns(data):
         0: "0: test0; 1: test1; 2: test2",
         1: "0: test0; 1: test1; 2: test2",
     }
-    plot1d = PydidasPlot1D()
-    assert plot1d.axis_is_columns(0, data)
-    assert plot1d.axis_is_columns(1, data)
-    plot2d = PydidasPlot2D()
-    assert plot2d.axis_is_columns(0, data)
-    assert plot2d.axis_is_columns(1, data)
+    assert axis_is_columns(0, data)
+    assert axis_is_columns(1, data)
+
+
+def test_axis_is_columns__malformed_columns(data):
+    data.axis_labels = {
+        0: "axis1; data: test",
+        1: "0: test0; 1: test1",
+    }
+    assert not axis_is_columns(0, data)
+    assert not axis_is_columns(1, data)
 
 
 def test_get_column_labels(data):
     data.axis_labels = {
         0: "0: test0; 1: test1; 2: test2",
-        1: "0: test0; 1: test1; 2: test2",
+        1: "test",
     }
     data.axis_units = {0: "", 1: ""}
-    plot1d = PydidasPlot1D()
-    assert plot1d.get_column_labels(0, data) == ["test0", "test1", "test2"]
-    assert plot1d.get_column_labels(1, data) == ["test0", "test1", "test2"]
-    plot2d = PydidasPlot2D()
-    assert plot2d.get_column_labels(0, data) == ["test0", "test1", "test2"]
-    assert plot2d.get_column_labels(1, data) == ["test0", "test1", "test2"]
+    assert get_column_labels(0, data) == ["test0", "test1", "test2"]
+    with pytest.raises(ValueError):
+        get_column_labels(1, data)

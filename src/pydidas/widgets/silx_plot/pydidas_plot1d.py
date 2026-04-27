@@ -31,12 +31,17 @@ import warnings
 from typing import Any
 
 import numpy as np
+from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
 from pydidas.core import Dataset, PydidasQsettings, UserConfigError
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
-from pydidas.widgets.silx_plot.utilities import get_allowed_kwargs
+from pydidas.widgets.silx_plot.utilities import (
+    axis_is_columns,
+    get_allowed_kwargs,
+    get_column_labels,
+)
 
 
 _QSETTINGS = PydidasQsettings()
@@ -205,7 +210,7 @@ class PydidasPlot1D(Plot1D):
             "resetzoom": False,
             "legend": kwargs.get("legend", "Curve"),
         } | get_allowed_kwargs(Plot1D.addCurve, kwargs)
-        self.setGraphXLabel(data.get_axis_description(_i_data) or "index")
+        self.set_axis_labels(1, _i_data, data)
         self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
         if kwargs.get("title"):
             self.setGraphTitle(kwargs.get("title"))
@@ -230,6 +235,33 @@ class PydidasPlot1D(Plot1D):
         if _reset_zoom:
             self.resetZoom()
 
+    def set_axis_labels(self, label_axis: int, data_axis: int, data: Dataset) -> None:
+        """
+        Set the axis labels for the given axis.
+
+        Parameters
+        ----------
+        axis : int
+            The axis index to set the labels for.
+        data : Dataset
+            The dataset to get the labels from.
+        """
+        if axis_is_columns(data_axis, data):
+            labels = get_column_labels(data_axis, data)
+            backend = self.getBackend()
+            ax = backend.ax
+            if label_axis == 0:
+                ax.set_yticks(list(range(len(labels))), labels)
+            elif label_axis == 1:
+                ax.set_xticks(list(range(len(labels))), labels, rotation=90)
+            backend.fig.canvas.draw_idle()
+        else:
+            axis_desc = data.get_axis_description(data_axis)
+            if label_axis == 0:
+                self.setGraphYLabel(axis_desc)
+            elif label_axis == 1:
+                self.setGraphXLabel(axis_desc)
+
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes
     display_data = plot_pydidas_dataset
@@ -243,6 +275,12 @@ class PydidasPlot1D(Plot1D):
         clear_data : bool, optional
             Flag to remove all items from the stored data dictionary as well.
         """
+        backend = self._backend
+        ax = backend.ax
+        ax.xaxis.set_major_locator(AutoLocator())
+        ax.xaxis.set_major_formatter(ScalarFormatter())
+        ax.yaxis.set_major_locator(AutoLocator())
+        ax.yaxis.set_major_formatter(ScalarFormatter())
         self.setGraphTitle("")
         self.setGraphYLabel("Y")
         self.setGraphXLabel("X")

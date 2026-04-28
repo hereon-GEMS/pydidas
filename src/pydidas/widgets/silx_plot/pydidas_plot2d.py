@@ -450,7 +450,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.setGraphTitle(_title)
         self.set_axis_labels(0, data)
         self.set_axis_labels(1, data)
-        if not self.axis_is_columns(0, data) and not self.axis_is_columns(1, data):
+        if not axis_is_columns(0, data) and not axis_is_columns(1, data):
             _cbar_legend = data.data_label
             if data.data_unit:
                 if not _cbar_legend:
@@ -475,7 +475,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         Parameters
         ----------
         axis : int
-            The axis index to set the labels for.
+            The axis index to set the labels for. 0 for y-axis, 1 for x-axis.
         data : Dataset
             The dataset to get the labels from.
         """
@@ -506,7 +506,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
     def clear_plot(self) -> None:
         """Clear the plot and remove all items."""
-        backend = self._backend
+        backend = self.getBackend()
         ax = backend.ax
         ax.xaxis.set_major_locator(AutoLocator())
         ax.xaxis.set_major_formatter(ScalarFormatter())

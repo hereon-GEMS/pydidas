@@ -62,9 +62,8 @@ def test_axis_is_columns__malformed_columns(data):
 def test_get_column_labels(data):
     data.axis_labels = {
         0: "0: test0; 1: test1; 2: test2",
-        1: "test",
+        1: "test3, test4",
     }
     data.axis_units = {0: "", 1: ""}
     assert get_column_labels(0, data) == ["test0", "test1", "test2"]
-    with pytest.raises(ValueError):
-        get_column_labels(1, data)
+    assert get_column_labels(1, data) == ["test3, test4"]

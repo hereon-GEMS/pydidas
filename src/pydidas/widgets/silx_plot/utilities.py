@@ -31,6 +31,7 @@ import inspect
 from typing import Any, Callable
 
 from pydidas.core import Dataset
+from pydidas_qtcore import PydidasQApplication
 
 
 _ALLOWED_KWARGS = {}
@@ -115,4 +116,7 @@ def get_column_labels(axis: int, data: Dataset) -> list[str]:
             part.split(":", 1)[1].strip()
             for part in data.get_axis_description(axis).split(";")
         ]
-    raise ValueError(f"Axis {axis} does not contain columns.")
+    PydidasQApplication.instance().set_status_message(
+        f"Warning: Axis {axis} does not contain columns. Labels may be incorrect."
+    )
+    return data.get_axis_description(axis).split(";")

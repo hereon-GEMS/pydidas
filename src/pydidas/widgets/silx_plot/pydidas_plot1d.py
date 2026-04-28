@@ -242,7 +242,7 @@ class PydidasPlot1D(Plot1D):
         Parameters
         ----------
         axis : int
-            The axis index to set the labels for.
+            The axis index to set the labels for. 0 for y-axis, 1 for x-axis.
         data : Dataset
             The dataset to get the labels from.
         """
@@ -275,7 +275,7 @@ class PydidasPlot1D(Plot1D):
         clear_data : bool, optional
             Flag to remove all items from the stored data dictionary as well.
         """
-        backend = self._backend
+        backend = self.getBackend()
         ax = backend.ax
         ax.xaxis.set_major_locator(AutoLocator())
         ax.xaxis.set_major_formatter(ScalarFormatter())

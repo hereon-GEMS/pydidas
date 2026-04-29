@@ -27,8 +27,7 @@ __status__ = "Production"
 
 
 from . import pydidas_icons as icons
-from . import pydidas_images as images
 from . import pydidas_svg_logos as logos
 
 
-__all__ = ["icons", "images", "logos"]
+__all__ = ["icons", "logos"]

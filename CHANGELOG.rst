@@ -94,6 +94,8 @@ Bugfixes
 - Added a workaround for silx issue #4472 until next silx release.
 - Fixed an issue in the documentation paths which arose from changing from
   str to pathlib.Path objects.
+- Renamed folders in pydidas.resources to prevent naming clashes with module
+  imports as <foldername>.
 
 
 v26.01.27

@@ -41,8 +41,8 @@ from qtpy import QtCore, QtGui
 from pydidas.core import UserConfigError
 
 
-ICON_PATH = Path(__file__).parent / "icons"
-MDI_ICON_PATH = Path(__file__).parent / "mdi_icons"
+ICON_PATH = Path(__file__).parent / "_icons"
+MDI_ICON_PATH = Path(__file__).parent / "_mdi_icons"
 
 
 def pydidas_icon() -> QtGui.QIcon:

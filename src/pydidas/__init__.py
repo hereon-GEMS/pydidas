@@ -29,8 +29,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-# must import h5py and the hdf5plugin here to have the dll libraries linked correctly
-# in Windows before using them in the package in different orders
+from types import ModuleType
+
+# must import h5py and the hdf5plugin here to have the dll libraries linked
+# correctly in Windows before using them in the package in different orders
 import h5py as __h5py  # noqa: F401
 import hdf5plugin as __hdf5plugin  # noqa: F401
 
@@ -53,7 +55,11 @@ from . import (
     workflow,
 )
 from .core.utils.qt_utilities import IS_QT6
-from .initialize import check_documentation, configure_pyFAI, initialize_qsetting_values
+from .initialize import (
+    check_documentation,
+    configure_pyFAI,
+    initialize_qsetting_values,
+)
 from .logging_level import LOGGING_LEVEL
 from .version import VERSION, version
 
@@ -76,6 +82,17 @@ __all__ = [
     "VERSION",
     "LOGGING_LEVEL",
 ]
+
+
+def __getattr__(name: str) -> ModuleType:
+    """Lazy-load gui and widgets modules on demand."""
+    if name in ("gui", "widgets"):
+        import importlib
+
+        module = importlib.import_module(f".{name}", __name__)
+        globals()[name] = module  # Cache in module globals
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 check_documentation()

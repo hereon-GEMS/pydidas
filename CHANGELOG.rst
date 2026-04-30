@@ -98,6 +98,8 @@ Bugfixes
   imports as <foldername>.
 - Fixed an issue with the automatic generic Parameter doc creation in the 
   latest sphinx version
+- Fixed an issue where integer Parameters were not properly stored after user
+  edits
 
 
 v26.01.27

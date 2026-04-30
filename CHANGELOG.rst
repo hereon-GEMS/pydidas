@@ -96,6 +96,8 @@ Bugfixes
   str to pathlib.Path objects.
 - Renamed folders in pydidas.resources to prevent naming clashes with module
   imports as <foldername>.
+- Fixed an issue with the automatic generic Parameter doc creation in the 
+  latest sphinx version
 
 
 v26.01.27

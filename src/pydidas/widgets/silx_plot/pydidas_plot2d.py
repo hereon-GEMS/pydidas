@@ -358,10 +358,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         if not axis_is_columns(0, data) and not axis_is_columns(1, data):
             _cbar_legend = data.data_description or "unspecified"
-            self.getColorBarWidget().setLegend(_cbar_legend)
+        else:
+            _cbar_legend = ""
+        self.getColorBarWidget().setLegend(_cbar_legend)
 
     # -----------------------------------------#
-    # private initialization methods          #
+    # private initialization methods           #
     # -----------------------------------------#
 
     def _update_config(self, kwargs: dict[str, Any]) -> None:

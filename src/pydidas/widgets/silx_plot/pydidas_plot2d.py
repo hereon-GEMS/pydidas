@@ -33,6 +33,7 @@ from functools import partial
 from typing import Any
 
 import numpy as np
+from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
@@ -57,8 +58,10 @@ from pydidas.widgets.silx_plot.silx_actions import (
     PydidasGetDataInfoAction,
 )
 from pydidas.widgets.silx_plot.utilities import (
+    axis_is_columns,
     check_data_dimensions,
     get_allowed_kwargs,
+    get_column_labels,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -166,6 +169,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
     def clear_plot(self) -> None:
         """Clear the plot and remove all items."""
+        _backend = self.getBackend()
+        _ax = _backend.ax
+        _ax.xaxis.set_major_locator(AutoLocator())
+        _ax.xaxis.set_major_formatter(ScalarFormatter())
+        _ax.yaxis.set_major_locator(AutoLocator())
+        _ax.yaxis.set_major_formatter(ScalarFormatter())
         self.remove()
         self.setGraphTitle("")
         self.setGraphYLabel("")
@@ -198,15 +207,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._update_cs_units(data.axis_units[1], data.axis_units[0])
         if _title:
             self.setGraphTitle(_title)
-        self.setGraphYLabel(data.get_axis_description(0))
-        self.setGraphXLabel(data.get_axis_description(1))
-        _cbar_legend = data.data_label
-        if data.data_unit:
-            if not _cbar_legend:
-                _cbar_legend += "unspecified"
-            _cbar_legend += f" / {data.data_unit}"
-        if _cbar_legend:
-            self.getColorBarWidget().setLegend(_cbar_legend)
+        self._set_axis_labels(0, data)
+        self._set_axis_labels(1, data)
+        self._update_colorbar(data)
         if not self._actions["lock_zoom"].locked and not _data_has_same_shape:
             self._actions["canvas"].set_canvas_mode(
                 data.shape != self._config["diffraction_exp"].det_shape
@@ -316,6 +319,46 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _scatter.setVisualization(_scatter.Visualization.IRREGULAR_GRID)
         self._notifyContentChanged(_scatter)
         self.setActiveScatter(_SCATTER_LEGEND)
+
+    def _set_axis_labels(self, axis: int, data: Dataset) -> None:
+        """
+        Set the axis labels for the given axis.
+
+        Parameters
+        ----------
+        axis : int
+            The axis index to set the labels for. 0 for y-axis, 1 for x-axis.
+        data : Dataset
+            The dataset to get the labels from.
+        """
+        if axis_is_columns(axis, data):
+            labels = get_column_labels(axis, data)
+            backend = self.getBackend()
+            ax = backend.ax
+            if axis == 0:
+                ax.set_yticks(list(range(len(labels))), labels)
+            elif axis == 1:
+                ax.set_xticks(list(range(len(labels))), labels, rotation=90)
+            backend.fig.canvas.draw_idle()
+        else:
+            axis_desc = data.get_axis_description(axis)
+            if axis == 0:
+                self.setGraphYLabel(axis_desc)
+            elif axis == 1:
+                self.setGraphXLabel(axis_desc)
+
+    def _update_colorbar(self, data: Dataset) -> None:
+        """
+        Update the colorbar limits and normalization based on the data.
+
+        Parameters
+        ----------
+        data : Dataset
+            The dataset to get the colorbar settings from.
+        """
+        if not axis_is_columns(0, data) and not axis_is_columns(1, data):
+            _cbar_legend = data.data_description or "unspecified"
+            self.getColorBarWidget().setLegend(_cbar_legend)
 
     # -----------------------------------------#
     # private initialization methods          #

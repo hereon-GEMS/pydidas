@@ -19,12 +19,12 @@
 Module with utilities for silx_plot package files.
 """
 
-__author__ = "Malte Storm"
+__author__ = "Malte Storm, Nonni Heere"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["check_data_dimensions", "get_allowed_kwargs"]
+__all__ = ["get_allowed_kwargs"]
 
 
 import inspect
@@ -33,6 +33,7 @@ from typing import Any, Callable
 import numpy as np
 
 from pydidas.core import Dataset, PydidasQsettings, UserConfigError
+from pydidas_qtcore import PydidasQApplication
 
 
 _ALLOWED_KWARGS = {}
@@ -64,6 +65,64 @@ def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, An
         ]
     _whitelist = _ALLOWED_KWARGS[method]
     return {_key: _val for _key, _val in kwargs.items() if _key in _whitelist}
+
+
+def axis_is_columns(axis: int, data: Dataset) -> bool:
+    """
+    Check if the given axis is structured in columns rather than continuous
+    data. This is not a definitive check, it just looks at the axis labels.
+
+    Parameters
+    ----------
+    axis : int
+        The axis index to check.
+    data : Dataset
+        The dataset to check.
+
+    Returns
+    -------
+    bool
+        True if the axis is structured in columns rather than continous data
+    """
+    axis_label = data.get_axis_description(axis)
+    if ";" in axis_label:
+        column_labels = axis_label.split(";")
+        if len(column_labels) != data.shape[axis]:
+            return False
+        colon_in_label = True
+        for label in column_labels:
+            if ":" not in label:
+                colon_in_label = False
+        return colon_in_label
+    return False
+
+
+def get_column_labels(axis: int, data: Dataset) -> list[str]:
+    """
+    Get the column labels for the given axis. Assumes the axis is structured
+    in columns.
+
+    Parameters
+    ----------
+    axis : int
+        The axis index to get the column labels for.
+    data : Dataset
+        The dataset to get the column labels from.
+
+    Returns
+    -------
+    list[str]
+        The column labels for the given axis.
+    """
+    if axis_is_columns(axis, data):
+        return [
+            part.split(":", 1)[1].strip()
+            for part in data.get_axis_description(axis).split(";")
+        ]
+    PydidasQApplication.instance().set_status_message(
+        f"Warning: Axis {axis} does not contain columns. Labels may be incorrect."
+    )
+    return data.get_axis_description(axis).split(";")
 
 
 def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:

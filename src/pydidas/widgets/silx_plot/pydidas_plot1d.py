@@ -30,6 +30,7 @@ __all__ = ["PydidasPlot1D"]
 from typing import Any
 
 import numpy as np
+from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
@@ -37,8 +38,10 @@ from pydidas.core import Dataset
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
 from pydidas.widgets.silx_plot.silx_actions import LockZoomAction
 from pydidas.widgets.silx_plot.utilities import (
+    axis_is_columns,
     check_data_dimensions,
     get_allowed_kwargs,
+    get_column_labels,
 )
 
 
@@ -88,6 +91,12 @@ class PydidasPlot1D(Plot1D):
         clear_data : bool, optional
             Flag to remove all items from the stored data dictionary as well.
         """
+        _backend = self.getBackend()
+        _ax = _backend.ax
+        _ax.xaxis.set_major_locator(AutoLocator())
+        _ax.xaxis.set_major_formatter(ScalarFormatter())
+        _ax.yaxis.set_major_locator(AutoLocator())
+        _ax.yaxis.set_major_formatter(ScalarFormatter())
         self.setGraphTitle("")
         self.setGraphYLabel("Y")
         self.setGraphXLabel("X")
@@ -219,7 +228,7 @@ class PydidasPlot1D(Plot1D):
             data.data_unit,
         )
         self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
-        self.setGraphXLabel(data.get_axis_description(_i_data) or "index")
+        self._set_axis_labels(1, _i_data, data)
 
     def _process_plot_kwargs(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         """
@@ -244,6 +253,35 @@ class PydidasPlot1D(Plot1D):
             "resetzoom": False,
             "legend": kwargs.get("legend", "Curve"),
         } | get_allowed_kwargs(Plot1D.addCurve, kwargs)
+
+    def _set_axis_labels(self, label_axis: int, data_axis: int, data: Dataset) -> None:
+        """
+        Set the axis labels for the given axis.
+
+        Parameters
+        ----------
+        label_axis : int
+            The axis index to set the labels for. 0 for y-axis, 1 for x-axis.
+        data_axis : int
+            The axis index to set the labels for. 0 for x-axis, 1 for y-axis.
+        data : Dataset
+            The dataset to get the labels from.
+        """
+        if axis_is_columns(data_axis, data):
+            labels = get_column_labels(data_axis, data)
+            backend = self.getBackend()
+            ax = backend.ax
+            if label_axis == 0:
+                ax.set_yticks(list(range(len(labels))), labels)
+            elif label_axis == 1:
+                ax.set_xticks(list(range(len(labels))), labels, rotation=90)
+            backend.fig.canvas.draw_idle()
+        else:
+            axis_desc = data.get_axis_description(data_axis)
+            if label_axis == 0:
+                self.setGraphYLabel(axis_desc)
+            elif label_axis == 1:
+                self.setGraphXLabel(axis_desc)
 
     # -----------------------------------------#
     # private initialization methods          #

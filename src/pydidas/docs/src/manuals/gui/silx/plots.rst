@@ -18,10 +18,6 @@ Pydidas uses `ESRF's silx toolkit <https://github.com/silx-kit/silx>`_ for
 plotting, with some minor additional functionality. The individual plots are
 presented below:
 
-.. _plot_imageview:
-
-.. include:: ./imageview.rst
-
 .. _plot_plot2d:
 
 .. include:: ./plot2d.rst

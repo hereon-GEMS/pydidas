@@ -23,15 +23,34 @@
     * -  .. image:: ../silx/images/menu_unzoom.png
             :align: center
       - Unzoom: Reset the display region to the full data.
-    * -  .. image:: ../silx/images/menu_match_canvas.png
-            :align: center
-      - Match canvas: Set the aspect ratio to 1 and match the canvas size to the
-        data to allow a tight fit.
-    * -  .. image:: ../silx/images/menu_expand_canvas.png
-            :align: center
-      - Expand canvas: Reset the canvas size to take up all available space.
-        This option does also change the data aspect ratio to make use of the
-        full canvas.
+    * -  .. list-table::
+           :class: no-border-table white-bg-table tight-table
+           :widths: 35 30 35
+
+           * - .. image:: ../silx/images/menu_zoom_lock.png
+                  :align: center
+             - or
+             - .. image:: ../silx/images/menu_zoom_unlock.png
+                  :align: center
+      - Lock the zoom at the current settings. The button will show the current
+        lock state in its icon and description and a click will toggle between the
+        locked and unlocked state. When the zoom is locked, the display region
+        will not change when loading new data.
+    * -  .. list-table::
+           :class: no-border-table white-bg-table tight-table
+           :widths: 35 30 35
+
+           * - .. image:: ../silx/images/menu_match_canvas.png
+                  :align: center
+             - or
+             - .. image:: ../silx/images/menu_expand_canvas.png
+                  :align: center
+      - Toggle the canvas size. Clicking this button will toggle between the two
+        options and change the icon accordingly. Options are a. Match canvas and
+        b. Expand canvas. Match canvas to the data: Set the aspect ratio to
+        1 and match the canvas size to the data to allow a tight fit. Or Expand
+        the canvas: Reset the canvas size to take up all available space. This
+        option does also change the data aspect ratio to make use of the full canvas.
     * -  .. image:: ../silx/images/menu_palette.png
             :align: center
       - Open the colormap editor: This button opens a window with selections
@@ -43,7 +62,10 @@
         the colormap to ignore the low *x%* and the top *y%* of the image
         histogram. The levels of *x* and *y* can be adjusted in the pydidas user
         settings.
-    * - .. image:: ../silx/images/menu_cmap_autoscale.png
+    * - .. image:: ../silx/images/menu_cmap_min_max.png
+            :align: center
+      - Autoscale the colormap to the image minimum and maximum values.
+    * - .. image:: ../silx/images/menu_cmap_mean_w_sigma.png
             :align: center
       - Autoscale the colormap to the image mean value +/- 3 standard
         deviations.

@@ -33,12 +33,9 @@ from typing import Any
 from qtpy import QtCore, QtGui, QtWidgets
 
 
-_SPLASH_IMAGE_PATH = (
-    Path(__file__).parents[1] / "pydidas" / "resources" / "images" / "splash_image.png"
-)
-_ICON_PATH = (
-    Path(__file__).parents[1] / "pydidas" / "resources" / "icons" / "pydidas_snakes.svg"
-)
+__RESOURCE_PATH = Path(__file__).parents[1] / "pydidas" / "resources"
+_SPLASH_IMAGE_PATH = __RESOURCE_PATH / "_images" / "splash_image.png"
+_ICON_PATH = __RESOURCE_PATH / "_icons" / "pydidas_snakes.svg"
 
 
 class PydidasSplashScreen(QtWidgets.QSplashScreen):

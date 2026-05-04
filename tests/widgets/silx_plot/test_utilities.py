@@ -1,0 +1,68 @@
+# This file is part of pydidas.
+#
+# Copyright 2026, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""Unit tests for silx_plot utility helpers."""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+
+
+import numpy as np
+import pytest
+
+from pydidas.core import PydidasQsettings, UserConfigError
+from pydidas.widgets.silx_plot.utilities import check_data_dimensions
+
+
+@pytest.fixture(scope="module", autouse=True)
+def set_max_number_curves_to_five():
+    """Set and restore the user-configured maximum number of displayed curves."""
+    _settings = PydidasQsettings(version="unittesting")  # type: ignore[arg-type]
+    _original = _settings.value("user/max_number_curves", int)
+    _settings.set_value("user/max_number_curves", 5)
+    yield
+    _settings.set_value("user/max_number_curves", _original)
+
+
+@pytest.mark.parametrize("target_dim", [1, 2, 3])
+def test_check_data_dimensions__equal_target_dim(target_dim):
+    _data = np.zeros((4,) * target_dim)
+    assert check_data_dimensions(_data, target_dim) is None
+
+
+@pytest.mark.parametrize("data_shape", [(4, 3), (4, 120), (120, 4), (42, 42)])
+def test_check_data_dimensions__1d_target_with_2d_data(data_shape):
+    _data = np.zeros(data_shape)
+    if _data.shape[0] <= 5:
+        assert check_data_dimensions(_data, 1) is None
+    else:
+        with pytest.raises(UserConfigError):
+            check_data_dimensions(_data, 1)
+
+
+@pytest.mark.parametrize("target_dim", [1, 2, 3])
+def test_check_data_dimensions__data_too_many_dims(target_dim):
+    _data = np.zeros((42,) * (target_dim + 1))
+    with pytest.raises(UserConfigError):
+        check_data_dimensions(_data, target_dim)
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])

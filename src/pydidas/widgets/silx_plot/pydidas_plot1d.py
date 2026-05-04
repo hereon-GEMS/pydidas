@@ -34,9 +34,13 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
-from pydidas.core import Dataset, PydidasQsettings, UserConfigError
+from pydidas.core import Dataset, PydidasQsettings
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
-from pydidas.widgets.silx_plot.utilities import get_allowed_kwargs
+from pydidas.widgets.silx_plot.silx_actions import LockZoomAction
+from pydidas.widgets.silx_plot.utilities import (
+    check_data_dimensions,
+    get_allowed_kwargs,
+)
 
 
 _QSETTINGS = PydidasQsettings()
@@ -46,36 +50,6 @@ class PydidasPlot1D(Plot1D):
     """
     A customized silx.gui.plot.Plot1D with support for pydidas Datasets.
     """
-
-    @staticmethod
-    def _check_data_dimensions(data: Dataset | np.ndarray) -> None:
-        """
-        Check the data dimensions.
-
-        Parameters
-        ----------
-        data : Dataset or np.ndarray
-            The data to display.
-        """
-        if data.ndim == 1:
-            return
-        if data.ndim > 2:
-            raise UserConfigError(
-                "The given dataset has more than 2 dimensions. Please check "
-                f"the input data definition:\nThe input data has {data.ndim} "
-                "dimensions but only 1d or 2d data can be plotted as curves or "
-                "curve groups, respectively."
-            )
-        _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # type: ignore[assignment]
-        if data.shape[0] > _n_max:
-            raise UserConfigError(
-                f"The number of given curves ({data.shape[0]}) exceeds the maximum "
-                f"number of curves allowed ({_n_max}). \n"
-                "Please limit the data range to be displayed or increase the maximum "
-                "number of curves in the user settings (Options -> User config). "
-                "Please note that displaying a large number of curves will slow down "
-                "the plotting performance."
-            )
 
     def __init__(self, **kwargs: Any) -> None:
         Plot1D.__init__(
@@ -89,11 +63,19 @@ class PydidasPlot1D(Plot1D):
             self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
+        self._add_lock_zoom_action()
         if kwargs.get("use_special_plots", True):
             self._add_special_plot_actions()
         self._y_function = SpecialPlotTypesButton.func_generic
         self._y_label = SpecialPlotTypesButton.label_generic
         self._current_raw_data = {}
+
+    def _add_lock_zoom_action(self) -> None:
+        """Add a lock zoom action to the plot."""
+        self._lock_zoom_action = LockZoomAction(self, parent=self)
+        self.group.addAction(self._lock_zoom_action)
+        self.addAction(self._lock_zoom_action)
+        self._toolbar.insertAction(self.xAxisAutoScaleAction, self._lock_zoom_action)
 
     def _add_special_plot_actions(self) -> None:
         """
@@ -116,6 +98,7 @@ class PydidasPlot1D(Plot1D):
         self._y_label = self._plot_type.plot_ylabel
         for _legend, (_data, _kwargs) in self._current_raw_data.items():
             _kwargs["legend"] = _legend
+            _kwargs["resetzoom"] = True
             self.plot_pydidas_dataset(_data, **_kwargs)
 
     def plot_data(self, data: np.ndarray, **kwargs: Any) -> None:
@@ -142,7 +125,7 @@ class PydidasPlot1D(Plot1D):
         if isinstance(data, Dataset):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
-            self._check_data_dimensions(data)
+            check_data_dimensions(data, 1)
             x = kwargs.pop("x", None)
             if x is None or x.size != data.size:  # type: ignore[union-attr]
                 x = np.arange(data.size)
@@ -191,7 +174,7 @@ class PydidasPlot1D(Plot1D):
         if kwargs.pop("replace", True):
             self.clear_plot()
         _i_data = 0 if data.ndim == 1 else 1
-        self._check_data_dimensions(data)
+        check_data_dimensions(data, 1)
         _ylabel = self._y_label(
             data.axis_labels[_i_data],
             data.axis_units[_i_data],
@@ -212,8 +195,8 @@ class PydidasPlot1D(Plot1D):
         self._current_raw_data[_plot_kwargs.get("legend")] = (data, _plot_kwargs)
         if data.ndim == 1:
             self.addCurve(
-                data.axis_ranges[_i_data],
-                self._y_function(data.axis_ranges[_i_data], data.array),
+                data.axis_ranges[0],
+                self._y_function(data.axis_ranges[0], data.array),
                 **_plot_kwargs,
             )
         else:
@@ -227,7 +210,7 @@ class PydidasPlot1D(Plot1D):
                     **_plot_kwargs,
                 )
             self.setActiveCurve(_label.format(value=_x[0]))
-        if _reset_zoom:
+        if _reset_zoom and not self._lock_zoom_action.locked:
             self.resetZoom()
 
     # display_data is a generic alias used in all custom silx plots to have a

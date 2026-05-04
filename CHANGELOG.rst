@@ -18,6 +18,8 @@ Improvements
 - Added an option to select a file by its filename in the DataBrowsingFrame.
 - Removed the gui and widget packages from the generic 'import pydidas'
   to speed-up loading for background processes.
+- Added an option in the plots to lock the current zoom settings
+- Added a button to plots to autoscale the colormap to min/max
 
 Programmatic changes
 --------------------
@@ -40,6 +42,7 @@ Programmatic changes
   widget.
 - Added an option to specify the display precision for floating point
   Parameters.
+- Refactored PydidasPlot2D and sorted methods.
 
 Bugfixes
 --------

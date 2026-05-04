@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,18 +20,23 @@ Module with utilities for silx_plot package files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_allowed_kwargs"]
+__all__ = ["check_data_dimensions", "get_allowed_kwargs"]
 
 
 import inspect
 from typing import Any, Callable
 
+import numpy as np
+
+from pydidas.core import Dataset, PydidasQsettings, UserConfigError
+
 
 _ALLOWED_KWARGS = {}
+_QSETTINGS = PydidasQsettings()
 
 
 def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -59,3 +64,34 @@ def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, An
         ]
     _whitelist = _ALLOWED_KWARGS[method]
     return {_key: _val for _key, _val in kwargs.items() if _key in _whitelist}
+
+
+def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:
+    """
+    Check the data dimensions.
+
+    Parameters
+    ----------
+    data : Dataset or np.ndarray
+        The data to display.
+    """
+    if data.ndim == target_dim:
+        return
+    if target_dim == 1 and data.ndim == 2:
+        _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # type: ignore[assignment]
+        if data.shape[0] > _n_max:
+            raise UserConfigError(
+                f"The number of given curves ({data.shape[0]}) exceeds the "
+                f"maximum number of curves allowed ({_n_max}).\n"
+                "Please limit the data range to be displayed or increase the "
+                "maximum number of curves in the user settings (Options -> "
+                "User config). Please note that displaying a large number of "
+                "curves will slow down the plotting performance."
+            )
+        return
+    if data.ndim > target_dim:
+        raise UserConfigError(
+            f"The given dataset has {data.ndim} dimensions. Please check the "
+            f"input data definition:\nThe expected input is {target_dim} "
+            "dimensions."
+        )

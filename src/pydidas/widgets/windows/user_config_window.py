@@ -314,7 +314,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         for _param_key in self.params:
             if _param_key.startswith("cmap"):
                 continue
-            self.param_widgets[_param_key].sig_new_value.connect(
+            self.param_composite_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)

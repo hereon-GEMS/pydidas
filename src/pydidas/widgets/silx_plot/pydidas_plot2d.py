@@ -97,7 +97,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._qtapp.sig_updated_user_config.connect(self._user_config_update)
 
     # -----------------------------------------#
-    # re-implemented public Plot2d functions  #
+    # re-implemented public Plot2D functions  #
     # -----------------------------------------#
 
     def addImage(self, data: Dataset | np.ndarray, **kwargs: Any) -> None:
@@ -105,7 +105,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         Add an image to the plot.
 
         This method implements an additional dimensionality check before passing
-        the image to the Plot2d.addImage method.
+        the image to the Plot2D.addImage method.
 
         Parameters
         ----------
@@ -113,7 +113,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             The input data to be displayed.
 
         **kwargs : Any
-            Any supported Plot2d.addImage keyword arguments.
+            Any supported Plot2D.addImage keyword arguments.
         """
         self.remove(_SCATTER_LEGEND, kind="scatter")
         if isinstance(data, Dataset):
@@ -130,24 +130,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """Override clear to also clear the stored data."""
         super().clear()
         self.clear_plot()
-
-    # ------------------------------------------#
-    # re-implemented private Plot2d functions  #
-    # ------------------------------------------#
-
-    # TODO: check if still needed with silx 2.2.2
-    def _activeItemChanged(self, type_: str) -> None:
-        """
-        Override generic Plot2D._activeItemChanged to catch QApplication signals.
-
-        Parameters
-        ----------
-        type_ : str
-            The type of the active item.
-        """
-        if self.sender() == self._qtapp:
-            return
-        Plot2D._activeItemChanged(self, type_)
 
     # -----------------------------------------#
     # new properties                          #
@@ -242,7 +224,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """
         Add an image with linear axes to the plot.
 
-        This method directly passes the image to the Plot2d.addImage method.
+        This method directly passes the image to the Plot2D.addImage method.
 
         Parameters
         ----------
@@ -314,7 +296,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         Add an image with non-linear axes to the plot.
 
         This method implements an additional dimensionality check before passing
-        the image to the Plot2d.addImage method.
+        the image to the Plot2D.addImage method.
 
         Parameters
         ----------

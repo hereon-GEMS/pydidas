@@ -42,7 +42,7 @@ Programmatic changes
   widget.
 - Added an option to specify the display precision for floating point
   Parameters.
-- Refactored PydidasPlot2D and sorted methods.
+- Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
 
 Bugfixes
 --------

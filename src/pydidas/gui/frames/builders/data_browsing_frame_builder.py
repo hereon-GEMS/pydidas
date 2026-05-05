@@ -32,8 +32,10 @@ from typing import Any
 
 from qtpy import QtGui, QtWidgets
 
+from pydidas.core import get_generic_parameter
 from pydidas.core.constants import POLICY_EXP_EXP
 from pydidas.widgets.data_viewer import DataViewer
+from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas.widgets.selection import (
     ConfigureBinaryDecodingWidget,
     DirectoryExplorer,
@@ -41,7 +43,7 @@ from pydidas.widgets.selection import (
 )
 
 
-DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = [
+DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = [
     ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
     [
         "create_empty_widget",
@@ -87,13 +89,11 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] 
         },
     ],
     [
-        "create_lineedit",
-        ("filename",),
+        "add_any_widget",
+        ("filename", ParamIoWidgetFile(get_generic_parameter("filename"))),
         {
             "gridPos": (0, 1, 1, 2),
             "parent_widget": "plot_header",
-            "readOnly": False,
-            "sizePolicy": POLICY_EXP_EXP,
         },
     ],
     [

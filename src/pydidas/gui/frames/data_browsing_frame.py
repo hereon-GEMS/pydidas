@@ -94,14 +94,12 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.set_default_params()
 
     def connect_signals(self) -> None:
-        """
-        Connect all required signals and slots between widgets and class methods.
-        """
+        """Connect all required signals and slots between widgets and class methods."""
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
-        self._widgets["filename"].returnPressed.connect(self.__filename_input)
-        self._widgets["filename"].editingFinished.connect(
-            self.__set_filename_input_text
-        )
+        _file_io = self._widgets["filename"]._io_lineedit
+        _file_io.returnPressed.connect(self.__filename_input)
+        _file_io.editingFinished.connect(self.__restore_filename_display_text)
+        self._widgets["filename"].sig_drop_accepted.connect(self.__filename_input)
         self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
@@ -131,6 +129,12 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         _viewer_layout = self._widgets["viewer_and_filename"].layout()
         _viewer_layout.setRowStretch(_viewer_layout.rowCount() - 1, 1)
+
+    def finalize_ui(self) -> None:
+        """Finalize the UI initialization."""
+        super().finalize_ui()
+        self.add_param(self._widgets["filename"]._linked_param)
+        self._widgets["filename"]._button.setVisible(False)
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int) -> None:
@@ -170,7 +174,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             get_extension(filename) not in self.__supported_extensions
             or not Path(filename).is_file()
         ):
-            self.__set_filename_input_text()
+            self.__restore_filename_display_text()
             self._widgets["viewer"].set_data(None)
             if self.__browser_window is not None:
                 self.__browser_window.hide()
@@ -182,7 +186,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         if self.__metadata_window is not None:
             self.__metadata_window.hide()
         self._widgets["viewer"].set_data(None)
-        self.__set_filename_input_text()
+        self.__restore_filename_display_text()
         self._widgets["ascii_widgets"].setVisible(self.ascii_file)
         self._widgets["hdf5_dataset_selector"].setVisible(self.hdf5_file)
         self._widgets["configure_binary_decoding"].set_new_filename(filename)
@@ -194,17 +198,22 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             _data = import_data(filename)
             self.__display_dataset(_data)
 
+    @QtCore.Slot()
     def __filename_input(self):
-        self.__file_selected(self._widgets["filename"].text())
+        """Select the current file based on a user filename input."""
+        self.__file_selected(self._widgets["filename"].current_text)
 
-    def __set_filename_input_text(self):
+    @QtCore.Slot()
+    def __restore_filename_display_text(self):
         """
-        Update filename input text only if it does not already match the current
-        filename. This is to prevent the text cursor from jumping to the end of
-        the filename when using the filename input field.
+        Restore the filename displayed in the UI.
+
+        This method updates the filename displayed in the UI in case of
+        unconfirmed user edits to assure that the displayed data and
+        filename are synchronized.
         """
-        if self._widgets["filename"].text() != self.current_filename:
-            self._widgets["filename"].setText(self.current_filename)
+        if self._widgets["filename"].current_text != self.current_filename:
+            self._widgets["filename"].update_display_value(self.current_filename)
 
     def __open_hdf5_file(self) -> None:
         """Process the input file and check whether it is a hdf5 file."""
@@ -227,7 +236,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
                 pass
             self.__open_file = None
             self._widgets["hdf5_dataset_selector"].clear()
-            self._widgets["filename"].setText("")
+            self._widgets["filename"].update_display_value("")
             self.current_filename = ""
             raise FileReadError(catcher.exception_message)
 

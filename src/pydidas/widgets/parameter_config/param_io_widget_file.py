@@ -48,6 +48,8 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     This widget includes a small button to select a filepath from a dialogue.
     """
 
+    sig_drop_accepted = QtCore.Signal()
+
     def __init__(self, param, **kwargs: Any) -> None:
         """
         Set up the widget.
@@ -126,6 +128,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             critical_warning("Not a file", "Can only accept single files.")
             return
         self.set_value(_path)
+        self.sig_drop_accepted.emit()
 
     def update_display_value(self, value: Any) -> None:
         """

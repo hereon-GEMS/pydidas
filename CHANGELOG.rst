@@ -103,6 +103,8 @@ Bugfixes
   latest sphinx version
 - Fixed an issue where integer Parameters were not properly stored after user
   edits
+- Fixed an issue in PydidasPlotStack which accepted ndarray without checks
+  and crashed
 
 
 v26.01.27

@@ -98,6 +98,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         _title = kwargs.pop("title", None)
         if _title is not None:
             _plot.setGraphTitle(_title)
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
         _plot.plot_pydidas_dataset(data, **kwargs)
 
     def clear_plots(self) -> None:

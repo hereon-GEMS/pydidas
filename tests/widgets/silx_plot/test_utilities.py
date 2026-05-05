@@ -74,6 +74,13 @@ def test_check_data_dimensions__data_too_many_dims(target_dim):
         check_data_dimensions(_data, target_dim)
 
 
+@pytest.mark.parametrize("target_dim", [2, 3])
+def test_check_data_dimensions__data_too_few_dims(target_dim):
+    _data = np.zeros((42,) * (target_dim - 1))
+    with pytest.raises(UserConfigError):
+        check_data_dimensions(_data, target_dim)
+
+
 def test_axis_is_columns__continuous_data(data):
     data.axis_labels = {0: "axis1", 1: "axis2"}
     assert not axis_is_columns(0, data)
@@ -110,3 +117,4 @@ def test_get_column_labels(data):
 
 if __name__ == "__main__":
     pytest.main([__file__])
+#

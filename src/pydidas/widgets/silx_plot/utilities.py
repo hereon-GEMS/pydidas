@@ -148,7 +148,7 @@ def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:
                 "curves will slow down the plotting performance."
             )
         return
-    if data.ndim > target_dim:
+    if data.ndim != target_dim:
         raise UserConfigError(
             f"The given dataset has {data.ndim} dimensions. Please check the "
             f"input data definition:\nThe expected input is {target_dim} "

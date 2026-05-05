@@ -261,7 +261,8 @@ class LockZoomAction(PlotAction):
         Parameters
         ----------
         mode : bool
-            The lock mode. If True, the
+            The lock mode. If True, the zoom is locked and will not reset
+            automatically on changed data.
         """
         self._zoom_locked = bool(mode)
         self._update_action_description_from_lock()

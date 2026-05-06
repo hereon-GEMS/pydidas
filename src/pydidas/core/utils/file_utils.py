@@ -67,7 +67,7 @@ def get_directory(path: str | Path) -> Path:
         The path without the filename.
     """
     if isinstance(path, str):
-        path : Path = Path(path)
+        path: Path = Path(path)
     return path.parent if path.is_file() else path
 
 

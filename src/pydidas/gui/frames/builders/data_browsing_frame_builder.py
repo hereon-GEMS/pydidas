@@ -33,7 +33,11 @@ from typing import Any
 from qtpy import QtGui, QtWidgets
 
 from pydidas.core import get_generic_parameter
-from pydidas.core.constants import POLICY_EXP_EXP
+from pydidas.core.constants import (
+    FONT_METRIC_CONFIG_WIDTH,
+    GENERIC_STANDARD_WIDGET_WIDTH,
+    POLICY_EXP_EXP,
+)
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas.widgets.selection import (
@@ -51,9 +55,29 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, An
         {"sizePolicy": POLICY_EXP_EXP, "minimumWidth": 200},
     ],
     [
+        "create_param_widget",
+        ("data_browsing_root",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "linebreak": True,
+            "parent_widget": "browser",
+            "size_hint_width": 2 * GENERIC_STANDARD_WIDGET_WIDTH,
+        },
+    ],
+    [
+        "create_button",
+        ("but_apply_roots", "Apply new roots"),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "icon": "qt-std::SP_BrowserReload",
+            "parent_widget": "browser",
+        },
+    ],
+    ["create_spacer", (None,), {"fixedHeight": 15, "parent_widget": "browser"}],
+    [
         "create_any_widget",
         ("explorer", DirectoryExplorer),
-        {"gridPos": (0, 0, 1, 1), "parent_widget": "browser"},
+        {"parent_widget": "browser"},
     ],
     [
         "create_spacer",

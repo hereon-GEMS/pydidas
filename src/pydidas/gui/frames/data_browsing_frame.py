@@ -37,7 +37,7 @@ from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset, Parameter, ParameterCollection
+from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
 )
@@ -46,6 +46,7 @@ from pydidas.core.utils import (
     CatchFileErrors,
     formatted_str_repr_of_dict,
     get_extension,
+    timed_print,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
@@ -72,6 +73,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
     default_params = ParameterCollection(
+        get_generic_parameter("data_browsing_root"),
         Parameter(
             "xcol",
             int,
@@ -79,7 +81,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             name="[ASCII] Use data column as x values:",
             allow_None=True,
             choices=[None],
-        )
+        ),
     )
     params_not_to_restore = ["xcol"]
 
@@ -156,6 +158,18 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             for _window in (self.__browser_window, self.__metadata_window):
                 if _window is not None and _window.isVisible():
                     _window.hide()
+        if index == self.frame_index:
+            _roots = self.q_settings_get("user/data_browsing_root", dtype=str)
+            if _roots != self.get_param_value("data_browsing_root"):
+                self.set_param_and_widget_value("data_browsing_root", _roots)
+                self._update_roots()
+
+    def _update_roots(self) -> None:
+        """Update the roots of the DataBrowsingFrame"""
+        timed_print(
+            "Updating data browsing roots...",
+            self.get_param_value("data_browsing_root"),
+        )
 
     @QtCore.Slot(str)
     def __file_selected(self, filename: str) -> None:

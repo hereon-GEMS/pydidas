@@ -11,3 +11,15 @@
 .align-references a:last-child {
   float: right;
 }
+
+table.no-border-table,
+table.no-border-table td,
+table.no-border-table th {
+    border: none !important;
+}
+
+table.white-bg-table,
+table.white-bg-table td,
+table.white-bg-table th {
+    background-color: white !important;
+}

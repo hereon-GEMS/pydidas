@@ -102,10 +102,13 @@ def _create_calib_tasks() -> list[
     for _task in [_experiment_task, _mask_task, _peak_task, _geometry_task]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar)[0]
-        _histo_crop_action = actions.CropHistogramOutliers(
+        _histo_crop_action = actions.CropHistogramOutliersAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
-        _autoscale_action = actions.AutoscaleToMeanAndThreeSigma(
+        _autoscale_min_max_action = actions.AutoscaleToMinMaxAction(
+            _plot, parent=_plot, forced_image_legend="image"
+        )
+        _autoscale_mean_3sigma_action = actions.AutoscaleToMeanAndThreeSigmaAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
         _widget_action = [
@@ -114,9 +117,11 @@ def _create_calib_tasks() -> list[
             if isinstance(_action, QtWidgets.QWidgetAction)
         ][0]
         _toolbar.addAction(_histo_crop_action)
-        _toolbar.addAction(_autoscale_action)
+        _toolbar.addAction(_autoscale_min_max_action)
+        _toolbar.addAction(_autoscale_mean_3sigma_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
-        _toolbar.insertAction(_widget_action, _autoscale_action)
+        _toolbar.insertAction(_widget_action, _autoscale_min_max_action)
+        _toolbar.insertAction(_widget_action, _autoscale_mean_3sigma_action)
     # explicitly hide the toolbar with the 3D visualization:
     getattr(_experiment_task, "_ExperimentTask__plot").findChildren(QToolBar)[
         2
@@ -228,6 +233,7 @@ class PyfaiCalibFrame(BaseFrame):
             _task.warningUpdated.connect(
                 functools.partial(self._update_task_state, _task, _menu_item)
             )
+        self._tasks[2].widgetShow.connect(self._update_peak_picking_task_menu)
         if len(self._tasks) > 0:
             self._widgets["task_list"].setCurrentRow(0)
             # Hide the nextStep button of the last task
@@ -247,6 +253,16 @@ class PyfaiCalibFrame(BaseFrame):
             self._calibration_model.markerModel().add(origin)
         for task in self._tasks:
             task.setModel(self._calibration_model)
+
+    @QtCore.Slot()
+    def _update_peak_picking_task_menu(self) -> None:
+        """Update the peak picking task menu width to show all actions."""
+        _peak_task: PeakPickingTask = self._tasks[2]
+        _splitter: QtWidgets.QSplitter = _peak_task.splitter
+        _sizes = _splitter.sizes()
+        _splitter.setSizes([_sizes[0], int(1.2 * _sizes[1])])
+        # disconnect slot to make sure the modification is only applied once:
+        _peak_task.widgetShow.disconnect(self._update_peak_picking_task_menu)
 
     @QtCore.Slot()
     def _display_help(self) -> None:

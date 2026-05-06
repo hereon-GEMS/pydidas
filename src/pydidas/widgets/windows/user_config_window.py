@@ -192,7 +192,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
-            "max_number_curves",
+            self.get_param("max_number_curves"),
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
@@ -300,7 +300,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     def connect_signals(self) -> None:
         """Connect the signals for Parameter updates."""
         for _param_key in QSETTINGS_USER_KEYS:
-            self.param_widgets[_param_key].sig_new_value.connect(
+            self.param_composite_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)

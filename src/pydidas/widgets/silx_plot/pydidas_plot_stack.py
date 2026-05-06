@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ datasets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -80,9 +80,9 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
 
-    def plot_data(self, data: np.ndarray | Dataset, **kwargs: Any) -> None:
+    def set_data(self, data: np.ndarray | Dataset, **kwargs: Any) -> None:
         """
-        Plot the given data.
+        Set the given data to be plotted.
 
         Parameters
         ----------
@@ -98,6 +98,8 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         _title = kwargs.pop("title", None)
         if _title is not None:
             _plot.setGraphTitle(_title)
+        if not isinstance(data, Dataset):
+            data = Dataset(data)
         _plot.plot_pydidas_dataset(data, **kwargs)
 
     def clear_plots(self) -> None:

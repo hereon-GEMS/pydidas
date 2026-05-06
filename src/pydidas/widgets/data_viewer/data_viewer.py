@@ -255,7 +255,6 @@ class DataViewer(WidgetWithParameterCollection):
             _data = self._data
         if not isinstance(_data, Dataset):
             _data = Dataset(_data)
-        _view.clear()
         _view.display_data(_data, title=self._config["plot_title"])
 
     def set_data(
@@ -299,9 +298,6 @@ class DataViewer(WidgetWithParameterCollection):
         self._import_data(data)
         self._update_widgets_from_data()
         self._set_new_view()
-
-    # Set up an alias for plotting
-    plot_data = set_data
 
     def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray) -> None:
         """

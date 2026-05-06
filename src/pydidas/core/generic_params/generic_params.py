@@ -129,6 +129,16 @@ scan_dim3_label. For clarity, only the generic form is described here.
     The unit of the movement / steps / offset in scan direction *{i}*.
 """
 
+__LIST_HEADER = """
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+   :class: tight-table
+   
+   * - Parameter
+     - Description
+"""
+
 
 def create_generic_params_rst_docs(filename: Path):
     """
@@ -143,39 +153,33 @@ def create_generic_params_rst_docs(filename: Path):
     filename : Path
         The path of the file to which the documentation will be written.
     """
+    __items_to_write = []
+    for module_name, module_items in _metadata_by_module.items():
+        _name = (
+            module_name.removeprefix("generic_params_").capitalize().replace("_", " ")
+        )
+        __items_to_write.append(f"\n{_name}\n{'~' * len(_name)}\n")
+        __items_to_write.append(__LIST_HEADER)
+        for param_key, param in module_items.items():
+            __items_to_write.append(f"   * - :py:data:`{param_key}`\n")
+            _param_type = param["type"]
+            if _param_type is None:
+                _display_type = "None"
+            elif isinstance(_param_type, str):
+                _display_type = _param_type
+            else:
+                _display_type = _param_type.__name__
+            __items_to_write.append(f"     - | **type** : {_display_type}\n")
+            for _key, _val in param.items():
+                if _key == "type":
+                    continue
+                _write_val = str(_val.__name__ if hasattr(_val, "__name__") else _val)
+                _write_val = _write_val.replace("\n", "\n       | ")
+                __items_to_write.append(f"       | **{_key}** : {_write_val}\n")
     with open(filename, "w", encoding="utf-8") as f:
         f.write(__DOC_FILE_HEADER)
-        for module_name, module_items in _metadata_by_module.items():
-            _name = (
-                module_name.removeprefix("generic_params_")
-                .capitalize()
-                .replace("_", " ")
-            )
-            f.write(
-                f"\n{_name}\n{'~' * len(_name)}\n\n"
-                ".. list-table::\n"
-                "   :widths: 20 80\n"
-                "   :header-rows: 1\n"
-                "   :class: tight-table\n\n"
-                "   * - Parameter\n"
-                "     - Description\n"
-            )
-            for param_key, param in module_items.items():
-                f.write(f"   * - :py:data:`{param_key}`\n     - | ")
-                if param["type"] is None:
-                    param["type"] = "None"
-                elif not isinstance(param["type"], str):
-                    param["type"] = param["type"].__name__
-                f.write(
-                    ("\n       | ").join(
-                        f"**{key}** : "
-                        + str(val.__name__ if hasattr(val, __name__) else val).replace(
-                            "\n", "\n       | "
-                        )
-                        for key, val in param.items()
-                    )
-                )
-                f.write("\n")
+        for _entry in __items_to_write:
+            f.write(_entry)
 
 
 def create_scan_context_params_rst_docs(filename: Path):

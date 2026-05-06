@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
 
 """
 The generic_params_fit module holds all the required data to create generic
-Parameters which are are used for fitting.
+Parameters which are used for fitting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -122,8 +122,8 @@ GENERIC_PARAMS_FIT = (
             "tooltip": (
                 "The output of the fitting plugin. The plugin can either return the "
                 "peak area, the peak position or the FWHM. Alternatively, any "
-                "combination of these values can be retured as well. Note that the fit "
-                "parameters are always stored in the metadata."
+                "combination of these values can be returned as well. Note that the "
+                "fit parameters are always stored in the metadata."
             ),
         },
     }

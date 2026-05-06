@@ -52,13 +52,13 @@ _FILE_NAME_SCHEME_ERROR_STR = (
 ).replace("\\\\.", ".")
 
 
-def get_directory(path: Path) -> Path:
+def get_directory(path: str or Path) -> Path:
     """
     Get the directory. If a file is given, return its parent directory.
 
     Parameters
     ----------
-    path : Path
+    path : str or Path
         The file system path, including eventual filenames.
 
     Returns
@@ -66,6 +66,8 @@ def get_directory(path: Path) -> Path:
     path : Path
         The path without the filename.
     """
+    if isinstance(path, str):
+        path = Path(path)
     return path.parent if path.is_file() else path
 
 

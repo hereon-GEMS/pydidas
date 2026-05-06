@@ -32,7 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=ab187429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -715,16 +715,51 @@ canvas.</p></td>
 </td>
 <td><p>Unzoom: Reset the display region to the full data.</p></td>
 </tr>
+<tr class="row-odd"><td><div class="pst-scrollable-table-container"><table class="no-border-table white-bg-table tight-table table">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 30.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="../../../_images/menu_zoom_lock.png" class="align-center" src="../../../_images/menu_zoom_lock.png" />
+</td>
+<td><p>or</p></td>
+<td><img alt="../../../_images/menu_zoom_unlock.png" class="align-center" src="../../../_images/menu_zoom_unlock.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</td>
+<td><p>Lock the zoom at the current settings. The button will show the current
+lock state in its icon and description and a click will toggle between the
+locked and unlocked state. When the zoom is locked, the display region
+will not change when loading new data.</p></td>
+</tr>
+<tr class="row-even"><td><div class="pst-scrollable-table-container"><table class="no-border-table white-bg-table tight-table table">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 30.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<tbody>
 <tr class="row-odd"><td><img alt="../../../_images/menu_match_canvas.png" class="align-center" src="../../../_images/menu_match_canvas.png" />
 </td>
-<td><p>Match canvas: Set the aspect ratio to 1 and match the canvas size to the
-data to allow a tight fit.</p></td>
-</tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
+<td><p>or</p></td>
+<td><img alt="../../../_images/menu_expand_canvas.png" class="align-center" src="../../../_images/menu_expand_canvas.png" />
 </td>
-<td><p>Expand canvas: Reset the canvas size to take up all available space.
-This option does also change the data aspect ratio to make use of the
-full canvas.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</td>
+<td><p>Toggle the canvas size. Clicking this button will toggle between the two
+options and change the icon accordingly. Options are a. Match canvas and
+b. Expand canvas. Match canvas to the data: Set the aspect ratio to
+1 and match the canvas size to the data to allow a tight fit. Or Expand
+the canvas: Reset the canvas size to take up all available space. This
+option does also change the data aspect ratio to make use of the full canvas.</p></td>
 </tr>
 <tr class="row-odd"><td><img alt="../../../_images/menu_palette.png" class="align-center" src="../../../_images/menu_palette.png" />
 </td>
@@ -739,33 +774,37 @@ the colormap to ignore the low <em>x%</em> and the top <em>y%</em> of the image
 histogram. The levels of <em>x</em> and <em>y</em> can be adjusted in the pydidas user
 settings.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_autoscale.png" class="align-center" src="../../../_images/menu_cmap_autoscale.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_cmap_min_max.png" class="align-center" src="../../../_images/menu_cmap_min_max.png" />
+</td>
+<td><p>Autoscale the colormap to the image minimum and maximum values.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_cmap_mean_w_sigma.png" class="align-center" src="../../../_images/menu_cmap_mean_w_sigma.png" />
 </td>
 <td><p>Autoscale the colormap to the image mean value +/- 3 standard
 deviations.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_aspect.png" class="align-center" src="../../../_images/menu_aspect.png" />
 </td>
 <td><p>This action allows to control the aspect of the displayed data and
 allows to stretch the data to fill the available canvas or keep its
 original aspect ratio.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_orientation.png" class="align-center" src="../../../_images/menu_orientation.png" />
 </td>
 <td><p>Control the position of the origin in the image: Select between the top
 left and bottom left corner.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_colorbar.png" class="align-center" src="../../../_images/menu_colorbar.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_colorbar.png" class="align-center" src="../../../_images/menu_colorbar.png" />
 </td>
 <td><p>Display or hide the colorbar on the drawing canvas.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_mask.png" class="align-center" src="../../../_images/menu_mask.png" />
 </td>
 <td><p>Mask tools: This button opens an additional widget at the bottom of the
 canvas with tools for importing or setting a mask to mask certain data
 regions.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_coordinate_system.png" class="align-center" src="../../../_images/menu_coordinate_system.png" />
 </td>
 <td><p>Set coordinate system: This button will open a submenu which allows to
 select the coordinate system (cartesian or cylindrical). Note that the
@@ -775,30 +814,30 @@ determine the beam center. Therefore, looking at data with a different
 calibration will display a wrong center and consequently wrong
 coordinates.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_get_data_info.png" class="align-center" src="../../../_images/menu_get_data_info.png" />
 </td>
 <td><p>Get information for selected datapoint: This button allows the user to
 click on a point in the image and show a window with additional
 information about this point (specifically: all indices / data values).</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_copy_to_clipboard.png" class="align-center" src="../../../_images/menu_copy_to_clipboard.png" />
 </td>
 <td><p>Copy the currently visible figure to the clipboard. This will only copy
 the main figure and not the colorbar.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_save_to_file.png" class="align-center" src="../../../_images/menu_save_to_file.png" />
 </td>
 <td><p>Save the currently loaded full data to file, ignoring any zooming. This
 function will open a dialogue to select the file type and filename.
 Depending on the selected file type, the colormap and scaling will be
 retained (e.g. for png export) or ignored (e.g. tiff export).</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_print.png" class="align-center" src="../../../_images/menu_print.png" />
 </td>
 <td><p>Print the currently visible figure. This will print only the data
 visible on the canvas and it will retain colormap and scaling settings.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_profile.png" class="align-center" src="../../../_images/menu_profile.png" />
 </td>
 <td><p>Create and delete line profiles. This function allows the selection and
 editing of line profiles. The line profiles are shown in the histogram

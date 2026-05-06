@@ -32,7 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=ab187429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -466,43 +466,76 @@ canvas.</p></td>
 </td>
 <td><p>Unzoom: Reset the display region to the full data.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_x_autoscale.png" class="align-center" src="../../../_images/menu_x_autoscale.png" />
+<tr class="row-odd"><td><div class="pst-scrollable-table-container"><table class="no-border-table white-bg-table tight-table table">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 30.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><img alt="../../../_images/menu_zoom_lock.png" class="align-center" src="../../../_images/menu_zoom_lock.png" />
+</td>
+<td><p>or</p></td>
+<td><img alt="../../../_images/menu_zoom_unlock.png" class="align-center" src="../../../_images/menu_zoom_unlock.png" />
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</td>
+<td><p>Lock the zoom at the current settings. The button will show the current
+lock state in its icon and description and a click will toggle between the
+locked and unlocked state. When the zoom is locked, the display region
+will not change when loading new data.</p></td>
+</tr>
+<tr class="row-even"><td><img alt="../../../_images/menu_x_autoscale.png" class="align-center" src="../../../_images/menu_x_autoscale.png" />
 </td>
 <td><p>Activate autoscaling of the x-axis: If enabled, the x-axis will be
 matched to the data range upon activation or upon using the “Unzoom”
 button.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_y_autoscale.png" class="align-center" src="../../../_images/menu_y_autoscale.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_y_autoscale.png" class="align-center" src="../../../_images/menu_y_autoscale.png" />
 </td>
 <td><p>Activate autoscaling of the y-axis: If enabled, the y-axis will be
 matched to the data range upon activation or upon using the “Unzoom”
 button.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_x_log.png" class="align-center" src="../../../_images/menu_x_log.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_x_log.png" class="align-center" src="../../../_images/menu_x_log.png" />
 </td>
 <td><p>Switch between a linear and a logarithmic x-axis.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_y_log.png" class="align-center" src="../../../_images/menu_y_log.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_y_log.png" class="align-center" src="../../../_images/menu_y_log.png" />
 </td>
 <td><p>Switch between a linear and a logarithmic y-axis.</p></td>
 </tr>
-<tr class="row-odd"><td><img alt="../../../_images/menu_grid.png" class="align-center" src="../../../_images/menu_grid.png" />
+<tr class="row-even"><td><img alt="../../../_images/menu_grid.png" class="align-center" src="../../../_images/menu_grid.png" />
 </td>
 <td><p>Toggle a grid in the main plotting canvas.</p></td>
 </tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_style.png" class="align-center" src="../../../_images/menu_style.png" />
+<tr class="row-odd"><td><img alt="../../../_images/menu_style.png" class="align-center" src="../../../_images/menu_style.png" />
 </td>
 <td><p>Change the drawing style. Repeatedly using this button will cycle
 through lines, dots, and lines &amp; dots styles for the curve.</p></td>
 </tr>
+<tr class="row-even"><td><div class="pst-scrollable-table-container"><table class="no-border-table white-bg-table tight-table table">
+<colgroup>
+<col style="width: 35.0%" />
+<col style="width: 30.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<tbody>
 <tr class="row-odd"><td><img alt="../../../_images/menu_plot_type_generic.png" class="align-center" src="../../../_images/menu_plot_type_generic.png" />
 </td>
-<td><p>Change the plotted data to the generic y vs. x plot without any special
-operations.</p></td>
-</tr>
-<tr class="row-even"><td><img alt="../../../_images/menu_plot_type_kratky.png" class="align-center" src="../../../_images/menu_plot_type_kratky.png" />
+<td><p>or</p></td>
+<td><img alt="../../../_images/menu_plot_type_kratky.png" class="align-center" src="../../../_images/menu_plot_type_kratky.png" />
 </td>
-<td><p>Plot data in a Kratky-type plot using y * x^2 vs. x for the y and x for
+</tr>
+</tbody>
+</table>
+</div>
+</td>
+<td><p>Change the plot style: Switch between a standard y vs. x or a Kratky-type
+plot. The Kratky-type plot uses y * x^2 for the y and x for
 the x-axis, respectively. This plot allows, for example, to correct for
 the q-dependence of the scattering intensity in small angle scattering.</p></td>
 </tr>

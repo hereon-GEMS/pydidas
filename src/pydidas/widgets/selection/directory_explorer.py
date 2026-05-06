@@ -29,6 +29,7 @@ __status__ = "Production"
 __all__ = ["DirectoryExplorer"]
 
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +72,11 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.add_param(get_generic_parameter("current_directory"))
+        self.__pending_filter_text = ""
+        self.__filter_timer = QtCore.QTimer(self)
+        self.__filter_timer.setSingleShot(True)
+        self.__filter_timer.setInterval(150)
+        self.__filter_timer.timeout.connect(self.__apply_filter_string)
         self._create_widgets()
         self._set_up_file_model(**kwargs)
         self._connect_signals()
@@ -136,12 +142,17 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _path = kwargs.get("current_path", None)
         if _path is None:
             _path = self.q_settings_get("directory_explorer/path", default="")
+        _path = str(_path)
         self.set_param_and_widget_value("current_directory", _path)
         self._file_model = QtWidgets.QFileSystemModel()
-        self._file_model.setRootPath(_path)
+        if hasattr(self._file_model, "DontUseCustomDirectoryIcons"):
+            self._file_model.setOption(
+                self._file_model.DontUseCustomDirectoryIcons, True
+            )
         self._file_model.setReadOnly(True)
+        self._file_model.setRootPath(_path)
         self._filter_model = DirectoryExplorerFilterModel()
-        self._filter_model.setSourceModel(self._file_model)
+        self._filter_model.setSourceModel(self._file_model)  # type: ignore[arg-type]
         self._widgets["explorer"].setModel(self._filter_model)
         self._widgets["explorer"].expand_to_path(_path)
 
@@ -160,9 +171,18 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         )
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
         self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
-        self._widgets["filter_edit"].textChanged.connect(
-            self._filter_model.toggle_filter_string
-        )
+        self._widgets["filter_edit"].textChanged.connect(self.__queue_filter_update)
+
+    @QtCore.Slot(str)
+    def __queue_filter_update(self, filter_text: str) -> None:
+        """Queue a debounced update of the filename filter."""
+        self.__pending_filter_text = filter_text
+        self.__filter_timer.start()
+
+    @QtCore.Slot()
+    def __apply_filter_string(self) -> None:
+        """Apply the pending filename filter after debounce timeout."""
+        self._filter_model.toggle_filter_string(self.__pending_filter_text)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -205,7 +225,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _usage = qstate_is_checked(state)
         self.q_settings_set("directory_explorer/is_case_sensitive", _usage)
         self._filter_model.setSortCaseSensitivity(
-            QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive
+            QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive  # type: ignore[arg-type]
         )
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
@@ -229,6 +249,14 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             self.sig_new_file_selected.emit(_name)  # type: ignore[attr-defined]
         elif Path(_name).is_dir():
             self.set_param_and_widget_value("current_directory", _name)
+        print(
+            "row cache: ",
+            len(self._filter_model._DirectoryExplorerFilterModel__file_info_cache),
+        )
+        print(
+            "root cache",
+            len(self._filter_model._DirectoryExplorerFilterModel__top_root_cache),
+        )
 
     @QtCore.Slot(str)
     def __user_dir_input(self, path: str) -> None:
@@ -240,13 +268,64 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         path : str
             The file or directory to be set as active.
         """
+        _target_dir = str(Path(path).parent if Path(path).is_file() else Path(path))
+        _norm_target = os.path.normcase(os.path.normpath(_target_dir))
+
+        # Only suspend filtering/sorting when the directory is not yet loaded.
+        # For already-cached directories, directoryLoaded may not fire again,
+        # and with no active filter the suspension is unnecessary anyway.
+        _target_index = self._file_model.index(_target_dir)
+        _already_loaded = (
+            _target_index.isValid() and self._file_model.rowCount(_target_index) > 0
+        )
+
+        if not _already_loaded:
+            _explorer = self._widgets["explorer"]
+            _sort_col = _explorer.header().sortIndicatorSection()
+            _sort_order = _explorer.header().sortIndicatorOrder()
+
+            # Safety timer ensures resume always fires even if directoryLoaded
+            # does not emit (already cached, permission errors, etc.).
+            _safety_timer = QtCore.QTimer(self)
+            _safety_timer.setSingleShot(True)
+            _safety_timer.setInterval(5000)  # 5 s hard cap
+
+            def _resume() -> None:
+                self._filter_model.resume_filtering()
+                _explorer.setSortingEnabled(True)
+                _explorer.sortByColumn(_sort_col, _sort_order)
+
+            def _on_loaded(loaded_path: str) -> None:
+                if os.path.normcase(os.path.normpath(loaded_path)) == _norm_target:
+                    _safety_timer.stop()
+                    _resume()
+                    try:
+                        self._file_model.directoryLoaded.disconnect(_on_loaded)
+                    except RuntimeError:
+                        pass
+
+            def _on_timeout() -> None:
+                try:
+                    self._file_model.directoryLoaded.disconnect(_on_loaded)
+                except RuntimeError:
+                    pass
+                _resume()
+
+            # Suspend both filtering and sorting so new rows arrive without
+            # triggering O(n log n) re-sort over all accumulated rows.
+            self._filter_model.suspend_filtering()
+            _explorer.setSortingEnabled(False)
+            self._file_model.directoryLoaded.connect(_on_loaded)
+            _safety_timer.timeout.connect(_on_timeout)
+            _safety_timer.start()
+
         self._file_model.setRootPath(path)
         self._widgets["explorer"].expand_to_path(path)
         _proxy_index = self._filter_model.mapFromSource(self._file_model.index(path))
         self._widgets["explorer"].selectionModel().select(
             _proxy_index, QtCore.QItemSelectionModel.Select
         )
-        self._widgets["explorer"].scrollToBottom()
+        self._widgets["explorer"].scrollTo(_proxy_index)
         self._widgets["explorer"].setCurrentIndex(_proxy_index)
         _path = Path(path)
         if _path.is_file():

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters for the global pydidas settings
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -171,6 +171,24 @@ GENERIC_PARAMS_SETTINGS = {
         "tooltip": (
             "The paths to all custom plugin locations. Individual entries must be "
             "separated by a double semicolon `;;`."
+        ),
+    },
+    "data_browsing_root": {
+        "type": str,
+        "default": "",
+        "name": "Data browsing roots",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The paths which should be included in the data browser. Multiple "
+            "entries are possible and must be separated by a double semicolon `;;`. "
+            "The paths given here will be used as top level paths and all children "
+            "will be accessible in the data browser. If no paths are given, the "
+            "data browser will start with the root directory of the filesystem and "
+            "all paths will be accessible. Note that the paths given here must "
+            "exist and be accessible, otherwise the data browser will ignore those "
+            "paths."
         ),
     },
     "plot_update_time": {

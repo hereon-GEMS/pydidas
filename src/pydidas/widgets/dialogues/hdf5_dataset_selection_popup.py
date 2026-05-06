@@ -51,14 +51,14 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     ----------
     parent : QWidget or None, optional
         The parent widget. The default is None.
-    fname : Path or None, optional
+    fname : Path or str or None, optional
         The file path to the hdf5 file. The default is None.
     """
 
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
-        fname: Path | None = None,
+        fname: Path | str | None = None,
     ) -> None:
         QtWidgets.QInputDialog.__init__(self, parent)
         if fname is not None:

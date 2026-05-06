@@ -143,7 +143,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_lineedit(
             "edit_fontsize",
-            text=str(PydidasQApplication.instance().font_size),
+            text=str(self.__qtapp.font_size),
             parent_widget="fontsize_container",
             gridPos=(0, -1, 1, 1),
             validator=_FONT_SIZE_VALIDATOR,
@@ -178,45 +178,33 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
         self.create_label("section_updates", "Update settings", **_section_options)
         self.create_param_widget(
-            self.get_param("auto_check_for_updates"),
-            parent_widget="config_canvas",
-            width_io=0.25,
-            width_text=0.7,
+            "auto_check_for_updates", parent_widget="config_canvas"
         )
         self.create_spacer(None, parent_widget="config_canvas")
-        self.create_label(
-            "section_mosaic",
-            "Composite creator settings",
-            **_section_options,
-        )
+        self.create_label("section_data_browsing", "Data browsing", **_section_options)
         self.create_param_widget(
-            self.get_param("mosaic_border_width"),
+            "data_browsing_root",
+            linebreak=True,
             parent_widget="config_canvas",
-            width_io=0.18,
-            width_text=0.7,
+            size_hint_width=2 * GENERIC_STANDARD_WIDGET_WIDTH,
         )
-        self.create_param_widget(
-            self.get_param("mosaic_border_value"),
-            parent_widget="config_canvas",
-            width_io=0.25,
-            width_text=0.7,
-        )
-        self.create_spacer("spacer_3", parent_widget="config_canvas")
+        self.create_spacer(None, parent_widget="config_canvas")
+
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
-            self.get_param("max_number_curves"),
+            "max_number_curves",
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
         )
         self.create_param_widget(
-            self.get_param("histogram_outlier_fraction_low"),
+            "histogram_outlier_fraction_low",
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
         )
         self.create_param_widget(
-            self.get_param("histogram_outlier_fraction_high"),
+            "histogram_outlier_fraction_high",
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
@@ -246,7 +234,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             toolTip=GENERIC_PARAMS_SETTINGS["cmap_nan_color"]["tooltip"],
         )
         self.create_param_widget(
-            self.get_param("cmap_nan_color"),
+            "cmap_nan_color",
             gridPos=(0, 0, 1, 2),
             parent_widget="cmap_nan_color_container",
             validator=QT_REG_EXP_RGB_VALIDATOR,
@@ -297,7 +285,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         update_palette(self._widgets["label_default_plugin"], base="#F0F0F0")
         self.create_param_widget(
-            self.get_param("plugin_path"),
+            "plugin_path",
             linebreak=True,
             parent_widget="config_canvas",
             size_hint_width=2 * GENERIC_STANDARD_WIDGET_WIDTH,
@@ -311,9 +299,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
     def connect_signals(self) -> None:
         """Connect the signals for Parameter updates."""
-        for _param_key in self.params:
-            if _param_key.startswith("cmap"):
-                continue
+        for _param_key in QSETTINGS_USER_KEYS:
             self.param_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )

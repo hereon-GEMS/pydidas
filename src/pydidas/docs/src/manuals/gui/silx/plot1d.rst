@@ -48,6 +48,19 @@ Menu entries description
     * -  .. image:: ../silx/images/menu_unzoom.png
             :align: center
       - Unzoom: Reset the display region to the full data.
+    * -  .. list-table::
+           :class: no-border-table white-bg-table tight-table
+           :widths: 35 30 35
+
+           * - .. image:: ../silx/images/menu_zoom_lock.png
+                  :align: center
+             - or
+             - .. image:: ../silx/images/menu_zoom_unlock.png
+                  :align: center
+      - Lock the zoom at the current settings. The button will show the current
+        lock state in its icon and description and a click will toggle between the
+        locked and unlocked state. When the zoom is locked, the display region
+        will not change when loading new data.
     * -  .. image:: ../silx/images/menu_x_autoscale.png
             :align: center
       - Activate autoscaling of the x-axis: If enabled, the x-axis will be
@@ -71,13 +84,17 @@ Menu entries description
             :align: center
       - Change the drawing style. Repeatedly using this button will cycle
         through lines, dots, and lines & dots styles for the curve.
-    * -  .. image:: ../silx/images/menu_plot_type_generic.png
-            :align: center
-      - Change the plotted data to the generic y vs. x plot without any special
-        operations.
-    * -  .. image:: ../silx/images/menu_plot_type_kratky.png
-            :align: center
-      - Plot data in a Kratky-type plot using y * x^2 vs. x for the y and x for
+    * -  .. list-table::
+           :class: no-border-table white-bg-table tight-table
+           :widths: 35 30 35
+
+           * - .. image:: ../silx/images/menu_plot_type_generic.png
+                  :align: center
+             - or
+             - .. image:: ../silx/images/menu_plot_type_kratky.png
+                  :align: center
+      - Change the plot style: Switch between a standard y vs. x or a Kratky-type
+        plot. The Kratky-type plot uses y * x^2 for the y and x for
         the x-axis, respectively. This plot allows, for example, to correct for
         the q-dependence of the scattering intensity in small angle scattering.
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png

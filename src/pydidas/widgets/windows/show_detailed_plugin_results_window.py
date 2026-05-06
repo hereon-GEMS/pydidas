@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ additional data for the selected plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -224,7 +224,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 for _key, _val in _item.items()
                 if _key in ["symbol", "linewidth", "linestyle"]
             } | {"resetzoom": False, "replace": False}
-            self._widgets[f"plot_{_i_plot}"].plot_data(
+            self._widgets[f"plot_{_i_plot}"].set_data(
                 _data,
                 title=_titles.get(_i_plot, ""),
                 legend=_item.get("label", f"unlabeled item #{_n}"),

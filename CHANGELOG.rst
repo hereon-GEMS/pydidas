@@ -18,6 +18,8 @@ Improvements
 - Added an option to select a file by its filename in the DataBrowsingFrame.
 - Removed the gui and widget packages from the generic 'import pydidas'
   to speed-up loading for background processes.
+- Added an option in the plots to lock the current zoom settings
+- Added a button to plots to autoscale the colormap to min/max
 
 Programmatic changes
 --------------------
@@ -40,6 +42,7 @@ Programmatic changes
   widget.
 - Added an option to specify the display precision for floating point
   Parameters.
+- Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
 
 Bugfixes
 --------
@@ -94,6 +97,14 @@ Bugfixes
 - Added a workaround for silx issue #4472 until next silx release.
 - Fixed an issue in the documentation paths which arose from changing from
   str to pathlib.Path objects.
+- Renamed folders in pydidas.resources to prevent naming clashes with module
+  imports as <foldername>.
+- Fixed an issue with the automatic generic Parameter doc creation in the 
+  latest sphinx version
+- Fixed an issue where integer Parameters were not properly stored after user
+  edits
+- Fixed an issue in PydidasPlotStack which accepted ndarray without checks
+  and crashed
 
 
 v26.01.27

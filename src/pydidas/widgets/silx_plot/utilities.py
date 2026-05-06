@@ -19,22 +19,25 @@
 Module with utilities for silx_plot package files.
 """
 
-__author__ = "Malte Storm"
+__author__ = "Malte Storm, Nonni Heere"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_allowed_kwargs", "axis_is_columns", "get_column_labels"]
+__all__ = ["get_allowed_kwargs"]
 
 
 import inspect
 from typing import Any, Callable
 
-from pydidas.core import Dataset
+import numpy as np
+
+from pydidas.core import Dataset, PydidasQsettings, UserConfigError
 from pydidas_qtcore import PydidasQApplication
 
 
 _ALLOWED_KWARGS = {}
+_QSETTINGS = PydidasQsettings()
 
 
 def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -66,7 +69,7 @@ def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, An
 
 def axis_is_columns(axis: int, data: Dataset) -> bool:
     """
-    Check if the given axis is structured in columns rather than continous
+    Check if the given axis is structured in columns rather than continuous
     data. This is not a definitive check, it just looks at the axis labels.
 
     Parameters
@@ -120,3 +123,34 @@ def get_column_labels(axis: int, data: Dataset) -> list[str]:
         f"Warning: Axis {axis} does not contain columns. Labels may be incorrect."
     )
     return data.get_axis_description(axis).split(";")
+
+
+def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:
+    """
+    Check the data dimensions.
+
+    Parameters
+    ----------
+    data : Dataset or np.ndarray
+        The data to display.
+    """
+    if data.ndim == target_dim:
+        return
+    if target_dim == 1 and data.ndim == 2:
+        _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # type: ignore[assignment]
+        if data.shape[0] > _n_max:
+            raise UserConfigError(
+                f"The number of given curves ({data.shape[0]}) exceeds the "
+                f"maximum number of curves allowed ({_n_max}).\n"
+                "Please limit the data range to be displayed or increase the "
+                "maximum number of curves in the user settings (Options -> "
+                "User config). Please note that displaying a large number of "
+                "curves will slow down the plotting performance."
+            )
+        return
+    if data.ndim != target_dim:
+        raise UserConfigError(
+            f"The given dataset has {data.ndim} dimensions. Please check the "
+            f"input data definition:\nThe expected input is {target_dim} "
+            "dimensions."
+        )

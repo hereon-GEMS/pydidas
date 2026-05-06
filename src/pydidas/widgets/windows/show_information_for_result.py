@@ -206,7 +206,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
             _input, _ = self._loader_plugin.execute(self._ordinal)
-            self._widgets["plot"].plot_data(_input)
+            self._widgets["plot"].set_data(_input)
 
     @QtCore.Slot()
     def process_font_metrics_changed(self) -> None:

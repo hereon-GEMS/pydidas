@@ -5,9 +5,9 @@
    viewBox="0 0 8.0059862 8"
    version="1.1"
    id="svg4213"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
-   sodipodi:docname="silx_cmap_autoscale.svg"
-   inkscape:export-filename="..\..\pydidas\resources\icons\silx_cmap_autoscale.png"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="silx_cmap_mean_w_sigma.svg"
+   inkscape:export-filename="..\..\src\pydidas\resources\_icons\silx_cmap_mean_w_sigma.png"
    inkscape:export-xdpi="101"
    inkscape:export-ydpi="101"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -99,8 +99,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="18.04431"
-     inkscape:cx="12.358466"
-     inkscape:cy="0.47106262"
+     inkscape:cx="12.330757"
+     inkscape:cy="4.9323028"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -243,49 +243,49 @@
        x="232.05661"
        y="31.697086" />
     <rect
-       style="fill:#666666;fill-opacity:1;stroke-width:0.129976;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;fill-opacity:1;stroke-width:0.129976;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
        id="rect866-0-2"
        width="0.42522639"
        height="1.4251015"
        x="232.64314"
        y="32.030529" />
     <rect
-       style="fill:#666666;fill-opacity:1;stroke-width:0.0896366;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;fill-opacity:1;stroke-width:0.0896366;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
        id="rect866-0-9"
        width="0.42522639"
        height="0.6777761"
        x="233.21626"
        y="32.751961" />
     <rect
-       style="fill:#666666;fill-opacity:1;stroke-width:0.0793215;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;fill-opacity:1;stroke-width:0.0793215;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
        id="rect866-0-9-0"
        width="0.42522639"
        height="0.53075868"
        x="233.8028"
        y="32.898979" />
     <rect
-       style="fill:#666666;stroke-width:0.14082;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;stroke-width:0.14082;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000;fill-opacity:1"
        id="rect866-0-9-4-9"
        width="0.42522639"
        height="1.672798"
        x="234.98793"
        y="31.767212" />
     <rect
-       style="fill:#666666;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000;fill-opacity:1"
        id="rect866-0-9-4-9-3"
        width="0.42522639"
        height="0.3677929"
        x="234.4014"
        y="33.042892" />
     <rect
-       style="fill:#666666;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000;fill-opacity:1"
        id="rect866-0-9-4-9-3-1"
        width="0.42522639"
        height="0.3677929"
        x="229.57768"
        y="33.019867" />
     <rect
-       style="fill:#666666;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000"
+       style="fill:#aaaaaa;stroke-width:0.0660304;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:98.9998;paint-order:fill markers stroke;stop-color:#000000;fill-opacity:1"
        id="rect866-0-9-4-9-3-1-4"
        width="0.42522639"
        height="0.3677929"

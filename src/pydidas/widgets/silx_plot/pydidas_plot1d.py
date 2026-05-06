@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["PydidasPlot1D"]
 
 
-import warnings
 from typing import Any
 
 import numpy as np
@@ -35,16 +34,15 @@ from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
-from pydidas.core import Dataset, PydidasQsettings, UserConfigError
+from pydidas.core import Dataset
 from pydidas.widgets.silx_plot._special_plot_types_button import SpecialPlotTypesButton
+from pydidas.widgets.silx_plot.silx_actions import LockZoomAction
 from pydidas.widgets.silx_plot.utilities import (
     axis_is_columns,
+    check_data_dimensions,
     get_allowed_kwargs,
     get_column_labels,
 )
-
-
-_QSETTINGS = PydidasQsettings()
 
 
 class PydidasPlot1D(Plot1D):
@@ -52,76 +50,59 @@ class PydidasPlot1D(Plot1D):
     A customized silx.gui.plot.Plot1D with support for pydidas Datasets.
     """
 
-    @staticmethod
-    def _check_data_dimensions(data: Dataset | np.ndarray) -> None:
-        """
-        Check the data dimensions.
-
-        Parameters
-        ----------
-        data : Dataset or np.ndarray
-            The data to display.
-        """
-        if data.ndim == 1:
-            return
-        if data.ndim > 2:
-            raise UserConfigError(
-                "The given dataset has more than 2 dimensions. Please check "
-                f"the input data definition:\nThe input data has {data.ndim} "
-                "dimensions but only 1d or 2d data can be plotted as curves or "
-                "curve groups, respectively."
-            )
-        _n_max: int = _QSETTINGS.value("user/max_number_curves", int)  # type: ignore[assignment]
-        if data.shape[0] > _n_max:
-            raise UserConfigError(
-                f"The number of given curves ({data.shape[0]}) exceeds the maximum "
-                f"number of curves allowed ({_n_max}). \n"
-                "Please limit the data range to be displayed or increase the maximum "
-                "number of curves in the user settings (Options -> User config). "
-                "Please note that displaying a large number of curves will slow down "
-                "the plotting performance."
-            )
-
     def __init__(self, **kwargs: Any) -> None:
         Plot1D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
-        self.getRoiAction().setVisible(False)
-        self.getFitAction().setVisible(False)
+        self.getRoiAction().setVisible(False)  # type: ignore[attr-defined]
+        self.getFitAction().setVisible(False)  # type: ignore[attr-defined]
 
         self._qtapp = QtWidgets.QApplication.instance()
         if hasattr(self._qtapp, "sig_mpl_font_change"):
-            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+            self._qtapp.sig_mpl_font_change.connect(self._update_mpl_fonts)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
+        self._add_lock_zoom_action()
         if kwargs.get("use_special_plots", True):
             self._add_special_plot_actions()
         self._y_function = SpecialPlotTypesButton.func_generic
         self._y_label = SpecialPlotTypesButton.label_generic
         self._current_raw_data = {}
 
-    def _add_special_plot_actions(self) -> None:
-        """
-        Add the action to change the type of the plot.
+    # -----------------------------------------#
+    # re-implemented public Plot1D functions  #
+    # -----------------------------------------#
 
-        This action allows to display image coordinates in polar coordinates
-        (with r / mm, 2theta / deg or q / nm^-1) scaling.
-        """
-        self._plot_type = SpecialPlotTypesButton(parent=self, plot=self)
-        self._toolbar.addWidget(self._plot_type)
-        self._plot_type.sig_new_plot_type.connect(self._process_plot_type)
+    def clear(self) -> None:
+        """Override clear to also clear the stored data."""
+        super().clear()
+        self.clear_plot()
 
-    @QtCore.Slot()
-    def _process_plot_type(self) -> None:
+    # -----------------------------------------#
+    # new public methods                      #
+    # -----------------------------------------#
+
+    def clear_plot(self, clear_data: bool = True) -> None:
         """
-        Process the changed plot type and set the function to update the plotted value.
+        Clear the plot and remove all items.
+
+        Parameters
+        ----------
+        clear_data : bool, optional
+            Flag to remove all items from the stored data dictionary as well.
         """
-        self.clear_plot(clear_data=False)
-        self._y_function = self._plot_type.plot_yfunc
-        self._y_label = self._plot_type.plot_ylabel
-        for _legend, (_data, _kwargs) in self._current_raw_data.items():
-            _kwargs["legend"] = _legend
-            self.plot_pydidas_dataset(_data, **_kwargs)
+        _backend = self.getBackend()
+        _ax = _backend.ax
+        _ax.xaxis.set_major_locator(AutoLocator())
+        _ax.xaxis.set_major_formatter(ScalarFormatter())
+        _ax.yaxis.set_major_locator(AutoLocator())
+        _ax.yaxis.set_major_formatter(ScalarFormatter())
+        self.setGraphTitle("")
+        self.setGraphYLabel("Y")
+        self.setGraphXLabel("X")
+        self.remove()
+        if clear_data:
+            self._current_raw_data = {}
 
     def plot_data(self, data: np.ndarray, **kwargs: Any) -> None:
         """
@@ -147,7 +128,7 @@ class PydidasPlot1D(Plot1D):
         if isinstance(data, Dataset):
             self.plot_pydidas_dataset(data, **kwargs)
         else:
-            self._check_data_dimensions(data)
+            check_data_dimensions(data, 1)
             x = kwargs.pop("x", None)
             if x is None or x.size != data.size:  # type: ignore[union-attr]
                 x = np.arange(data.size)
@@ -196,29 +177,14 @@ class PydidasPlot1D(Plot1D):
         if kwargs.pop("replace", True):
             self.clear_plot()
         _i_data = 0 if data.ndim == 1 else 1
-        self._check_data_dimensions(data)
-        _ylabel = self._y_label(
-            data.axis_labels[_i_data],
-            data.axis_units[_i_data],
-            data.data_label,
-            data.data_unit,
-        )
-        _plot_kwargs = {
-            "linewidth": kwargs.get("linewidth", 1.5),
-            "linestyle": kwargs.get("linestyle", "-"),
-            "symbol": kwargs.get("symbol", None),
-            "resetzoom": False,
-            "legend": kwargs.get("legend", "Curve"),
-        } | get_allowed_kwargs(Plot1D.addCurve, kwargs)
-        self.set_axis_labels(1, _i_data, data)
-        self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
-        if kwargs.get("title"):
-            self.setGraphTitle(kwargs.get("title"))
+        check_data_dimensions(data, 1)
+        _plot_kwargs = self._process_plot_kwargs(kwargs)
+        self._set_graph_labels(kwargs, data)
         self._current_raw_data[_plot_kwargs.get("legend")] = (data, _plot_kwargs)
         if data.ndim == 1:
             self.addCurve(
-                data.axis_ranges[_i_data],
-                self._y_function(data.axis_ranges[_i_data], data.array),
+                data.axis_ranges[0],
+                self._y_function(data.axis_ranges[0], data.array),
                 **_plot_kwargs,
             )
         else:
@@ -231,18 +197,73 @@ class PydidasPlot1D(Plot1D):
                     self._y_function(_x, data.array[_index]),
                     **_plot_kwargs,
                 )
-            self.setActiveCurve(_label.format(value=_x[0]))
-        if _reset_zoom:
+            self.setActiveCurve(_label.format(value=data.axis_ranges[0][0]))
+        if _reset_zoom and not self._lock_zoom_action.locked:
             self.resetZoom()
 
-    def set_axis_labels(self, label_axis: int, data_axis: int, data: Dataset) -> None:
+    # display_data is a generic alias used in all custom silx plots to have a
+    # uniform interface call to display data in DataViewer-like classes
+    display_data = plot_pydidas_dataset
+
+    # -----------------------------------------#
+    # private plot methods                     #
+    # -----------------------------------------#
+
+    def _set_graph_labels(self, kwargs: dict[str, Any], data: Dataset) -> None:
+        """
+        Set the graph x and y labels.
+
+        Parameters
+        ----------
+        kwargs : dict[str, Any]
+            The calling kwargs.
+        data : Dataset
+            The data to be plotted.
+        """
+        _i_data = 0 if data.ndim == 1 else 1
+        _ylabel = self._y_label(
+            data.axis_labels[_i_data],
+            data.axis_units[_i_data],
+            data.data_label,
+            data.data_unit,
+        )
+        self.setGraphYLabel(kwargs.get("ylabel", _ylabel))
+        self._set_axis_labels(1, _i_data, data)
+
+    def _process_plot_kwargs(self, kwargs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Get the sanitized plot kwargs.
+
+        Parameters
+        ----------
+        kwargs : dict[str, Any]
+            The calling kwargs.
+
+        Returns
+        -------
+        dict[str, Any]
+            The kwargs to be passed to the silx plot method.
+        """
+        if kwargs.get("title"):
+            self.setGraphTitle(kwargs.get("title"))  # type: ignore[arg-type]
+        return {
+            "linewidth": kwargs.get("linewidth", 1.5),
+            "linestyle": kwargs.get("linestyle", "-"),
+            "symbol": kwargs.get("symbol", None),
+            "resetzoom": False,
+            "legend": kwargs.get("legend", "Curve"),
+        } | get_allowed_kwargs(Plot1D.addCurve, kwargs)
+
+    def _set_axis_labels(self, label_axis: int, data_axis: int, data: Dataset) -> None:
         """
         Set the axis labels for the given axis.
 
         Parameters
         ----------
-        axis : int
+        label_axis : int
             The axis index to set the labels for. 0 for y-axis, 1 for x-axis.
+        data_axis : int
+            The axis index to set the labels for. 0 for x-axis, 1 for y-axis.
         data : Dataset
             The dataset to get the labels from.
         """
@@ -262,49 +283,52 @@ class PydidasPlot1D(Plot1D):
             elif label_axis == 1:
                 self.setGraphXLabel(axis_desc)
 
-    # display_data is a generic alias used in all custom silx plots to have a
-    # uniform interface call to display data in DataViewer-like classes
-    display_data = plot_pydidas_dataset
+    # -----------------------------------------#
+    # private initialization methods          #
+    # -----------------------------------------#
 
-    def clear_plot(self, clear_data: bool = True) -> None:
+    def _add_lock_zoom_action(self) -> None:
+        """Add a lock zoom action to the plot."""
+        self._lock_zoom_action = LockZoomAction(self, parent=self)  # type: ignore[arg-type]
+        self.group.addAction(self._lock_zoom_action)  # type: ignore[attr-defined]
+        self.addAction(self._lock_zoom_action)  # type: ignore[arg-type]
+        self._toolbar.insertAction(  # type: ignore[attr-defined]
+            self.xAxisAutoScaleAction,
+            self._lock_zoom_action,  # type: ignore[attr-defined]
+        )
+
+    def _add_special_plot_actions(self) -> None:
         """
-        Clear the plot and remove all items.
+        Add the action to change the type of the plot.
 
-        Parameters
-        ----------
-        clear_data : bool, optional
-            Flag to remove all items from the stored data dictionary as well.
+        This action allows to display image coordinates in polar coordinates
+        (with r / mm, 2theta / deg or q / nm^-1) scaling.
         """
-        backend = self.getBackend()
-        ax = backend.ax
-        ax.xaxis.set_major_locator(AutoLocator())
-        ax.xaxis.set_major_formatter(ScalarFormatter())
-        ax.yaxis.set_major_locator(AutoLocator())
-        ax.yaxis.set_major_formatter(ScalarFormatter())
-        self.setGraphTitle("")
-        self.setGraphYLabel("Y")
-        self.setGraphXLabel("X")
-        self.remove()
-        if clear_data:
-            self._current_raw_data = {}
+        self._plot_type = SpecialPlotTypesButton(parent=self, plot=self)  # type: ignore[arg-type]
+        self._toolbar.addWidget(self._plot_type)  # type: ignore[attr-defined]
+        self._plot_type.sig_new_plot_type.connect(self._process_plot_type)
 
-    def clear(self) -> None:
-        """Override clear to also clear the stored data."""
-        super().clear()
-        self.clear_plot()
+    # -----------------------------------------#
+    # private update methods                   #
+    # -----------------------------------------#
 
     @QtCore.Slot()
-    def update_mpl_fonts(self) -> None:
+    def _process_plot_type(self) -> None:
+        """
+        Process the changed plot type and set the function to update the plotted value.
+        """
+        self.clear_plot(clear_data=False)
+        self._y_function = self._plot_type.plot_yfunc
+        self._y_label = self._plot_type.plot_ylabel
+        for _legend, (_data, _kwargs) in self._current_raw_data.items():
+            _kwargs["legend"] = _legend
+            _kwargs["resetzoom"] = True
+            self.plot_pydidas_dataset(_data, **_kwargs)
+
+    @QtCore.Slot()
+    def _update_mpl_fonts(self) -> None:
         """Update the plot's fonts."""
         _curve = self.getCurve()
         if _curve is None:
             return
         self.setBackend("matplotlib")  # type: ignore[arg-type]
-
-    # TODO: check if still needed with silx 2.2.2
-    def _activeItemChanged(self, type_: str) -> None:
-        """Override generic Plot1D._activeItemChanged to catch QApplication signals."""
-        if self.sender() == self._qtapp:
-            warnings.warn("Skipping _activeItemChanged call from QApplication signal")
-            return
-        Plot1D._activeItemChanged(self, type_)

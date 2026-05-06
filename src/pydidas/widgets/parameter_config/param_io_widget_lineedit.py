@@ -166,6 +166,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         simply skip this step and emit the signal directly.
         """
         if not self._user_edited or self._precision is None:
+            self._current_text_value = self.text()
             self.emit_signal()
             return
         self._user_edited = False

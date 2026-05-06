@@ -26,19 +26,20 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "AutoscaleToMeanAndThreeSigma",
-    "CropHistogramOutliers",
-    "ChangeCanvasToData",
-    "ExpandCanvas",
+    "CropHistogramOutliersAction",
+    "LockZoomAction",
+    "AutoscaleToMeanAndThreeSigmaAction",
+    "AutoscaleToMinMaxAction",
+    "ChangeCanvasAction",
     "PydidasLoadImageAction",
     "PydidasGetDataInfoAction",
 ]
 
 
-from typing import Any, NewType
+from typing import Any, Literal, NewType
 
 import silx.gui.plot
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot.actions import PlotAction
 
@@ -52,85 +53,9 @@ from pydidas.widgets.file_dialog import PydidasFileDialog
 PydidasPlot2d = NewType("PydidasPlot2d", QtWidgets.QWidget)
 
 
-class ChangeCanvasToData(PlotAction):
+class _AutoscaleAction(PlotAction, PydidasQsettingsMixin):
     """
-    A customized silx Action to change the size of the figure canvas to the data
-    dimensions.
-    """
-
-    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
-        PlotAction.__init__(
-            self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.create_pydidas_icon("silx_limit_plot_canvas.png"),
-            text="Change Canvas to data shape",
-            tooltip="Change the canvas shape to match the data aspect ratio.",
-            triggered=self._actionTriggered,
-            checkable=False,
-            parent=kwargs.get("parent", None),
-        )
-
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
-        """
-        Trigger the "change canvas to data" action.
-
-        Parameters
-        ----------
-        checked : bool, optional
-            Silx flag for a checked action. The default is False.
-        """
-        self.plot.setKeepDataAspectRatio(True)
-        _range = self.plot.getDataRange()
-        if _range.x is None or _range.y is None:
-            return
-        _plot_data_aspect = (
-            1
-            if self.plot._backend.ax.get_aspect() == "auto"  # noqa W0212
-            else self.plot._backend.ax.get_aspect()  # noqa W0212
-        )
-        _data_aspect = (_range.x[1] - _range.x[0]) / (_range.y[1] - _range.y[0])
-        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)  # noqa W0212
-        self.plot._backend.ax.set_anchor("C")  # noqa W0212
-        self.plot.resetZoom()
-        # for some reason, need to call resetZoom twice to match data to the new canvas
-        self.plot.resetZoom()
-
-
-class ExpandCanvas(PlotAction):
-    """
-    A modified silx ResetZoomAction, which also resets the figure canvas to the maximum
-    size allowed by the widget.
-    """
-
-    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
-        PlotAction.__init__(
-            self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icon=icons.create_pydidas_icon("silx_expand_plot_canvas.png"),
-            text="Maximize canvas size",
-            tooltip="Maximize the canvas size.",
-            triggered=self._actionTriggered,
-            checkable=False,
-            parent=kwargs.get("parent", None),
-        )
-
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
-        """
-        Trigger the "expand canvas" action.
-
-        Parameters
-        ----------
-        checked : bool, optional
-            Silx flag for a checked action. The default is False.
-        """
-        self.plot.setKeepDataAspectRatio(False)
-        self.plot._backend.ax.set_box_aspect(None)  # noqa W0212
-        self.plot.resetZoom()
-
-
-class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
-    """
-    A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
+    A new custom PlotAction to set the colormap to autoscale the colormap.
 
     Parameters
     ----------
@@ -147,13 +72,16 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
             The default is None.
     """
 
+    icon: QtGui.QIcon = None
+    action_text: str = None
+    scale_mode: str = None
+
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
             plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
-            icons.create_pydidas_icon("silx_cmap_autoscale.png"),
-            "Autoscale colormap to mean +/- 3 std",
-            tooltip="Autoscale colormap to mean +/- 3 std",
+            self.icon,
+            self.action_text,
             triggered=self._actionTriggered,
             checkable=False,
             parent=kwargs.get("parent", None),
@@ -168,7 +96,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
         Parameters
         ----------
         checked : bool, optional
-            Silx flag for a checked action. The default is False.
+            silx flag for a checked action. The default is False.
         """
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()
@@ -178,12 +106,195 @@ class AutoscaleToMeanAndThreeSigma(PlotAction, PydidasQsettingsMixin):
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
         colormap = image.getColormap()
-        colormap.setAutoscaleMode(Colormap.STDDEV3)
+        colormap.setAutoscaleMode(self.scale_mode)
         colormap.setVMin(None)
         colormap.setVMax(None)
 
 
-class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
+class ChangeCanvasAction(PlotAction):
+    """
+    A customized silx Action to change the size of the figure canvas.
+
+    This action can be used to toggle the canvas size from the maximum
+    available size to a tight fit for the data dimensions.
+    """
+
+    toolTip = {
+        "set_to_expand": "Maximize the canvas size to use the available screen space.",
+        "set_to_tight": "Change the canvas shape to match the data aspect ratio.",
+    }
+    icon = {
+        "set_to_expand": icons.create_pydidas_icon("silx_plot_canvas_full.png"),
+        "set_to_tight": icons.create_pydidas_icon("silx_plot_canvas_tight.png"),
+    }
+    text = {
+        "set_to_expand": "Maximize canvas size",
+        "set_to_tight": "Change Canvas to data shape",
+    }
+
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
+        PlotAction.__init__(
+            self,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            icon=self.icon["set_to_tight"],
+            text=self.text["set_to_tight"],
+            triggered=self._actionTriggered,
+            checkable=False,
+            parent=kwargs.get("parent", None),
+        )
+        self._full_canvas = True
+        self._update_description_from_canvas()
+        if kwargs.get("visible") in [True, False]:
+            self.setVisible(kwargs.get("visible"))
+
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+        """
+        Trigger the "change canvas to data" action.
+
+        Parameters
+        ----------
+        checked : bool, optional
+            silx flag for a checked action. The default is False.
+        """
+        self.set_canvas_mode(not self._full_canvas)
+
+    def set_canvas_mode(self, mode: Literal["set_to_tight", "full"] | bool) -> None:
+        """
+        Set the canvas mode to tight or full.
+
+        Parameters
+        ----------
+        mode : Literal["set_to_tight", "full"] or bool
+            The canvas mode to set. "set_to_tight" will restrict the canvas to the data
+            aspect ratio, while "full" will expand the canvas to the maximum
+            available size. If bool, the mode will be interpreted as the
+            flag for the full canvas mode.
+        """
+        self._full_canvas = mode in ["full", True]
+        if self._full_canvas:
+            self._expand_canvas()
+        else:
+            self._restrict_canvas_to_data()
+        self._update_description_from_canvas()
+        self.plot.resetZoom()
+
+    def _restrict_canvas_to_data(self) -> None:
+        """Restrict the canvas size to match the data aspect ratio."""
+        self.plot.setKeepDataAspectRatio(True)
+        _range = self.plot.getDataRange()
+        if _range.x is None or _range.y is None:
+            return
+        _plot_data_aspect = (
+            1
+            if self.plot._backend.ax.get_aspect() == "auto"  # noqa W0212
+            else self.plot._backend.ax.get_aspect()  # noqa W0212
+        )
+        _data_aspect = (_range.x[1] - _range.x[0]) / (_range.y[1] - _range.y[0])
+        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)  # noqa W0212
+        self.plot._backend.ax.set_anchor("C")  # noqa W0212
+        self.plot.resetZoom()
+
+    def _expand_canvas(self) -> None:
+        """Expand the canvas to the maximum available size."""
+        self.plot.setKeepDataAspectRatio(False)
+        self.plot._backend.ax.set_box_aspect(None)  # noqa W0212
+
+    def _update_description_from_canvas(self) -> None:
+        """Expand the action's description from the canvas mode."""
+        _key = "set_to_tight" if self._full_canvas else "set_to_expand"
+        self.setToolTip(self.toolTip[_key])
+        self.setIcon(self.icon[_key])
+        self.setText(self.text[_key])
+
+
+class LockZoomAction(PlotAction):
+    """
+    A customized silx Action to lock the current zoom level
+
+    This action can be used to lock the zoom settings in its current mode.
+    """
+
+    icon = {
+        "lock": icons.create_pydidas_icon("silx_zoom_lock.png"),
+        "unlock": icons.create_pydidas_icon("silx_zoom_unlock.png"),
+    }
+    text = {
+        "lock": "Lock the current zoom settings and disable automatic zoom resets",
+        "unlock": "Unlock the current zoom settings for automatic resets",
+    }
+
+    def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
+        PlotAction.__init__(
+            self,
+            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            icon=self.icon["lock"],
+            text=self.text["lock"],
+            triggered=self._actionTriggered,
+            checkable=True,
+            parent=kwargs.get("parent", None),
+        )
+        self._zoom_locked = False
+        self._update_action_description_from_lock()
+        if kwargs.get("visible") in [True, False]:
+            self.setVisible(kwargs.get("visible"))
+
+    @property
+    def locked(self) -> bool:
+        """Get the zoom lock state."""
+        return self._zoom_locked
+
+    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+        """
+        Trigger the "zoom lock" action.
+
+        Parameters
+        ----------
+        checked : bool, optional
+            silx flag for a checked action. The default is False.
+        """
+        self.set_zoom_lock(not self._zoom_locked)
+
+    def set_zoom_lock(self, mode: bool) -> None:
+        """
+        Set the canvas mode to tight or full.
+
+        Parameters
+        ----------
+        mode : bool
+            The lock mode. If True, the zoom is locked and will not reset
+            automatically on changed data.
+        """
+        self._zoom_locked = bool(mode)
+        self._update_action_description_from_lock()
+
+    def _update_action_description_from_lock(self) -> None:
+        """Expand the action's description from the canvas mode."""
+        _key = "unlock" if self._zoom_locked else "lock"
+        self.setIcon(self.icon[_key])
+        self.setText(self.text[_key])
+
+
+class AutoscaleToMeanAndThreeSigmaAction(_AutoscaleAction):
+    """
+    A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
+    """
+
+    icon = icons.create_pydidas_icon("silx_cmap_mean_w_sigma.png")
+    action_text = "Autoscale colormap to mean +/- 3 std"
+    scale_mode = Colormap.STDDEV3
+
+
+class AutoscaleToMinMaxAction(_AutoscaleAction):
+    """
+    A new custom PlotAction to set the colormap to min/max autoscale.
+    """
+
+    icon = icons.create_pydidas_icon("silx_cmap_min_max.png")
+    action_text = "Autoscale colormap to min / max"
+    scale_mode = Colormap.MINMAX
+
+
+class CropHistogramOutliersAction(PlotAction, PydidasQsettingsMixin):
     """
     A new custom PlotAction to crop outliers from the histogram.
 
@@ -233,7 +344,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         Parameters
         ----------
         checked : bool, optional
-            Silx flag for a checked action. The default is False.
+            silx flag for a checked action. The default is False.
         """
         if self.__forced_image_legend is None:
             image = self.plot.getActiveImage()

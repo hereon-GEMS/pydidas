@@ -32,13 +32,12 @@ __all__ = [
     "update_qwidget_font",
     "check_pydidas_qapp_instance",
     "IS_QT6",
-    "qstate_is_checked",
 ]
 
 
 from typing import Any, NoReturn
 
-from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
+from qtpy import QT_VERSION, QtGui, QtWidgets
 from qtpy.QtCore import QObject
 from qtpy.QtWidgets import QWidget
 
@@ -228,23 +227,3 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
             "PydidasQApplication instance to work properly and are not "
             "compatible with the generic QApplication."
         )
-
-
-def qstate_is_checked(state: QtCore.Qt.CheckState) -> bool:
-    """
-    Check if the given state is checked.
-
-    Parameters
-    ----------
-    state : QtCore.Qt.CheckState
-        The state to check.
-
-    Returns
-    -------
-    bool
-        True if the state is checked, False otherwise.
-    """
-    # In Qt6, Qt.CheckState is an enum.Enum, and `.value` is used to get
-    # the integer value. In Qt5, no `.value` is available and the
-    # Qt.CheckState holds the integer value directly.
-    return state == getattr(QtCore.Qt.Checked, "value", QtCore.Qt.Checked)

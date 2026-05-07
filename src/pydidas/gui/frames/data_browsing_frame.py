@@ -37,7 +37,7 @@ from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
+from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
 )
@@ -46,7 +46,6 @@ from pydidas.core.utils import (
     CatchFileErrors,
     formatted_str_repr_of_dict,
     get_extension,
-    timed_print,
 )
 from pydidas.core.utils.associated_file_mixin import AssociatedFileMixin
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
@@ -73,7 +72,6 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
     menu_title = "Data browsing"
     menu_entry = "Data browsing"
     default_params = ParameterCollection(
-        get_generic_parameter("data_browsing_root"),
         Parameter(
             "xcol",
             int,
@@ -97,12 +95,16 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
 
     def connect_signals(self) -> None:
         """Connect all required signals and slots between widgets and class methods."""
+        # Signals to handle new file selections:
         self._widgets["explorer"].sig_new_file_selected.connect(self.__file_selected)
         _file_io = self._widgets["filename"]._io_lineedit
         _file_io.returnPressed.connect(self.__filename_input)
         _file_io.editingFinished.connect(self.__restore_filename_display_text)
         self._widgets["filename"].sig_drop_accepted.connect(self.__filename_input)
+
+        # Signals for special file-type handling (e.g. ASCII, HDF5)
         self.param_widgets["xcol"].sig_new_value.connect(self.__display_ascii_data)
+        self._widgets["button_ascii_metadata"].clicked.connect(self.__display_metadata)
         self._widgets["hdf5_dataset_selector"].sig_new_dataset_selected.connect(
             self.__display_hdf5_dataset
         )
@@ -112,7 +114,6 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self._widgets["hdf5_dataset_selector"].sig_request_hdf5_browser.connect(
             self.__inspect_hdf5_tree
         )
-        self._widgets["button_ascii_metadata"].clicked.connect(self.__display_metadata)
 
     def build_frame(self) -> None:
         """
@@ -124,7 +125,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.add_any_widget(
             "splitter",
             create_splitter(
-                self._widgets["browser"],
+                self._widgets["browser_canvas"],
                 self._widgets["viewer_and_filename"],
                 self.width(),
             ),
@@ -159,17 +160,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
                 if _window is not None and _window.isVisible():
                     _window.hide()
         if index == self.frame_index:
-            _roots = self.q_settings_get("user/data_browsing_root", dtype=str)
-            if _roots != self.get_param_value("data_browsing_root"):
-                self.set_param_and_widget_value("data_browsing_root", _roots)
-                self._update_roots()
-
-    def _update_roots(self) -> None:
-        """Update the roots of the DataBrowsingFrame"""
-        timed_print(
-            "Updating data browsing roots...",
-            self.get_param_value("data_browsing_root"),
-        )
+            self._widgets["explorer"].check_root_up_to_date()
 
     @QtCore.Slot(str)
     def __file_selected(self, filename: str) -> None:

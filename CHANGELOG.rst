@@ -46,6 +46,8 @@ Programmatic changes
 - Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
 - Added an option in the UI creation to specify the gridPos row position
   with "::current::" to append a widget in the current row.
+- Changed the signal of QCheckBox tick state to be consistent with 
+  Qt.QCheckState definitions (checked == 2)
 
 Bugfixes
 --------

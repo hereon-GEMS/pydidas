@@ -104,7 +104,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
         state : int
             The new checked state.
         """
-        self._fit_output[name] = bool(state)
+        self._fit_output[name] = bool(state == 2)
         self._update_fit_output()
 
     def _update_fit_output(self) -> None:

@@ -36,15 +36,22 @@ from typing import Any
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import (
+    Parameter,
+    ParameterCollection,
     get_generic_parameter,
 )
-from pydidas.core.utils import qstate_is_checked
+from pydidas.core.constants import (
+    FONT_METRIC_CONSOLE_WIDTH,
+    FONT_METRIC_HALF_CONSOLE_WIDTH,
+    FONT_METRIC_WIDE_BUTTON_WIDTH,
+)
 from pydidas.widgets.selection.directory_explorer_filter_model import (
     DirectoryExplorerFilterModel,
 )
 from pydidas.widgets.selection.directory_explorer_tree_view import (
     DirectoryExplorerTreeView,
 )
+from pydidas.widgets.selection.toggle_options_button import ToggleOptionsButton
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
@@ -68,10 +75,27 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     """
 
     sig_new_file_selected = QtCore.Signal(str)
+    default_params = ParameterCollection(
+        get_generic_parameter("current_directory"),
+        get_generic_parameter("data_browsing_root"),
+        Parameter(
+            "map_network_drives", bool, 1, name="Show network drives", choices=[0, 1]
+        ),
+        Parameter(
+            "case_sensitive", bool, 1, name="Sorting is case sensitive", choices=[0, 1]
+        ),
+        Parameter(
+            "use_custom_roots",
+            bool,
+            0,
+            name="Use custom broowsing roots",
+            choices=[0, 1],
+        ),
+    )
 
     def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
-        self.add_param(get_generic_parameter("current_directory"))
+        self.set_default_params()
         self.__pending_filter_text = ""
         self.__filter_timer = QtCore.QTimer(self)
         self.__filter_timer.setSingleShot(True)
@@ -83,52 +107,114 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     def _create_widgets(self) -> None:
         """Create the widgets required for the Directory explorer."""
-        self.create_check_box(
-            "map_network_drives",
-            "Show network drives",
-            checked=self.q_settings_get(
-                "directory_explorer/show_network_drives", dtype=bool, default=True
-            ),
+        self.create_empty_widget(
+            "header_container",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
         )
-        self.create_check_box(
-            "case_sensitive",
-            "Sorting is case sensitive",
-            checked=self.q_settings_get(
-                "directory_explorer/is_case_sensitive", dtype=bool, default=True
-            ),
+        self.create_empty_widget(
+            "option_container",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+        )
+        self.create_label(
+            "label_option_header",
+            "Data browsing options",
+            bold=True,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            fontsize_offset=1,
+            parent_widget="header_container",
+        )
+        self.create_any_widget(
+            "button_toggle_options",
+            ToggleOptionsButton,
+            gridPos=(0, 2, 1, 1),
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            linked_widget="option_container",
+            linked_widget_visible=True,
+            parent_widget="header_container",
+            toggle_text_shown="Hide browsing options",
+            toggle_text_hidden="Show browsing options",
         )
         self.create_param_widget(
-            self.params["current_directory"], linebreak=True, hide_button=True
+            "map_network_drives",
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(0, 0, 1, 1),
+            parent_widget="option_container",
         )
-        self.param_composite_widgets["current_directory"]._widgets[
-            "io"
-        ]._button.setVisible(False)  # type: ignore[attr-defined]
-        self.create_empty_widget("option_container")
+        self.create_param_widget(
+            "case_sensitive",
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(0, 1, 1, 1),
+            parent_widget="option_container",
+        )
+        self.create_param_widget(
+            "use_custom_roots",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            gridPos=(-1, 0, 1, 2),
+            parent_widget="option_container",
+        )
+        self.create_param_widget(
+            "data_browsing_root",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            gridPos=(-1, 0, 1, 2),
+            linebreak=True,
+            parent_widget="option_container",
+        )
+        self.create_button(
+            "button_apply_roots",
+            "Apply new roots",
+            icon="qt-std::SP_DialogApplyButton",
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            parent_widget="option_container",
+        )
+        self.create_button(
+            "button_reset_roots",
+            "Clear root selection",
+            icon="qt-std::SP_BrowserReload",
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            parent_widget="option_container",
+            gridPos=("::current::", 1, 1, 1),
+        )
+        self.create_param_widget(
+            "current_directory",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            linebreak=True,
+            parent_widget="option_container",
+            gridPos=(-1, 0, 1, 2),
+        )
+        self.create_empty_widget(
+            "filter_container",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+        )
         self.create_lineedit(
             "filter_edit",
-            font_metric_width_factor=24,
-            parent_widget="option_container",
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
+            parent_widget="filter_container",
             placeholderText="Filename filter...",
         )
         self.create_button(
             "button_reset_filter",
             "Reset filter",
-            font_metric_width_factor=16,
+            font_metric_width_factor=20,
             gridPos=(0, -1, 1, 1),
-            parent_widget="option_container",
+            parent_widget="filter_container",
         )
         self.create_spacer(
-            None, parent_widget="option_container", gridPos=(0, -1, 1, 1)
+            None, parent_widget="filter_container", gridPos=(0, -1, 1, 1)
         )
         self.create_button(
             "button_collapse",
             "Collapse all",
-            font_metric_width_factor=16,
+            font_metric_width_factor=20,
             gridPos=(0, -1, 1, 1),
-            parent_widget="option_container",
+            parent_widget="filter_container",
         )
-        self._widgets["option_container"].layout().setColumnStretch(2, 1)
-        self.create_any_widget("explorer", DirectoryExplorerTreeView)
+        self.param_composite_widgets["current_directory"]._widgets[
+            "io"
+        ]._button.setVisible(False)  # type: ignore[attr-defined]
+        self.create_any_widget(
+            "explorer", DirectoryExplorerTreeView, gridPos=(-1, 0, 1, 2)
+        )
+        self._widgets["filter_container"].layout().setColumnStretch(2, 1)
 
     def _set_up_file_model(self, **kwargs: Any) -> None:
         """
@@ -160,10 +246,10 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """Connect the signals of the widgets to the slots."""
         self._widgets["explorer"].clicked.connect(self.__file_highlighted)
         self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
-        self._widgets["map_network_drives"].sig_new_check_state.connect(
+        self.param_composite_widgets["map_network_drives"].sig_new_value.connect(
             self.__update_filesystem_network_drive_usage
         )
-        self._widgets["case_sensitive"].sig_new_check_state.connect(
+        self.param_composite_widgets["case_sensitive"].sig_new_value.connect(
             self.__update_filter_case_sensitivity
         )
         self.param_widgets["current_directory"].sig_new_value.connect(
@@ -172,6 +258,25 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
         self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
         self._widgets["filter_edit"].textChanged.connect(self.__queue_filter_update)
+        # Signals for file browser root handling
+        self._widgets["button_apply_roots"].clicked.connect(self._update_roots)
+
+    def check_root_update(self) -> None:
+        """Check if the root of the directory is up to date."""
+        _roots = self.q_settings_get("user/data_browsing_root", dtype=str)
+        if _roots != self.get_param_value("data_browsing_root"):
+            self.set_param_and_widget_value("data_browsing_root", _roots)
+            self._update_roots()
+
+    def _update_roots(self) -> None:
+        """Update the roots of the DataBrowsingFrame"""
+        self.q_settings_set(
+            "user/data_browsing_root", self.get_param_value("data_browsing_root")
+        )
+        print(
+            "Updating data browsing roots...",
+            self.get_param_value("data_browsing_root"),
+        )
 
     @QtCore.Slot(str)
     def __queue_filter_update(self, filter_text: str) -> None:
@@ -195,34 +300,34 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """
         return QtCore.QSize(400, 4000)
 
-    @QtCore.Slot(int)
-    def __update_filesystem_network_drive_usage(
-        self, state: QtCore.Qt.CheckState
-    ) -> None:
+    @QtCore.Slot(str)
+    def __update_filesystem_network_drive_usage(self, value_repr: str) -> None:
         """
         Update the filesystem model network drive usage.
 
         Parameters
         ----------
-        state : QtCore.Qt.CheckState
-            The checkbox's state.
+        value_repr : str
+            The string representation of the checkbox's state
+            (as defined in QtCore.Qt.CheckState).
         """
-        _usage = qstate_is_checked(state)
+        _usage = value_repr == "True"
         self.q_settings_set("directory_explorer/show_network_drives", _usage)
         self._filter_model.toggle_network_location_acceptance(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
-    @QtCore.Slot(int)
-    def __update_filter_case_sensitivity(self, state: QtCore.Qt.CheckState) -> None:
+    @QtCore.Slot(str)
+    def __update_filter_case_sensitivity(self, value_repr: str) -> None:
         """
         Update the filter's case sensitivity.
 
         Parameters
         ----------
-        state : QtCore.Qt.CheckState
-            The checkbox's state.
+        value_repr : str
+            The string representation of the checkbox's state
+            (as defined in QtCore.Qt.CheckState).
         """
-        _usage = qstate_is_checked(state)
+        _usage = value_repr == "True"
         self.q_settings_set("directory_explorer/is_case_sensitive", _usage)
         self._filter_model.setSortCaseSensitivity(
             QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive  # type: ignore[arg-type]

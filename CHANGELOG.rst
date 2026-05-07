@@ -44,6 +44,8 @@ Programmatic changes
 - Added an option to specify the display precision for floating point
   Parameters.
 - Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
+- Added an option in the UI creation to specify the gridPos row position
+  with "::current::" to append a widget in the current row.
 
 Bugfixes
 --------

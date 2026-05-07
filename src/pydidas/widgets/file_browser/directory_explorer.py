@@ -35,23 +35,13 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import (
-    Parameter,
-    ParameterCollection,
-    get_generic_parameter,
-)
-from pydidas.core.constants import (
-    FONT_METRIC_CONSOLE_WIDTH,
-    FONT_METRIC_HALF_CONSOLE_WIDTH,
-    FONT_METRIC_WIDE_BUTTON_WIDTH,
+from pydidas.widgets.file_browser._directory_explorer_config import (
+    DIRECTORY_EXPLORER_DEFAULT_PARAMS,
+    DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG,
 )
 from pydidas.widgets.selection.directory_explorer_filter_model import (
     DirectoryExplorerFilterModel,
 )
-from pydidas.widgets.selection.directory_explorer_tree_view import (
-    DirectoryExplorerTreeView,
-)
-from pydidas.widgets.selection.toggle_options_button import ToggleOptionsButton
 from pydidas.widgets.widget_with_parameter_collection import (
     WidgetWithParameterCollection,
 )
@@ -75,145 +65,24 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     """
 
     sig_new_file_selected = QtCore.Signal(str)
-    default_params = ParameterCollection(
-        get_generic_parameter("current_directory"),
-        get_generic_parameter("data_browsing_root"),
-        Parameter(
-            "map_network_drives", bool, 1, name="Show network drives", choices=[0, 1]
-        ),
-        Parameter(
-            "case_sensitive", bool, 1, name="Sorting is case sensitive", choices=[0, 1]
-        ),
-        Parameter(
-            "use_custom_roots",
-            bool,
-            0,
-            name="Use custom broowsing roots",
-            choices=[0, 1],
-        ),
-    )
+    default_params = DIRECTORY_EXPLORER_DEFAULT_PARAMS
 
     def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
         self.set_default_params()
-        self.__pending_filter_text = ""
-        self.__filter_timer = QtCore.QTimer(self)
-        self.__filter_timer.setSingleShot(True)
-        self.__filter_timer.setInterval(150)
-        self.__filter_timer.timeout.connect(self.__apply_filter_string)
         self._create_widgets()
         self._set_up_file_model(**kwargs)
         self._connect_signals()
+        self._finalize_ui()
 
     def _create_widgets(self) -> None:
         """Create the widgets required for the Directory explorer."""
-        self.create_empty_widget(
-            "header_container",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-        )
-        self.create_empty_widget(
-            "option_container",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-        )
-        self.create_label(
-            "label_option_header",
-            "Data browsing options",
-            bold=True,
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            fontsize_offset=1,
-            parent_widget="header_container",
-        )
-        self.create_any_widget(
-            "button_toggle_options",
-            ToggleOptionsButton,
-            gridPos=(0, 2, 1, 1),
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            linked_widget="option_container",
-            linked_widget_visible=True,
-            parent_widget="header_container",
-            toggle_text_shown="Hide browsing options",
-            toggle_text_hidden="Show browsing options",
-        )
-        self.create_param_widget(
-            "map_network_drives",
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            gridPos=(0, 0, 1, 1),
-            parent_widget="option_container",
-        )
-        self.create_param_widget(
-            "case_sensitive",
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            gridPos=(0, 1, 1, 1),
-            parent_widget="option_container",
-        )
-        self.create_param_widget(
-            "use_custom_roots",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-            gridPos=(-1, 0, 1, 2),
-            parent_widget="option_container",
-        )
-        self.create_param_widget(
-            "data_browsing_root",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-            gridPos=(-1, 0, 1, 2),
-            linebreak=True,
-            parent_widget="option_container",
-        )
-        self.create_button(
-            "button_apply_roots",
-            "Apply new roots",
-            icon="qt-std::SP_DialogApplyButton",
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            parent_widget="option_container",
-        )
-        self.create_button(
-            "button_reset_roots",
-            "Clear root selection",
-            icon="qt-std::SP_BrowserReload",
-            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
-            parent_widget="option_container",
-            gridPos=("::current::", 1, 1, 1),
-        )
-        self.create_param_widget(
-            "current_directory",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-            linebreak=True,
-            parent_widget="option_container",
-            gridPos=(-1, 0, 1, 2),
-        )
-        self.create_empty_widget(
-            "filter_container",
-            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
-        )
-        self.create_lineedit(
-            "filter_edit",
-            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
-            parent_widget="filter_container",
-            placeholderText="Filename filter...",
-        )
-        self.create_button(
-            "button_reset_filter",
-            "Reset filter",
-            font_metric_width_factor=20,
-            gridPos=(0, -1, 1, 1),
-            parent_widget="filter_container",
-        )
-        self.create_spacer(
-            None, parent_widget="filter_container", gridPos=(0, -1, 1, 1)
-        )
-        self.create_button(
-            "button_collapse",
-            "Collapse all",
-            font_metric_width_factor=20,
-            gridPos=(0, -1, 1, 1),
-            parent_widget="filter_container",
-        )
+        for _method, _args, _kwargs in DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG:
+            getattr(self, _method)(*_args, **_kwargs)
+
         self.param_composite_widgets["current_directory"]._widgets[
             "io"
         ]._button.setVisible(False)  # type: ignore[attr-defined]
-        self.create_any_widget(
-            "explorer", DirectoryExplorerTreeView, gridPos=(-1, 0, 1, 2)
-        )
         self._widgets["filter_container"].layout().setColumnStretch(2, 1)
 
     def _set_up_file_model(self, **kwargs: Any) -> None:
@@ -257,18 +126,36 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         )
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
         self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
-        self._widgets["filter_edit"].textChanged.connect(self.__queue_filter_update)
         # Signals for file browser root handling
-        self._widgets["button_apply_roots"].clicked.connect(self._update_roots)
+        self._widgets["button_apply_roots"].clicked.connect(self._apply_new_roots)
+        self.param_composite_widgets["use_custom_roots"].sig_new_value.connect(
+            self.__toggle_root_widget_visibility
+        )
 
-    def check_root_update(self) -> None:
+    def _finalize_ui(self) -> None:
+        """Finalize the widget initalization."""
+        self.check_root_up_to_date()
+
+        # Set up the filter to only accept the final entry after the used
+        # did not change the edit for 500 ms to prevent multiple calls during
+        # editing
+        self.__pending_filter_text = ""
+        self.__filter_timer = QtCore.QTimer(self)
+        self.__filter_timer.setSingleShot(True)
+        self.__filter_timer.setInterval(500)
+        self.__filter_timer.timeout.connect(self.__apply_filter_string)
+        self._widgets["filter_edit"].textChanged.connect(self.__queue_filter_update)
+
+    def check_root_up_to_date(self) -> None:
         """Check if the root of the directory is up to date."""
         _roots = self.q_settings_get("user/data_browsing_root", dtype=str)
         if _roots != self.get_param_value("data_browsing_root"):
             self.set_param_and_widget_value("data_browsing_root", _roots)
-            self._update_roots()
+            self._apply_new_roots()
+        self.set_param_and_widget_value("use_custom_roots", _roots != "")
 
-    def _update_roots(self) -> None:
+    @QtCore.Slot()
+    def _apply_new_roots(self) -> None:
         """Update the roots of the DataBrowsingFrame"""
         self.q_settings_set(
             "user/data_browsing_root", self.get_param_value("data_browsing_root")
@@ -286,7 +173,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     @QtCore.Slot()
     def __apply_filter_string(self) -> None:
-        """Apply the pending filename filter after debounce timeout."""
+        """Apply the filename filter to the filter model."""
         self._filter_model.toggle_filter_string(self.__pending_filter_text)
 
     def sizeHint(self) -> QtCore.QSize:
@@ -354,14 +241,18 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             self.sig_new_file_selected.emit(_name)  # type: ignore[attr-defined]
         elif Path(_name).is_dir():
             self.set_param_and_widget_value("current_directory", _name)
-        print(
-            "row cache: ",
-            len(self._filter_model._DirectoryExplorerFilterModel__file_info_cache),
+        _row_cache = getattr(
+            self._filter_model,
+            "_DirectoryExplorerFilterModel__file_info_cache",
+            {},
         )
-        print(
-            "root cache",
-            len(self._filter_model._DirectoryExplorerFilterModel__top_root_cache),
+        _root_cache = getattr(
+            self._filter_model,
+            "_DirectoryExplorerFilterModel__top_root_cache",
+            {},
         )
+        print("row cache: ", len(_row_cache))
+        print("root cache", len(_root_cache))
 
     @QtCore.Slot(str)
     def __user_dir_input(self, path: str) -> None:
@@ -449,3 +340,18 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     def __reset_filter(self) -> None:
         """Reset the filter to show all files."""
         self._widgets["filter_edit"].setText("")
+
+    @QtCore.Slot(str)
+    def __toggle_root_widget_visibility(self, vis_repr: str) -> None:
+        """
+        Toggle the visibility of the data browsing root widgets.
+
+        Parameters
+        ----------
+        vis_repr : str
+            The string representation of the bool visibility.
+        """
+        _vis = vis_repr == "True"
+        self.toggle_param_widget_visibility("data_browsing_root", _vis)
+        for _name in ["button_apply_roots", "button_reset_roots"]:
+            self._widgets[_name].setVisible(_vis)

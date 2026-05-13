@@ -105,6 +105,8 @@ Bugfixes
   edits
 - Fixed an issue in PydidasPlotStack which accepted ndarray without checks
   and crashed
+- Fixed an issue which occured if column labels in Datasets had the wrong number
+  of entries with respect to the data.
 
 
 v26.01.27

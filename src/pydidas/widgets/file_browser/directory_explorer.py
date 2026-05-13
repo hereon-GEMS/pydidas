@@ -29,17 +29,18 @@ __status__ = "Production"
 __all__ = ["DirectoryExplorer"]
 
 
-import os
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from qtpy import QtCore, QtWidgets
 
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_directory, get_single_shot_timer
 from pydidas.widgets.file_browser._directory_explorer_config import (
     DIRECTORY_EXPLORER_DEFAULT_PARAMS,
     DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG,
 )
-from pydidas.widgets.selection.directory_explorer_filter_model import (
+from pydidas.widgets.file_browser.directory_explorer_filter_model import (
     DirectoryExplorerFilterModel,
 )
 from pydidas.widgets.widget_with_parameter_collection import (
@@ -61,7 +62,8 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         parent : QtWidgets.QWidget or None, optional
             The parent widget, if applicable. The default is None.
         current_path : str, optional
-            The default path in the file system. The default is ''.
+            Initial file system path. If omitted, the value is read from
+            settings and falls back to ''.
     """
 
     sig_new_file_selected = QtCore.Signal(str)
@@ -92,13 +94,13 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         Parameters
         ----------
         **kwargs : Any
-            The calling kwargs.
+            Optional setup kwargs. Supported key: ``current_path``.
         """
         _path = kwargs.get("current_path", None)
         if _path is None:
             _path = self.q_settings_get("directory_explorer/path", default="")
-        _path = str(_path)
         self.set_param_and_widget_value("current_directory", _path)
+        _path = str(_path)
         self._file_model = QtWidgets.QFileSystemModel()
         if hasattr(self._file_model, "DontUseCustomDirectoryIcons"):
             self._file_model.setOption(
@@ -108,32 +110,43 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._file_model.setRootPath(_path)
         self._filter_model = DirectoryExplorerFilterModel()
         self._filter_model.setSourceModel(self._file_model)  # type: ignore[arg-type]
-        self._widgets["explorer"].setModel(self._filter_model)
-        self._widgets["explorer"].expand_to_path(_path)
+        self._widgets["tree_view"].setModel(self._filter_model)
+        self._widgets["tree_view"].expand_to_path(_path)
+
+    def _suspend_filtering(self) -> None:
+        """Suspend proxy filtering when the model supports this optimization."""
+        if hasattr(self._filter_model, "suspend_filtering"):
+            cast(Any, self._filter_model).suspend_filtering()
+
+    def _resume_filtering(self) -> None:
+        """Resume proxy filtering when the model supports this optimization."""
+        if hasattr(self._filter_model, "resume_filtering"):
+            cast(Any, self._filter_model).resume_filtering()
 
     def _connect_signals(self) -> None:
         """Connect the signals of the widgets to the slots."""
-        self._widgets["explorer"].clicked.connect(self.__file_highlighted)
-        self._widgets["explorer"].doubleClicked.connect(self.__file_selected)
+        self._widgets["tree_view"].clicked.connect(self.__file_highlighted)
+        self._widgets["tree_view"].doubleClicked.connect(self.__item_selected)
         self.param_composite_widgets["map_network_drives"].sig_new_value.connect(
             self.__update_filesystem_network_drive_usage
         )
         self.param_composite_widgets["case_sensitive"].sig_new_value.connect(
             self.__update_filter_case_sensitivity
         )
-        self.param_widgets["current_directory"].sig_new_value.connect(
-            self.__user_dir_input
+        self.param_composite_widgets["current_directory"].sig_new_value.connect(
+            self._user_dir_selection
         )
         self._widgets["button_collapse"].clicked.connect(self.__collapse_all)
         self._widgets["button_reset_filter"].clicked.connect(self.__reset_filter)
         # Signals for file browser root handling
-        self._widgets["button_apply_roots"].clicked.connect(self._apply_new_roots)
-        self.param_composite_widgets["use_custom_roots"].sig_new_value.connect(
-            self.__toggle_root_widget_visibility
+        self._widgets["button_apply_root"].clicked.connect(self._apply_new_root)
+        self._widgets["button_reset_root"].clicked.connect(self._reset_root)
+        self.param_composite_widgets["use_custom_root"].sig_new_value.connect(
+            self._toggle_custom_root_usage
         )
 
     def _finalize_ui(self) -> None:
-        """Finalize the widget initalization."""
+        """Finalize the widget initialization."""
         self.check_root_up_to_date()
 
         # Set up the filter to only accept the final entry after the used
@@ -148,33 +161,69 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     def check_root_up_to_date(self) -> None:
         """Check if the root of the directory is up to date."""
-        _roots = self.q_settings_get("user/data_browsing_root", dtype=str)
-        if _roots != self.get_param_value("data_browsing_root"):
-            self.set_param_and_widget_value("data_browsing_root", _roots)
-            self._apply_new_roots()
-        self.set_param_and_widget_value("use_custom_roots", _roots != "")
+        _root = self.q_settings_get("user/data_browsing_root", dtype=str)
+        _custom_root = self.q_settings_get(
+            "directory_explorer/use_custom_root", dtype=bool, default=False
+        )
+        self.set_param_and_widget_value("use_custom_root", _custom_root)
+        if _custom_root and _root != self.get_param_value("data_browsing_root"):
+            self.set_param_and_widget_value("data_browsing_root", _root)
+            self._apply_new_root()
 
     @QtCore.Slot()
-    def _apply_new_roots(self) -> None:
-        """Update the roots of the DataBrowsingFrame"""
-        self.q_settings_set(
-            "user/data_browsing_root", self.get_param_value("data_browsing_root")
+    def _apply_new_root(self) -> None:
+        """Update the root of the DirectoryExplorer."""
+        if not self.get_param_value("use_custom_root"):
+            _root_dir = Path()
+        else:
+            _root_dir = get_directory(self.get_param_value("data_browsing_root"))
+            if not _root_dir.is_dir():
+                self._widgets["tree_view"].setRootIndex(QtCore.QModelIndex())
+
+                raise UserConfigError(
+                    "Warning: The given directory does not exist and the entry has "
+                    "been ignored and reset to the file system root."
+                )
+        if _root_dir == Path():
+            self.q_settings_set("user/data_browsing_root", "")
+            self._widgets["tree_view"].setRootIndex(QtCore.QModelIndex())
+            return
+        self.q_settings_set("user/data_browsing_root", str(_root_dir))
+        _index = self._filter_model.mapFromSource(
+            self._file_model.index(str(_root_dir))
         )
-        print(
-            "Updating data browsing roots...",
-            self.get_param_value("data_browsing_root"),
-        )
+        if not _index.isValid():
+            _index = QtCore.QModelIndex()
+            _root_dir = Path()
+        self._widgets["tree_view"].setRootIndex(_index)
+        _current_dir = get_directory(self.get_param_value("current_directory"))
+        if _root_dir not in _current_dir.parents:
+            with QtCore.QSignalBlocker(self.param_widgets["current_directory"]):
+                self.set_param_and_widget_value("current_directory", _root_dir)
+
+    @QtCore.Slot()
+    def _reset_root(self) -> None:
+        """Reset the user root to the default (empty) value."""
+        self.set_param_and_widget_value("data_browsing_root", "")
+        self._apply_new_root()
 
     @QtCore.Slot(str)
     def __queue_filter_update(self, filter_text: str) -> None:
-        """Queue a debounced update of the filename filter."""
+        """
+        Queue a debounced update of the filename filter.
+
+        Parameters
+        ----------
+        filter_text : str
+            The new filter text to be applied after the debounce interval.
+        """
         self.__pending_filter_text = filter_text
         self.__filter_timer.start()
 
     @QtCore.Slot()
     def __apply_filter_string(self) -> None:
         """Apply the filename filter to the filter model."""
-        self._filter_model.toggle_filter_string(self.__pending_filter_text)
+        self._filter_model.change_filter_string(self.__pending_filter_text)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -195,12 +244,12 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         Parameters
         ----------
         value_repr : str
-            The string representation of the checkbox's state
-            (as defined in QtCore.Qt.CheckState).
+            The string representation of the checkbox's state.
         """
         _usage = value_repr == "True"
         self.q_settings_set("directory_explorer/show_network_drives", _usage)
-        self._filter_model.toggle_network_location_acceptance(_usage)
+        # self._file_model.set_include_network_locations(_usage)
+        self._filter_model.show_network_drives(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
     @QtCore.Slot(str)
@@ -211,20 +260,20 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         Parameters
         ----------
         value_repr : str
-            The string representation of the checkbox's state
-            (as defined in QtCore.Qt.CheckState).
+            The string representation of the checkbox's state.
         """
         _usage = value_repr == "True"
         self.q_settings_set("directory_explorer/is_case_sensitive", _usage)
+        _sensitivity = QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive
         self._filter_model.setSortCaseSensitivity(
-            QtCore.Qt.CaseSensitive if _usage else QtCore.Qt.CaseInsensitive  # type: ignore[arg-type]
+            _sensitivity  # type: ignore[arg-type]
         )
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
     @QtCore.Slot()
     def __file_highlighted(self) -> None:
         """Store the selected filename after highlighting."""
-        _filter_index = self._widgets["explorer"].selectedIndexes()[0]
+        _filter_index = self._widgets["tree_view"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
         if Path(_name).is_file():
@@ -232,117 +281,110 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self.q_settings_set("directory_explorer/path", str(_name))
 
     @QtCore.Slot()
-    def __file_selected(self) -> None:
-        """Open a file after it has been selected in the DirectoryExplorer."""
-        _filter_index = self._widgets["explorer"].selectedIndexes()[0]
+    def __item_selected(self) -> None:
+        """Open a file/dir after it has been selected in the DirectoryExplorer."""
+        _filter_index = self._widgets["tree_view"].selectedIndexes()[0]
         _index = self._filter_model.mapToSource(_filter_index)
         _name = self._file_model.filePath(_index)
-        if Path(_name).is_file():
+        _path = Path(_name)
+        _dir = get_directory(_path)
+        self.set_param_and_widget_value(
+            "current_directory", _dir, emit_signal=_path == _dir
+        )
+        if _path.is_file():
             self.sig_new_file_selected.emit(_name)  # type: ignore[attr-defined]
-        elif Path(_name).is_dir():
-            self.set_param_and_widget_value("current_directory", _name)
-        _row_cache = getattr(
-            self._filter_model,
-            "_DirectoryExplorerFilterModel__file_info_cache",
-            {},
-        )
-        _root_cache = getattr(
-            self._filter_model,
-            "_DirectoryExplorerFilterModel__top_root_cache",
-            {},
-        )
-        print("row cache: ", len(_row_cache))
-        print("root cache", len(_root_cache))
 
     @QtCore.Slot(str)
-    def __user_dir_input(self, path: str) -> None:
+    def _user_dir_selection(self, name: str) -> None:
         """
-        Process the user file / directory input.
+        Process the user's selection of a file / directory to display.
 
         Parameters
         ----------
-        path : str
-            The file or directory to be set as active.
+        name : str
+            The file or directory name to be set as active.
         """
-        _target_dir = str(Path(path).parent if Path(path).is_file() else Path(path))
-        _norm_target = os.path.normcase(os.path.normpath(_target_dir))
-
+        _target_dir = get_directory(name).resolve()
+        print("User selection of name / dir", name, _target_dir)
         # Only suspend filtering/sorting when the directory is not yet loaded.
         # For already-cached directories, directoryLoaded may not fire again,
         # and with no active filter the suspension is unnecessary anyway.
-        _target_index = self._file_model.index(_target_dir)
+        _target_index = self._file_model.index(str(_target_dir))
         _already_loaded = (
             _target_index.isValid() and self._file_model.rowCount(_target_index) > 0
         )
-
         if not _already_loaded:
-            _explorer = self._widgets["explorer"]
-            _sort_col = _explorer.header().sortIndicatorSection()
-            _sort_order = _explorer.header().sortIndicatorOrder()
+            self.__prepare_directory_loading(_target_dir)
 
-            # Safety timer ensures resume always fires even if directoryLoaded
-            # does not emit (already cached, permission errors, etc.).
-            _safety_timer = QtCore.QTimer(self)
-            _safety_timer.setSingleShot(True)
-            _safety_timer.setInterval(5000)  # 5 s hard cap
-
-            def _resume() -> None:
-                self._filter_model.resume_filtering()
-                _explorer.setSortingEnabled(True)
-                _explorer.sortByColumn(_sort_col, _sort_order)
-
-            def _on_loaded(loaded_path: str) -> None:
-                if os.path.normcase(os.path.normpath(loaded_path)) == _norm_target:
-                    _safety_timer.stop()
-                    _resume()
-                    try:
-                        self._file_model.directoryLoaded.disconnect(_on_loaded)
-                    except RuntimeError:
-                        pass
-
-            def _on_timeout() -> None:
-                try:
-                    self._file_model.directoryLoaded.disconnect(_on_loaded)
-                except RuntimeError:
-                    pass
-                _resume()
-
-            # Suspend both filtering and sorting so new rows arrive without
-            # triggering O(n log n) re-sort over all accumulated rows.
-            self._filter_model.suspend_filtering()
-            _explorer.setSortingEnabled(False)
-            self._file_model.directoryLoaded.connect(_on_loaded)
-            _safety_timer.timeout.connect(_on_timeout)
-            _safety_timer.start()
-
-        self._file_model.setRootPath(path)
-        self._widgets["explorer"].expand_to_path(path)
-        _proxy_index = self._filter_model.mapFromSource(self._file_model.index(path))
-        self._widgets["explorer"].selectionModel().select(
+        self._file_model.setRootPath(name)
+        self._widgets["tree_view"].expand_to_path(name)
+        _proxy_index = self._filter_model.mapFromSource(self._file_model.index(name))
+        self._widgets["tree_view"].selectionModel().select(
             _proxy_index, QtCore.QItemSelectionModel.Select
         )
-        self._widgets["explorer"].scrollTo(_proxy_index)
-        self._widgets["explorer"].setCurrentIndex(_proxy_index)
-        _path = Path(path)
+        self._widgets["tree_view"].scrollTo(_proxy_index)
+        self._widgets["tree_view"].setCurrentIndex(_proxy_index)
+        _path = Path(name)
         if _path.is_file():
             with QtCore.QSignalBlocker(self.param_widgets["current_directory"]):
                 self.set_param_and_widget_value("current_directory", _path.parent)
-            self.sig_new_file_selected.emit(path)  # type: ignore[attr-defined]
+            self.sig_new_file_selected.emit(name)  # type: ignore[attr-defined]
 
     @QtCore.Slot()
     def __collapse_all(self) -> None:
         """Collapse all directories in the explorer."""
-        for row in range(self._filter_model.rowCount()):
-            index = self._filter_model.index(row, 0)
-            self._widgets["explorer"].collapse(index)
+        self._widgets["tree_view"].collapseAll()
 
     @QtCore.Slot()
     def __reset_filter(self) -> None:
         """Reset the filter to show all files."""
         self._widgets["filter_edit"].setText("")
 
+    def __prepare_directory_loading(self, target_dir: Path) -> None:
+        """
+        Prepare the loading of a directory by skipping filtering etc. during loading.
+
+        Parameters
+        ----------
+        target_dir : Path
+            The selected directory.
+        """
+        _explorer = self._widgets["tree_view"]
+        _sort_col = _explorer.header().sortIndicatorSection()
+        _sort_order = _explorer.header().sortIndicatorOrder()
+
+        # Safety timer ensures resume always fires even if directoryLoaded
+        # does not emit (e.g. because it is already cached):
+        _safety_timer = get_single_shot_timer(self)
+
+        def _resume() -> None:
+            self._resume_filtering()
+            _explorer.setSortingEnabled(True)
+            _explorer.sortByColumn(_sort_col, _sort_order)
+
+        def _on_loaded(loaded_path: str) -> None:
+            _loaded_dir = get_directory(loaded_path).resolve()
+            if _loaded_dir == target_dir:
+                _safety_timer.stop()
+                _finalize()
+
+        def _finalize() -> None:
+            try:
+                self._file_model.directoryLoaded.disconnect(_on_loaded)
+            except RuntimeError:
+                pass
+            _resume()
+
+        # Suspend both filtering and sorting so new rows arrive without
+        # triggering re-sort over all accumulated rows.
+        self._filter_model.suspend_filtering()
+        _explorer.setSortingEnabled(False)
+        self._file_model.directoryLoaded.connect(_on_loaded)
+        _safety_timer.timeout.connect(_finalize)
+        _safety_timer.start()
+
     @QtCore.Slot(str)
-    def __toggle_root_widget_visibility(self, vis_repr: str) -> None:
+    def _toggle_custom_root_usage(self, vis_repr: str) -> None:
         """
         Toggle the visibility of the data browsing root widgets.
 
@@ -353,5 +395,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """
         _vis = vis_repr == "True"
         self.toggle_param_widget_visibility("data_browsing_root", _vis)
-        for _name in ["button_apply_roots", "button_reset_roots"]:
+        self.q_settings_set("directory_explorer/use_custom_root", _vis)
+        for _name in ["button_apply_root", "button_reset_root"]:
             self._widgets[_name].setVisible(_vis)
+        self._apply_new_root()

@@ -176,19 +176,18 @@ GENERIC_PARAMS_SETTINGS = {
     "data_browsing_root": {
         "type": str,
         "default": "",
-        "name": "Data browsing roots",
+        "name": "Data browsing root",
         "choices": None,
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The paths which should be included in the data browser. Multiple "
-            "entries are possible and must be separated by a double semicolon `;;`. "
-            "The paths given here will be used as top level paths and all children "
-            "will be accessible in the data browser. If no paths are given, the "
+            "The path which should be used as base directory in the data browser."
+            "The path given here will be used as top level paths and all children "
+            "will be accessible in the data browser. If no path is given, the "
             "data browser will start with the root directory of the filesystem and "
-            "all paths will be accessible. Note that the paths given here must "
-            "exist and be accessible, otherwise the data browser will ignore those "
-            "paths."
+            "all paths will be accessible. Note that the path given here must "
+            "exist and be accessible, otherwise the data browser will ignore this "
+            "path."
         ),
     },
     "plot_update_time": {

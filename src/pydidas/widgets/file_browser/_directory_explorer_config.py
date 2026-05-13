@@ -43,7 +43,7 @@ from pydidas.core.constants import (
     FONT_METRIC_HALF_CONSOLE_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
-from pydidas.widgets.selection.directory_explorer_tree_view import (
+from pydidas.widgets.file_browser.directory_explorer_tree_view import (
     DirectoryExplorerTreeView,
 )
 from pydidas.widgets.selection.toggle_options_button import ToggleOptionsButton
@@ -105,7 +105,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_param_widget",
-        ("use_custom_roots",),
+        ("use_custom_root",),
         {
             "font_metric_width_factor": FONT_METRIC_CONSOLE_WIDTH,
             "gridPos": (-1, 0, 1, 2),
@@ -125,7 +125,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_button",
-        ("button_apply_roots", "Apply new roots"),
+        ("button_apply_root", "Apply new root"),
         {
             "icon": "qt-std::SP_DialogApplyButton",
             "font_metric_width_factor": FONT_METRIC_HALF_CONSOLE_WIDTH,
@@ -135,7 +135,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_button",
-        ("button_reset_roots", "Clear root selection"),
+        ("button_reset_root", "Reset root"),
         {
             "icon": "qt-std::SP_BrowserReload",
             "font_metric_width_factor": FONT_METRIC_HALF_CONSOLE_WIDTH,
@@ -194,7 +194,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("explorer", DirectoryExplorerTreeView),
+        ("tree_view", DirectoryExplorerTreeView),
         {"gridPos": (-1, 0, 1, 2)},
     ],
 ]
@@ -209,10 +209,10 @@ DIRECTORY_EXPLORER_DEFAULT_PARAMS = ParameterCollection(
         "case_sensitive", bool, 1, name="Sorting is case sensitive", choices=[0, 1]
     ),
     Parameter(
-        "use_custom_roots",
+        "use_custom_root",
         bool,
         0,
-        name="Use custom browsing roots",
+        name="Use custom browsing root",
         choices=[0, 1],
     ),
 )

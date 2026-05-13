@@ -30,41 +30,12 @@ __all__ = ["DirectoryExplorerFilterModel"]
 
 
 import platform
-from typing import Any
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from qtpy.QtCore import QSortFilterProxyModel, Qt
-from qtpy.QtWidgets import QFileSystemModel
 
-from pydidas import IS_QT6
 from pydidas.core import PydidasQsettings
-
-
-class _ChangeFilter:
-    """
-    The _ChangeFilter is used as context to change the filter and
-    wrap the different Qt5 / Qt6."""
-
-    def __init__(self, model: QSortFilterProxyModel) -> None:
-        self._model = model
-
-    def __enter__(self) -> "_ChangeFilter":
-        """Start the context manager."""
-        if IS_QT6:
-            self._model.beginFilterChange()
-        return self
-
-    def __exit__(
-        self,
-        type_: type[BaseException] | None,
-        value: BaseException | None,
-        traceback: Any,
-    ) -> None:
-        """Exit the context manager."""
-        if IS_QT6:
-            self._model.endFilterChange()
-        else:
-            self._model.invalidateFilter()
+from pydidas.widgets.file_browser.utilities import ChangeFilter
 
 
 class DirectoryExplorerFilterModel(QSortFilterProxyModel):
@@ -96,6 +67,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
             # because toStdString does not work with Qt 5.15.2, fall back :
             if not bytes(_vol.device()).decode().startswith(__prefix)
         }
+        self.__filter_str: str = ""
         self.__filename_filter_active: bool = False
         self.__filter_pattern: QtCore.QRegularExpression | None = None
         self.__sort_ascending: bool = True
@@ -106,51 +78,15 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         self.__top_root_cache: dict[tuple[int, int, int], str] = {}
         self.__network_acceptance_cache: dict[str, bool] = {}
 
-    def setSourceModel(self, sourceModel: QFileSystemModel) -> None:
+    def setSourceModel(self, sourceModel: QtCore.QAbstractItemModel) -> None:
         """Set source model and connect invalidation hooks for runtime caches."""
-        if not isinstance(sourceModel, QFileSystemModel):
-            raise TypeError(
-                "The DirectoryExplorerFilterModel only works with a QFileSystemModel "
-                "as source model."
-            )
+        if not isinstance(sourceModel, QtWidgets.QFileSystemModel):
+            raise TypeError("DirectoryExplorerFilterModel requires a QFileSystemModel.")
         super().setSourceModel(sourceModel)
         self.__clear_runtime_caches()
-        # Use only coarse invalidation signals. Clearing caches on high-frequency
-        # row insert/remove signals causes severe thrashing during root loading.
         sourceModel.modelReset.connect(self.__clear_runtime_caches)  # type: ignore[arg-type]
-        # Clear row metadata cache on every directoryLoaded so stale internalId-based
-        # keys from previous directories don't pollute new directory metadata.
-        sourceModel.directoryLoaded.connect(self.__clear_row_info_cache)
-
-    def suspend_filtering(self) -> None:
-        """
-        Suspend per-row filtering to avoid Python call overhead during large
-        directory loads.
-
-        While suspended, filterAcceptsRow returns True immediately for all rows.
-        Call resume_filtering() once the directory has finished loading to
-        re-apply the active filter in a single pass.
-        """
-        self.__filtering_suspended = True
-
-    def resume_filtering(self) -> None:
-        """
-        Resume filtering after a directory load is complete.
-
-        Clears the row metadata cache and – only when active filter criteria
-        could reject rows – invalidates the filter so criteria are applied in
-        one pass.  When no filename filter is active and network locations are
-        accepted (the common navigation case) no invalidation is needed because
-        every row already passes: skipping it avoids an O(n) re-evaluation over
-        the entire accumulated model.
-        """
-        if not self.__filtering_suspended:
-            return
-        self.__filtering_suspended = False
-        self.__clear_row_info_cache()
-        # Only force a full re-evaluation when something could actually reject rows.
-        if self.__filename_filter_active or not self.__accept_network_locations:
-            self.invalidateFilter()
+        if hasattr(sourceModel, "directoryLoaded"):
+            sourceModel.directoryLoaded.connect(self.__clear_row_info_cache)  # type: ignore[attr-defined]
 
     @staticmethod
     def __index_key(index: QtCore.QModelIndex) -> tuple[int, int, int]:
@@ -207,9 +143,9 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         return _accepted
 
     @QtCore.Slot(bool)
-    def toggle_network_location_acceptance(self, acceptance: bool):
+    def show_network_drives(self, acceptance: bool):
         """
-        Toggle the acceptance of network locations.
+        Toggle the filtering of network locations.
 
         Parameters
         ----------
@@ -218,28 +154,60 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         """
         if self.__accept_network_locations == acceptance:
             return
-        with _ChangeFilter(self):
+        with ChangeFilter(self):
             self.__accept_network_locations = acceptance
             self.__network_acceptance_cache.clear()
 
     @QtCore.Slot(str)
-    def toggle_filter_string(self, filter_string: str):
+    def change_filter_string(self, filter_string: str):
         """
-        Toggle the filter string.
+        Change and update the filter string.
 
         Parameters
         ----------
         filter_string : str
             The filter string to be used.
         """
-
-        with _ChangeFilter(self):
+        if filter_string == self.__filter_str:
+            return
+        with ChangeFilter(self):
             self.__filename_filter_active = len(filter_string) > 0
+            self.__filter_str = filter_string
             escaped_filter_string = QtCore.QRegularExpression.escape(filter_string)
             self.__filter_pattern = QtCore.QRegularExpression(
                 escaped_filter_string.replace("\\*", ".*").replace("\\?", ".")
             )
             self.__file_info_cache.clear()
+
+    def suspend_filtering(self) -> None:
+        """
+        Suspend per-row filtering to avoid Python call overhead during large
+        directory loads.
+
+        While suspended, filterAcceptsRow returns True immediately for all rows.
+        Call resume_filtering() once the directory has finished loading to
+        re-apply the active filter in a single pass.
+        """
+        self.__filtering_suspended = True
+
+    def resume_filtering(self) -> None:
+        """
+        Resume filtering after a directory load is complete.
+
+        Clears the row metadata cache and – only when active filter criteria
+        could reject rows – invalidates the filter so criteria are applied in
+        one pass.  When no filename filter is active and network locations are
+        accepted (the common navigation case) no invalidation is needed because
+        every row already passes: skipping it avoids an O(n) re-evaluation over
+        the entire accumulated model.
+        """
+        if not self.__filtering_suspended:
+            return
+        self.__filtering_suspended = False
+        self.__clear_row_info_cache()
+        # Only force a full re-evaluation when something could actually reject rows.
+        if self.__filename_filter_active or not self.__accept_network_locations:
+            self.invalidateFilter()
 
     def filterAcceptsRow(
         self, source_row: int, source_parent: QtCore.QModelIndex

@@ -31,13 +31,14 @@ __all__ = [
     "update_palette",
     "update_qwidget_font",
     "check_pydidas_qapp_instance",
+    "get_single_shot_timer",
     "IS_QT6",
 ]
 
 
 from typing import Any, NoReturn
 
-from qtpy import QT_VERSION, QtGui, QtWidgets
+from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QObject
 from qtpy.QtWidgets import QWidget
 
@@ -227,3 +228,25 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
             "PydidasQApplication instance to work properly and are not "
             "compatible with the generic QApplication."
         )
+
+
+def get_single_shot_timer(parent: QtCore.QObject, timeout: int = 5000) -> QtCore.QTimer:
+    """
+    Get a single shot QTimer.
+
+    Parameters
+    ----------
+    parent : QtCore.QObject
+        The parent object for the timer.
+    timeout : int, optional
+        The timeout in milliseconds, by default 5000 (5 seconds).
+
+    Returns
+    -------
+    QtCore.QTimer
+        The configured single shot timer.
+    """
+    _timer = QtCore.QTimer(parent)
+    _timer.setSingleShot(True)
+    _timer.setInterval(timeout)
+    return _timer

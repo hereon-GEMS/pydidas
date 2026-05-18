@@ -51,6 +51,7 @@ QSETTINGS_USER_KEYS = [
     "max_number_curves",
     "histogram_outlier_fraction_low",
     "histogram_outlier_fraction_high",
+    "use_custom_data_browsing_root",
     "data_browsing_root",
     "plugin_path",
     "auto_check_for_updates",

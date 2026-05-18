@@ -78,7 +78,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     menu_title = "User configuration"
     menu_entry = "User configuration"
 
-    value_changed_signal = QtCore.Signal(str, object)
+    sig_new_config_value = QtCore.Signal(str, object)
 
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
@@ -182,6 +182,9 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_spacer(None, parent_widget="config_canvas")
         self.create_label("section_data_browsing", "Data browsing", **_section_options)
+        self.create_param_widget(
+            "use_custom_data_browsing_root", parent_widget="config_canvas"
+        )
         self.create_param_widget(
             "data_browsing_root",
             linebreak=True,
@@ -353,7 +356,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             The new value.
         """
         self.q_settings_set(f"user/{param_key}", value)
-        self.value_changed_signal.emit(param_key, value)
+        self.sig_new_config_value.emit(param_key, value)
 
     @QtCore.Slot(QtGui.QColor)
     def _update_cmap_nan_value(self, new_value: QtGui.QColor | str | None) -> None:
@@ -521,7 +524,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
                 self.update_param_widget_value(_param_key, _value)
-                self.value_changed_signal.emit(_param_key, _value)
+                self.sig_new_config_value.emit(_param_key, _value)
                 self.q_settings_set(f"user/{_param_key}", _value)
             self.process_new_fontsize_setting()
             self._update_cmap_nan_current_color(

@@ -190,6 +190,19 @@ GENERIC_PARAMS_SETTINGS = {
             "path."
         ),
     },
+    "use_custom_data_browsing_root": {
+        "type": bool,
+        "default": False,
+        "name": "Use custom browsing root",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The flag whether the full file system is accessible or only a small "
+            "subset should be made available in the data browsing. If activated, "
+            "select the directory to use with the `data_browsing_root` parameter."
+        ),
+    },
     "plot_update_time": {
         "type": float,
         "default": 1.0,

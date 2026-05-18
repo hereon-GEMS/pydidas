@@ -122,7 +122,7 @@ def get_column_labels(axis: int, data: Dataset) -> list[str]:
     PydidasQApplication.instance().set_status_message(
         f"Warning: Axis {axis} does not contain columns. Labels may be incorrect."
     )
-    return data.get_axis_description(axis).split(";")
+    return [f"column #{index}" for index in range(data.shape[axis])]
 
 
 def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:

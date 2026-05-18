@@ -29,9 +29,8 @@ __status__ = "Production"
 __all__ = ["DirectoryExplorerTreeView"]
 
 
-import os
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -42,193 +41,7 @@ from pydidas.core.utils import apply_qt_properties, get_directory
 AscendingOrder = QtCore.Qt.AscendingOrder
 QSortFilterProxyModel = QtCore.QSortFilterProxyModel
 
-
-class _DirectoryExplorerTreeView(QtWidgets.QTreeView):
-    """
-    The DirectoryExplorerTreeView is an implementation of a QTreeView widget with a
-    file system model to display the contents of directories.
-
-    Parameters
-    ----------
-    **kwargs : Any
-        Supported keywords are any keywords that are supported by QTreeView.
-    """
-
-    init_kwargs = ["parent"]
-
-    def __init__(self, **kwargs: Any) -> None:
-        QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))  # type: ignore[arg-type]
-        apply_qt_properties(self, **kwargs)  # type: ignore[arg-type]
-        self.raw_model: QtCore.QAbstractItemModel | None = None
-        self._proxy_models: list[QtCore.QSortFilterProxyModel] = []
-        self._pending_expand_paths: list[str] = []
-        self._pending_expand_retry_count = 0
-
-    def setModel(self, model: QtCore.QAbstractItemModel) -> None:
-        """
-        Set the model of the directory explorer.
-
-        Parameters
-        ----------
-        model : QtCore.QAbstractItemModel
-            The model to be used.
-        """
-        self._proxy_models = []
-        _raw_model = model
-        while isinstance(_raw_model, QtCore.QSortFilterProxyModel):
-            self._proxy_models.append(_raw_model)
-            _raw_model = _raw_model.sourceModel()
-        self.raw_model = _raw_model
-        QtWidgets.QTreeView.setModel(self, model)  # type: ignore[arg-type]
-        self.setAnimated(False)
-        self.setUniformRowHeights(True)
-        self.setIndentation(12)
-        self._connect_model_ready_signal()
-        self.setColumnWidth(0, 400)
-        self.setColumnWidth(1, 70)
-        self.setColumnWidth(2, 100)
-        self.setColumnWidth(3, 140)
-        self.setSizePolicy(*POLICY_EXP_EXP)
-
-    def _connect_model_ready_signal(self) -> None:
-        """Connect to model ready signal for deferred sorting."""
-        if self.raw_model is None:
-            return
-        if hasattr(self.raw_model, "directoryLoaded"):
-            try:
-                cast(Any, self.raw_model).directoryLoaded.connect(
-                    self._on_directory_loaded
-                )
-            except (AttributeError, TypeError):
-                self._fallback_defer_sorting()
-        else:
-            self._fallback_defer_sorting()
-
-    def _fallback_defer_sorting(self) -> None:
-        """Fallback timer-based deferred sorting for non-filesystem models."""
-        QtCore.QTimer.singleShot(1000, self._enable_deferred_sorting)
-
-    @QtCore.Slot(str)
-    def _on_directory_loaded(self, path: str) -> None:
-        """Enable sorting when the first directory is loaded."""
-        if self.raw_model is None:
-            return
-        _root_path = (
-            cast(Any, self.raw_model).rootPath()
-            if hasattr(self.raw_model, "rootPath")
-            else ""
-        )
-        _norm_loaded = os.path.normcase(os.path.normpath(path))
-        _norm_root = os.path.normcase(os.path.normpath(str(_root_path)))
-        if _norm_loaded == _norm_root:
-            self._enable_deferred_sorting()
-            try:
-                cast(Any, self.raw_model).directoryLoaded.disconnect(
-                    self._on_directory_loaded
-                )
-            except (AttributeError, TypeError):
-                pass
-
-    @QtCore.Slot()
-    def _enable_deferred_sorting(self) -> None:
-        """Enable sorting after initial tree render is complete."""
-        self.setSortingEnabled(True)
-        self.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-
-    def _map_from_source(self, index: QtCore.QModelIndex) -> QtCore.QModelIndex:
-        """
-        Map a source-model index to the tree view model index.
-
-        Parameters
-        ----------
-        index : QtCore.QModelIndex
-            The source-model index.
-
-        Returns
-        -------
-        QtCore.QModelIndex
-            The mapped view index.
-        """
-        _index = index
-        for _proxy_model in reversed(self._proxy_models):
-            _index = _proxy_model.mapFromSource(_index)
-        return _index
-
-    def _schedule_expand_step(self) -> None:
-        """Schedule the next deferred expansion step."""
-        QtCore.QTimer.singleShot(0, self._expand_next_pending_path)
-
-    def _expand_next_pending_path(self) -> None:
-        """Expand the next pending source path in the tree view."""
-        if self.raw_model is None or len(self._pending_expand_paths) == 0:
-            self._pending_expand_retry_count = 0
-            return
-
-        _source_index = cast(Any, self.raw_model).index(self._pending_expand_paths[0])
-        if not _source_index.isValid():
-            self._pending_expand_retry_count += 1
-            if self._pending_expand_retry_count <= 10:
-                self._schedule_expand_step()
-            else:
-                self._pending_expand_paths = []
-                self._pending_expand_retry_count = 0
-            return
-
-        _view_index = self._map_from_source(_source_index)
-        if not _view_index.isValid():
-            self._pending_expand_paths = []
-            self._pending_expand_retry_count = 0
-            return
-
-        self._pending_expand_retry_count = 0
-        self.expand(_view_index)
-        self._pending_expand_paths.pop(0)
-        if len(self._pending_expand_paths) == 0:
-            self.scrollTo(_view_index)
-            return
-        self._schedule_expand_step()
-
-    def expand_to_path(self, path: str) -> None:
-        """
-        Expand the treeview to a given path.
-
-        Parameters
-        ----------
-        path : str
-            The full path to expand.
-        """
-        if self.raw_model is None:
-            return
-
-        _path = get_directory(Path(path))
-        _expand_paths = [str(_path)]
-        _source_root = (
-            cast(Any, self.raw_model).rootPath()
-            if hasattr(self.raw_model, "rootPath")
-            else ""
-        )
-        _norm_source_root = os.path.normcase(os.path.normpath(str(_source_root)))
-        while _path.parent != _path:
-            _norm_path = os.path.normcase(os.path.normpath(str(_path)))
-            if _norm_source_root and _norm_path == _norm_source_root:
-                break
-            _path = _path.parent
-            _expand_paths.insert(0, str(_path))
-        if _expand_paths != self._pending_expand_paths:
-            self._pending_expand_paths = _expand_paths
-            self._pending_expand_retry_count = 0
-            self._schedule_expand_step()
-
-    def sizeHint(self) -> QtCore.QSize:
-        """
-        Overload the generic sizeHint.
-
-        Returns
-        -------
-        QtCore.QSize
-            The updated size hint.
-        """
-        return QtCore.QSize(400, 4000)
+_EXPAND_PATH_RETRY_LIMIT = 10
 
 
 class DirectoryExplorerTreeView(QtWidgets.QTreeView):
@@ -245,59 +58,52 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
     init_kwargs = ["parent"]
 
     def __init__(self, **kwargs: Any) -> None:
-        QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))
-        apply_qt_properties(self, **kwargs)
-        self.raw_model: QtCore.QAbstractItemModel | None = None
+        QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))  # type: ignore[arg-type]
+        apply_qt_properties(self, **kwargs)  # type: ignore[arg-type]
+        self._raw_model: QtWidgets.QFileSystemModel | None = None
+        self._proxy_model: QtCore.QSortFilterProxyModel | None = None
+        self._pending_expand_paths: list[str] = []
+        self._pending_expand_retry_count = 0
+        self.__expand_scroll_hint: QtWidgets.QAbstractItemView.ScrollHint = (
+            QtWidgets.QAbstractItemView.EnsureVisible
+        )
 
-    def setModel(self, model: QtCore.QAbstractItemModel):
+    def setModel(self, model: QtCore.QAbstractItemModel) -> None:
         """
         Set the model of the directory explorer.
 
         Parameters
         ----------
         model : QtCore.QAbstractItemModel
-            The model to be used. This must be an instance of a QFileSystemModel
-            or a QSortFilterProxyModel with a QFileSystemModel as source.
+            The model to be used.
         """
-        if isinstance(model, QtCore.QSortFilterProxyModel):
-            _source = model.sourceModel()
-            if not isinstance(_source, QtWidgets.QFileSystemModel):
-                raise TypeError(
-                    "The DirectoryExplorerTreeView only supports QFileSystemModel "
-                    "or QSortFilterProxyModel with QFileSystemModel as source."
-                )
-            self.raw_model = _source
-        elif isinstance(model, QtWidgets.QFileSystemModel):
-            self.raw_model = model
-        else:
+        if not isinstance(
+            model, (QtCore.QSortFilterProxyModel, QtWidgets.QFileSystemModel)
+        ):
             raise TypeError(
-                "The DirectoryExplorerTreeView only supports QFileSystemModel"
+                "The DirectoryExplorerTreeView only supports QFileSystemModel or "
+                "QSortFilterProxyModel with QFileSystemModel as source."
             )
-        QtWidgets.QTreeView.setModel(self, model)
+        if isinstance(model, QtCore.QSortFilterProxyModel):
+            _raw_model = model.sourceModel()
+            if not isinstance(_raw_model, QtWidgets.QFileSystemModel):
+                raise TypeError(
+                    "The DirectoryExplorerTreeView only supports QFileSystemModel or "
+                    "QSortFilterProxyModel with QFileSystemModel as source."
+                )
+            self._proxy_model = model
+            self._raw_model = _raw_model
+        elif isinstance(model, QtWidgets.QFileSystemModel):
+            self._proxy_model = None
+            self._raw_model = model
+        super().setModel(model)  # type: ignore[arg-type]
         self.setAnimated(False)
+        self.setUniformRowHeights(True)
         self.setIndentation(12)
-        self.setSortingEnabled(True)
         for _col, _width in [(0, 400), (1, 70), (2, 100), (3, 140)]:
             self.setColumnWidth(_col, _width)
         self.setSizePolicy(*POLICY_EXP_EXP)
-        self.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-
-    def expand_to_path(self, path: str):
-        """
-        Expand the tree view to a given path.
-
-        Parameters
-        ----------
-        path : str
-            The full path to expand.
-        """
-        _index = self.raw_model.index(path)
-        _indices = []
-        while _index.isValid():
-            _indices.insert(0, _index)
-            _index = _index.parent()
-        for _ix in _indices:
-            self.setExpanded(self.model().mapFromSource(_ix), True)
+        self._raw_model.directoryLoaded.connect(self._on_directory_loaded)
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -309,3 +115,131 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
             The updated size hint.
         """
         return QtCore.QSize(400, 4000)
+
+    @QtCore.Slot(str)
+    def _on_directory_loaded(self, path: str) -> None:
+        """Enable sorting when the first directory is loaded."""
+        _root_path = Path(self._raw_model.rootPath())
+        _loaded_path = Path(path)
+        if _root_path == _loaded_path:
+            self._raw_model.directoryLoaded.disconnect(self._on_directory_loaded)
+            self.setSortingEnabled(True)
+            self.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+
+    def _map_from_source(self, index: QtCore.QModelIndex) -> QtCore.QModelIndex:
+        """
+        Map a source-model index to the tree view model index.
+
+        Parameters
+        ----------
+        index : QtCore.QModelIndex
+            The source-model index.
+
+        Returns
+        -------
+        QtCore.QModelIndex
+            The mapped view index.
+        """
+        if not index.isValid() or self._raw_model is None:
+            return QtCore.QModelIndex()
+        if self._proxy_model is None:
+            return index
+        return self._proxy_model.mapFromSource(index)
+
+    def _expand_next_pending_path(self) -> None:
+        """Expand the next pending source path in the tree view."""
+        if self._raw_model is None or len(self._pending_expand_paths) == 0:
+            self._pending_expand_retry_count = 0
+            return
+
+        _source_index = self._raw_model.index(self._pending_expand_paths[0])
+        # Check if the model has loaded the requested directory:
+        if not _source_index.isValid():
+            self._pending_expand_retry_count += 1
+            if self._pending_expand_retry_count <= _EXPAND_PATH_RETRY_LIMIT:
+                self._schedule_expand_step()
+            else:
+                self._pending_expand_paths = []
+                self._pending_expand_retry_count = 0
+            return
+
+        _view_index = self._map_from_source(_source_index)
+        if not _view_index.isValid():
+            self._pending_expand_paths = []
+            self._pending_expand_retry_count = 0
+            return
+
+        self.expand(_view_index)
+        self._pending_expand_paths.pop(0)
+        self._pending_expand_retry_count = 0
+        if len(self._pending_expand_paths) == 0:
+            self.scrollTo(_view_index, self.__expand_scroll_hint)
+            _selection_model = self.selectionModel()
+            _selection_model.select(_view_index, QtCore.QItemSelectionModel.Select)
+            self.setCurrentIndex(_view_index)
+            return
+        self._schedule_expand_step()
+
+    def _schedule_expand_step(self) -> None:
+        """
+        Schedule the next deferred expansion step.
+
+        This timer will allow the Qt event loop to process other signals
+        and events, such as loading the directory contents, before attempting
+        to expand the next path.
+        """
+        QtCore.QTimer.singleShot(0, self._expand_next_pending_path)
+
+    def expand_to_path(self, path: Path | str, show_at_top: bool = False) -> None:
+        """
+        Expand the QTreeView to a given path.
+
+        Parameters
+        ----------
+        path : Path or str
+            The full path to expand.
+        show_at_top : bool, optional
+            Flag whether to show the given path at the top of the
+            QTreeView or leave the current layout.
+        """
+        if self._raw_model is None:
+            return
+        self.__expand_scroll_hint = (
+            QtWidgets.QAbstractItemView.PositionAtTop
+            if show_at_top
+            else QtWidgets.QAbstractItemView.EnsureVisible
+        )
+        _path = get_directory(path)
+        _expand_paths = [str(_path)]
+        _source_root = Path(self._raw_model.rootPath())
+        for _ancestor in _path.parents:
+            _expand_paths.insert(0, str(_ancestor))
+            if _source_root is not None and _ancestor == _source_root:
+                break
+        self._pending_expand_paths = _expand_paths
+        self._pending_expand_retry_count = 0
+        self._schedule_expand_step()
+        if _expand_paths != self._pending_expand_paths:
+            self._pending_expand_paths = _expand_paths
+            self._pending_expand_retry_count = 0
+            self._schedule_expand_step()
+
+    def select_item(self, name: str) -> None:
+        """
+        Select the item with the given name to highlight.
+
+        Parameters
+        ----------
+        name : str
+            The name of the item to highlight.
+        """
+        _index = self._raw_model.index(name)
+        if self._proxy_model is not None:
+            _index = self._map_from_source(_index)
+            _model = self._proxy_model
+        else:
+            _model = self._raw_model
+        _selection_model = self.selectionModel()
+        _selection_model.select(_index, QtCore.QItemSelectionModel.Select)
+        self.setCurrentIndex(_index)
+        self.scrollTo(_index)

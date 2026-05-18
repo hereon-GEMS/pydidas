@@ -21,6 +21,9 @@ Improvements
   to speed-up loading for background processes.
 - Added an option in the plots to lock the current zoom settings
 - Added a button to plots to autoscale the colormap to min/max
+- Added an option to set a custom root for data browsing in the 
+  DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
+  from unresponsive locations
 
 Programmatic changes
 --------------------

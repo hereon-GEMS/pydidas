@@ -30,7 +30,6 @@ __all__ = [
     "DIRECTORY_EXPLORER_DEFAULT_PARAMS",
 ]
 
-
 from typing import Any
 
 from pydidas.core import (
@@ -105,7 +104,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_param_widget",
-        ("use_custom_root",),
+        ("use_custom_data_browsing_root",),
         {
             "font_metric_width_factor": FONT_METRIC_CONSOLE_WIDTH,
             "gridPos": (-1, 0, 1, 2),
@@ -201,18 +200,12 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
 
 DIRECTORY_EXPLORER_DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter("current_directory"),
+    get_generic_parameter("use_custom_data_browsing_root"),
     get_generic_parameter("data_browsing_root"),
     Parameter(
         "map_network_drives", bool, 1, name="Show network drives", choices=[0, 1]
     ),
     Parameter(
         "case_sensitive", bool, 1, name="Sorting is case sensitive", choices=[0, 1]
-    ),
-    Parameter(
-        "use_custom_root",
-        bool,
-        0,
-        name="Use custom browsing root",
-        choices=[0, 1],
     ),
 )

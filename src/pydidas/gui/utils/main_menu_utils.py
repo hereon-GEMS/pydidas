@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "get_standard_state_full_filename",
+    "get_available_exit_states",
     "clear_local_log_files",
     "open_doc_in_browser",
     "get_latest_release_tag",
@@ -73,6 +74,30 @@ def get_standard_state_full_filename(filename: str) -> Path:
         if _fname.is_file() and os.access(_fname, os.R_OK):
             return _fname
     return PYDIDAS_STANDARD_CONFIG_PATH.joinpath(filename)
+
+
+def get_available_exit_states() -> list[str]:
+    """
+    Get the available states from the standard config path.
+
+    Returns
+    -------
+    list[str]
+        The available state filenames.
+    """
+    filenames = []
+    for _path in PYDIDAS_CONFIG_PATHS:
+        if not _path.exists():
+            continue
+        _files = [
+            _f for _f in _path.iterdir() if _f.is_file() and os.access(_f, os.R_OK)
+        ]
+        for _f in _files:
+            if _f.name.startswith("pydidas_gui_exit_state_") and _f.name.endswith(
+                ".yaml"
+            ):
+                filenames.append(_f.name)
+    return filenames
 
 
 @QtCore.Slot()

@@ -111,6 +111,8 @@ Bugfixes
   deprecated actions in PydidasPlot2d which caused exceptions when calling them.
 - Fixed an issue in the ImageMathFrame which did not show some widgets correctly
   in Qt6.
+- Fixed an issue in the SubtractBackgroundImage plugin which could lead to an
+  uint overflow.
 
 
 v26.01.27

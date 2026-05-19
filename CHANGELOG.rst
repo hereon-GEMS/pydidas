@@ -109,6 +109,8 @@ Bugfixes
   of entries with respect to the data.
 - Fixed an issue where some windows and frames still had references to some
   deprecated actions in PydidasPlot2d which caused exceptions when calling them.
+- Fixed an issue in the ImageMathFrame which did not show some widgets correctly
+  in Qt6.
 
 
 v26.01.27

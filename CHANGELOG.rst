@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-v26.mm.dd
+v26.05.19
 =========
 
 Improvements
@@ -105,7 +105,7 @@ Bugfixes
   edits
 - Fixed an issue in PydidasPlotStack which accepted ndarray without checks
   and crashed
-- Fixed an issue which occured if column labels in Datasets had the wrong number
+- Fixed an issue which occurred if column labels in Datasets had the wrong number
   of entries with respect to the data.
 
 
@@ -161,7 +161,7 @@ Improvements
   residual stress calculations.
 - Reorganized the frames in the toolbar menu.
 - Programmatic improvements:
-    - Programatically improved the layout of the GUI export/import files for more clarity
+    - Programmatically improved the layout of the GUI export/import files for more clarity
       and to support importing states created from different configurations.
     - Modified the behaviour of the splash screen to allow display of the splash screen
       also when calling pydidas trough an entry-point from the command line.

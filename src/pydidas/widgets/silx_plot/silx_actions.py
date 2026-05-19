@@ -158,14 +158,14 @@ class ChangeCanvasAction(PlotAction):
         """
         self.set_canvas_mode(not self._full_canvas)
 
-    def set_canvas_mode(self, mode: Literal["set_to_tight", "full"] | bool) -> None:
+    def set_canvas_mode(self, mode: Literal["tight", "full"] | bool) -> None:
         """
         Set the canvas mode to tight or full.
 
         Parameters
         ----------
-        mode : Literal["set_to_tight", "full"] or bool
-            The canvas mode to set. "set_to_tight" will restrict the canvas to the data
+        mode : Literal["tight", "full"] or bool
+            The canvas mode to set. `tight` will restrict the canvas to the data
             aspect ratio, while "full" will expand the canvas to the maximum
             available size. If bool, the mode will be interpreted as the
             flag for the full canvas mode.

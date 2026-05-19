@@ -107,6 +107,8 @@ Bugfixes
   and crashed
 - Fixed an issue which occurred if column labels in Datasets had the wrong number
   of entries with respect to the data.
+- Fixed an issue where some windows and frames still had references to some
+  deprecated actions in PydidasPlot2d which caused exceptions when calling them.
 
 
 v26.01.27

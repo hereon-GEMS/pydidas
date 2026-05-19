@@ -158,9 +158,11 @@ def test_execute__w_uint_overflow(temp_path):
     plugin.set_param_value("multiplicator", 1.0)
     plugin.set_param_value("threshold_low", 0)
     plugin.pre_execute()
-    data = np.ones(_IMAGE.shape, dtype=float) * 200
+    data = np.ones(_IMAGE.shape, dtype=np.uint16) * 200
     _res, _kws = plugin.execute(data)
     _ref = np.where(data - _IMAGE < 0, 0, data - _IMAGE)
+    assert data.dtype == np.uint16
+    assert _res.dtype == np.uint16
     assert np.allclose(_res, _ref)
     assert np.all(_res <= 200)
 

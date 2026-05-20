@@ -31,6 +31,7 @@ __all__ = ["DirectoryExplorer"]
 
 import re
 from numbers import Integral
+from os.path import normpath
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +77,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
+        self.__dir_to_load: Path | None = None
         self.set_default_params()
         self._create_widgets()
         self._set_up_file_model(**kwargs)
@@ -111,14 +113,13 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         if _path is None:
             _path = self.q_settings_get("directory_explorer/path", default="")
         self.set_param_and_widget_value("current_directory", _path)
-        _path = str(_path)
         self._file_model = QtWidgets.QFileSystemModel()
         if hasattr(self._file_model, "DontUseCustomDirectoryIcons"):
             self._file_model.setOption(
                 self._file_model.DontUseCustomDirectoryIcons, True
             )
         self._file_model.setReadOnly(True)
-        self._file_model.setRootPath(_path)
+        self._file_model.setRootPath(str(_path))
 
     def _set_up_filter(self) -> None:
         """
@@ -138,8 +139,8 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     def _connect_signals(self) -> None:
         """Connect the signals of the widgets to the slots."""
-        self._widgets["tree_view"].clicked.connect(self._file_highlighted)
         self._widgets["tree_view"].doubleClicked.connect(self._item_selected)
+        self._widgets["tree_view"].expanded.connect(self._tree_directory_expanded)
         self.param_composite_widgets["map_network_drives"].sig_new_value.connect(
             self._update_filesystem_network_drive_usage
         )
@@ -320,20 +321,20 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         )
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
-    @QtCore.Slot()
-    def _file_highlighted(self) -> None:
-        """Store the selected filename after highlighting."""
-        _dir = get_directory(self.selected_item)
-        self.q_settings_set("directory_explorer/path", str(_dir))
+    @QtCore.Slot(QtCore.QModelIndex)
+    def _item_selected(self, index: QtCore.QModelIndex) -> None:
+        """
+        Open a file after it has been double-clicked in the DirectoryExplorer.
 
-    @QtCore.Slot()
-    def _item_selected(self) -> None:
-        """Open a file/dir after it has been selected in the DirectoryExplorer."""
-        _item = self.selected_item
+        Parameters
+        ----------
+        index :  QtCore.QModelIndex
+            The index of the selected item (file or directory).
+        """
+        _source_index = self._filter_model.mapToSource(index)
+        _item = Path(self._file_model.filePath(_source_index))
         _dir = get_directory(_item)
         self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
-        if _item.is_dir():
-            self._dir_selection(_dir)
         if _item.is_file():
             self.sig_new_file_selected.emit(str(_item))  # type: ignore[attr-defined]
 
@@ -347,7 +348,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         path : str
             The file or directory path to be set as active.
         """
-        _item = Path(path).resolve()
+        _item = Path(normpath(path))
         _dir = get_directory(_item)
         self._dir_selection(_dir, show_at_top=True)
         if _item.is_file():
@@ -356,6 +357,26 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             )
             self._widgets["tree_view"].select_item(path)
             self.sig_new_file_selected.emit(path)  # type: ignore[attr-defined]
+
+    @QtCore.Slot(QtCore.QModelIndex)
+    def _tree_directory_expanded(self, index: QtCore.QModelIndex) -> None:
+        """
+        Prepare loading optimization when the user expands a directory.
+
+
+        Parameters
+        ----------
+        index :  QtCore.QModelIndex
+            The index of the selected directory (expanded only triggers for
+            directories).
+        """
+        _source_index = self._filter_model.mapToSource(index)
+        if not _source_index.isValid():
+            return
+        _target_dir = get_directory(self._file_model.filePath(_source_index))
+        if self.__dir_to_load == _target_dir or self.__is_directory_loaded(_target_dir):
+            return
+        self.__prepare_directory_loading(_target_dir)
 
     def _dir_selection(self, path: Path, show_at_top: bool = False) -> None:
         """
@@ -381,11 +402,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         # Only suspend filtering/sorting when the directory is not yet loaded.
         # For already-cached directories, directoryLoaded may not fire again,
         # and with no active filter the suspension is unnecessary anyway.
-        _target_index = self._file_model.index(_dir)
-        _already_loaded = (
-            _target_index.isValid() and self._file_model.rowCount(_target_index) > 0
-        )
-        if not _already_loaded:
+        if not self.__is_directory_loaded(path) and self.__dir_to_load != path:
             self.__prepare_directory_loading(path)
         self._file_model.setRootPath(_dir)
         self._widgets["tree_view"].expand_to_path(path, show_at_top=show_at_top)
@@ -430,6 +447,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         target_dir : Path
             The selected directory.
         """
+        self.__dir_to_load = target_dir
         _explorer = self._widgets["tree_view"]
         _sort_col = _explorer.header().sortIndicatorSection()
         _sort_order = _explorer.header().sortIndicatorOrder()
@@ -444,7 +462,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
             _explorer.sortByColumn(_sort_col, _sort_order)
 
         def _on_loaded(loaded_path: str) -> None:
-            _loaded_dir = get_directory(loaded_path).resolve()
+            _loaded_dir = get_directory(normpath(loaded_path))
             if _loaded_dir == target_dir:
                 _safety_timer.stop()
                 _finalize()
@@ -454,6 +472,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
                 self._file_model.directoryLoaded.disconnect(_on_loaded)
             except RuntimeError:
                 pass
+            self.__dir_to_load = None
             _resume()
 
         # Suspend both filtering and sorting so new rows arrive without
@@ -463,3 +482,15 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self._file_model.directoryLoaded.connect(_on_loaded)
         _safety_timer.timeout.connect(_finalize)
         _safety_timer.start()
+
+    def __is_directory_loaded(self, target_dir: Path) -> bool:
+        """
+        Check whether the filesystem model already has the directory contents.
+
+        Parameters
+        ----------
+        target_dir : Path
+            The selected directory to be checked.
+        """
+        _target_index = self._file_model.index(str(target_dir))
+        return _target_index.isValid() and self._file_model.rowCount(_target_index) > 0

@@ -250,7 +250,7 @@ class ImageMathFrame(BaseFrame):
         self._current_image = _image
         self._widgets["viewer"].plot_pydidas_dataset(_image)
         self._widgets["viewer"].setGraphTitle(_title)
-        self._widgets["viewer"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["viewer"]._actions["canvas"].set_canvas_mode("tight")
         self._toggle_features_enabled(True)
 
     def _toggle_features_enabled(self, enable: bool) -> None:

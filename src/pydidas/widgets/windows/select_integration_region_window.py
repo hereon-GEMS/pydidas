@@ -204,7 +204,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             )
         self._image = Dataset(np.zeros(_shape))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
-        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
         self._roi_controller.show_plot_items("roi")
         if self._config["only_show_roi"]:
             self._config["closing_confirmed"] = True
@@ -237,7 +237,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._image = import_data(filename, **kwargs)
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
-        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
         self._roi_controller.reset_selection_mode()
         self._roi_controller.update_input_widgets()
         self._roi_controller.show_plot_items("roi")

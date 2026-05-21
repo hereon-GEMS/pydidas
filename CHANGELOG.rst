@@ -2,6 +2,25 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+v26.mm.dd
+=========
+
+Improvements
+------------
+- Added an option to set a custom root for data browsing in the 
+  DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
+  from unresponsive locations
+
+Programmatic changes
+--------------------
+
+Bugfixes
+--------
+- Fixed an issue in the DataBrowsingFrame which did not load the icons for 
+  the starting directory correctly.
+
+
 v26.05.19
 =========
 
@@ -21,9 +40,6 @@ Improvements
   to speed-up loading for background processes.
 - Added an option in the plots to lock the current zoom settings
 - Added a button to plots to autoscale the colormap to min/max
-- Added an option to set a custom root for data browsing in the 
-  DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
-  from unresponsive locations
 
 Programmatic changes
 --------------------

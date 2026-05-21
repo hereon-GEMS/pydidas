@@ -77,14 +77,23 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
     def __init__(self, **kwargs: Any) -> None:
         WidgetWithParameterCollection.__init__(self, **kwargs)
-        self.__dir_to_load: Path | None = None
+        self.__dir_to_load: Path | None = Path(
+            kwargs.get(
+                "current_path",
+                self.q_settings_get("directory_explorer/path", default="")
+            )
+        )
+
         self.set_default_params()
         self._create_widgets()
         self._set_up_file_model(**kwargs)
         self._set_up_filter()
         self._connect_signals()
-        self._widgets["tree_view"].expand_to_path(self._file_model.rootPath())
-        self.check_root_up_to_date()
+        # schedule the expansion and root check through timers to inject them
+        # correctly in the QEventLoop and prevent them from running before the
+        # file system model is properly populated:
+        QtCore.QTimer.singleShot(1, self.__expand_initial_path)
+        QtCore.QTimer.singleShot(2, self.check_root_up_to_date)
 
     # +-------------------------+
     # | initialization methods  |
@@ -109,17 +118,13 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         **kwargs : Any
             Optional setup kwargs. Supported key: ``current_path``.
         """
-        _path = kwargs.get("current_path", None)
-        if _path is None:
-            _path = self.q_settings_get("directory_explorer/path", default="")
-        self.set_param_and_widget_value("current_directory", _path)
         self._file_model = QtWidgets.QFileSystemModel()
         if hasattr(self._file_model, "DontUseCustomDirectoryIcons"):
             self._file_model.setOption(
                 self._file_model.DontUseCustomDirectoryIcons, True
             )
         self._file_model.setReadOnly(True)
-        self._file_model.setRootPath(str(_path))
+        self._file_model.setRootPath("")
 
     def _set_up_filter(self) -> None:
         """
@@ -166,25 +171,6 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     # | public API methods and properties |
     # +-----------------------------------+
 
-    @property
-    def selected_item(self) -> Path:
-        """
-        Get the selected item (i.e. the file or directory)
-
-        Returns
-        -------
-        Path
-            The currently selected file or directory in the DirectoryExplorer.
-        """
-        _filter_index = self._widgets["tree_view"].selectedIndexes()
-        if len(_filter_index) == 0:
-            raise TypeError(
-                "No items selected in DirectoryExplorer while querying for selection."
-            )
-        _filter_index = _filter_index[0]
-        _index = self._filter_model.mapToSource(_filter_index)
-        _name = self._file_model.filePath(_index)
-        return Path(_name)
 
     def check_root_up_to_date(self) -> None:
         """Check if the root of the directory is up to date."""
@@ -335,6 +321,13 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _item = Path(self._file_model.filePath(_source_index))
         _dir = get_directory(_item)
         self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
+        if _item.is_dir():
+            # doubleClicked is emitted before QTreeView processes its own
+            # expand/collapse toggle, so isExpanded still reflects
+            # the before-click state
+            _was_expanded = self._widgets["tree_view"].isExpanded(index)
+            if not _was_expanded:
+                self.q_settings_set("directory_explorer/path", str(_dir))
         if _item.is_file():
             self.sig_new_file_selected.emit(str(_item))  # type: ignore[attr-defined]
 
@@ -351,6 +344,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _item = Path(normpath(path))
         _dir = get_directory(_item)
         self._dir_selection(_dir, show_at_top=True)
+        self.q_settings_set("directory_explorer/path", str(_dir))
         if _item.is_file():
             self.set_param_and_widget_value(
                 "current_directory", _dir, emit_signal=False
@@ -437,6 +431,14 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     # +---------------------------+
     # | private helper methods    |
     # +---------------------------+
+
+    def __expand_initial_path(self) -> None:
+        """Expand the initial path of the selected directory."""
+        _dir = str(self.__dir_to_load)
+        self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
+        self._dir_selection(_dir)
+        self._widgets["tree_view"].select_item(_dir)
+        self.__dir_to_load = None
 
     def __prepare_directory_loading(self, target_dir: Path) -> None:
         """

@@ -37,9 +37,8 @@ from pydidas.core import Parameter
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
-    HDF5_EXTENSIONS,
-    FONT_METRIC_CONSOLE_WIDTH,
     FONT_METRIC_WIDE_CONFIG_WIDTH,
+    HDF5_EXTENSIONS,
 )
 from pydidas.core.utils import (
     ShowBusyMouse,

@@ -181,7 +181,7 @@ GENERIC_PARAMS_SETTINGS = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The path which should be used as base directory in the data browser."
+            "The path which should be used as base directory in the data browser. "
             "The path given here will be used as top level paths and all children "
             "will be accessible in the data browser. If no path is given, the "
             "data browser will start with the root directory of the filesystem and "

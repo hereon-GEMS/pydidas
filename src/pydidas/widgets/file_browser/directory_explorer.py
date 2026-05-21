@@ -319,13 +319,13 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         _source_index = self._filter_model.mapToSource(index)
         _item = Path(self._file_model.filePath(_source_index))
         _dir = get_directory(_item)
-        if _item.is_dir():
+        if _item.is_dir() and self._widgets["tree_view"].isExpanded(index):
             # doubleClicked is emitted before QTreeView processes its own
             # expand/collapse toggle, so isExpanded still reflects
-            # the before-click state
-            if self._widgets["tree_view"].isExpanded(index):
-                return
-            self.q_settings_set("directory_explorer/path", str(_dir))
+            # the before-click state.
+            # Return on minimizing a directory without updating any settings.
+            return
+        self.q_settings_set("directory_explorer/path", str(_dir))
         self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
         if _item.is_file():
             self.sig_new_file_selected.emit(str(_item))  # type: ignore[attr-defined]

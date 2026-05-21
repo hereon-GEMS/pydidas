@@ -37,7 +37,7 @@ from silx.gui.hdf5 import H5Node
 from silx.gui.hdf5.Hdf5Item import Hdf5Item
 from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset, Parameter, ParameterCollection
+from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
 )
@@ -56,6 +56,7 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
 )
 from pydidas.widgets.framework import BaseFrame, PydidasWindow
 from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas.widgets.windows import Hdf5BrowserWindow
 
 
@@ -122,6 +123,14 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         for _method, _args, _kwargs in DATA_BROWSING_FRAME_BUILD_CONFIG:
             _widget_creation_method = getattr(self, _method)
             _widget_creation_method(*_args, **_kwargs)
+        # explicitly add the widget here to because the generic widget
+        # creation do not accept direct args
+        self.add_any_widget(
+            "filename",
+            ParamIoWidgetFile(get_generic_parameter("filename")),
+            gridPos=(0, 1, 1, 2),
+            parent_widget="plot_header",
+        )
         self.add_any_widget(
             "splitter",
             create_splitter(

@@ -40,10 +40,23 @@ from pydidas.widgets.file_browser.utilities import ChangeFilter
 
 class DirectoryExplorerFilterModel(QSortFilterProxyModel):
     """
-    A proxy sort model which allows hiding network drives and filter for files.
+    A proxy sort/filter model for ``QFileSystemModel``.
+
+    Supports hiding network drives and filtering visible files by a
+    filename pattern.  Large-directory loads can be bracketed with
+    :meth:`suspend_filtering` / :meth:`resume_filtering` to avoid
+    per-row Python overhead during bulk insertion.
     """
 
     def __init__(self, parent=None):
+        """
+        Initialise the filter model.
+
+        Parameters
+        ----------
+        parent : QObject or None, optional
+            The parent object. The default is None.
+        """
         QSortFilterProxyModel.__init__(self, parent)  # type: ignore[arg-type]
         self.setRecursiveFilteringEnabled(False)
         self.__accept_network_locations = PydidasQsettings().q_settings_get(
@@ -82,7 +95,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         """Set source model and connect invalidation hooks for runtime caches."""
         if not isinstance(sourceModel, QtWidgets.QFileSystemModel):
             raise TypeError("DirectoryExplorerFilterModel requires a QFileSystemModel.")
-        super().setSourceModel(sourceModel)
+        super().setSourceModel(sourceModel)  # type: ignore[arg-type]
         self.__clear_runtime_caches()
         sourceModel.modelReset.connect(self.__clear_runtime_caches)  # type: ignore[arg-type]
         if hasattr(sourceModel, "directoryLoaded"):
@@ -124,7 +137,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         if _cached is not None:
             return _cached
         _root_index = index
-        while _root_index.parent().isValid():
+        while _root_index.parent().isValid():  # type: ignore[attr-defined]
             _root_index = _root_index.parent()
         _root_path = self.sourceModel().filePath(_root_index)  # type: ignore[attr-defined]
         self.__top_root_cache[_key] = _root_path
@@ -143,7 +156,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         return _accepted
 
     @QtCore.Slot(bool)
-    def show_network_drives(self, acceptance: bool):
+    def show_network_drives(self, acceptance: bool) -> None:
         """
         Toggle the filtering of network locations.
 
@@ -154,12 +167,12 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         """
         if self.__accept_network_locations == acceptance:
             return
-        with ChangeFilter(self):
+        with ChangeFilter(self):  # type: ignore[arg-type]
             self.__accept_network_locations = acceptance
             self.__network_acceptance_cache.clear()
 
     @QtCore.Slot(str)
-    def change_filter_string(self, filter_string: str):
+    def change_filter_string(self, filter_string: str) -> None:
         """
         Change and update the filter string.
 
@@ -170,7 +183,7 @@ class DirectoryExplorerFilterModel(QSortFilterProxyModel):
         """
         if filter_string == self.__filter_str:
             return
-        with ChangeFilter(self):
+        with ChangeFilter(self):  # type: ignore[arg-type]
             self.__filename_filter_active = len(filter_string) > 0
             self.__filter_str = filter_string
             escaped_filter_string = QtCore.QRegularExpression.escape(filter_string)

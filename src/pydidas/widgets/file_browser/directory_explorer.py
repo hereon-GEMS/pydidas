@@ -80,10 +80,10 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         self.__dir_to_load: Path | None = Path(
             kwargs.get(
                 "current_path",
-                self.q_settings_get("directory_explorer/path", default="")
+                self.q_settings_get("directory_explorer/path", default=""),
             )
+            or ""
         )
-
         self.set_default_params()
         self._create_widgets()
         self._set_up_file_model(**kwargs)
@@ -170,7 +170,6 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     # +-----------------------------------+
     # | public API methods and properties |
     # +-----------------------------------+
-
 
     def check_root_up_to_date(self) -> None:
         """Check if the root of the directory is up to date."""
@@ -314,20 +313,20 @@ class DirectoryExplorer(WidgetWithParameterCollection):
 
         Parameters
         ----------
-        index :  QtCore.QModelIndex
+        index : QtCore.QModelIndex
             The index of the selected item (file or directory).
         """
         _source_index = self._filter_model.mapToSource(index)
         _item = Path(self._file_model.filePath(_source_index))
         _dir = get_directory(_item)
-        self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
         if _item.is_dir():
             # doubleClicked is emitted before QTreeView processes its own
             # expand/collapse toggle, so isExpanded still reflects
             # the before-click state
-            _was_expanded = self._widgets["tree_view"].isExpanded(index)
-            if not _was_expanded:
-                self.q_settings_set("directory_explorer/path", str(_dir))
+            if self._widgets["tree_view"].isExpanded(index):
+                return
+            self.q_settings_set("directory_explorer/path", str(_dir))
+        self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
         if _item.is_file():
             self.sig_new_file_selected.emit(str(_item))  # type: ignore[attr-defined]
 
@@ -357,13 +356,16 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """
         Prepare loading optimization when the user expands a directory.
 
-
         Parameters
         ----------
-        index :  QtCore.QModelIndex
+        index : QtCore.QModelIndex
             The index of the selected directory (expanded only triggers for
             directories).
         """
+        # Ignore expansions triggered programmatically by expand_to_path to
+        # avoid stacking up redundant suspend/resume cycles for ancestor nodes.
+        if self._widgets["tree_view"].programmatic_expanding:
+            return
         _source_index = self._filter_model.mapToSource(index)
         if not _source_index.isValid():
             return
@@ -436,7 +438,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         """Expand the initial path of the selected directory."""
         _dir = str(self.__dir_to_load)
         self.set_param_and_widget_value("current_directory", _dir, emit_signal=False)
-        self._dir_selection(_dir)
+        self._dir_selection(self.__dir_to_load)
         self._widgets["tree_view"].select_item(_dir)
         self.__dir_to_load = None
 
@@ -493,6 +495,12 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         ----------
         target_dir : Path
             The selected directory to be checked.
+
+        Returns
+        -------
+        bool
+            Returns True if the directory index is valid and has at least one
+            child row already populated in the model.
         """
         _target_index = self._file_model.index(str(target_dir))
         return _target_index.isValid() and self._file_model.rowCount(_target_index) > 0

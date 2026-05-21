@@ -38,9 +38,6 @@ from pydidas.core.constants import POLICY_EXP_EXP
 from pydidas.core.utils import apply_qt_properties, get_directory
 
 
-AscendingOrder = QtCore.Qt.AscendingOrder
-QSortFilterProxyModel = QtCore.QSortFilterProxyModel
-
 _EXPAND_PATH_RETRY_LIMIT = 10
 
 
@@ -63,8 +60,9 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
         self._raw_model: QtWidgets.QFileSystemModel | None = None
         self._proxy_model: QtCore.QSortFilterProxyModel | None = None
         self._pending_expand_paths: list[str] = []
-        self._pending_expand_retry_count = 0
-        self.__expand_scroll_hint: QtWidgets.QAbstractItemView.ScrollHint = (
+        self._pending_expand_retry_count: int = 0
+        self._programmatic_expanding: bool = False
+        self.__expand_scroll_hint: QtWidgets.QAbstractItemView.ScrollHint = (  # type: ignore[arg-type]
             QtWidgets.QAbstractItemView.EnsureVisible
         )
 
@@ -116,13 +114,32 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
         """
         return QtCore.QSize(400, 4000)
 
+    @property
+    def programmatic_expanding(self) -> bool:
+        """
+        Return the state for the programmatic expanding.
+
+        Returns
+        -------
+        bool
+            Flag whether the tree view is currently expanding programmatically.
+        """
+        return self._programmatic_expanding
+
     @QtCore.Slot(str)
     def _on_directory_loaded(self, path: str) -> None:
-        """Enable sorting when the first directory is loaded."""
+        """
+        Enable sorting when the root directory finishes loading.
+
+        Parameters
+        ----------
+        path : str
+            The path of the directory that has finished loading.
+        """
         _root_path = Path(self._raw_model.rootPath())
         _loaded_path = Path(path)
         if _root_path == _loaded_path:
-            self._raw_model.directoryLoaded.disconnect(self._on_directory_loaded)
+            self._raw_model.directoryLoaded.disconnect(self._on_directory_loaded)  # type: ignore[attr-defined]
             self.setSortingEnabled(True)
             self.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
 
@@ -169,7 +186,9 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
             self._pending_expand_retry_count = 0
             return
 
+        self._programmatic_expanding = True
         self.expand(_view_index)
+        self._programmatic_expanding = False
         self._pending_expand_paths.pop(0)
         self._pending_expand_retry_count = 0
         if len(self._pending_expand_paths) == 0:
@@ -204,7 +223,7 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
         """
         if self._raw_model is None:
             return
-        self.__expand_scroll_hint = (
+        self.__expand_scroll_hint = (  # type: ignore[arg-type]
             QtWidgets.QAbstractItemView.PositionAtTop
             if show_at_top
             else QtWidgets.QAbstractItemView.EnsureVisible
@@ -219,10 +238,6 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
         self._pending_expand_paths = _expand_paths
         self._pending_expand_retry_count = 0
         self._schedule_expand_step()
-        if _expand_paths != self._pending_expand_paths:
-            self._pending_expand_paths = _expand_paths
-            self._pending_expand_retry_count = 0
-            self._schedule_expand_step()
 
     def select_item(self, name: str) -> None:
         """

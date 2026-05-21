@@ -38,6 +38,8 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     FONT_METRIC_SMALL_PARAM_EDIT_WIDTH,
     HDF5_EXTENSIONS,
+    FONT_METRIC_CONSOLE_WIDTH,
+    FONT_METRIC_WIDE_CONFIG_WIDTH,
 )
 from pydidas.core.utils import (
     ShowBusyMouse,
@@ -143,7 +145,7 @@ class Hdf5DatasetSelector(WidgetWithParameterCollection):
         )
         self.create_param_widget(
             self.get_param("dataset"),
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
+            font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
             gridPos=(2, 0, 1, 2),
             width_text=0.275,
             width_io=0.725,

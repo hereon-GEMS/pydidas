@@ -26,7 +26,7 @@ __copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["ParamIoWidgetHdf5Key"]
+__all__ = ["ParamIoWidgetHdf5Key", "ParamIoWidgetNXdata"]
 
 
 from typing import Any
@@ -48,6 +48,8 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     dialogue.
     """
 
+    nxdata_signal_only = False
+
     def __init__(self, param: Parameter, **kwargs: Any) -> None:
         """
         Initialize the widget.
@@ -67,6 +69,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
             "Select the dataset to use from all dataset keys in a file."
         )
         self.io_dialog = PydidasFileDialog()
+        self.__selection_popup: Hdf5DatasetSelectionPopup | None = None
         self._io_qsettings_ref = kwargs.get("persistent_qsettings_ref", None)
 
     def button_function(self) -> None:
@@ -82,6 +85,23 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
             default_suffix=".nxs",
         )
         if _result is not None:
+            if self.__selection_popup is None:
+                self.__selection_popup = Hdf5DatasetSelectionPopup(
+                    self, _result, nxdata_signal_only=self.nxdata_signal_only
+                )
+            else:
+                self.__selection_popup.set_filename(_result)
             dset = Hdf5DatasetSelectionPopup(self, _result).get_dset()
             if dset is not None:
                 self.set_value(str(dset))
+
+
+class ParamIoWidgetNXdata(ParamIoWidgetHdf5Key):
+    """
+    Widget for entering and editing a NXdata Parameter.
+
+    This widget includes a small button to select a filepath and Hdf5 key from a
+    dialogue.
+    """
+
+    nxdata_signal_only = True

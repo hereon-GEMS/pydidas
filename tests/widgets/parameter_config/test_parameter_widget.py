@@ -32,7 +32,7 @@ import numpy as np
 import pytest
 from qtpy import QtCore
 
-from pydidas.core import Hdf5key, Parameter, UserConfigError
+from pydidas.core import Hdf5key, Parameter, UserConfigError, NXdataKey
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
@@ -49,8 +49,8 @@ from pydidas.widgets.parameter_config.param_io_widget_combobox import (
     ParamIoWidgetComboBox,
 )
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
-from pydidas.widgets.parameter_config.param_io_widget_hdf5key import (
-    ParamIoWidgetHdf5Key,
+from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
+    ParamIoWidgetHdf5Key, ParamIoWidgetNXdata,
 )
 from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
     ParamIoWidgetLineEdit,
@@ -64,6 +64,7 @@ _TEST_DTYPE_VAL_NEW_VALS = [
     (float, 1.2, -4.2),
     (Path, Path("/tmp"), Path("/home/user")),
     (Hdf5key, Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")),
+    (NXdataKey, NXdataKey("/entry/A"), NXdataKey("/entry/meta/B")),
 ]
 LAYOUT_VERTICAL_SPACING = ParameterWidget.LAYOUT_VERTICAL_SPACING
 LAYOUT_TOP_BOTTOM_MARGIN = ParameterWidget.LAYOUT_TOP_BOTTOM_MARGIN
@@ -161,6 +162,7 @@ def test__creation__w__bool_choices(
         (float, 1.2, [1.2, -2.4, 0.0]),
         (Path, Path("/tmp"), [Path("/tmp"), Path("/home")]),
         (Hdf5key, Hdf5key("/entry/A"), [Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")]),
+        (NXdataKey, NXdataKey("/entry/A"), [NXdataKey("/entry/A"), NXdataKey("/entry/meta/B")]),
     ],
 )
 @pytest.mark.parametrize("use_choices", [True, False])
@@ -185,6 +187,8 @@ def test__creation__check_choices_behaviour(
             assert isinstance(widget.io_widget, ParamIoWidgetFile)
         elif dtype is Hdf5key:
             assert isinstance(widget.io_widget, ParamIoWidgetHdf5Key)
+        elif dtype is NXdataKey:
+            assert isinstance(widget.io_widget, ParamIoWidgetNXdata)
         else:
             assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
 

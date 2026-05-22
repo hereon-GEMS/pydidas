@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ suite.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,9 +37,9 @@ from .dataset import *
 # import exceptions first to be used in other modules
 from .exceptions import *
 from .generic_parameters import *
-from .hdf5_key import *
 from .object_with_parameter_collection import *
 from .parameter import *
+from .parameter_classes import *
 from .parameter_collection import *
 from .parameter_collection_mixin import *
 from .pydidas_q_settings import *
@@ -53,7 +53,7 @@ __all__ = ["constants", "generic_params", "io_registry", "utils"] + (
     + dataset.__all__
     + exceptions.__all__
     + generic_parameters.__all__
-    + hdf5_key.__all__
+    + parameter_classes.__all__
     + object_with_parameter_collection.__all__
     + parameter.__all__
     + parameter_collection.__all__
@@ -70,7 +70,7 @@ del (
     dataset,
     exceptions,
     generic_parameters,
-    hdf5_key,
+    parameter_classes,
     object_with_parameter_collection,
     parameter,
     parameter_collection,

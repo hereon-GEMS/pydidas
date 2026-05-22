@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with unittests for pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,10 +32,11 @@ import h5py
 import numpy as np
 import pytest
 
-from pydidas.core import get_generic_parameter
+from pydidas.core import Hdf5key, NXdataKey, Parameter, get_generic_parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_hdf5key import (
+from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
     ParamIoWidgetHdf5Key,
+    ParamIoWidgetNXdata,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -47,11 +48,16 @@ _POPULATED_KEYS = {
     "/entry/data2/test": (4, 6),
 }
 
+_PARAMS = [get_generic_parameter("hdf5_key"), get_generic_parameter("nxdata_key")]
 
-def widget_instance(qtbot, qref=None):
-    widget = ParamIoWidgetHdf5Key(
-        get_generic_parameter("hdf5_key"), persistent_qsettings_ref=qref
-    )
+
+def widget_instance(qtbot, param: Parameter = _PARAMS[0], qref: str | None = None):
+    param.restore_default()
+    if param.dtype == Hdf5key:
+        _widget_class = ParamIoWidgetHdf5Key
+    elif param.dtype == NXdataKey:
+        _widget_class = ParamIoWidgetNXdata
+    widget = _widget_class(param, persistent_qsettings_ref=qref)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
@@ -83,9 +89,13 @@ def _cleanup():
 
 @pytest.mark.gui
 @pytest.mark.parametrize("qref", [None, "test_ref_hdf5_key"])
-def test__creation(qtbot, test_dir, qref):
-    widget = widget_instance(qtbot, qref=qref)
-    assert isinstance(widget, ParamIoWidgetHdf5Key)
+@pytest.mark.parametrize("param", _PARAMS)
+def test__creation(qtbot, param, test_dir, qref):
+    widget = widget_instance(qtbot, param, qref=qref)
+    if param.dtype == Hdf5key:
+        assert isinstance(widget, ParamIoWidgetHdf5Key)
+    if param.dtype == NXdataKey:
+        assert isinstance(widget, ParamIoWidgetNXdata)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     if qref is None:

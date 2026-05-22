@@ -471,23 +471,6 @@ frames.</p>
 improved code organisation. They will create the user interface “shells”
 without any connections and functionality.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.CompositeCreatorFrameBuilder">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">CompositeCreatorFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder" title="Link to this definition">#</a></dt>
-<dd><p>Create the layout and add all widgets required for the CompositeCreatorFrame.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame" title="Link to this definition">#</a></dt>
-<dd><p>Create and initialize all widgets for the CompositeCreatorFrame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="../../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The BaseFrame instance in which the widgets shall be added.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="pydidas.gui.frames.builders.UtilitiesFrameBuilder">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">UtilitiesFrameBuilder</span></span><a class="headerlink" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder" title="Link to this definition">#</a></dt>
 <dd><p>Create all widgets and initialize their state.</p>
@@ -524,6 +507,23 @@ without any connections and functionality.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pydidas.gui.frames.builders.ccf_param_widget_config">
+<span class="sig-prename descclassname"><span class="pre">pydidas.gui.frames.builders.</span></span><span class="sig-name descname"><span class="pre">ccf_param_widget_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.gui.frames.builders.ccf_param_widget_config" title="Link to this definition">#</a></dt>
+<dd><p>Get Formatting options for create_param_widget instances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>param_key</strong> (<em>str</em>) – The reference key for Parameter.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The keyword dictionary to be passed to the ParamWidget creation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -614,10 +614,6 @@ widget creation method name, the method arguments and the method</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.CompositeCreatorFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorFrameBuilder.build_frame</span></code></a></li>
-</ul>
-</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.UtilitiesFrameBuilder.build_frame"><code class="docutils literal notranslate"><span class="pre">UtilitiesFrameBuilder.build_frame</span></code></a></li>
 </ul>
@@ -626,6 +622,7 @@ widget creation method name, the method arguments and the method</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.WorkflowEditFrameBuilder.populate_frame"><code class="docutils literal notranslate"><span class="pre">WorkflowEditFrameBuilder.populate_frame</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.ccf_param_widget_config"><code class="docutils literal notranslate"><span class="pre">ccf_param_widget_config</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.create_splitter"><code class="docutils literal notranslate"><span class="pre">create_splitter</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.builders.get_WorkflowTestFrame_build_config"><code class="docutils literal notranslate"><span class="pre">get_WorkflowTestFrame_build_config</span></code></a></li>
 </ul>

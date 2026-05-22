@@ -1032,6 +1032,30 @@ available:</p>
 </div>
 </td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_browsing_root</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : str</div>
+<div class="line"><strong>default</strong> :</div>
+<div class="line"><strong>name</strong> : Data browsing root</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The path which should be used as base directory in the data browser. The path given here will be used as top level paths and all children will be accessible in the data browser. If no path is given, the data browser will start with the root directory of the filesystem and all paths will be accessible. Note that the path given here must exist and be accessible, otherwise the data browser will ignore this path.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_custom_data_browsing_root</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : bool</div>
+<div class="line"><strong>default</strong> : False</div>
+<div class="line"><strong>name</strong> : Use custom browsing root</div>
+<div class="line"><strong>choices</strong> : [True, False]</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : The flag whether the full file system is accessible or only a small subset should be made available in the data browsing. If activated, select the directory to use with the <cite>data_browsing_root</cite> parameter.</div>
+</div>
+</td>
+</tr>
 <tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">plot_update_time</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>

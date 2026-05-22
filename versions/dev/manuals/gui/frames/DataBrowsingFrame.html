@@ -468,14 +468,20 @@
 <span id="id1"></span><h1>Data browsing frame<a class="headerlink" href="#data-browsing-frame" title="Link to this heading">#</a></h1>
 <nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference internal" href="#controls" id="id2">Controls</a></p></li>
-<li><p><a class="reference internal" href="#directory-explorer" id="id3">Directory explorer</a></p></li>
-<li><p><a class="reference internal" href="#data-display" id="id4">Data display</a></p>
+<li><p><a class="reference internal" href="#controls" id="id2">Controls</a></p>
 <ul>
-<li><p><a class="reference internal" href="#the-hdf5-data-selection-widget" id="id5">The hdf5 data selection widget</a></p></li>
-<li><p><a class="reference internal" href="#the-raw-data-selection-widget" id="id6">The raw data selection widget</a></p></li>
-<li><p><a class="reference internal" href="#display-modality-and-slice-selection" id="id7">Display modality and slice selection</a></p></li>
-<li><p><a class="reference internal" href="#d-image-view" id="id8">2D image view</a></p></li>
+<li><p><a class="reference internal" href="#browsing-options-header" id="id3">Browsing options header</a></p></li>
+<li><p><a class="reference internal" href="#browsing-options" id="id4">Browsing options</a></p></li>
+<li><p><a class="reference internal" href="#current-directory-and-filter-row" id="id5">Current directory and filter row</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#directory-explorer" id="id6">Directory explorer</a></p></li>
+<li><p><a class="reference internal" href="#data-display" id="id7">Data display</a></p>
+<ul>
+<li><p><a class="reference internal" href="#the-hdf5-data-selection-widget" id="id8">The hdf5 data selection widget</a></p></li>
+<li><p><a class="reference internal" href="#the-raw-data-selection-widget" id="id9">The raw data selection widget</a></p></li>
+<li><p><a class="reference internal" href="#display-modality-and-slice-selection" id="id10">Display modality and slice selection</a></p></li>
+<li><p><a class="reference internal" href="#d-image-view" id="id11">2D image view</a></p></li>
 </ul>
 </li>
 </ul>
@@ -488,7 +494,7 @@ the right side, a data display allows to visualize data.</p>
 For raw images, an additional selection widget to specify the data settings will
 be shown. Similarly, for hdf5 files, an additional selection widget to select
 the dataset in the file will be shown.</p>
-<a class="reference internal image-reference" href="../../../_images/overview.png"><img alt="../../../_images/overview.png" class="align-center" src="../../../_images/overview.png" style="width: 675px;" />
+<a class="reference internal image-reference" href="../../../_images/overview.png"><img alt="../../../_images/overview.png" class="align-center" src="../../../_images/overview.png" style="width: 580px;" />
 </a>
 <p>In the screenshot above, the data display is empty as no data has been selected.
 An example will be shown in the following sections.</p>
@@ -505,20 +511,70 @@ center.</p>
 </div>
 <section id="controls">
 <h2>Controls<a class="headerlink" href="#controls" title="Link to this heading">#</a></h2>
-<p>The controls are located on the left, above the directory explorer. Selecting or
+<p>The controls are located on the left, above the directory explorer.</p>
+<section id="browsing-options-header">
+<h3>Browsing options header<a class="headerlink" href="#browsing-options-header" title="Link to this heading">#</a></h3>
+<a class="reference internal image-reference" href="../../../_images/options.png"><img alt="../../../_images/options.png" class="align-right" src="../../../_images/options.png" style="width: 297px;" />
+</a>
+<p>At the very top of the left panel, a bold <strong>Data browsing options</strong> header is
+shown next to a toggle button labelled <em>Hide browsing options</em> /
+<em>Show browsing options</em>. Clicking this button collapses or expands the entire
+browsing-options section, leaving only the <em>Current directory</em> field and the
+filter row visible. This is useful to maximise the vertical space for the
+directory tree when the options do not need to be changed.</p>
+</section>
+<section id="browsing-options">
+<h3>Browsing options<a class="headerlink" href="#browsing-options" title="Link to this heading">#</a></h3>
+<p>The collapsible options section contains the following controls. Selecting or
 deselecting an option will directly update the directory explorer.</p>
-<p>The options and control widgets are:</p>
 <blockquote>
 <div><ul>
-<li><p>Show network drives</p>
+<li><p><strong>Show network drives</strong></p>
 <p>This option allows to show or hide linked network drives in the explorer
 view.</p>
 </li>
-<li><p>Sorting is case sensitive</p>
+<li><p><strong>Sorting is case sensitive</strong></p>
 <p>This option toggles case sensitive sorting. If enabled, lowercase and
 uppercase names will be sorted and displayed separately.</p>
 </li>
-<li><p>Current directory</p>
+<li><p><strong>Use custom data browsing root</strong></p>
+<p>When this checkbox is enabled, the directory explorer is restricted to a
+user-defined root directory. Only paths at or below the chosen root will
+be visible and accessible. This is convenient when working in an
+environment with a well-known data location and a cluttered file system.</p>
+<p>Enabling this option reveals three additional controls (see below).</p>
+<a class="reference internal image-reference" href="../../../_images/custom_root.png"><img alt="../../../_images/custom_root.png" class="align-left" src="../../../_images/custom_root.png" style="width: 400px;" />
+</a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Attempting to navigate to a directory outside the custom root will
+raise a warning and the request will be ignored.</p>
+</div>
+</li>
+<li><p><strong>Data browsing root</strong> <em>(visible only when the custom root is enabled)</em></p>
+<p>An input field that accepts the path of the desired root directory. Bare
+drive letters such as <code class="docutils literal notranslate"><span class="pre">C:</span></code> are automatically expanded to <code class="docutils literal notranslate"><span class="pre">C:\</span></code>. The
+entry is not applied immediately; use the <em>Apply new root</em> button to
+confirm it.</p>
+</li>
+<li><p><strong>Apply new root</strong> button <em>(visible only when the custom root is enabled)</em></p>
+<p>Applies the path currently entered in the <em>Data browsing root</em> field as
+the new root for the explorer. If the path does not exist, the entry is
+rejected and the explorer reverts to showing the full file system.</p>
+</li>
+<li><p><strong>Reset root</strong> button <em>(visible only when the custom root is enabled)</em></p>
+<p>Clears the custom root and restores the explorer to the full file system.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="current-directory-and-filter-row">
+<h3>Current directory and filter row<a class="headerlink" href="#current-directory-and-filter-row" title="Link to this heading">#</a></h3>
+<p>These controls are always visible regardless of whether the browsing options
+section is collapsed.</p>
+<blockquote>
+<div><ul>
+<li><p><strong>Current directory</strong></p>
 <p>This widget both shows the current directory and allows to change the
 current directory by entering a new path. If the new path does not exist,
 the entry will be ignored. It is also possible to drag and drop directories
@@ -526,24 +582,24 @@ or files from the file system into the entry field. This will automatically
 set the current directory to the directory of the dragged item. In the case
 of files, the file will also be opened, if it is a supported data format.</p>
 </li>
-<li><p>Filename filter</p>
+<li><p><strong>Filename filter</strong></p>
 <p>This field allows to filter the displayed files in the directory explorer.
-The asterix <cite>*</cite> can be used as a wildcard. For example, entering <cite>*.h5</cite> will
-display only files with the <cite>.h5</cite> extension. The filter is applied to files
-only and will not affect the display of directories, i.e. all directories
-will always be shown, regardless of the filter. The filter can be reset by
-deleting the entry in the field.</p>
+The asterisk <code class="docutils literal notranslate"><span class="pre">*</span></code> can be used as a wildcard. For example, entering <code class="docutils literal notranslate"><span class="pre">*.h5</span></code>
+will display only files with the <code class="docutils literal notranslate"><span class="pre">.h5</span></code> extension. The filter is applied to
+files only and will not affect the display of directories, i.e. all
+directories will always be shown, regardless of the filter. The filter can
+be reset by deleting the entry in the field.</p>
 </li>
-<li><p>Reset filter</p>
-<p>This button also resets the filename filter. It is equivalent to deleting
-the entry in the filter field.</p>
+<li><p><strong>Reset filter</strong></p>
+<p>This button resets the filename filter. It is equivalent to deleting the
+entry in the filter field.</p>
 </li>
-<li><p>Collapse all</p>
-<p>This button collapses all directories in the directory explorer. It is
-equivalent to double-clicking on all top level entries.</p>
+<li><p><strong>Collapse all</strong></p>
+<p>This button collapses all directories in the directory explorer.</p>
 </li>
 </ul>
 </div></blockquote>
+</section>
 </section>
 <section id="directory-explorer">
 <h2>Directory explorer<a class="headerlink" href="#directory-explorer" title="Link to this heading">#</a></h2>
@@ -551,12 +607,16 @@ equivalent to double-clicking on all top level entries.</p>
 look and feel will depend on the used operating system and might be different
 from the screenshots shown here.</p>
 <p>A single click on an item will just highlight the item but will otherwise be
-ignored. Double-clicking on a folder (or the arrow next to a folder) will expand
-or collapse the folder, depending on the folder’s current state. Double-clicking
-on a file will instruct pydidas to open the selected file. If the data format is
-readable and the file contains two-dimensional data, the content will be
-displayed in the ImageView widget. In case of hdf5 files, an additional
-selection field will be shown to select the data frame.</p>
+ignored.</p>
+<p>Double-clicking on a folder (or clicking the arrow next to a folder) will
+<strong>expand</strong> the folder if it is currently collapsed, or <strong>collapse</strong> it if it is
+already expanded. Double-clicking on a file will instruct pydidas to open the
+selected file. If the data format is readable and the file contains
+two-dimensional data, the content will be displayed in the ImageView widget.
+In case of hdf5 files, an additional selection field will be shown to select
+the data frame.</p>
+<p>When a custom browsing root is active, the tree is anchored at that root
+directory and parent directories above it are not shown.</p>
 </section>
 <section id="data-display">
 <h2>Data display<a class="headerlink" href="#data-display" title="Link to this heading">#</a></h2>
@@ -616,7 +676,7 @@ be explained below.</p>
 shape and header length (the header length is given in bytes). Setting all these
 values allows to correctly decode raw images. The respective widget is shown
 below:</p>
-<img alt="../../../_images/hdf5_all.png" class="align-center" src="../../../_images/hdf5_all.png" />
+<img alt="../../../_images/raw.png" class="align-center" src="../../../_images/raw.png" />
 <p>Trying to decode raw data with wrong settings raises a warning message if the
 data cannot be imported.</p>
 <p>A checkbox with <em>Automatically load files with these settings</em> allows to
@@ -904,7 +964,12 @@ plots for the vertical and horizontal axes, respectively.</p></td>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controls">Controls</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controls">Controls</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#browsing-options-header">Browsing options header</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#browsing-options">Browsing options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#current-directory-and-filter-row">Current directory and filter row</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-explorer">Directory explorer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-display">Data display</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-hdf5-data-selection-widget">The hdf5 data selection widget</a></li>

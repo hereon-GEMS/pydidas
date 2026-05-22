@@ -25,7 +25,7 @@ be shown. Similarly, for hdf5 files, an additional selection widget to select
 the dataset in the file will be shown.
 
 .. image::  images/data_browse/overview.png
-    :width: 675px
+    :width: 580px
     :align: center
 
 In the screenshot above, the data display is empty as no data has been selected.
@@ -46,22 +46,81 @@ in the screenshot above.
 Controls
 ^^^^^^^^
 
-The controls are located on the left, above the directory explorer. Selecting or
+The controls are located on the left, above the directory explorer.
+
+Browsing options header
+"""""""""""""""""""""""
+
+.. image:: images/data_browse/options.png
+    :width: 297 px
+    :align: right
+
+At the very top of the left panel, a bold **Data browsing options** header is
+shown next to a toggle button labelled *Hide browsing options* /
+*Show browsing options*. Clicking this button collapses or expands the entire
+browsing-options section, leaving only the *Current directory* field and the
+filter row visible. This is useful to maximise the vertical space for the
+directory tree when the options do not need to be changed.
+
+
+Browsing options
+""""""""""""""""
+
+The collapsible options section contains the following controls. Selecting or
 deselecting an option will directly update the directory explorer.
 
-The options and control widgets are:
-
-  - Show network drives
+  - **Show network drives**
 
     This option allows to show or hide linked network drives in the explorer
     view.
 
-  - Sorting is case sensitive
+  - **Sorting is case sensitive**
 
     This option toggles case sensitive sorting. If enabled, lowercase and
     uppercase names will be sorted and displayed separately.
 
-  - Current directory
+  - **Use custom data browsing root**
+
+    When this checkbox is enabled, the directory explorer is restricted to a
+    user-defined root directory. Only paths at or below the chosen root will
+    be visible and accessible. This is convenient when working in an
+    environment with a well-known data location and a cluttered file system.
+
+    Enabling this option reveals three additional controls (see below).
+
+    .. image:: images/data_browse/custom_root.png
+        :width: 400px
+        :align: left
+
+    .. note::
+
+        Attempting to navigate to a directory outside the custom root will
+        raise a warning and the request will be ignored.
+
+  - **Data browsing root** *(visible only when the custom root is enabled)*
+
+    An input field that accepts the path of the desired root directory. Bare
+    drive letters such as ``C:`` are automatically expanded to ``C:\``. The
+    entry is not applied immediately; use the *Apply new root* button to
+    confirm it.
+
+  - **Apply new root** button *(visible only when the custom root is enabled)*
+
+    Applies the path currently entered in the *Data browsing root* field as
+    the new root for the explorer. If the path does not exist, the entry is
+    rejected and the explorer reverts to showing the full file system.
+
+  - **Reset root** button *(visible only when the custom root is enabled)*
+
+    Clears the custom root and restores the explorer to the full file system.
+
+Current directory and filter row
+"""""""""""""""""""""""""""""""""
+
+These controls are always visible regardless of whether the browsing options
+section is collapsed.
+
+  - **Current directory**
 
     This widget both shows the current directory and allows to change the
     current directory by entering a new path. If the new path does not exist,
@@ -70,24 +129,23 @@ The options and control widgets are:
     set the current directory to the directory of the dragged item. In the case
     of files, the file will also be opened, if it is a supported data format.
 
-  - Filename filter
+  - **Filename filter**
 
     This field allows to filter the displayed files in the directory explorer.
-    The asterix `*` can be used as a wildcard. For example, entering `*.h5` will
-    display only files with the `.h5` extension. The filter is applied to files
-    only and will not affect the display of directories, i.e. all directories
-    will always be shown, regardless of the filter. The filter can be reset by
-    deleting the entry in the field.
+    The asterisk ``*`` can be used as a wildcard. For example, entering ``*.h5``
+    will display only files with the ``.h5`` extension. The filter is applied to
+    files only and will not affect the display of directories, i.e. all
+    directories will always be shown, regardless of the filter. The filter can
+    be reset by deleting the entry in the field.
 
-  - Reset filter
+  - **Reset filter**
 
-    This button also resets the filename filter. It is equivalent to deleting
-    the entry in the filter field.
+    This button resets the filename filter. It is equivalent to deleting the
+    entry in the filter field.
 
-  - Collapse all
+  - **Collapse all**
 
-    This button collapses all directories in the directory explorer. It is
-    equivalent to double-clicking on all top level entries.
+    This button collapses all directories in the directory explorer.
 
 
 Directory explorer
@@ -98,12 +156,18 @@ look and feel will depend on the used operating system and might be different
 from the screenshots shown here.
 
 A single click on an item will just highlight the item but will otherwise be
-ignored. Double-clicking on a folder (or the arrow next to a folder) will expand
-or collapse the folder, depending on the folder's current state. Double-clicking
-on a file will instruct pydidas to open the selected file. If the data format is
-readable and the file contains two-dimensional data, the content will be
-displayed in the ImageView widget. In case of hdf5 files, an additional
-selection field will be shown to select the data frame.
+ignored.
+
+Double-clicking on a folder (or clicking the arrow next to a folder) will
+**expand** the folder if it is currently collapsed, or **collapse** it if it is
+already expanded. Double-clicking on a file will instruct pydidas to open the
+selected file. If the data format is readable and the file contains
+two-dimensional data, the content will be displayed in the ImageView widget.
+In case of hdf5 files, an additional selection field will be shown to select
+the data frame.
+
+When a custom browsing root is active, the tree is anchored at that root
+directory and parent directories above it are not shown.
 
 Data display
 ^^^^^^^^^^^^
@@ -177,7 +241,7 @@ shape and header length (the header length is given in bytes). Setting all these
 values allows to correctly decode raw images. The respective widget is shown
 below:
 
-.. image:: images/data_browse/hdf5_all.png
+.. image:: images/data_browse/raw.png
     :align: center
 
 Trying to decode raw data with wrong settings raises a warning message if the

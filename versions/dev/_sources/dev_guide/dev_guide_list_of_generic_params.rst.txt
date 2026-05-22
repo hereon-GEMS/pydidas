@@ -412,6 +412,22 @@ Settings
        | **unit** : 
        | **allow_None** : False
        | **tooltip** : The paths to all custom plugin locations. Individual entries must be separated by a double semicolon `;;`.
+   * - :py:data:`data_browsing_root`
+     - | **type** : str
+       | **default** : 
+       | **name** : Data browsing root
+       | **choices** : None
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The path which should be used as base directory in the data browser. The path given here will be used as top level paths and all children will be accessible in the data browser. If no path is given, the data browser will start with the root directory of the filesystem and all paths will be accessible. Note that the path given here must exist and be accessible, otherwise the data browser will ignore this path.
+   * - :py:data:`use_custom_data_browsing_root`
+     - | **type** : bool
+       | **default** : False
+       | **name** : Use custom browsing root
+       | **choices** : [True, False]
+       | **unit** : 
+       | **allow_None** : False
+       | **tooltip** : The flag whether the full file system is accessible or only a small subset should be made available in the data browsing. If activated, select the directory to use with the `data_browsing_root` parameter.
    * - :py:data:`plot_update_time`
      - | **type** : float
        | **default** : 1.0

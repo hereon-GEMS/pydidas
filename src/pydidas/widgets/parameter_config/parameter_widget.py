@@ -35,7 +35,7 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import Hdf5key, Parameter, UserConfigError, NXdataKey
+from pydidas.core import Hdf5key, NXdataKey, Parameter, UserConfigError
 from pydidas.core.constants import (
     ALIGN_CENTER_LEFT,
     FLOAT_DISPLAY_ACCURACY,
@@ -56,7 +56,8 @@ from pydidas.widgets.parameter_config.param_io_widget_combobox import (
 )
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
-    ParamIoWidgetHdf5Key, ParamIoWidgetNXdata
+    ParamIoWidgetHdf5Key,
+    ParamIoWidgetNXdata,
 )
 from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
     ParamIoWidgetLineEdit,
@@ -227,7 +228,11 @@ class ParameterWidget(EmptyWidget):
             _linebreak = False
             _text_width = 0
         # modify presets to ignore unit for files or HDF5 keys:
-        if self._param_widget_class in (ParamIoWidgetFile, ParamIoWidgetHdf5Key, ParamIoWidgetNXdata):
+        if self._param_widget_class in (
+            ParamIoWidgetFile,
+            ParamIoWidgetHdf5Key,
+            ParamIoWidgetNXdata,
+        ):
             _unit_width = 0
         # define I/O width based on available space:
         _io_width = (

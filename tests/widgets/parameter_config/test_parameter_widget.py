@@ -32,7 +32,7 @@ import numpy as np
 import pytest
 from qtpy import QtCore
 
-from pydidas.core import Hdf5key, Parameter, UserConfigError, NXdataKey
+from pydidas.core import Hdf5key, NXdataKey, Parameter, UserConfigError
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
@@ -50,7 +50,8 @@ from pydidas.widgets.parameter_config.param_io_widget_combobox import (
 )
 from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
 from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
-    ParamIoWidgetHdf5Key, ParamIoWidgetNXdata,
+    ParamIoWidgetHdf5Key,
+    ParamIoWidgetNXdata,
 )
 from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
     ParamIoWidgetLineEdit,
@@ -162,7 +163,11 @@ def test__creation__w__bool_choices(
         (float, 1.2, [1.2, -2.4, 0.0]),
         (Path, Path("/tmp"), [Path("/tmp"), Path("/home")]),
         (Hdf5key, Hdf5key("/entry/A"), [Hdf5key("/entry/A"), Hdf5key("/entry/meta/B")]),
-        (NXdataKey, NXdataKey("/entry/A"), [NXdataKey("/entry/A"), NXdataKey("/entry/meta/B")]),
+        (
+            NXdataKey,
+            NXdataKey("/entry/A"),
+            [NXdataKey("/entry/A"), NXdataKey("/entry/meta/B")],
+        ),
     ],
 )
 @pytest.mark.parametrize("use_choices", [True, False])

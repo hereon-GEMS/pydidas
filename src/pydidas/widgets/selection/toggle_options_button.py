@@ -94,7 +94,7 @@ class ToggleOptionsButton(PydidasPushButton):
         self._linked_widget_visible = bool(kwargs.get("linked_widget_visible", False))
         self._toggle_text_for_state = {
             True: kwargs.get("toggle_text_shown", "Hide advanced options"),
-            False: kwargs.get("toggle_text_hidden", "ShowN advanced options"),
+            False: kwargs.get("toggle_text_hidden", "Show advanced options"),
         }
         self.linked_widget = kwargs.get("linked_widget", None)
         self.clicked.connect(self.toggle_state)

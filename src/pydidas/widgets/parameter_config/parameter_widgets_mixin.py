@@ -96,19 +96,21 @@ class ParameterWidgetsMixIn:
                 QSettings reference key for persisting file-dialog directories
                 across sessions. The default is None.
         """
-        _parent = kwargs.get("parent_widget", self)
+        _parent = kwargs.pop("parent_widget", self)
         if isinstance(_parent, str):
             _parent = self._widgets[_parent]
+        _layout = _parent.layout()
+        if _layout is None:
+            raise PydidasGuiError("No layout set, cannot create ParameterWidget.")
+
         if isinstance(param, str):
             param = self.params[param]
         _widget = ParameterWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget
 
-        if _parent.layout() is None:
-            raise PydidasGuiError("No layout set.")
         _layout_args = get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(_widget, *_layout_args)
+        _layout.addWidget(_widget, *_layout_args)
 
     def toggle_param_widget_visibility(self, key: str, visible: bool) -> None:
         """

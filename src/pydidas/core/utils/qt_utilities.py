@@ -31,8 +31,8 @@ __all__ = [
     "update_palette",
     "update_qwidget_font",
     "check_pydidas_qapp_instance",
+    "get_single_shot_timer",
     "IS_QT6",
-    "qstate_is_checked",
 ]
 
 
@@ -230,21 +230,23 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
         )
 
 
-def qstate_is_checked(state: QtCore.Qt.CheckState) -> bool:
+def get_single_shot_timer(parent: QtCore.QObject, timeout: int = 5000) -> QtCore.QTimer:
     """
-    Check if the given state is checked.
+    Get a single shot QTimer.
 
     Parameters
     ----------
-    state : QtCore.Qt.CheckState
-        The state to check.
+    parent : QtCore.QObject
+        The parent object for the timer.
+    timeout : int, optional
+        The timeout in milliseconds, by default 5000 (5 seconds).
 
     Returns
     -------
-    bool
-        True if the state is checked, False otherwise.
+    QtCore.QTimer
+        The configured single shot timer.
     """
-    # In Qt6, Qt.CheckState is an enum.Enum, and `.value` is used to get
-    # the integer value. In Qt5, no `.value` is available and the
-    # Qt.CheckState holds the integer value directly.
-    return state == getattr(QtCore.Qt.Checked, "value", QtCore.Qt.Checked)
+    _timer = QtCore.QTimer(parent)
+    _timer.setSingleShot(True)
+    _timer.setInterval(timeout)
+    return _timer

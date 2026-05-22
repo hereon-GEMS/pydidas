@@ -2,6 +2,25 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+v26.mm.dd
+=========
+
+Improvements
+------------
+- Added an option to set a custom root for data browsing in the 
+  DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
+  from unresponsive locations
+
+Programmatic changes
+--------------------
+
+Bugfixes
+--------
+- Fixed an issue in the DataBrowsingFrame which did not load the icons for 
+  the starting directory correctly.
+
+
 v26.05.19
 =========
 
@@ -16,6 +35,7 @@ Improvements
 - When editing advanced Parameters, the GUI now remembers the settings
   for each plugin.
 - Added an option to select a file by its filename in the DataBrowsingFrame.
+  The field also accepts drag & drop entries.
 - Removed the gui and widget packages from the generic 'import pydidas'
   to speed-up loading for background processes.
 - Added an option in the plots to lock the current zoom settings
@@ -43,6 +63,10 @@ Programmatic changes
 - Added an option to specify the display precision for floating point
   Parameters.
 - Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
+- Added an option in the UI creation to specify the gridPos row position
+  with "::current::" to append a widget in the current row.
+- Changed the signal of QCheckBox tick state to be consistent with 
+  Qt.QCheckState definitions (checked == 2)
 
 Bugfixes
 --------

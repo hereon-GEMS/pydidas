@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
+# Copyright 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,25 +16,20 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Package with widgets which allow the selection of a specific element.
+The pydidas.widgets.file_browser subpackage includes all functionality for file
+browsing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .configure_binary_decoding_widget import ConfigureBinaryDecodingWidget
-from .hdf5_dataset_selector import Hdf5DatasetSelector
-from .select_data_frame_widget import SelectDataFrameWidget
-from .toggle_options_button import ToggleOptionsButton
+from .directory_explorer import DirectoryExplorer
 
 
 __all__ = [
-    "ConfigureBinaryDecodingWidget",
-    "Hdf5DatasetSelector",
-    "SelectDataFrameWidget",
-    "ToggleOptionsButton",
+    "DirectoryExplorer",
 ]

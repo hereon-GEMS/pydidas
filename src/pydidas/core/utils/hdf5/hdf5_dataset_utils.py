@@ -98,8 +98,8 @@ def get_hdf5_populated_dataset_keys(
             The default is None.
         nxdata_signal_only : bool, optional
             Flag to toggle displaying only datasets in NXdata groups which
-            have the 'signal' attribute set to 1. If the group does not
-            have an NXdata attribute, all datasets in the group are
+            have the 'signal' attribute set to an included dataset. If the group
+            does not have an NXdata attribute, all datasets in the group are
             returned. The default is False.
 
     Returns

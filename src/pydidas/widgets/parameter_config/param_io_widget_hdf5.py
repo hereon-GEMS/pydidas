@@ -91,7 +91,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
                 )
             else:
                 self.__selection_popup.set_filename(_result)
-            dset = Hdf5DatasetSelectionPopup(self, _result).get_dset()
+            dset = self.__selection_popup.get_dset()
             if dset is not None:
                 self.set_value(str(dset))
 

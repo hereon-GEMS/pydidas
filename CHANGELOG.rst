@@ -2,6 +2,22 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+v26.mm.dd
+=========
+
+Improvements
+------------
+
+Programmatic changes
+--------------------
+
+Bugfixes
+--------
+- Fixed a Qt6 issue in the Hdf5DAtasetSelectionPopup which did not scale
+  the dialog correctly with the choices.
+
+
 v26.05.19
 =========
 

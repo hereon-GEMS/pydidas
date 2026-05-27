@@ -58,30 +58,31 @@ def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoRetur
             "Please check the Scan configuration and retry."
         )
     _group_name = str(PurePosixPath(dataset).parent)
+    _invalid = False
     try:
         with h5py.File(filename, "r") as f:
             grp = f[_group_name]
             if grp.attrs.get("NX_class") != "NXdata":
-                raise AssertionError
+                _invalid = True
             if dataset not in f or not isinstance(f[dataset], h5py.Dataset):
-                raise KeyError(dataset)
+                _invalid = True
             _data = f[dataset]
             if grp.attrs.get("signal") != PurePosixPath(dataset).stem:
-                raise AssertionError
-            _axes = grp.attrs.get("axes")
+                _invalid = True
+            _axes = grp.attrs.get("axes", ())
             if len(_axes) != _data.ndim:
-                raise AssertionError
+                _invalid = True
             for _dim, _axis in enumerate(_axes):
                 _ax = f[f"{_group_name}/{_axis}"]
-                _ax_shape = _data.shape[_dim]
+                _ax_shape = (_data.shape[_dim],)
                 if not isinstance(_ax, h5py.Dataset) or _ax.shape != _ax_shape:
-                    raise AssertionError
+                    _invalid = True
     except (KeyError, ValueError, OSError):
         raise UserConfigError(
             f"Unable to read the selected file `{filename}` as HDF5 file. Please "
             "check the file."
         )
-    except AssertionError:
+    if _invalid:
         raise UserConfigError(
             f"The selected file `{filename}` does not adhere to the NXdata standard. "
             "Please select a different file or use a different loader for raw HDF5 "

@@ -249,7 +249,7 @@ class NXdataResultLoader(InputPlugin):
                 f"The dataset `{self._config['filename']}::"
                 f"{self.get_param_value('nxdata_key')}` could not be read as "
                 "NXdata dataset. Please check the file and dataset key. "
-                "\n\nThe NxdataResultLoader plugin relies on the correct metadata "
+                "\n\nThe NXdataResultLoader plugin relies on the correct metadata "
                 "and will not accept non-NeXus-compliant files. "
                 "If you need to import HDF5 data without metadata, please use the "
                 "`Hdf5fileSeriesLoader` plugin instead."

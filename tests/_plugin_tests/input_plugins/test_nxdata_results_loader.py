@@ -23,7 +23,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-import shutil
 from pathlib import Path
 
 import h5py
@@ -118,7 +117,6 @@ def test_input_available(config, plugin, index):
 def test_pre_execute(config, empty_temp_path):
     plugin = PLUGIN_COLLECTION.get_plugin_by_name("NXdataResultLoader")()
     plugin.set_param_value("nxdata_key", config.dset_key)
-    shutil.copy2(empty_temp_path / _FILENAME, r"e:/temp/nxdata_test.nxs")
     plugin.pre_execute()
     assert plugin._config["pre_executed"]
     assert plugin._config["filename"] == empty_temp_path / _FILENAME

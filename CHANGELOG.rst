@@ -11,6 +11,8 @@ Improvements
 
 Programmatic changes
 --------------------
+- Added a checker for adherece to NeXus NXdata definition of selected 
+  datasets in HDF5 files.
 
 Bugfixes
 --------

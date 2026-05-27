@@ -73,7 +73,8 @@ def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoRetur
                 raise AssertionError
             for _dim, _axis in enumerate(_axes):
                 _ax = f[f"{_group_name}/{_axis}"]
-                if not isinstance(_ax, h5py.Dataset) or _ax.shape != (_data.shape[_dim],):
+                _ax_shape = _data.shape[_dim]
+                if not isinstance(_ax, h5py.Dataset) or _ax.shape != _ax_shape:
                     raise AssertionError
     except (KeyError, ValueError, OSError):
         raise UserConfigError(

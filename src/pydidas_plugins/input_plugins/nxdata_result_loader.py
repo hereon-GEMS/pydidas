@@ -187,7 +187,6 @@ class NXdataResultLoader(InputPlugin):
         kwargs : dict
             The updated keyword arguments.
         """
-        _data_dim = self.get_param_value("expected_data_dim")
         kwargs = kwargs | self._standard_kwargs
         kwargs["indices"] = self._SCAN.get_indices_from_ordinal(frame_index)
         _data = import_data(self._config["filename"], **kwargs)

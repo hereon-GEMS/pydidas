@@ -207,21 +207,25 @@ class NXdataResultLoader(InputPlugin):
             self._config["filename"], "shape", dset=self.get_param_value("nxdata_key")
         )
         _data_ndim = len(_data_shape)
+        _expected_ndim = self.get_param_value("expected_data_dim")
         if not _data_shape[:_scan_ndim] == _scan_shape:
             raise UserConfigError(
-                f"The imported data ({self._config['filename']})::"
-                f"{self.get_param_value('nxdata_key')} with the shape "
+                f"The imported data `{self._config['filename']}::"
+                f"{self.get_param_value('nxdata_key')}` with the shape "
                 f"{_data_shape} does not match the defined shape of the Scan "
                 f"{_scan_shape}. Please check the input file or the Scan "
                 "definition. Data import did not succeed."
             )
-        if not _data_ndim - _scan_ndim == self.get_param_value("expected_data_dim"):
+        if not _data_ndim - _scan_ndim == _expected_ndim:
             raise UserConfigError(
-                f"The imported data ({self._config['filename']})::"
-                f"{self.get_param_value('nxdata_key')} does not match the "
-                "defined number of dimensions of the results. Please verify the "
-                "data and adjust the Parameter for the expected data "
-                "dimensionality."
+                f"The imported data `{self._config['filename']}::"
+                f"{self.get_param_value('nxdata_key')}` does not match the "
+                "defined number of dimensions of the results.\n\n"
+                f"Expected number of dimensions: {_scan_ndim + _expected_ndim} "
+                f"({_scan_ndim} scan dimensions + {_expected_ndim} data dimensions) "
+                f"but received data with {_data_ndim} dimensions.\n\n"
+                "Please verify the data and adjust the Parameter for the expected "
+                "data dimensionality."
             )
 
     def _store_result_metadata(self) -> dict[str, Any]:
@@ -243,8 +247,8 @@ class NXdataResultLoader(InputPlugin):
             )
         except (KeyError, FileNotFoundError, FileReadError):
             raise UserConfigError(
-                f"The dataset ({self._config['filename']})::"
-                f"{self.get_param_value('nxdata_key')} could not be read as "
+                f"The dataset `{self._config['filename']}::"
+                f"{self.get_param_value('nxdata_key')}` could not be read as "
                 "NXdata dataset. Please check the file and dataset key. "
                 "\n\nThe NxdataResultLoader plugin relies on the correct metadata "
                 "and will not accept non-NeXus-compliant files. "

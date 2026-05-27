@@ -54,7 +54,7 @@ def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoRetur
     filename = Path(filename)
     if not filename.is_file():
         raise UserConfigError(
-            f"The selected data file ({filename}) does not exist. "
+            f"The selected data file `{filename}` does not exist. "
             "Please check the Scan configuration and retry."
         )
     _group_name = str(PurePosixPath(dataset).parent)

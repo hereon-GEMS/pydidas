@@ -39,10 +39,10 @@ from pydidas.core.exceptions import UserConfigError
 
 def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoReturn:
     """
-    Check that the selected dataset in the given file adheres to the NXdata defition.
+    Check that the selected dataset in the given file adheres to the NXdata definition.
 
     This function will raise a UserConfigError if the dataset cannot be read
-    or does not adhere to the NXdata defition.
+    or does not adhere to the NXdata definition.
 
     Parameters
     ----------

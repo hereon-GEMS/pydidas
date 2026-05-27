@@ -39,10 +39,10 @@ from pydidas.core.exceptions import UserConfigError
 
 def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoReturn:
     """
-    Check that the selected dataset in the given file adheres to the NXdata defition.
+    Check that the selected dataset in the given file adheres to the NXdata definition.
 
     This function will raise a UserConfigError if the dataset cannot be read
-    or does not adhere to the NXdata defition.
+    or does not adhere to the NXdata definition.
 
     Parameters
     ----------
@@ -60,16 +60,21 @@ def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoRetur
     _group_name = str(PurePosixPath(dataset).parent)
     try:
         with h5py.File(filename, "r") as f:
-            assert f[_group_name].attrs["NX_class"] == "NXdata"
+            grp = f[_group_name]
+            if grp.attrs.get("NX_class") != "NXdata":
+                raise AssertionError
+            if dataset not in f or not isinstance(f[dataset], h5py.Dataset):
+                raise KeyError(dataset)
             _data = f[dataset]
-            assert f[_group_name].attrs["signal"] == PurePosixPath(dataset).stem
-            assert isinstance(f[dataset], h5py.Dataset)
-            _axes = f[_group_name].attrs["axes"]
-            assert len(_axes) == _data.ndim
+            if grp.attrs.get("signal") != PurePosixPath(dataset).stem:
+                raise AssertionError
+            _axes = grp.attrs.get("axes")
+            if len(_axes) != _data.ndim:
+                raise AssertionError
             for _dim, _axis in enumerate(_axes):
                 _ax = f[f"{_group_name}/{_axis}"]
-                assert isinstance(_ax, h5py.Dataset)
-                assert _ax.shape == (_data.shape[_dim],)
+                if not isinstance(_ax, h5py.Dataset) or _ax.shape != (_data.shape[_dim],):
+                    raise AssertionError
     except (KeyError, ValueError, OSError):
         raise UserConfigError(
             f"Unable to read the selected file `{filename}` as HDF5 file. Please "

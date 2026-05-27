@@ -36,6 +36,7 @@ __all__ = [
 ]
 
 import os
+import re
 from pathlib import Path
 
 import requests
@@ -85,6 +86,7 @@ def get_available_exit_states() -> list[str]:
     list[str]
         The available state filenames.
     """
+    _regex = r"^pydidas_gui_exit_state_[0-9]{2}\.[0-9]{2}\.[0-9]{2}.yaml$"
     filenames = []
     for _path in PYDIDAS_CONFIG_PATHS:
         if not _path.exists():
@@ -93,9 +95,7 @@ def get_available_exit_states() -> list[str]:
             _f for _f in _path.iterdir() if _f.is_file() and os.access(_f, os.R_OK)
         ]
         for _f in _files:
-            if _f.name.startswith("pydidas_gui_exit_state_") and _f.name.endswith(
-                ".yaml"
-            ):
+            if re.search(_regex, _f.name):
                 filenames.append(_f.name)
     return filenames
 

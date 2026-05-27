@@ -22,7 +22,7 @@ Programmatic changes
 
 Bugfixes
 --------
-- Fixed a Qt6 issue in the Hdf5DAtasetSelectionPopup which did not scale
+- Fixed a Qt6 issue in the Hdf5DatasetSelectionPopup which did not scale
   the dialog correctly with the choices.
 - Fixed an issue in the ErrorBox when the error string was too wide to show
   (e.g. for long filenames).

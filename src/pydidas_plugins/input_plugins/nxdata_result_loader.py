@@ -56,9 +56,6 @@ class NXdataResultLoader(InputPlugin):
     ...) and the number of expected data dimensions must be given in the
     respective Parameter to verify the data consistency.
 
-    Multi-frame reads (``scan_frames_per_point > 1``) are performed in a
-    single HDF5 call using numpy fancy indexing to avoid per-frame I/O.
-
     Parameters
     ----------
     nxdata_key : str, optional
@@ -187,7 +184,6 @@ class NXdataResultLoader(InputPlugin):
         kwargs : dict
             The updated keyword arguments.
         """
-        _data_dim = self.get_param_value("expected_data_dim")
         kwargs = kwargs | self._standard_kwargs
         kwargs["indices"] = self._SCAN.get_indices_from_ordinal(frame_index)
         _data = import_data(self._config["filename"], **kwargs)
@@ -232,7 +228,8 @@ class NXdataResultLoader(InputPlugin):
         """
         Read the required result metadata and store it in a dictionary.
 
-        This method reads the
+        This method reads the metadata from the file defined in the Scan
+        and stores it locally.
 
         Returns
         -------

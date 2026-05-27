@@ -52,9 +52,9 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
     Parameters
     ----------
     *args : Any
-        Arguments passed to QtWidgets.QDialogue instantiation.
+        Arguments passed to QtWidgets.QDialog instantiation.
     **kwargs : Any
-        Keyword arguments passed to QtWidgets.QDialogue instantiation.
+        Keyword arguments passed to QtWidgets.QDialog instantiation.
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

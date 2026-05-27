@@ -108,13 +108,6 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             of string items.
         """
         _font_height = PydidasQApplication.instance().font_height
-        self.resize(
-            get_max_pixel_width_of_entries(items) + 60,
-            min(
-                15 * _font_height,
-                max(10 * _font_height, 50 + len(items) * _font_height),
-            ),
-        )
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 

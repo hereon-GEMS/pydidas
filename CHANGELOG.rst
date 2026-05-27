@@ -8,6 +8,9 @@ v26.mm.dd
 
 Improvements
 ------------
+- Added a dedicated plugin to import NeXus NXdata with full metadata
+  and in the shape of the Scan. This allows for conveniently restarting
+  workflows from stored intermediate data.
 
 Programmatic changes
 --------------------

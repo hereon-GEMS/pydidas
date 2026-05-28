@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests pydidas initialization."""
+"""Unit tests for pydidas modules."""
 
 __author__ = "Nonni Heere"
 __copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"

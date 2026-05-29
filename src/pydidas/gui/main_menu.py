@@ -593,9 +593,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 _exit_states = utils.get_available_exit_states()
                 if not _exit_states:
                     return
-                filename = utils.get_standard_state_full_filename(
-                    sorted(_exit_states)[-1]
-                )
+                filename = utils.get_standard_state_full_filename(_exit_states[-1])
         elif state.upper() == "MANUAL" and filename is None:
             raise UserConfigError(
                 "A filename must be supplied for 'manual' gui state restoration."

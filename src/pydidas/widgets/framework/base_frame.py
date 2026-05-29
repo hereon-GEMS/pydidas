@@ -37,6 +37,7 @@ from pydidas.core import (
     ParameterCollection,
     ParameterCollectionMixIn,
     PydidasQsettingsMixin,
+    UserConfigError,
 )
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.resources import icons
@@ -119,7 +120,15 @@ class BaseFrame(
         if "state" in self._config:
             with ShowBusyMouse():
                 _state = self._config.pop("state")
-                self.restore_state(_state)
+                try:
+                    self.restore_state(_state)
+                except Exception as exc:
+                    raise UserConfigError(
+                        "Error restoring state for frame "
+                        + str(self.menu_title)
+                        + ":\n"
+                        + str(exc)
+                    )
         self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
             self.sig_this_frame_activated.emit()  # type: ignore[attr-defined]

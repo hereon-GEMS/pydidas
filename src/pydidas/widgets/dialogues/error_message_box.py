@@ -143,7 +143,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         _note = (
             "Please report the bug online using the form available on:\n"
             "\thttps://pydidas.hereon.de/\n\n"
-            "You can simply use the button on the bottom left to coyy the\n"
+            "You can simply use the button on the bottom left to copy the\n"
             "exception trace to your clipboard and open the webpage in your"
             " default browser."
             f"\n\nA log has been written to:\n\t{_logfile}\n\n"

@@ -27,6 +27,7 @@ __status__ = "Production"
 from unittest.mock import patch
 
 import pytest
+from numpy._core.numeric import sort
 
 from pydidas.gui.utils.main_menu_utils import get_available_exit_states
 
@@ -66,7 +67,7 @@ def test_get_available_exit_states(mock_config_dir_exit_states):
 
     actual_filenames = get_available_exit_states()
 
-    assert set(actual_filenames) == set(expected_filenames)
+    assert actual_filenames == sorted(expected_filenames)
 
 
 if __name__ == "__main__":

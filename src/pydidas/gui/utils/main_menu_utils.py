@@ -97,7 +97,7 @@ def get_available_exit_states() -> list[str]:
         for _f in _files:
             if re.search(_regex, _f.name):
                 filenames.append(_f.name)
-    return filenames
+    return sorted(filenames)
 
 
 @QtCore.Slot()

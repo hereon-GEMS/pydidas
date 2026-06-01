@@ -176,7 +176,7 @@ class WorkflowTestFrame(BaseFrame):
         """
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
-        self._tree = None
+        self._tree: WorkflowTree | None = None
         self._active_node = -1
         self._results = {}
         self._config.update(
@@ -302,6 +302,8 @@ class WorkflowTestFrame(BaseFrame):
         if not self._check_tree_is_populated():
             return
         with utils.ShowBusyMouse():
+            _selected_row = self._widgets["result_table"].selected_row_id
+            _selected_label = self._widgets["result_table"].selected_node_label
             self.clear_results()
             _index = self.__get_index()
             self._tree.execute_process(
@@ -312,8 +314,11 @@ class WorkflowTestFrame(BaseFrame):
                 test=True,
             )
             self.__store_tree_results()
-            self.__update_selection_choices()
+            self.__update_selection_choices(
+                selected_row=_selected_row, selected_label=_selected_label
+            )
             if self._active_node != -1:
+                self.__set_derived_widget_visibility(True)
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
 
@@ -450,9 +455,27 @@ class WorkflowTestFrame(BaseFrame):
         if self._active_node not in self._results:
             self._active_node = -1
 
-    def __update_selection_choices(self) -> None:
-        """Update the choice of results to display"""
-        self._widgets["result_table"].update_node_descriptions(self._result_titles)
+    def __update_selection_choices(
+        self, selected_row: int = -1, selected_label: str = ""
+    ) -> None:
+        """
+        Update the choice of results to display
+
+        If an entry with a selected row and selected label is given, it will
+        be restored if the new entries match the old one.
+
+        Parameters
+        ----------
+        selected_row : int
+            The previously selected row.
+        selected_label : str
+            The selected label.
+        """
+        _table = self._widgets["result_table"]
+        _table.update_node_descriptions(self._result_titles)
+        if _table.get_row_label(selected_row) == selected_label:
+            with QtCore.QSignalBlocker(_table):
+                _table.setCurrentCell(selected_row, 0)
 
     @QtCore.Slot(int)
     def _selected_new_node(self, index: int) -> None:

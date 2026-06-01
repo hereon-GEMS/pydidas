@@ -19,7 +19,8 @@ Bugfixes
 --------
 - Fixed an issue in the DataBrowsingFrame which did not load the icons for 
   the starting directory correctly.
-
+- Fixed an issue in the WorkflowTestFrame which de-selected the node after
+  running the test for a different datapoint.
 
 v26.05.19
 =========

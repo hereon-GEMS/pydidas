@@ -61,11 +61,9 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self._rel_column_widths = kwargs.pop("relative_column_widths", None)
         self._autoscale_height = kwargs.pop("autoscale_height", False)
         self._qtapp = PydidasQApplication.instance()
-        QtWidgets.QTableWidget.__init__(
-            self,
-            rowCount=kwargs.pop("rowCount", 0),
-            columnCount=kwargs.pop("columnCount", 0),
-        )
+        QtWidgets.QTableWidget.__init__(self)
+        self.setRowCount(kwargs.pop("rowCount", 0))
+        self.setColumnCount(kwargs.pop("columnCount", 0))
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)

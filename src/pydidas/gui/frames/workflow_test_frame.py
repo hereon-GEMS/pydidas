@@ -473,7 +473,7 @@ class WorkflowTestFrame(BaseFrame):
         """
         _table = self._widgets["result_table"]
         _table.update_node_descriptions(self._result_titles)
-        if _table.get_row_label(selected_row) == selected_label:
+        if selected_row >= 0 and _table.get_row_label(selected_row) == selected_label:
             with QtCore.QSignalBlocker(_table):
                 _table.setCurrentCell(selected_row, 0)
 

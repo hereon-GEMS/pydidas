@@ -228,30 +228,6 @@ class ProcessingResultIoMeta(GenericIoMeta):
             _saver.export_full_data_to_file(data, scan_context, squeeze=squeeze_results)
 
     @classmethod
-    def export_full_data_to_file(
-        cls,
-        extension: str,
-        data: dict[int, Dataset],
-        scan_context: Scan | None = None,
-    ):
-        """
-        Export the full data to all active savers.
-
-        Parameters
-        ----------
-        extension : str
-            The file extension for the saver.
-        data : dict
-            The result dictionary with nodeID keys and result values.
-        scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        """
-        cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension.lower()]
-        _saver.export_full_data_to_file(data, scan_context)
-
-    @classmethod
     def export_frame_to_file(
         cls,
         index: int,

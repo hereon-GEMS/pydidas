@@ -19,7 +19,10 @@ Bugfixes
 --------
 - Fixed an issue in the DataBrowsingFrame which did not load the icons for 
   the starting directory correctly.
-
+- Fixed an issue in the WorkflowTestFrame which de-selected the node after
+  running the test for a different datapoint.
+- Fixed an issue which would not scale 1d plots correctly due to Qt's 
+  processing queue for signals and its use in PydidasPlot1d.
 
 v26.05.19
 =========

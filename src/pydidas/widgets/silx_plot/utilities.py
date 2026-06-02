@@ -24,7 +24,12 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_allowed_kwargs"]
+__all__ = [
+    "get_allowed_kwargs",
+    "axis_is_columns",
+    "get_column_labels",
+    "check_data_dimensions",
+]
 
 
 import inspect
@@ -82,7 +87,7 @@ def axis_is_columns(axis: int, data: Dataset) -> bool:
     Returns
     -------
     bool
-        True if the axis is structured in columns rather than continous data
+        True if the axis is structured in columns rather than continuous data
     """
     axis_label = data.get_axis_description(axis)
     if ";" in axis_label:
@@ -133,6 +138,8 @@ def check_data_dimensions(data: Dataset | np.ndarray, target_dim: int) -> None:
     ----------
     data : Dataset or np.ndarray
         The data to display.
+    target_dim : int
+        The expected data dimension.
     """
     if data.ndim == target_dim:
         return

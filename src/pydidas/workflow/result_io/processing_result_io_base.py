@@ -30,7 +30,7 @@ __all__ = ["ProcessingResultIoBase"]
 
 import re
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 from pydidas.contexts.scan import Scan
 from pydidas.core import Dataset
@@ -40,7 +40,7 @@ from pydidas.workflow.result_io.processing_result_io_meta import ProcessingResul
 
 class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     """
-    Base class for WorkflowTree exporters.
+    Base class for processing result importers and exporters.
     """
 
     extensions = []
@@ -51,34 +51,34 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
     @classmethod
     def prepare_files_and_directories(
-        cls, save_dir: Union[Path, str], node_information: dict, **kwargs
-    ):
+        cls, save_dir: Path | str, node_information: dict, **kwargs: Any
+    ) -> None:
         """
         Prepare the required files and directories to write the data to disk.
 
         Parameters
         ----------
-        save_dir : Union[Path, str]
+        save_dir : Path or str
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
             must have the following keys: shape, node_label, data_label, plugin_name
-            and the respecive values. The shape (tuple) detemines the shape of the
+            and the respective values. The shape (tuple) determines the shape of the
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
         **kwargs:
             Supported kwargs are:
 
-            scan_context : Union[Scan, None], optional
+            scan_context : Scan or None, optional
                 The scan context. If None, the generic context will be used.
                 Only specify this, if you explicitly require a different context.
                 The default is None.
-            diffraction_exp_context : Union[DiffractionExp, None], optional
+            diffraction_exp_context : DiffractionExp or None, optional
                 The diffraction experiment context. If None, the generic context
                 will be used. Only specify this, if you explicitly require a
                 different context. The default is None.
-            workflow_tree : Union[WorkflowTree, None], optional
+            workflow_tree : WorkflowTree or None, optional
                 The WorkflowTree. If None, the generic WorkflowTree will be used.
                 Only specify this, if you explicitly require a different context.
                 The default is None.
@@ -88,7 +88,7 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     @classmethod
     def get_attribute_dict(cls, name: str) -> dict:
         """
-        Get a dictionary for a single attribute from the combined node informatinon.
+        Get a dictionary for a single attribute from the combined node information.
 
         Parameters
         ----------
@@ -116,13 +116,13 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Returns
         -------
-        type
+        object
             The value of the required attribute
         """
         return cls._node_information[node_id][name]
 
     @classmethod
-    def get_filenames_from_labels(cls, labels: Union[dict, None] = None):
+    def get_filenames_from_labels(cls, labels: dict | None = None) -> dict:
         """
         Get the directory names from labels.
 
@@ -132,7 +132,7 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Parameters
         ----------
-        labels : Union[dict, None], optional
+        labels : dict or None, optional
             The labels to be used. If labels are not supplied, they will be taken from
             the internally stored node information. The default is None.
 
@@ -159,8 +159,9 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     def export_full_data_to_file(
         cls,
         full_data: dict[int, Dataset],
-        scan_context: Union[Scan, None] = None,
-    ):
+        scan_context: Scan | None = None,
+        squeeze: bool = False,
+    ) -> None:
         """
         Export all specified datasets to disk.
 
@@ -173,16 +174,20 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         ----------
         full_data : dict
             The result dictionary with nodeID keys and result values.
-        scan_context : Union[Scan, None], optional
+        scan_context : Scan or None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
+        squeeze : bool, optional
+            Flag to toggle squeezing of the data. If True, any empty dimensions will
+            be squeezed from the data. The default is False.
+
         """
         raise NotImplementedError
 
     @classmethod
     def export_frame_to_file(
-        cls, index: int, frame_result_dict: dict[int, Dataset], **kwargs: dict
-    ):
+        cls, index: int, frame_result_dict: dict[int, Dataset], **kwargs: Any
+    ) -> None:
         """
         Export the results of one frame and store them on disk.
 
@@ -197,13 +202,13 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
             The frame index.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        **kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+        **kwargs
+            Any kwargs which should be passed to the underlying exporter.
         """
         raise NotImplementedError
 
     @classmethod
-    def update_frame_metadata(cls, metadata: dict, scan: Union[Scan, None] = None):
+    def update_frame_metadata(cls, metadata: dict, scan: Scan | None = None) -> None:
         """
         Update the metadata of the individual frame.
 
@@ -216,20 +221,20 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         ----------
         metadata : dict
             The metadata dictionary with results of one frame for each node.
-        scan : Union[pydidas.contexts.scan.Scan, None], optional
+        scan : Scan or None, optional
             The Scan instance. If None, this will default to the generic ScanContext.
             The default is None.
         """
         raise NotImplementedError
 
     @classmethod
-    def import_results_from_file(cls, filename: Union[Path, str]):
+    def import_results_from_file(cls, filename: Path | str) -> tuple[Dataset, dict, dict]:
         """
         Import results from a file and store them as a Dataset.
 
         Parameters
         ----------
-        filename : Union[Path, str]
+        filename : Path or str
             The full filename of the file to be imported.
 
         Raises
@@ -239,7 +244,7 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The dataset with the imported data.
         node_info : dict
             A dictionary with node_label, data_label, plugin_name keys and the

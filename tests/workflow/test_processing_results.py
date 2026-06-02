@@ -510,6 +510,13 @@ class TestProcessingResults(unittest.TestCase):
         _res = res.get_results_for_flattened_scan(1)
         self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
 
+    def test_get_results_for_flattened_scan__w_n1_scan_dim(self) -> None:
+        SCAN.set_param_value("scan_dim0_n_points", 1)
+        res = self.create_standard_workflow_results()
+        _res = res.get_results_for_flattened_scan(1)
+        print(_res.shape)
+        self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
+
     def test_get_results_for_flattened_scan__wrong_node_id(self) -> None:
         res = self.create_standard_workflow_results()
         with self.assertRaises(UserConfigError):
@@ -745,7 +752,7 @@ class TestProcessingResults(unittest.TestCase):
             "data_unit": "u2",
         }
         res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, ".HDF5", squeeze_results=True)
+        res.save_results_to_disk(self._tmpdir, ".HDF5", squeeze=True)
         with h5py.File(self.get_node_output_path(1), "r") as f:
             _shape1 = f["entry/data/data"].shape
         with h5py.File(self.get_node_output_path(2), "r") as f:
@@ -784,7 +791,7 @@ class TestProcessingResults(unittest.TestCase):
     def test_get_node_result_metadata_string__no_squeeze(self) -> None:
         res = self.create_standard_workflow_results()
         _node_info = res.get_node_result_metadata_string(
-            2, use_scan_timeline=False, squeeze_results=False
+            2, use_scan_timeline=False, squeeze=False
         )
         for _dim in range(SCAN.ndim):
             self.assertIn(f"Axis #{_dim:02d} (scan):", _node_info)

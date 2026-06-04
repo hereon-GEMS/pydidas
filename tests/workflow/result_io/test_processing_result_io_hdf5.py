@@ -141,7 +141,7 @@ def setup_module_data(temp_path):
     import_legacy_no_match_filename = temp_path / "import_test_legacy_no_match.h5"
 
     for _name, _dset, _extra_kwargs in [
-        (import_squeezed_filename, squeezed_data, {"squeezed_scan_dims": [1]}),
+        (import_squeezed_filename, squeezed_data, {"squeezed_scan_dims": "1"}),
         (import_squeezed_empty_filename, squeezed_data, {}),
         (import_legacy_squeezed_filename, squeezed_data, {}),
         (import_legacy_no_match_filename, mismatched_data, {}),
@@ -521,7 +521,10 @@ def test_update_metadata__with_squeeze(empty_temp_path):
     H5SAVER.update_metadata({1: _data}, scan=_scan, squeeze=True)
     _fname = empty_temp_path / H5SAVER._filenames[1]
     with h5py.File(_fname, "r") as _file:
-        _squeezed_dims = list(_file["entry/pydidas_config/squeezed_scan_dims"][()])
+        _squeeze_str = read_and_decode_hdf5_dataset(
+            _file["entry/pydidas_config/squeezed_scan_dims"]
+        )
+        _squeezed_dims = [int(_i) for _i in _squeeze_str.split(";")]
     assert _squeezed_dims == [1]
 
 
@@ -546,10 +549,12 @@ def test_export_full_data_to_file__with_squeeze(empty_temp_path):
     H5SAVER.export_full_data_to_file(_full_data, scan_context=_scan, squeeze=True)
     with h5py.File(empty_temp_path / H5SAVER._filenames[1], "r") as _file:
         _written = _file["entry/data/data"][()]
-        _squeezed_dims = list(_file["entry/pydidas_config/squeezed_scan_dims"][()])
+        _squeeze_str = read_and_decode_hdf5_dataset(
+            _file["entry/pydidas_config/squeezed_scan_dims"]
+        )
     assert _written.shape == _squeezed_shape
     assert np.allclose(_written, _full_data[1].squeeze().array)
-    assert _squeezed_dims == [1]
+    assert _squeeze_str == "1"
 
 
 def test_import_results_from_file__with_squeezed_dims_flag(setup_module_data):

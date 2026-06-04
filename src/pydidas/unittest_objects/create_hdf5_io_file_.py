@@ -30,7 +30,7 @@ __all__ = ["create_hdf5_io_file", "create_hdf5_results_file"]
 
 import os.path
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import h5py  # type: ignore[import-untyped]
 
@@ -152,9 +152,15 @@ def create_hdf5_results_file(
         _root.create_dataset("node_label", data=kwargs.get("node_label", ""))
         _root.create_dataset("plugin_name", data=kwargs.get("plugin_name", ""))
         _root.create_dataset("scan_title", data=kwargs.get("scan_title", ""))
-        _config_group.create_dataset(
-            "squeezed_scan_dims", data=kwargs.get("squeezed_scan_dims", [])
-        )
+        _squeezed_dims = kwargs.get("squeezed_scan_dims", "")
+        if _squeezed_dims:
+            if isinstance(_squeezed_dims, Iterable):
+                _squeezed_dims = ",".join(str(_item) for _item in _squeezed_dims)
+            if not isinstance(_squeezed_dims, str):
+                raise UserConfigError(
+                    "Squeezed scan dimensions must be a string or list of integers."
+                )
+        _config_group.create_dataset("squeezed_scan_dims", data=_squeezed_dims)
         for _key, _value in scan.items():
             _scan_group.create_dataset(_key, data=_value)
         for _key, _value in diffraction_exp.items():

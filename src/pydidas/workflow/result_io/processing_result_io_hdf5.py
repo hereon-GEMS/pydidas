@@ -33,7 +33,6 @@ from pathlib import Path
 from typing import Any
 
 import h5py
-import numpy as np
 
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
@@ -46,6 +45,9 @@ from pydidas.core.utils.hdf5 import (
     read_and_decode_hdf5_dataset,
 )
 from pydidas.core.utils.hdf5.nxs_export import nx_dataset_config_from_param
+from pydidas.core.utils.iterable_utils import (
+    insert_item_in_tuple,
+)
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -388,7 +390,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _scan_dim_ranges = scan.axis_ranges
         _new_metadata = {}
         for _id, _entry in metadata.items():
-            _metadata: dict[str, Any] = (
+            _metadata: dict[str, Any] = (  # type: ignore[type]
                 _entry.property_dict if isinstance(_entry, Dataset) else _entry
             )
             _metadata["axis_labels"] = {
@@ -436,9 +438,10 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             will be squeezed to remove empty dimensions. The default is False.
         """
         _scan = ScanContext() if scan is None else scan
-        _squeezed_scan_dims = np.array(
-            [i for i, n in enumerate(_scan.shape) if n == 1] if squeeze else [],
-            dtype=int,
+        _squeezed_scan_dims = (
+            ";".join([str(i) for i, n in enumerate(_scan.shape) if n == 1])
+            if squeeze
+            else ""
         )
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
@@ -463,8 +466,12 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                         long_name=_metadata["axis_labels"][_dim],
                         axis=_dim,
                     )
-                _file["entry/pydidas_config"].create_dataset(
-                    "squeezed_scan_dims", data=_squeezed_scan_dims
+                create_nx_dataset(
+                    _file["entry/pydidas_config"],
+                    "squeezed_scan_dims",
+                    {"data": _squeezed_scan_dims},
+                    NX_class="NX_CHAR",
+                    units="",
                 )
         cls._metadata_written = True
 
@@ -492,18 +499,15 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         Dataset
             The Dataset with the squeezed scan dims re-inserted.
         """
+        _shape = data.shape
         for _dim in sorted(dims):
-            _label, _unit, _range = scan.get_metadata_for_dim(_dim)  # type: ignore[arg-type]
-            _new_labels = [data.axis_labels[i] for i in range(data.ndim)]
-            _new_units = [data.axis_units[i] for i in range(data.ndim)]
-            _new_ranges = [data.axis_ranges[i] for i in range(data.ndim)]
-            _new_labels.insert(_dim, _label)
-            _new_units.insert(_dim, _unit)
-            _new_ranges.insert(_dim, _range)
-            data = np.expand_dims(data, axis=_dim)
-            data.axis_labels = _new_labels
-            data.axis_units = _new_units
-            data.axis_ranges = _new_ranges
+            _shape = insert_item_in_tuple(_shape, _dim, 1)
+        data = data.reshape(_shape)  # type: ignore[type]
+        for _dim in sorted(dims):
+            _label, _unit, _range = scan.get_metadata_for_dim(_dim)
+            data.update_axis_label(_dim, _label)
+            data.update_axis_unit(_dim, _unit)
+            data.update_axis_range(_dim, _range)
         return data  # type: ignore[return-value]
 
     @classmethod
@@ -569,10 +573,14 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 else f"[{_info['plugin_name']}] (node #{_info['node_id']:03d})"
             )
             try:
-                _squeezed_scan_dims = [
-                    int(x) for x in _file["entry/pydidas_config/squeezed_scan_dims"][()]
-                ]
-            except KeyError:
+                _squeeze_str = read_and_decode_hdf5_dataset(
+                    _file["entry/pydidas_config/squeezed_scan_dims"]
+                )
+                if _squeeze_str:
+                    _squeezed_scan_dims = [int(_s) for _s in _squeeze_str.split(";")]
+                else:
+                    _squeezed_scan_dims = []
+            except (KeyError, ValueError, AttributeError):
                 _squeezed_scan_dims = None
 
         if _squeezed_scan_dims is None:
@@ -584,10 +592,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             if _size_1_scan_dims:
                 _scan_shape_no_ones = tuple(n for n in _scan.shape if n > 1)
                 if _data.shape[: len(_scan_shape_no_ones)] == _scan_shape_no_ones:
-                    _data = cls._insert_squeezed_scan_dims(
-                        _data, _scan, _size_1_scan_dims
-                    )
-        elif len(_squeezed_scan_dims) > 0:
+                    _squeezed_scan_dims = _size_1_scan_dims
+        if _squeezed_scan_dims is not None and len(_squeezed_scan_dims) > 0:
             _data = cls._insert_squeezed_scan_dims(_data, _scan, _squeezed_scan_dims)
 
         _info["shape"] = _data.shape

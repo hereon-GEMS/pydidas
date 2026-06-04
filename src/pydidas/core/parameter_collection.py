@@ -30,8 +30,8 @@ __status__ = "Production"
 __all__ = ["ParameterCollection"]
 
 
-from collections.abc import Iterable
-from typing import Any, Self
+from collections.abc import Collection
+from typing import Any, NoReturn
 
 from pydidas.core.parameter import Parameter
 from pydidas.core.utils.iterable_utils import flatten
@@ -50,17 +50,15 @@ class ParameterCollection(dict):
 
     Parameters
     ----------
-    *args : Union[Parameter, ParameterCollection]
+    *args : Parameter or ParameterCollection
         Any number of Parameter or ParameterCollection instances
-    **kwargs : dict
-        Any number of Parameters
     """
 
-    def __init__(self, *args: Parameter | Self):
+    def __init__(self, *args: "Parameter | ParameterCollection") -> None:
         super().__init__()
-        self.add_params(*args)
+        self.add_params(*args)  # type: ignore[arg-type]
 
-    def __copy__(self) -> Self:
+    def __copy__(self) -> "ParameterCollection":
         """
         Get a copy of the ParameterCollection.
 
@@ -79,7 +77,7 @@ class ParameterCollection(dict):
             _copy.add_param(_new_param)
         return _copy
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int:  # type: ignore[override]
         """
         Create a hash value for the ParameterCollection.
 
@@ -95,7 +93,7 @@ class ParameterCollection(dict):
         _values = tuple(hash(_val) for _val in self.values())
         return hash((_keys, _values))
 
-    def __setitem__(self, key: str, param: Parameter):
+    def __setitem__(self, key: str, param: Parameter) -> None:
         """
         Assign a value to a dictionary key.
 
@@ -127,15 +125,31 @@ class ParameterCollection(dict):
         self.__check_key_available(param)
         super().__setitem__(key, param)
 
+    def __getitem__(self, key: str) -> Parameter:
+        """
+        Get the requested Parameter
+
+        Parameters
+        ----------
+        key : str
+            The reference key.
+
+        Returns
+        -------
+        Parameter
+            The requested Parameter.
+        """
+        return super().__getitem__(key)
+
     @staticmethod
-    def __raise_type_error(item: object):
+    def __raise_type_error(item: Any) -> NoReturn:
         """
         Raise a TypeError that item is of the wrong type.
 
         Parameters
         ----------
-        item : object
-            Any item.
+        item : Any
+            Any item (which cannot be added to the ParameterCollection).
 
         Raises
         ------
@@ -148,8 +162,8 @@ class ParameterCollection(dict):
         )
 
     def __check_key_available(
-        self, param: Parameter, keys: Iterable[str] | None = None
-    ):
+        self, param: Parameter, keys: Collection[str] | None = None
+    ) -> None | NoReturn:
         """
         Check if the Parameter refkey is already a registered key.
 
@@ -157,7 +171,7 @@ class ParameterCollection(dict):
         ----------
         param : Parameter
             The Parameter to be compared.
-        keys : Iterable[str] | None, optional
+        keys : Collection[str] or None, optional
             The keys to be compared against. If None, the comparison will be
             performed against all dictionary keys. The default is None.
 
@@ -173,7 +187,7 @@ class ParameterCollection(dict):
                 f"A parameter with the reference key '{param.refkey}' already exists."
             )
 
-    def add_param(self, param: Parameter):
+    def add_param(self, param: Parameter) -> None:
         """
         Add a parameter to the ParameterCollection.
 
@@ -195,7 +209,7 @@ class ParameterCollection(dict):
         self.__check_key_available(param)
         self.__setitem__(param.refkey, param)
 
-    def __check_arg_types(self, *args: Parameter | Self):
+    def __check_arg_types(self, *args: Any) -> None:
         """
         Check the types of input arguments.
 
@@ -204,7 +218,7 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : Parameter | Self
+        *args : Any
             Any arguments.
         """
         for _param in args:
@@ -223,25 +237,25 @@ class ParameterCollection(dict):
         """
         return list(self.keys())
 
-    def add_params(self, *args: tuple[Parameter, Self, dict]):
+    def add_params(self, *args: "Parameter | ParameterCollection") -> None:
         """
         Add parameters to the ParameterCollection.
 
         This method adds Parameters to the ParameterCollection.
         Parameters can be either supplied individually as arguments or as
-        ParameterCollections or dictionaries.
+        ParameterCollections.
 
         Parameters
         ----------
-        *args : tuple[Parameter, dict, ParameterCollection]
-            Any dict, Parameter or ParameterCollection
+        *args : Parameter or ParameterCollection
+            Any Parameter or ParameterCollection
         """
         # perform all type checks before adding any items:
-        self.__check_arg_types(*args)
-        self.__check_duplicate_keys(*args)
-        self.__add_arg_params(*args)
+        self.__check_arg_types(*args)  # type: ignore[arg-type]
+        self.__check_duplicate_keys(*args)  # type: ignore[arg-type]
+        self.__add_arg_params(*args)  # type: ignore[arg-type]
 
-    def __check_duplicate_keys(self, *args: dict[str, Parameter] | Parameter | Self):
+    def __check_duplicate_keys(self, *args: "Parameter | ParameterCollection") -> None:
         """
         Check for duplicate keys and raise an error if a duplicate key is found.
 
@@ -250,8 +264,8 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *args : dict[str, Parameter] | Parameter | Self
-            Any number of Parameters or ParameterCollections or dictionaries
+        *args : Parameter or ParameterCollection
+            Any number of Parameters or ParameterCollections
             with key: Parameter pairs.
 
         Raises
@@ -260,9 +274,9 @@ class ParameterCollection(dict):
             If the kwargs key of a Parameter differs from the Parameter
             reference key.
         """
-        _flattened_params = flatten(
+        _flattened_params = flatten(  # type: ignore[arg-type]
             [_arg] if isinstance(_arg, Parameter) else list(_arg.values())
-            for _arg in args
+            for _arg in args  # type: ignore[arg-type]
         )
         _original_keys = tuple(self.keys())
         for _param in _flattened_params:
@@ -270,22 +284,22 @@ class ParameterCollection(dict):
             _temp_keys = _original_keys + _other_keys
             self.__check_key_available(_param, keys=_temp_keys)
 
-    def __add_arg_params(self, *args: tuple[Parameter, Self]):
+    def __add_arg_params(self, *args: "Parameter | ParameterCollection") -> None:
         """
         Add the passed parameters to the ParameterCollection.
 
         Parameters
         ----------
-        *args : tuple[Parameter, Self]
+        *args : Parameter or ParameterCollection
             The single Parameters or ParameterCollections to be added.
         """
-        for _item in args:
+        for _item in args:  # type: ignore[arg-type]
             if isinstance(_item, Parameter):
                 self.add_param(_item)
             elif isinstance(_item, ParameterCollection):
                 self.update(_item)
 
-    def delete_param(self, key: str):
+    def delete_param(self, key: str) -> None:
         """
         Remove a Parameter from the ParameterCollection.
 
@@ -298,7 +312,7 @@ class ParameterCollection(dict):
         """
         self.__delitem__(key)
 
-    def copy(self) -> Self:
+    def copy(self) -> "ParameterCollection":
         """
         Get a copy of the ParameterCollection.
 
@@ -312,7 +326,7 @@ class ParameterCollection(dict):
         """
         return self.__copy__()
 
-    def deepcopy(self) -> Self:
+    def deepcopy(self) -> "ParameterCollection":
         """
         Get a copy of the ParameterCollection.
 
@@ -345,7 +359,7 @@ class ParameterCollection(dict):
         """
         return self.__getitem__(param_key).value
 
-    def set_value(self, param_key: str, value: Any):
+    def set_value(self, param_key: str, value: Any) -> None:
         """
         Update the value of a stored parameter.
 
@@ -427,7 +441,8 @@ class ParameterCollection(dict):
         _vals = set()
         for _arg in args:
             if _arg not in self.keys():
-                raise KeyError(f"No Parameter with the key {_arg} has been registered.")
+                _msg = f"No Parameter with the key {_arg} has been registered."
+                raise KeyError(_msg)
             _vals.add(self.get_value(_arg))
         if len(_vals) == 1:
             return True

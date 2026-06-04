@@ -2,7 +2,6 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-
 v26.mm.dd
 =========
 
@@ -19,7 +18,11 @@ Bugfixes
 --------
 - Fixed an issue in the DataBrowsingFrame which did not load the icons for 
   the starting directory correctly.
-- Fixed an issue with importing data with scan dimensions of size 1 which 
+- Fixed an issue in the WorkflowTestFrame which de-selected the node after
+  running the test for a different datapoint.
+- Fixed an issue which would not scale 1d plots correctly due to Qt's 
+  processing queue for signals and its use in PydidasPlot1d.
+- Fixed an issue with importing data with scan dimensions of size 1 which
   were squeezed during export.
 
 

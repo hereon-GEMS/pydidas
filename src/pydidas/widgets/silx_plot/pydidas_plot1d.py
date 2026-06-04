@@ -199,7 +199,7 @@ class PydidasPlot1D(Plot1D):
                 )
             self.setActiveCurve(_label.format(value=data.axis_ranges[0][0]))
         if _reset_zoom and not self._lock_zoom_action.locked:
-            self.resetZoom()
+            QtCore.QTimer.singleShot(0, self.resetZoom)
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes

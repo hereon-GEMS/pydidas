@@ -154,11 +154,13 @@ def create_hdf5_results_file(
         _root.create_dataset("scan_title", data=kwargs.get("scan_title", ""))
         _squeezed_dims = kwargs.get("squeezed_scan_dims", "")
         if _squeezed_dims:
-            if isinstance(_squeezed_dims, Iterable):
-                _squeezed_dims = ",".join(str(_item) for _item in _squeezed_dims)
-            if not isinstance(_squeezed_dims, str):
+            if isinstance(_squeezed_dims, str):
+                pass
+            elif isinstance(_squeezed_dims, Iterable):
+                _squeezed_dims = ";".join(str(_item) for _item in _squeezed_dims)
+            else:
                 raise UserConfigError(
-                    "Squeezed scan dimensions must be a string or list of integers."
+                    "Squeezed scan dimensions must be a string or an iterable of integers."
                 )
         _config_group.create_dataset("squeezed_scan_dims", data=_squeezed_dims)
         for _key, _value in scan.items():

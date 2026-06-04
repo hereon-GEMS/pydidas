@@ -111,7 +111,7 @@ def test_squeezed_shape__default_scan():
     # Default scan_dim is 1, and scan_dim0_n_points should be 1
     _squeezed = scan.squeezed_shape
     assert isinstance(_squeezed, tuple)
-    # The result should be empty or contain only 1s removed
+    assert _squeezed == ()
 
 
 def test_ndim():

@@ -514,7 +514,6 @@ class TestProcessingResults(unittest.TestCase):
         SCAN.set_param_value("scan_dim0_n_points", 1)
         res = self.create_standard_workflow_results()
         _res = res.get_results_for_flattened_scan(1)
-        print(_res.shape)
         self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
 
     def test_get_results_for_flattened_scan__wrong_node_id(self) -> None:

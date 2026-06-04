@@ -32,9 +32,10 @@ import re
 from pathlib import Path
 from typing import Any
 
-from pydidas.contexts.scan import Scan
+from pydidas.contexts import DiffractionExperiment, Scan
 from pydidas.core import Dataset
 from pydidas.core.io_registry import GenericIoBase
+from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io.processing_result_io_meta import ProcessingResultIoMeta
 
 
@@ -150,7 +151,7 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
             else:
                 _label = re.sub("[^a-zA-Z0-9_-]", "_", _label)
                 _label = re.sub("_+", "_", _label).strip("_")
-                _names[_id] = (f"node_{_id:02d}_{_label}{cls.default_suffix}").replace(
+                _names[_id] = f"node_{_id:02d}_{_label}{cls.default_suffix}".replace(
                     "__", "_"
                 )
         return _names
@@ -228,7 +229,9 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         raise NotImplementedError
 
     @classmethod
-    def import_results_from_file(cls, filename: Path | str) -> tuple[Dataset, dict, dict]:
+    def import_results_from_file(
+        cls, filename: Path | str
+    ) -> tuple[Dataset, dict[str, Any], Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import results from a file and store them as a Dataset.
 
@@ -244,12 +247,16 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Returns
         -------
-        data : Dataset
+        data : pydidas.core.Dataset
             The dataset with the imported data.
         node_info : dict
-            A dictionary with node_label, data_label, plugin_name keys and the
-            respective values.
-        scan : dict
-            The dictionary with meta information about the scan.
+            A dictionary with node_label, data_label, plugin_name keys and
+            the respective values.
+        scan : pydidas.contexts.Scan
+            The imported scan configuration.
+        diffraction_exp : pydidas.contexts.DiffractionExperiment
+            The imported diffraction experiment configuration.
+        tree : pydidas.workflow.WorkflowTree
+            The imported workflow tree.
         """
         raise NotImplementedError

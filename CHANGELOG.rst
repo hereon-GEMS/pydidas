@@ -19,6 +19,8 @@ Bugfixes
 --------
 - Fixed an issue in the DataBrowsingFrame which did not load the icons for 
   the starting directory correctly.
+- Fixed an issue with importing data with scan dimensions of size 1 which 
+  were squeezed during export.
 
 
 v26.05.19

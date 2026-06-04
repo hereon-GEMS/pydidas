@@ -122,6 +122,8 @@ def create_hdf5_results_file(
             The default is "".
         scan_title : str, optional
             The scan title. The default is "".
+        squeezed_scan_dims : list[int], optional
+            The squeezed scan dimensions. The default is [].
     """
     if isinstance(scan, Scan):
         scan = scan.get_param_values_as_dict(filter_types_for_export=True)
@@ -150,6 +152,9 @@ def create_hdf5_results_file(
         _root.create_dataset("node_label", data=kwargs.get("node_label", ""))
         _root.create_dataset("plugin_name", data=kwargs.get("plugin_name", ""))
         _root.create_dataset("scan_title", data=kwargs.get("scan_title", ""))
+        _config_group.create_dataset(
+            "squeezed_scan_dims", data=kwargs.get("squeezed_scan_dims", [])
+        )
         for _key, _value in scan.items():
             _scan_group.create_dataset(_key, data=_value)
         for _key, _value in diffraction_exp.items():

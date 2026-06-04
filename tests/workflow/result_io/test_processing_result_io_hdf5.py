@@ -57,6 +57,23 @@ META = ProcessingResultIoMeta
 H5SAVER = ProcessingResultIoHdf5
 
 
+def _make_scan_with_size1_dims(n_dim: int, *size_1_dims: int) -> Scan:
+    _scan = Scan()
+    _default_shape = (3, 7, 5, 11)
+    _units = ("mm", "deg", "um", "rad")
+    _offsets = (0.5, -2, 11, 4.2)
+    _deltas = (0.1, -0.2, 0.4, 0.75)
+    _scan.set_param_value("scan_dim", n_dim)
+    for _dim in range(n_dim):
+        _scan.set_param_value(f"scan_dim{_dim}_label", f"motor{_dim}")
+        _size = 1 if _dim in size_1_dims else _default_shape[_dim]
+        _scan.set_param_value(f"scan_dim{_dim}_n_points", _size)
+        _scan.set_param_value(f"scan_dim{_dim}_delta", _deltas[_dim])
+        _scan.set_param_value(f"scan_dim{_dim}_offset", _offsets[_dim])
+        _scan.set_param_value(f"scan_dim{_dim}_unit", _units[_dim])
+    return _scan
+
+
 class TestProcessingResultIoHdf5(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -86,28 +103,6 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         shutil.rmtree(cls._dir)
 
     @classmethod
-    def _make_scan_with_size1_dim(cls) -> Scan:
-        """Return a Scan with dim0 having n_points=1 and dim1 having n_points=5."""
-        _scan = Scan()
-        _scan.set_param_value("scan_dim", 3)
-        _scan.set_param_value("scan_dim0_n_points", 3)
-        _scan.set_param_value("scan_dim0_delta", 1.0)
-        _scan.set_param_value("scan_dim0_offset", 0.5)
-        _scan.set_param_value("scan_dim0_label", "motor0")
-        _scan.set_param_value("scan_dim0_unit", "mm")
-        _scan.set_param_value("scan_dim1_n_points", 1)
-        _scan.set_param_value("scan_dim1_delta", 0.2)
-        _scan.set_param_value("scan_dim1_offset", 1.0)
-        _scan.set_param_value("scan_dim1_label", "motor1")
-        _scan.set_param_value("scan_dim1_unit", "deg")
-        _scan.set_param_value("scan_dim2_n_points", 7)
-        _scan.set_param_value("scan_dim2_delta", 0.5)
-        _scan.set_param_value("scan_dim2_offset", 1.0)
-        _scan.set_param_value("scan_dim2_label", "motor2")
-        _scan.set_param_value("scan_dim2_unit", "um")
-        return _scan
-
-    @classmethod
     def _create_h5_squeezed_test_files(cls):
         """
         Create HDF5 result files with squeezed scan data for import tests.
@@ -118,11 +113,13 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         - import_test_legacy_squeezed.h5   : no ``squeezed_scan_dims`` key (legacy)
         - import_test_legacy_no_match.h5   : no ``squeezed_scan_dims`` key, shape mismatch
         """
-        _scan = cls._make_scan_with_size1_dim()  # shape (3, 1, 7)
+        cls._data_shape = (5, 7)
+        cls._mismatched_data_shape = (2, 3, 4, 5)
+        _scan = _make_scan_with_size1_dims(3, 1)
         _data = cls._squeezed_import_data = create_dataset(
-            5, shape=_scan.shape + (5, 7)
+            5, shape=_scan.shape + cls._data_shape
         ).squeeze()
-        _mismatched_data = create_dataset(4, shape=(2, 3, 4, 5))
+        _mismatched_data = create_dataset(4, shape=cls._mismatched_data_shape)
 
         _scan_dict = _scan.get_param_values_as_dict(filter_types_for_export=True)
         _exp_dict = EXP.get_param_values_as_dict(filter_types_for_export=True)
@@ -397,21 +394,30 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             )
 
     def test_insert_squeezed_scan_dims__single_dim(self):
-        _scan = self._make_scan_with_size1_dim()
+        _scan = _make_scan_with_size1_dims(3, 1)
         _data = Dataset(
-            np.random.random((3, 7, 12)),
+            np.random.random(_scan.squeezed_shape + self._data_shape),
             axis_labels={
-                0: _scan.axis_labels[0], 1: _scan.axis_labels[2], 2: "data_label"
+                0: _scan.axis_labels[0],
+                1: _scan.axis_labels[2],
+                2: "data_label0",
+                3: "data_label1",
             },
-            axis_units={0: _scan.axis_units[0], 1: _scan.axis_units[2], 2: "data_unit"},
+            axis_units={
+                0: _scan.axis_units[0],
+                1: _scan.axis_units[2],
+                2: "data_unit",
+                3: "data_unit B",
+            },
             axis_ranges={
                 0: _scan.axis_ranges[0],
                 1: _scan.axis_ranges[2],
-                2: np.linspace(11, 12, 12),
+                2: np.linspace(11, 12, self._data_shape[0]),
+                3: np.linspace(0, 2, self._data_shape[1]),
             },
         )
         _result = H5SAVER._insert_squeezed_scan_dims(_data, _scan, [1])
-        self.assertEqual(_result.shape, (3, 1, 7, 12))
+        self.assertEqual(_result.shape, _scan.shape + self._data_shape)
         for _dim in [0, 1, 2]:
             self.assertEqual(
                 _result.axis_labels[_dim],
@@ -420,78 +426,43 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             self.assertEqual(
                 _result.axis_units[_dim], _scan.get_param_value(f"scan_dim{_dim}_unit")
             )
+        self.assertTrue(np.allclose(_result.squeeze(), _data))
 
     def test_insert_squeezed_scan_dims__multiple_dims(self):
-        # 3D scan with size-1 dims at indices 0 and 2
-        _scan = Scan()
-        _scan.set_param_value("scan_dim", 3)
-        _scan.set_param_value("scan_dim0_n_points", 1)
-        _scan.set_param_value("scan_dim0_delta", 1.0)
-        _scan.set_param_value("scan_dim0_offset", 0.0)
-        _scan.set_param_value("scan_dim0_label", "motor0")
-        _scan.set_param_value("scan_dim0_unit", "mm")
-        _scan.set_param_value("scan_dim1_n_points", 5)
-        _scan.set_param_value("scan_dim1_delta", 0.1)
-        _scan.set_param_value("scan_dim1_offset", 0.0)
-        _scan.set_param_value("scan_dim1_label", "motor1")
-        _scan.set_param_value("scan_dim1_unit", "deg")
-        _scan.set_param_value("scan_dim2_n_points", 1)
-        _scan.set_param_value("scan_dim2_delta", 1.0)
-        _scan.set_param_value("scan_dim2_offset", 0.0)
-        _scan.set_param_value("scan_dim2_label", "motor2")
-        _scan.set_param_value("scan_dim2_unit", "um")
-        # Squeezed data has shape (5, 12): only scan dim1 + plugin dim
+        _scan = _make_scan_with_size1_dims(3, 0, 2)
+        _data_shape = (12,)
         _data = Dataset(
-            np.random.random((5, 12)),
+            np.random.random(_scan.squeezed_shape + _data_shape),
             axis_labels={0: "motor1_ax", 1: "intensity"},
             axis_units={0: "deg", 1: "a.u."},
-            axis_ranges={0: np.linspace(0, 0.4, 5), 1: np.arange(12, dtype=float)},
-        )
-        _result = H5SAVER._insert_squeezed_scan_dims(_data, _scan, [0, 2])
-        # Expected shape: (1, 5, 1, 12) — dim0 and dim2 re-inserted
-        self.assertEqual(_result.shape, (1, 5, 1, 12))
-        self.assertEqual(_result.axis_labels[0], "motor0")
-        self.assertEqual(_result.axis_labels[1], "motor1_ax")
-        self.assertEqual(_result.axis_labels[2], "motor2")
-        self.assertEqual(_result.axis_labels[3], "intensity")
-
-    def test_insert_squeezed_scan_dims__values_preserved(self):
-        # scan shape (3, 1, 7) — dim1 is size-1; squeezed data has shape (3, 7, 8)
-        _scan = self._make_scan_with_size1_dim()
-        _original = np.random.random((3, 7, 8))
-        _data = Dataset(
-            _original,
-            axis_labels={0: "ax0", 1: "ax1", 2: "ax2"},
-            axis_units={0: "u0", 1: "u1", 2: "u2"},
             axis_ranges={
-                0: np.linspace(0.5, 2.5, 3),
-                1: np.linspace(1.0, 4.0, 7),
-                2: np.arange(8, dtype=float),
+                0: np.linspace(0, 0.4, _scan.shape[1]),
+                1: np.arange(_data_shape[0], dtype=float),
             },
         )
-        _result = H5SAVER._insert_squeezed_scan_dims(_data, _scan, [1])
-        self.assertTrue(np.allclose(_result.squeeze(), _original))
-
-    # ------------------------------------------------------------------
-    # Tests for update_metadata with squeeze=True
-    # ------------------------------------------------------------------
+        _result = H5SAVER._insert_squeezed_scan_dims(_data, _scan, [0, 2])
+        self.assertEqual(_result.shape, _scan.shape + _data_shape)
+        self.assertEqual(_result.axis_labels[0], _scan.axis_labels[0])
+        self.assertEqual(_result.axis_labels[1], _data.axis_labels[0])
+        self.assertEqual(_result.axis_labels[2], _scan.axis_labels[2])
+        self.assertEqual(_result.axis_labels[3], _data.axis_labels[1])
+        self.assertTrue(np.allclose(_result.squeeze(), _data))
 
     def test_update_metadata__with_squeeze(self):
-        _scan = self._make_scan_with_size1_dim()  # shape (3, 1, 7); dim1 is size-1
+        _scan = _make_scan_with_size1_dims(3, 1)
         _plugin_shape = (12, 7)
-        _full_shape = _scan.shape + _plugin_shape  # (3, 1, 7, 12, 7)
+        _full_shape = _scan.shape + _plugin_shape
         _node_infos = {
             1: {
                 "node_label": "SqueezedNode",
                 "data_label": "Intensity",
                 "data_unit": "a.u.",
-                "shape": _plugin_shape,  # plugin output dims only (no scan dims yet)
+                "shape": _plugin_shape,
                 "plugin_name": "SomeProcPlugin",
             }
         }
         _resdir = self._dir / get_random_string(8)
         H5SAVER.prepare_files_and_directories(_resdir, _node_infos, scan_context=_scan)
-        # Build a full Dataset (scan dims + plugin dims) for metadata extraction
         _data = Dataset(
             np.random.random(_full_shape),
             axis_labels={i: f"ax{i}" for i in range(len(_full_shape))},
@@ -507,16 +478,11 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
             _squeezed_dims = list(_file["entry/pydidas_config/squeezed_scan_dims"][()])
         self.assertEqual(_squeezed_dims, [1])
 
-    # ------------------------------------------------------------------
-    # Tests for export_full_data_to_file with squeeze=True
-    # ------------------------------------------------------------------
-
     def test_export_full_data_to_file__with_squeeze(self):
-        _scan = self._make_scan_with_size1_dim()  # shape (3, 1, 7); dim1 is size-1
+        _scan = _make_scan_with_size1_dims(3, 1)
         _plugin_shape = (12, 7)
-        _full_shape = _scan.shape + _plugin_shape  # (3, 1, 7, 12, 7)
-        _squeezed_shape = (3, 7) + _plugin_shape  # (3, 7, 12, 7)
-        # Pre-allocate with the squeezed shape so the squeezed write fits
+        _full_shape = _scan.shape + _plugin_shape
+        _squeezed_shape = _scan.squeezed_shape + _plugin_shape
         _node_infos = {
             1: {
                 "node_label": "SqueezedNode",
@@ -530,58 +496,48 @@ class TestProcessingResultIoHdf5(unittest.TestCase):
         H5SAVER.prepare_files_and_directories(_resdir, _node_infos, scan_context=_scan)
         _full_data = {1: Dataset(np.random.random(_full_shape))}
         H5SAVER.export_full_data_to_file(_full_data, scan_context=_scan, squeeze=True)
-        _fname = _resdir / H5SAVER._filenames[1]
-        with h5py.File(_fname, "r") as _file:
+        with h5py.File(_resdir / H5SAVER._filenames[1], "r") as _file:
             _written = _file["entry/data/data"][()]
             _squeezed_dims = list(_file["entry/pydidas_config/squeezed_scan_dims"][()])
         self.assertEqual(_written.shape, _squeezed_shape)
         self.assertTrue(np.allclose(_written, _full_data[1].squeeze().array))
         self.assertEqual(_squeezed_dims, [1])
 
-    # ------------------------------------------------------------------
-    # Tests for import_results_from_file with squeezed dims
-    # ------------------------------------------------------------------
-
     def test_import_results_from_file__with_squeezed_dims_flag(self):
-        # Squeezed data stored as (3, 7, 5, 7); after import: (3, 1, 7, 5, 7).
+        """Test to check that data was re-inserted for squeezed dim"""
         _data, _info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
             self._import_squeezed_filename
         )
-        self.assertEqual(_data.shape, (3, 1, 7, 5, 7))
-        # The re-inserted dim gets its metadata from the scan
-        self.assertEqual(_data.axis_labels[1], "motor1")
-        self.assertEqual(_data.axis_units[1], "deg")
-        # The axis that was at position 0 in the squeezed data stays at position 0
+        self.assertEqual(_data.shape, _scan.shape + self._data_shape)
+        self.assertEqual(_data.axis_labels[1], _scan.axis_labels[1])
+        self.assertEqual(_data.axis_units[1], _scan.axis_units[1])
         self.assertEqual(
             _data.axis_labels[0], self._squeezed_import_data.axis_labels[0]
         )
 
     def test_import_results_from_file__with_empty_squeezed_dims_flag(self):
-        # File has squeezed_scan_dims=[] (empty); no re-insertion expected.
-        # Squeezed data was stored as (3, 7, 5, 7); shape must stay the same.
+        """Test to check that no data was re-inserted for squeezed dim"""
         _data, _info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
             self._import_squeezed_empty_filename
         )
-        self.assertEqual(_data.shape, (3, 7, 5, 7))
+        _expected_shape = _scan.squeezed_shape + self._data_shape
+        self.assertEqual(_data.shape, _expected_shape)
 
     def test_import_results_from_file__legacy_squeezed_dims(self):
-        # Legacy file has no squeezed_scan_dims key.
-        # scan has dim1 with n_points=1; _scan_shape_no_ones=(3, 7).
-        # Stored data shape (3, 7, 5, 7) starts with (3, 7) → backward compat re-inserts dim1.
+        """Test to check that data was re-inserted if key is misssing"""
         _data, _info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
             self._import_legacy_squeezed_filename
         )
-        self.assertEqual(_data.shape, (3, 1, 7, 5, 7))
-        self.assertEqual(_data.axis_labels[1], "motor1")
-        self.assertEqual(_data.axis_units[1], "deg")
+        self.assertEqual(_data.shape, _scan.shape + self._data_shape)
+        self.assertEqual(_data.axis_labels[1], _scan.axis_labels[1])
+        self.assertEqual(_data.axis_units[1], _scan.axis_units[1])
 
     def test_import_results_from_file__legacy_size1_dims_shape_no_match(self):
-        # Legacy file: scan has size-1 dim0, but data shape (3, 27) does NOT
-        # match the non-size-1 scan prefix (5,) → no re-insertion.
+        """Without key and shape mismatch, data should stay the same"""
         _data, _info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
             self._import_legacy_no_match_filename
         )
-        self.assertEqual(_data.shape, (2, 3, 4, 5))
+        self.assertEqual(_data.shape, self._mismatched_data_shape)
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ from typing import Sequence
 
 from qtpy import QtWidgets
 
-from pydidas.core import Hdf5key
+from pydidas.core import Hdf5key, NXdataKey, UserConfigError
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.widgets.utilities import (
     get_max_pixel_width_of_entries,
@@ -53,20 +53,27 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         The parent widget. The default is None.
     fname : Path or str or None, optional
         The file path to the hdf5 file. The default is None.
+    nxdata_signal_only : bool, optional
+        Flag whether to show only the NxData entries. The default is False.
+    min_dim : int, optional
+        The minimum dimension of the datasets to be shown. The default is 1.
     """
 
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
-        fname: Path | str | None = None,
+        fname: None | Path | str = None,
+        nxdata_signal_only: bool = False,
+        min_dim: int = 1,
     ) -> None:
         QtWidgets.QInputDialog.__init__(self, parent)
-        if fname is not None:
-            dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
-            self.__update_combo_box_items(dsets)
+        self.__nxdata_signal_only = nxdata_signal_only
+        self.__min_dim = min_dim
         self.setWindowTitle("Select hdf5 dataset")
         self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_FileDialogListView"))
         self.setLabelText("Hdf5 datasets:")
+        if fname is not None:
+            self.set_filename(fname)
 
     def set_filename(self, fname: Path | str) -> None:
         """
@@ -77,7 +84,17 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         fname : Path or str
             The full path to the Hdf5 file.
         """
-        dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
+        if not isinstance(fname, Path):
+            fname = Path(fname)
+        if not fname.is_file():
+            raise UserConfigError(
+                f"The selected file `{fname}` is not a valid file, for example "
+                "the filename is misspelled and the file does not exist. Please "
+                "select a valid hdf5 file."
+            )
+        dsets = get_hdf5_populated_dataset_keys(
+            fname, min_dim=self.__min_dim, nxdata_signal_only=self.__nxdata_signal_only
+        )
         self.__update_combo_box_items(dsets)
 
     def __update_combo_box_items(self, items: Sequence[str]) -> None:
@@ -91,26 +108,31 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             of string items.
         """
         _font_height = PydidasQApplication.instance().font_height
-        self.resize(
-            get_max_pixel_width_of_entries(items) + 60,
-            min(
-                15 * _font_height,
-                max(10 * _font_height, 50 + len(items) * _font_height),
-            ),
-        )
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
-    def get_dset(self) -> Hdf5key | None:
+        _width = get_max_pixel_width_of_entries(items) + 60
+        _basic_height = 5 * _font_height
+        _listview = self.findChild(QtWidgets.QListView)
+        if not _listview or len(items) < 1:
+            _list_height = _font_height + 5
+        else:
+            _row_height = _listview.sizeHintForRow(0)
+            _list_height = _row_height * min(10, 1 + len(items))
+        self.resize(_width, _list_height + _basic_height)
+
+    def get_dset(self) -> Hdf5key | NXdataKey | None:
         """
         Show the QInputDialog and return the selected Hdf5key.
 
         Returns
         -------
-        Hdf5key or None
+        Hdf5key or NXdataKey or None
             If the dialogue is accepted, returns the selected Hdf5key.
             If it is aborted, it will return None.
         """
         if self.exec_() == QtWidgets.QDialog.Accepted:
+            if self.__nxdata_signal_only:
+                return NXdataKey(self.textValue())
             return Hdf5key(self.textValue())
         return None

@@ -66,7 +66,7 @@ class InputPlugin(BasePlugin):
         "binning",
     ]
 
-    def __init__(self, *args: tuple, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any):
         """
         Create a BasicPlugin instance.
         """
@@ -219,7 +219,7 @@ class InputPlugin(BasePlugin):
         return _data, kwargs
 
     def read_multi_image(
-        self, frame_indices: list[int, ...], **kwargs: Any
+        self, frame_indices: list[int], **kwargs: Any
     ) -> tuple[Dataset, dict]:
         """
         Read multiple image frames and handle them according to the settings.

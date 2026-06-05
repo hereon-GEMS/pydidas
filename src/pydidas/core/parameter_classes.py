@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2026, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,28 +16,31 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The core.utils sub-package provides generic convenience functions and classes
-which are used throughout the package.
+The Hdf5key is a subclassed string to have a unique identifier for Hdf5 dataset
+keys.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+__all__ = ["Hdf5key", "NXdataKey"]
 
 
-from . import hdf5_dataset_utils, hdf5_filter_keys, nxs_export
-from .hdf5_dataset_utils import *
-from .nxs_dataset_utils import *
-from .nxs_export import *
+class Hdf5key(str):
+    """
+    A class used for referencing keys to HDF5 datasets.
+
+    Inherits from :py:class:`str`. This class is only used for type-checking
+    Parameters.
+    """
 
 
-__all__ = hdf5_dataset_utils.__all__ + nxs_dataset_utils.__all__ + nxs_export.__all__
+class NXdataKey(str):
+    """
+    A class used for referencing keys to NXdata datasets.
 
-del (
-    hdf5_dataset_utils,
-    hdf5_filter_keys,
-    nxs_dataset_utils,
-    nxs_export,
-)
+    Inherits from :py:class:`str`. This class is only used for type-checking
+    Parameters.
+    """

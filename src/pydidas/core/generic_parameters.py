@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ Reference keys are defined in the core.generic_params subpackage.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
@@ -33,8 +33,8 @@ __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 from pathlib import Path
 
 from pydidas.core.generic_params import GENERIC_PARAMS_METADATA
-from pydidas.core.hdf5_key import Hdf5key
 from pydidas.core.parameter import Parameter
+from pydidas.core.parameter_classes import Hdf5key, NXdataKey
 from pydidas.core.parameter_collection import ParameterCollection
 
 
@@ -71,6 +71,10 @@ def get_generic_parameter(refkey: str) -> Parameter:
         case "Hdf5key":
             _config["type"] = Hdf5key
             _config["default"] = Hdf5key(_config["default"])
+        case "NXdataKey":
+            _config["type"] = NXdataKey
+            _config["default"] = NXdataKey(_config["default"])
+
     _type = _config.pop("type")
     _default = _config.pop("default")
     return Parameter(refkey, _type, _default, **_config)

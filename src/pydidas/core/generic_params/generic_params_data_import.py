@@ -68,8 +68,8 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The name of the first file for a file series or of the hdf5 file in "
-            "case of hdf5 file input."
+            "The name of the first file for a file series or of the HDF5 file in "
+            "case of HDF5 file input."
         ),
     },
     "last_file": {
@@ -95,6 +95,15 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "file."
         ),
     },
+    "nxdata_key": {
+        "type": "NXdataKey",
+        "default": "/entry/data/data",
+        "name": "NXdata signal",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "Used only for NeXus files: The key to the signal dataset.",
+    },
     "hdf5_key": {
         "type": "Hdf5key",
         "default": "/entry/data/data",
@@ -102,7 +111,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "Used only for hdf5 files: The dataset key.",
+        "tooltip": "Used only for HDF5 files: The dataset key.",
     },
     "hdf5_key_str": {
         "type": str,
@@ -111,7 +120,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": [None],
         "unit": "",
         "allow_None": True,
-        "tooltip": "Used only for hdf5 files: The dataset key.",
+        "tooltip": "Used only for HDF5 files: The dataset key.",
     },
     "hdf5_frame": {
         "type": int,
@@ -120,7 +129,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "For hdf5 image files: The frame number in the dataset",
+        "tooltip": "For HDF5 image files: The frame number in the dataset",
     },
     "hdf5_first_image_num": {
         "type": int,
@@ -129,7 +138,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "The first image in the hdf5-dataset to be used.",
+        "tooltip": "The first image in the HDF5 dataset to be used.",
     },
     "hdf5_last_image_num": {
         "type": int,
@@ -139,7 +148,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The last image in the hdf5-dataset to be used. The value -1 will "
+            "The last image in the HDF5 dataset to be used. The value -1 will "
             "default to the last image."
         ),
     },
@@ -166,7 +175,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
             "The slicing axes to identify the frame by its number in the full "
             "dataset. For example, if the frame has the axes (frame index, x, y), "
             "the slicing axes would be 0. To use the full dataset, set the slicing "
-            "axis to `None`. A `None` setting will also ignore the hdf5 frame number "
+            "axis to `None`. A `None` setting will also ignore the HDF5 frame number "
             "Parameter."
         ),
     },
@@ -201,7 +210,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "For hdf5 background image files: The dataset key.",
+        "tooltip": "For HDF5 background image files: The dataset key.",
     },
     "bg_hdf5_frame": {
         "type": int,
@@ -210,7 +219,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "For hdf5 background image files: The image number in the dataset",
+        "tooltip": "For HDF5 background image files: The image number in the dataset",
     },
     "images_per_file": {
         "type": int,
@@ -220,8 +229,8 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of images or spectra in the file. For hdf5 files, this "
-            "corresponds to the number of image frames/spectra in the hdf5 dataset. "
+            "The number of images or spectra in the file. For HDF5 files, this "
+            "corresponds to the number of image frames/spectra in the HDF5 dataset. "
             "A value -1 auto-discovers the number of images per file."
         ),
     },
@@ -233,8 +242,8 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of 1d profiles in the file. For hdf5 files, this corresponds "
-            "to the number of frames in the hdf5 dataset. A value -1 auto-discovers "
+            "The number of 1d profiles in the file. For HDF5 files, this corresponds "
+            "to the number of frames in the HDF5 dataset. A value -1 auto-discovers "
             "the number of profiles per file."
         ),
     },

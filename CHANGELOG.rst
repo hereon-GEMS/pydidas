@@ -11,12 +11,21 @@ Improvements
 - Added an option to set a custom root for data browsing in the 
   DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
   from unresponsive locations
+- Added a dedicated plugin to import NeXus NXdata with full metadata
+  and in the shape of the Scan. This allows for conveniently restarting
+  workflows from stored intermediate data.
 
 Programmatic changes
 --------------------
+- Added a checker for adherece to NeXus NXdata definition of selected 
+  datasets in HDF5 files.
 
 Bugfixes
 --------
+- Fixed a Qt6 issue in the Hdf5DatasetSelectionPopup which did not scale
+  the dialog correctly with the choices.
+- Fixed an issue in the ErrorBox when the error string was too wide to show
+  (e.g. for long filenames).
 - Fixed an issue in the DataBrowsingFrame which did not load the icons for 
   the starting directory correctly.
 - Fixed an issue in the WorkflowTestFrame which de-selected the node after

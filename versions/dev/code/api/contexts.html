@@ -1135,14 +1135,14 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.export_to_file">
-<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.Scan.export_to_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Export ScanContext to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p></li>
-<li><p><strong>overwrite</strong> (<em>bool</em>) – Keyword to allow overwriting of existing files. The default is
-False.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The full filename.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Keyword to allow overwriting of existing files.
+The default is False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1185,13 +1185,13 @@ The length of indices is equal to the number of scan dimensions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.get_metadata_for_dim">
-<span class="sig-name descname"><span class="pre">get_metadata_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.get_metadata_for_dim" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_metadata_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.get_metadata_for_dim" title="Link to this definition">#</a></dt>
 <dd><p>Get the label, unit and range of the specified scan dimension.</p>
 <p>Note: The scan dimensions are 0 … 3 and follow the python convention of
 starting with zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>Literal</em><em>[</em><em>0</em><em>, </em><em>1</em><em>, </em><em>2</em><em>, </em><em>3</em><em>]</em>) – The index of the scan dimension.</p>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the scan dimension (only 0, 1, 2, 3 are supported).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
@@ -1305,11 +1305,11 @@ keys.</p>
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.get_range_for_dim">
 <span class="sig-name descname"><span class="pre">get_range_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.get_range_for_dim" title="Link to this definition">#</a></dt>
 <dd><p>Get the Scan range for the specified dimension.</p>
-<p>Note: The scan dimensions are 0 … 3 and follow the python convention of
-starting with zero.</p>
+<p>Note: The scan dimensions are 0 … 3 and follow the python
+convention of starting with zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>Union</em><em>[</em><em>0</em><em>, </em><em>1</em><em>, </em><em>2</em><em>, </em><em>3</em><em>]</em>) – The scan dimension</p>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The scan dimension (only 0, 1, 2, 3 are supported).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The scan range as numpy array.</p>
@@ -1322,11 +1322,11 @@ starting with zero.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.import_from_file">
-<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.Scan.import_from_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Import ScanContext from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The full filename.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1494,7 +1494,7 @@ Parameter with a default value.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.Scan.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Set the value of a parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1558,9 +1558,23 @@ for the Parameter will be disabled.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.Scan.squeezed_shape">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">squeezed_shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.squeezed_shape" title="Link to this definition">#</a></dt>
+<dd><p>Get the shape of the Scan with all dimensions of length 1 removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The tuple with an entry of the length for each dimension.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.update_from_dictionary">
-<span class="sig-name descname"><span class="pre">update_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.Scan.update_from_dictionary" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.update_from_dictionary" title="Link to this definition">#</a></dt>
 <dd><p>Update the Scan from an imported dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1571,10 +1585,10 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.update_from_scan">
-<span class="sig-name descname"><span class="pre">update_from_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.Scan.update_from_scan" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.update_from_scan" title="Link to this definition">#</a></dt>
 <dd><p>Update this Scan object’s Parameters from another Scan.</p>
-<p>The purpose of this method is to “copy” the other Scan’s Parameter values while
-keeping the reference to this object.</p>
+<p>The purpose of this method is to copy the other Scan’s
+Parameter values while keeping the reference to this object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>scan</strong> (<a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a>) – The other Scan from which the Parameters should be taken.</p>
@@ -1898,7 +1912,7 @@ keys.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.instance">
-<span class="sig-name descname"><span class="pre">instance</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.diff_exp.diff_exp_context.DiffractionExperimentContext(0x55bddb7c45e0)&gt;</span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.instance" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">instance</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.diff_exp.diff_exp_context.DiffractionExperimentContext(0x5595277df200)&gt;</span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.instance" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2430,14 +2444,14 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.export_to_file">
-<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanContext.export_to_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Export ScanContext to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p></li>
-<li><p><strong>overwrite</strong> (<em>bool</em>) – Keyword to allow overwriting of existing files. The default is
-False.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The full filename.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Keyword to allow overwriting of existing files.
+The default is False.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2480,13 +2494,13 @@ The length of indices is equal to the number of scan dimensions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.get_metadata_for_dim">
-<span class="sig-name descname"><span class="pre">get_metadata_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.get_metadata_for_dim" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_metadata_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.get_metadata_for_dim" title="Link to this definition">#</a></dt>
 <dd><p>Get the label, unit and range of the specified scan dimension.</p>
 <p>Note: The scan dimensions are 0 … 3 and follow the python convention of
 starting with zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>Literal</em><em>[</em><em>0</em><em>, </em><em>1</em><em>, </em><em>2</em><em>, </em><em>3</em><em>]</em>) – The index of the scan dimension.</p>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the scan dimension (only 0, 1, 2, 3 are supported).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
@@ -2600,11 +2614,11 @@ keys.</p>
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.get_range_for_dim">
 <span class="sig-name descname"><span class="pre">get_range_for_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.get_range_for_dim" title="Link to this definition">#</a></dt>
 <dd><p>Get the Scan range for the specified dimension.</p>
-<p>Note: The scan dimensions are 0 … 3 and follow the python convention of
-starting with zero.</p>
+<p>Note: The scan dimensions are 0 … 3 and follow the python
+convention of starting with zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>Union</em><em>[</em><em>0</em><em>, </em><em>1</em><em>, </em><em>2</em><em>, </em><em>3</em><em>]</em>) – The scan dimension</p>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The scan dimension (only 0, 1, 2, 3 are supported).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The scan range as numpy array.</p>
@@ -2617,18 +2631,18 @@ starting with zero.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.import_from_file">
-<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanContext.import_from_file" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Import ScanContext from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>pathlib.Path</em><em>]</em>) – The full filename.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The full filename.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.instance">
-<span class="sig-name descname"><span class="pre">instance</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.scan.scan_context.ScanContext(0x55bddb6c1300)&gt;</span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.instance" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">instance</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydidas.contexts.scan.scan_context.ScanContext(0x559528128da0)&gt;</span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.instance" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -2800,7 +2814,7 @@ Parameter with a default value.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.set_param_value">
-<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanContext.set_param_value" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_param_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.set_param_value" title="Link to this definition">#</a></dt>
 <dd><p>Set the value of a parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2864,9 +2878,23 @@ for the Parameter will be disabled.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.ScanContext.squeezed_shape">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">squeezed_shape</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.squeezed_shape" title="Link to this definition">#</a></dt>
+<dd><p>Get the shape of the Scan with all dimensions of length 1 removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The tuple with an entry of the length for each dimension.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.update_from_dictionary">
-<span class="sig-name descname"><span class="pre">update_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanContext.update_from_dictionary" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.update_from_dictionary" title="Link to this definition">#</a></dt>
 <dd><p>Update the Scan from an imported dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2877,10 +2905,10 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.update_from_scan">
-<span class="sig-name descname"><span class="pre">update_from_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanContext.update_from_scan" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.update_from_scan" title="Link to this definition">#</a></dt>
 <dd><p>Update this Scan object’s Parameters from another Scan.</p>
-<p>The purpose of this method is to “copy” the other Scan’s Parameter values while
-keeping the reference to this object.</p>
+<p>The purpose of this method is to copy the other Scan’s
+Parameter values while keeping the reference to this object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>scan</strong> (<a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a>) – The other Scan from which the Parameters should be taken.</p>
@@ -3038,14 +3066,14 @@ each separated by a “;;”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.import_from_file">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Import a Scan from file and update the given Scan object.</p>
 <p>Call the concrete import_from_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – The full filename and path.</p></li>
+<li><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full filename and path.</p></li>
 <li><p><strong>scan</strong> (<a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The Scan object to be updated. If None, the generic ScanContext is used.
 The default is None.</p></li>
 </ul>
@@ -3261,6 +3289,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.set_param_values"><code class="docutils literal notranslate"><span class="pre">Scan.set_param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.set_param_values_from_dict"><code class="docutils literal notranslate"><span class="pre">Scan.set_param_values_from_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.shape"><code class="docutils literal notranslate"><span class="pre">Scan.shape</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.squeezed_shape"><code class="docutils literal notranslate"><span class="pre">Scan.squeezed_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.update_from_dictionary"><code class="docutils literal notranslate"><span class="pre">Scan.update_from_dictionary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.update_from_scan"><code class="docutils literal notranslate"><span class="pre">Scan.update_from_scan</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.update_param_values_from_kwargs"><code class="docutils literal notranslate"><span class="pre">Scan.update_param_values_from_kwargs</span></code></a></li>
@@ -3360,6 +3389,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.set_param_values"><code class="docutils literal notranslate"><span class="pre">ScanContext.set_param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.set_param_values_from_dict"><code class="docutils literal notranslate"><span class="pre">ScanContext.set_param_values_from_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.shape"><code class="docutils literal notranslate"><span class="pre">ScanContext.shape</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.squeezed_shape"><code class="docutils literal notranslate"><span class="pre">ScanContext.squeezed_shape</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.update_from_dictionary"><code class="docutils literal notranslate"><span class="pre">ScanContext.update_from_dictionary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.update_from_scan"><code class="docutils literal notranslate"><span class="pre">ScanContext.update_from_scan</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.update_param_values_from_kwargs"><code class="docutils literal notranslate"><span class="pre">ScanContext.update_param_values_from_kwargs</span></code></a></li>

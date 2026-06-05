@@ -474,24 +474,20 @@ etc.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.core.Hdf5key">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Hdf5key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Hdf5key" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Hdf5key</span></span><a class="headerlink" href="#pydidas.core.Hdf5key" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
-<p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>.</p>
-<p>A class used for referencing hdf5 keys.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="pydidas.core.Hdf5key.hdf5_filename">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">hdf5_filename</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></span><a class="headerlink" href="#pydidas.core.Hdf5key.hdf5_filename" title="Link to this definition">#</a></dt>
-<dd><p>Get the filename of the associated hdf5 file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The filename of the associated hdf5 file.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
+<p>A class used for referencing keys to HDF5 datasets.</p>
+<p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>. This class is only used for type-checking
+Parameters.</p>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.core.NXdataKey">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">NXdataKey</span></span><a class="headerlink" href="#pydidas.core.NXdataKey" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>A class used for referencing keys to NXdata datasets.</p>
+<p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>. This class is only used for type-checking
+Parameters.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -1074,10 +1070,8 @@ on the supplied keys.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.FileReadError"><code class="docutils literal notranslate"><span class="pre">FileReadError</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Hdf5key"><code class="docutils literal notranslate"><span class="pre">Hdf5key</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Hdf5key.hdf5_filename"><code class="docutils literal notranslate"><span class="pre">Hdf5key.hdf5_filename</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Hdf5key"><code class="docutils literal notranslate"><span class="pre">Hdf5key</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.NXdataKey"><code class="docutils literal notranslate"><span class="pre">NXdataKey</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ParameterCollectionMixIn"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ParameterCollectionMixIn.add_param"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.add_param</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ParameterCollectionMixIn.add_params"><code class="docutils literal notranslate"><span class="pre">ParameterCollectionMixIn.add_params</span></code></a></li>

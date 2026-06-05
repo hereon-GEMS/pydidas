@@ -1780,7 +1780,7 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The name of the first file for a file series or of the hdf5 file in case of hdf5 file input.</div>
+<div class="line"><strong>tooltip</strong> : The name of the first file for a file series or of the HDF5 file in case of HDF5 file input.</div>
 </div>
 </td>
 </tr>
@@ -1807,7 +1807,19 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">nxdata_key</span></code></p></td>
+<td><div class="line-block">
+<div class="line"><strong>type</strong> : NXdataKey</div>
+<div class="line"><strong>default</strong> : /entry/data/data</div>
+<div class="line"><strong>name</strong> : NXdata signal</div>
+<div class="line"><strong>choices</strong> : None</div>
+<div class="line"><strong>unit</strong> :</div>
+<div class="line"><strong>allow_None</strong> : False</div>
+<div class="line"><strong>tooltip</strong> : Used only for NeXus files: The key to the signal dataset.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : Hdf5key</div>
 <div class="line"><strong>default</strong> : /entry/data/data</div>
@@ -1815,11 +1827,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : Used only for hdf5 files: The dataset key.</div>
+<div class="line"><strong>tooltip</strong> : Used only for HDF5 files: The dataset key.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key_str</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_key_str</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : None</div>
@@ -1827,11 +1839,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : [None]</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : Used only for hdf5 files: The dataset key.</div>
+<div class="line"><strong>tooltip</strong> : Used only for HDF5 files: The dataset key.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_frame</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_frame</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -1839,11 +1851,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : For hdf5 image files: The frame number in the dataset</div>
+<div class="line"><strong>tooltip</strong> : For HDF5 image files: The frame number in the dataset</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_first_image_num</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_first_image_num</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -1851,11 +1863,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The first image in the hdf5-dataset to be used.</div>
+<div class="line"><strong>tooltip</strong> : The first image in the HDF5 dataset to be used.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_last_image_num</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_last_image_num</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : -1</div>
@@ -1863,11 +1875,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The last image in the hdf5-dataset to be used. The value -1 will default to the last image.</div>
+<div class="line"><strong>tooltip</strong> : The last image in the HDF5 dataset to be used. The value -1 will default to the last image.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_stepping</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_stepping</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 1</div>
@@ -1879,7 +1891,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_slicing_axis</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">hdf5_slicing_axis</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -1887,11 +1899,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : True</div>
-<div class="line"><strong>tooltip</strong> : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to <cite>None</cite>. A <cite>None</cite> setting will also ignore the hdf5 frame number Parameter.</div>
+<div class="line"><strong>tooltip</strong> : The slicing axes to identify the frame by its number in the full dataset. For example, if the frame has the axes (frame index, x, y), the slicing axes would be 0. To use the full dataset, set the slicing axis to <cite>None</cite>. A <cite>None</cite> setting will also ignore the HDF5 frame number Parameter.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">slicing_axis</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">slicing_axis</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -1903,7 +1915,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_file</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_file</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : Path</div>
 <div class="line"><strong>default</strong> :</div>
@@ -1915,7 +1927,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_key</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : Hdf5key</div>
 <div class="line"><strong>default</strong> : /entry/data/data</div>
@@ -1923,11 +1935,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : For hdf5 background image files: The dataset key.</div>
+<div class="line"><strong>tooltip</strong> : For HDF5 background image files: The dataset key.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">bg_hdf5_frame</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -1935,11 +1947,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : For hdf5 background image files: The image number in the dataset</div>
+<div class="line"><strong>tooltip</strong> : For HDF5 background image files: The image number in the dataset</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">images_per_file</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">images_per_file</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : -1</div>
@@ -1947,11 +1959,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of images or spectra in the file. For hdf5 files, this corresponds to the number of image frames/spectra in the hdf5 dataset. A value -1 auto-discovers the number of images per file.</div>
+<div class="line"><strong>tooltip</strong> : The number of images or spectra in the file. For HDF5 files, this corresponds to the number of image frames/spectra in the HDF5 dataset. A value -1 auto-discovers the number of images per file.</div>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">profiles_per_file</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">profiles_per_file</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : -1</div>
@@ -1959,11 +1971,11 @@ available:</p>
 <div class="line"><strong>choices</strong> : None</div>
 <div class="line"><strong>unit</strong> :</div>
 <div class="line"><strong>allow_None</strong> : False</div>
-<div class="line"><strong>tooltip</strong> : The number of 1d profiles in the file. For hdf5 files, this corresponds to the number of frames in the hdf5 dataset. A value -1 auto-discovers the number of profiles per file.</div>
+<div class="line"><strong>tooltip</strong> : The number of 1d profiles in the file. For HDF5 files, this corresponds to the number of frames in the HDF5 dataset. A value -1 auto-discovers the number of profiles per file.</div>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_counted_images_per_file</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_counted_images_per_file</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 1</div>
@@ -1975,7 +1987,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">directory_path</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">directory_path</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : Path</div>
 <div class="line"><strong>default</strong> :</div>
@@ -1987,7 +1999,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">current_directory</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">current_directory</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : Path</div>
 <div class="line"><strong>default</strong> :</div>
@@ -1999,7 +2011,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">eiger_filename_suffix</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">eiger_filename_suffix</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : _data_000001.h5</div>
@@ -2011,7 +2023,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">eiger_dir</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">eiger_dir</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : eiger9m</div>
@@ -2023,7 +2035,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_datatype</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_datatype</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : float 64 bit</div>
@@ -2035,7 +2047,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_x</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_x</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2047,7 +2059,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_y</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_n_y</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2059,7 +2071,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_header_size</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">raw_header_size</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 0</div>
@@ -2071,7 +2083,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">num_frames_to_use</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">num_frames_to_use</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 2</div>
@@ -2083,7 +2095,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">files_per_directory</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">files_per_directory</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : -1</div>
@@ -2095,7 +2107,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_counted_files_per_directory</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">_counted_files_per_directory</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 1</div>
@@ -2107,7 +2119,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fio_suffix</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">fio_suffix</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : _mca_s#.fio</div>
@@ -2119,7 +2131,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_custom_xscale</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">use_custom_xscale</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : bool</div>
 <div class="line"><strong>default</strong> : False</div>
@@ -2131,7 +2143,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x0_offset</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x0_offset</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 0.0</div>
@@ -2143,7 +2155,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_delta</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_delta</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : float</div>
 <div class="line"><strong>default</strong> : 1.0</div>
@@ -2155,7 +2167,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_unit</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_unit</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : a.u.</div>
@@ -2167,7 +2179,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_label</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_label</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : x</div>
@@ -2179,7 +2191,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_dimensionality</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">data_dimensionality</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : 2</div>
@@ -2191,7 +2203,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_axis_label</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">detector_axis_label</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : str</div>
 <div class="line"><strong>default</strong> : detector</div>
@@ -2203,7 +2215,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_column</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">x_column</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : None</div>
@@ -2215,7 +2227,7 @@ available:</p>
 </div>
 </td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">y_column</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-data docutils literal notranslate"><span class="pre">y_column</span></code></p></td>
 <td><div class="line-block">
 <div class="line"><strong>type</strong> : int</div>
 <div class="line"><strong>default</strong> : None</div>

@@ -2,7 +2,6 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
-
 v26.mm.dd
 =========
 
@@ -32,6 +31,9 @@ Bugfixes
   running the test for a different datapoint.
 - Fixed an issue which would not scale 1d plots correctly due to Qt's 
   processing queue for signals and its use in PydidasPlot1d.
+- Fixed an issue with importing data with scan dimensions of size 1 which
+  were squeezed during export.
+
 
 v26.05.19
 =========

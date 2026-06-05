@@ -33,6 +33,7 @@ __all__ = ["ProcessingResultIoMeta"]
 
 import os
 from pathlib import Path
+from typing import Any
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
@@ -207,7 +208,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         cls,
         data: dict[int, Dataset],
         scan_context: Scan | None = None,
-        squeeze_results: bool = False,
+        squeeze: bool = False,
     ):
         """
         Export the full data to all active savers.
@@ -219,37 +220,13 @@ class ProcessingResultIoMeta(GenericIoMeta):
         scan_context : Scan or None, optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
-        squeeze_results : bool, optional
+        squeeze : bool, optional
             Flag to toggle squeezing of the data. If True, any empty dimensions will
             be squeezed from the data. The default is False.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.export_full_data_to_file(data, scan_context, squeeze=squeeze_results)
-
-    @classmethod
-    def export_full_data_to_file(
-        cls,
-        extension: str,
-        data: dict[int, Dataset],
-        scan_context: Scan | None = None,
-    ):
-        """
-        Export the full data to all active savers.
-
-        Parameters
-        ----------
-        extension : str
-            The file extension for the saver.
-        data : dict
-            The result dictionary with nodeID keys and result values.
-        scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        """
-        cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension.lower()]
-        _saver.export_full_data_to_file(data, scan_context)
+            _saver.export_full_data_to_file(data, scan_context, squeeze=squeeze)
 
     @classmethod
     def export_frame_to_file(
@@ -257,7 +234,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         index: int,
         extension: str,
         frame_result_dict: dict[int, Dataset],
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         """
         Call the concrete export_to_file method in the subclass registered
@@ -271,7 +248,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
             The file extension for the saver.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        kwargs : dict
+        kwargs : Any
             Any kwargs which should be passed to the underlying exporter.
         """
         cls.verify_extension_is_registered(extension)

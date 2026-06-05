@@ -95,7 +95,7 @@ class ScanIo(GenericIoMeta):
         cls.beamline_format_registry = {}
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Scan | None = None):
+    def import_from_file(cls, filename: Path | str, scan: Scan | None = None):
         """
         Import a Scan from file and update the given Scan object.
 
@@ -104,7 +104,7 @@ class ScanIo(GenericIoMeta):
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The full filename and path.
         scan : Scan, optional
             The Scan object to be updated. If None, the generic ScanContext is used.

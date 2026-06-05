@@ -238,21 +238,6 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         self.assertTrue(np.allclose(_Saver._exported["full_data"][1], _results[1]))
         self.assertTrue(np.allclose(_Saver._exported["full_data"][2], _results[2]))
 
-    def test_export_full_data_to_file(self):
-        _frame_results = {
-            1: np.random.random((10, 10, 10)),
-            2: np.random.random((11, 27, 25)),
-        }
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
-        META.export_full_data_to_file(".TEST", _frame_results)
-        self.assertTrue(
-            np.allclose(_Saver._exported["full_data"][1], _frame_results[1])
-        )
-        self.assertTrue(
-            np.allclose(_Saver._exported["full_data"][2], _frame_results[2])
-        )
-
     def test_prepare_active_savers(self):
         _save_dir, _node_info = self.get_save_dir_and_node_info()
         _Saver = self.create_saver_class("SAVER", ".Test")

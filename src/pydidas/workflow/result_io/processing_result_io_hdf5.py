@@ -45,6 +45,9 @@ from pydidas.core.utils.hdf5 import (
     read_and_decode_hdf5_dataset,
 )
 from pydidas.core.utils.hdf5.nxs_export import nx_dataset_config_from_param
+from pydidas.core.utils.iterable_utils import (
+    insert_item_in_tuple,
+)
 from pydidas.data_io import import_data
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -64,9 +67,9 @@ _DEFAULT_GROUPS = [
 ]
 
 
-def _get_pydidas_context_config_entries(
+def _context_config_entries(
     scan: Scan, exp: DiffractionExperiment, tree: ProcessingTree
-) -> list[list[str | dict]]:
+) -> list[tuple[str, str, Any, dict[str, Any]]]:
     """
     Get the context configuration from the pydidas Context singletons.
 
@@ -81,64 +84,59 @@ def _get_pydidas_context_config_entries(
 
     Returns
     -------
-    list[list[str, dict]]
-        The writable entries for the contexts.
+    list[tuple[str, str, Any, dict[str, Any]]]
+        The writable entries for the contexts in the form of a list of
+        tuples with group name, dataset name, data and data attributes.
     """
-    _dsets = []
+    _dsets: list[tuple[str, str, Any, dict[str, Any]]] = []
     for _key, _param in scan.params.items():
-        _dsets.append(
-            [
-                "entry/pydidas_config/scan",
-                _key,
-                *nx_dataset_config_from_param(_param),
-            ]
-        )
+        _data_cfg, _nx_attrs = nx_dataset_config_from_param(_param)
+        _dsets.append(("entry/pydidas_config/scan", _key, _data_cfg, _nx_attrs))
     for _key, _param in exp.params.items():
+        _data_cfg, _nx_attrs = nx_dataset_config_from_param(_param)
         _dsets.append(
-            [
-                "entry/pydidas_config/diffraction_exp",
-                _key,
-                *nx_dataset_config_from_param(_param),
-            ]
+            ("entry/pydidas_config/diffraction_exp", _key, _data_cfg, _nx_attrs)
         )
-    _dsets += [
+    _dsets.extend(
         [
-            "entry/pydidas_config",
-            "workflow",
-            {"data": tree.export_to_string()},
-            {"NX_class": "NX_CHAR", "units": ""},
-        ],
-        [
-            "entry/pydidas_config",
-            "pydidas_version",
-            {"data": VERSION},
-            {"NX_class": "NX_CHAR", "units": ""},
-        ],
-        [
-            "entry/instrument/detector/COLLECTION",
-            "frame_start_number",
-            {"data": scan.get_param_value("pattern_number_offset")},
-            {"NX_class": "NX_INT", "units": ""},
-        ],
-        [
-            "entry/instrument/detector",
-            "x_pixel_size",
-            {"data": exp.get_param_value("detector_pxsizex")},
-            {"NX_class": "NX_FLOAT", "units": "um"},
-        ],
-        [
-            "entry/instrument/detector",
-            "y_pixel_size",
-            {"data": exp.get_param_value("detector_pxsizey")},
-            {"NX_class": "NX_FLOAT", "units": "um"},
-        ],
-        [
-            "entry/instrument/detector",
-            "distance",
-            {"data": exp.get_param_value("detector_dist")},
-            {"NX_class": "NX_FLOAT", "units": "m"},
-        ],
-    ]
+            (
+                "entry/pydidas_config",
+                "workflow",
+                {"data": tree.export_to_string()},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ),
+            (
+                "entry/pydidas_config",
+                "pydidas_version",
+                {"data": VERSION},
+                {"NX_class": "NX_CHAR", "units": ""},
+            ),
+            (
+                "entry/instrument/detector/COLLECTION",
+                "frame_start_number",
+                {"data": scan.get_param_value("pattern_number_offset")},
+                {"NX_class": "NX_INT", "units": ""},
+            ),
+            (
+                "entry/instrument/detector",
+                "x_pixel_size",
+                {"data": exp.get_param_value("detector_pxsizex")},
+                {"NX_class": "NX_FLOAT", "units": "um"},
+            ),
+            (
+                "entry/instrument/detector",
+                "y_pixel_size",
+                {"data": exp.get_param_value("detector_pxsizey")},
+                {"NX_class": "NX_FLOAT", "units": "um"},
+            ),
+            (
+                "entry/instrument/detector",
+                "distance",
+                {"data": exp.get_param_value("detector_dist")},
+                {"NX_class": "NX_FLOAT", "units": "m"},
+            ),
+        ]
+    )
     return _dsets
 
 
@@ -239,7 +237,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         scan: Scan,
         exp: DiffractionExperiment,
         workflow: ProcessingTree,
-    ) -> list[list[str | dict]]:
+    ) -> list[tuple[str, str, Any, dict[str, Any]]]:
         """
         Get the datasets to be written to the hdf5 file.
 
@@ -256,44 +254,46 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Returns
         -------
-        list[list[str, dict]]
-            The list with the dataset information to be written.
+        list[tuple[str, str, Any, dict[str, Any]]]
+            The list with the dataset information to be written. Each tuple
+            contains the HDF5 group name, key name, data to be written and
+            a NeXus attributes dictionary.
         """
 
         _node_attribute = partial(cls.get_node_attribute, node_id)
-        _dsets = [
-            [
+        _dsets: list[tuple[str, str, Any, dict[str, Any]]] = [
+            (
                 "entry",
                 "scan_title",
                 {"data": cls.scan_title},
                 {"NX_class": "NX_CHAR", "units": ""},
-            ],
-            [
+            ),
+            (
                 "entry",
                 "node_id",
                 {"data": node_id},
                 {"NX_class": "NX_INT", "units": ""},
-            ],
-            [
+            ),
+            (
                 "entry",
                 "node_label",
                 {"data": _node_attribute("node_label")},
                 {"NX_class": "NX_CHAR", "units": ""},
-            ],
-            [
+            ),
+            (
                 "entry",
                 "plugin_name",
                 {"data": _node_attribute("plugin_name")},
                 {"NX_class": "NX_CHAR", "units": ""},
-            ],
-            [
+            ),
+            (
                 "entry/data",
                 "data",
                 {"shape": _node_attribute("shape")},
                 {"NX_class": "NX_INT", "units": ""},
-            ],
+            ),
         ]
-        _dsets = _dsets + _get_pydidas_context_config_entries(scan, exp, workflow)  # type: ignore[operator]
+        _dsets.extend(_context_config_entries(scan, exp, workflow))  # type: ignore[arg-type]
         return _dsets
 
     @classmethod
@@ -323,7 +323,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _indices = _scan.get_indices_from_ordinal(index)
         if not cls._metadata_written:
             _metadata = cls.update_with_scan_metadata(frame_result_dict, _scan)
-            cls.update_metadata(_metadata)
+            cls.update_metadata(_metadata, scan=_scan)
         for _node_id, _data in frame_result_dict.items():
             _file_path = cls._save_dir / cls._filenames[_node_id]
             with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
@@ -352,7 +352,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             will be squeezed to remove empty dimensions. The default is False.
         """
         if not cls._metadata_written:
-            cls.update_metadata(full_data, squeeze=squeeze)
+            cls.update_metadata(full_data, scan=scan_context, squeeze=squeeze)
         for _node_id, _data in full_data.items():
             if squeeze:
                 _data = _data.squeeze()
@@ -362,8 +362,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     @classmethod
     def update_with_scan_metadata(
-        cls, metadata: dict[int, Dataset | dict], scan: Scan
-    ) -> dict[int, dict]:
+        cls, metadata: dict[int, Dataset] | dict[int, dict[str, Any]], scan: Scan
+    ) -> dict[int, dict[str, Any]]:
         """
         Update the frame metadata with the scan metadata.
 
@@ -372,24 +372,27 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        metadata : dict[int, Dataset or dict]
+        metadata : dict[int, Dataset] or dict[int, dict[str, Any]]
             The metadata in dictionary form with entries of the form
-            node_id: node_metadata.
+            node_id: node_metadata or node_id: Dataset.
+            If the Dataset is given, the metadata will be read from the
+            Dataset.
         scan : Scan
             The scan context to be used for metadata information.
 
         Returns
         -------
-        dict[int, dict]
-            The updated metadata.
+        dict[int, dict[str, Any]]
+            The updated metadata in a dictionary.
         """
         _scan_dim_labels = scan.axis_labels
         _scan_dim_units = scan.axis_units
         _scan_dim_ranges = scan.axis_ranges
         _new_metadata = {}
-        for _id, _metadata in metadata.items():
-            if isinstance(_metadata, Dataset):
-                _metadata = _metadata.property_dict
+        for _id, _entry in metadata.items():
+            _metadata: dict[str, Any] = (  # type: ignore[type]
+                _entry.property_dict if isinstance(_entry, Dataset) else _entry
+            )
             _metadata["axis_labels"] = {
                 _i: _label
                 for _i, _label in enumerate(
@@ -413,7 +416,10 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     @classmethod
     def update_metadata(
-        cls, metadata: dict[int, Dataset | dict], squeeze: bool = False
+        cls,
+        metadata: dict[int, Dataset | dict[str, Any]],
+        scan: Scan | None = None,
+        squeeze: bool = False,
     ) -> None:
         """
         Update the frame metadata with a separately supplied metadata
@@ -421,13 +427,22 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Parameters
         ----------
-        metadata : dict[int, Dataset or dict]
+        metadata : dict[int, Dataset or dict[str, Any]]
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
+        scan : Scan or None, optional
+            The scan context. If None, the global ScanContext will be used.
+            The default is None.
         squeeze : bool, optional
             Flag to toggle squeezing of empty dimensions. If True, the data
             will be squeezed to remove empty dimensions. The default is False.
         """
+        _scan = ScanContext() if scan is None else scan
+        _squeezed_scan_dims = (
+            ";".join([str(i) for i, n in enumerate(_scan.shape) if n == 1])
+            if squeeze
+            else ""
+        )
         for _id, _metadata in metadata.items():
             if isinstance(_metadata, Dataset):
                 if squeeze:
@@ -451,12 +466,54 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                         long_name=_metadata["axis_labels"][_dim],
                         axis=_dim,
                     )
+                create_nx_dataset(
+                    _file["entry/pydidas_config"],
+                    "squeezed_scan_dims",
+                    {"data": _squeezed_scan_dims},
+                    NX_class="NX_CHAR",
+                    units="",
+                )
         cls._metadata_written = True
+
+    @classmethod
+    def _insert_squeezed_scan_dims(
+        cls,
+        data: Dataset,
+        scan: Scan,
+        dims: list[int],
+    ) -> Dataset:
+        """
+        Re-insert scan dimensions of size 1 that were squeezed during export.
+
+        Parameters
+        ----------
+        data : Dataset
+            The squeezed Dataset to reconstruct.
+        scan : Scan
+            The scan context containing the full scan definition.
+        dims : list[int]
+            The scan dimension indices that were squeezed (any order).
+
+        Returns
+        -------
+        Dataset
+            The Dataset with the squeezed scan dims re-inserted.
+        """
+        _shape = data.shape
+        for _dim in sorted(dims):
+            _shape = insert_item_in_tuple(_shape, _dim, 1)
+        data = data.reshape(_shape)  # type: ignore[type]
+        for _dim in sorted(dims):
+            _label, _unit, _range = scan.get_metadata_for_dim(_dim)
+            data.update_axis_label(_dim, _label)
+            data.update_axis_unit(_dim, _unit)
+            data.update_axis_range(_dim, _range)
+        return data  # type: ignore[return-value]
 
     @classmethod
     def import_results_from_file(
         cls, filename: Path | str
-    ) -> tuple[Dataset, dict, Scan, DiffractionExperiment, ProcessingTree]:
+    ) -> tuple[Dataset, dict[str, Any], Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import results from a file and store them as a Dataset.
 
@@ -467,16 +524,16 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The dataset with the imported data.
-        node_info : dict
+        node_info : dict[str, Any]
             A dictionary with node_label, data_label, plugin_name keys and
             the respective values.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The imported scan configuration.
-        diffraction_exp : pydidas.contexts.DiffractionExperiment
+        diffraction_exp : DiffractionExperiment
             The imported diffraction experiment configuration.
-        tree : pydidas.workflow.WorkflowTree
+        tree : ProcessingTree
             The imported workflow tree.
         """
         _tree = ProcessingTree()
@@ -500,15 +557,44 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     "standard and cannot be imported. Please check the input file."
                 )
             _info = {
-                "node_label": read_and_decode_hdf5_dataset(_file["entry/node_label"]),  # type: ignore[arg-type]
-                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),  # type: ignore[arg-type]
-                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),  # type: ignore[arg-type]
+                "node_label": read_and_decode_hdf5_dataset(  # type: ignore[arg-type]
+                    _file["entry/node_label"]
+                ),
+                "plugin_name": read_and_decode_hdf5_dataset(  # type: ignore[arg-type]
+                    _file["entry/plugin_name"]
+                ),
+                "node_id": read_and_decode_hdf5_dataset(  # type: ignore[arg-type]
+                    _file["entry/node_id"]
+                ),
             }
             _info["result_title"] = (
                 f"{_info['node_label']} (node #{_info['node_id']:03d})"
                 if len(_info["node_label"]) > 0
                 else f"[{_info['plugin_name']}] (node #{_info['node_id']:03d})"
             )
+            try:
+                _squeeze_str = read_and_decode_hdf5_dataset(
+                    _file["entry/pydidas_config/squeezed_scan_dims"]
+                )
+                if _squeeze_str:
+                    _squeezed_scan_dims = [int(_s) for _s in _squeeze_str.split(";")]
+                else:
+                    _squeezed_scan_dims = []
+            except (KeyError, ValueError, AttributeError):
+                _squeezed_scan_dims = None
+
+        if _squeezed_scan_dims is None:
+            # Check in files written before the squeezed_scan_dims flag
+            # was introduced: if the scan has size-1 dims and the non-size-1
+            # scan shape prefix matches the start of the data shape, those
+            # size-1 dims were squeezed away during export.
+            _size_1_scan_dims = [i for i, n in enumerate(_scan.shape) if n == 1]
+            if _size_1_scan_dims:
+                _scan_shape_no_ones = tuple(n for n in _scan.shape if n > 1)
+                if _data.shape[: len(_scan_shape_no_ones)] == _scan_shape_no_ones:
+                    _squeezed_scan_dims = _size_1_scan_dims
+        if _squeezed_scan_dims is not None and len(_squeezed_scan_dims) > 0:
+            _data = cls._insert_squeezed_scan_dims(_data, _scan, _squeezed_scan_dims)
 
         _info["shape"] = _data.shape
         return _data, _info, _scan, _exp, _tree

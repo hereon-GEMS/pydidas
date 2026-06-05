@@ -29,7 +29,7 @@ __all__ = ["Scan"]
 
 import warnings
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any
 
 import numpy as np
 
@@ -90,7 +90,7 @@ class Scan(ObjectWithParameterCollection):
 
     default_params = SCAN_DEFAULT_PARAMS
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.set_default_params()
         self._scan_io = None
@@ -149,7 +149,7 @@ class Scan(ObjectWithParameterCollection):
             0 <= _index <= _shapes[_dim]  # noqa
             for _dim, _index in enumerate(indices)
         ]
-        if False in _indices_okay:
+        if not all(_indices_okay):
             raise UserConfigError(
                 f"The given indices {tuple(indices)} are out of the scope "
                 f"of the scan range {self.shape}"
@@ -158,9 +158,7 @@ class Scan(ObjectWithParameterCollection):
         _index = np.sum(_factors * indices)
         return _index
 
-    def get_metadata_for_dim(
-        self, index: Literal[0, 1, 2, 3]
-    ) -> tuple[str, str, np.ndarray]:
+    def get_metadata_for_dim(self, index: int) -> tuple[str, str, np.ndarray]:
         """
         Get the label, unit and range of the specified scan dimension.
 
@@ -169,8 +167,8 @@ class Scan(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        index : Literal[0, 1, 2, 3]
-            The index of the scan dimension.
+        index : int
+            The index of the scan dimension (only 0, 1, 2, 3 are supported).
 
         Returns
         -------
@@ -192,13 +190,13 @@ class Scan(ObjectWithParameterCollection):
         """
         Get the Scan range for the specified dimension.
 
-        Note: The scan dimensions are 0 ... 3 and follow the python convention of
-        starting with zero.
+        Note: The scan dimensions are 0 ... 3 and follow the python
+        convention of starting with zero.
 
         Parameters
         ----------
-        index : Union[0, 1, 2, 3]
-            The scan dimension
+        index : int
+            The scan dimension (only 0, 1, 2, 3 are supported).
 
         Returns
         -------
@@ -212,22 +210,22 @@ class Scan(ObjectWithParameterCollection):
         _n = self.get_param_value(f"scan_dim{index}_n_points")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)  # noqa
 
-    def update_from_scan(self, scan: "Scan"):
+    def update_from_scan(self, scan: "Scan") -> None:
         """
         Update this Scan object's Parameters from another Scan.
 
-        The purpose of this method is to "copy" the other Scan's Parameter values while
-        keeping the reference to this object.
+        The purpose of this method is to copy the other Scan's
+        Parameter values while keeping the reference to this object.
 
         Parameters
         ----------
         scan : Scan
             The other Scan from which the Parameters should be taken.
         """
-        for _key, _val in scan.get_param_values_as_dict().items():
-            self.set_param_value(_key, _val)
+        for _key, _param in scan.params.items():
+            self.set_param_value(_key, _param.value)
 
-    def update_from_dictionary(self, scan_dict: dict):
+    def update_from_dictionary(self, scan_dict: dict) -> None:
         """
         Update the Scan from an imported dictionary.
 
@@ -236,9 +234,9 @@ class Scan(ObjectWithParameterCollection):
         scan_dict : dict
             The dictionary with the data to import.
         """
-        if scan_dict == {}:
+        if not scan_dict:
             return
-        for _pname in [
+        for _param_name in [
             "scan_dim",
             "scan_title",
             "scan_base_directory",
@@ -248,7 +246,7 @@ class Scan(ObjectWithParameterCollection):
             "scan_frames_per_point",
             "scan_multi_frame_handling",
         ]:
-            self.set_param_value(_pname, scan_dict[_pname])
+            self.set_param_value(_param_name, scan_dict[_param_name])
         for _dim in range(self.get_param_value("scan_dim")):
             _curr_dim_info = scan_dict[_dim]
             for _entry in ["label", "unit", "offset", "delta", "n_points"]:
@@ -267,6 +265,22 @@ class Scan(ObjectWithParameterCollection):
         return tuple(
             self.get_param_value(f"scan_dim{_i}_n_points")
             for _i in range(self.ndim)  # noqa
+        )
+
+    @property
+    def squeezed_shape(self) -> tuple[int, ...]:
+        """
+        Get the shape of the Scan with all dimensions of length 1 removed.
+
+        Returns
+        -------
+        tuple[int]
+            The tuple with an entry of the length for each dimension.
+        """
+        return tuple(
+            self.get_param_value(f"scan_dim{_i}_n_points")
+            for _i in range(self.ndim)  # noqa
+            if self.get_param_value(f"scan_dim{_i}_n_points") > 1
         )
 
     @property
@@ -369,13 +383,13 @@ class Scan(ObjectWithParameterCollection):
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
 
-    def import_from_file(self, filename: Union[str, Path]):
+    def import_from_file(self, filename: str | Path) -> None:
         """
         Import ScanContext from a file.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : str or Path
             The full filename.
         """
         if self._scan_io is None:
@@ -384,17 +398,17 @@ class Scan(ObjectWithParameterCollection):
             self._scan_io = ScanIo
         self._scan_io.import_from_file(filename, scan=self)
 
-    def export_to_file(self, filename: Union[str, Path], overwrite: bool = False):
+    def export_to_file(self, filename: str | Path, overwrite: bool = False) -> None:
         """
         Export ScanContext to a file.
 
         Parameters
         ----------
-        filename : Union[str, pathlib.Path]
+        filename : str or Path
             The full filename.
         overwrite : bool
-            Keyword to allow overwriting of existing files. The default is
-            False.
+            Keyword to allow overwriting of existing files.
+            The default is False.
         """
         if self._scan_io is None:
             from pydidas.contexts.scan.scan_io import ScanIo
@@ -402,7 +416,7 @@ class Scan(ObjectWithParameterCollection):
             self._scan_io = ScanIo
         self._scan_io.export_to_file(filename, scan=self, overwrite=overwrite)
 
-    def set_param_value(self, param_key: str, value: Any):
+    def set_param_value(self, param_key: str, value: Any) -> None:
         """
         Set the value of a parameter.
 

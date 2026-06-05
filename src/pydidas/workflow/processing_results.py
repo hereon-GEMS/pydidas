@@ -552,7 +552,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         save_dir: str | Path,
         *save_formats: str,
         overwrite: bool = False,
-        squeeze_results: bool = False,
+        squeeze: bool = False,
         node_id: int | None = None,
     ):
         """
@@ -576,7 +576,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             (","), ampersand ("&") or slash ("/") characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
-        squeeze_results : bool, optional
+        squeeze : bool, optional
             Flag to enable squeezing of empty dimensions. The default is False.
         node_id : int or None, optional
             The node ID for which data shall be saved. If None, this defaults
@@ -587,7 +587,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             ",".join(save_formats),
             overwrite,
             single_node=node_id,
-            squeeze_results=squeeze_results,
+            squeeze=squeeze,
         )
         if node_id is None:
             _res = self._composites
@@ -596,7 +596,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         ResultSaver.export_full_data_to_active_savers(
             _res,
             scan_context=self._config["frozen_SCAN"],
-            squeeze_results=squeeze_results,
+            squeeze=squeeze,
         )
 
     # alias
@@ -608,7 +608,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         save_formats: str,
         overwrite: bool = False,
         single_node: int | None = None,
-        squeeze_results: bool = False,
+        squeeze: bool = False,
     ):
         """
         Prepare the required files and directories for saving.
@@ -629,7 +629,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         single_node: int or None, optional
             Keyword to select a single node. If None, all nodes will be
             selected. The default is None.
-        squeeze_results : bool, optional
+        squeeze : bool, optional
             Flag to enable squeezing of empty dimensions. The default is False.
 
         Raises
@@ -654,7 +654,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             _id: {
                 "shape": (
                     self._config["shapes"][_id]
-                    if not squeeze_results
+                    if not squeeze
                     else tuple(_n for _n in self._config["shapes"][_id] if _n > 1)
                 ),
                 "node_label": self._config["node_labels"][_id],
@@ -683,7 +683,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self,
         node_id: int,
         use_scan_timeline: bool = False,
-        squeeze_results: bool = True,
+        squeeze: bool = True,
     ) -> str:
         """
         Get the edited metadata from ProcessingResults as a formatted string.
@@ -695,7 +695,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         use_scan_timeline : bool, optional
             The flag whether to reduce the scan dimensions to a single
             timeline. The default is False.
-        squeeze_results : bool, optional
+        squeeze : bool, optional
             Flag whether to squeeze the results (i.e. remove all dimensions of length 1)
             from the data. The default is True.
 
@@ -718,7 +718,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             ),
             "axis_points": list(_metadata["shape"]),
         }
-        if squeeze_results:
+        if squeeze:
             _squeezed_dims = np.where(np.asarray(_print_info["axis_points"]) == 1)[0]
             _print_info = {
                 _key: [

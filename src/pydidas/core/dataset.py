@@ -365,13 +365,13 @@ class Dataset(ndarray):
         return self.transpose()
 
     @property
-    def property_dict(self) -> dict:
+    def property_dict(self) -> dict[str, Any]:
         """
         Get a copy of the property dictionary.
 
         Returns
         -------
-        dict
+        dict[str, Any]
             A dictionary with copies of all properties.
         """
         return {

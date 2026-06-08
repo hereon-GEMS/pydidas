@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ information about the scan.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,8 +29,7 @@ __all__ = ["ScanContext"]
 
 
 from pydidas.contexts.scan.scan import Scan
-from pydidas.core.singleton_context_object import SingletonContextObject
+from pydidas.core.singleton_context import Singleton
 
 
-class ScanContext(SingletonContextObject, Scan):
-    non_context_class = Scan
+class ScanContext(Scan, metaclass=Singleton): ...

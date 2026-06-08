@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ global information about the experiment.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,8 +29,7 @@ __all__ = ["DiffractionExperimentContext"]
 
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
-from pydidas.core import SingletonContextObject
+from pydidas.core import Singleton
 
 
-class DiffractionExperimentContext(SingletonContextObject, DiffractionExperiment):
-    non_context_class = DiffractionExperiment
+class DiffractionExperimentContext(DiffractionExperiment, metaclass=Singleton): ...

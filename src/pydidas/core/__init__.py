@@ -44,7 +44,7 @@ from .parameter_collection import *
 from .parameter_collection_mixin import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
-from .singleton_context_object import *
+from .singleton_context import *
 from .singleton_object import *
 
 
@@ -60,7 +60,7 @@ __all__ = ["constants", "generic_params", "io_registry", "utils"] + (
     + parameter_collection_mixin.__all__
     + pydidas_q_settings.__all__
     + pydidas_q_settings_mixin.__all__
-    + singleton_context_object.__all__
+    + singleton_context.__all__
     + singleton_object.__all__
 )
 
@@ -77,6 +77,6 @@ del (
     parameter_collection_mixin,
     pydidas_q_settings,
     pydidas_q_settings_mixin,
-    singleton_context_object,
+    singleton_context,
     singleton_object,
 )

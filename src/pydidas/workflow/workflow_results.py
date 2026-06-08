@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,15 @@ singleton class for storing and accessing the composite results of the processin
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowResults"]
 
 
-from pydidas.core import SingletonContextObject
+from pydidas.core import Singleton
 from pydidas.workflow.processing_results import ProcessingResults
 
 
-class WorkflowResults(SingletonContextObject, ProcessingResults):
-    non_context_class = ProcessingResults
+class WorkflowResults(ProcessingResults, metaclass=Singleton): ...

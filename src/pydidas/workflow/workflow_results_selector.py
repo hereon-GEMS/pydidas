@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ results stored in the WorkflowResults.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["WorkflowResultsSelector"]
 
 
 import re
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -39,6 +40,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from pydidas.workflow import ProcessingResults
 from pydidas.workflow.workflow_results import WorkflowResults
 
 
@@ -68,11 +70,11 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         "use_scan_timeline", "result_n_dim", "use_data_range"
     )
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
-        _results = kwargs.get("workflow_results", None)
+        _results: ProcessingResults | None = kwargs.get("workflow_results", None)
         self._RESULTS = WorkflowResults() if _results is None else _results
         self._SCAN = self._RESULTS.frozen_scan
         self._selection = None

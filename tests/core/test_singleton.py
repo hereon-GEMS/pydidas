@@ -62,8 +62,10 @@ _CONTEXT_CLASSES = [_ContextClass, _ContextWithSubClass, _SubContextClass]
 def clear_singletons():
     """Fixture to reset singletons."""
     # Reset singleton state before each test
+    _stored_instances = Singleton._instances
     Singleton._instances = {}
     yield
+    Singleton._instances = _stored_instances
 
 
 def test_init():

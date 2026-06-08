@@ -18,6 +18,8 @@ Programmatic changes
 --------------------
 - Added a checker for adherece to NeXus NXdata definition of selected 
   datasets in HDF5 files.
+- Modified the way singletons are created and handled for a cleaner
+  architecture.
 
 Bugfixes
 --------

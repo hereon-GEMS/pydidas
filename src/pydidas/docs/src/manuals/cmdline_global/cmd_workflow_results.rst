@@ -17,7 +17,7 @@ The WorkflowResults class
 Introduction
 ------------
 
-:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the Singleton
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the singleton
 instance of the :py:class:`ProcessingResults
 <pydidas.workflow.ProcessingResults>`. It is used for managing the processing
 results.

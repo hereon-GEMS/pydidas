@@ -19,7 +19,7 @@ Introduction
 
 The :py:class:`DiffractionExperimentContext
 <pydidas.contexts.diff_exp.diff_exp.DiffractionExperimentContext>` is the
-pydidas Singleton instance of the :py:class:`DiffractionExperiment
+pydidas singleton instance of the :py:class:`DiffractionExperiment
 <pydidas.contexts.diff_exp.DiffractionExperiment>` class. It is used for storing
 and accessing global information about the experimental setup. Stored
 information includes

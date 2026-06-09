@@ -26,9 +26,9 @@ __status__ = "Production"
 
 import random
 import string
-import unittest
 
 import numpy as np
+import pytest
 from qtpy import QtWidgets
 
 from pydidas.widgets.framework import BaseFrame, PydidasFrameStack
@@ -51,122 +51,156 @@ class _TestWidget(BaseFrame):
     def frame_activated(self, index): ...
 
 
-class TestPydidasFrameStack(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.frames = []
-
-    @classmethod
-    def tearDownClass(cls):
-        while cls.frames:
-            w = cls.frames.pop()
+@pytest.fixture
+def frames():
+    """Create a list of test frames for cleanup."""
+    frame_list = []
+    yield frame_list
+    # Cleanup
+    while frame_list:
+        w = frame_list.pop()
+        try:
             w.deleteLater()
+        except RuntimeError:
+            pass
 
-    def setUp(self):
-        self.frames = []
-        PydidasFrameStack.reset_instance()
 
-    def create_stack(self):
-        stack = PydidasFrameStack()
-        stack.reset()
-        for i in range(4):
-            w = _TestWidget()
-            stack.register_frame(w)
-            self.frames.append(w)
-        return stack
-
-    def test_init(self):
-        obj = PydidasFrameStack()
-        self.assertIsInstance(obj, QtWidgets.QStackedWidget)
-        self.assertTrue(hasattr(obj, "frame_indices"))
-        self.assertTrue(hasattr(obj, "current_frames"))
-        self.assertTrue(hasattr(obj, "frame_names"))
-
-    def test_register_frame(self):
-        stack = PydidasFrameStack()
+@pytest.fixture
+def stack_with_frames(frames):
+    """Create a PydidasFrameStack with 4 registered frames."""
+    stack = PydidasFrameStack()
+    for i in range(4):
         w = _TestWidget()
         stack.register_frame(w)
-        assert stack.widget(0) == w
+        frames.append(w)
+    return stack, frames
 
-    def test_register_frame_duplicate(self):
-        stack = PydidasFrameStack()
-        w = _TestWidget()
+
+def test_init() -> None:
+    """Test PydidasFrameStack initialization."""
+    obj = PydidasFrameStack()
+    assert isinstance(obj, QtWidgets.QStackedWidget)
+    assert hasattr(obj, "frame_indices")
+    assert hasattr(obj, "current_frames")
+    assert hasattr(obj, "frame_names")
+
+
+def test_register_frame(frames) -> None:
+    """Test registering a single frame."""
+    stack = PydidasFrameStack()
+    w = _TestWidget()
+    stack.register_frame(w)
+    frames.append(w)
+    assert stack.widget(0) == w
+
+
+def test_register_frame_duplicate(frames) -> None:
+    """Test registering a duplicate frame raises KeyError."""
+    stack = PydidasFrameStack()
+    w = _TestWidget()
+    stack.register_frame(w)
+    frames.append(w)
+    with pytest.raises(KeyError):
         stack.register_frame(w)
-        with self.assertRaises(KeyError):
-            stack.register_frame(w)
 
-    def test_get_widget_by_name__known_name(self):
-        stack = self.create_stack()
-        _w = stack.get_widget_by_name(stack.widget(0).menu_entry)
-        self.assertEqual(_w, self.frames[0])
 
-    def test_get_widget_by_name__not_registered(self):
-        stack = self.create_stack()
-        with self.assertRaises(KeyError):
-            stack.get_widget_by_name("no such widget")
+def test_get_widget_by_name__known_name(stack_with_frames) -> None:
+    """Test retrieving a widget by registered name."""
+    stack, frames = stack_with_frames
+    _w = stack.get_widget_by_name(stack.widget(0).menu_entry)
+    assert _w == frames[0]
 
-    def test_get_all_widget_names(self):
-        stack = self.create_stack()
-        _names = stack.frame_names
-        self.assertEqual(len(self.frames), len(_names))
-        for w in self.frames:
-            self.assertTrue(w.menu_entry in _names)
 
-    def test_activate_widget_by_name(self):
-        stack = self.create_stack()
-        stack.activate_widget_by_name(self.frames[-1].menu_entry)
-        self.assertEqual(stack.currentIndex(), len(self.frames) - 1)
+def test_get_widget_by_name__not_registered(stack_with_frames) -> None:
+    """Test retrieving unregistered widget by name raises KeyError."""
+    stack, _ = stack_with_frames
+    with pytest.raises(KeyError):
+        stack.get_widget_by_name("no such widget")
 
-    def test_activate_widget_by_name_wrong_name(self):
-        stack = self.create_stack()
-        with self.assertRaises(KeyError):
-            stack.activate_widget_by_name("no such name")
 
-    def test_remove_widget_by_name(self):
-        stack = self.create_stack()
-        stack.remove_widget_by_name(self.frames[-1].menu_entry)
+def test_get_all_widget_names(stack_with_frames) -> None:
+    """Test retrieving all registered widget names."""
+    stack, frames = stack_with_frames
+    _names = stack.frame_names
+    assert len(frames) == len(_names)
+    for w in frames:
+        assert w.menu_entry in _names
 
-    def test_remove_widget_by_name_wrong_name(self):
-        stack = self.create_stack()
-        with self.assertRaises(KeyError):
-            stack.remove_widget_by_name("no such name")
 
-    def test_removeWidget_widget_not_registered(self):
-        stack = self.create_stack()
-        w = _TestWidget()
-        with self.assertRaises(KeyError):
-            stack.removeWidget(w)
+def test_activate_widget_by_name(stack_with_frames) -> None:
+    """Test activating a widget by name."""
+    stack, frames = stack_with_frames
+    stack.activate_widget_by_name(frames[-1].menu_entry)
+    assert stack.currentIndex() == len(frames) - 1
 
-    def test_removeWidget(self):
-        stack = self.create_stack()
-        w = self.frames[1]
+
+def test_activate_widget_by_name_wrong_name(stack_with_frames) -> None:
+    """Test activating widget with wrong name raises KeyError."""
+    stack, _ = stack_with_frames
+    with pytest.raises(KeyError):
+        stack.activate_widget_by_name("no such name")
+
+
+def test_remove_widget_by_name(stack_with_frames) -> None:
+    """Test removing a widget by name."""
+    stack, frames = stack_with_frames
+    stack.remove_widget_by_name(frames[-1].menu_entry)
+
+
+def test_remove_widget_by_name_wrong_name(stack_with_frames) -> None:
+    """Test removing widget with wrong name raises KeyError."""
+    stack, _ = stack_with_frames
+    with pytest.raises(KeyError):
+        stack.remove_widget_by_name("no such name")
+
+
+def test_removeWidget_widget_not_registered(stack_with_frames, frames) -> None:
+    """Test removing unregistered widget raises KeyError."""
+    stack, _ = stack_with_frames
+    w = _TestWidget()
+    frames.append(w)
+    with pytest.raises(KeyError):
         stack.removeWidget(w)
-        _indices = set(stack.frame_indices.values())
-        self.assertNotIn(w.menu_entry, stack.frame_indices)
-        self.assertNotIn(w, stack.current_frames)
-        self.assertEqual(_indices, set(np.arange(stack.count())))
-
-    def test_addWidget(self):
-        stack = self.create_stack()
-        w = _TestWidget()
-        with self.assertRaises(NotImplementedError):
-            stack.addWidget(w)
-
-    def test_reset(self):
-        stack = self.create_stack()
-        stack.reset()
-        self.assertEqual(stack.count(), 0)
-        self.assertEqual(stack.current_frames, [])
-        self.assertEqual(stack.frame_indices, {})
-
-    def test_is_registered(self):
-        stack = self.create_stack()
-        self.assertTrue(stack.is_registered(self.frames[0]))
-
-    def test_is_registered_wrong_widget(self):
-        stack = self.create_stack()
-        self.assertFalse(stack.is_registered(_TestWidget()))
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_removeWidget(stack_with_frames) -> None:
+    """Test removing a registered widget."""
+    stack, frames = stack_with_frames
+    w = frames[1]
+    stack.removeWidget(w)
+    _indices = set(stack.frame_indices.values())
+    assert w.menu_entry not in stack.frame_indices
+    assert w not in stack.current_frames
+    assert _indices == set(np.arange(stack.count()))
+
+
+def test_addWidget(stack_with_frames, frames) -> None:
+    """Test addWidget raises NotImplementedError."""
+    stack, _ = stack_with_frames
+    w = _TestWidget()
+    frames.append(w)
+    with pytest.raises(NotImplementedError):
+        stack.addWidget(w)
+
+
+def test_reset(stack_with_frames) -> None:
+    """Test resetting the stack."""
+    stack, _ = stack_with_frames
+    stack.reset()
+    assert stack.count() == 0
+    assert stack.current_frames == []
+    assert stack.frame_indices == {}
+
+
+def test_is_registered(stack_with_frames) -> None:
+    """Test checking if widget is registered."""
+    stack, frames = stack_with_frames
+    assert stack.is_registered(frames[0])
+
+
+def test_is_registered_wrong_widget(stack_with_frames, frames) -> None:
+    """Test checking if unregistered widget returns False."""
+    stack, _ = stack_with_frames
+    w = _TestWidget()
+    frames.append(w)
+    assert not stack.is_registered(w)

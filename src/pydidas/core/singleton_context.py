@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Singleton"]
 
+
 import copy
 from typing import Any, ClassVar
 
@@ -51,7 +52,23 @@ class Singleton(type(QObject)):
     _instances: ClassVar[dict[type, type[QObject] | None]] = {}
 
     def __new__(cls, name: str, bases: tuple[type], dct: dict) -> "Singleton":
-        """Create a new singleton context class with copy redirection."""
+        """
+        Create a new singleton context class with copy redirection.
+
+        Parameters
+        ----------
+        name : str
+            The name of the new class being created.
+        bases : tuple[type]
+            The base classes for the new class.
+        dct : dict
+            The class dictionary containing class attributes and methods.
+
+        Returns
+        -------
+        Singleton
+            The newly created singleton metaclass instance.
+        """
         # Store original __copy__ and __deepcopy__ if they exist
         original_copy = dct.get("__copy__")
         original_deepcopy = dct.get("__deepcopy__")

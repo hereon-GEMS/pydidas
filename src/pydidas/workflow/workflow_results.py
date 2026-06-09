@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["WorkflowResults"]
 
 
-from pydidas.core import Singleton
+from pydidas.core import QtSingleton
 from pydidas.workflow.processing_results import ProcessingResults
 
 
-class WorkflowResults(ProcessingResults, metaclass=Singleton): ...
+class WorkflowResults(ProcessingResults, metaclass=QtSingleton): ...

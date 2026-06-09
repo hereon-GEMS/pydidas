@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ with the editing Canvas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -49,7 +49,7 @@ class WorkflowTreeEditManager(SingletonObject, QtCore.QObject):
     """
     Manage the editing of the workflow tree.
 
-    The _WorkflowTreeEditManager is designed as a Singleton to manage editing
+    The _WorkflowTreeEditManager is designed as a singleton to manage editing
     the WorkflowTree, plugin parameters and the corresponding plugins' QT
     widgets. It is responsible for creating widgets and placing them correctly
     on the canvas of the workflow editor. Most method names correspond to

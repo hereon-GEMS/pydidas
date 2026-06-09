@@ -29,7 +29,7 @@ __all__ = ["ScanContext"]
 
 
 from pydidas.contexts.scan.scan import Scan
-from pydidas.core.singleton_context import Singleton
+from pydidas.core.qt_singleton import QtSingleton
 
 
-class ScanContext(Scan, metaclass=Singleton): ...
+class ScanContext(Scan, metaclass=QtSingleton): ...

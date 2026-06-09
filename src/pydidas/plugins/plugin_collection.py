@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginCollection Singleton of the PluginRegistry.
+Module with the PluginCollection singleton of the PluginRegistry.
 """
 
 __author__ = "Malte Storm"
@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = ["PluginCollection"]
 
 
-from pydidas.core import Singleton
+from pydidas.core import QtSingleton
 from pydidas.plugins.plugin_registry import PluginRegistry
 
 
-class PluginCollection(PluginRegistry, metaclass=Singleton): ...
+class PluginCollection(PluginRegistry, metaclass=QtSingleton): ...

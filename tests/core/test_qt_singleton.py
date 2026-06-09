@@ -29,11 +29,11 @@ import numpy as np
 import pytest
 
 from pydidas.core import ObjectWithParameterCollection, Parameter, PydidasQsettingsMixin
-from pydidas.core.singleton_context import Singleton
+from pydidas.core.qt_singleton import QtSingleton
 
 
 class _NonContextClass(ObjectWithParameterCollection):
-    """Testing class to test Singleton."""
+    """Testing class to test QtSingleton."""
 
     def __init__(self):
         ObjectWithParameterCollection.__init__(self)
@@ -46,13 +46,13 @@ class _NonContextClass(ObjectWithParameterCollection):
 class _NonContextSubClass(_NonContextClass): ...
 
 
-class _ContextClass(_NonContextClass, metaclass=Singleton): ...
+class _ContextClass(_NonContextClass, metaclass=QtSingleton): ...
 
 
 class _SubContextClass(_ContextClass): ...
 
 
-class _ContextWithSubClass(_NonContextSubClass, metaclass=Singleton): ...
+class _ContextWithSubClass(_NonContextSubClass, metaclass=QtSingleton): ...
 
 
 _CONTEXT_CLASSES = [_ContextClass, _ContextWithSubClass, _SubContextClass]
@@ -62,18 +62,18 @@ _CONTEXT_CLASSES = [_ContextClass, _ContextWithSubClass, _SubContextClass]
 def clear_singletons():
     """Fixture to reset singletons."""
     # Reset singleton state before each test
-    _stored_instances = Singleton._instances
-    Singleton._instances = {}
+    _stored_instances = QtSingleton._instances
+    QtSingleton._instances = {}
     yield
-    Singleton._instances = _stored_instances
+    QtSingleton._instances = _stored_instances
 
 
 def test_init():
-    assert _ContextClass not in Singleton._instances
+    assert _ContextClass not in QtSingleton._instances
     obj = _ContextClass()
     assert isinstance(obj, _ContextClass)
     assert isinstance(obj, _NonContextClass)
-    assert Singleton._instances[_ContextClass] is obj
+    assert QtSingleton._instances[_ContextClass] is obj
 
 
 @pytest.mark.parametrize(
@@ -97,15 +97,15 @@ def test_init__w_multiple_contexts():
     assert isinstance(objA, _ContextClass)
     assert isinstance(objB, _ContextWithSubClass)
     assert isinstance(objC, _SubContextClass)
-    assert Singleton._instances[_ContextClass] == objA
-    assert Singleton._instances[_ContextWithSubClass] == objB
-    assert Singleton._instances[_SubContextClass] == objC
+    assert QtSingleton._instances[_ContextClass] == objA
+    assert QtSingleton._instances[_ContextWithSubClass] == objB
+    assert QtSingleton._instances[_SubContextClass] == objC
 
 
 def test_init__w_incompatible_non_context_class():
     with pytest.raises(TypeError):
 
-        class IncompatibleClass(PydidasQsettingsMixin, metaclass=Singleton): ...
+        class IncompatibleClass(PydidasQsettingsMixin, metaclass=QtSingleton): ...
 
 
 @pytest.mark.parametrize("singleton_class", _CONTEXT_CLASSES)

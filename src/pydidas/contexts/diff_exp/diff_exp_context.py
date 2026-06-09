@@ -29,7 +29,7 @@ __all__ = ["DiffractionExperimentContext"]
 
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
-from pydidas.core import Singleton
+from pydidas.core import QtSingleton
 
 
-class DiffractionExperimentContext(DiffractionExperiment, metaclass=Singleton): ...
+class DiffractionExperimentContext(DiffractionExperiment, metaclass=QtSingleton): ...

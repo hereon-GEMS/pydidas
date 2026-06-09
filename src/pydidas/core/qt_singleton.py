@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Singleton class for implementing thread-safe singletons.
+Module with the QtSingleton class for implementing thread-safe singletons.
 """
 
 __author__ = "Malte Storm"
@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["Singleton"]
+__all__ = ["QtSingleton"]
 
 
 import copy
@@ -36,7 +36,7 @@ from pydidas.core.object_with_parameter_collection import ObjectWithParameterCol
 from pydidas.core.parameter_collection import ParameterCollection
 
 
-class Singleton(type(QObject)):
+class QtSingleton(type(QObject)):
     """
     Metaclass to implement singleton pattern for QObjects.
 
@@ -51,7 +51,7 @@ class Singleton(type(QObject)):
 
     _instances: ClassVar[dict[type, type[QObject] | None]] = {}
 
-    def __new__(cls, name: str, bases: tuple[type], dct: dict) -> "Singleton":
+    def __new__(cls, name: str, bases: tuple[type], dct: dict) -> "QtSingleton":
         """
         Create a new singleton context class with copy redirection.
 
@@ -66,7 +66,7 @@ class Singleton(type(QObject)):
 
         Returns
         -------
-        Singleton
+        QtSingleton
             The newly created singleton metaclass instance.
         """
         # Store original __copy__ and __deepcopy__ if they exist
@@ -74,7 +74,7 @@ class Singleton(type(QObject)):
         original_deepcopy = dct.get("__deepcopy__")
 
         # Get the first base class which is not instantiated through the
-        # Singleton:
+        # QtSingleton:
         _base_class = ObjectWithParameterCollection
         if bases:
             _non_context_bases = list(
@@ -85,7 +85,7 @@ class Singleton(type(QObject)):
 
         if not issubclass(_base_class, ObjectWithParameterCollection):
             raise TypeError(
-                "The Singleton class must inherit from "
+                "The QtSingleton class must inherit from "
                 "ObjectWithParameterCollection or derived classes."
             )
 

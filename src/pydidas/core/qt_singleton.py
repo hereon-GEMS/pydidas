@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the QtSingleton class for implementing thread-safe singletons.
+Module with singleton metaclass factory for implementing thread-safe singletons.
 """
 
 __author__ = "Malte Storm"
@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["QtSingleton"]
+__all__ = ["QtSingleton", "Singleton", "create_singleton_metaclass"]
 
 
 import copy as copy_module
@@ -36,197 +36,213 @@ from pydidas.core.object_with_parameter_collection import ObjectWithParameterCol
 from pydidas.core.parameter_collection import ParameterCollection
 
 
-def _get_base_class(obj: Any) -> type[ObjectWithParameterCollection]:
+def _fallback_copy(obj: Any, base_class: type, copy_func: Callable) -> Any:
     """
-    Get the base class for a singleton object.
+    Create a copy of obj with fallback copy method.
 
     Parameters
     ----------
     obj : Any
-        The singleton object instance.
+        The object to be copied.
+    base_class : type
+        The base class to use for copying.
+    copy_func : Callable
+        The copy function to use (copy or deepcopy).
 
     Returns
     -------
-    type[ObjectWithParameterCollection]
-        The base class for the singleton.
+    Any
+        A copy of the object.
     """
-    # Imported here to avoid circular reference before class definition
-    return QtSingleton._base_classes[obj.__class__]  # type: ignore[attr-defined]
-
-
-def _make_copy(self: Any, copy_function: Callable) -> object:
-    """
-    Make a copy of the base class with the specified copy function.
-
-    This is used when the base class doesn't have a custom __copy__ or
-    __deepcopy__ method. It creates a new base class instance and copies
-    the params and config attributes.
-
-    Parameters
-    ----------
-    self : Any
-        The singleton object instance.
-    copy_function : Callable
-        The copy function to use (copy.copy or copy.deepcopy).
-
-    Returns
-    -------
-    object
-        The copied object.
-    """
-    _base_class = _get_base_class(self)
-    _copy_instance = _base_class()
-    _param_copy: ParameterCollection = copy_function(  # type: ignore[type]
-        getattr(self, "params", ParameterCollection())
-    )
+    # Fall back to default copy
+    _copy_instance = base_class()
     if hasattr(_copy_instance, "add_params"):
+        _param_copy: ParameterCollection = copy_func(  # type: ignore[type]
+            getattr(obj, "params", ParameterCollection())
+        )
         _copy_instance.add_params(_param_copy)
-    _config_copy: dict[str, Any] = copy_function(getattr(self, "_config", {}))
+    _config_copy: dict[str, Any] = copy_func(getattr(obj, "_config", {}))
     if _config_copy:
         _copy_instance._config = _config_copy
     return _copy_instance
 
 
-def __copy__(self: Any) -> object:
-    """Create a copy as the base class, not the singleton."""
-    _base_class = _get_base_class(self)
-    if hasattr(_base_class, "__copy__"):
-        # Use temp instance to ensure custom __copy__ doesn't trigger singleton
-        _temp = _base_class.__new__(_base_class)
-        _temp.__dict__.update(self.__dict__)
-        return _base_class.__copy__(_temp)
-    return _make_copy(self, copy_module.copy)
 
-
-def __deepcopy__(self: Any, _memo: dict = {}) -> object:
-    """Create a deep copy as the base class, not the singleton."""
-    _base_class = _get_base_class(self)
-    if hasattr(_base_class, "__deepcopy__"):
-        # Use temp instance to ensure custom __deepcopy__ doesn't trigger singleton
-        _temp = _base_class.__new__(_base_class)
-        _temp.__dict__.update(self.__dict__)
-        return _base_class.__deepcopy__(_temp, _memo)
-    return _make_copy(self, copy_module.deepcopy)
-
-
-def reset_instance(kls: type) -> None:
+def create_singleton_metaclass(  # noqa: C901
+    base_metaclass: type = type, name: str | None = None
+) -> type:
     """
-    Reset the singleton instance.
+    Create a singleton metaclass that inherits from the specified base metaclass.
 
-    This allows a fresh instance to be created on the next instantiation.
-    Useful for testing or reinitializing singleton state.
+    This factory function generates singleton metaclasses that work with any
+    base metaclass, including `type` for regular objects and `type(QObject)`
+    for Qt objects.
 
     Parameters
     ----------
-    kls : type
-        The singleton class to reset.
-    """
-    QtSingleton.reset_instance(kls)
+    base_metaclass : type, optional
+        The base metaclass to inherit from. Default is `type` for regular
+        Python objects. Can also be `type(QObject)` for Qt compatibility.
+    name : str or None, optional
+        Name of the created metaclass. If None, the default name will be
+        used. Default is None.
 
-
-class QtSingleton(type(QObject)):
-    """
-    Metaclass to implement singleton pattern for QObjects.
-
-    This class provides singleton functionality using the `__new__()` method,
-    avoiding metaclass conflicts with `QtCore.QObject`.
-
-    Class Attributes
-    ----------------
-    _instances : ClassVar[dict[type, Any]]
-        Dictionary mapping each subclass to its singleton instance.
+    Returns
+    -------
+    type
+        A new singleton metaclass.
     """
 
-    _instances: ClassVar[dict[type, type[QObject] | None]] = {}
-    _base_classes: ClassVar[dict[type, type[QObject]]] = {}
+    class _SingletonMeta(base_metaclass):  # type: ignore[misc,valid-type]
+        """Singleton metaclass implementation."""
 
-    def __new__(cls, name: str, bases: tuple[type], dct: dict) -> "QtSingleton":
-        """
-        Create a new singleton context class with copy redirection.
+        _instances: ClassVar[dict[type, Any]] = {}
+        _base_classes: ClassVar[dict[type, type]] = {}
 
-        Parameters
-        ----------
-        name : str
-            The name of the new class being created.
-        bases : tuple[type]
-            The base classes for the new class.
-        dct : dict
-            The class dictionary containing class attributes and methods.
+        @staticmethod
+        def _instance_copy(obj: Any) -> object:
+            """Create a copy as base class, not singleton."""
+            metaclass = type(obj.__class__)
+            _bc = metaclass.get_base_class(obj.__class__)
+            if hasattr(_bc, "__copy__"):
+                _temp = _bc.__new__(_bc)  # type: ignore[misc]
+                _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
+                return _bc.__copy__(_temp)
+            return _fallback_copy(obj, _bc, copy_module.copy)
 
-        Returns
-        -------
-        QtSingleton
-            The newly created singleton metaclass instance.
-        """
-        # Get the first base class which is not a QtSingleton:
-        _base_class: type[ObjectWithParameterCollection] = ObjectWithParameterCollection
-        if bases:
-            _non_context_bases = list(
-                _b for _b in bases[0].__mro__ if type(_b) is not cls
-            )
-            if _non_context_bases:
-                _base_class = _non_context_bases[0]  # type: ignore[assignment]
+        @staticmethod
+        def _instance_deepcopy(obj: Any, _memo: dict | None = None) -> object:
+            """Create a deep copy as base class, not singleton."""
+            if _memo is None:
+                _memo = {}
+            metaclass = type(obj.__class__)
+            _bc = metaclass.get_base_class(obj.__class__)
+            if hasattr(_bc, "__deepcopy__"):
+                _temp = _bc.__new__(_bc)  # type: ignore[misc]
+                _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
+                return _bc.__deepcopy__(_temp, _memo)
+            return _fallback_copy(obj, _bc, copy_module.deepcopy)
 
-        # Add required methods to class dictionary
-        dct["__copy__"] = __copy__
-        dct["__deepcopy__"] = __deepcopy__
-        dct["_make_copy"] = _make_copy
-        if hasattr(_base_class, "copy"):
-            dct["copy"] = __copy__
-        if hasattr(_base_class, "deepcopy"):
-            dct["deepcopy"] = __deepcopy__
-        dct["reset_instance"] = classmethod(reset_instance)
+        def __new__(
+            cls, name_: str, bases: tuple[type], dct: dict
+        ) -> "_SingletonMeta":
+            """
+            Create a new singleton class with copy redirection.
 
-        _singleton_class = super().__new__(cls, name, bases, dct)
-        cls._base_classes[_singleton_class] = _base_class
-        return _singleton_class
+            Parameters
+            ----------
+            name_ : str
+                The name of the new class being created.
+            bases : tuple[type]
+                The base classes for the new class.
+            dct : dict
+                The class dictionary containing class attributes and methods.
 
-    def __call__(cls, *args: Any, **kwargs: Any) -> Any:  # type: ignore[reportSelfClsParameterName]
-        """
-        Intercept instance creation to implement singleton + init skip.
+            Returns
+            -------
+            _SingletonMeta
+                The newly created singleton metaclass instance.
+            """
+            # Get the first base class which is not a singleton. If no base
+            # class was found, this reverts to ObjectWithParameterCollection:
+            _base_class: type = ObjectWithParameterCollection
+            if bases:
+                _non_singleton_bases = list(
+                    _b for _b in bases[0].__mro__ if type(_b) is not cls
+                )
+                if _non_singleton_bases:
+                    _base_class = _non_singleton_bases[0]
 
-        Parameters
-        ----------
-        *args: Any
-            Positional arguments (unused, for compatibility).
-        **kwargs: Any
-            Keyword arguments (unused, for compatibility).
-        """
-        if cls not in cls._instances:
-            cls._instances[cls] = super().__call__(*args, **kwargs)
-        return cls._instances[cls]
+            # Add methods from metaclass to instance methods
+            dct["__copy__"] = cls._instance_copy
+            dct["__deepcopy__"] = cls._instance_deepcopy
+            if hasattr(_base_class, "copy"):
+                dct["copy"] = cls._instance_copy
+            if hasattr(_base_class, "deepcopy"):
+                dct["deepcopy"] = cls._instance_deepcopy
+            dct["reset_instance"] = classmethod(
+                lambda kls: cls._reset_instance(kls)
+            )  # type: ignore[arg-type]
 
-    @classmethod
-    def get_base_class(cls, kls: type) -> type[object]:
-        """
-        Get the base class of the singleton class.
+            _singleton_class = super().__new__(cls, name_, bases, dct)
+            cls._base_classes[_singleton_class] = _base_class
+            return _singleton_class
 
-        Parameters
-        ----------
-        kls : type
-            The singleton class to get the base class from.
+        @staticmethod
+        def _reset_instance(kls: type) -> None:
+            """
+            Reset singleton instance.
 
-        Returns
-        -------
-        type[object]
-            The base class of the singleton class.
-        """
-        _base_class: type[object] | None = cls._base_classes.get(kls, None)
-        if _base_class is None:
-            raise KeyError(
-                f"The class type {kls} is not stored in the singleton instance."
-            )
-        return _base_class
+            Parameters
+            ----------
+            kls : type
+                The singleton class to reset.
+            """
+            metaclass = type(kls)
+            if kls in metaclass._instances:
+                del metaclass._instances[kls]
 
-    @classmethod
-    def reset_instance(cls, kls: type[QObject]) -> None:
-        """
-        Reset the singleton instance.
+        def __call__(cls, *args: Any, **kwargs: Any) -> Any:  # type: ignore[override]
+            """
+            Intercept instance creation to implement singleton.
 
-        Parameters
-        ----------
-        kls : type[QObject]
-            The singleton class to reset.
-        """
-        if kls in QtSingleton._instances:  # type: ignore[attr-defined]
-            del QtSingleton._instances[kls]  # type: ignore[attr-defined]
+            Parameters
+            ----------
+            *args: Any
+                Positional arguments.
+            **kwargs: Any
+                Keyword arguments.
+
+            Returns
+            -------
+            Any
+                The singleton instance for this class.
+            """
+            if cls not in cls._instances:
+                cls._instances[cls] = super().__call__(*args, **kwargs)
+            return cls._instances[cls]
+
+        @classmethod
+        def reset_instance(cls, kls: type) -> None:
+            """
+            Reset the singleton instance.
+
+            Parameters
+            ----------
+            kls : type
+                The singleton class to reset.
+            """
+            if kls in cls._instances:
+                del cls._instances[kls]
+
+        @classmethod
+        def get_base_class(cls, kls: type) -> type:
+            """
+            Get the non-singleton base class for a given singleton class.
+
+            Parameters
+            ----------
+            kls : type
+                The singleton class to get the base class for.
+
+            Returns
+            -------
+            type
+                The non-singleton base class.
+            """
+            _base_class = cls._base_classes.get(kls)
+            if _base_class is None:
+                raise KeyError(
+                    f"The class type {kls} is not stored in the singleton instance."
+                )
+            return _base_class
+
+    _name = name or _SingletonMeta.__name__
+    _SingletonMeta.__name__ = _name
+    _SingletonMeta.__qualname__ = _name
+    return _SingletonMeta
+
+
+# Create concrete metaclass instances
+QtSingleton = create_singleton_metaclass(type(QObject), "QtSingleton")
+Singleton = create_singleton_metaclass(type, "Singleton")

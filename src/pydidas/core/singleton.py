@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
+# Copyright 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with singleton metaclass factory for implementing thread-safe singletons.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,7 @@ __all__ = ["QtSingleton", "Singleton", "create_singleton_metaclass"]
 import copy as copy_module
 from typing import Any, Callable, ClassVar
 
-from qtpy.QtCore import QObject  # type: ignore[import-not-found]
+from qtpy.QtCore import QObject
 
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter_collection import ParameterCollection
@@ -57,7 +57,7 @@ def _fallback_copy(obj: Any, base_class: type, copy_func: Callable) -> Any:
     # Fall back to default copy
     _copy_instance = base_class()
     if hasattr(_copy_instance, "add_params"):
-        _param_copy: ParameterCollection = copy_func(  # type: ignore[type]
+        _param_copy: ParameterCollection = copy_func(
             getattr(obj, "params", ParameterCollection())
         )
         _copy_instance.add_params(_param_copy)
@@ -92,7 +92,7 @@ def create_singleton_metaclass(  # noqa: C901
         A new singleton metaclass.
     """
 
-    class _SingletonMeta(base_metaclass):  # type: ignore[misc,valid-type]
+    class _SingletonMeta(base_metaclass):
         """Singleton metaclass implementation."""
 
         _instances: ClassVar[dict[type, Any]] = {}
@@ -103,8 +103,10 @@ def create_singleton_metaclass(  # noqa: C901
             """Create a copy as base class, not singleton."""
             _bc = obj.__class__.get_base_class(obj.__class__)
             if hasattr(_bc, "__copy__"):
-                _temp = _bc.__new__(_bc)  # type: ignore[misc]
-                _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
+                _temp = _bc.__new__(_bc)
+                _temp.__dict__.update(obj.__dict__)
+                if isinstance(obj, dict):
+                    dict.update(_temp, obj)
                 return _bc.__copy__(_temp)
             return _fallback_copy(obj, _bc, copy_module.copy)
 
@@ -115,8 +117,10 @@ def create_singleton_metaclass(  # noqa: C901
                 _memo = {}
             _bc = obj.__class__.get_base_class(obj.__class__)
             if hasattr(_bc, "__deepcopy__"):
-                _temp = _bc.__new__(_bc)  # type: ignore[misc]
-                _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
+                _temp = _bc.__new__(_bc)
+                _temp.__dict__.update(obj.__dict__)
+                if isinstance(obj, dict):
+                    dict.update(_temp, obj)
                 return _bc.__deepcopy__(_temp, _memo)
             return _fallback_copy(obj, _bc, copy_module.deepcopy)
 
@@ -148,7 +152,7 @@ def create_singleton_metaclass(  # noqa: C901
                 if _non_singleton_bases:
                     _base_class = _non_singleton_bases[0]
 
-            # Add methods from metaclass to instance methods
+            # Add methods from metaclass to instance methods:
             dct["__copy__"] = cls._instance_copy
             dct["__deepcopy__"] = cls._instance_deepcopy
             if hasattr(_base_class, "copy"):
@@ -224,6 +228,6 @@ def create_singleton_metaclass(  # noqa: C901
     return _SingletonMeta
 
 
-# Create concrete metaclass instances
+# Create concrete metaclass instances:
 QtSingleton = create_singleton_metaclass(type(QObject), "QtSingleton")
 Singleton = create_singleton_metaclass(type, "Singleton")

@@ -24,80 +24,107 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 import copy
+from typing import Any
 
 import numpy as np
 import pytest
 
-from pydidas.core import ObjectWithParameterCollection, Parameter, PydidasQsettingsMixin
-from pydidas.core.singleton import QtSingleton
+from pydidas.core import Parameter, PydidasQsettingsMixin
+from pydidas.core.parameter_collection import ParameterCollection
+from pydidas.core.singleton import Singleton
 
 
-class _NonContextClass(ObjectWithParameterCollection):
-    """Testing class to test QtSingleton."""
-
-    def __init__(self):
-        ObjectWithParameterCollection.__init__(self)
-        self.add_params(
-            Parameter("test1", int, 1),
-            Parameter("test2", int, 2),
-        )
-
-
-class _NonContextClassWithCustomCopy(ObjectWithParameterCollection):
-    """Testing class to test QtSingleton."""
+class _NonContextClass:
+    """Testing class to test Singleton."""
 
     def __init__(self):
-        ObjectWithParameterCollection.__init__(self)
-        self.add_params(
-            Parameter("test1", int, 1),
-            Parameter("test2", int, 2),
-        )
-
-    def __copy__(self) -> "_NonContextClassWithCustomCopy":
-        # Use self.__class__ for elegant subclass support;
-        # the QtSingleton metaclass ensures this is the actual base class
-        # (not a singleton), so this creates the correct type
-        _copy = self.__class__()
-        _copy.is_copy = True
-        return _copy
+        self._config: dict[str, Any] = {"valueA": 1}
+        self.is_copy: bool = False
+        self.valueA: int = 1
 
 
 class _NonContextSubClass(_NonContextClass): ...
 
 
-class _ContextClass(_NonContextClass, metaclass=QtSingleton): ...
+class _NonContextClassWithCustomCopy(_NonContextClass):
+    """Testing class to test Singleton."""
+
+    def copy(self) -> "_NonContextClassWithCustomCopy":
+        return self.__copy__()
+
+    def deepcopy(self) -> "_NonContextClassWithCustomCopy":
+        memo = {}
+        return self.__deepcopy__(memo)
+
+    def __copy__(self) -> "_NonContextClassWithCustomCopy":
+        _copy = self.__class__()
+        _copy._config = copy.copy(self._config)
+        _copy.valueA = copy.copy(self.valueA)
+        _copy.is_copy = True
+        return _copy
+
+    def __deepcopy__(self, memo) -> "_NonContextClassWithCustomCopy":
+        _copy = self.__class__()
+        _copy._config = copy.deepcopy(self._config)
+        _copy.valueA = copy.deepcopy(self.valueA)
+        _copy.is_copy = True
+        return _copy
+
+
+class _NonContextClassFromDict(ParameterCollection):
+    """Testing class to test Singleton."""
+
+    def __init__(self):
+        ParameterCollection.__init__(self)
+        self.add_params(
+            Parameter("test1", int, 1),
+            Parameter("test2", int, 2),
+        )
+        self._config: dict[str, Any] = {}
+
+
+class _ContextClass(_NonContextClass, metaclass=Singleton): ...
+
+
+class _ContextWithSubClass(_NonContextSubClass, metaclass=Singleton): ...
 
 
 class _ContextClassWithCustomCopy(
-    _NonContextClassWithCustomCopy, metaclass=QtSingleton
+    _NonContextClassWithCustomCopy, metaclass=Singleton
 ): ...
+
+
+class _ContextClassFromDict(_NonContextClassFromDict, metaclass=Singleton): ...
 
 
 class _SubContextClass(_ContextClass): ...
 
 
-class _ContextWithSubClass(_NonContextSubClass, metaclass=QtSingleton): ...
-
-
-_CONTEXT_CLASSES = [_ContextClass, _ContextWithSubClass, _SubContextClass]
+_CONTEXT_CLASSES = [
+    _ContextClass,
+    _ContextWithSubClass,
+    _SubContextClass,
+    _ContextClassWithCustomCopy,
+    _ContextClassFromDict,
+]
 
 
 @pytest.fixture(autouse=True)
 def clear_singletons():
     """Fixture to reset singletons."""
     # Reset singleton state before each test
-    _stored_instances = QtSingleton._instances
-    QtSingleton._instances = {}
+    _stored_instances = Singleton._instances
+    Singleton._instances = {}
     yield
-    QtSingleton._instances = _stored_instances
+    Singleton._instances = _stored_instances
 
 
 def test_init():
-    assert _ContextClass not in QtSingleton._instances
+    assert _ContextClass not in Singleton._instances
     obj = _ContextClass()
     assert isinstance(obj, _ContextClass)
     assert isinstance(obj, _NonContextClass)
-    assert QtSingleton._instances[_ContextClass] is obj
+    assert Singleton._instances[_ContextClass] is obj
 
 
 @pytest.mark.parametrize(
@@ -121,13 +148,13 @@ def test_init__w_multiple_contexts():
     assert isinstance(objA, _ContextClass)
     assert isinstance(objB, _ContextWithSubClass)
     assert isinstance(objC, _SubContextClass)
-    assert QtSingleton._instances[_ContextClass] == objA
-    assert QtSingleton._instances[_ContextWithSubClass] == objB
-    assert QtSingleton._instances[_SubContextClass] == objC
+    assert Singleton._instances[_ContextClass] == objA
+    assert Singleton._instances[_ContextWithSubClass] == objB
+    assert Singleton._instances[_SubContextClass] == objC
 
 
 def test_init__w_class_without_params():
-    class OtherClass(PydidasQsettingsMixin, metaclass=QtSingleton): ...
+    class OtherClass(PydidasQsettingsMixin, metaclass=Singleton): ...
 
     assert getattr(OtherClass, "params", None) is None
     assert getattr(OtherClass, "_config", None) is None
@@ -137,13 +164,13 @@ def test_init__w_class_without_params():
 def test_reset_instance__basic(singleton_class):
     """Test that reset_instance removes only the stored singleton instance."""
     _ = [_cls() for _cls in _CONTEXT_CLASSES]
-    assert singleton_class in QtSingleton._instances
+    assert singleton_class in Singleton._instances
     singleton_class.reset_instance()
     for _cls in _CONTEXT_CLASSES:
         if _cls is singleton_class:
-            assert _cls not in QtSingleton._instances
+            assert _cls not in Singleton._instances
         else:
-            assert _cls in QtSingleton._instances
+            assert _cls in Singleton._instances
 
 
 @pytest.mark.parametrize("singleton_class", _CONTEXT_CLASSES)
@@ -175,57 +202,47 @@ def test_reset_instance__multiple_resets(singleton_class):
 def test_reset_instance__preserves_state_until_call():
     """Test that resetting instance doesn't affect existing references."""
     obj1 = _ContextClass()
-    obj1.set_param_value("test1", 42)
-    original_value = obj1.get_param_value("test1")
+    obj1.valueA = 42
+    original_value = obj1.valueA
     _ContextClass.reset_instance()
     obj2 = _ContextClass()
-    assert obj1.get_param_value("test1") == original_value
-    assert obj2.get_param_value("test1") == 1  # default value
+    assert obj1.valueA == original_value
+    assert obj2.valueA == 1  # default value
 
 
 @pytest.mark.parametrize("singleton_class", _CONTEXT_CLASSES)
 def test_reset_instance__on_empty_stack(singleton_class):
     """Test that reset_instance silently succeeds even if no instance exists."""
-    assert singleton_class not in QtSingleton._instances
+    assert singleton_class not in Singleton._instances
     singleton_class.reset_instance()
-    assert singleton_class not in QtSingleton._instances
+    assert singleton_class not in Singleton._instances
 
 
 @pytest.mark.parametrize("singleton_class", _CONTEXT_CLASSES)
-@pytest.mark.parametrize("copy_module", [True, False])
-def test_copy(singleton_class, copy_module):
+@pytest.mark.parametrize("use_copy_module", [True, False])
+def test_copy(singleton_class, use_copy_module):
+    if not hasattr(singleton_class, "copy") and not use_copy_module:
+        pytest.skip("Skipping copy test with invalid configuration")
     obj = singleton_class()
     obj._config["test_key"] = 42
     obj._config["is_false"] = False
-    obj.add_param(Parameter("test3", int, 21))
-    if copy_module:
+    obj.valueA = 11
+    if use_copy_module:
         obj_copy = copy.copy(obj)
     else:
         obj_copy = obj.copy()
     assert id(obj) != id(obj_copy)
-    assert isinstance(obj_copy, _NonContextClass)
+    assert isinstance(obj_copy, Singleton.get_base_class(singleton_class))
     for _context_class in _CONTEXT_CLASSES:
         assert not isinstance(obj_copy, _context_class)
-    assert obj_copy.get_param_value("test3") == obj.get_param_value("test3")
-    assert obj_copy.get_param("test3") is not obj.get_param("test3")
+    assert obj_copy.valueA == (
+        obj.valueA
+        if singleton_class in [_ContextClassWithCustomCopy, _ContextClassFromDict]
+        else 1
+    )
+    assert obj_copy._config is not obj._config
     for _key, _val in obj._config.items():
         assert obj_copy._config[_key] == _val
-
-
-@pytest.mark.parametrize("copy_module", [True, False])
-def test_copy__w_custom_copy(copy_module):
-    obj = _ContextClassWithCustomCopy()
-    obj._config["test_key"] = 42
-    obj._config["is_false"] = False
-    if copy_module:
-        obj_copy = copy.copy(obj)
-    else:
-        obj_copy = obj.copy()
-    assert id(obj) != id(obj_copy)
-    assert isinstance(obj_copy, _NonContextClassWithCustomCopy)
-    assert getattr(obj_copy, "is_copy", False)
-    assert obj_copy._config == {}
-    assert not isinstance(obj_copy, _ContextClassWithCustomCopy)
 
 
 @pytest.mark.parametrize("singleton_class", _CONTEXT_CLASSES)
@@ -235,26 +252,20 @@ def test_copy__w_ndarray(singleton_class):
     _ref = np.array([1, 2, 3])
     obj._config["obj_arr"] = copy.deepcopy(_ref_w_obj)
     obj._config["arr"] = copy.copy(_ref)
-    copyA = obj.copy()
-    copyB = copy.copy(obj)
-    deepcopyA = obj.deepcopy()
-    deepcopyB = copy.deepcopy(obj)
-    for _item in [copyA, deepcopyA, copyB, deepcopyB]:
+    _copy = copy.copy(obj)
+    _deepcopy = copy.deepcopy(obj)
+    for _item in [_copy, _deepcopy]:
         assert id(obj) != id(_item)
-        assert isinstance(_item, _NonContextClass)
+        assert isinstance(_item, Singleton.get_base_class(singleton_class))
         assert not isinstance(_item, singleton_class)
     obj._config["obj_arr"][0][0] = 42
     obj._config["arr"][0] = 7
-    for _item in [copyA, copyB]:
-        assert id(obj._config["arr"]) == id(_item._config["arr"])
-        assert np.allclose(obj._config["arr"], _item._config["arr"])
-    for _item in [deepcopyA, deepcopyB]:
-        assert id(obj._config["arr"]) != id(_item._config["arr"])
-        assert not np.allclose(obj._config["arr"], _item._config["arr"])
-    assert copyA._config["obj_arr"][0][0] == 42
-    assert copyB._config["obj_arr"][0][0] == 42
-    assert deepcopyA._config["obj_arr"][0][0] == 1
-    assert deepcopyB._config["obj_arr"][0][0] == 1
+    assert id(obj._config["arr"]) == id(_copy._config["arr"])
+    assert np.allclose(obj._config["arr"], _copy._config["arr"])
+    assert id(obj._config["arr"]) != id(_deepcopy._config["arr"])
+    assert not np.allclose(obj._config["arr"], _deepcopy._config["arr"])
+    assert _copy._config["obj_arr"][0][0] == 42
+    assert _deepcopy._config["obj_arr"][0][0] == 1
 
 
 if __name__ == "__main__":

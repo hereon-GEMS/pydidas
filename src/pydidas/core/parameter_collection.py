@@ -30,6 +30,7 @@ __status__ = "Production"
 __all__ = ["ParameterCollection"]
 
 
+import copy as copy_module
 from collections.abc import Collection
 from typing import Any, NoReturn
 
@@ -75,10 +76,42 @@ class ParameterCollection(dict):
         _copy : ParameterCollection
             The copy of ParameterCollection with no shared objects.
         """
-        _copy = self.__class__()
+        _copy = self.__class__.__new__(self.__class__)
+        dict.__init__(_copy)
         for _param in self.values():
             _new_param = Parameter(*_param.dump())
-            _copy.add_param(_new_param, force_replace=True)
+            _copy.add_param(_new_param)
+        # Preserve __dict__ references (for shallow copy semantics)
+        for _key, _val in self.__dict__.items():
+            _copy.__dict__[_key] = copy_module.copy(_val)
+        return _copy
+
+    def __deepcopy__(self, memo: dict) -> "ParameterCollection":
+        """
+        Get a deep copy of the ParameterCollection.
+
+        This method will return a copy of the ParameterCollection with
+        a copy of each Parameter object. Note that there is no difference between
+        a ParameterCollections copy and deepcopy.
+
+        Parameters
+        ----------
+        memo : dict
+            A dictionary to track already copied objects.
+
+        Returns
+        -------
+        _copy : ParameterCollection
+            The deep copy of ParameterCollection with no shared objects.
+        """
+        _copy = self.__class__.__new__(self.__class__)
+        dict.__init__(_copy)
+        for _param in self.values():
+            _new_param = Parameter(*_param.dump())
+            _copy.add_param(_new_param)
+        # Preserve and deep copy __dict__ attributes
+        for _key, _val in self.__dict__.items():
+            _copy.__dict__[_key] = copy_module.deepcopy(_val, memo)
         return _copy
 
     def __hash__(self) -> int:  # type: ignore[override]
@@ -252,7 +285,8 @@ class ParameterCollection(dict):
         ParameterCollection
             The deep copy of ParameterCollection with no shared objects.
         """
-        return self.__copy__()
+
+        return self.__deepcopy__({})
 
     def get_value(self, param_key: str) -> Any:
         """

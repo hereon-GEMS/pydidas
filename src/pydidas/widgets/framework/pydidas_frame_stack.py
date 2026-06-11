@@ -60,7 +60,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self._frame_indices : dict[str, int] = {}
+        self._frame_indices: dict[str, int] = {}
         self._frame_names_from_index = {}
         self._frames = {}
 
@@ -166,7 +166,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         if ref_name not in self._frame_indices:
             raise KeyError(f"No widget with the name `{ref_name}` has been registered.")
-        return self.widget(self._frame_indices[ref_name]) # type: ignore[arg-type]
+        return self.widget(self._frame_indices[ref_name])  # type: ignore[arg-type]
 
     @property
     def frame_toolbar_entries(self) -> list[str]:
@@ -316,7 +316,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         super().removeWidget(frame)  # type: ignore[arg-type]
         self._frame_names_from_index = {}
         for _index in range(self.count()):
-            _frame : BaseFrame = self.widget(_index)  # type: ignore[assignment]
+            _frame: BaseFrame = self.widget(_index)  # type: ignore[assignment]
             _frame.frame_index = _index
             self._frame_names_from_index[_index] = _frame.menu_entry
             self._frame_indices[_frame.menu_entry] = _index

@@ -289,9 +289,7 @@ class MainWindow(MainMenu):
             MainMenu.restore_gui_state(self, state, filename)
         except Exception as exc:
             raise UserConfigError(
-                "Error during GUI state restoration.\n\n"
-                + str(exc)
-                + "\n\nSkipping restoration..."
+                "Errors occurred during GUI state restoration:\n\n" + str(exc)
             )
         self.select_item(self.centralWidget().currentWidget().menu_entry)
 

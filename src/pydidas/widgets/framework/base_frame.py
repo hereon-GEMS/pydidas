@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -122,12 +122,13 @@ class BaseFrame(
                 _state = self._config.pop("state")
                 try:
                     self.restore_state(_state)
-                except Exception as exc:
+                except UserConfigError as exc:
                     raise UserConfigError(
-                        "Error restoring state for frame "
+                        "- Error restoring state for frame "
                         + str(self.menu_title)
-                        + ":\n"
+                        + ": "
                         + str(exc)
+                        + "\n"
                     )
         self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
@@ -193,14 +194,18 @@ class BaseFrame(
         """
         if not self._config["built"]:
             self._config["state"] = state  # type: ignore[arg-type]
+            for _key, _val in state["params"].items():
+                if _key not in self.params_not_to_restore:
+                    try:
+                        self.set_param_value(_key, _val)
+                    except Exception:
+                        raise UserConfigError(f"- Error restoring parameter {_key}\n")
             return
         self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
-                    self.set_param_and_widget_value(_key, _val)
-                else:
-                    self.set_param_value(_key, _val)
+                    self.update_param_widget_value(_key, _val)
 
     def closeEvent(self, event: QtCore.QEvent) -> None:
         """

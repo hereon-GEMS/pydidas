@@ -195,10 +195,18 @@ def restore_global_objects(state: dict):
         The restored global states which includes the states for the
         global objects.
     """
+    _errors = ""
     try:
         TREE.restore_from_string(state["context::workflow_tree"])
     except KeyError:
-        raise UserConfigError("Cannot import Workflow. Not all plugins found.")
+        _errors.append("- Cannot import Workflow. Not all plugins found.")
     for _context_key, _context in GLOBAL_CONTEXTS.items():
         for _key, _val in state[f"context::{_context_key}"].items():
-            _context.set_param_value(_key, _val)
+            try:
+                _context.set_param_value(_key, _val)
+            except Exception:
+                _errors += (
+                    f"- Failed to set parameter '{_key}' in context '{_context_key}'\n"
+                )
+    if _errors:
+        raise UserConfigError(_errors)

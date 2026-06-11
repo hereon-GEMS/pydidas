@@ -27,7 +27,6 @@ __status__ = "Production"
 from unittest.mock import patch
 
 import pytest
-from numpy._core.numeric import sort
 
 from pydidas.gui.utils.main_menu_utils import get_available_exit_states
 

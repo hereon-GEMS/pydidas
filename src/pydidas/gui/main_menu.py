@@ -608,21 +608,20 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         if _state is None:
             return
-        try:
-            utils.restore_global_objects(_state)
-            self.restore_frame_states(_state)
-            self.restore_window_states(_state)
-            self.restore_main_window_state(_state.get("main", {}))
-        except Exception as exc:
-            if _state.get("pydidas_version", "0.0.0") != VERSION:
-                raise UserConfigError(
-                    "Error during GUI state import.\n"
-                    "The saved state was not created with the current pydidas version "
-                    "and cannot be imported."
-                )
-            raise UserConfigError(
-                f"Error during GUI state import.\nThe following error occurred: {exc}\n"
-            )
+        _errors = ""
+        restore_functions = [
+            lambda: utils.restore_global_objects(_state),
+            lambda: self.restore_frame_states(_state),
+            lambda: self.restore_window_states(_state),
+            lambda: self.restore_main_window_state(_state.get("main", {})),
+        ]
+        for _func in restore_functions:
+            try:
+                _func()
+            except Exception as exc:
+                _errors += str(exc) + "\n"
+        if _errors:
+            raise UserConfigError(_errors)
 
     def restore_window_states(self, state: dict):
         """
@@ -634,8 +633,16 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The dictionary with the required information to store and restore
             window states.
         """
+        _errors = ""
         for _key, _window in self._child_windows.items():
-            _window.restore_window_state(state[f"window::{_key}"])
+            try:
+                _window.restore_window_state(state[f"window::{_key}"])
+            except Exception as exc:
+                _errors += (
+                    f"- Failed to restore window state for '{_key}': {str(exc)}\n"
+                )
+        if _errors:
+            raise UserConfigError(_errors)
 
     def restore_main_window_state(self, state: dict):
         """

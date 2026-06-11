@@ -376,7 +376,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
                 self.get_widget_by_name(_frame_name).restore_state(_state)
             except Exception as exc:
                 raise UserConfigError(
-                    f"Error restoring state for frame {_frame_name}: {str(exc)}"
+                    f"- Error restoring state for frame {_frame_name}: {str(exc)}\n"
                 )
             _unrestored_frames.remove(_frame_name)
         if _unrestored_frames:

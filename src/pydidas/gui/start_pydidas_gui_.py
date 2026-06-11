@@ -104,16 +104,18 @@ def start_pydidas_gui(
             )
         _splash.show_aligned_message("Restoring interface state")
         _splash.finish(_gui)
-        try:
-            _gui.restore_gui_state(state=restore_state)
-        except UserConfigError:
-            pass
+        # try:
+        #     _gui.restore_gui_state(state=restore_state)
+        # except UserConfigError:
+        #     pass
+        _gui.restore_gui_state(state=restore_state)
         _gui.check_for_updates(auto_check=True)
         _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
-    except Exception:
-        _splash.close()
+    except Exception as _e:
+        #    _splash.close()
+        raise _e
     if _app is not None:
         _app.deleteLater()
 

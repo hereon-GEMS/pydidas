@@ -36,6 +36,7 @@ from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import DEFAULT_FRAMES
 from pydidas.resources import icons
+from pydidas.widgets.dialogues import PydidasExceptionMessageBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
@@ -104,11 +105,12 @@ def start_pydidas_gui(
             )
         _splash.show_aligned_message("Restoring interface state")
         _splash.finish(_gui)
-        # try:
-        #     _gui.restore_gui_state(state=restore_state)
-        # except UserConfigError:
-        #     pass
-        _gui.restore_gui_state(state=restore_state)
+        try:
+            _gui.restore_gui_state(state=restore_state)
+        except UserConfigError as exc:
+            _ = PydidasExceptionMessageBox(
+                text=str(exc), title="Errors during state import"
+            ).exec_()
         _gui.check_for_updates(auto_check=True)
         _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()

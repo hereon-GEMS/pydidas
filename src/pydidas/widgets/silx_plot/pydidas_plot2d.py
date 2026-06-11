@@ -169,17 +169,22 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
     def clear_plot(self) -> None:
         """Clear the plot and remove all items."""
+        self.reset_ticks()
+        self.remove()
+        self.setGraphTitle("")
+        self.setGraphYLabel("")
+        self.setGraphXLabel("")
+        self.getColorBarWidget().setLegend("")
+
+    def reset_ticks(self) -> None:
+        """Reset the axis ticks to their default state."""
         _backend = self.getBackend()
         _ax = _backend.ax
         _ax.xaxis.set_major_locator(AutoLocator())
         _ax.xaxis.set_major_formatter(ScalarFormatter())
         _ax.yaxis.set_major_locator(AutoLocator())
         _ax.yaxis.set_major_formatter(ScalarFormatter())
-        self.remove()
-        self.setGraphTitle("")
-        self.setGraphYLabel("")
-        self.setGraphXLabel("")
-        self.getColorBarWidget().setLegend("")
+        _ax.tick_params(axis="x", labelrotation=0)
 
     def plot_pydidas_dataset(self, data: Dataset, **kwargs: Any) -> None:
         """
@@ -192,6 +197,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         **kwargs : Any
             Additional keyword arguments to be passed to the silx plot method.
         """
+        self.reset_ticks()
         check_data_dimensions(data, 2)
         _title = kwargs.pop("title", "")
         _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))

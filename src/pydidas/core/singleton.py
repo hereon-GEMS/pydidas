@@ -67,7 +67,6 @@ def _fallback_copy(obj: Any, base_class: type, copy_func: Callable) -> Any:
     return _copy_instance
 
 
-
 def create_singleton_metaclass(  # noqa: C901
     base_metaclass: type = type, name: str | None = None
 ) -> type:
@@ -102,8 +101,7 @@ def create_singleton_metaclass(  # noqa: C901
         @staticmethod
         def _instance_copy(obj: Any) -> object:
             """Create a copy as base class, not singleton."""
-            metaclass = type(obj.__class__)
-            _bc = metaclass.get_base_class(obj.__class__)
+            _bc = obj.__class__.get_base_class(obj.__class__)
             if hasattr(_bc, "__copy__"):
                 _temp = _bc.__new__(_bc)  # type: ignore[misc]
                 _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
@@ -115,17 +113,14 @@ def create_singleton_metaclass(  # noqa: C901
             """Create a deep copy as base class, not singleton."""
             if _memo is None:
                 _memo = {}
-            metaclass = type(obj.__class__)
-            _bc = metaclass.get_base_class(obj.__class__)
+            _bc = obj.__class__.get_base_class(obj.__class__)
             if hasattr(_bc, "__deepcopy__"):
                 _temp = _bc.__new__(_bc)  # type: ignore[misc]
                 _temp.__dict__.update(obj.__dict__)  # type: ignore[union-attr]
                 return _bc.__deepcopy__(_temp, _memo)
             return _fallback_copy(obj, _bc, copy_module.deepcopy)
 
-        def __new__(
-            cls, name_: str, bases: tuple[type], dct: dict
-        ) -> "_SingletonMeta":
+        def __new__(cls, name_: str, bases: tuple[type], dct: dict) -> "_SingletonMeta":
             """
             Create a new singleton class with copy redirection.
 
@@ -161,26 +156,12 @@ def create_singleton_metaclass(  # noqa: C901
             if hasattr(_base_class, "deepcopy"):
                 dct["deepcopy"] = cls._instance_deepcopy
             dct["reset_instance"] = classmethod(
-                lambda kls: cls._reset_instance(kls)
-            )  # type: ignore[arg-type]
+                lambda kls: cls._reset_instance(kls)  # type: ignore[arg-type]
+            )
 
             _singleton_class = super().__new__(cls, name_, bases, dct)
             cls._base_classes[_singleton_class] = _base_class
             return _singleton_class
-
-        @staticmethod
-        def _reset_instance(kls: type) -> None:
-            """
-            Reset singleton instance.
-
-            Parameters
-            ----------
-            kls : type
-                The singleton class to reset.
-            """
-            metaclass = type(kls)
-            if kls in metaclass._instances:
-                del metaclass._instances[kls]
 
         def __call__(cls, *args: Any, **kwargs: Any) -> Any:  # type: ignore[override]
             """
@@ -203,9 +184,9 @@ def create_singleton_metaclass(  # noqa: C901
             return cls._instances[cls]
 
         @classmethod
-        def reset_instance(cls, kls: type) -> None:
+        def _reset_instance(cls, kls: type) -> None:
             """
-            Reset the singleton instance.
+            Reset singleton instance.
 
             Parameters
             ----------

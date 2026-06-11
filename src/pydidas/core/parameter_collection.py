@@ -58,6 +58,10 @@ class ParameterCollection(dict):
         super().__init__()
         self.add_params(*args)  # type: ignore[arg-type]
 
+    # ----------------------------
+    # Re-implemented dict methods:
+    # ----------------------------
+
     def __copy__(self) -> "ParameterCollection":
         """
         Get a copy of the ParameterCollection.
@@ -71,10 +75,10 @@ class ParameterCollection(dict):
         _copy : ParameterCollection
             The copy of ParameterCollection with no shared objects.
         """
-        _copy = ParameterCollection()
+        _copy = self.__class__()
         for _param in self.values():
             _new_param = Parameter(*_param.dump())
-            _copy.add_param(_new_param)
+            _copy.add_param(_new_param, force_replace=True)
         return _copy
 
     def __hash__(self) -> int:  # type: ignore[override]
@@ -118,9 +122,10 @@ class ParameterCollection(dict):
             self.__raise_type_error(param)
         if key != param.refkey:
             raise KeyError(
-                f'The dictionary key "{key}" for Parameter "{param}" does not'
-                ' match the Parameter reference key: "{param.refkey}". Cannot'
-                " add item."
+                f"The dictionary key `{key}` for Parameter `{param}` does not "
+                "match the Parameter reference key: `{param.refkey}`. The "
+                "Parameter cannot be added to the ParameterCollection: Both keys "
+                "must be identical."
             )
         self.__check_key_available(param)
         super().__setitem__(key, param)
@@ -141,53 +146,23 @@ class ParameterCollection(dict):
         """
         return super().__getitem__(key)
 
-    @staticmethod
-    def __raise_type_error(item: Any) -> NoReturn:
+    # ----------------------------
+    # New public methods:
+    # ----------------------------
+
+    @property
+    def param_keys(self) -> list[str]:
         """
-        Raise a TypeError that item is of the wrong type.
+        Get the Parameter reference keys of the ParameterCollection.
 
-        Parameters
-        ----------
-        item : Any
-            Any item (which cannot be added to the ParameterCollection).
-
-        Raises
-        ------
-        TypeError
-            Error message that object cannot be added to ParameterCollection.
+        Returns
+        -------
+        list[str]
+            The Parameter reference keys in a list.
         """
-        raise TypeError(
-            f"Cannot add object *{item}* of type {item.__class__} to the "
-            "ParameterCollection."
-        )
+        return list(self.keys())
 
-    def __check_key_available(
-        self, param: Parameter, keys: Collection[str] | None = None
-    ) -> None | NoReturn:
-        """
-        Check if the Parameter refkey is already a registered key.
-
-        Parameters
-        ----------
-        param : Parameter
-            The Parameter to be compared.
-        keys : Collection[str] or None, optional
-            The keys to be compared against. If None, the comparison will be
-            performed against all dictionary keys. The default is None.
-
-        Raises
-        ------
-        KeyError
-            If the key already exists in keys.
-        """
-        if keys is None:
-            keys = self.keys()
-        if param.refkey in keys:
-            raise KeyError(
-                f"A parameter with the reference key '{param.refkey}' already exists."
-            )
-
-    def add_param(self, param: Parameter) -> None:
+    def add_param(self, param: Parameter, force_replace: bool = False) -> None:
         """
         Add a parameter to the ParameterCollection.
 
@@ -195,6 +170,10 @@ class ParameterCollection(dict):
         ----------
         param : Parameter
             An instance of a Parameter object.
+        force_replace : bool, optional
+            Flag whether to replace an existing entry with the same reference
+            key. This allows to handle generic dict operations (e.g. when
+            calling copy) to bypass the key check.
 
         Raises
         ------
@@ -206,36 +185,9 @@ class ParameterCollection(dict):
         if not isinstance(param, Parameter):
             self.__raise_type_error(param)
         self.__check_arg_types(param)
-        self.__check_key_available(param)
-        self.__setitem__(param.refkey, param)
-
-    def __check_arg_types(self, *args: Any) -> None:
-        """
-        Check the types of input arguments.
-
-        This method verifies that all passed arguments are either Parameters
-        or ParameterCollections.
-
-        Parameters
-        ----------
-        *args : Any
-            Any arguments.
-        """
-        for _param in args:
-            if not isinstance(_param, (Parameter, ParameterCollection)):
-                self.__raise_type_error(_param)
-
-    @property
-    def param_keys(self) -> list:
-        """
-        Get the Parameter reference keys of the ParameterCollection.
-
-        Returns
-        -------
-        list[str]
-            The Parameter reference keys in a list.
-        """
-        return list(self.keys())
+        if not force_replace:
+            self.__check_key_available(param)
+        super().__setitem__(param.refkey, param)
 
     def add_params(self, *args: "Parameter | ParameterCollection") -> None:
         """
@@ -253,49 +205,9 @@ class ParameterCollection(dict):
         # perform all type checks before adding any items:
         self.__check_arg_types(*args)  # type: ignore[arg-type]
         self.__check_duplicate_keys(*args)  # type: ignore[arg-type]
-        self.__add_arg_params(*args)  # type: ignore[arg-type]
-
-    def __check_duplicate_keys(self, *args: "Parameter | ParameterCollection") -> None:
-        """
-        Check for duplicate keys and raise an error if a duplicate key is found.
-
-        This method compares the reference key of all args with the dictionary
-        keys.
-
-        Parameters
-        ----------
-        *args : Parameter or ParameterCollection
-            Any number of Parameters or ParameterCollections
-            with key: Parameter pairs.
-
-        Raises
-        ------
-        KeyError
-            If the kwargs key of a Parameter differs from the Parameter
-            reference key.
-        """
-        _flattened_params = flatten(  # type: ignore[arg-type]
-            [_arg] if isinstance(_arg, Parameter) else list(_arg.values())
-            for _arg in args  # type: ignore[arg-type]
-        )
-        _original_keys = tuple(self.keys())
-        for _param in _flattened_params:
-            _other_keys = tuple(p.refkey for p in _flattened_params if p is not _param)
-            _temp_keys = _original_keys + _other_keys
-            self.__check_key_available(_param, keys=_temp_keys)
-
-    def __add_arg_params(self, *args: "Parameter | ParameterCollection") -> None:
-        """
-        Add the passed parameters to the ParameterCollection.
-
-        Parameters
-        ----------
-        *args : Parameter or ParameterCollection
-            The single Parameters or ParameterCollections to be added.
-        """
         for _item in args:  # type: ignore[arg-type]
             if isinstance(_item, Parameter):
-                self.add_param(_item)
+                super().__setitem__(_item.refkey, _item)
             elif isinstance(_item, ParameterCollection):
                 self.update(_item)
 
@@ -328,15 +240,17 @@ class ParameterCollection(dict):
 
     def deepcopy(self) -> "ParameterCollection":
         """
-        Get a copy of the ParameterCollection.
+        Get a deep copy of the ParameterCollection.
 
         This method will return a copy of the ParameterCollection with
-        a copy of each Parameter object.
+        a copy of each Parameter object. Note that there is no difference between
+        a ParameterCollections copy and deepcopy since Parameter objects are
+        immutable value objects.
 
         Returns
         -------
         ParameterCollection
-            The copy of ParameterCollection with no shared objects.
+            The deep copy of ParameterCollection with no shared objects.
         """
         return self.__copy__()
 
@@ -447,3 +361,105 @@ class ParameterCollection(dict):
         if len(_vals) == 1:
             return True
         return False
+
+    # ----------------------------
+    # Private methods:
+    # ----------------------------
+
+    @staticmethod
+    def __raise_type_error(*items: Any) -> NoReturn:
+        """
+        Raise a TypeError that item is of the wrong type.
+
+        Parameters
+        ----------
+        *items : Any
+            Any item(s) (which cannot be added to the ParameterCollection).
+
+        Raises
+        ------
+        TypeError
+            Error message that object cannot be added to ParameterCollection.
+        """
+        _invalids = "\n".join(
+            f"- `{item}` of type `{item.__class__}`" for item in items
+        )
+        raise TypeError(
+            "Only Parameter or ParameterCollection instances are supported in the "
+            "ParameterCollection. The following items are invalid:\n." + _invalids
+        )
+
+    def __check_key_available(
+        self, param: Parameter, keys: Collection[str] | None = None
+    ) -> None | NoReturn:
+        """
+        Check if the Parameter refkey is already a registered key.
+
+        Parameters
+        ----------
+        param : Parameter
+            The Parameter to be compared.
+        keys : Collection[str] or None, optional
+            The keys to be compared against. If None, the comparison will be
+            performed against all dictionary keys. The default is None.
+
+        Raises
+        ------
+        KeyError
+            If the key already exists in keys.
+        """
+        if keys is None:
+            keys = self.keys()
+        if param.refkey in keys:
+            raise KeyError(
+                f"A parameter with the reference key '{param.refkey}' already exists."
+            )
+
+    def __check_arg_types(self, *args: Any) -> None:
+        """
+        Check the types of input arguments.
+
+        This method verifies that all passed arguments are either Parameters
+        or ParameterCollections.
+
+        Parameters
+        ----------
+        *args : Any
+            Any arguments.
+        """
+        _are_params = [
+            isinstance(arg, (Parameter, ParameterCollection)) for arg in args
+        ]
+        _valid = all(_are_params)
+        if not _valid:
+            _invalid = [arg for arg, is_param in zip(args, _are_params) if not is_param]
+            self.__raise_type_error(*_invalid)
+
+    def __check_duplicate_keys(self, *args: "Parameter | ParameterCollection") -> None:
+        """
+        Check for duplicate keys and raise an error if a duplicate key is found.
+
+        This method compares the reference key of all args with the dictionary
+        keys.
+
+        Parameters
+        ----------
+        *args : Parameter or ParameterCollection
+            Any number of Parameters or ParameterCollections
+            with key: Parameter pairs.
+
+        Raises
+        ------
+        KeyError
+            If the kwargs key of a Parameter differs from the Parameter
+            reference key.
+        """
+        _flattened_params = flatten(  # type: ignore[arg-type]
+            [_arg] if isinstance(_arg, Parameter) else list(_arg.values())
+            for _arg in args  # type: ignore[arg-type]
+        )
+        _original_keys = tuple(self.keys())
+        for _param in _flattened_params:
+            _other_keys = tuple(p.refkey for p in _flattened_params if p is not _param)
+            _temp_keys = _original_keys + _other_keys
+            self.__check_key_available(_param, keys=_temp_keys)

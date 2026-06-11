@@ -356,9 +356,9 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         self.sig_mouse_entered.emit()
 
-    def restore_frame_states(self, state: dict[str, dict]):
+    def restore_frame_state_info(self, state: dict[str, dict]):
         """
-        Restore the states of all frames from the stored state information.
+        Restore the state info of all frames from the stored state information.
 
         Parameters
         ----------
@@ -373,7 +373,7 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
             if _frame_name not in _unrestored_frames:
                 _missing_frames.append(_frame_name)
             try:
-                self.get_widget_by_name(_frame_name).restore_state(_state)
+                self.get_widget_by_name(_frame_name).inject_frame_state(_state)
             except Exception as exc:
                 raise UserConfigError(
                     f"- Error restoring state for frame {_frame_name}: {str(exc)}\n"

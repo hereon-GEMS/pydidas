@@ -687,7 +687,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             for _key, _val in state.items()
             if _key.startswith("frame::")
         }
-        self.centralWidget().restore_frame_states(_frame_states)
+        self.centralWidget().restore_frame_state_info(_frame_states)
 
     @QtCore.Slot()
     def _open_help(self):

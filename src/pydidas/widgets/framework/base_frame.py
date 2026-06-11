@@ -117,11 +117,10 @@ class BaseFrame(
                 self.connect_signals()
                 self.finalize_ui()
                 self._config["built"] = True
-        if "state" in self._config:
-            with ShowBusyMouse():
-                _state = self._config.pop("state")
                 try:
-                    self.restore_state(_state)
+                    _state = self._config.pop("state", None)
+                    if _state:
+                        self.restore_state(_state)
                 except UserConfigError as exc:
                     raise UserConfigError(
                         "- Error restoring state for frame "
@@ -177,6 +176,28 @@ class BaseFrame(
             "class": self.__class__.__name__,
         }
 
+    def inject_frame_state(self, state: dict) -> None:
+        """
+        Inject a previously stored frame state and save it for restoration.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with the frame state information. The exact contents
+            may vary for each BaseFrame implementation.
+        """
+        self._config["state"] = state  # type: ignore[arg-type]
+        self.frame_index = state["frame_index"]
+        for _key, _val in state["params"].items():
+            # TODO: Discuss whether check for _key in self.params here is sensible
+            #       currently, the first wrong param will trigger an abort
+            # if _key in self.params and _key not in self.params_not_to_restore:
+            if _key not in self.params_not_to_restore:
+                try:
+                    self.set_param_value(_key, _val)
+                except Exception:
+                    raise UserConfigError(f"- Error restoring parameter {_key}\n")
+
     def restore_state(self, state: dict) -> None:
         """
         Restore the frame's state from stored information.
@@ -192,16 +213,6 @@ class BaseFrame(
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        if not self._config["built"]:
-            self._config["state"] = state  # type: ignore[arg-type]
-            for _key, _val in state["params"].items():
-                if _key not in self.params_not_to_restore:
-                    try:
-                        self.set_param_value(_key, _val)
-                    except Exception:
-                        raise UserConfigError(f"- Error restoring parameter {_key}\n")
-            return
-        self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:

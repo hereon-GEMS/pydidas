@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["QtSingleton", "Singleton", "create_singleton_metaclass"]
+__all__ = ["QtSingleton", "Singleton"]
 
 
 import copy as copy_module

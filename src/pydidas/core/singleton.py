@@ -54,13 +54,23 @@ def _fallback_copy(obj: Any, base_class: type, copy_func: Callable) -> Any:
     Any
         A copy of the object.
     """
-    # Fall back to default copy
-    _copy_instance = base_class()
+    # Fall back to default copy by creating a fresh instance
+    try:
+        _copy_instance = base_class()
+    except TypeError:
+        # If base_class() requires arguments, create with __new__ and __dict__ copy
+        _copy_instance = base_class.__new__(base_class)
+        _copy_instance.__dict__.update(obj.__dict__)
+        return _copy_instance
+
+    # Copy params if the method exists
     if hasattr(_copy_instance, "add_params"):
         _param_copy: ParameterCollection = copy_func(
             getattr(obj, "params", ParameterCollection())
         )
         _copy_instance.add_params(_param_copy)
+
+    # Shallow copy _config
     _config_copy: dict[str, Any] = copy_func(getattr(obj, "_config", {}))
     if _config_copy:
         _copy_instance._config = _config_copy
@@ -102,12 +112,17 @@ def create_singleton_metaclass(  # noqa: C901
         def _instance_copy(obj: Any) -> object:
             """Create a copy as base class, not singleton."""
             _bc = obj.__class__.get_base_class(obj.__class__)
+            # Try to use the base class __copy__ if available and feasible
             if hasattr(_bc, "__copy__"):
-                _temp = _bc.__new__(_bc)
-                _temp.__dict__.update(obj.__dict__)
-                if isinstance(obj, dict):
-                    dict.update(_temp, obj)
-                return _bc.__copy__(_temp)
+                try:
+                    _temp = _bc.__new__(_bc)
+                    _temp.__dict__.update(obj.__dict__)
+                    if isinstance(obj, dict):
+                        dict.update(_temp, obj)
+                    return _bc.__copy__(_temp)
+                except (AttributeError, TypeError):
+                    # If __copy__ fails due to missing attributes, fall back
+                    pass
             return _fallback_copy(obj, _bc, copy_module.copy)
 
         @staticmethod
@@ -116,12 +131,17 @@ def create_singleton_metaclass(  # noqa: C901
             if _memo is None:
                 _memo = {}
             _bc = obj.__class__.get_base_class(obj.__class__)
+            # Try to use the base class __deepcopy__ if available and feasible
             if hasattr(_bc, "__deepcopy__"):
-                _temp = _bc.__new__(_bc)
-                _temp.__dict__.update(obj.__dict__)
-                if isinstance(obj, dict):
-                    dict.update(_temp, obj)
-                return _bc.__deepcopy__(_temp, _memo)
+                try:
+                    _temp = _bc.__new__(_bc)
+                    _temp.__dict__.update(obj.__dict__)
+                    if isinstance(obj, dict):
+                        dict.update(_temp, obj)
+                    return _bc.__deepcopy__(_temp, _memo)
+                except (AttributeError, TypeError):
+                    # If __deepcopy__ fails due to missing attributes, fall back
+                    pass
             return _fallback_copy(obj, _bc, copy_module.deepcopy)
 
         def __new__(cls, name_: str, bases: tuple[type], dct: dict) -> "_SingletonMeta":
@@ -150,7 +170,10 @@ def create_singleton_metaclass(  # noqa: C901
                     _b for _b in bases[0].__mro__ if type(_b) is not cls
                 )
                 if _non_singleton_bases:
-                    _base_class = _non_singleton_bases[0]
+                    _found_base = _non_singleton_bases[0]
+                    # Only use the found base if it's not object itself
+                    if _found_base is not object:
+                        _base_class = _found_base
 
             # Add methods from metaclass to instance methods:
             dct["__copy__"] = cls._instance_copy

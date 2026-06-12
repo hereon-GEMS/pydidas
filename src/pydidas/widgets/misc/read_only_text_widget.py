@@ -156,7 +156,10 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
             or 'subsection'. The default is 'plain'.
         """
         _entry = (formatter, text)
-        self._current_content.append(_entry)
+        if self._current_content == self.default_text:
+            self._current_content = [_entry]
+        else:
+            self._current_content.append(_entry)
         self._print_contents()
 
     def prepend_text(self, text: str, formatter: str = "plain") -> None:
@@ -172,7 +175,10 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
             or 'subsection'. The default is 'plain'.
         """
         _entry = (formatter, text)
-        self._current_content.insert(0, _entry)
+        if self._current_content == self.default_text:
+            self._current_content = [_entry]
+        else:
+            self._current_content.insert(0, _entry)
         self._print_contents()
 
     def set_title(self, title: str) -> None:
@@ -220,30 +226,33 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self._print_title()
         self.setFontPointSize(self._qtapp.font_size + 1)
         _cursor = self.textCursor()
-        for _type, _value in self._current_content:
-            if _value == "":
+        for _format, _text in self._current_content:
+            if _text == "":
                 continue
-            if _type == "header":
+            if _format == "header":
                 _block_format = self._BLOCK_FORMAT_STANDARD
                 _char_format = self._CHAR_FORMAT_BOLD
-            elif _type == "section":
+                _text = f"\n{_text}:"
+            elif _format == "section":
                 _block_format = self._BLOCK_FORMAT_SECTION
                 _char_format = self._CHAR_FORMAT_NORMAL
-            elif _type == "subsection":
+            elif _format == "subsection":
                 _block_format = self._BLOCK_FORMAT_SUBSECTION
                 _char_format = self._CHAR_FORMAT_NORMAL
-            elif _type == "plain":
+            elif _format == "plain":
                 _block_format = self._BLOCK_FORMAT_STANDARD
-                _char_format = self._CHAR_FORMAT_BOLD
+                _char_format = self._CHAR_FORMAT_NORMAL
             else:
                 raise UserConfigError(
-                    f"Unsupported formatter type: {_type} in ReadOnlyTextWidget. "
+                    f"Unsupported formatter type: {_format} in ReadOnlyTextWidget. "
                     "Supported types are `plain`, `header`, `section`, and "
                     "`subsection`."
                 )
+            if not _text.endswith("\n"):
+                _text += "\n"
             _cursor.setBlockFormat(_block_format)
             _cursor.setCharFormat(_char_format)
-            _cursor.insertText(f"\n{_value}:\n")
+            _cursor.insertText(_text)
         self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
     def _print_title(self) -> None:

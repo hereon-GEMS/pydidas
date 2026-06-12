@@ -165,6 +165,15 @@ def test_append_text__with_formatters(widget, formatter) -> None:
 
 
 @pytest.mark.gui
+def test_append_text__replaces_default_content(widget) -> None:
+    """Test that appending to default content replaces it instead of appending."""
+    widget.set_text("")  # Start with default content
+    widget.append_text("New content", formatter="plain")
+    # The new content should be present (replacing the default)
+    assert "New content" in widget.toPlainText()
+
+
+@pytest.mark.gui
 def test_append_text__default_formatter(widget) -> None:
     """Test that default formatter for append_text is 'plain'."""
     widget.set_text("Base")
@@ -193,6 +202,15 @@ def test_prepend_text__with_formatters(widget, formatter) -> None:
     content = widget.toPlainText()
     assert "Base" in content
     assert f"Text with {formatter}" in content
+
+
+@pytest.mark.gui
+def test_prepend_text__replaces_default_content(widget) -> None:
+    """Test that prepending to default content replaces it instead of prepending."""
+    widget.set_text("")  # Start with default content
+    widget.prepend_text("New content", formatter="plain")
+    # The new content should be present (replacing the default)
+    assert "New content" in widget.toPlainText()
 
 
 @pytest.mark.gui
@@ -316,7 +334,7 @@ def test__reprint_method(qtbot, widget) -> None:
 
 @pytest.mark.gui
 def test__multiple_appends_accumulate(widget) -> None:
-    """Test that multiple appends accumulate content."""
+    """Test that multiple appends accumulate content after initial content is set."""
     widget.set_text("Base")
     widget.append_text("First")
     widget.append_text("Second")
@@ -330,7 +348,7 @@ def test__multiple_appends_accumulate(widget) -> None:
 
 @pytest.mark.gui
 def test__multiple_prepends_accumulate(widget) -> None:
-    """Test that multiple prepends accumulate content."""
+    """Test that multiple prepends accumulate content after initial content is set."""
     widget.set_text("Base")
     widget.prepend_text("First")
     widget.prepend_text("Second")

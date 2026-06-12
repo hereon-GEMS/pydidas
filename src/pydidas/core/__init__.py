@@ -48,8 +48,9 @@ from .singleton import *
 from .singleton_object import *
 
 
-__all__ = ["constants", "generic_params", "io_registry", "utils"] + (
-    base_app.__all__
+__all__: list[str] = (  # type: ignore[reportUnsupportedDunderAll]
+    ["constants", "generic_params", "io_registry", "utils"]
+    + base_app.__all__
     + dataset.__all__
     + exceptions.__all__
     + generic_parameters.__all__

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,6 +37,7 @@ from pydidas.core import (
     ParameterCollection,
     ParameterCollectionMixIn,
     PydidasQsettingsMixin,
+    UserConfigError,
 )
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.resources import icons
@@ -116,10 +117,18 @@ class BaseFrame(
                 self.connect_signals()
                 self.finalize_ui()
                 self._config["built"] = True
-        if "state" in self._config:
-            with ShowBusyMouse():
-                _state = self._config.pop("state")
-                self.restore_state(_state)
+                try:
+                    _state = self._config.pop("state", None)
+                    if _state:
+                        self.restore_state(_state)
+                except UserConfigError as exc:
+                    raise UserConfigError(
+                        "- Error restoring state for frame "
+                        + str(self.menu_title)
+                        + ": "
+                        + str(exc)
+                        + "\n"
+                    )
         self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
             self.sig_this_frame_activated.emit()  # type: ignore[attr-defined]
@@ -167,6 +176,28 @@ class BaseFrame(
             "class": self.__class__.__name__,
         }
 
+    def inject_frame_state(self, state: dict) -> None:
+        """
+        Inject a previously stored frame state and save it for restoration.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with the frame state information. The exact contents
+            may vary for each BaseFrame implementation.
+        """
+        self._config["state"] = state  # type: ignore[arg-type]
+        self.frame_index = state["frame_index"]
+        for _key, _val in state["params"].items():
+            # TODO: Discuss whether check for _key in self.params here is sensible
+            #       currently, the first wrong param will trigger an abort
+            # if _key in self.params and _key not in self.params_not_to_restore:
+            if _key not in self.params_not_to_restore:
+                try:
+                    self.set_param_value(_key, _val)
+                except Exception:
+                    raise UserConfigError(f"- Error restoring parameter '{_key}'\n")
+
     def restore_state(self, state: dict) -> None:
         """
         Restore the frame's state from stored information.
@@ -182,16 +213,10 @@ class BaseFrame(
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        if not self._config["built"]:
-            self._config["state"] = state  # type: ignore[arg-type]
-            return
-        self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
-                    self.set_param_and_widget_value(_key, _val)
-                else:
-                    self.set_param_value(_key, _val)
+                    self.update_param_widget_value(_key, _val)
 
     def closeEvent(self, event: QtCore.QEvent) -> None:
         """

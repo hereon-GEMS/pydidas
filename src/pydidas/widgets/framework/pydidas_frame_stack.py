@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ once they have been registered.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -36,7 +36,7 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import SingletonObject, utils
+from pydidas.core import SingletonObject, UserConfigError, utils
 from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.framework.base_frame import BaseFrame
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
@@ -356,9 +356,9 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         self.sig_mouse_entered.emit()
 
-    def restore_frame_states(self, state: dict[str, dict]):
+    def restore_frame_state_info(self, state: dict[str, dict]):
         """
-        Restore the states of all frames from the stored state information.
+        Restore the state info of all frames from the stored state information.
 
         Parameters
         ----------
@@ -369,11 +369,17 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         _unrestored_frames = self.frame_names
         _missing_frames = []
+        _errors = ""
         for _frame_name, _state in state.items():
             if _frame_name not in _unrestored_frames:
                 _missing_frames.append(_frame_name)
-            self.get_widget_by_name(_frame_name).restore_state(_state)
+            try:
+                self.get_widget_by_name(_frame_name).inject_frame_state(_state)
+            except UserConfigError as exc:
+                _errors += f"Frame '{_frame_name}':\n{str(exc)}\n"
             _unrestored_frames.remove(_frame_name)
+        if _errors:
+            raise UserConfigError(f"--- Frame states ---\n{_errors}")
         if _unrestored_frames:
             WarningBox(
                 "Unrestored frames",

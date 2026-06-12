@@ -583,41 +583,57 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
-        if state.upper() == "NONE":
-            return
-        if state.upper() == "SAVED":
-            filename = utils.get_standard_state_full_filename(self.STATE_FILENAME)
-        elif state.upper() == "EXIT":
-            filename = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
-        elif state.upper() == "MANUAL" and filename is None:
-            raise UserConfigError(
-                "A filename must be supplied for 'manual' gui state restoration."
-            )
-        elif state.upper() == "MANUAL" and os.path.isfile(filename):
-            pass
-        else:
-            raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
-        if not os.path.isfile(filename):
+        filename = self._resolve_state_filename(state, filename)
+        if filename is None or not os.path.isfile(filename):
             return
         with open(filename, "rt", encoding="UTF-8") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         if _state is None:
             return
-        try:
-            utils.restore_global_objects(_state)
-            self.restore_frame_states(_state)
-            self.restore_window_states(_state)
-            self.restore_main_window_state(_state.get("main", {}))
-        except Exception as exc:
-            if _state.get("pydidas_version", "0.0.0") != VERSION:
+        _errors = ""
+        restore_functions = [
+            lambda: utils.restore_global_objects(_state),
+            lambda: self.restore_frame_states(_state),
+            lambda: self.restore_window_states(_state),
+            lambda: self.restore_main_window_state(_state.get("main", {})),
+        ]
+        for _func in restore_functions:
+            try:
+                _func()
+            except UserConfigError as exc:
+                _errors += f"{str(exc)}\n"
+        if _errors:
+            raise UserConfigError(_errors)
+
+    def _resolve_state_filename(
+        self, state: str, filename: Optional[str]
+    ) -> Optional[str]:
+        """Get the correct filename based on the requested state."""
+        state_upper = state.upper()
+
+        if state_upper == "NONE":
+            return None
+
+        if state_upper == "SAVED":
+            return utils.get_standard_state_full_filename(self.STATE_FILENAME)
+
+        if state_upper == "EXIT":
+            filename = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
+            if not os.path.isfile(filename):
+                _exit_states = utils.get_available_exit_states()
+                if not _exit_states:
+                    return None
+                filename = utils.get_standard_state_full_filename(_exit_states[-1])
+            return filename
+
+        if state_upper == "MANUAL":
+            if filename is None:
                 raise UserConfigError(
-                    "Error during GUI state import.\n"
-                    "The saved state was not created with the current pydidas version "
-                    "and cannot be imported."
+                    "A filename must be supplied for 'manual' gui state restoration."
                 )
-            raise UserConfigError(
-                f"Error during GUI state import.\nThe following error occurred: {exc}\n"
-            )
+            return filename
+
+        raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
 
     def restore_window_states(self, state: dict):
         """
@@ -629,8 +645,14 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The dictionary with the required information to store and restore
             window states.
         """
+        _errors = ""
         for _key, _window in self._child_windows.items():
-            _window.restore_window_state(state[f"window::{_key}"])
+            try:
+                _window.restore_window_state(state[f"window::{_key}"])
+            except Exception as exc:
+                _errors += f"Window '{_key}':\n{str(exc)}\n"
+        if _errors:
+            raise UserConfigError(f"--- Window states ---\n{_errors}")
 
     def restore_main_window_state(self, state: dict):
         """
@@ -641,25 +663,33 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         state : dict
             The stored state of the main window.
         """
-        _app = QtWidgets.QApplication.instance()
-        if _app.screen_to_use is not None:
-            state["screen"] = _app.screen_to_use
-        _screens = _app.screens()
-        _screen_no = state.get("screen", 0)
-        _target_screen = _screens[_screen_no if _screen_no < len(_screens) else 0]
-        _target_screen_geo = _target_screen.availableGeometry()
-        if state["geometry"][0] + state["geometry"][2] > _target_screen_geo.width():
-            state["geometry"][2] = _target_screen_geo.width() - state["geometry"][0]
-        if state["geometry"][1] + state["geometry"][3] > _target_screen_geo.height():
-            state["geometry"][3] = _target_screen_geo.height() - state["geometry"][1]
-        state["geometry"][0] += _target_screen_geo.x()
-        state["geometry"][1] += _target_screen_geo.y()
-        if state["maximized"]:
-            self.setWindowState(QtCore.Qt.WindowMaximized)
-        _frame_index = state["frame_index"]
-        if _frame_index >= 0:
-            self.centralWidget().setCurrentIndex(_frame_index)
-        self.setGeometry(*state["geometry"])
+        try:
+            _app = QtWidgets.QApplication.instance()
+            if _app.screen_to_use is not None:
+                state["screen"] = _app.screen_to_use
+            _screens = _app.screens()
+            _screen_no = state.get("screen", 0)
+            _target_screen = _screens[_screen_no if _screen_no < len(_screens) else 0]
+            _target_screen_geo = _target_screen.availableGeometry()
+            if state["geometry"][0] + state["geometry"][2] > _target_screen_geo.width():
+                state["geometry"][2] = _target_screen_geo.width() - state["geometry"][0]
+            if (
+                state["geometry"][1] + state["geometry"][3]
+                > _target_screen_geo.height()
+            ):
+                state["geometry"][3] = (
+                    _target_screen_geo.height() - state["geometry"][1]
+                )
+            state["geometry"][0] += _target_screen_geo.x()
+            state["geometry"][1] += _target_screen_geo.y()
+            if state["maximized"]:
+                self.setWindowState(QtCore.Qt.WindowMaximized)
+            _frame_index = state["frame_index"]
+            if _frame_index >= 0:
+                self.centralWidget().setCurrentIndex(_frame_index)
+            self.setGeometry(*state["geometry"])
+        except Exception as exc:
+            raise UserConfigError(f"--- Main window state ---\n{str(exc)}\n")
 
     def restore_frame_states(self, state: dict):
         """
@@ -675,7 +705,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             for _key, _val in state.items()
             if _key.startswith("frame::")
         }
-        self.centralWidget().restore_frame_states(_frame_states)
+        self.centralWidget().restore_frame_state_info(_frame_states)
 
     @QtCore.Slot()
     def _open_help(self):

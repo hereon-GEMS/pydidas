@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ MainMenu class or relating to the MainMenu class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "get_standard_state_full_filename",
+    "get_available_exit_states",
     "clear_local_log_files",
     "open_doc_in_browser",
     "get_latest_release_tag",
@@ -35,6 +36,7 @@ __all__ = [
 ]
 
 import os
+import re
 from pathlib import Path
 
 import requests
@@ -73,6 +75,29 @@ def get_standard_state_full_filename(filename: str) -> Path:
         if _fname.is_file() and os.access(_fname, os.R_OK):
             return _fname
     return PYDIDAS_STANDARD_CONFIG_PATH.joinpath(filename)
+
+
+def get_available_exit_states() -> list[str]:
+    """
+    Get the available states from the standard config path.
+
+    Returns
+    -------
+    list[str]
+        The available state filenames.
+    """
+    _regex = r"^pydidas_gui_exit_state_[0-9]{2}\.[0-9]{2}\.[0-9]{2}.yaml$"
+    filenames = []
+    for _path in PYDIDAS_CONFIG_PATHS:
+        if not _path.exists():
+            continue
+        _files = [
+            _f for _f in _path.iterdir() if _f.is_file() and os.access(_f, os.R_OK)
+        ]
+        for _f in _files:
+            if re.search(_regex, _f.name):
+                filenames.append(_f.name)
+    return sorted(filenames)
 
 
 @QtCore.Slot()
@@ -170,10 +195,18 @@ def restore_global_objects(state: dict):
         The restored global states which includes the states for the
         global objects.
     """
+    _errors = ""
     try:
         TREE.restore_from_string(state["context::workflow_tree"])
     except KeyError:
-        raise UserConfigError("Cannot import Workflow. Not all plugins found.")
+        _errors.append("- Cannot import Workflow. Not all plugins found.")
     for _context_key, _context in GLOBAL_CONTEXTS.items():
         for _key, _val in state[f"context::{_context_key}"].items():
-            _context.set_param_value(_key, _val)
+            try:
+                _context.set_param_value(_key, _val)
+            except Exception:
+                _errors += (
+                    f"Context '{_context_key}':\n- Error restoring parameter '{_key}'\n"
+                )
+    if _errors:
+        raise UserConfigError(f"--- Global objects ---\n{_errors}")

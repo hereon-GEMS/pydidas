@@ -109,15 +109,14 @@ def start_pydidas_gui(
             _gui.restore_gui_state(state=restore_state)
         except UserConfigError as exc:
             _ = PydidasExceptionMessageBox(
-                text=str(exc), title="Errors during state import"
+                text=str(exc), title="Errors occurred during GUI state restoration"
             ).exec_()
         _gui.check_for_updates(auto_check=True)
         _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
     except Exception as _e:
-        #    _splash.close()
-        raise _e
+        _splash.close()
     if _app is not None:
         _app.deleteLater()
 

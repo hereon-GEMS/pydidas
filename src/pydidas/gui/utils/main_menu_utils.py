@@ -206,7 +206,7 @@ def restore_global_objects(state: dict):
                 _context.set_param_value(_key, _val)
             except Exception:
                 _errors += (
-                    f"- Failed to set parameter '{_key}' in context '{_context_key}'\n"
+                    f"Context '{_context_key}':\n- Error restoring parameter '{_key}'\n"
                 )
     if _errors:
-        raise UserConfigError(_errors)
+        raise UserConfigError(f"--- Global objects ---\n{_errors}")

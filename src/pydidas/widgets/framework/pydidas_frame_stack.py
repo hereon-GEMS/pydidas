@@ -369,16 +369,17 @@ class PydidasFrameStack(SingletonObject, QtWidgets.QStackedWidget):
         """
         _unrestored_frames = self.frame_names
         _missing_frames = []
+        _errors = ""
         for _frame_name, _state in state.items():
             if _frame_name not in _unrestored_frames:
                 _missing_frames.append(_frame_name)
             try:
                 self.get_widget_by_name(_frame_name).inject_frame_state(_state)
-            except Exception as exc:
-                raise UserConfigError(
-                    f"- Error restoring state for frame {_frame_name}: {str(exc)}\n"
-                )
+            except UserConfigError as exc:
+                _errors += f"Frame '{_frame_name}':\n{str(exc)}\n"
             _unrestored_frames.remove(_frame_name)
+        if _errors:
+            raise UserConfigError(f"--- Frame states ---\n{_errors}")
         if _unrestored_frames:
             WarningBox(
                 "Unrestored frames",

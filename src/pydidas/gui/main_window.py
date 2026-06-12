@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to select the different frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -287,10 +287,8 @@ class MainWindow(MainMenu):
         """
         try:
             MainMenu.restore_gui_state(self, state, filename)
-        except Exception as exc:
-            raise UserConfigError(
-                "Errors occurred during GUI state restoration:\n\n" + str(exc)
-            )
+        except UserConfigError as exc:
+            raise UserConfigError(exc)
         self.select_item(self.centralWidget().currentWidget().menu_entry)
 
     def export_main_window_state(self):

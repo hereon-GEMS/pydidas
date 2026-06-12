@@ -196,7 +196,7 @@ class BaseFrame(
                 try:
                     self.set_param_value(_key, _val)
                 except Exception:
-                    raise UserConfigError(f"- Error restoring parameter {_key}\n")
+                    raise UserConfigError(f"- Error restoring parameter '{_key}'\n")
 
     def restore_state(self, state: dict) -> None:
         """

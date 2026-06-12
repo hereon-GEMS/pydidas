@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,23 +21,24 @@ be used to display scrollable text.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ReadOnlyTextWidget"]
 
+
 from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
+from pydidas.core.exceptions import UserConfigError
 from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 
-raise AttributeError("Must continue work here to finish _print_contents")
 
 class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     """
-    A QTextEdit widget with some layout settings in setup and a more advanced setText.
+    A QTextEdit widget with advanced text display and formatting support.
 
     The ReadOnlyTextWidget is a subclass of QTextEdit and is used to
     display scrollable text. It allows four formatters for text.
@@ -47,23 +48,23 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     - 'section' : A single indent level and regular text
     - 'subsection' : Two indent levels and regular text
 
-    The formas can be specified in the :py:meth:`ReadOnlyTextWidget.append_text'
-    or specified if giving a list of items.
+    The formats can be specified in the :py:meth:`set_text` or
+    :py:meth:`append_text` method or by supplying a list of items.
 
     Parameters
     ----------
     parent : QWidget, optional
         The Qt parent widget. The default is None.
-    **kwargs : Any supported Qt arguments
-        Any arguments which have an associated setArgName method in Qt can be used
-        at creation.
+    **kwargs : Any
+        Any arguments which have an associated setArgName method in Qt can
+        be used at creation.
     """
 
     init_kwargs = PydidasWidgetMixin.init_kwargs + ["line_wrap_width"]
 
     # Class-level formatter objects (shared across all instances)
-    _BLOCK_FORMAT_HEADER = QtGui.QTextBlockFormat()
-    _BLOCK_FORMAT_HEADER.setIndent(0)
+    _BLOCK_FORMAT_STANDARD = QtGui.QTextBlockFormat()
+    _BLOCK_FORMAT_STANDARD.setIndent(0)
     _BLOCK_FORMAT_SECTION = QtGui.QTextBlockFormat()
     _BLOCK_FORMAT_SECTION.setIndent(1)
     _BLOCK_FORMAT_SUBSECTION = QtGui.QTextBlockFormat()
@@ -74,6 +75,16 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     _CHAR_FORMAT_BOLD.setFontWeight(QtGui.QFont.Bold)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any):
+        """
+        Initialize the ReadOnlyTextWidget.
+
+        Parameters
+        ----------
+        parent : QWidget, optional
+            The Qt parent widget. The default is None.
+        **kwargs : Any
+            Additional keyword arguments passed to PydidasWidgetMixin.
+        """
         QtWidgets.QTextEdit.__init__(self, parent)
         kwargs["minimumWidth"] = kwargs.get("minimumWidth", 300)
         kwargs["readOnly"] = kwargs.get("readOnly", True)
@@ -87,17 +98,15 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         PydidasWidgetMixin.__init__(self, **kwargs)
         if hasattr(self._qtapp, "sig_font_size_changed"):
             self._qtapp.sig_font_size_changed.connect(self.reprint)
-        self._current_content : list[tuple[str, str]] = [("simple", "")]
-        self.self._title : str = ""
+        self._current_content: list[tuple[str, str]] = self.default_text
+        self._title: str = ""
         self.setLineWrapMode(QtWidgets.QTextEdit.FixedColumnWidth)
         self.setLineWrapColumnOrWidth(kwargs.get("line_wrap_width", 80))
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
 
-    def setText(
-        self,
-        text: str,
-        title: str = "",
-    ):
+    # Re-implemented Qt methods:
+
+    def setText(self, text: str, title: str = "") -> None:
         """
         Set the widget's text.
 
@@ -105,7 +114,7 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         ----------
         text : str
             The text to be displayed.
-        title : str, optional
+        title : str
             The title. If an empty string, no title will be printed.
             The default is ''.
         """
@@ -113,26 +122,60 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self._current_content = [("plain", text)]
         self._print_contents()
 
-    # define an alias in Python style
+    @QtCore.Slot()
+    def reprint(self) -> None:
+        """Reprint the latest text with the updated font settings."""
+        self._print_contents()
+
+    @QtCore.Slot()
+    def clear(self) -> None:
+        """Clear the widget and reset the content tracking."""
+        super().clear()
+        self._current_content = self.default_text
+
+    # New public methods:
+
+    # Set an alias for setText in Python style
     set_text = setText
 
-    def append_text(self, text: str, formatter: str="plain"):
+    @property
+    def default_text(self) -> list[tuple[str, str]]:
+        """Get the default text (the first entry in the content list)."""
+        return [("plain", "")]
+
+    def append_text(self, text: str, formatter: str = "plain") -> None:
         """
+        Append text to the widget with a specified formatter.
 
         Parameters
         ----------
         text : str
             The text to be appended.
-        formatter : str, optional
+        formatter : str
             The formatter of the text. Can be 'plain', 'header', 'section',
             or 'subsection'. The default is 'plain'.
         """
-        self._current_content.append((formatter, text))
+        _entry = (formatter, text)
+        self._current_content.append(_entry)
+        self._print_contents()
 
-    # TODO: Rename set_text_from_list to reasonable name
-    def set_text_from_list(self, ):
+    def prepend_text(self, text: str, formatter: str = "plain") -> None:
+        """
+        Prepend text to the widget with a specified formatter.
 
-    def update_title(self, title: str):
+        Parameters
+        ----------
+        text : str
+            The text to be appended.
+        formatter : str
+            The formatter of the text. Can be 'plain', 'header', 'section',
+            or 'subsection'. The default is 'plain'.
+        """
+        _entry = (formatter, text)
+        self._current_content.insert(0, _entry)
+        self._print_contents()
+
+    def set_title(self, title: str) -> None:
         """
         Update the displayed title without changing the text.
 
@@ -144,42 +187,16 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self._title = title
         self._print_contents()
 
-
-    def _print_contents(self) -> None:
-        """Print the current content."""
-        self.clear()
-
-        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
-
-    def _add_title(self, title: str):
-        """
-        Add the title to the box, if given.
-
-        Parameters
-        ----------
-        title : str
-            The title to be added. Use an empty string to skip the title.
-        """
-        self.self._title = title
-        if title == "":
-            return
-        self.setFontPointSize(self._qtapp.font_size + 3)
-        self.setFontWeight(QtGui.QFont.Bold)
-        self.append(f"{title}\n")
-        self.setFontPointSize(self._qtapp.font_size + 1)
-        self.setFontWeight(QtGui.QFont.Normal)
-
+    # TODO: Rename set_text_from_list to reasonable name
     def set_text_from_list(
-        self,
-        text_list: list[tuple[str, str]],
-        title: str  | None = ""
-    ):
+        self, text_list: list[tuple[str, str]], title: str = ""
+    ) -> None:
         """
         Set the widget's text from a list of entries.
 
         Each entry in the list is a tuple with the first element being the
         `type` of the entry (header, section, subsection) and the second
-        element being the value. The type will determine the formatterting of
+        element being the value. The type will determine the formatting of
         the entry.
 
         Parameters
@@ -187,40 +204,53 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         text_list: list[tuple[str, str]]
             The list of entries. Each entry is a tuple with the formatter key
             and text entries to be displayed.
-        title : str or None, optional
-            The title. If None, the current title will be kept. If an empty
-            string, no title will be printed. The default is ''.
+        title : str
+            The title. If an empty string, no title will be printed.
+            The default is ''.
         """
         self._current_content = text_list
-        if title is not None:
-            self._title = title
+        self._title = title
+        self._print_contents()
 
+        # Private methods:
 
-            self._add_title(title)
-        cursor = self.textCursor()
-
-        for _type, _value in text_list:
-            if _type == "header":
-                cursor.setBlockFormat(self._BLOCK_FORMAT_HEADER)
-                cursor.setCharFormat(self._CHAR_FORMAT_BOLD)
-                cursor.insertText(f"\n{_value}:\n")
-            elif _type == "section":
-                cursor.setBlockFormat(self._BLOCK_FORMAT_SECTION)
-                cursor.setCharFormat(self._CHAR_FORMAT_NORMAL)
-                self.setFontWeight(QtGui.QFont.Normal)
-                cursor.insertText(f"{_value}\n")
-            elif _type == "subsection":
-                cursor.setBlockFormat(self._BLOCK_FORMAT_SUBSECTION)
-                cursor.setCharFormat(self._CHAR_FORMAT_NORMAL)
-                cursor.insertText(f"{_value}\n")
-
-    @QtCore.Slot()
-    def reprint(self):
-        """
-        Reprint the latest text with the updated font settings.
-        """
+    def _print_contents(self) -> None:
+        """Print the currently stored content."""
+        super().clear()
+        self._print_title()
         self.setFontPointSize(self._qtapp.font_size + 1)
-        if isinstance(self._current_content, list):
-            self.set_text_from_list(self._current_content, title=self.self._title)
-        else:
-            self.setText(self._current_content, title=self.self._title)
+        _cursor = self.textCursor()
+        for _type, _value in self._current_content:
+            if _value == "":
+                continue
+            if _type == "header":
+                _block_format = self._BLOCK_FORMAT_STANDARD
+                _char_format = self._CHAR_FORMAT_BOLD
+            elif _type == "section":
+                _block_format = self._BLOCK_FORMAT_SECTION
+                _char_format = self._CHAR_FORMAT_NORMAL
+            elif _type == "subsection":
+                _block_format = self._BLOCK_FORMAT_SUBSECTION
+                _char_format = self._CHAR_FORMAT_NORMAL
+            elif _type == "plain":
+                _block_format = self._BLOCK_FORMAT_STANDARD
+                _char_format = self._CHAR_FORMAT_BOLD
+            else:
+                raise UserConfigError(
+                    f"Unsupported formatter type: {_type} in ReadOnlyTextWidget. "
+                    "Supported types are `plain`, `header`, `section`, and "
+                    "`subsection`."
+                )
+            _cursor.setBlockFormat(_block_format)
+            _cursor.setCharFormat(_char_format)
+            _cursor.insertText(f"\n{_value}:\n")
+        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
+
+    def _print_title(self) -> None:
+        """Print the box title, if set."""
+        if self._title:
+            self.setFontPointSize(self._qtapp.font_size + 3)
+            self.setFontWeight(QtGui.QFont.Bold)
+            self.append(f"{self._title}\n")
+            self.setFontPointSize(self._qtapp.font_size + 1)
+            self.setFontWeight(QtGui.QFont.Normal)

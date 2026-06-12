@@ -20,6 +20,8 @@ Programmatic changes
   datasets in HDF5 files.
 - Modified the way singletons are created and handled for a cleaner
   architecture.
+- Reworked ReadOnlyTextWidget to allow appending and prepending text 
+  to the widget text in a generic way.
 
 Bugfixes
 --------

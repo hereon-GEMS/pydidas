@@ -45,7 +45,6 @@ from .parameter_collection_mixin import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
 from .singleton import *
-from .singleton_object import *
 
 
 __all__: list[str] = (  # type: ignore[reportUnsupportedDunderAll]

@@ -37,6 +37,8 @@ Bugfixes
   processing queue for signals and its use in PydidasPlot1d.
 - Fixed an issue with importing data with scan dimensions of size 1 which
   were squeezed during export.
+- Fixed an issue where the plotted labels for columnar data were not 
+  properly reset on loading new data.
 
 
 v26.05.19

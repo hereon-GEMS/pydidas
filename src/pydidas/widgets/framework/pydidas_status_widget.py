@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ which is used as a global logging and status widget.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,10 +30,10 @@ __all__ = ["PydidasStatusWidget"]
 
 from typing import Any
 
-from qtpy import QtCore, QtGui, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core.singleton import QtSingleton
-from pydidas.core.utils import get_time_string
+from pydidas.core.utils import get_short_time_string
 from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas_qtcore import PydidasQApplication
 
@@ -49,15 +49,10 @@ _ALLOWED_AREAS: QtCore.Qt.DockWidgetAreas = (
     | QtCore.Qt.BottomDockWidgetArea
 )
 
-raise AttributeError(
-    "Must finish rework of ReadOnlyTextWidget and then solve the issue"
-    "of disappearing entries on font resize"
-)
-
 
 class PydidasStatusWidget(QtWidgets.QDockWidget, metaclass=QtSingleton):
     """
-    The PydidasStatusWidget is used for managing global status messages.
+    The StatusWidget is used for managing global status messages.
     """
 
     def __init__(self, *_args: Any, **_kwargs: Any) -> None:
@@ -99,19 +94,11 @@ class PydidasStatusWidget(QtWidgets.QDockWidget, metaclass=QtSingleton):
         text : str
             The text to add.
         """
-        if text[-1] != "\n":
-            text = text + "\n"
-        _cursor = self._text_edit.textCursor()
-        _cursor.movePosition(QtGui.QTextCursor.Start, QtGui.QTextCursor.MoveAnchor, 1)
-        self._text_edit.setTextCursor(_cursor)
-        _formatted_text = f"{get_time_string()}: {text}"
-        self._text_edit.insertPlainText(_formatted_text)
-        # Update the internal content tracking for font changes
-        self._text_edit._current_content = (
-            _formatted_text + self._text_edit._current_content
-        )
+        text = text.removesuffix("\n")
+        _message = f"{get_short_time_string()}: {text}"
+        self._text_edit.prepend_text(_message, "plain")
         self._text_edit.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum
+            QtWidgets.QScrollBar.SliderToMaximum
         )
 
     @QtCore.Slot()

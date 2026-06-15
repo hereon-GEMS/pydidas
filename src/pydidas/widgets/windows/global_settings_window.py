@@ -33,13 +33,14 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import SingletonObject, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, QSETTINGS_GLOBAL_KEYS
+from pydidas.core.singleton import QtSingleton
 from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 
-class GlobalSettingsWindow(SingletonObject, PydidasWindow):
+class GlobalSettingsWindow(PydidasWindow, metaclass=QtSingleton):
     """
     A window to modify global pydidas settings.
     """
@@ -52,7 +53,8 @@ class GlobalSettingsWindow(SingletonObject, PydidasWindow):
 
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
-    def initialize(self, **kwargs: Any) -> None:
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas system settings")
 

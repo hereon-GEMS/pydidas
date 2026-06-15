@@ -91,18 +91,23 @@ class PydidasPlot1D(Plot1D):
         clear_data : bool, optional
             Flag to remove all items from the stored data dictionary as well.
         """
-        _backend = self.getBackend()
-        _ax = _backend.ax
-        _ax.xaxis.set_major_locator(AutoLocator())
-        _ax.xaxis.set_major_formatter(ScalarFormatter())
-        _ax.yaxis.set_major_locator(AutoLocator())
-        _ax.yaxis.set_major_formatter(ScalarFormatter())
+        self.reset_ticks()
         self.setGraphTitle("")
         self.setGraphYLabel("Y")
         self.setGraphXLabel("X")
         self.remove()
         if clear_data:
             self._current_raw_data = {}
+
+    def reset_ticks(self) -> None:
+        """Reset the axis ticks to their default state."""
+        _backend = self.getBackend()
+        _ax = _backend.ax
+        _ax.xaxis.set_major_locator(AutoLocator())
+        _ax.xaxis.set_major_formatter(ScalarFormatter())
+        _ax.yaxis.set_major_locator(AutoLocator())
+        _ax.yaxis.set_major_formatter(ScalarFormatter())
+        _ax.tick_params(axis="x", labelrotation=0)
 
     def plot_data(self, data: np.ndarray, **kwargs: Any) -> None:
         """
@@ -176,6 +181,8 @@ class PydidasPlot1D(Plot1D):
         _reset_zoom = kwargs.pop("resetzoom", True)
         if kwargs.pop("replace", True):
             self.clear_plot()
+        else:
+            self.reset_ticks()
         _i_data = 0 if data.ndim == 1 else 1
         check_data_dimensions(data, 1)
         _plot_kwargs = self._process_plot_kwargs(kwargs)

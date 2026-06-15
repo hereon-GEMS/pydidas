@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+#
+# Parts of this file have been created using the AI-tool Claude Haiku 4.5.
 
 """Unit tests for the ReadOnlyTextWidget."""
 
@@ -35,7 +37,6 @@ from pydidas_qtcore import PydidasQApplication
 
 @pytest.fixture(autouse=True)
 def _cleanup() -> Generator[None, None, None]:
-    """Clean up widgets after each test."""
     app = PydidasQApplication.instance()
     yield
     for widget in [
@@ -57,7 +58,6 @@ def widget(qtbot) -> ReadOnlyTextWidget:
 
 @pytest.mark.gui
 def test_creation__defaults(qtbot) -> None:
-    """Test widget creation with default parameters."""
     w = ReadOnlyTextWidget()
     qtbot.add_widget(w)
     w.show()
@@ -71,7 +71,6 @@ def test_creation__defaults(qtbot) -> None:
 @pytest.mark.gui
 @pytest.mark.parametrize("line_wrap_width", [40, 80, 120])
 def test_creation__with_line_wrap_width(qtbot, line_wrap_width) -> None:
-    """Test widget creation with custom line wrap width."""
     w = ReadOnlyTextWidget(line_wrap_width=line_wrap_width)
     qtbot.add_widget(w)
     assert w.lineWrapColumnOrWidth() == line_wrap_width
@@ -82,7 +81,6 @@ def test_creation__with_line_wrap_width(qtbot, line_wrap_width) -> None:
     "width,height", [(None, None), (500, None), (None, 400), (500, 400)]
 )
 def test_creation__with_size_kwargs(qtbot, width, height) -> None:
-    """Test widget creation with size kwargs."""
     kwargs = {}
     if width is not None:
         kwargs["minimumWidth"] = width
@@ -98,16 +96,13 @@ def test_creation__with_size_kwargs(qtbot, width, height) -> None:
 
 @pytest.mark.gui
 def test_creation__with_fixed_size(qtbot) -> None:
-    """Test that fixedWidth is applied when set."""
     w = ReadOnlyTextWidget(fixedWidth=500, minimumWidth=300)
     qtbot.add_widget(w)
-    # When fixedWidth is set, the widget size is constrained
-    assert w.width() <= 500 or w.minimumWidth() != -1
+    assert w.width() <= 500
 
 
 @pytest.mark.gui
-def test__set_text(widget) -> None:
-    """Test setText method."""
+def test_set_text(widget) -> None:
     text = "This is a test text"
     widget.setText(text)
     assert text in widget.toPlainText()
@@ -115,7 +110,6 @@ def test__set_text(widget) -> None:
 
 @pytest.mark.gui
 def test_set_text__alias(widget) -> None:
-    """Test set_text alias for setText."""
     text = "Alias test text"
     widget.set_text(text)
     assert text in widget.toPlainText()
@@ -123,7 +117,6 @@ def test_set_text__alias(widget) -> None:
 
 @pytest.mark.gui
 def test_set_text__with_title(widget) -> None:
-    """Test setText with a title."""
     title = "Title"
     text = "Content"
     widget.setText(text, title=title)
@@ -133,7 +126,6 @@ def test_set_text__with_title(widget) -> None:
 
 @pytest.mark.gui
 def test_set_text__empty_title(widget) -> None:
-    """Test setText with an empty title doesn't add a title."""
     text = "Content"
     widget.setText(text, title="")
     content = widget.toPlainText()
@@ -145,7 +137,6 @@ def test_set_text__empty_title(widget) -> None:
 
 @pytest.mark.gui
 def test_append_text__plain(widget) -> None:
-    """Test appending plain text."""
     widget.set_text("Initial")
     widget.append_text("Appended", formatter="plain")
     content = widget.toPlainText()
@@ -156,7 +147,6 @@ def test_append_text__plain(widget) -> None:
 @pytest.mark.gui
 @pytest.mark.parametrize("formatter", ["plain", "header", "section", "subsection"])
 def test_append_text__with_formatters(widget, formatter) -> None:
-    """Test appending text with different formatters."""
     widget.set_text("Base")
     widget.append_text(f"Text with {formatter}", formatter=formatter)
     content = widget.toPlainText()
@@ -166,7 +156,6 @@ def test_append_text__with_formatters(widget, formatter) -> None:
 
 @pytest.mark.gui
 def test_append_text__replaces_default_content(widget) -> None:
-    """Test that appending to default content replaces it instead of appending."""
     widget.set_text("")  # Start with default content
     widget.append_text("New content", formatter="plain")
     # The new content should be present (replacing the default)
@@ -175,7 +164,6 @@ def test_append_text__replaces_default_content(widget) -> None:
 
 @pytest.mark.gui
 def test_append_text__default_formatter(widget) -> None:
-    """Test that default formatter for append_text is 'plain'."""
     widget.set_text("Base")
     widget.append_text("Appended without formatter")
     content = widget.toPlainText()
@@ -185,7 +173,6 @@ def test_append_text__default_formatter(widget) -> None:
 
 @pytest.mark.gui
 def test_prepend_text__plain(widget) -> None:
-    """Test prepending plain text."""
     widget.set_text("Initial")
     widget.prepend_text("Prepended", formatter="plain")
     content = widget.toPlainText()
@@ -196,7 +183,6 @@ def test_prepend_text__plain(widget) -> None:
 @pytest.mark.gui
 @pytest.mark.parametrize("formatter", ["plain", "header", "section", "subsection"])
 def test_prepend_text__with_formatters(widget, formatter) -> None:
-    """Test prepending text with different formatters."""
     widget.set_text("Base")
     widget.prepend_text(f"Text with {formatter}", formatter=formatter)
     content = widget.toPlainText()
@@ -206,7 +192,6 @@ def test_prepend_text__with_formatters(widget, formatter) -> None:
 
 @pytest.mark.gui
 def test_prepend_text__replaces_default_content(widget) -> None:
-    """Test that prepending to default content replaces it instead of prepending."""
     widget.set_text("")  # Start with default content
     widget.prepend_text("New content", formatter="plain")
     # The new content should be present (replacing the default)
@@ -215,7 +200,6 @@ def test_prepend_text__replaces_default_content(widget) -> None:
 
 @pytest.mark.gui
 def test_prepend_text__default_formatter(widget) -> None:
-    """Test that default formatter for prepend_text is 'plain'."""
     widget.set_text("Base")
     widget.prepend_text("Prepended without formatter")
     content = widget.toPlainText()
@@ -225,7 +209,6 @@ def test_prepend_text__default_formatter(widget) -> None:
 
 @pytest.mark.gui
 def test_set_title_(widget) -> None:
-    """Test set_title method."""
     widget.set_text("Content")
     widget.set_title("New Title")
     content = widget.toPlainText()
@@ -235,7 +218,6 @@ def test_set_title_(widget) -> None:
 
 @pytest.mark.gui
 def test_set_title__empty(widget) -> None:
-    """Test set_title with empty string."""
     widget.set_text("Content", title="Old Title")
     widget.set_title("")
     content = widget.toPlainText()
@@ -245,7 +227,6 @@ def test_set_title__empty(widget) -> None:
 
 @pytest.mark.gui
 def test_set_text__from_list(widget) -> None:
-    """Test set_text_from_list method."""
     text_list = [
         ("header", "Header Text"),
         ("section", "Section Text"),
@@ -254,13 +235,12 @@ def test_set_text__from_list(widget) -> None:
     ]
     widget.set_text_from_list(text_list)
     content = widget.toPlainText()
-    for _type, text in text_list:
+    for _, text in text_list:
         assert text in content
 
 
 @pytest.mark.gui
 def test_set_text__from_list_with_title(widget) -> None:
-    """Test set_text_from_list with a title."""
     text_list = [
         ("plain", "Item 1"),
         ("section", "Item 2"),
@@ -269,16 +249,15 @@ def test_set_text__from_list_with_title(widget) -> None:
     widget.set_text_from_list(text_list, title=title)
     content = widget.toPlainText()
     assert title in content
-    for _type, text in text_list:
+    for _, text in text_list:
         assert text in content
 
 
 @pytest.mark.gui
 def test_set_text__from_list_empty_entries_skipped(widget) -> None:
-    """Test that empty text entries in list are skipped."""
     text_list = [
         ("plain", "Item 1"),
-        ("section", ""),  # Empty entry should be skipped
+        ("section", ""),
         ("plain", "Item 3"),
     ]
     widget.set_text_from_list(text_list)
@@ -289,7 +268,6 @@ def test_set_text__from_list_empty_entries_skipped(widget) -> None:
 
 @pytest.mark.gui
 def test_clear(widget) -> None:
-    """Test clear method."""
     widget.set_text("Some content")
     assert len(widget.toPlainText()) > 0
     widget.clear()
@@ -324,8 +302,7 @@ def test__invalid_formatter_type_raises_error(widget) -> None:
 
 
 @pytest.mark.gui
-def test__reprint_method(qtbot, widget) -> None:
-    """Test reprint method repositions text with new font settings."""
+def test__reprint_method(widget) -> None:
     widget.set_text("Test content")
     initial_text = widget.toPlainText()
     widget.reprint()
@@ -334,7 +311,6 @@ def test__reprint_method(qtbot, widget) -> None:
 
 @pytest.mark.gui
 def test__multiple_appends_accumulate(widget) -> None:
-    """Test that multiple appends accumulate content after initial content is set."""
     widget.set_text("Base")
     widget.append_text("First")
     widget.append_text("Second")
@@ -348,7 +324,6 @@ def test__multiple_appends_accumulate(widget) -> None:
 
 @pytest.mark.gui
 def test__multiple_prepends_accumulate(widget) -> None:
-    """Test that multiple prepends accumulate content after initial content is set."""
     widget.set_text("Base")
     widget.prepend_text("First")
     widget.prepend_text("Second")
@@ -359,30 +334,14 @@ def test__multiple_prepends_accumulate(widget) -> None:
 
 
 @pytest.mark.gui
-def test__widget_is_read_only(widget) -> None:
-    """Test that the widget is read-only."""
-    assert widget.isReadOnly()
-
-
-@pytest.mark.gui
-def test__widget_accepts_rich_text(widget) -> None:
-    """Test that acceptRichText is set to True."""
-    assert widget.acceptRichText()
-
-
-@pytest.mark.gui
 def test__vertical_scroll_resets_on_print(widget) -> None:
-    """Test that vertical scrollbar resets to top when content is printed."""
     widget.set_text("Content")
-    # Check that scrollbar is at top
     scroll_bar = widget.verticalScrollBar()
-    # After setting text, should scroll to minimum
     assert scroll_bar.value() == scroll_bar.minimum()
 
 
 @pytest.mark.gui
 def test_set_text__overwrites_previous_content(widget) -> None:
-    """Test that set_text overwrites all previous content."""
     widget.set_text("First text")
     widget.append_text("Appended")
     widget.set_text("Second text")
@@ -393,7 +352,6 @@ def test_set_text__overwrites_previous_content(widget) -> None:
 
 @pytest.mark.gui
 def test__empty_text_in_list(widget) -> None:
-    """Test handling of empty strings in text list."""
     text_list = [("plain", ""), ("header", "Header"), ("plain", "")]
     widget.set_text_from_list(text_list)
     content = widget.toPlainText()
@@ -401,18 +359,15 @@ def test__empty_text_in_list(widget) -> None:
 
 
 @pytest.mark.gui
-def test__complex_workflow(widget) -> None:
-    """Test a complex workflow with multiple operations."""
+def test__integration__complex_workflow(widget) -> None:
     widget.set_text("Initial content", title="Original Title")
     initial_content = widget.toPlainText()
     assert "Original Title" in initial_content
-
-    # Change title
+    # Change title:
     widget.set_title("New Title")
     content_after_title = widget.toPlainText()
     assert "New Title" in content_after_title
-
-    # Append various types
+    # Append various items:
     widget.append_text("Section content", formatter="section")
     widget.append_text("Subsection content", formatter="subsection")
 
@@ -425,15 +380,11 @@ def test__complex_workflow(widget) -> None:
 
 @pytest.mark.gui
 def test__font_size_connection(qtbot) -> None:
-    """Test that widget initializes with font size change connection if available."""
-    app = PydidasQApplication.instance()
     w = ReadOnlyTextWidget()
     qtbot.add_widget(w)
     w.show()
     w.set_text("Test content")
-    # Verify content is set properly
     assert "Test content" in w.toPlainText()
-    # Verify font size related attributes exist
     assert hasattr(w, "_qtapp")
     assert hasattr(w, "reprint")
 

@@ -32,8 +32,7 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
-from numbers import Integral
-from typing import Optional, Union
+from typing import Any, Optional
 
 import numpy as np
 from qtpy import QtCore
@@ -87,7 +86,7 @@ class ExecuteWorkflowApp(BaseApp):
     autosave_results : bool, optional
         Use this flag to control whether result data should be automatically
         saved to disk. The default is False.
-    autosave_directory : Union[pathlib.Path, str], optional
+    autosave_directory : Path or str, optional
         The directory for autosave_files. If autosave_results is True, the
         directory must be set.
     autosave_format : str
@@ -102,16 +101,19 @@ class ExecuteWorkflowApp(BaseApp):
 
     Parameters
     ----------
-    *args : tuple
+    *args : Any
         Any number of Parameters. These will be added to the app's
         ParameterCollection.
-    **kwargs : dict
+    **kwargs : Any
         Parameters supplied with their reference key as dict key and the
         Parameter itself as value.
     """
 
     default_params = get_generic_param_collection(
-        "autosave_results", "autosave_directory", "autosave_format", "live_processing"
+        "autosave_results",
+        "autosave_directory",
+        "autosave_format",
+        "live_processing",
     )
     parse_func = execute_workflow_app_parser
     attributes_not_to_copy_to_app_clone = (
@@ -124,7 +126,7 @@ class ExecuteWorkflowApp(BaseApp):
     )
     sig_results_updated = QtCore.Signal()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.print_debug = kwargs.pop("print_debug", False)
         BaseApp.__init__(self, *args, **kwargs)
         self._config.update(
@@ -145,7 +147,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._prepare_mp_configuration()
         self.reset_runtime_vars()
 
-    def _prepare_mp_configuration(self):
+    def _prepare_mp_configuration(self) -> None:
         """
         Prepare the multiprocessing configuration for the app.
 
@@ -176,7 +178,7 @@ class ExecuteWorkflowApp(BaseApp):
         )
         self.mp_manager["buffer_n"] = self._mp_manager_instance.Value("I", 0)
 
-    def reset_runtime_vars(self):
+    def reset_runtime_vars(self) -> None:
         """
         Reset the runtime variables for a new run.
         """
@@ -190,13 +192,13 @@ class ExecuteWorkflowApp(BaseApp):
                 if _key.startswith("shape") or _key.endswith("_dict"):
                     _val.clear()
 
-    def multiprocessing_pre_run(self):
+    def multiprocessing_pre_run(self) -> None:
         """
         Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
 
-    def prepare_run(self):
+    def prepare_run(self) -> None:
         """
         Prepare running the workflow execution.
 
@@ -227,7 +229,7 @@ class ExecuteWorkflowApp(BaseApp):
         TREE.prepare_execution()
         self._config["run_prepared"] = True
 
-    def _recreate_context(self):
+    def _recreate_context(self) -> None:
         """
         Recreate the required context from the config for app clones.
         """
@@ -237,7 +239,7 @@ class ExecuteWorkflowApp(BaseApp):
         for _key, _val in self._config["exp_context"].items():
             EXP.set_param_value(_key, _val)
 
-    def close_shared_arrays_and_memory(self):
+    def close_shared_arrays_and_memory(self) -> None:
         """
         Close (and unlink) the shared memory buffers.
 
@@ -253,12 +255,12 @@ class ExecuteWorkflowApp(BaseApp):
                     _buffer.unlink()
                 except FileNotFoundError:
                     logger.error(
-                        "Error while unlinking shared memory buffers from app: %s %s "
-                        % (_buffer, self)
+                        "Error while unlinking shared memory buffers from "
+                        f"app: {_buffer} {self}"
                     )
                     pass
 
-    def _store_context(self):
+    def _store_context(self) -> None:
         """
         Store the current context for app clone instances.
         """
@@ -281,7 +283,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return self._mp_tasks
 
-    def multiprocessing_pre_cycle(self, index: int):
+    def multiprocessing_pre_cycle(self, index: int) -> None:
         """
         Store the reference to the frame index internally.
 
@@ -321,7 +323,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return self.mp_manager["shapes_set"].is_set()
 
-    def multiprocessing_func(self, index: int) -> Union[None, int]:
+    def multiprocessing_func(self, index: int) -> None | int:
         """
         Perform key operation with parallel processing.
 
@@ -337,8 +339,8 @@ class ExecuteWorkflowApp(BaseApp):
 
         Returns
         -------
-        _image : pydidas.core.Dataset
-            The (pre-processed) image.
+        None or int
+            None in clone mode, -1 on FileReadError, or buffer position.
         """
         try:
             with warnings.catch_warnings():
@@ -358,7 +360,7 @@ class ExecuteWorkflowApp(BaseApp):
         return self._config["buffer_pos"]
 
     @QtCore.Slot()
-    def multiprocessing_post_run(self):
+    def multiprocessing_post_run(self) -> None:
         """
         Perform operations after running the main parallel processing function.
 
@@ -366,7 +368,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         self.close_shared_arrays_and_memory()
 
-    def _publish_shapes_and_metadata_to_manager(self):
+    def _publish_shapes_and_metadata_to_manager(self) -> None:
         """
         Publish the shapes and metadata to the multiprocessing manager dictionaries.
         """
@@ -383,7 +385,7 @@ class ExecuteWorkflowApp(BaseApp):
         self.mp_manager["shapes_available"].set()
         RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
 
-    def _create_shared_memory(self):
+    def _create_shared_memory(self) -> None:
         """
         Create the necessary shared memory for passing the results.
 
@@ -405,7 +407,7 @@ class ExecuteWorkflowApp(BaseApp):
         self._initialize_shared_memory()
         self._initialize_arrays_from_shared_memory()
 
-    def _check_size_of_results_and_buffer(self):
+    def _check_size_of_results_and_buffer(self) -> None:
         """
         Check the size of results and the buffer size.
 
@@ -425,17 +427,17 @@ class ExecuteWorkflowApp(BaseApp):
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker
             raise UserConfigError(
-                "The defined buffer is too small. The required memory per diffraction "
-                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
-                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
-                "\nPlease update the buffer size or change number of workers in the "
-                "global settings."
+                "The defined buffer is too small. The required memory per "
+                f"diffraction image is {_req_mem_per_dataset:.3f} MB and "
+                f"{_n_worker} workers have been defined. The minimum buffer "
+                f"size must be {_min_buffer:.2f} MB. Please update the buffer "
+                "size or change number of workers in the global settings."
             )
         self.mp_manager["buffer_n"].value = min(
             _n_dataset_in_buffer, _n_data, self._mp_tasks.size
         )
 
-    def _initialize_shared_memory(self):
+    def _initialize_shared_memory(self) -> None:
         """
         Initialize the shared arrays from the buffer size and result shapes.
         """
@@ -452,7 +454,7 @@ class ExecuteWorkflowApp(BaseApp):
             )
         self.mp_manager["shapes_set"].set()
 
-    def _initialize_arrays_from_shared_memory(self):
+    def _initialize_arrays_from_shared_memory(self) -> None:
         """
         Initialize the numpy arrays from the shared memory buffers.
         """
@@ -468,13 +470,13 @@ class ExecuteWorkflowApp(BaseApp):
             (_buffer_size,), dtype=np.int32, buffer=_shared_mem.buf
         )
 
-    def __get_shared_memory(self, name: Union[str, int]) -> SharedMemory:
+    def __get_shared_memory(self, name: str | int) -> SharedMemory:
         """
         Get the SharedMemory object from the shared memory buffers.
 
         Parameters
         ----------
-        name : Union[str, int]
+        name : str or int
             The name of the shared memory buffer.
 
         Returns
@@ -488,7 +490,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._locals["shared_memory_buffers"][name] = _mem_buffer
         return self._locals["shared_memory_buffers"][name]
 
-    def __write_results_to_shared_arrays(self):
+    def __write_results_to_shared_arrays(self) -> None:
         """Write the results from the WorkflowTree execution to the shared array."""
         if self._shared_arrays == dict():
             self._initialize_arrays_from_shared_memory()
@@ -537,7 +539,7 @@ class ExecuteWorkflowApp(BaseApp):
         return self._config["buffer_pos"]
 
     @QtCore.Slot(str)
-    def received_signal_message(self, message: str):
+    def received_signal_message(self, message: str) -> None:
         """
         Process the received signal message.
 
@@ -552,15 +554,15 @@ class ExecuteWorkflowApp(BaseApp):
             self._create_shared_memory()
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index: Integral, data_index: Integral):
+    def multiprocessing_store_results(self, index: int, data_index: int) -> None:
         """
         Store the results of the multiprocessing operation.
 
         Parameters
         ----------
-        index : Integral
+        index : int
             The index of the processed task.
-        data_index : Integral
+        data_index : int
             The index to retrieve the results from multiprocessing_func.
         """
         if self.clone_mode:
@@ -570,8 +572,8 @@ class ExecuteWorkflowApp(BaseApp):
         if data_index == -1:
             _filename = TREE.root.plugin.get_filename(index)
             PydidasQApplication.instance().set_status_message(
-                f"File reading error during processing of scan index #{index}."
-                f" (filename: {_filename})"
+                f"File reading error during processing of scan index #{index}. "
+                f"(filename: {_filename})"
             )
             return
         if not self._config["result_metadata_set"]:
@@ -599,14 +601,14 @@ class ExecuteWorkflowApp(BaseApp):
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
         self.sig_results_updated.emit()
 
-    def deleteLater(self):
+    def deleteLater(self) -> None:
         """
         Delete the instance of the ExecuteWorkflowApp.
         """
         self.__del__()
         super().deleteLater()
 
-    def __del__(self):
+    def __del__(self) -> None:
         """
         Delete the ExecuteWorkflowApp.
         """

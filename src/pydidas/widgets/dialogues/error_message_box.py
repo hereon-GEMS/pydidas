@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["ErrorMessageBox"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core.constants import (
@@ -49,13 +51,13 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
 
     Parameters
     ----------
-    *args : tuple
-        Arguments passed to QtWidgets.QDialogue instanciation.
-    **kwargs : dict
-        Keyword arguments passed to QtWidgets.QDialogue instanciation.
+    *args : Any
+        Arguments passed to QtWidgets.QDialog instantiation.
+    **kwargs : Any
+        Keyword arguments passed to QtWidgets.QDialog instantiation.
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._text = kwargs.pop("text", "")
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)

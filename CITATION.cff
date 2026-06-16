@@ -16,6 +16,10 @@ authors:
     family-names: Lotze
     affiliation: Helmholtz-Zentrum Hereon
     # Gudrun Lotze contributed in the time period between April 2024 and May 2025
+  - given-names: Nonni
+    family-names: Heere
+    affiliation: Helmholtz-Zentrum Hereon
+    # Nonni Heere contributed since February 2026
 url: 'https://pydidas.hereon.de/'
 funding:
   - funder: Deutsche Forschungsgemeinschaft (DFG)
@@ -28,8 +32,8 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-date-released: 2026-01-27
-version: 26.01.27
+date-released: 2026-05-19
+version: 26.05.19
 references:
   - type: article
     title: "pydidas: a tool for automated X-ray diffraction data analysis"

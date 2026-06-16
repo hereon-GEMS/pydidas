@@ -7,6 +7,45 @@ v26.mm.dd
 
 Improvements
 ------------
+- Added an option to set a custom root for data browsing in the 
+  DataBrowsingFrame (and in the UserConfigWindow) to prevent freezes
+  from unresponsive locations
+- Added a dedicated plugin to import NeXus NXdata with full metadata
+  and in the shape of the Scan. This allows for conveniently restarting
+  workflows from stored intermediate data.
+
+Programmatic changes
+--------------------
+- Added a checker for adherece to NeXus NXdata definition of selected 
+  datasets in HDF5 files.
+- Modified the way singletons are created and handled for a cleaner
+  architecture.
+- Reworked ReadOnlyTextWidget to allow appending and prepending text 
+  to the widget text in a generic way.
+
+Bugfixes
+--------
+- Fixed a Qt6 issue in the Hdf5DatasetSelectionPopup which did not scale
+  the dialog correctly with the choices.
+- Fixed an issue in the ErrorBox when the error string was too wide to show
+  (e.g. for long filenames).
+- Fixed an issue in the DataBrowsingFrame which did not load the icons for 
+  the starting directory correctly.
+- Fixed an issue in the WorkflowTestFrame which de-selected the node after
+  running the test for a different datapoint.
+- Fixed an issue which would not scale 1d plots correctly due to Qt's 
+  processing queue for signals and its use in PydidasPlot1d.
+- Fixed an issue with importing data with scan dimensions of size 1 which
+  were squeezed during export.
+- Fixed an issue where the plotted labels for columnar data were not 
+  properly reset on loading new data.
+
+
+v26.05.19
+=========
+
+Improvements
+------------
 - Added an option to exclude specific HDF5 dataset keys from filters
   (e.g. necessary for Lambda files)
 - Added an info field to the DefineScanFrame to show the required total 
@@ -16,6 +55,7 @@ Improvements
 - When editing advanced Parameters, the GUI now remembers the settings
   for each plugin.
 - Added an option to select a file by its filename in the DataBrowsingFrame.
+  The field also accepts drag & drop entries.
 - Removed the gui and widget packages from the generic 'import pydidas'
   to speed-up loading for background processes.
 - Added an option in the plots to lock the current zoom settings
@@ -43,6 +83,10 @@ Programmatic changes
 - Added an option to specify the display precision for floating point
   Parameters.
 - Refactored PydidasPlot1D and PydidasPlot2D and sorted methods.
+- Added an option in the UI creation to specify the gridPos row position
+  with "::current::" to append a widget in the current row.
+- Changed the signal of QCheckBox tick state to be consistent with 
+  Qt.QCheckState definitions (checked == 2)
 
 Bugfixes
 --------
@@ -105,6 +149,14 @@ Bugfixes
   edits
 - Fixed an issue in PydidasPlotStack which accepted ndarray without checks
   and crashed
+- Fixed an issue which occurred if column labels in Datasets had the wrong number
+  of entries with respect to the data.
+- Fixed an issue where some windows and frames still had references to some
+  deprecated actions in PydidasPlot2d which caused exceptions when calling them.
+- Fixed an issue in the ImageMathFrame which did not show some widgets correctly
+  in Qt6.
+- Fixed an issue in the SubtractBackgroundImage plugin which could lead to an
+  uint overflow.
 
 
 v26.01.27
@@ -159,7 +211,7 @@ Improvements
   residual stress calculations.
 - Reorganized the frames in the toolbar menu.
 - Programmatic improvements:
-    - Programatically improved the layout of the GUI export/import files for more clarity
+    - Programmatically improved the layout of the GUI export/import files for more clarity
       and to support importing states created from different configurations.
     - Modified the behaviour of the splash screen to allow display of the splash screen
       also when calling pydidas trough an entry-point from the command line.

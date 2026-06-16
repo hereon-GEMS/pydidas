@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -26,27 +26,23 @@ __status__ = "Production"
 
 import pytest
 
-from pydidas.core import SingletonObject
+from pydidas.core import Singleton
 from pydidas.workflow import ProcessingTree, WorkflowTree
 
 
 def test_init():
-    """Test the initialization of the WorkflowTree class."""
     tree = WorkflowTree()
-    assert isinstance(tree, SingletonObject)
     assert isinstance(tree, ProcessingTree)
     assert isinstance(tree, WorkflowTree)
-    assert WorkflowTree._instance is tree
+    assert Singleton._instances[WorkflowTree] is tree
 
 
 def test_hash():
-    """Test the hash function of the WorkflowTree class."""
     tree = WorkflowTree()
     assert isinstance(hash(tree), int)
 
 
 def test_copy():
-    """Test the copy function of the WorkflowTree class."""
     tree = WorkflowTree()
     tree_copy = tree.copy()
     assert isinstance(tree_copy, ProcessingTree)
@@ -55,7 +51,6 @@ def test_copy():
 
 
 def test__repeated_calls():
-    """Test the repeated calls to the WorkflowTree class."""
     tree = WorkflowTree()
     tree2 = WorkflowTree()
     assert tree is tree2
@@ -63,4 +58,4 @@ def test__repeated_calls():
 
 
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main([__file__])

@@ -64,6 +64,7 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
         else:
             self.stateChanged.connect(self._emit_signal_in_qt5)
 
+    @QtCore.Slot(QtCore.Qt.CheckState)
     def _emit_signal_in_qt6(self, state: QtCore.Qt.CheckState) -> None:
         """
         Handle the signal emission in Qt6.
@@ -73,14 +74,10 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
         state : QtCore.Qt.CheckState
             The new check state.
         """
-        if state == QtCore.Qt.CheckState.Checked:
-            self.sig_new_check_state.emit(1)
-        elif state == QtCore.Qt.CheckState.Unchecked:
-            self.sig_new_check_state.emit(0)
-        elif state == QtCore.Qt.CheckState.PartiallyChecked:
-            self.sig_new_check_state.emit(-1)
+        self.sig_new_check_state.emit(state.value)
         self.sig_check_state_changed.emit()
 
+    @QtCore.Slot(int)
     def _emit_signal_in_qt5(self, state: int) -> None:
         """
         Handle the signal emission in Qt5.
@@ -90,5 +87,5 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
         state : int
             The new check state.
         """
-        self.sig_new_check_state.emit(int(self.isChecked()))
+        self.sig_new_check_state.emit(state)
         self.sig_check_state_changed.emit()

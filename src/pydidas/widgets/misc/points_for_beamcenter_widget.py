@@ -34,7 +34,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import get_generic_parameter
 from pydidas.core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
-from pydidas.core.utils import apply_qt_properties, qstate_is_checked
+from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 
@@ -247,14 +247,13 @@ class PointsForBeamcenterWidget(
         )
 
     @QtCore.Slot(int)
-    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState) -> None:
+    def _toggle_2click_selection(self, state: int) -> None:
         """
         Toggle the two-click selection option.
 
         Parameters
         ----------
-        state : QtCore.Qt.CheckState
-            The checkbox's state.
+        state : int
+            The checkbox's state (as defined in QtCore.Qt.CheckState).
         """
-        _usage = qstate_is_checked(state)
-        self.sig_2click_usage.emit(_usage)
+        self.sig_2click_usage.emit(state == 2)

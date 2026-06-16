@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -48,11 +48,11 @@ QSETTINGS_GLOBAL_KEYS = [
 ]
 
 QSETTINGS_USER_KEYS = [
-    "mosaic_border_width",
-    "mosaic_border_value",
     "max_number_curves",
     "histogram_outlier_fraction_low",
     "histogram_outlier_fraction_high",
+    "use_custom_data_browsing_root",
+    "data_browsing_root",
     "plugin_path",
     "auto_check_for_updates",
     "cmap_nan_color",
@@ -60,4 +60,6 @@ QSETTINGS_USER_KEYS = [
 
 QSETTINGS_USER_SPECIAL_KEYS = [
     "cmap_name",
+    "mosaic_border_width",
+    "mosaic_border_value",
 ]

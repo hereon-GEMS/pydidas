@@ -50,8 +50,22 @@ class TableWithNodeLabels(PydidasQTable):
         kwargs["font_metric_height_factor"] = kwargs.get("font_metric_height_factor", 6)
         PydidasQTable.__init__(self, **kwargs)
         apply_qt_properties(self, columnCount=1, rowCount=0)
-        self._row_items = {}
+        self._row_node_ids: dict[int, int] = {}
+        self._row_labels: dict[int, str] = {}
         self.selectionModel().selectionChanged.connect(self.emit_new_node_selection)
+
+    @property
+    def selected_node_label(self) -> str:
+        """
+        Get the label of the currently selected node.
+
+        Returns
+        -------
+        str
+            The label of the currently selected node.
+        """
+        _label = self._row_labels.get(self.selected_row_id)
+        return _label or ""
 
     @QtCore.Slot()
     def emit_new_node_selection(self) -> None:
@@ -59,7 +73,23 @@ class TableWithNodeLabels(PydidasQTable):
         Emit the signal of a new selection.
         """
         if self.selected_row_id >= 0:
-            self.sig_node_selected.emit(self._row_items[self.selected_row_id])
+            self.sig_node_selected.emit(self._row_node_ids[self.selected_row_id])
+
+    def get_row_label(self, row_id: int) -> str:
+        """
+        Get the label of a given row.
+
+        Parameters
+        ----------
+        row_id: int
+            The id of the row for which to get the label.
+
+        Returns
+        -------
+        str
+            The label of the given row.
+        """
+        return self._row_labels.get(row_id, "")
 
     def update_node_descriptions(self, titles: dict[int, str]) -> None:
         """
@@ -71,9 +101,12 @@ class TableWithNodeLabels(PydidasQTable):
             The dictionary with node ids and their corresponding labels.
         """
         self.remove_all_rows()
-        self._row_items = {_i: _node_id for _i, _node_id in enumerate(titles)}
+        self._row_node_ids = {}
+        self._row_labels = {}
         self.setRowCount(len(titles))
         for _i_row, (_node_id, _label) in enumerate(titles.items()):
+            self._row_node_ids[_i_row] = _node_id
+            self._row_labels[_i_row] = _label
             self.setItem(_i_row, 0, QtWidgets.QTableWidgetItem(_label))
         self.setVisible(True)
         self.setFixedHeight(self.table_display_height)

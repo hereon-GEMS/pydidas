@@ -158,7 +158,7 @@ def create_nxdata_entry(
 def create_nx_dataset(
     group: h5py.Group,
     name: str,
-    data: dict | np.ndarray | str | Number,
+    data: dict[str, Any] | np.ndarray | str | Number,
     **attributes: Any,
 ) -> h5py.Dataset:
     """
@@ -188,7 +188,9 @@ def create_nx_dataset(
     return _dataset
 
 
-def nx_dataset_config_from_param(param: Parameter) -> tuple[Any, dict[str, Any]]:
+def nx_dataset_config_from_param(
+    param: Parameter,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     """
     Get a dict with NXdata configuration from a Parameter.
 
@@ -199,7 +201,7 @@ def nx_dataset_config_from_param(param: Parameter) -> tuple[Any, dict[str, Any]]
 
     Returns
     -------
-    Any
+    dict[str, Any]
         The data to be stored in the dataset.
     dict[str, Any]
         The NXdata configuration dict.
@@ -210,7 +212,7 @@ def nx_dataset_config_from_param(param: Parameter) -> tuple[Any, dict[str, Any]]
     if param.name:
         _config["long_name"] = param.name
     _config["NX_class"] = _get_nx_class_for_param(param)
-    return param.value_for_export, _config
+    return {"data": param.value_for_export}, _config
 
 
 def _get_nx_class_for_param(param: Parameter) -> str:

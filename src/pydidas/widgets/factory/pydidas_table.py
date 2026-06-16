@@ -49,7 +49,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         "relative_column_widths",
         "autoscale_height",
         # need to handle the Qt properties for columnCount and rowCount here to
-        # handle the relative column widths correctly
+        # handle the relative column widths correctly:
         "columnCount",
         "rowCount",
     ]
@@ -61,9 +61,9 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self._rel_column_widths = kwargs.pop("relative_column_widths", None)
         self._autoscale_height = kwargs.pop("autoscale_height", False)
         self._qtapp = PydidasQApplication.instance()
-        QtWidgets.QTableWidget.__init__(
-            self, kwargs.pop("rowCount", 0), kwargs.pop("columnCount", 0)
-        )
+        QtWidgets.QTableWidget.__init__(self)
+        self.setRowCount(kwargs.pop("rowCount", 0))
+        self.setColumnCount(kwargs.pop("columnCount", 0))
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -218,7 +218,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
         self._set_new_height()
 
     def add_multicolumn_cell(
-        self, label: str, start_col: int = 0, n_col: int | None = None
+        self, label: str, start_col: int = 0, n_col: int = -1
     ) -> None:
         """
         Add a cell which spans all columns in the table.
@@ -229,15 +229,15 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
             The label of the spanned row.
         start_col : int, optional
             The column index at which the spanned cell starts, by default 0.
-        n_col : int or None, optional
-            The number of columns to span, by default None which spans all
+        n_col : int, optional
+            The number of columns to span, by default -1 which spans all
             columns.
         """
         self._wrapped_cells = True
         self.setVisible(True)
         _i_row = self.rowCount()
         self.setRowCount(_i_row + 1)
-        if n_col is None:
+        if n_col == -1:
             n_col = self.columnCount() - start_col
         _item = QtWidgets.QTableWidgetItem(label)
         self.setItem(_i_row, start_col, _item)

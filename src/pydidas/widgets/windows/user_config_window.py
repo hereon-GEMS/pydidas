@@ -35,7 +35,7 @@ from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from pydidas.core import SingletonObject, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONFIG_WIDTH,
@@ -49,6 +49,7 @@ from pydidas.core.constants import (
 from pydidas.core.generic_params.generic_params_settings import (
     GENERIC_PARAMS_SETTINGS,
 )
+from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.dialogues import (
@@ -69,7 +70,7 @@ _FONT_SIZE_VALIDATOR = QtGui.QDoubleValidator(5, 20, 1)
 _FONT_SIZE_VALIDATOR.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
 
-class UserConfigWindow(SingletonObject, PydidasWindow):
+class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
     """
     The UserConfigWindow allows setting the user configuration for pydidas.
     """
@@ -78,13 +79,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     menu_title = "User configuration"
     menu_entry = "User configuration"
 
-    value_changed_signal = QtCore.Signal(str, object)
+    sig_new_config_value = QtCore.Signal(str, object)
 
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
     def __init__(self, **kwargs: Any) -> None:
         self.__qtapp = PydidasQApplication.instance()
-        SingletonObject.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.setWindowTitle("pydidas user configuration")
         self.setSizePolicy(*POLICY_MIN_MIN)
 
@@ -143,7 +144,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         self.create_lineedit(
             "edit_fontsize",
-            text=str(PydidasQApplication.instance().font_size),
+            text=str(self.__qtapp.font_size),
             parent_widget="fontsize_container",
             gridPos=(0, -1, 1, 1),
             validator=_FONT_SIZE_VALIDATOR,
@@ -178,30 +179,21 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
         self.create_label("section_updates", "Update settings", **_section_options)
         self.create_param_widget(
-            self.get_param("auto_check_for_updates"),
-            parent_widget="config_canvas",
-            width_io=0.25,
-            width_text=0.7,
+            "auto_check_for_updates", parent_widget="config_canvas"
         )
         self.create_spacer(None, parent_widget="config_canvas")
-        self.create_label(
-            "section_mosaic",
-            "Composite creator settings",
-            **_section_options,
+        self.create_label("section_data_browsing", "Data browsing", **_section_options)
+        self.create_param_widget(
+            "use_custom_data_browsing_root", parent_widget="config_canvas"
         )
         self.create_param_widget(
-            self.get_param("mosaic_border_width"),
+            "data_browsing_root",
+            linebreak=True,
             parent_widget="config_canvas",
-            width_io=0.18,
-            width_text=0.7,
+            size_hint_width=2 * GENERIC_STANDARD_WIDGET_WIDTH,
         )
-        self.create_param_widget(
-            self.get_param("mosaic_border_value"),
-            parent_widget="config_canvas",
-            width_io=0.25,
-            width_text=0.7,
-        )
-        self.create_spacer("spacer_3", parent_widget="config_canvas")
+        self.create_spacer(None, parent_widget="config_canvas")
+
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
             self.get_param("max_number_curves"),
@@ -210,13 +202,13 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             width_text=0.7,
         )
         self.create_param_widget(
-            self.get_param("histogram_outlier_fraction_low"),
+            "histogram_outlier_fraction_low",
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
         )
         self.create_param_widget(
-            self.get_param("histogram_outlier_fraction_high"),
+            "histogram_outlier_fraction_high",
             parent_widget="config_canvas",
             width_io=0.25,
             width_text=0.7,
@@ -246,7 +238,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             toolTip=GENERIC_PARAMS_SETTINGS["cmap_nan_color"]["tooltip"],
         )
         self.create_param_widget(
-            self.get_param("cmap_nan_color"),
+            "cmap_nan_color",
             gridPos=(0, 0, 1, 2),
             parent_widget="cmap_nan_color_container",
             validator=QT_REG_EXP_RGB_VALIDATOR,
@@ -297,7 +289,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
         )
         update_palette(self._widgets["label_default_plugin"], base="#F0F0F0")
         self.create_param_widget(
-            self.get_param("plugin_path"),
+            "plugin_path",
             linebreak=True,
             parent_widget="config_canvas",
             size_hint_width=2 * GENERIC_STANDARD_WIDGET_WIDTH,
@@ -311,9 +303,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
     def connect_signals(self) -> None:
         """Connect the signals for Parameter updates."""
-        for _param_key in self.params:
-            if _param_key.startswith("cmap"):
-                continue
+        for _param_key in QSETTINGS_USER_KEYS:
             self.param_composite_widgets[_param_key].sig_new_value.connect(
                 partial(self.update_qsetting, _param_key)
             )
@@ -343,7 +333,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""
         self._config["cmap_nan_palette"] = QtGui.QPalette()
-        self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
+        _initial_cmap_nan_color = self.q_settings_get("user/cmap_nan_color")
+        self._update_cmap_nan_current_color(_initial_cmap_nan_color)
         _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
@@ -367,7 +358,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             The new value.
         """
         self.q_settings_set(f"user/{param_key}", value)
-        self.value_changed_signal.emit(param_key, value)
+        self.sig_new_config_value.emit(param_key, value)
 
     @QtCore.Slot(QtGui.QColor)
     def _update_cmap_nan_value(self, new_value: QtGui.QColor | str | None) -> None:
@@ -494,7 +485,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot(int)
     def frame_activated(self, index: int) -> None:
         """
-        Update the frame.
+        Handle the frame activation.
 
         The frame_activated slot is called every time a frame is activated.
         The index is the frame_index of the newly activated frame in case any
@@ -535,7 +526,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
                 self.update_param_widget_value(_param_key, _value)
-                self.value_changed_signal.emit(_param_key, _value)
+                self.sig_new_config_value.emit(_param_key, _value)
                 self.q_settings_set(f"user/{_param_key}", _value)
             self.process_new_fontsize_setting()
             self._update_cmap_nan_current_color(

@@ -204,7 +204,7 @@ class QuickIntegrationFrame(BaseFrame):
         """
         self._image = import_data(filename, **open_image_kwargs)
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
-        self._widgets["input_plot"].changeCanvasToDataAction._actionTriggered()  # noqa W0212
+        self._widgets["input_plot"]._actions["canvas"].set_canvas_mode("tight")  # noqa W0212
         self._roi_controller.show_plot_items("roi")
         self._toggle_fname_valid(True)
         self._update_detector_model()

@@ -18,7 +18,7 @@ The ScanContext class
 Introduction
 ------------
 
-The :py:class:`ScanContext` is the pydidas Singleton instance of the
+The :py:class:`ScanContext` is the pydidas singleton instance of the
 :py:class:`Scan <pydidas.contexts.scan.Scan>` class. It is used for storing and
 accessing global information about the scan layout and generic information like
 title, directory and file naming patterns.

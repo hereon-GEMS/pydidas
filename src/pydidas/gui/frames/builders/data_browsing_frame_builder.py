@@ -32,31 +32,30 @@ from typing import Any
 
 from qtpy import QtGui, QtWidgets
 
-from pydidas.core.constants import POLICY_EXP_EXP
-from pydidas.widgets.data_viewer import DataViewer
-from pydidas.widgets.selection import (
-    ConfigureBinaryDecodingWidget,
-    DirectoryExplorer,
-    Hdf5DatasetSelector,
+from pydidas.core.constants import (
+    POLICY_EXP_EXP,
 )
+from pydidas.widgets.data_viewer import DataViewer
+from pydidas.widgets.file_browser import DirectoryExplorer
+from pydidas.widgets.selection import ConfigureBinaryDecodingWidget, Hdf5DatasetSelector
 
 
-DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = [
+DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = [
     ["create_label", (None, "Data browser"), {"fontsize_offset": 4, "bold": True}],
     [
         "create_empty_widget",
-        ("browser",),
+        ("browser_canvas",),
         {"sizePolicy": POLICY_EXP_EXP, "minimumWidth": 200},
     ],
     [
         "create_any_widget",
         ("explorer", DirectoryExplorer),
-        {"gridPos": (0, 0, 1, 1), "parent_widget": "browser"},
+        {"parent_widget": "browser_canvas"},
     ],
     [
         "create_spacer",
         ("explorer_spacer",),
-        {"gridPos": (0, -1, 1, 1), "parent_widget": "browser", "fixedWidth": 5},
+        {"gridPos": (0, -1, 1, 1), "parent_widget": "browser_canvas", "fixedWidth": 5},
     ],
     [
         "create_empty_widget",
@@ -84,16 +83,6 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] 
             "parent_widget": "plot_header",
             "gridPos": (0, 0, 1, 1),
             "font_metric_width_factor": 12,
-        },
-    ],
-    [
-        "create_lineedit",
-        ("filename",),
-        {
-            "gridPos": (0, 1, 1, 2),
-            "parent_widget": "plot_header",
-            "readOnly": False,
-            "sizePolicy": POLICY_EXP_EXP,
         },
     ],
     [

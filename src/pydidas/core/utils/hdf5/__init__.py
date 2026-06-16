@@ -29,13 +29,15 @@ __status__ = "Production"
 
 from . import hdf5_dataset_utils, hdf5_filter_keys, nxs_export
 from .hdf5_dataset_utils import *
+from .nxs_dataset_utils import *
 from .nxs_export import *
 
 
-__all__ = nxs_export.__all__ + hdf5_dataset_utils.__all__
+__all__ = hdf5_dataset_utils.__all__ + nxs_dataset_utils.__all__ + nxs_export.__all__
 
 del (
     hdf5_dataset_utils,
     hdf5_filter_keys,
+    nxs_dataset_utils,
     nxs_export,
 )

@@ -44,7 +44,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
     imported_params = {}
 
     @classmethod
-    def export_to_file(cls, filename, *args: Any, **kwargs: Any) -> None:
+    def export_to_file(cls, filename: Path | str, *args: Any, **kwargs: Any) -> None:
         """
         Write the content to a file.
 
@@ -52,7 +52,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
         **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by

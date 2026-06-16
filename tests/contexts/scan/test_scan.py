@@ -24,8 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from typing import Any
-
 import numpy as np
 import pytest
 
@@ -34,32 +32,27 @@ from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 
 
-_scan_param_values = {
-    "shape": (5, 7, 3, 2),
-    "delta": (0.1, 0.5, 1, 1.5),
-    "offset": (3, -1, 0, 0.5),
-    "scan_dim": 4,
-}
+_SCAN_SHAPE: tuple[int, ...] = (5, 7, 3, 2)
+_SCAN_DELTA: tuple[float | int, ...] = (0.1, 0.5, 1, 1.5)
+_SCAN_OFFSET: tuple[float | int, ...] = (3, -1, 0, 0.5)
+_SCAN_DIM: int = 4
 
 
-def set_scan_params(scan: Scan) -> dict[str, Any]:
-    scan.set_param_value("scan_dim", _scan_param_values["scan_dim"])
-    for index, val in enumerate(_scan_param_values["shape"]):
+def set_scan_params(scan: Scan) -> None:
+    scan.set_param_value("scan_dim", _SCAN_DIM)
+    for index, val in enumerate(_SCAN_SHAPE):
         scan.set_param_value(f"scan_dim{index}_n_points", val)
-    for index, val in enumerate(_scan_param_values["delta"]):
+    for index, val in enumerate(_SCAN_DELTA):
         scan.set_param_value(f"scan_dim{index}_delta", val)
-    for index, val in enumerate(_scan_param_values["offset"]):
+    for index, val in enumerate(_SCAN_OFFSET):
         scan.set_param_value(f"scan_dim{index}_offset", val)
 
 
 def get_scan_range(dim):
     return np.linspace(
-        _scan_param_values["offset"][dim],
-        (
-            _scan_param_values["offset"][dim]
-            + (_scan_param_values["shape"][dim] - 1) * _scan_param_values["delta"][dim]
-        ),
-        num=_scan_param_values["shape"][dim],
+        _SCAN_OFFSET[dim],
+        (_SCAN_OFFSET[dim] + (_SCAN_SHAPE[dim] - 1) * _SCAN_DELTA[dim]),
+        num=_SCAN_SHAPE[dim],
     )
 
 
@@ -71,13 +64,54 @@ def test_init():
 def test_n_total():
     scan = Scan()
     set_scan_params(scan)
-    assert scan.n_points == np.prod(_scan_param_values["shape"])
+    assert scan.n_points == np.prod(_SCAN_SHAPE)
 
 
 def test_shape():
     scan = Scan()
     set_scan_params(scan)
-    assert scan.shape == _scan_param_values["shape"]
+    assert scan.shape == _SCAN_SHAPE
+
+
+@pytest.mark.parametrize(
+    "scan_dim, n_points, expected_squeezed",
+    [
+        (4, (5, 7, 3, 2), (5, 7, 3, 2)),  # no squeezing needed
+        (4, (5, 1, 3, 1), (5, 3)),  # with single dimensions
+        (4, (1, 1, 1, 1), ()),  # all dimensions one
+        (3, (1, 10, 1), (10,)),  # single dimension nonzero
+        (4, (5, 1, 7, 1), (5, 7)),  # alternating pattern
+        (4, (1, 1, 4, 6), (4, 6)),  # ones at start
+        (4, (3, 5, 1, 1), (3, 5)),  # ones at end
+    ],
+)
+def test_squeezed_shape(scan_dim, n_points, expected_squeezed):
+    """Test squeezed_shape property with various dimension configurations.
+
+    Parameters
+    ----------
+    scan_dim : int
+        The number of scan dimensions to set.
+    n_points : tuple[int]
+        The number of points for each dimension.
+    expected_squeezed : tuple[int]
+        The expected squeezed shape (dimensions with n_points == 1 removed).
+    """
+    scan = Scan()
+    scan.set_param_value("scan_dim", scan_dim)
+    for i, n in enumerate(n_points):
+        scan.set_param_value(f"scan_dim{i}_n_points", n)
+    assert scan.squeezed_shape == expected_squeezed
+
+
+def test_squeezed_shape__default_scan():
+    """Test squeezed_shape on a default (uninitialized) scan."""
+    scan = Scan()
+    # Default scan should have all dimensions as 1
+    # Default scan_dim is 1, and scan_dim0_n_points should be 1
+    _squeezed = scan.squeezed_shape
+    assert isinstance(_squeezed, tuple)
+    assert _squeezed == ()
 
 
 def test_ndim():
@@ -123,7 +157,7 @@ def test_file_naming_pattern_w_index__multiple_counters(pattern):
     scan = Scan()
     scan.set_param_value("scan_name_pattern", pattern)
     with pytest.raises(UserConfigError):
-        scan.processed_file_naming_pattern
+        _ = scan.processed_file_naming_pattern
 
 
 @pytest.mark.parametrize(
@@ -142,9 +176,9 @@ def test_file_naming_pattern_w_index__no_counters(pattern):
 def test_update_filename_string(pattern):
     scan = Scan()
     scan.set_param_value("scan_name_pattern", pattern)
-    _nhash = pattern.count("#")
-    _parts = pattern.split("#" * _nhash)
-    _parts.insert(1, "{index:0" + str(_nhash) + "d}")
+    _n_hash = pattern.count("#")
+    _parts = pattern.split("#" * _n_hash)
+    _parts.insert(1, "{index:0" + str(_n_hash) + "d}")
     assert scan.processed_file_naming_pattern == "".join(_parts)
 
 
@@ -178,9 +212,9 @@ def test_get_metadata_for_dim():
         _label = get_random_string(20)
         scan.set_param_value(f"scan_dim{_index}_unit", _unit)
         scan.set_param_value(f"scan_dim{_index}_label", _label)
-        _scanlabel, _scanunit, _range = scan.get_metadata_for_dim(_index)
-        assert _scanlabel == _label
-        assert _unit == _scanunit
+        _scan_label, _scan_unit, _range = scan.get_metadata_for_dim(_index)
+        assert _scan_label == _label
+        assert _unit == _scan_unit
         assert np.allclose(get_scan_range(_index), _range)
 
 
@@ -189,14 +223,9 @@ def test_get_indices_from_ordinal(n_frames):
     scan = Scan()
     set_scan_params(scan)
     scan.set_param_value("scan_frames_per_point", n_frames)
-    _pos = tuple(i - 2 for i in _scan_param_values["shape"])
-    _shape = _scan_param_values["shape"] + (1,)
-    _n = np.sum(
-        [
-            _pos[i] * np.prod(_shape[i + 1 :])
-            for i in range(_scan_param_values["scan_dim"])
-        ]
-    )
+    _pos = tuple(i - 2 for i in _SCAN_SHAPE)
+    _shape = _SCAN_SHAPE + (1,)
+    _n = np.sum([_pos[i] * np.prod(_shape[i + 1 :]) for i in range(_SCAN_DIM)])
     _index = scan.get_indices_from_ordinal(_n)
     assert _index == _pos
 
@@ -222,13 +251,13 @@ def test_get_ordinal_from_indices__negative():
         scan.get_ordinal_from_indices((0, -1, 0, 0))
 
 
-def test_get_ordinal_from_indices__inscan():
+def test_get_ordinal_from_indices__in_scan():
     _indices = (2, 1, 2, 1)
     _frame = (
         _indices[3]
-        + _scan_param_values["shape"][3] * _indices[2]
-        + np.prod(_scan_param_values["shape"][2:]) * _indices[1]
-        + np.prod(_scan_param_values["shape"][1:]) * _indices[0]
+        + _SCAN_SHAPE[3] * _indices[2]
+        + np.prod(_SCAN_SHAPE[2:]) * _indices[1]
+        + np.prod(_SCAN_SHAPE[1:]) * _indices[0]
     )
     scan = Scan()
     set_scan_params(scan)
@@ -239,8 +268,8 @@ def test_get_ordinal_from_indices__inscan():
 def test_axis_labels():
     scan = Scan()
     set_scan_params(scan)
-    _labels = [get_random_string(5) for _ in range(_scan_param_values["scan_dim"])]
-    for _index in range(_scan_param_values["scan_dim"]):
+    _labels = [get_random_string(5) for _ in range(_SCAN_DIM)]
+    for _index in range(_SCAN_DIM):
         scan.set_param_value(f"scan_dim{_index}_label", _labels[_index])
     assert _labels == scan.axis_labels
 
@@ -248,8 +277,8 @@ def test_axis_labels():
 def test_axis_units():
     scan = Scan()
     set_scan_params(scan)
-    _units = [get_random_string(5) for _ in range(_scan_param_values["scan_dim"])]
-    for _index in range(_scan_param_values["scan_dim"]):
+    _units = [get_random_string(5) for _ in range(_SCAN_DIM)]
+    for _index in range(_SCAN_DIM):
         scan.set_param_value(f"scan_dim{_index}_unit", _units[_index])
     assert _units == scan.axis_units
 
@@ -258,7 +287,7 @@ def test_axis_ranges():
     scan = Scan()
     set_scan_params(scan)
     _ranges = scan.axis_ranges
-    for _index in range(_scan_param_values["scan_dim"]):
+    for _index in range(_SCAN_DIM):
         _ref = get_scan_range(_index)
         assert np.allclose(_ref, _ranges[_index])
 
@@ -317,10 +346,9 @@ def test_update_from_dictionary__all_entries_present():
     assert scan.get_param_value("scan_title") == _scan["scan_title"]
     assert scan.get_param_value("scan_dim") == _scan["scan_dim"]
     for _dim in [0, 1]:
+        _dim_info: dict[str, str | int] = _scan[_dim]  # type: ignore[typeddict-unknown-key]
         for _entry in ["label", "unit", "offset", "delta", "n_points"]:
-            assert _scan[_dim][_entry] == scan.get_param_value(
-                f"scan_dim{_dim}_{_entry}"
-            )
+            assert _dim_info[_entry] == scan.get_param_value(f"scan_dim{_dim}_{_entry}")
 
 
 def test_set_param_value__deprecated():

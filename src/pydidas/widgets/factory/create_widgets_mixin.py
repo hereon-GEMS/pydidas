@@ -435,6 +435,8 @@ class CreateWidgetsMixIn:
         """
         if "widget" in kwargs and isinstance(kwargs["widget"], str):
             kwargs["widget"] = self._widgets[kwargs["widget"]]
+        if "linked_widget" in kwargs and isinstance(kwargs["linked_widget"], str):
+            kwargs["linked_widget"] = self._widgets[kwargs["linked_widget"]]
         if hasattr(widget_class, "init_kwargs"):
             _init_kwargs = {}
             for _key in widget_class.init_kwargs:

@@ -39,7 +39,7 @@ from qtpy import QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
 from pydidas.core import PydidasGuiError
-from pydidas.core.utils import IS_QT6
+from pydidas.core.utils import IS_QT6, replace_item_in_iterable
 from pydidas.resources import icons
 from pydidas_qtcore import PydidasQApplication
 
@@ -212,13 +212,20 @@ def get_grid_pos(parent: QtWidgets.QWidget, **kwargs: Any) -> tuple:
         )
     if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
         raise PydidasGuiError(
-            'The passed value for "gridPos" is not of type tuple and/or not'
-            " of length 4."
+            "The passed value for `gridPos` is not a tuple of length 4."
+        )
+    if _grid_pos[0] == "::current::":
+        _grid_pos = replace_item_in_iterable(_grid_pos, 0, _default_row - 1)
+    if not all(isinstance(x, int) for x in _grid_pos):
+        raise PydidasGuiError(
+            "Only integers are allowed for gridPos argument. The only exception is "
+            "`::current::` for the row to add a widget in the current row."
         )
     if _grid_pos[0] == -1:
-        _grid_pos = (_default_row,) + _grid_pos[1:4]
+        _grid_pos = replace_item_in_iterable(_grid_pos, 0, _default_row)
     if _grid_pos[1] == -1:
-        _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]  # type: ignore[union-attr]
+        _n_col = parent.layout().columnCount()
+        _grid_pos = replace_item_in_iterable(_grid_pos, 1, _n_col)
     return _grid_pos
 
 

@@ -46,11 +46,16 @@ from pydidas.core.utils import (
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.data_io import IoManager
-from pydidas.gui.frames.builders import CompositeCreatorFrameBuilder
+from pydidas.gui.frames.builders import (
+    COMPOSITE_CREATOR_FRAME_BUILD_CONFIG,
+    KEYS_TO_INSERT_LINES_AFTER,
+    ccf_param_widget_config,
+)
 from pydidas.gui.mixins import SilxPlotWindowMixIn
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets import dialogues
 from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas_qtcore import PydidasQApplication
 
 
 logger = pydidas_logger(LOGGING_LEVEL)
@@ -66,7 +71,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     menu_title = "Composite image creator"
     menu_entry = "Composite image creator"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrameWithApp.__init__(self, **kwargs)
         SilxPlotWindowMixIn.__init__(self)
 
@@ -78,7 +83,6 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["input_configured"] = False
         self._config["bg_configured"] = False
         self._config["frame_active"] = False
-        self._update_timer = 0
         self._create_param_collection()
 
     def _create_param_collection(self) -> None:
@@ -105,11 +109,28 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                         tooltip="The total number of images.",
                     )
                 )
+        self.add_param(get_generic_parameter("mosaic_border_width"))
+        self.add_param(get_generic_parameter("mosaic_border_value"))
 
     def build_frame(self) -> None:
         """Populate the frame with widgets."""
-        # TODO : Refactor to specify the build options in a list
-        CompositeCreatorFrameBuilder.build_frame(self)
+        _vis = self.isVisible()
+        self.setVisible(False)
+        self.layout().setContentsMargins(10, 0, 0, 0)
+        self.setMinimumHeight(800)
+        for _method, _args, _kwargs in COMPOSITE_CREATOR_FRAME_BUILD_CONFIG:
+            getattr(self, _method)(*_args, **_kwargs)
+
+        for _key in self.params:
+            self.create_param_widget(_key, **ccf_param_widget_config(_key))
+            # add spacers between groups:
+            if _key in KEYS_TO_INSERT_LINES_AFTER:
+                self.create_line(f"line_{_key}", parent_widget="param_container")
+            if _key in ["first_file", "last_file", "bg_file"]:
+                self.param_widgets[_key].set_unique_ref_name(
+                    f"CompositeCreatorFrame__{_key}"
+                )
+        self.setVisible(_vis)
 
     def connect_signals(self) -> None:
         """Connect the required signals between widgets and methods."""
@@ -161,10 +182,15 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.param_widgets["composite_ny"].sig_value_changed.connect(
             partial(self._update_composite_dim, "y")
         )
+        self.param_composite_widgets["mosaic_border_width"].sig_new_value.connect(
+            partial(self.__store_qsetting, "mosaic_border_width")
+        )
+        self.param_composite_widgets["mosaic_border_value"].sig_new_value.connect(
+            partial(self.__store_qsetting, "mosaic_border_value")
+        )
         self._app.updated_composite.connect(self.__received_composite_update)
-        _app = QtWidgets.QApplication.instance()
-        if hasattr(_app, "sig_exit_pydidas"):
-            _app.sig_exit_pydidas.connect(self.deleteLater)
+        _app = PydidasQApplication.instance()
+        _app.sig_exit_pydidas.connect(self.deleteLater)
 
         self.setup_initial_state()
 
@@ -189,6 +215,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.__toggle_bg_file_selection(False)
         self.__toggle_use_threshold(False)
         self.__toggle_use_det_mask(False)
+        self.__restore_qsettings()
 
     def restore_state(self, state: dict) -> None:
         """
@@ -336,7 +363,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     @QtCore.Slot()
     def __save_composite(self) -> None:
         """Save the composite image."""
-        fname = QtWidgets.QFileDialog.getSaveFileName(
+        fname = QtWidgets.QFileDialog.getSaveFileName(  # type: ignore[arg-type]
             self,
             "Name of file",
             "",
@@ -462,7 +489,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         fname : str or Path
             The filename to the hdf5 data file.
         """
-        dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
+        _fname = Path(fname)
+        dset = dialogues.Hdf5DatasetSelectionPopup(self, _fname).get_dset()
         if dset is not None:
             self.set_param_and_widget_value("hdf5_key", dset)
             self.__selected_hdf5_key()
@@ -531,7 +559,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     @QtCore.Slot()
     def __selected_bg_hdf5_key(self) -> None:
-        """Check that the background image hdf5 file actually has the required key."""
+        """Check that the background HDF5 file has the selected dataset key."""
         _fname = self.get_param_value("bg_file")
         _dset = self.get_param_value("bg_hdf5_key")
         if _dset in get_hdf5_populated_dataset_keys(_fname):
@@ -555,10 +583,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         Parameters
         ----------
-        keys : Literal["all"] or Iterable[str] or None], optional
-            An iterable of keys which reference the Parameters. If 'all',
-            all Parameters in the ParameterCollection will be reset to their
-            default values. The default is 'all'.
+        keys : str
+            Parameter reference keys to reset.
         """
         for _but in ["but_exec", "but_save", "but_show"]:
             self._widgets[_but].setEnabled(False)
@@ -594,15 +620,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         flag : str or bool
             The show or hide boolean flag.
         """
-        if isinstance(flag, str):
-            flag = flag == "True"
-        self.set_param_value("use_bg_file", flag)
-        self.toggle_param_widget_visibility("bg_file", flag)
+        _flag = flag == "True" if isinstance(flag, str) else flag
+        self.set_param_value("use_bg_file", _flag)
+        self.toggle_param_widget_visibility("bg_file", _flag)
         _bg_ext = get_extension(self.get_param_value("bg_file"))
-        if _bg_ext not in HDF5_EXTENSIONS:
-            flag = False
-        self.toggle_param_widget_visibility("bg_hdf5_key", flag)
-        self.toggle_param_widget_visibility("bg_hdf5_frame", flag)
+        _show_hdf5 = _flag and _bg_ext in HDF5_EXTENSIONS
+        self.toggle_param_widget_visibility("bg_hdf5_key", _show_hdf5)
+        self.toggle_param_widget_visibility("bg_hdf5_frame", _show_hdf5)
         self.__check_exec_enable()
 
     @QtCore.Slot()
@@ -622,11 +646,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         flag : bool or str
             The flag with visibility information for the ROI selection.
         """
-        if isinstance(flag, str):
-            flag = flag == "True"
-        self.set_param_value("use_roi", flag)
+        _flag = flag == "True" if isinstance(flag, str) else flag
+        self.set_param_value("use_roi", _flag)
         for _key in ["roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh"]:
-            self.toggle_param_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, _flag)
 
     @QtCore.Slot(str)
     def __toggle_use_threshold(self, flag: str | bool) -> None:
@@ -638,42 +661,67 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         flag : str or bool
             The flag with visibility information for the threshold selection.
         """
-        if isinstance(flag, str):
-            flag = flag == "True"
-        self.set_param_value("use_thresholds", flag)
+        _flag = flag == "True" if isinstance(flag, str) else flag
+        self.set_param_value("use_thresholds", _flag)
         for _key in ["threshold_low", "threshold_high"]:
-            self.toggle_param_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, _flag)
 
     @QtCore.Slot(str)
     def __toggle_use_det_mask(self, flag: str | bool) -> None:
         """
-        Show or hide the detector mask Parameters based on the flag selection.
+        Show or hide the detector mask parameters based on the flag selection.
 
         Parameters
         ----------
         flag : str or bool
-            The flag with visibility information for the threshold selection.
+            The flag with visibility information for the detector mask selection.
         """
-        if isinstance(flag, str):
-            flag = flag == "True"
-        self.set_param_value("use_detector_mask", flag)
+        _flag = flag == "True" if isinstance(flag, str) else flag
+        self.set_param_value("use_detector_mask", _flag)
         for _key in ["detector_mask_file", "detector_mask_val"]:
-            self.toggle_param_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, _flag)
+
+    def __restore_qsettings(self) -> None:
+        """Restore the QSettings parameters."""
+        _width = self.q_settings_get("user/mosaic_border_width", int, 0)
+        self.set_param_and_widget_value("mosaic_border_width", _width)
+        _val = self.q_settings_get("user/mosaic_border_value", float, 0)
+        self.set_param_and_widget_value("mosaic_border_value", _val)
+
+    @QtCore.Slot(str)
+    def __store_qsetting(self, key: str, value_repr: str) -> None:
+        """
+        Store a value in the QSettings.
+
+        Parameters
+        ----------
+        key : str
+            The key for the QSetting to be stored.
+        value_repr : str
+            The value to be stored in the QSettings in its string representation.
+        """
+        if key == "mosaic_border_width":
+            value = int(value_repr)
+        elif key == "mosaic_border_value":
+            value = float(value_repr)
+        else:
+            return
+        self.q_settings_set(f"user/{key}", value)
 
     @QtCore.Slot()
     def __clear_entries(self, *keys: str, hide: bool = True) -> None:
         """
-        Clear the Parameter entries and reset to default for selected keys.
+        Clear parameter entries and reset selected keys to their defaults.
 
         Parameters
         ----------
-        keys : Literal["all"] or Iterable[str], optional
-            The keys for the Parameters to be reset. The default is 'all'.
+        keys : str
+            Parameter reference keys to be reset. If omitted, all keys are reset.
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
         """
-        keys = list(self.params.keys()) if keys == () else keys
-        self.__reset_params(*keys)
+        _keys = tuple(self.params.keys()) if not keys else keys
+        self.__reset_params(*_keys)
         for _key in [
             "last_file",
             "file_stepping",
@@ -689,14 +737,14 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             "composite_nx",
             "composite_ny",
         ]:
-            if _key in keys:
+            if _key in _keys:
                 self.toggle_param_widget_visibility(_key, not hide)
         self.__check_exec_enable()
 
     @QtCore.Slot()
     def __update_n_image(self) -> None:
         """
-        Update the number of images in the composite based on the input parameters.
+        Update the number of images in the composite based on input parameters.
         """
         if not self._config["input_configured"]:
             return
@@ -716,7 +764,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             return
         if not self._filelist.n_files > 0:
             dialogues.critical_warning(
-                "Filelist is empty.",
+                "File list is empty.",
                 "The list of files is empty. Please verify the selection.",
             )
             return

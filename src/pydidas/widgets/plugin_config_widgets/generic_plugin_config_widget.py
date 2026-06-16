@@ -32,7 +32,7 @@ from typing import Any
 
 from qtpy import QtCore
 
-from pydidas.core import Hdf5key
+from pydidas.core import Hdf5key, NXdataKey
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     OUTPUT_PLUGIN,
@@ -132,7 +132,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 and not param.refkey.startswith("_")
             ):
                 _kwargs = {
-                    "linebreak": param.dtype in [Hdf5key, Path]
+                    "linebreak": param.dtype in [Hdf5key, NXdataKey, Path]
                     or param.refkey == "label"
                 }
                 self.create_param_widget(param, **_kwargs)

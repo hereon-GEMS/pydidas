@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ consistent interface for various data types.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,7 +38,7 @@ from typing import Any, NoReturn, Sequence
 from numpy import asarray, ndarray
 
 from pydidas.core.exceptions import UserConfigError
-from pydidas.core.hdf5_key import Hdf5key
+from pydidas.core.parameter_classes import Hdf5key, NXdataKey
 
 
 _ITERATORS = (list, set, tuple)
@@ -291,6 +291,7 @@ class Parameter:
 
             - str input and Path type
             - str input and Hdf5key type
+            - str input and NXdataKey type
             - str input of list/tuple of numbers to list/tuple of numbers
             - str of `True` or `False` to bool
             - list to tuple
@@ -310,7 +311,7 @@ class Parameter:
         if self.__meta["allow_None"] and value in ["None", "", None]:
             return None
         if isinstance(value, str):
-            if self.__type in [Path, Hdf5key]:
+            if self.__type in [Path, Hdf5key, NXdataKey]:
                 return self.__type(value)
             if self.__type == Integral and value in ["True", "False"]:
                 return value == "True"
@@ -421,6 +422,8 @@ class Parameter:
             _t += " (type: str)"
         elif self.dtype == Hdf5key:
             _t += " (type: Hdf5key)"
+        elif self.dtype == NXdataKey:
+            _t += " (type: NXdataKey)"
         elif self.dtype == Path:
             _t += " (type: Path)"
         else:
@@ -546,7 +549,7 @@ class Parameter:
         """
         if self.value is None:
             return None
-        if self.__type in (str, Hdf5key, Path):
+        if self.__type in (str, Hdf5key, NXdataKey, Path):
             return str(self.value)
         if self.__type == Integral:
             return int(self.value)

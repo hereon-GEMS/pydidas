@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Parameters for the global pydidas settings
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -171,6 +171,36 @@ GENERIC_PARAMS_SETTINGS = {
         "tooltip": (
             "The paths to all custom plugin locations. Individual entries must be "
             "separated by a double semicolon `;;`."
+        ),
+    },
+    "data_browsing_root": {
+        "type": str,
+        "default": "",
+        "name": "Data browsing root",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The path which should be used as base directory in the data browser. "
+            "The path given here will be used as top level paths and all children "
+            "will be accessible in the data browser. If no path is given, the "
+            "data browser will start with the root directory of the filesystem and "
+            "all paths will be accessible. Note that the path given here must "
+            "exist and be accessible, otherwise the data browser will ignore this "
+            "path."
+        ),
+    },
+    "use_custom_data_browsing_root": {
+        "type": bool,
+        "default": False,
+        "name": "Use custom browsing root",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The flag whether the full file system is accessible or only a small "
+            "subset should be made available in the data browsing. If activated, "
+            "select the directory to use with the `data_browsing_root` parameter."
         ),
     },
     "plot_update_time": {

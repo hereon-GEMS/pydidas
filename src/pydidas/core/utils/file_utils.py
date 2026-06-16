@@ -52,13 +52,13 @@ _FILE_NAME_SCHEME_ERROR_STR = (
 ).replace("\\\\.", ".")
 
 
-def get_directory(path: Path) -> Path:
+def get_directory(path: str | Path) -> Path:
     """
     Get the directory. If a file is given, return its parent directory.
 
     Parameters
     ----------
-    path : Path
+    path : str or Path
         The file system path, including eventual filenames.
 
     Returns
@@ -66,6 +66,8 @@ def get_directory(path: Path) -> Path:
     path : Path
         The path without the filename.
     """
+    if isinstance(path, str):
+        path: Path = Path(path)
     return path.parent if path.is_file() else path
 
 
@@ -141,10 +143,10 @@ def has_extension(path: Path | str, extensions: str | list[str]) -> bool:
 
 def find_valid_python_files(path: Path | str) -> list[Path]:
     """
-    Search for all python files in the path and subdirectories.
+    Search for all Python files in the path and subdirectories.
 
     This method will search the specified path recursively for all
-    python files, defined as files with a .py extension.
+    Python files, defined as files with a .py extension.
     It will ignore protected files /directories (starting with "__")
     and hidden files / directories (starting with ".").
 
@@ -156,7 +158,7 @@ def find_valid_python_files(path: Path | str) -> list[Path]:
     Returns
     -------
     list[Path]
-        A list with the full filesystem path of python files in the
+        A list with the full filesystem path of Python files in the
         directory and its subdirectories.
     """
     if isinstance(path, str):

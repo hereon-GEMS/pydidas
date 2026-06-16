@@ -316,5 +316,5 @@ class ViewResultsFrame(BaseFrameWithApp):
             _formats,
             overwrite=_overwrite,
             node_id=node,
-            squeeze_results=_squeeze_flag,
+            squeeze=_squeeze_flag,
         )

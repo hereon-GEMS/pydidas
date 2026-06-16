@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["get_WorkflowTestFrame_build_config"]
 
+from typing import Any
 
 from qtpy import QtCore
 
@@ -66,7 +67,7 @@ def __param_widget_config(param_key: str) -> dict:
 
 def get_WorkflowTestFrame_build_config(
     frame: BaseFrame,
-) -> list[list[str, tuple[str], dict]]:
+) -> list[list[str | tuple[str] | dict[str, Any]]]:
     """
     Return the build configuration for the WorkflowTestFrame.
 

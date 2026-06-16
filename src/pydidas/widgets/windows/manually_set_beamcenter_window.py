@@ -210,7 +210,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._image = import_data(filename, **kwargs)
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
-        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
 
     def update_detector_description(
         self, detector_name: str, mask_filename: str
@@ -260,7 +260,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._image = Dataset(np.zeros(_shape))
         self._widgets["image_selection"].set_param_and_widget_value("filename", ".")
         self._widgets["plot"].plot_pydidas_dataset(self._image)
-        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+        self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """

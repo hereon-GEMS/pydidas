@@ -27,7 +27,6 @@ __status__ = "Production"
 
 
 from .configure_binary_decoding_widget import ConfigureBinaryDecodingWidget
-from .directory_explorer import DirectoryExplorer
 from .hdf5_dataset_selector import Hdf5DatasetSelector
 from .select_data_frame_widget import SelectDataFrameWidget
 from .toggle_options_button import ToggleOptionsButton
@@ -35,7 +34,6 @@ from .toggle_options_button import ToggleOptionsButton
 
 __all__ = [
     "ConfigureBinaryDecodingWidget",
-    "DirectoryExplorer",
     "Hdf5DatasetSelector",
     "SelectDataFrameWidget",
     "ToggleOptionsButton",

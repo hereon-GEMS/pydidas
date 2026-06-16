@@ -98,7 +98,7 @@ class PydidasStatusWidget(QtWidgets.QDockWidget, metaclass=QtSingleton):
         _message = f"{get_short_time_string()}: {text}"
         self._text_edit.prepend_text(_message, "plain")
         self._text_edit.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMaximum
+            QtWidgets.QScrollBar.SliderToMinimum
         )
 
     @QtCore.Slot()

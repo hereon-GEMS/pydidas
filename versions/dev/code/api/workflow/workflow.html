@@ -1986,18 +1986,24 @@ calculated. Else, returns None.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.non_context_class">
-<span class="sig-name descname"><span class="pre">non_context_class</span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.non_context_class" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="#pydidas.workflow.workflow_results.ProcessingResults" title="pydidas.workflow.processing_results.ProcessingResults"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingResults</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResults" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.copy" title="Link to this definition">#</a></dt>
+<dd><p>Create a copy as base class, not singleton.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowResults.deepcopy">
+<span class="sig-name descname"><span class="pre">deepcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResults.deepcopy" title="Link to this definition">#</a></dt>
+<dd><p>Create a deep copy as base class, not singleton.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResultsSelector">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResultsSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowResultsSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector" title="Link to this definition">#</a></dt>
 <dd><p>The WorkflowResultsSelector class allows to select a subset of results
 from a full WorkflowResults node.</p>
 <dl class="field-list simple">
@@ -2006,10 +2012,10 @@ from a full WorkflowResults node.</p>
 <li><p><strong>parent</strong> (<em>QtWidgets.QWidget</em>) – The parent widget.</p></li>
 <li><p><strong>select_results_param</strong> (<a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>pydidas.core.Parameter</em></a>) – The select_results Parameter instance. This instance should be
 shared between the WorkflowResultsSelector and the parent.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – <p>Optional keyword arguments. Supported kwargs are:</p>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Optional keyword arguments. Supported kwargs are:</p>
 <dl class="simple">
-<dt>workflow_results<span class="classifier">ProcessingResults, optional</span></dt><dd><p>The ProcessingResults instance to use. If not specied, this will default
-to the WorkflowResults.</p>
+<dt>workflow_results<span class="classifier">ProcessingResults or WorkflowResults, optional</span></dt><dd><p>The ProcessingResults instance to use. If not specified, this will
+default to the WorkflowResults.</p>
 </dd>
 </dl>
 </p></li>
@@ -2018,14 +2024,14 @@ to the WorkflowResults.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResultsSelector.active_dims">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">active_dims</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.active_dims" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">active_dims</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.active_dims" title="Link to this definition">#</a></dt>
 <dd><p>Get the active dimensions (i.e. dimensions with more than one entry)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The active dimensions.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
+<dd class="field-even"><p>list[int]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2052,14 +2058,14 @@ to the WorkflowResults.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResultsSelector.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.reset" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.reset" title="Link to this definition">#</a></dt>
 <dd><p>Reset the instance to its default selection, for example when a new
 processing has been started and the old information is no longer valid.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResultsSelector.select_active_node">
-<span class="sig-name descname"><span class="pre">select_active_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.select_active_node" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">select_active_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.select_active_node" title="Link to this definition">#</a></dt>
 <dd><p>Select the active node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2070,14 +2076,14 @@ processing has been started and the old information is no longer valid.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowResultsSelector.selection">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">selection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.selection" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">selection</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">slice</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pydidas.workflow.WorkflowResultsSelector.selection" title="Link to this definition">#</a></dt>
 <dd><p>Get the current selection object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The selection for slicing the WorkflowResults array.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple</p>
+<dd class="field-even"><p>tuple[slice, …] or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2093,17 +2099,14 @@ class and is used to store the current processing tree of the workflow.</p>
 instance of the ProcessingTree class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.workflow.WorkflowTree.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.processing_tree.ProcessingTree"><span class="pre">ProcessingTree</span></a></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowTree.copy" title="Link to this definition">#</a></dt>
-<dd><p>Create a copy of the current ProcessingTree instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A new instance of the ProcessingTree class with the same
-parameters as the current instance.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#pydidas.workflow.ProcessingTree" title="pydidas.workflow.ProcessingTree">ProcessingTree</a></p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowTree.copy" title="Link to this definition">#</a></dt>
+<dd><p>Create a copy as base class, not singleton.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.workflow.WorkflowTree.deepcopy">
+<span class="sig-name descname"><span class="pre">deepcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.workflow.WorkflowTree.deepcopy" title="Link to this definition">#</a></dt>
+<dd><p>Create a deep copy as base class, not singleton.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2270,7 +2273,8 @@ parameters as the current instance.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults"><code class="docutils literal notranslate"><span class="pre">WorkflowResults</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.non_context_class"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.non_context_class</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.copy"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.copy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResults.deepcopy"><code class="docutils literal notranslate"><span class="pre">WorkflowResults.deepcopy</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowResultsSelector"><code class="docutils literal notranslate"><span class="pre">WorkflowResultsSelector</span></code></a><ul class="nav section-nav flex-column">
@@ -2283,6 +2287,7 @@ parameters as the current instance.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowTree"><code class="docutils literal notranslate"><span class="pre">WorkflowTree</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowTree.copy"><code class="docutils literal notranslate"><span class="pre">WorkflowTree.copy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.workflow.WorkflowTree.deepcopy"><code class="docutils literal notranslate"><span class="pre">WorkflowTree.deepcopy</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -901,72 +901,49 @@ referenced by param_key or dtype, if given.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonContextObject</span></span><a class="headerlink" href="#pydidas.core.SingletonContextObject" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class which includes the necessary code to create classes only as Singletons.</p>
-<p>Implementations must inherit from the ObjectWithParameterCollection class.</p>
-<p>FOR THE CORRECT METHOD RESOLUTION ORDER, THE IMPLEMENTED CLASS <em>MUST</em>
-INHERIT FROM THE SingletonContextObject CLASS <em>FIRST</em>.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject.instance">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">instance</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span></span><a class="headerlink" href="#pydidas.core.SingletonContextObject.instance" title="Link to this definition">#</a></dt>
-<dd><p>Get the instance of the singleton object.</p>
+<dt class="sig sig-object py" id="pydidas.core.QtSingleton">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">QtSingleton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.QtSingleton" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectType</span></code></p>
+<p>Singleton metaclass implementation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.core.QtSingleton.get_base_class">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_base_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="headerlink" href="#pydidas.core.QtSingleton.get_base_class" title="Link to this definition">#</a></dt>
+<dd><p>Get the non-singleton base class for a given singleton class.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The instance of the singleton object.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kls</strong> (<em>type</em>) – The singleton class to get the base class for.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#pydidas.core.SingletonContextObject" title="pydidas.core.SingletonContextObject">SingletonContextObject</a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The non-singleton base class.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pydidas.core.SingletonContextObject.non_context_class">
-<span class="sig-name descname"><span class="pre">non_context_class</span></span><a class="headerlink" href="#pydidas.core.SingletonContextObject.non_context_class" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.object_with_parameter_collection.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a></p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="pydidas.core.SingletonObject">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">SingletonObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.SingletonObject" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class which includes the necessary code to create classes only as Singletons.</p>
-<p>Implementations must inherit from SingletonObject first to assert the correct
-method resolution order for calling methods.</p>
+<dt class="sig sig-object py" id="pydidas.core.Singleton">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">Singleton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.Singleton" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
+<p>Singleton metaclass implementation.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.SingletonObject.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">NoReturn</span></span></span><a class="headerlink" href="#pydidas.core.SingletonObject.copy" title="Link to this definition">#</a></dt>
-<dd><p>Wrapper for the __copy__ method.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.SingletonObject.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.SingletonObject.initialize" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the singleton object.</p>
-<p>This method should be overridden by subclasses which have additional
-mixin-classes to perform any necessary initialization. Using the initialize
-method instead of __init__ is required to avoid multiple initializations
-through the SingletonObject.</p>
+<dt class="sig sig-object py" id="pydidas.core.Singleton.get_base_class">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_base_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span></span></span><a class="headerlink" href="#pydidas.core.Singleton.get_base_class" title="Link to this definition">#</a></dt>
+<dd><p>Get the non-singleton base class for a given singleton class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> (<em>Any</em>) – Positional arguments for the initialization.</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – Keyword arguments for the initialization.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>kls</strong> (<em>type</em>) – The singleton class to get the base class for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The non-singleton base class.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.SingletonObject.reset_instance">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">reset_instance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.SingletonObject.reset_instance" title="Link to this definition">#</a></dt>
-<dd><p>Reset the instance of the singleton object.</p>
-<p>This method is intended for testing purposes only and should not be used
-in production code.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1108,15 +1085,12 @@ on the supplied keys.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.PydidasQsettingsMixin.q_settings_set"><code class="docutils literal notranslate"><span class="pre">PydidasQsettingsMixin.q_settings_set</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject.instance"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject.instance</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonContextObject.non_context_class"><code class="docutils literal notranslate"><span class="pre">SingletonContextObject.non_context_class</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.QtSingleton"><code class="docutils literal notranslate"><span class="pre">QtSingleton</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.QtSingleton.get_base_class"><code class="docutils literal notranslate"><span class="pre">QtSingleton.get_base_class</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject"><code class="docutils literal notranslate"><span class="pre">SingletonObject</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject.copy"><code class="docutils literal notranslate"><span class="pre">SingletonObject.copy</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject.initialize"><code class="docutils literal notranslate"><span class="pre">SingletonObject.initialize</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.SingletonObject.reset_instance"><code class="docutils literal notranslate"><span class="pre">SingletonObject.reset_instance</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Singleton"><code class="docutils literal notranslate"><span class="pre">Singleton</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.Singleton.get_base_class"><code class="docutils literal notranslate"><span class="pre">Singleton.get_base_class</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.UserConfigError"><code class="docutils literal notranslate"><span class="pre">UserConfigError</span></code></a></li>

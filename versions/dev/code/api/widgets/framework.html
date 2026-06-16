@@ -640,7 +640,7 @@ respective information for all.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">PydidasFrameStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/others.html#pydidas.core.SingletonObject" title="pydidas.core.singleton_object.SingletonObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingletonObject</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QStackedWidget</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QStackedWidget</span></code></p>
 <p>A QStackedWidget with references to all the possible top-level widgets.</p>
 <p>Widgets are responsible for registering themselves with this class to
 allow a later reference. For the pydidas main application, the main
@@ -652,7 +652,7 @@ window takes care of registration.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name">
-<span class="sig-name descname"><span class="pre">activate_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">activate_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.activate_widget_by_name" title="Link to this definition">#</a></dt>
 <dd><p>Set the widget referenced by name to the active widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -680,7 +680,7 @@ window takes care of registration.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.addWidget">
-<span class="sig-name descname"><span class="pre">addWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.addWidget" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">addWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.addWidget" title="Link to this definition">#</a></dt>
 <dd><p>Overload the QStackedWidget.addWidget method to deactivate it.</p>
 <p>Widgets should be added through the register_widget method, which
 also demands a reference name.</p>
@@ -709,7 +709,7 @@ PydidasFrameStack.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.enterEvent">
-<span class="sig-name descname"><span class="pre">enterEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.enterEvent" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">enterEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.enterEvent" title="Link to this definition">#</a></dt>
 <dd><p>Send a signal that the mouse entered the central widget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -800,24 +800,6 @@ name, if it exists.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.initialize" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the singleton object.</p>
-<p>This method should be overridden by subclasses which have additional
-mixin-classes to perform any necessary initialization. Using the initialize
-method instead of __init__ is required to avoid multiple initializations
-through the SingletonObject.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> (<em>Any</em>) – Positional arguments for the initialization.</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – Keyword arguments for the initialization.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.is_registered">
 <span class="sig-name descname"><span class="pre">is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.is_registered" title="Link to this definition">#</a></dt>
 <dd><p>Check if a widget is already registered.</p>
@@ -839,10 +821,10 @@ if not.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.register_frame">
-<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.register_frame" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.register_frame" title="Link to this definition">#</a></dt>
 <dd><p>Register a Frame with the stacked widget.</p>
-<p>This method will register a Frame and hold a reference to the frame index by
-the Frame’s menu_entry.</p>
+<p>This method will register a Frame and hold a reference to the
+frame index by the Frame’s menu_entry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>pydidas.widgets.framework.BaseFrame</em></a>) – The BaseFrame to be registered.</p>
@@ -859,10 +841,10 @@ the Frame’s menu_entry.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.removeWidget">
-<span class="sig-name descname"><span class="pre">removeWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.removeWidget" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">removeWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.removeWidget" title="Link to this definition">#</a></dt>
 <dd><p>Remove a frame from the QStackedWidget.</p>
-<p>This overloaded method removes a frame widget from the QStackedWidget and
-also dereferences it from the metadata.</p>
+<p>This overloaded method removes a frame widget from the QStackedWidget
+and also dereferences it from the metadata.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a>) – The widget to be removed from the QStackedWidget.</p>
@@ -875,12 +857,12 @@ also dereferences it from the metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.remove_widget_by_name">
-<span class="sig-name descname"><span class="pre">remove_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.remove_widget_by_name" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">remove_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.remove_widget_by_name" title="Link to this definition">#</a></dt>
 <dd><p>Remove a widget by its reference name.</p>
-<p>This method finds the widget associated with the reference name and
-deletes it from the QStackedWidget.</p>
-<p>Note: This does not delete the widget itself, only the reference in
-the QStackedWidget.</p>
+<p>This method finds the widget associated with the reference name
+and deletes it from the QStackedWidget.</p>
+<p>Note: This does not delete the widget itself, only the reference
+in the QStackedWidget.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ref_name</strong> (<em>str</em>) – The reference name of the widget</p>
@@ -893,19 +875,19 @@ the QStackedWidget.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.reset" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.reset" title="Link to this definition">#</a></dt>
 <dd><p>Reset the PydidasFrameStack and delete all widgets from itself.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasFrameStack.restore_frame_states">
-<span class="sig-name descname"><span class="pre">restore_frame_states</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.restore_frame_states" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">restore_frame_states</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasFrameStack.restore_frame_states" title="Link to this definition">#</a></dt>
 <dd><p>Restore the states of all frames from the stored state information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>state</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – A dictionary with the stored state information for all frames.
-The keys are labeled based on the menu entries and the values are
-dictionaries with the state information for each frame.</p>
+The keys are labeled based on the menu entries and the values
+are dictionaries with the state information for each frame.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -915,35 +897,17 @@ dictionaries with the state information for each frame.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasStatusWidget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.framework.</span></span><span class="sig-name descname"><span class="pre">PydidasStatusWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasStatusWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/others.html#pydidas.core.SingletonObject" title="pydidas.core.singleton_object.SingletonObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingletonObject</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QDockWidget</span></code></p>
-<p>The PydidasStatusWidget is used for managing global status messages.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDockWidget</span></code></p>
+<p>The StatusWidget is used for managing global status messages.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasStatusWidget.add_status">
-<span class="sig-name descname"><span class="pre">add_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.framework.PydidasStatusWidget.add_status" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasStatusWidget.add_status" title="Link to this definition">#</a></dt>
 <dd><p>Add a status message to the PydidasStatusWidget.</p>
 <p>This method will add a status message to the Info/Log widget together
 with a timestamp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to add.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.widgets.framework.PydidasStatusWidget.initialize">
-<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.framework.PydidasStatusWidget.initialize" title="Link to this definition">#</a></dt>
-<dd><p>Initialize the singleton object.</p>
-<p>This method should be overridden by subclasses which have additional
-mixin-classes to perform any necessary initialization. Using the initialize
-method instead of __init__ is required to avoid multiple initializations
-through the SingletonObject.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>args</strong> (<em>Any</em>) – Positional arguments for the initialization.</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – Keyword arguments for the initialization.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1120,7 +1084,6 @@ the respective helpfile if it exits or the main documentation if it does not.</p
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_toolbar_entries"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_entries</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.frame_toolbar_metadata"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_metadata</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.get_widget_by_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.get_widget_by_name</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.initialize"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.initialize</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.is_registered"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.is_registered</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.register_frame"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.register_frame</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasFrameStack.removeWidget"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.removeWidget</span></code></a></li>
@@ -1131,7 +1094,6 @@ the respective helpfile if it exits or the main documentation if it does not.</p
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasStatusWidget"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasStatusWidget.add_status"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.add_status</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasStatusWidget.initialize"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.initialize</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasStatusWidget.sizeHint"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.sizeHint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.framework.PydidasStatusWidget.text"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.text</span></code></a></li>
 </ul>

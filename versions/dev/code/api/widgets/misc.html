@@ -519,31 +519,99 @@ Qt can be defined at creation.</p></li>
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">ReadOnlyTextWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QTextEdit</span></code></p>
-<p>A QTextEdit widget with some layout settings in setup and a more advanced setText.</p>
+<p>A QTextEdit widget with advanced text display and formatting support.</p>
+<p>The ReadOnlyTextWidget is a subclass of QTextEdit and is used to
+display scrollable text. It allows four formatters for text.</p>
+<ul class="simple">
+<li><p>‘plain’ : No indent and regular text</p></li>
+<li><p>‘header’ : No indent and bold font</p></li>
+<li><p>‘section’ : A single indent level and regular text</p></li>
+<li><p>‘subsection’ : Two indent levels and regular text</p></li>
+</ul>
+<p>The formats can be specified in the <a class="reference internal" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text" title="pydidas.widgets.misc.ReadOnlyTextWidget.set_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_text</span></code></a> or
+<a class="reference internal" href="#pydidas.widgets.misc.ReadOnlyTextWidget.append_text" title="pydidas.widgets.misc.ReadOnlyTextWidget.append_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">append_text</span></code></a> method or by supplying a list of items.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parent</strong> (<em>QWidget</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The Qt parent widget. The default is None.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any supported Qt arguments</em>) – Any arguments which have an associated setArgName method in Qt can be used
-at creation.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any arguments which have an associated setArgName method in Qt can
+be used at creation.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.append_text">
+<span class="sig-name descname"><span class="pre">append_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plain'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.append_text" title="Link to this definition">#</a></dt>
+<dd><p>Append text to the widget with a specified formatter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be appended.</p></li>
+<li><p><strong>formatter</strong> (<em>str</em>) – The formatter of the text. Can be ‘plain’, ‘header’, ‘section’,
+or ‘subsection’. The default is ‘plain’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.clear" title="Link to this definition">#</a></dt>
+<dd><p>Clear the widget and reset the content tracking.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.default_text">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">default_text</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.default_text" title="Link to this definition">#</a></dt>
+<dd><p>Get the default text (the first entry in the content list).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.prepend_text">
+<span class="sig-name descname"><span class="pre">prepend_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plain'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.prepend_text" title="Link to this definition">#</a></dt>
+<dd><p>Prepend text to the widget with a specified formatter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be appended.</p></li>
+<li><p><strong>formatter</strong> (<em>str</em>) – The formatter of the text. Can be ‘plain’, ‘header’, ‘section’,
+or ‘subsection’. The default is ‘plain’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.reprint">
-<span class="sig-name descname"><span class="pre">reprint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.reprint" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reprint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.reprint" title="Link to this definition">#</a></dt>
 <dd><p>Reprint the latest text with the updated font settings.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.setText">
-<span class="sig-name descname"><span class="pre">setText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.setText" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">setText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.setText" title="Link to this definition">#</a></dt>
 <dd><p>Set the widget’s text.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The title. If None, no title will be printed. The default is None.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget’s text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
 </ul>
 </dd>
 </dl>
@@ -551,7 +619,7 @@ at creation.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list">
-<span class="sig-name descname"><span class="pre">set_text_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_text_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list" title="Link to this definition">#</a></dt>
 <dd><p>Set the widget’s text from a list of entries.</p>
 <p>Each entry in the list is a tuple with the first element being the
 <cite>type</cite> of the entry (header, section, subsection) and the second
@@ -560,11 +628,22 @@ the entry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_list</strong> (<em>list</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – The list of the type keys and /text entries to be displayed.
-The list will be processed with type keys used for formatting
-the entries.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The title. If None, no title will be printed. The default is None.</p></li>
+<li><p><strong>text_list</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – The list of entries. Each entry is a tuple with the formatter key
+and text entries to be displayed.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.misc.ReadOnlyTextWidget.set_title">
+<span class="sig-name descname"><span class="pre">set_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_title" title="Link to this definition">#</a></dt>
+<dd><p>Update the displayed title without changing the text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) – The new title.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -667,9 +746,15 @@ owned by this widget.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.append_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.append_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.clear"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.clear</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.default_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.default_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.prepend_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.prepend_text</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.reprint"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.reprint</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.setText"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.setText</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_text</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_text_from_list"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_text_from_list</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ReadOnlyTextWidget.set_title"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextWidget.set_title</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.misc.ShowIntegrationRoiParamsWidget"><code class="docutils literal notranslate"><span class="pre">ShowIntegrationRoiParamsWidget</span></code></a><ul class="nav section-nav flex-column">

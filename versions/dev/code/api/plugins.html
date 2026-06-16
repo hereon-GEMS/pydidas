@@ -1366,11 +1366,17 @@ label.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.plugins.PluginCollection">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">PluginCollection</span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="pydidas.plugins.PluginCollection.non_context_class">
-<span class="sig-name descname"><span class="pre">non_context_class</span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection.non_context_class" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PluginRegistry</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">PluginCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.PluginCollection" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.PluginCollection.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection.copy" title="Link to this definition">#</a></dt>
+<dd><p>Create a copy as base class, not singleton.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.plugins.PluginCollection.deepcopy">
+<span class="sig-name descname"><span class="pre">deepcopy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span></span></span><a class="headerlink" href="#pydidas.plugins.PluginCollection.deepcopy" title="Link to this definition">#</a></dt>
+<dd><p>Create a deep copy as base class, not singleton.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1714,7 +1720,8 @@ will be used.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection"><code class="docutils literal notranslate"><span class="pre">PluginCollection</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection.non_context_class"><code class="docutils literal notranslate"><span class="pre">PluginCollection.non_context_class</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection.copy"><code class="docutils literal notranslate"><span class="pre">PluginCollection.copy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.PluginCollection.deepcopy"><code class="docutils literal notranslate"><span class="pre">PluginCollection.deepcopy</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.plugins.ProcPlugin"><code class="docutils literal notranslate"><span class="pre">ProcPlugin</span></code></a></li>

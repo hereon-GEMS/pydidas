@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with singleton metaclass factory for implementing thread-safe singletons.
+Module with singleton metaclass factory for implementing singleton metaclasses.
 """
 
 __author__ = "Malte Storm"
@@ -120,7 +120,7 @@ def create_singleton_metaclass(  # noqa: C901
                     if isinstance(obj, dict):
                         dict.update(_temp, obj)
                     return _bc.__copy__(_temp)
-                except (AttributeError, TypeError):
+                except (AttributeError, TypeError, RuntimeError):
                     # If __copy__ fails due to missing attributes, fall back
                     pass
             return _fallback_copy(obj, _bc, copy_module.copy)
@@ -139,7 +139,7 @@ def create_singleton_metaclass(  # noqa: C901
                     if isinstance(obj, dict):
                         dict.update(_temp, obj)
                     return _bc.__deepcopy__(_temp, _memo)
-                except (AttributeError, TypeError):
+                except (AttributeError, TypeError, RuntimeError):
                     # If __deepcopy__ fails due to missing attributes, fall back
                     pass
             return _fallback_copy(obj, _bc, copy_module.deepcopy)

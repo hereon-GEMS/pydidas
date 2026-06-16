@@ -156,7 +156,7 @@ class ParameterCollection(dict):
         if key != param.refkey:
             raise KeyError(
                 f"The dictionary key `{key}` for Parameter `{param}` does not "
-                "match the Parameter reference key: `{param.refkey}`. The "
+                f"match the Parameter reference key: `{param.refkey}`. The "
                 "Parameter cannot be added to the ParameterCollection: Both keys "
                 "must be identical."
             )
@@ -420,7 +420,7 @@ class ParameterCollection(dict):
         )
         raise TypeError(
             "Only Parameter or ParameterCollection instances are supported in the "
-            "ParameterCollection. The following items are invalid:\n." + _invalids
+            "ParameterCollection. The following items are invalid:\n" + _invalids
         )
 
     def __check_key_available(

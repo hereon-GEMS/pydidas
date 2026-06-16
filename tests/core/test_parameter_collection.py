@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -102,36 +102,6 @@ class TestParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj.delete_param("TEST")
 
-    def test_add_arg_params__with_param_collection(self):
-        tester = ParameterCollection(*self._params)
-        obj = ParameterCollection()
-        obj._ParameterCollection__add_arg_params(tester)
-        for item in self._params:
-            self.assertTrue(item in obj.values())
-
-    def test_add_arg_params__with_params(self):
-        obj = ParameterCollection()
-        obj._ParameterCollection__add_arg_params(*self._params)
-        for item in self._params:
-            self.assertTrue(item in obj.values())
-
-    def test_add_arg_params__with_mixed_items(self):
-        tester = ParameterCollection(*self._params[1:])
-        obj = ParameterCollection()
-        obj._ParameterCollection__add_arg_params(self._params[0], tester)
-        for item in self._params:
-            self.assertTrue(item in obj.values())
-
-    def test_add_arg_params__with_collection(self):
-        obj = ParameterCollection(*self._params)
-        coll = ParameterCollection(
-            Parameter("Test7", str, default="Test"),
-            Parameter("Test8", float, default=0),
-        )
-        obj._ParameterCollection__add_arg_params(coll)
-        for index in range(7, 9):
-            self.assertIsInstance(obj[f"Test{index}"], Parameter)
-
     def test_check_duplicate_keys__only_args(self):
         obj = ParameterCollection()
         obj._ParameterCollection__check_duplicate_keys(*self._params)
@@ -175,11 +145,19 @@ class TestParameterCollection(unittest.TestCase):
         for index in range(7, 9):
             self.assertIsInstance(obj[f"Test{index}"], Parameter)
 
-    def test_add_params__duplicate(self):
+    def test_add_params__w_duplicate_key(self):
         obj = ParameterCollection(*self._params)
         with self.assertRaises(KeyError):
             obj.add_params(
                 Parameter("Test5", float, default=-1),
+                Parameter("Test5", int, default=12),
+            )
+
+    def test_add_params__w_existing_key(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(KeyError):
+            obj.add_params(
+                self._params[0].copy(),
                 Parameter("Test5", int, default=12),
             )
 
@@ -202,6 +180,20 @@ class TestParameterCollection(unittest.TestCase):
     def test_add_param___with_parameter(self):
         obj = ParameterCollection()
         obj.add_param(self._params[0])
+
+    def test_add_param___with_existing_parameter(self):
+        obj = ParameterCollection()
+        obj.add_param(self._params[0])
+        with self.assertRaises(KeyError):
+            obj.add_param(self._params[0])
+
+    def test_add_param___with_existing_parameter_and_force_replace(self):
+        obj = ParameterCollection()
+        _key = self._params[0].refkey
+        _duplicate = self._params[0].copy()
+        obj.add_param(self._params[0])
+        obj.add_param(_duplicate, force_replace=True)
+        self.assertEqual(obj[_key], _duplicate)
 
     def test_add_param___with_collection(self):
         tester = ParameterCollection(*self._params)

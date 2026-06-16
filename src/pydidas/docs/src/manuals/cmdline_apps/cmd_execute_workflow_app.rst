@@ -179,7 +179,7 @@ Accessing results within Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The results from the ExecuteWorkflowApp are written in the global
-:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` (the Singleton
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` (the singleton
 instance of :py:class:`ProcessingResults <pydidas.workflow.ProcessingResults>`)
 which is described in detail in :ref:`workflow_results`.
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ results stored in the WorkflowResults.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["WorkflowResultsSelector"]
 
 
 import re
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -39,6 +40,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from pydidas.workflow import ProcessingResults
 from pydidas.workflow.workflow_results import WorkflowResults
 
 
@@ -54,12 +56,12 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
     select_results_param : pydidas.core.Parameter
         The select_results Parameter instance. This instance should be
         shared between the WorkflowResultsSelector and the parent.
-    **kwargs : dict
+    **kwargs : Any
         Optional keyword arguments. Supported kwargs are:
 
-        workflow_results : ProcessingResults, optional
-            The ProcessingResults instance to use. If not specied, this will default
-            to the WorkflowResults.
+        workflow_results : ProcessingResults or WorkflowResults, optional
+            The ProcessingResults instance to use. If not specified, this will
+            default to the WorkflowResults.
     """
 
     new_selection = QtCore.Signal(bool, int, int, object)
@@ -68,21 +70,21 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         "use_scan_timeline", "result_n_dim", "use_data_range"
     )
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
-        _results = kwargs.get("workflow_results", None)
+        _results: ProcessingResults | None = kwargs.get("workflow_results", None)
         self._RESULTS = WorkflowResults() if _results is None else _results
         self._SCAN = self._RESULTS.frozen_scan
-        self._selection = None
+        self._selection: tuple[slice, ...] | None = None
         self._npoints = []
         self._config["active_node"] = -1
         self._config["active_ranges"] = {}
         self._config["param_hash"] = -1
         self._re_pattern = re.compile(r"^(\s*(-?\d*\.?\d*:?){1,3},?)*?$")
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the instance to its default selection, for example when a new
         processing has been started and the old information is no longer valid.
@@ -90,7 +92,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._config["active_node"] = -1
         self._selection = None
 
-    def select_active_node(self, index: int):
+    def select_active_node(self, index: int) -> None:
         """
         Select the active node.
 
@@ -104,7 +106,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._check_and_create_params_for_slice_selection()
         self._config["active_ranges"] = self._RESULTS.get_result_ranges(index)
 
-    def _calc_and_store_ndim_of_results(self):
+    def _calc_and_store_ndim_of_results(self) -> None:
         """
         Update the number of dimensions the results will have and store the
         new number.
@@ -114,7 +116,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             _ndim -= self._SCAN.ndim - 1
         self._config["result_ndim"] = _ndim
 
-    def _check_and_create_params_for_slice_selection(self):
+    def _check_and_create_params_for_slice_selection(self) -> None:
         """
         Check whether the required Parameters for the slice selection exist
         for all current data dimensions and create and add them if they do not.
@@ -135,13 +137,13 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 self.add_param(_param)
 
     @property
-    def selection(self) -> tuple[slice, ...]:
+    def selection(self) -> tuple[slice, ...] | None:
         """
         Get the current selection object.
 
         Returns
         -------
-        tuple
+        tuple[slice, ...] or None
             The selection for slicing the WorkflowResults array.
         """
         if self._get_param_hash() != self._config["param_hash"]:
@@ -149,13 +151,13 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         return self._selection
 
     @property
-    def active_dims(self) -> list[int, ...]:
+    def active_dims(self) -> list[int]:
         """
         Get the active dimensions (i.e. dimensions with more than one entry)
 
         Returns
         -------
-        list
+        list[int]
             The active dimensions.
         """
         if self._get_param_hash() != self._config["param_hash"]:
@@ -166,7 +168,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
 
     def _get_param_hash(self) -> int:
         """
-        Get the hash value for all Parameter values.
+        Get a single hash value for all Parameter values and Scan settings.
 
         Returns
         -------
@@ -186,7 +188,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         )
         return hash(tuple(_hash_tuple))
 
-    def _update_selection(self):
+    def _update_selection(self) -> None:
         """
         Update the selection based on the entries for the "data_slice_##"
         Parameters.
@@ -281,7 +283,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             _new_items.append(_entries)
         return _new_items
 
-    def _convert_values_to_indices(self, substrings: list[str]) -> list[int]:
+    def _convert_values_to_indices(self, substrings: list[str]) -> list[list[int]]:
         """
         Convert data value strings to indexes for selecting the required
         datapoints.
@@ -294,8 +296,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
 
         Returns
         -------
-        list[int]
-            The list with index values for the various selections.
+        list[list[int]]
+            The list with index values for the various selections. For each
+            dimension, the entry is either a single int for a specific index
+            or a list of two indices for the first and last index to be sliced.
         """
         _new_items = []
         _range = self._config["active_ranges"][self._config["active_index"]]
@@ -341,14 +345,14 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         _index = _delta.argmin()
         return _index
 
-    def _check_for_selection_dim(self, selection: tuple[slice]):
+    def _check_for_selection_dim(self, selection: tuple[np.ndarray, ...]) -> None:
         """
         Check that the selection has the same dimensionality as the requested
         dimensionality and raise an Exception if not.
 
         Parameters
         ----------
-        selection : tuple[slice]
+        selection : tuple[np.ndarray, ...]
             The slice objects for all dimensions.
 
         Raises
@@ -367,6 +371,6 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         if _target_dims != _dims_larger_one:
             raise UserConfigError(
                 "The dimensionality of the selected data subset does not match "
-                f"the specified dimension. Specified dimensionality: {_dims_larger_one}"
-                f"; Target dimensionality: {_target_dims}."
+                "the specified dimension. Specified dimensionality: "
+                f"{_dims_larger_one}; Target dimensionality: {_target_dims}."
             )

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,19 +21,18 @@ a ProcessingTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowTree"]
 
-from typing import Type
 
-from pydidas.core import SingletonObject
+from pydidas.core import Singleton
 from pydidas.workflow.processing_tree import ProcessingTree
 
 
-class WorkflowTree(SingletonObject, ProcessingTree):
+class WorkflowTree(ProcessingTree, metaclass=Singleton):
     """
     The WorkflowTree class is the singleton instance of the ProcessingTree
     class and is used to store the current processing tree of the workflow.
@@ -41,27 +40,3 @@ class WorkflowTree(SingletonObject, ProcessingTree):
     It implements a copy method to allow copying the current tree to a new
     instance of the ProcessingTree class.
     """
-
-    def __copy__(self, as_type: Type | None = None) -> ProcessingTree:
-        """
-        Create a copy of the current ProcessingTree instance.
-
-        Returns
-        -------
-        ProcessingTree
-            A new instance of the ProcessingTree class with the same
-            parameters as the current instance.
-        """
-        return ProcessingTree.__copy__(self, as_type=ProcessingTree)
-
-    def copy(self, as_type: Type | None = None) -> ProcessingTree:
-        """
-        Create a copy of the current ProcessingTree instance.
-
-        Returns
-        -------
-        ProcessingTree
-            A new instance of the ProcessingTree class with the same
-            parameters as the current instance.
-        """
-        return self.__copy__()

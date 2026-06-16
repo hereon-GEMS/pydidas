@@ -106,6 +106,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
         self._qtapp = PydidasQApplication.instance()
         self._qtapp.setWindowIcon(icons.pydidas_icon_with_bg())
+        self._frame_stack: PydidasFrameStack = PydidasFrameStack()
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
@@ -121,7 +122,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self._open_help)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self._qtapp.aboutToQuit.connect(self.centralWidget().reset)
+        self._qtapp.aboutToQuit.connect(self._frame_stack.reset)
         self.sig_close_main_window.connect(self._qtapp.send_gui_close_signal)
 
     def _create_logging_info_widget(self):
@@ -167,7 +168,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             self.setGeometry(geometry)
         else:
             self.setGeometry(40, 60, 1400, 1000)
-        self.setCentralWidget(PydidasFrameStack())
+        self.setCentralWidget(self._frame_stack)
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI")
         self.setWindowIcon(icons.pydidas_icon_with_bg())
@@ -517,7 +518,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if not filename.parent.is_dir():
             filename.parent.mkdir(parents=True)
         _state = self.__get_window_states()
-        for _index, _frame in enumerate(self.centralWidget().current_frames):
+        for _index, _frame in enumerate(self._frame_stack.current_frames):
             _entry, _frame_state = _frame.export_state()
             _state[f"frame::{_entry}"] = _frame_state
         for _key, _context in GLOBAL_CONTEXTS.items():
@@ -563,7 +564,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             "geometry": tuple(_relative_geometry),
             "maximized": self.isMaximized(),
             "screen": _app.screens().index(self.window().windowHandle().screen()),
-            "frame_index": self.centralWidget().currentIndex(),
+            "frame_index": self._frame_stack.currentIndex(),
         }
         return _state
 
@@ -658,7 +659,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             self.setWindowState(QtCore.Qt.WindowMaximized)
         _frame_index = state["frame_index"]
         if _frame_index >= 0:
-            self.centralWidget().setCurrentIndex(_frame_index)
+            self._frame_stack.setCurrentIndex(_frame_index)
         self.setGeometry(*state["geometry"])
 
     def restore_frame_states(self, state: dict):
@@ -675,7 +676,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             for _key, _val in state.items()
             if _key.startswith("frame::")
         }
-        self.centralWidget().restore_frame_states(_frame_states)
+        self._frame_stack.restore_frame_states(_frame_states)
 
     @QtCore.Slot()
     def _open_help(self):
@@ -685,7 +686,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         This slot will check whether a help file exists for the current frame and open
         the respective help file if it exits or the main documentation if it does not.
         """
-        _frame_class = self.centralWidget().currentWidget().__class__.__name__
+        _frame_class = self._frame_stack.currentWidget().__class__.__name__
         _doc_file = doc_path_for_gui_manual(_frame_class, "frame")
 
         if os.path.exists(_doc_file):

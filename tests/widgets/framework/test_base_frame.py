@@ -99,7 +99,7 @@ class TestBaseFrame(unittest.TestCase):
         self.assertEqual(obj.__class__.__name__, _state["class"])
         obj.deleteLater()
 
-    def test_restore_state__hidden_frame(self) -> None:
+    def test_inject_frame_state(self) -> None:
         _n = 10
         obj = self.get_base_frame()
         obj._config["built"] = False
@@ -111,11 +111,11 @@ class TestBaseFrame(unittest.TestCase):
             "menu_entry": obj.menu_entry,
         }
         obj.show()
-        obj.restore_state(_state)
+        obj.inject_frame_state(_state)
         self.assertEqual(obj._config["state"], _state)
         obj.deleteLater()
 
-    def test_restore_state__frame_visible(self) -> None:
+    def test_restore_state(self) -> None:
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
@@ -127,6 +127,7 @@ class TestBaseFrame(unittest.TestCase):
             "menu_entry": obj.menu_entry,
         }
         obj.show()
+        obj.inject_frame_state(_state)
         obj.restore_state(_state)
         _, _state = obj.export_state()
         self.assertEqual(_params, _state["params"])

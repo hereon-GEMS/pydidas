@@ -189,10 +189,7 @@ class BaseFrame(
         self._config["state"] = state  # type: ignore[arg-type]
         self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
-            # TODO: Discuss whether check for _key in self.params here is sensible
-            #       currently, the first wrong param will trigger an abort
-            # if _key in self.params and _key not in self.params_not_to_restore:
-            if _key not in self.params_not_to_restore:
+            if _key in self.params and _key not in self.params_not_to_restore:
                 try:
                     self.set_param_value(_key, _val)
                 except Exception:

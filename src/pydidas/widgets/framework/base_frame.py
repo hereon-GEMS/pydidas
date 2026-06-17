@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFrame"]
 
 
-from numbers import Integral
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -95,7 +94,7 @@ class BaseFrame(
         self._config: dict[str, Any] = {"built": False}
 
     @QtCore.Slot(int)
-    def frame_activated(self, index: Integral) -> None:
+    def frame_activated(self, index: int) -> None:
         """
         Received signal that frame has been activated.
 
@@ -106,7 +105,7 @@ class BaseFrame(
 
         Parameters
         ----------
-        index : Integral
+        index : int
             The index of the activated frame.
         """
         if index == self.frame_index and not self._config["built"]:
@@ -159,7 +158,12 @@ class BaseFrame(
             A dictionary with all the information required to export the
             frame's state.
         """
-        _params = self.get_param_values_as_dict(filter_types_for_export=True)
+        _all_params = self.get_param_values_as_dict(filter_types_for_export=True)
+        _params = {
+            _key: _value
+            for _key, _value in _all_params.items()
+            if _key not in self.params_not_to_restore
+        }
         return self.menu_entry, {
             "frame_index": self.frame_index,
             "params": _params,

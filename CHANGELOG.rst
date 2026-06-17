@@ -45,6 +45,8 @@ Bugfixes
   storing them when using the autosave_results flag in the ExecuteWorkflowApp.
 - Fixed an issue in the BaseApp when exporting ranges where values defaulted
   to None (not supported in range)
+- Fixed an issue where the filename parameter was exported in the data
+  browsing frame even though it was not intended.
 
 
 v26.05.19

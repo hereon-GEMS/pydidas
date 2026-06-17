@@ -81,7 +81,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         if self.parse_func is None:
             return
-        _cmdline_args = self.parse_func()
+        _cmdline_args = type(self).parse_func()
         for _key, _value in _cmdline_args.items():
             if _key in self.params and _value is not None:
                 self.params.set_value(_key, _value)

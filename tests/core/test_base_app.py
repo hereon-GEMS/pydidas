@@ -292,7 +292,7 @@ def test_parse_func__w_implementation(params):
         app = BaseApp(params)
         assert app.get_param_value("label") == "Spam & Eggs"
     finally:
-        BaseApp.parse_func = original_parse_func  # type: ignore
+        BaseApp.parse_func = staticmethod(original_parse_func)  # type: ignore
 
 
 def test_deleteLater__no_manager(base_app):

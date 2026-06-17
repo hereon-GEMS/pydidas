@@ -20,6 +20,10 @@ Programmatic changes
 --------------------
 - Added a checker for adherece to NeXus NXdata definition of selected 
   datasets in HDF5 files.
+- Modified the way singletons are created and handled for a cleaner
+  architecture.
+- Reworked ReadOnlyTextWidget to allow appending and prepending text 
+  to the widget text in a generic way.
 
 Bugfixes
 --------
@@ -35,6 +39,8 @@ Bugfixes
   processing queue for signals and its use in PydidasPlot1d.
 - Fixed an issue with importing data with scan dimensions of size 1 which
   were squeezed during export.
+- Fixed an issue where the plotted labels for columnar data were not 
+  properly reset on loading new data.
 - Fixed an issue where results were accidentally overwritten in buffer before
   storing them when using the autosave_results flag in the ExecuteWorkflowApp.
 - Fixed an issue in the BaseApp when exporting ranges where values defaulted

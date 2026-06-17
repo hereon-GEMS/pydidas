@@ -36,10 +36,10 @@ from qtpy import QtCore, QtWidgets
 from pydidas.contexts import ScanContext
 from pydidas.core import (
     PydidasQsettingsMixin,
-    SingletonObject,
     UserConfigError,
 )
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
+from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_child_qobject
 from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
@@ -78,8 +78,8 @@ class SelectionModel(QtCore.QIdentityProxyModel):
         return _flags
 
 
-class PydidasFileDialog(
-    SingletonObject, QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
+class _PydidasFileDialog(
+    QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
 ):
     """
     pydidas's subclassed QFileDialog with additional functionality.
@@ -91,14 +91,12 @@ class PydidasFileDialog(
     The usage is the same as for the generic QFileDialog.
     """
 
-    def initialize(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize the PydidasFileDialog.
 
         Parameters
         ----------
-        *args : Any
-            Positional arguments.
         **kwargs : Any
             Keyword arguments. Supported keywords are:
 
@@ -118,6 +116,9 @@ class PydidasFileDialog(
                 An additional information string which is displayed in
                 the FileDialog widget. The default is None.
         """
+        QtWidgets.QFileDialog.__init__(self)
+        CreateWidgetsMixIn.__init__(self)
+        PydidasQsettingsMixin.__init__(self)
         self._files_unselectable_model = SelectionModel(self)
         self._config = {
             "caption": kwargs.get("caption", None),
@@ -556,3 +557,6 @@ class PydidasFileDialog(
                 f"The given extension `{extension}` is invalid because the file type "
                 "is not supported for this use case."
             )
+
+
+class PydidasFileDialog(_PydidasFileDialog, metaclass=QtSingleton): ...

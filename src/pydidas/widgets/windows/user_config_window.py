@@ -35,7 +35,7 @@ from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from pydidas.core import SingletonObject, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONFIG_WIDTH,
@@ -49,6 +49,7 @@ from pydidas.core.constants import (
 from pydidas.core.generic_params.generic_params_settings import (
     GENERIC_PARAMS_SETTINGS,
 )
+from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.dialogues import (
@@ -69,7 +70,7 @@ _FONT_SIZE_VALIDATOR = QtGui.QDoubleValidator(5, 20, 1)
 _FONT_SIZE_VALIDATOR.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
 
-class UserConfigWindow(SingletonObject, PydidasWindow):
+class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
     """
     The UserConfigWindow allows setting the user configuration for pydidas.
     """
@@ -84,7 +85,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
 
     def __init__(self, **kwargs: Any) -> None:
         self.__qtapp = PydidasQApplication.instance()
-        SingletonObject.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.setWindowTitle("pydidas user configuration")
         self.setSizePolicy(*POLICY_MIN_MIN)
 
@@ -332,7 +333,8 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""
         self._config["cmap_nan_palette"] = QtGui.QPalette()
-        self._update_cmap_nan_current_color(self.q_settings_get("user/cmap_nan_color"))
+        _initial_cmap_nan_color = self.q_settings_get("user/cmap_nan_color")
+        self._update_cmap_nan_current_color(_initial_cmap_nan_color)
         _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
         self.setFixedWidth(_width)
         self._widgets["font_family_box"].setFixedWidth(
@@ -483,7 +485,7 @@ class UserConfigWindow(SingletonObject, PydidasWindow):
     @QtCore.Slot(int)
     def frame_activated(self, index: int) -> None:
         """
-        Update the frame.
+        Handle the frame activation.
 
         The frame_activated slot is called every time a frame is activated.
         The index is the frame_index of the newly activated frame in case any

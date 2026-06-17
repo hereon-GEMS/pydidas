@@ -51,6 +51,8 @@ class _TestApp(BaseApp):
             "item1": 1,
             "item2": slice(0, 5),
             "item3": "dummy",
+            "item4": range(35),
+            "item5": range(3, 42, 7),
             "carryon_counter": -1,
         }
 

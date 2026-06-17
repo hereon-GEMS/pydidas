@@ -37,6 +37,8 @@ Bugfixes
   were squeezed during export.
 - Fixed an issue where results were accidentally overwritten in buffer before
   storing them when using the autosave_results flag in the ExecuteWorkflowApp.
+- Fixed an issue in the BaseApp when exporting ranges where values defaulted
+  to None (not supported in range)
 
 
 v26.05.19

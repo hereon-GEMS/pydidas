@@ -13,6 +13,8 @@ Improvements
 - Added a dedicated plugin to import NeXus NXdata with full metadata
   and in the shape of the Scan. This allows for conveniently restarting
   workflows from stored intermediate data.
+- Added an options parser to the GUI starer script to set the state import
+  at calling time with an argument. Use '-restore_state None | exit | saved'
 
 Programmatic changes
 --------------------
@@ -33,6 +35,8 @@ Bugfixes
   processing queue for signals and its use in PydidasPlot1d.
 - Fixed an issue with importing data with scan dimensions of size 1 which
   were squeezed during export.
+- Fixed an issue where results were accidentally overwritten in buffer before
+  storing them when using the autosave_results flag in the ExecuteWorkflowApp.
 
 
 v26.05.19

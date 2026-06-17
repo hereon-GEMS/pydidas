@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,7 +32,7 @@ import multiprocessing as mp
 import time
 import warnings
 from multiprocessing.shared_memory import SharedMemory
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from qtpy import QtCore
@@ -224,10 +224,9 @@ class ExecuteWorkflowApp(BaseApp):
             RESULT_SAVER.set_active_savers_and_title([])
             self._store_context()
             RESULTS.prepare_new_results()
-            if self.get_param_value("autosave_results"):
-                self._config["export_files_prepared"] = False
         TREE.prepare_execution()
         self._config["run_prepared"] = True
+        self._config["export_files_prepared"] = False
 
     def _recreate_context(self) -> None:
         """
@@ -509,7 +508,7 @@ class ExecuteWorkflowApp(BaseApp):
                     _node_id
                 ].results
 
-    def must_send_signal_and_wait_for_response(self) -> Optional[str]:
+    def must_send_signal_and_wait_for_response(self) -> str | None:
         """
         Check if a signal must be sent and wait for the response.
 
@@ -517,21 +516,22 @@ class ExecuteWorkflowApp(BaseApp):
 
         Returns
         -------
-        Optional[str]
+        str or None
             The signal to be sent.
         """
         if not self.mp_manager["shapes_set"].is_set():
             return "::shapes_not_set::"
         return None
 
-    def get_latest_results(self) -> Optional[object]:
+    def get_latest_results(self) -> int | None:
         """
         Return the latest results from the WorkflowTree.
 
         Returns
         -------
-        dict or None
-            The latest results from the WorkflowTree.
+        int or None
+            The buffer index of the latest results from the WorkflowTree
+            or None, if not set.
         """
         if not self.mp_manager["shapes_set"].is_set():
             return None
@@ -581,7 +581,8 @@ class ExecuteWorkflowApp(BaseApp):
             self._config["result_metadata_set"] = True
         with self.mp_manager["lock"]:
             _new_results = {
-                _key: _arr[data_index]
+                # explicitly create new arrays to have new copies in memory:
+                _key: np.array(_arr[data_index])
                 for _key, _arr in self._shared_arrays.items()
                 if _key != "in_use_flag"
             }
@@ -593,11 +594,11 @@ class ExecuteWorkflowApp(BaseApp):
                     self.get_param_value("autosave_directory"),
                     self.get_param_value("autosave_format"),
                 )
-                _new_results = {
-                    _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
-                    for _key, _val in _new_results.items()
-                }
                 self._config["export_files_prepared"] = True
+            _new_results = {
+                _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
+                for _key, _val in _new_results.items()
+            }
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
         self.sig_results_updated.emit()
 

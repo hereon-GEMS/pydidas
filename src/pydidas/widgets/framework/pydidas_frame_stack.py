@@ -359,7 +359,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         self.sig_mouse_entered.emit()
 
-    def restore_frame_states(self, state: dict[str, dict]) -> None:
+    def restore_frame_state_info(self, state: dict[str, dict]) -> None:
         """
         Restore the state info of all frames from the stored state information.
 

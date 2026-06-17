@@ -129,8 +129,6 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         """
         Create the PydidasStatusWidget for logging and status messages.
         """
-        _app = PydidasQApplication.instance()
-
         self._info_widget = PydidasStatusWidget()
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self._info_widget)
         self._qtapp.sig_new_font_metrics.connect(self._resize_default_dock_area)
@@ -559,11 +557,12 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         _relative_geometry = list(self.geometry().getRect())
         _relative_geometry[0] -= self.screen().geometry().x()
         _relative_geometry[1] -= self.screen().geometry().y()
-        _app = QtWidgets.QApplication.instance()
         _state = {
             "geometry": tuple(_relative_geometry),
             "maximized": self.isMaximized(),
-            "screen": _app.screens().index(self.window().windowHandle().screen()),
+            "screen": self._qtapp.screens().index(
+                self.window().windowHandle().screen()
+            ),
             "frame_index": self._frame_stack.currentIndex(),
         }
         return _state
@@ -665,10 +664,9 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             The stored state of the main window.
         """
         try:
-            _app = QtWidgets.QApplication.instance()
-            if _app.screen_to_use is not None:
-                state["screen"] = _app.screen_to_use
-            _screens = _app.screens()
+            if self._qtapp.screen_to_use is not None:
+                state["screen"] = self._qtapp.screen_to_use
+            _screens = self._qtapp.screens()
             _screen_no = state.get("screen", 0)
             _target_screen = _screens[_screen_no if _screen_no < len(_screens) else 0]
             _target_screen_geo = _target_screen.availableGeometry()
@@ -706,7 +704,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             for _key, _val in state.items()
             if _key.startswith("frame::")
         }
-        self._frame_stack.restore_frame_states(_frame_states)
+        self._frame_stack.restore_frame_state_info(_frame_states)
 
     @QtCore.Slot()
     def _open_help(self):

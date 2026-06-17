@@ -98,9 +98,7 @@ def _str_to_bool(value: str) -> bool:
         return True
     if value.lower() in ("false", "no", "0", "off"):
         return False
-    raise argparse.ArgumentTypeError(
-        f"Boolean value expected. Got: {value}"
-    )
+    raise argparse.ArgumentTypeError(f"Boolean value expected. Got: {value}")
 
 
 def open_gui() -> None:

@@ -36,6 +36,7 @@ from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import DEFAULT_FRAMES
 from pydidas.resources import icons
+from pydidas.widgets.dialogues import PydidasExceptionMessageBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
@@ -106,13 +107,15 @@ def start_pydidas_gui(
         _splash.finish(_gui)
         try:
             _gui.restore_gui_state(state=restore_state)
-        except UserConfigError:
-            pass
+        except UserConfigError as exc:
+            _ = PydidasExceptionMessageBox(
+                text=str(exc), title="Errors occurred during GUI state restoration"
+            ).exec_()
         _gui.check_for_updates(auto_check=True)
         _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
-    except Exception:
+    except Exception as _e:
         _splash.close()
     if _app is not None:
         _app.deleteLater()

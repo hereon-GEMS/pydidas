@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ URLs for the documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -35,6 +35,7 @@ __all__ = [
 import logging
 import multiprocessing as mp
 import os
+import re
 import sys
 import warnings
 from pathlib import Path
@@ -97,6 +98,13 @@ def initialize_qsetting_values():
     # if not existing, initialize all QSettings with the default values from the
     # default Parameters to avoid having "None" keys returned.
     __settings = QtCore.QSettings("Hereon", "pydidas")
+    _settings_versions = []
+    for _key in __settings.allKeys():
+        _key_version = _key.split("/")[0]
+        if _key_version not in _settings_versions:
+            if re.search(r"^[0-9]{2}\.[0-9]{2}\.[0-9]{2}$", _key_version):
+                _settings_versions.append(_key.split("/")[0])
+    _settings_versions.sort(reverse=True)
     for _prefix, _keys in (
         ("global", constants.QSETTINGS_GLOBAL_KEYS),
         ("user", constants.QSETTINGS_USER_KEYS),
@@ -104,6 +112,12 @@ def initialize_qsetting_values():
     ):
         for _key in _keys:
             _val = __settings.value(f"{VERSION}/{_prefix}/{_key}")
+            if _val is None:
+                for _version in _settings_versions:
+                    _val = __settings.value(f"{_version}/{_prefix}/{_key}")
+                    if _val is not None:
+                        __settings.setValue(f"{VERSION}/{_prefix}/{_key}", _val)
+                        break
             if _val is None:
                 _param = get_generic_parameter(_key)
                 __settings.setValue(f"{VERSION}/{_prefix}/{_key}", _param.default)

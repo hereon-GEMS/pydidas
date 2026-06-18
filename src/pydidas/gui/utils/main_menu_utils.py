@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ MainMenu class or relating to the MainMenu class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "get_standard_state_full_filename",
+    "get_available_exit_states",
     "clear_local_log_files",
     "open_doc_in_browser",
     "get_latest_release_tag",
@@ -34,7 +35,9 @@ __all__ = [
     "restore_global_objects",
 ]
 
+
 import os
+import re
 from pathlib import Path
 
 import requests
@@ -55,8 +58,8 @@ def get_standard_state_full_filename(filename: str) -> Path:
     """
     Get the standard full path for the state filename.
 
-    This method will search all stored config paths and return the first match of
-    path/filename combinations which is an accessible file.
+    This method will search all stored config paths and return the first
+    match of path/filename combinations which is an accessible file.
 
     Parameters
     ----------
@@ -65,7 +68,7 @@ def get_standard_state_full_filename(filename: str) -> Path:
 
     Returns
     -------
-    _fname : Path
+    Path
         The file name and path to the config file.
     """
     for _path in PYDIDAS_CONFIG_PATHS:
@@ -75,8 +78,31 @@ def get_standard_state_full_filename(filename: str) -> Path:
     return PYDIDAS_STANDARD_CONFIG_PATH.joinpath(filename)
 
 
+def get_available_exit_states() -> list[str]:
+    """
+    Get the available states from the standard config path.
+
+    Returns
+    -------
+    list[str]
+        The available state filenames.
+    """
+    _regex = r"^pydidas_gui_exit_state_[0-9]{2}\.[0-9]{2}\.[0-9]{2}.yaml$"
+    filenames = []
+    for _path in PYDIDAS_CONFIG_PATHS:
+        if not _path.exists():
+            continue
+        _files = [
+            _f for _f in _path.iterdir() if _f.is_file() and os.access(_f, os.R_OK)
+        ]
+        for _f in _files:
+            if re.search(_regex, _f.name):
+                filenames.append(_f.name)
+    return sorted(filenames)
+
+
 @QtCore.Slot()
-def clear_local_log_files():
+def clear_local_log_files() -> None:
     """
     Clear all local log files for this pydidas version.
     """
@@ -89,7 +115,7 @@ def clear_local_log_files():
     ).exec_()
     if _reply:
         _access_error = utils.clear_logging_dir()
-        if len(_access_error) > 0:
+        if _access_error:
             raise UserConfigError(
                 "Could not delete the following log file(s):\n - "
                 + "\n - ".join(_access_error)
@@ -97,10 +123,8 @@ def clear_local_log_files():
 
 
 @QtCore.Slot()
-def open_doc_in_browser():
-    """
-    Open the link to the documentation in the system web browser.
-    """
+def open_doc_in_browser() -> None:
+    """Open the link to the documentation in the system web browser."""
     _ = QtGui.QDesktopServices.openUrl(utils.DOC_HOME_QURL)
 
 
@@ -132,7 +156,7 @@ def get_update_check_text(remote_version: str, acknowledged_update: str) -> str:
     Get the text with the result of the update check for the user.
 
     Parameters
-    __________
+    ----------
     remote_version : str
         The latest released version of pydidas.
     acknowledged_update : str
@@ -159,10 +183,10 @@ def get_update_check_text(remote_version: str, acknowledged_update: str) -> str:
     return _text
 
 
-def restore_global_objects(state: dict):
+def restore_global_objects(state: dict) -> None:
     """
     Get the states of pydidas's global objects (ScanContext,
-    DiffractionExperimentContext, WorkflowTree)
+    DiffractionExperimentContext, WorkflowTree).
 
     Parameters
     ----------
@@ -170,10 +194,18 @@ def restore_global_objects(state: dict):
         The restored global states which includes the states for the
         global objects.
     """
+    _errors = ""
     try:
         TREE.restore_from_string(state["context::workflow_tree"])
     except KeyError:
-        raise UserConfigError("Cannot import Workflow. Not all plugins found.")
+        _errors += "- Cannot import Workflow. Not all plugins found.\n"
     for _context_key, _context in GLOBAL_CONTEXTS.items():
         for _key, _val in state[f"context::{_context_key}"].items():
-            _context.set_param_value(_key, _val)
+            try:
+                _context.set_param_value(_key, _val)
+            except Exception:
+                _errors += (
+                    f"Context `{_context_key}`:\n- Error restoring parameter `{_key}`\n"
+                )
+    if _errors:
+        raise UserConfigError(f"--- Global objects ---\n{_errors}")

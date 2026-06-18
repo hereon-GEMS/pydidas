@@ -36,7 +36,7 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import utils
+from pydidas.core import UserConfigError, utils
 from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.framework.base_frame import BaseFrame
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
@@ -63,6 +63,19 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         self._frame_indices: dict[str, int] = {}
         self._frame_names_from_index = {}
         self._frames = {}
+
+    def currentWidget(self) -> BaseFrame:
+        """
+        Get the currently active widget, i.e. frame.
+
+        This method only overrides the type hint.
+
+        Returns
+        -------
+        BaseFrame
+            The currently active widget, i.e. frame.
+        """
+        return super().currentWidget()  # type: ignore[return-value]
 
     @property
     def frame_indices(self) -> dict[str, int]:
@@ -359,9 +372,9 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         self.sig_mouse_entered.emit()
 
-    def restore_frame_states(self, state: dict[str, dict]) -> None:
+    def restore_frame_state_info(self, state: dict[str, dict]) -> None:
         """
-        Restore the states of all frames from the stored state information.
+        Restore the state info of all frames from the stored state information.
 
         Parameters
         ----------
@@ -372,11 +385,17 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         """
         _unrestored_frames = self.frame_names
         _missing_frames = []
+        _errors = ""
         for _frame_name, _state in state.items():
             if _frame_name not in _unrestored_frames:
                 _missing_frames.append(_frame_name)
-            self.get_widget_by_name(_frame_name).restore_state(_state)
+            try:
+                self.get_widget_by_name(_frame_name).inject_frame_state(_state)
+            except UserConfigError as exc:
+                _errors += f"Frame '{_frame_name}':\n{str(exc)}\n"
             _unrestored_frames.remove(_frame_name)
+        if _errors:
+            raise UserConfigError(f"--- Frame states ---\n{_errors}")
         if _unrestored_frames:
             WarningBox(
                 "Unrestored frames",

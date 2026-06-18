@@ -83,9 +83,9 @@ def params() -> ParameterCollection:
     _nx.value = 10
     _ny = get_generic_parameter("composite_ny")
     _ny.value = 5
-    _dir = get_generic_parameter("label")
-    _dir.value = "start label"
-    return ParameterCollection(_nx, _ny, _dir)
+    _label = get_generic_parameter("label")
+    _label.value = "start label"
+    return ParameterCollection(_nx, _ny, _label)
 
 
 def test_creation():

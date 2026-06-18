@@ -13,7 +13,7 @@ Improvements
 - Added a dedicated plugin to import NeXus NXdata with full metadata
   and in the shape of the Scan. This allows for conveniently restarting
   workflows from stored intermediate data.
-- Added an options parser to the GUI starer script to set the state import
+- Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
 
 Programmatic changes

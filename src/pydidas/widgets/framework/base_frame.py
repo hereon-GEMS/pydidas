@@ -123,11 +123,7 @@ class BaseFrame(
                         self.restore_state(_state)
                 except UserConfigError as exc:
                     raise UserConfigError(
-                        "- Error restoring state for frame "
-                        + str(self.menu_title)
-                        + ": "
-                        + str(exc)
-                        + "\n"
+                        f"- Error restoring state for frame {self.menu_title}: {exc}\n"
                     )
         self._config["frame_active"] = index == self.frame_index
         if index == self.frame_index:

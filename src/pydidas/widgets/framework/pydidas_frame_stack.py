@@ -64,6 +64,19 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
         self._frame_names_from_index = {}
         self._frames = {}
 
+    def currentWidget(self) -> BaseFrame:
+        """
+        Get the currently active widget, i.e. frame.
+
+        This method only overrides the type hint.
+
+        Returns
+        -------
+        BaseFrame
+            The currently active widget, i.e. frame.
+        """
+        return super().currentWidget()  # type: ignore[return-value]
+
     @property
     def frame_indices(self) -> dict[str, int]:
         """

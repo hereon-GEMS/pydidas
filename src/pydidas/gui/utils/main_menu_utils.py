@@ -35,6 +35,7 @@ __all__ = [
     "restore_global_objects",
 ]
 
+
 import os
 import re
 from pathlib import Path
@@ -57,8 +58,8 @@ def get_standard_state_full_filename(filename: str) -> Path:
     """
     Get the standard full path for the state filename.
 
-    This method will search all stored config paths and return the first match of
-    path/filename combinations which is an accessible file.
+    This method will search all stored config paths and return the first
+    match of path/filename combinations which is an accessible file.
 
     Parameters
     ----------
@@ -67,7 +68,7 @@ def get_standard_state_full_filename(filename: str) -> Path:
 
     Returns
     -------
-    _fname : Path
+    Path
         The file name and path to the config file.
     """
     for _path in PYDIDAS_CONFIG_PATHS:
@@ -101,7 +102,7 @@ def get_available_exit_states() -> list[str]:
 
 
 @QtCore.Slot()
-def clear_local_log_files():
+def clear_local_log_files() -> None:
     """
     Clear all local log files for this pydidas version.
     """
@@ -114,7 +115,7 @@ def clear_local_log_files():
     ).exec_()
     if _reply:
         _access_error = utils.clear_logging_dir()
-        if len(_access_error) > 0:
+        if _access_error:
             raise UserConfigError(
                 "Could not delete the following log file(s):\n - "
                 + "\n - ".join(_access_error)
@@ -122,10 +123,8 @@ def clear_local_log_files():
 
 
 @QtCore.Slot()
-def open_doc_in_browser():
-    """
-    Open the link to the documentation in the system web browser.
-    """
+def open_doc_in_browser() -> None:
+    """Open the link to the documentation in the system web browser."""
     _ = QtGui.QDesktopServices.openUrl(utils.DOC_HOME_QURL)
 
 
@@ -157,7 +156,7 @@ def get_update_check_text(remote_version: str, acknowledged_update: str) -> str:
     Get the text with the result of the update check for the user.
 
     Parameters
-    __________
+    ----------
     remote_version : str
         The latest released version of pydidas.
     acknowledged_update : str
@@ -184,10 +183,10 @@ def get_update_check_text(remote_version: str, acknowledged_update: str) -> str:
     return _text
 
 
-def restore_global_objects(state: dict):
+def restore_global_objects(state: dict) -> None:
     """
     Get the states of pydidas's global objects (ScanContext,
-    DiffractionExperimentContext, WorkflowTree)
+    DiffractionExperimentContext, WorkflowTree).
 
     Parameters
     ----------
@@ -199,14 +198,14 @@ def restore_global_objects(state: dict):
     try:
         TREE.restore_from_string(state["context::workflow_tree"])
     except KeyError:
-        _errors.append("- Cannot import Workflow. Not all plugins found.")
+        _errors += "- Cannot import Workflow. Not all plugins found.\n"
     for _context_key, _context in GLOBAL_CONTEXTS.items():
         for _key, _val in state[f"context::{_context_key}"].items():
             try:
                 _context.set_param_value(_key, _val)
             except Exception:
                 _errors += (
-                    f"Context '{_context_key}':\n- Error restoring parameter '{_key}'\n"
+                    f"Context `{_context_key}`:\n- Error restoring parameter `{_key}`\n"
                 )
     if _errors:
         raise UserConfigError(f"--- Global objects ---\n{_errors}")

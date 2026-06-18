@@ -30,6 +30,7 @@ __all__ = ["MainWindow"]
 
 import os
 from functools import partial
+from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
@@ -42,7 +43,7 @@ from pydidas.gui.frames import (
 )
 from pydidas.gui.main_menu import MainMenu
 from pydidas.resources import icons
-from pydidas.widgets.framework import FontScalingToolbar
+from pydidas.widgets.framework import BaseFrame, FontScalingToolbar
 
 
 class MainWindow(MainMenu):
@@ -56,13 +57,18 @@ class MainWindow(MainMenu):
     ----------
     parent : QtWidgets.QWidget, optional
         The widget's parent. The default is None.
-    geometry : Union[tuple, list, None], optional
+    geometry : tuple or list or None, optional
         The geometry as a 4-tuple or list. The entries are the top left
         corner coordinates (x0, y0) and width and height. If None, the
         default values will be used. The default is None.
     """
 
-    def __init__(self, parent=None, geometry=None, export_exit_state: bool = True):
+    def __init__(
+        self,
+        parent: QtWidgets.QWidget | None = None,
+        geometry: tuple | list | None = None,
+        export_exit_state: bool = True,
+    ) -> None:
         MainMenu.__init__(self, parent, geometry, export_exit_state)
 
         self._toolbar_metadata = {}
@@ -70,13 +76,13 @@ class MainWindow(MainMenu):
 
         self._toolbars = {}
         self._toolbar_actions = {}
-        self.__configuration = {
+        self.__configuration: dict = {
             "toolbars_created": False,
             "toolbar_visibility": {"": True},
         }
         self.setWindowIcon(icons.pydidas_icon_with_bg())
 
-    def show(self):
+    def show(self) -> None:
         """
         Insert a create_toolbar_menu method call into the show method if the
         toolbars have not been created at the time of the show call.
@@ -84,61 +90,47 @@ class MainWindow(MainMenu):
         self.create_frame_instances()
         if not self.__configuration["toolbars_created"]:
             self.create_toolbar_menu()
-        QtWidgets.QMainWindow.show(self)
-        self.centralWidget().currentChanged.emit(0)
+        super().show()
+        self._frame_stack.currentChanged.emit(0)
 
-    def create_frame_instances(self):
-        """
-        Create the instances for all registered frames.
-
-        Raises
-        ------
-        PydidasGuiError
-            If a similar menu entry has already been registered.
-
-        """
+    def create_frame_instances(self) -> None:
+        """Create the instances for all registered frames."""
         while len(self._frames_to_add) > 0:
             _class = self._frames_to_add.pop(0)
-            _frame = _class(parent=self.centralWidget())
+            _frame = _class(parent=self._frame_stack)
             _frame.status_msg.connect(self.update_status)
-            self.centralWidget().register_frame(_frame)
+            self._frame_stack.register_frame(_frame)
 
-    def create_toolbar_menu(self):
-        """
-        Create the toolbar menu to select between different widgets in the
-        centralWidget.
-        """
-        self._toolbar_metadata = self.centralWidget().frame_toolbar_metadata
-
+    def create_toolbar_menu(self) -> None:
+        """Create the toolbar menu to select between widgets in the FrameStack."""
+        self._toolbar_metadata = self._frame_stack.frame_toolbar_metadata
         self._create_toolbar_menu_entries()
         self._create_toolbars()
         self._create_toolbar_actions()
 
         self._update_toolbar_visibility()
-        self.select_item(self.centralWidget().currentWidget().menu_entry)
+        _current_widget = self._frame_stack.currentWidget()
+        self.select_item(_current_widget.menu_entry)  # type: ignore[attr-defined]
         self.__configuration["toolbars_created"] = True
         self.__connect_workflow_processing_signals()
 
-    def _create_toolbar_menu_entries(self):
-        """
-        Create the required toolbar menu entries to populate the menu.
-        """
+    def _create_toolbar_menu_entries(self) -> None:
+        """Create the required toolbar menu entries to populate the menu."""
         self.__configuration["menu_entries"] = []
-        for _key in self.centralWidget().frame_toolbar_entries:
+        for _key in self._frame_stack.frame_toolbar_entries:  # type: ignore[attr-defined]
             _items = _key.split("/")
-            for _entry in ["/".join(_items[: _i + 1]) for _i in range(len(_items))]:
+            _entry_paths = ["/".join(_items[: _i + 1]) for _i in range(len(_items))]
+            for _entry in _entry_paths:
                 if _entry not in self.__configuration["menu_entries"]:
-                    self.__configuration["menu_entries"].append(_entry)
+                    self.__configuration["menu_entries"].append(_entry)  # type: ignore[union-attr]
                 if _entry not in self._toolbar_metadata:
                     self._toolbar_metadata[_entry] = utils.create_generic_toolbar_entry(
                         _entry
                     )
                     self.__configuration["toolbar_visibility"][_entry] = False
 
-    def _create_toolbars(self):
-        """
-        Create the toolbar widgets for the toolbar menu.
-        """
+    def _create_toolbars(self) -> None:
+        """Create the toolbar widgets for the toolbar menu."""
         for _tb in utils.find_toolbar_bases(self.__configuration["menu_entries"]):
             tb_title = _tb if _tb else "Main toolbar"
             self._toolbars[_tb] = FontScalingToolbar(tb_title, self)
@@ -147,11 +139,9 @@ class MainWindow(MainMenu):
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
             self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
 
-    def _create_toolbar_actions(self):
-        """
-        Create the toolbar actions to switch between frames.
-        """
-        for _entry in self.__configuration["menu_entries"]:
+    def _create_toolbar_actions(self) -> None:
+        """Create the toolbar actions to switch between frames."""
+        for _entry in self.__configuration["menu_entries"]:  # type: ignore[union-attr]
             _metadata = self._toolbar_metadata[_entry]
             _action = QtWidgets.QAction(_metadata["icon"], _metadata["label"], self)
             _action.setCheckable(True)
@@ -160,22 +150,18 @@ class MainWindow(MainMenu):
             _item_base = os.path.dirname(_entry)
             self._toolbars[_item_base].addAction(_action)
 
-    def _update_toolbar_visibility(self):
-        """
-        Update the toolbar visibility based on the stored information.
-        """
+    def _update_toolbar_visibility(self) -> None:
+        """Update the toolbar visibility based on the stored information."""
         for _name, _toolbar in self._toolbars.items():
             _visible = self.__configuration["toolbar_visibility"].get(_name, False)
             _toolbar.setVisible(_visible)
             if _name != "":
                 self._auto_update_toolbar_entry(_name)
 
-    def __connect_workflow_processing_signals(self):
-        """
-        Connect the signals from the WorkflowProcessing which block changes.
-        """
+    def __connect_workflow_processing_signals(self) -> None:
+        """Connect the signals from the WorkflowProcessing which block changes."""
         try:
-            _proc_frame = self.centralWidget().get_widget_by_name(
+            _proc_frame = self._frame_stack.get_widget_by_name(
                 "Workflow processing/Run full workflow"
             )
         except KeyError:
@@ -186,9 +172,9 @@ class MainWindow(MainMenu):
                 DefineScanFrame.menu_entry,
                 DefineDiffractionExpFrame.menu_entry,
             ]:
-                _proc_frame.sig_processing_running.connect(_action.setDisabled)
+                _proc_frame.sig_processing_running.connect(_action.setDisabled)  # type: ignore[attr-defined]
 
-    def _auto_update_toolbar_entry(self, label):
+    def _auto_update_toolbar_entry(self, label: str) -> None:
         """
         Run an automatic update of the toolbar entry referenced by name.
 
@@ -210,45 +196,47 @@ class MainWindow(MainMenu):
         _icon = self._toolbar_metadata[label][f"icon{_suffix}"]
         _action.setIcon(_icon)
 
-    def register_frame(self, frame):
+    def register_frame(self, frame: type[BaseFrame]) -> None:
         """
         Register a frame class with the MainWindow and add it to the
         PydidasFrameStack.
 
-        This method takes a :py:class:`BaseFrame <pydidas.widgets.framework.BaseFrame>`
-        and creates an instance which is registers with the
-        PydidasFrameStack. It also stores the required metadata to create
-        an actionbar link to open the frame.
+        This method takes a :py:class:`BaseFrame
+        <pydidas.widgets.framework.BaseFrame>` and creates an instance which
+        is registers with the PydidasFrameStack. It also stores the required
+        metadata to create an actionbar link to open the frame.
 
         Parameters
         ----------
-        frame : type[pydidas.widgets.framework.BaseFrame]
+        frame : type[BaseFrame]
             The class of the Frame. This must be a subclass of BaseFrame.
             If a string is passed, an empty frame class with the metadata
             given by title, menu_entry and icon is created.
         """
-        _stack = self.centralWidget()
-        _entry_exists = frame.menu_entry in _stack.frame_names
-        _class_exists = frame in [_frame.__class__ for _frame in _stack.current_frames]
+        _frame_names = self._frame_stack.frame_names  # type: ignore[attr-defined]
+        _entry_exists = frame.menu_entry in _frame_names  # type: ignore[attr-defined]
+        _class_exists = frame in [
+            _frame.__class__ for _frame in self._frame_stack.current_frames
+        ]
         if _entry_exists and _class_exists:
             return
         if _entry_exists or _class_exists:
+            frame_title = frame.menu_title  # type: ignore[attr-defined]
             raise PydidasGuiError(
-                f"Could not register frame '{frame.menu_title}' (class {frame}) "
-                "because the menu entry and frame class do not match an already "
-                "registered Frame."
+                f"Could not register frame `{frame_title}` "
+                f"(class {frame}) because the menu entry and frame class do not "
+                "match an already registered Frame."
             )
         self._frames_to_add.append(frame)
 
     @QtCore.Slot(str)
-    def select_item(self, label):
+    def select_item(self, label: str) -> None:
         """
-        Select an item from the left toolbar and select the corresponding
-        frame in the centralWidget.
+        Handle the selection of an item from the left toolbar.
 
-        For labels that have frames attached to them, this method will show the frame.
-        For labels which are only entries in the menu tree, this method will show/hide
-        the respective toolbar.
+        For labels that have frames attached to them, this method will show
+        the frame. For labels which are only entries in the menu tree, this
+        method will show/hide the respective toolbar.
 
         Parameters
         ----------
@@ -256,10 +244,10 @@ class MainWindow(MainMenu):
             The label of the selected item.
         """
         self.setUpdatesEnabled(False)
-        if label in self.centralWidget().frame_indices:
+        if label in self._frame_stack.frame_indices:
             for _name, _action in self._toolbar_actions.items():
                 _action.setChecked(_name == label)
-            self.centralWidget().activate_widget_by_name(label)
+            self._frame_stack.activate_widget_by_name(label)
         else:
             _toolbar = self._toolbars[label]
             _new_visibility = not _toolbar.isVisible()
@@ -269,29 +257,33 @@ class MainWindow(MainMenu):
             self._auto_update_toolbar_entry(label)
         self.setUpdatesEnabled(True)
 
-    def restore_gui_state(self, state="saved", filename=None):
+    def restore_gui_state(
+        self, state: str = "saved", filename: str | Path | None = None
+    ) -> None:
         """
         Restore the window states from saved information.
 
-        This method also updates the left toolbar entry according to the restored
-        frame.
+        This method also updates the left toolbar entry according to the
+        restored frame.
 
         Parameters
         ----------
-        state: str, optional
-            The state to be restored. Can be "saved" to restore the last saved state,
-            "exit" to restore the state on exit or "manual" to manually give a filename.
-        filename : Union[None, str], optional
-            The filename to be used to restore the state. This kwarg will only be used
-            if the state kwarg is set to "manual".
+        state: str
+            The state to be restored. Can be "saved" to restore the last
+            saved state, "exit" to restore the state on exit or "manual" to
+            manually give a filename. The default is "saved".
+        filename : str or Path or None, optional
+            The filename to be used to restore the state. This kwarg will
+            only be used if the state kwarg is set to "manual". The default
+            is None.
         """
         try:
             MainMenu.restore_gui_state(self, state, filename)
         except UserConfigError as exc:
             raise UserConfigError(exc)
-        self.select_item(self.centralWidget().currentWidget().menu_entry)
+        self.select_item(self._frame_stack.currentWidget().menu_entry)
 
-    def export_main_window_state(self):
+    def export_main_window_state(self) -> dict:
         """
         Export the main window's state.
 
@@ -304,7 +296,7 @@ class MainWindow(MainMenu):
             "toolbar_visibility": self.__configuration["toolbar_visibility"],
         }
 
-    def restore_main_window_state(self, state):
+    def restore_main_window_state(self, state: dict) -> None:
         """
         Restore the main window's state from saved information.
 

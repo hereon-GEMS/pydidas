@@ -202,7 +202,7 @@ class Parameter:
         if isinstance(meta, dict):
             kwargs.update(meta)
         self.__meta = dict(
-            tooltip=kwargs.get("tooltip", ""),
+            tooltip=kwargs.get("tooltip", "<No description>"),
             unit=str(kwargs.get("unit")) if kwargs.get("unit") is not None else "",
             optional=kwargs.get("optional", False),
             name=kwargs.get("name", ""),

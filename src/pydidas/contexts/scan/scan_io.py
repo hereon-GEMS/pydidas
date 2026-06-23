@@ -29,7 +29,7 @@ __all__ = ["ScanIo"]
 
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar, Sequence
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.core import UserConfigError
@@ -49,12 +49,13 @@ class ScanIo(GenericIoMeta):
     for importing / exporting Scan (and ScanContexts).
     """
 
-    # need to redefine the registry to have a unique registry for ScanIo
-    registry: dict[str, "ScanIoBase"] = {}
-    beamline_format_registry: dict[str, "ScanIoBase"] = {}
+    registry: ClassVar[dict[str, "ScanIoBase"]] = {}  # type: ignore[assignment]
+    beamline_format_registry: ClassVar[dict[str, "ScanIoBase"]] = {}  # type: ignore[misc]
 
     @classmethod
-    def register_class(cls, new_class: "ScanIoBase", update_registry=False):
+    def register_class(  # type: ignore[override]
+        cls, new_class: "ScanIoBase", update_registry: bool = False
+    ) -> None:
         """
         Register a class as object for its native extensions.
 
@@ -62,7 +63,7 @@ class ScanIo(GenericIoMeta):
         ----------
         new_class : ScanIoBase
             The class to be registered.
-        update_registry : bool, optional
+        update_registry : bool
             Keyword to allow updating / overwriting of registered extensions.
             The default is False.
 
@@ -82,20 +83,23 @@ class ScanIo(GenericIoMeta):
                 _ext = "." + _ext
             if _ext.lower() in _ref_registry and not update_registry:
                 raise KeyError(
-                    f"A class has already been registered for the extension `{_ext.lower()}`."
+                    "A class has already been registered for the extension "
+                    f"`{_ext.lower()}`."
                 )
             _ref_registry[_ext.lower()] = new_class
 
     @classmethod
-    def clear_registry(cls):
+    def clear_registry(cls) -> None:
         """
         Clear the registry and remove all items.
         """
-        cls.registry = {}
+        cls.registry = {}  # type: ignore[misc]
         cls.beamline_format_registry = {}
 
     @classmethod
-    def import_from_file(cls, filename: Path | str, scan: Scan | None = None):
+    def import_from_file(  # type: ignore[override]
+        cls, filename: Path | str, scan: Scan | None = None
+    ) -> None:
         """
         Import a Scan from file and update the given Scan object.
 
@@ -106,9 +110,9 @@ class ScanIo(GenericIoMeta):
         ----------
         filename : Path or str
             The full filename and path.
-        scan : Scan, optional
-            The Scan object to be updated. If None, the generic ScanContext is used.
-            The default is None.
+        scan : Scan or None, optional
+            The Scan object to be updated. If None, the generic
+            ScanContext is used. The default is None.
         """
         _io_class = cls.get_io_class(filename)
         _io_class.import_from_file(filename, scan=scan)
@@ -120,7 +124,7 @@ class ScanIo(GenericIoMeta):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename with extension.
 
         Returns
@@ -136,21 +140,23 @@ class ScanIo(GenericIoMeta):
             return cls.beamline_format_registry[_extension]
 
     @classmethod
-    def import_from_multiple_files(cls, filenames: list[Path | str], **kwargs: Any):
+    def import_from_file_sequence(
+        cls, filenames: Sequence[Path | str], **kwargs: Any
+    ) -> None:
         """
         Import a Scan from multiple files and update the given Scan object.
 
         Parameters
         ----------
-        filenames : list[Path | str]
-            The list of full filenames and paths.
-        **kwargs : Any
+        filenames : Sequence[Path or str]
+            The sequence of full filenames and paths.
+        **kwargs : Any, optional
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
             scan : Scan, optional
-                The Scan object to be updated. If None, the generic ScanContext is used.
-                The default is None.
+                The Scan object to be updated. If None, the generic
+                ScanContext is used. The default is None.
             scan_dim0_motor : str, optional
                 The motor name for the first dimension. The default is None.
         """
@@ -160,26 +166,26 @@ class ScanIo(GenericIoMeta):
                 "All files must have the same extension for batch import."
             )
         _io_class = cls.get_io_class(filenames[0])
-        _io_class.import_from_file(filenames, **kwargs)
+        _io_class.import_from_file_sequence(filenames, **kwargs)
 
     @classmethod
     def check_multiple_files(
-        cls, filenames: list[Path | str], **kwargs: Any
+        cls, filenames: Sequence[Path | str], **kwargs: Any
     ) -> list[str]:
         """
         Check whether a selection of multiple files can be imported.
 
         Parameters
         ----------
-        filenames : list[Path | str]
+        filenames : Sequence[Path or str]
             The list of full filenames and paths.
-        **kwargs : Any
+        **kwargs : Any, optional
             Any kwargs which should be passed to the underlying importer.
             Supported kwargs are:
 
             scan : Scan, optional
-                The Scan object to be updated. If None, the generic ScanContext is used.
-                The default is None.
+                The Scan object to be updated. If None, the generic
+                ScanContext is used. The default is None.
 
         Returns
         -------
@@ -197,16 +203,16 @@ class ScanIo(GenericIoMeta):
         return _result
 
     @classmethod
-    def export_to_file(cls, filename: Path | str, **kwargs: Any):
+    def export_to_file(cls, filename: Path | str, **kwargs: Any) -> None:
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The full filename and path.
-        kwargs : Any
+        **kwargs : Any, optional
             Any kwargs which should be passed to the underlying exporter.
         """
         _extension = get_extension(filename)
@@ -222,7 +228,7 @@ class ScanIo(GenericIoMeta):
         _io_class.export_to_file(filename, **kwargs)
 
     @classmethod
-    def is_extension_registered(cls, extension: str):
+    def is_extension_registered(cls, extension: str) -> bool:
         """
         Check if the extension of filename corresponds to a registered
         class.

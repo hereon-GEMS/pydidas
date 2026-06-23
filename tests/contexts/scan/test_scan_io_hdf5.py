@@ -27,7 +27,7 @@ __status__ = "Production"
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 import h5py
 import numpy as np
@@ -39,11 +39,11 @@ from pydidas.contexts.scan.scan_io_hdf5 import ScanIoHdf5
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5 import (
-    create_nx_entry_groups,
     get_hdf5_populated_dataset_keys,
+    nxs_create_recursive_groups,
     read_and_decode_hdf5_dataset,
 )
-from pydidas.core.utils.hdf5.nxs_export import export_context_to_nxs
+from pydidas.core.utils.hdf5.nxs_export import nxs_export_context
 
 
 SCAN = ScanContext()
@@ -76,7 +76,7 @@ _TEST_DIR = Path(__file__).parents[2]
 
 
 @pytest.fixture(scope="module")
-def temp_dir() -> Path:
+def temp_dir() -> Generator[Path, Any, Any]:
     """Fixture to create a temporary directory."""
     temp_dir = tempfile.mkdtemp()
     yield Path(temp_dir)
@@ -84,7 +84,7 @@ def temp_dir() -> Path:
 
 
 @pytest.fixture
-def modify_scan_context() -> dict[str, Any]:
+def modify_scan_context() -> Generator[dict[str, Any], Any, Any]:
     """Fixture to modify the DiffractionExperimentContext."""
     _randomize_scan(SCAN)
     yield {_key: _param.value_for_export for _key, _param in SCAN.params.items()}
@@ -110,7 +110,8 @@ def _randomize_scan(scan: Scan):
 def create_hdf5_file(temp_dir) -> Path:
     """Fixture to create a temporary HDF5 file."""
     hdf5_filename = temp_dir / "scan_io_hdf5.h5"
-    export_context_to_nxs(hdf5_filename, SCAN, "entry/pydidas_config/scan")
+    with h5py.File(hdf5_filename, "a") as h5file:
+        nxs_export_context(h5file, SCAN, "entry/pydidas_scan")
     return hdf5_filename
 
 
@@ -118,7 +119,7 @@ def read_hdf5_file(file_path: Path) -> dict[str, Any]:
     """Read the HDF5 file and return the data as a dictionary."""
     with h5py.File(file_path, "r") as file:
         data = {}
-        group = file["entry/pydidas_config/scan"]
+        group = file["entry/pydidas_scan"]
         for key in group.keys():
             data[key] = read_and_decode_hdf5_dataset(group[key])
     return data
@@ -129,7 +130,7 @@ def test_export_to_file__correct(modify_scan_context, temp_dir):
     hdf5_file = temp_dir / "scan_io_hdf5.h5"
     SCAN_IO_HDF5.export_to_file(hdf5_file)
     with h5py.File(hdf5_file, "r") as file:
-        _group = file["entry/pydidas_config/scan"]
+        _group = file["entry/pydidas_scan"]
         for _key, _param in SCAN.params.items():
             assert (
                 read_and_decode_hdf5_dataset(_group[_key]) == modify_scan_context[_key]
@@ -138,24 +139,24 @@ def test_export_to_file__correct(modify_scan_context, temp_dir):
 
 def test_export_to_file__w_scan(temp_dir):
     """Test the export_to_file method with a custom Scan."""
-    local_SCAN = Scan()
-    _randomize_scan(local_SCAN)
+    _local_scan = Scan()
+    _randomize_scan(_local_scan)
     hdf5_file = temp_dir / "local_scan_io_hdf5.h5"
-    SCAN_IO_HDF5.export_to_file(hdf5_file, scan=local_SCAN)
+    SCAN_IO_HDF5.export_to_file(hdf5_file, scan=_local_scan)
     with h5py.File(hdf5_file, "r") as file:
-        _group = file["entry/pydidas_config/scan"]
+        _group = file["entry/pydidas_scan"]
         for _key, _param in SCAN.params.items():
             assert (
                 read_and_decode_hdf5_dataset(_group[_key])
-                == local_SCAN.params[_key].value_for_export
+                == _local_scan.params[_key].value_for_export
             )
 
 
 def test_import_from_file__empty_file(temp_dir):
     _fname = temp_dir / "empty_file.h5"
     with h5py.File(_fname, "w") as file:
-        create_nx_entry_groups(
-            file, "entry/pydidas_config/scan", group_type="NXcollection"
+        nxs_create_recursive_groups(
+            file, "entry/pydidas_scan", group_type="NXcollection"
         )
     with pytest.raises(UserConfigError):
         SCAN_IO_HDF5.import_from_file(_fname)
@@ -171,26 +172,32 @@ def test_import_from_file(temp_dir, modify_scan_context, create_hdf5_file):
 def test_import_from_file__to_local_context(
     temp_dir, modify_scan_context, create_hdf5_file
 ):
-    """Test the import_from_file method."""
-    local_SCAN = Scan()
-    SCAN_IO_HDF5.import_from_file(create_hdf5_file, scan=local_SCAN)
-    for _key, _param in local_SCAN.params.items():
+    _local_scan = Scan()
+    SCAN_IO_HDF5.import_from_file(create_hdf5_file, scan=_local_scan)
+    for _key, _param in _local_scan.params.items():
         assert SCAN.params[_key].value_for_export == modify_scan_context[_key]
 
 
 @pytest.mark.parametrize(
-    "fname", ["load_test_scan_context.h5", "load_test_scan_context_legacy.h5"]
+    "fname",
+    [
+        "load_test_scan_context_legacy_v250616.h5",
+        "load_test_scan_context_legacy_v251028.h5",
+        "load_test_scan_context_legacy_v260519.h5",
+    ],
 )
-def test_import_from_file__from_exported_file(fname):
+def test_import_from_file__from_exported_legacy_file(fname):
     _fname = _TEST_DIR / "_data" / fname
+    _prefix = "/entry/pydidas_config/scan/"
     with h5py.File(_fname, "r") as file:
-        _keys = get_hdf5_populated_dataset_keys(
-            file["entry/pydidas_config/scan"], min_dim=0, min_size=0
-        )
+        _keys = [
+            _key.removeprefix(_prefix)
+            for _key in get_hdf5_populated_dataset_keys(
+                file[_prefix], min_dim=0, min_size=0
+            )
+        ]
         _imported_values = {
-            _key.removeprefix(
-                "/entry/pydidas_config/scan/"
-            ): read_and_decode_hdf5_dataset(file["entry/pydidas_config/scan"][_key])
+            _key: read_and_decode_hdf5_dataset(file[f"{_prefix}{_key}"])
             for _key in _keys
         }
     SCAN_IO_HDF5.import_from_file(_fname)

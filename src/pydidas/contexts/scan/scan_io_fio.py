@@ -29,7 +29,7 @@ __all__ = ["ScanIoFio"]
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 
@@ -57,7 +57,9 @@ class ScanIoFio(ScanIoBase):
     import_only = True
 
     @classmethod
-    def check_file_list(cls, filenames: list[Path | str], **kwargs: Any) -> list[str]:
+    def check_file_list(
+        cls, filenames: Sequence[Path | str], **kwargs: Any
+    ) -> list[str]:
         """
         Check if the given list of files is valid for import.
 
@@ -65,7 +67,7 @@ class ScanIoFio(ScanIoBase):
 
         Parameters
         ----------
-        filenames : list[Path or str]
+        filenames : Sequence[Path or str]
             The list of filenames to be checked.
         **kwargs : Any
             Additional keyword arguments. Please refer to _import_multiple_fio
@@ -94,7 +96,7 @@ class ScanIoFio(ScanIoBase):
 
     @classmethod
     def import_from_file(  # type: ignore[override]
-        cls, filename: Path | str | list[Path | str], **kwargs: Any
+        cls, filename: Path | str, **kwargs: Any
     ) -> None:
         """
         Import scan metadata from a single or multiple fio files.
@@ -110,26 +112,44 @@ class ScanIoFio(ScanIoBase):
             scan : Scan, optional
                 The scan object to import the data into. If None, the global
                 ScanContext is used.
-            scan_dim0_motor : str, optional
-                The name of the motor that is scanned in the first dimension.
-                If None, the motor name is determined from differences in the
-                motor positions between the scans.
         """
-        scan = kwargs.get("scan") or ScanContext()
+        _scan = kwargs.get("scan") or ScanContext()
         if isinstance(filename, (Path, str)):
             _imported_params = cls._read_single_fio_file(filename)
-        elif isinstance(filename, (list, tuple)):
-            if len(filename) == 1:
-                _imported_params = cls._read_single_fio_file(filename[0])
-            else:
-                _imported_params = cls._import_multiple_fio(filename, **kwargs)
         else:
             raise UserConfigError(
                 "The input for the fio importer must be a single filename or "
                 "a list or tuple of filenames. Filenames can be given as string "
                 "or Path objects."
             )
-        cls.update_scan_from_import(_imported_params, scan)
+        cls.update_scan_from_import(_imported_params, _scan)
+
+    @classmethod
+    def import_from_file_sequence(cls, filenames: Sequence[Path | str], **kwargs: Any):
+        """
+        Import a Scan from a sequence of filenames.
+
+        Parameters
+        ----------
+        filenames : Sequence[Path or str]
+            The sequence of filenames to be imported.
+        **kwargs : Any
+            Additional keyword arguments. The following keys are supported:
+
+            scan : Scan, optional
+                The scan object to import the data into. If None, the global
+                ScanContext is used.
+            scan_dim0_motor : str, optional
+                The name of the motor that is scanned in the first dimension.
+                If None, the motor name is determined from differences in the
+                motor positions between the scans.
+        """
+        _scan = kwargs.get("scan") or ScanContext()
+        if len(filenames) == 1:
+            _imported_params = cls._read_single_fio_file(filenames[0])
+        else:
+            _imported_params = cls._import_multiple_fio(filenames, **kwargs)
+        cls.update_scan_from_import(_imported_params, _scan)
 
     @staticmethod
     def _get_default_values(filepath: Path, ndim: int) -> dict[str, Any]:
@@ -342,7 +362,7 @@ class ScanIoFio(ScanIoBase):
 
     @classmethod
     def _import_multiple_fio(
-        cls, filenames: list[Path | str], **kwargs: Any
+        cls, filenames: Sequence[Path | str], **kwargs: Any
     ) -> dict[str, Any]:
         """
         Import scan metadata from multiple fio files.
@@ -352,7 +372,7 @@ class ScanIoFio(ScanIoBase):
 
         Parameters
         ----------
-        filenames : list[Path or str]
+        filenames : Sequence[Path or str]
             The filenames of the files to be imported.
         **kwargs : Any
             Additional keyword arguments. The following keys are supported:
@@ -408,14 +428,14 @@ class ScanIoFio(ScanIoBase):
 
     @classmethod
     def _process_fio_file_list(
-        cls, filenames: list[Path | str]
+        cls, filenames: Sequence[Path | str]
     ) -> tuple[dict[str, Any], np.ndarray, list[str]]:
         """
         Read the content of multiple fio files.
 
         Parameters
         ----------
-        filenames : list[Path or str]
+        filenames : Sequence[Path or str]
             The filenames of the files to be read.
 
         Returns

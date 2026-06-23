@@ -13,6 +13,8 @@ Improvements
 - Added a dedicated plugin to import NeXus NXdata with full metadata
   and in the shape of the Scan. This allows for conveniently restarting
   workflows from stored intermediate data.
+- Reworked the way NeXus files are structured for stronger compliance
+  with NeXus format.
 
 Programmatic changes
 --------------------
@@ -22,6 +24,9 @@ Programmatic changes
   architecture.
 - Reworked ReadOnlyTextWidget to allow appending and prepending text 
   to the widget text in a generic way.
+- Reworked the Scan importer/exporter classes and made the imported
+  params not a class variable but a local variable to preempt issues
+  with multiple parallel importers.
 
 Bugfixes
 --------

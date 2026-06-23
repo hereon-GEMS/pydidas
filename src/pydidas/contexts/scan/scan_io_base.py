@@ -28,7 +28,7 @@ __all__ = ["ScanIoBase"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
@@ -50,13 +50,15 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     import_only = False
 
     @classmethod
-    def check_file_list(cls, filenames: list[Path | str], **kwargs: Any) -> list[str]:
+    def check_file_list(
+        cls, filenames: Sequence[Path | str], **kwargs: Any
+    ) -> list[str]:
         """
         Check if the list of filenames is valid.
 
         Parameters
         ----------
-        filenames : list[Path or str]
+        filenames : Sequence[Path or str]
             List of filenames to be checked.
         **kwargs : Any
             Additional keyword arguments. Must be defined by the subclass.

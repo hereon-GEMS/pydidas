@@ -49,19 +49,19 @@ class ScanIo(GenericIoMeta):
     for importing / exporting Scan (and ScanContexts).
     """
 
-    registry: ClassVar[dict[str, "ScanIoBase"]] = {}  # type: ignore[assignment]
-    beamline_format_registry: ClassVar[dict[str, "ScanIoBase"]] = {}  # type: ignore[misc]
+    registry: ClassVar[dict[str, type["ScanIoBase"]]] = {}
+    beamline_format_registry: ClassVar[dict[str, type["ScanIoBase"]]] = {}
 
     @classmethod
     def register_class(  # type: ignore[override]
-        cls, new_class: "ScanIoBase", update_registry: bool = False
+        cls, new_class: type["ScanIoBase"], update_registry: bool = False
     ) -> None:
         """
         Register a class as object for its native extensions.
 
         Parameters
         ----------
-        new_class : ScanIoBase
+        new_class : type["ScanIoBase"]
             The class to be registered.
         update_registry : bool
             Keyword to allow updating / overwriting of registered extensions.
@@ -118,7 +118,7 @@ class ScanIo(GenericIoMeta):
         _io_class.import_from_file(filename, scan=scan)
 
     @classmethod
-    def get_io_class(cls, filename: Path | str) -> "ScanIoBase":
+    def get_io_class(cls, filename: Path | str) -> type["ScanIoBase"]:
         """
         Get the IO class for a given filename.
 
@@ -129,7 +129,7 @@ class ScanIo(GenericIoMeta):
 
         Returns
         -------
-        ScanIoBase
+        type["ScanIoBase"]
             The IO class.
         """
         _extension = get_extension(filename)

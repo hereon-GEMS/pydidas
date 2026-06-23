@@ -176,6 +176,16 @@ def test_set_scaling__wrong_scaling(
         _setter("test1", (0.5, 1.5, 2.0))
 
 
+def test_update_plot__small_dataset(grid_plot: GridCurvePlot) -> None:
+    small_data = Dataset(np.random.random((5, 3, 12)))
+    grid_plot.set_datasets(test=small_data)
+
+    grid_plot.n_plots_hor = 5
+    grid_plot.n_plots_vert = 5
+
+    grid_plot._update_plot()
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize("direction", ["x", "y"])
 def test_set_autoscaling(

@@ -29,7 +29,7 @@ __all__ = ["GenericIoBase"]
 
 
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any, ClassVar, NoReturn, Sequence
 
 from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 
@@ -39,12 +39,11 @@ class GenericIoBase(metaclass=GenericIoMeta):
     Base class for Metaclass-based importer/exporters.
     """
 
-    extensions = []
-    format_name = ""
-    imported_params = {}
+    extensions: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = ""
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, *args: Any, **kwargs: Any) -> None:
+    @staticmethod
+    def export_to_file(filename: Path | str, **kwargs: Any) -> None:
         """
         Write the content to a file.
 
@@ -54,16 +53,14 @@ class GenericIoBase(metaclass=GenericIoMeta):
         ----------
         filename : Path or str
             The filename of the file to be written.
-        **kwargs : Any
+        **kwargs : Any, optional
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """
         raise NotImplementedError
 
     @classmethod
-    def import_from_file(
-        cls, filename: str | Path | list[Path | str], **kwargs: Any
-    ) -> None:
+    def import_from_file(cls, filename: str | Path, **kwargs: Any) -> None:
         """
         Restore the content from a file
 
@@ -71,8 +68,27 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str or Path or list[Path or str]
+        filename : str or Path
             The filename of the file to be imported.
+        **kwargs : Any, optional
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def import_from_file_sequence(
+        cls, filenames: Sequence[Path | str], **kwargs: Any
+    ) -> None:
+        """
+        Restore the content from a sequence of files.
+
+        Parameters
+        ----------
+        filenames : Sequence[Path or str]
+        **kwargs : Any, optional
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
         raise NotImplementedError
 
@@ -87,7 +103,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
         ----------
         filename : str or Path
             The full filename and path.
-        **kwargs : Any
+        **kwargs : Any, optional
             Any keyword arguments. Supported are:
 
             overwrite : bool, optional
@@ -98,8 +114,9 @@ class GenericIoBase(metaclass=GenericIoMeta):
         FileExistsError
             If a file with filename exists and the overwrite flag is not True.
         """
-        _overwrite = kwargs.get("overwrite", False)
-        if Path(filename).exists() and not _overwrite:
+        _replace = kwargs.get("overwrite", False) or kwargs.get("replace", False)
+        if Path(filename).exists() and not _replace:
             raise FileExistsError(
-                f"The file `{filename}` exists and overwriting has not been confirmed."
+                f"The file `{filename}` exists and replacing the file has "
+                "not been confirmed."
             )

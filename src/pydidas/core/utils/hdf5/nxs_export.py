@@ -369,5 +369,3 @@ def nxs_export_context(
     for _key, _param in context_object.params.items():
         _val, _attributes = nxs_param_config_for_dset(_param)
         nxs_write_dataset(_group, _key, _val, **_attributes)
-
-

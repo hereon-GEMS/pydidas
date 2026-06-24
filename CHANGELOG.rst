@@ -13,6 +13,8 @@ Improvements
 - Added a dedicated plugin to import NeXus NXdata with full metadata
   and in the shape of the Scan. This allows for conveniently restarting
   workflows from stored intermediate data.
+- Added an options parser to the GUI starter script to set the state import
+  at calling time with an argument. Use '-restore_state None | exit | saved'
 
 Programmatic changes
 --------------------
@@ -39,6 +41,12 @@ Bugfixes
   were squeezed during export.
 - Fixed an issue where the plotted labels for columnar data were not 
   properly reset on loading new data.
+- Fixed an issue where results were accidentally overwritten in buffer before
+  storing them when using the autosave_results flag in the ExecuteWorkflowApp.
+- Fixed an issue in the BaseApp when exporting ranges where values defaulted
+  to None (not supported in range)
+- Fixed an issue where the filename parameter was exported in the data
+  browsing frame even though it was not intended.
 
 
 v26.05.19

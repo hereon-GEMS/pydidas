@@ -82,7 +82,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             choices=[None],
         ),
     )
-    params_not_to_restore = ["xcol"]
+    params_not_to_restore = ["xcol", "filename"]
 
     def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
@@ -163,7 +163,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         index : int
             The index of the activated frame.
         """
-        BaseFrame.frame_activated(self, index)
+        super().frame_activated(index)
         if index != self.frame_index:
             for _window in (self.__browser_window, self.__metadata_window):
                 if _window is not None and _window.isVisible():

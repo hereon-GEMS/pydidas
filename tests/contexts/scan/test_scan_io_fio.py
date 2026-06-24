@@ -209,9 +209,8 @@ def test_import_from_files_sequence__no_common_prefix(reset_scan_context, temp_d
     _new_file = temp_dir / "other_file_2.fio"
     shutil.copy(filenames[2], _new_file)
     filenames[2] = _new_file
-    ScanIoFio.import_from_file_sequence(filenames)
-    scan = ScanContext()
-    assert scan.get_param_value("scan_name_pattern") == Path()
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file_sequence(filenames)
 
 
 def test_import_from_files_sequence__corrupt_file(reset_scan_context, temp_dir):
@@ -253,6 +252,16 @@ def test_import_from_files_sequence__multiple_motors_moved(
         ScanIoFio.import_from_file_sequence(_filenames)
 
 
+def test_import_from_files_sequence__multiple_motors_moved_wrong_dim0_motor(
+    reset_scan_context, temp_dir
+):
+    _filenames = [temp_dir.joinpath(f"2dmesh_{i:05d}.fio") for i in range(10)]
+    _write_fio_files_with_2moved_motors(_filenames)
+    ScanIoFio.imported_params = {"test_entry": True}
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file_sequence(_filenames, scan_dim0_motor="motor42")
+
+
 def test_import_from_files_sequence__multiple_motors_moved_but_scan_dim0_motor_given(
     reset_scan_context, temp_dir
 ):
@@ -290,6 +299,13 @@ def test_import_from_files_sequence__different_scan_commands(
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
         ScanIoFio.import_from_file_sequence(_filenames)
+
+
+def test_import_from_files_sequence__different_filenames(reset_scan_context, temp_dir):
+    _filenames = [temp_dir / "test_01_001.fio", temp_dir / "another_fname_0000001.fio"]
+    _write_fio_files_with_2moved_motors(_filenames)
+    with pytest.raises(UserConfigError):
+        ScanIoFio.import_from_file_sequence(_filenames, scan_dim0_motor="motor4")
 
 
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan", "mesh", "dmesh"])

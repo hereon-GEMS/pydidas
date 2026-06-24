@@ -208,6 +208,14 @@ def test_import_from_file__from_exported_legacy_file(fname):
         assert _val == SCAN.params[_scan_key].value_for_export
 
 
+def test_import_from_file__other_key():
+    _fname = _TEST_DIR / "_data" / "test_other_key.h5"
+    with h5py.File(_fname, "a") as h5file:
+        nxs_export_context(h5file, SCAN, "entry/other/custom_scan")
+    with pytest.raises(UserConfigError):
+        SCAN_IO_HDF5.import_from_file(_fname)
+
+
 def test_import_from_file__no_file(temp_dir):
     with pytest.raises(UserConfigError):
         SCAN_IO_HDF5.import_from_file(temp_dir / "test_42_random.h5")

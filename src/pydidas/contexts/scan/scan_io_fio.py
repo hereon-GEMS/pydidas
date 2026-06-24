@@ -256,9 +256,9 @@ class ScanIoFio(ScanIoBase):
             if _line.startswith(("ascan", "dscan", "mesh", "dmesh")):
                 if _scan_command_found:
                     raise UserConfigError(_ERROR_TEXT_MULTIPLE_SCAN_COMMANDS)
-                if _line.startswith("ascan") or _line.startswith("dscan"):
+                if _line.startswith(("ascan", "dscan")):
                     _params = cls._process_1dscan_cmd(_i_line, _line, file_lines)
-                elif _line.startswith("mesh") or _line.startswith("dmesh"):
+                else:  # "mesh" or "dmesh"
                     _params = cls._process_mesh_cmd(_i_line, _line, file_lines)
                 _scan_command_found = True
         if not _scan_command_found:
@@ -389,10 +389,10 @@ class ScanIoFio(ScanIoBase):
                 scans. If True, the function returns a list with the error
                 message and the names of the motors that have moved.
         """
+        _params = cls._get_default_values(Path(filenames[0]), 2)
         scan_dim0_motor: str | None = kwargs.get("scan_dim0_motor", None)
-        _params, _motor_pos, _motor_names = cls._process_fio_file_list(filenames)
-
-        # Determine the second scan dimension:
+        _fio_params, _motor_pos, _motor_names = cls._process_fio_file_list(filenames)
+        _params.update(_fio_params)
         _index_moved_motors = cls._get_moved_motor_indices(
             _motor_pos, _motor_names, _params
         )
@@ -400,30 +400,21 @@ class ScanIoFio(ScanIoBase):
             _motors = {_motor_name: _i for _i, _motor_name in enumerate(_motor_names)}
             if scan_dim0_motor in _motors:
                 _index_moved_motors = [_motors[scan_dim0_motor]]
+            else:
+                scan_dim0_motor = None
         if len(_index_moved_motors) != 1 and scan_dim0_motor is None:
             raise UserConfigError(
                 "Could not determine the second scan dimension!\n"
                 + "Multiple motors have been moved between scans: "
                 + ", ".join([_motor_names[_i] for _i in _index_moved_motors])
             )
-
+        # process other parameters
         _values = _motor_pos[_index_moved_motors[0]]
         _delta, _start = np.polyfit(np.arange(_values.size), _values, 1)
         _params[f"{_D0}_delta"] = _delta
         _params[f"{_D0}_n_points"] = len(filenames)
         _params[f"{_D0}_offset"] = _start
         _params[f"{_D0}_label"] = _motor_names[_index_moved_motors[0]]
-        _params.update(cls._get_default_values(Path(filenames[0]), 2))
-        _stems = [Path(_fname).stem for _fname in filenames]
-        _stem_lengths = np.unique([len(_stem) for _stem in _stems])
-        _common = os.path.commonprefix(_stems)
-        if _common:
-            while _common[-1] == "0":
-                _common = _common[:-1]
-            if _common and _stem_lengths.size == 1:
-                _params["pattern_number_offset"] = int(_stems[0][len(_common) :])
-                _common += "#" * (_stem_lengths[0] - len(_common))
-        _params["scan_name_pattern"] = _common
         return _params
 
     @classmethod
@@ -452,6 +443,20 @@ class ScanIoFio(ScanIoBase):
         for _key in ["delta", "n_points", "offset", "label"]:
             _params[f"{_D1}_{_key}"] = _params[f"{_D0}_{_key}"]
             _params[f"{_D0}_{_key}"] = "" if _key == "label" else 0
+        # check for file name consistency:
+        _stems = [Path(_fname).stem for _fname in filenames]
+        _common = os.path.commonprefix(_stems)
+        _stem_lengths = np.unique([len(_stem) for _stem in _stems])
+        if not _common or _stem_lengths.size > 1:
+            raise UserConfigError(
+                "The selected fio files do not have a common filename prefix "
+                "and/or differ in their filename length. Please check the "
+                "selected files and try again. Only filenames with a common "
+                "prefix and identical lengths are supported."
+            )
+        _common = _common.rstrip("0")
+        _params["pattern_number_offset"] = int(_stems[0].removeprefix(_common))
+        _params["scan_name_pattern"] = _common + "#" * (_stem_lengths[0] - len(_common))
         # Initialize variables to avoid possibly unbound issues
         _motor_names: list[str] = []
         _motor_pos = np.array([])

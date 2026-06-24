@@ -140,5 +140,10 @@ def test_check_file_list() -> None:
     assert _res == ["::no_error::"]
 
 
+def test_import_from_file():
+    with pytest.raises(NotImplementedError):
+        ScanIoBase.import_from_file("dummy_file.h5")
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

@@ -71,8 +71,10 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
         return ["::no_error::"]
 
     @classmethod
-    def import_from_file(cls, filename: Path | str, scan: Scan | None = None) -> None:  # type: ignore[override]
-        pass
+    def import_from_file(  # type: ignore[override]
+        cls, filename: Path | str, scan: Scan | None = None
+    ) -> None:
+        raise NotImplementedError()
 
     @classmethod
     def update_scan_from_import(

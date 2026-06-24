@@ -77,7 +77,7 @@ class ScanIoYaml(ScanIoBase):
     @classmethod
     def import_from_file(
         cls,
-        filename: str | Path | list[Path | str],
+        filename: str | Path,
         scan: Scan | None = None,
         **kwargs: Any,
     ) -> None:
@@ -86,9 +86,8 @@ class ScanIoYaml(ScanIoBase):
 
         Parameters
         ----------
-        filename : str or Path or list[Path or str]
-            The filename of the file to be imported. If a list is
-            provided, only the first element is used.
+        filename : str or Path
+            The filename of the file to be imported.
         scan : Scan or None, optional
             The Scan instance to be updated. If None, the ScanContext
             instance is used. The default is None.
@@ -96,8 +95,6 @@ class ScanIoYaml(ScanIoBase):
             Optional keyword arguments. Not used in this implementation
             but supported for consistency.
         """
-        if isinstance(filename, list):
-            filename = filename[0]
         _scan = SCAN if scan is None else scan
         with open(filename, "r") as stream:
             try:

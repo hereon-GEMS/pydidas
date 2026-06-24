@@ -131,6 +131,10 @@ def test__editing_finished(qtbot, widget):
 
 
 @pytest.mark.gui
+@pytest.mark.skipif(
+    PydidasQApplication.platformName() == "wayland",
+    reason="Wayland does not support window focus grabbing.",
+)
 def test__lost_focus(widget):
     widget._io_lineedit.setFocus()
     widget._io_lineedit.setText("10")

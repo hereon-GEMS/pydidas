@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the GridCurvePlot which allows to plot a number of curves on a grid.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -283,6 +283,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._current_index = min(
             self._config["max_index"] - (self.n_plots - 1), self._current_index
         )
+        self._current_index = max(0, self._current_index)
         if self._datasets:
             self._update_navigation_widgets()
             self._update_plot()
@@ -597,6 +598,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
             _xrange = _data.axis_ranges[_data.ndim - 1]
             _xmin, _xmax, _ymin, _ymax = self.__get_limits_for_data(_data_key)
             for _i_plot in range(self.n_plots):
+                if self._current_index + _i_plot >= _data.shape[0]:
+                    continue
                 _key = f"sub{self._config['active_plot_keys'][_i_plot]}_{_idata}"
                 self.__prepare_plot_for_new_data(
                     _data_key, _key, (_xmin, _xmax), (_ymin, _ymax)
@@ -671,6 +674,8 @@ class GridCurvePlot(WidgetWithParameterCollection):
     def __update_grid_titles(self) -> None:
         """Update the titles of the grid layout items."""
         for _iplot in range(self.n_plots):
+            if self._current_index + _iplot >= self._local_scan.shape[0]:
+                continue
             _key = self._config["active_plot_keys"][_iplot] + "_title"
             _scan_index = _iplot + self._current_index
             _indices = self._local_scan.get_indices_from_ordinal(_scan_index)

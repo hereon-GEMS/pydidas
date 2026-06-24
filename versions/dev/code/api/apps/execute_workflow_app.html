@@ -461,7 +461,7 @@
 <span id="all-methods-executeworkflowapp"></span><h2>ExecuteWorkflowApp with inherited methods<a class="headerlink" href="#class-name-with-inherited-methods" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">ExecuteWorkflowApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.apps.</span></span><span class="sig-name descname"><span class="pre">ExecuteWorkflowApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseApp</span></code></a></p>
 <p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">pydidas.apps.BaseApp</span></code>.</p>
 <p>The ExecuteWorkflowApp is used to run workflows which can be any operation
@@ -480,7 +480,7 @@ using the keyword argument syntax of standard &lt;parameter name&gt;=&lt;value&g
 <dt>autosave_results<span class="classifier">bool, optional</span></dt><dd><p>Use this flag to control whether result data should be automatically
 saved to disk. The default is False.</p>
 </dd>
-<dt>autosave_directory<span class="classifier">Union[pathlib.Path, str], optional</span></dt><dd><p>The directory for autosave_files. If autosave_results is True, the
+<dt>autosave_directory<span class="classifier">Path or str, optional</span></dt><dd><p>The directory for autosave_files. If autosave_results is True, the
 directory must be set.</p>
 </dd>
 <dt>autosave_format<span class="classifier">str</span></dt><dd><p>The formats for saving the results. This must be chosen from the list
@@ -495,9 +495,9 @@ stored result and can be used</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>*args</strong> (<em>tuple</em>) – Any number of Parameters. These will be added to the app’s
+<li><p><strong>*args</strong> (<em>Any</em>) – Any number of Parameters. These will be added to the app’s
 ParameterCollection.</p></li>
-<li><p><strong>**kwargs</strong> (<em>dict</em>) – Parameters supplied with their reference key as dict key and the
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Parameters supplied with their reference key as dict key and the
 Parameter itself as value.</p></li>
 </ul>
 </dd>
@@ -532,22 +532,22 @@ subclasses full control over args and kwargs.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.close_shared_arrays_and_memory">
-<span class="sig-name descname"><span class="pre">close_shared_arrays_and_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.close_shared_arrays_and_memory" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">close_shared_arrays_and_memory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.close_shared_arrays_and_memory" title="Link to this definition">#</a></dt>
 <dd><p>Close (and unlink) the shared memory buffers.</p>
 <p>Note that only the manager app should unlink the shared memory buffers.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle creation of an app clone which does not include
-attributes marked in the classes clone_mode attribute.</p>
+attributes marked in the classes’ clone_mode attribute.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>App</strong> – A copy of the App instance.</p>
+<dd class="field-even"><p>A copy of the App instance.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.BaseApp">BaseApp</a></p>
@@ -571,7 +571,7 @@ attributes marked in the classes clone_mode attribute.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.deleteLater">
-<span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.deleteLater" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.deleteLater" title="Link to this definition">#</a></dt>
 <dd><p>Delete the instance of the ExecuteWorkflowApp.</p>
 </dd></dl>
 
@@ -605,14 +605,15 @@ attributes marked in the classes clone_mode attribute.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.get_latest_results">
-<span class="sig-name descname"><span class="pre">get_latest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.get_latest_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_latest_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.get_latest_results" title="Link to this definition">#</a></dt>
 <dd><p>Return the latest results from the WorkflowTree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The latest results from the WorkflowTree.</p>
+<dd class="field-odd"><p>The buffer index of the latest results from the WorkflowTree
+or None, if not set.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict or None</p>
+<dd class="field-even"><p>int or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -699,6 +700,12 @@ keys.</p>
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.import_state">
 <span class="sig-name descname"><span class="pre">import_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.import_state" title="Link to this definition">#</a></dt>
 <dd><p>Import a stored state including Parameters and configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em>) – A dictionary with keys “params” and “config” containing the
+exported state information to be restored.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -730,10 +737,10 @@ they will be published.</p>
 <dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The task index to be executed.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>_image</strong> – The (pre-processed) image.</p>
+<dd class="field-even"><p>None in clone mode, -1 on FileReadError, or buffer position.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">pydidas.core.Dataset</a></p>
+<dd class="field-odd"><p>None or int</p>
 </dd>
 </dl>
 </dd></dl>
@@ -754,14 +761,14 @@ they will be published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.multiprocessing_post_run">
-<span class="sig-name descname"><span class="pre">multiprocessing_post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_post_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_post_run" title="Link to this definition">#</a></dt>
 <dd><p>Perform operations after running the main parallel processing function.</p>
 <p>This implementation will close the arrays and unlink the shared memory buffers.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_cycle">
-<span class="sig-name descname"><span class="pre">multiprocessing_pre_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_cycle" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_pre_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_cycle" title="Link to this definition">#</a></dt>
 <dd><p>Store the reference to the frame index internally.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -772,19 +779,19 @@ they will be published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_run">
-<span class="sig-name descname"><span class="pre">multiprocessing_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_run" title="Link to this definition">#</a></dt>
 <dd><p>Perform operations prior to running main parallel processing function.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results">
-<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Integral</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Integral</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store the results of the multiprocessing operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<em>Integral</em>) – The index of the processed task.</p></li>
-<li><p><strong>data_index</strong> (<em>Integral</em>) – The index to retrieve the results from multiprocessing_func.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The index of the processed task.</p></li>
+<li><p><strong>data_index</strong> (<em>int</em>) – The index to retrieve the results from multiprocessing_func.</p></li>
 </ul>
 </dd>
 </dl>
@@ -800,7 +807,7 @@ they will be published.</p>
 <dd class="field-odd"><p>The signal to be sent.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Optional[str]</p>
+<dd class="field-even"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -860,7 +867,7 @@ and entered values or - if missing - the default values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.prepare_run">
-<span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.prepare_run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.prepare_run" title="Link to this definition">#</a></dt>
 <dd><p>Prepare running the workflow execution.</p>
 <p>For the main App (i.e. running not in clone_mode), this involves the
 following steps:</p>
@@ -936,7 +943,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.received_signal_message">
-<span class="sig-name descname"><span class="pre">received_signal_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.received_signal_message" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">received_signal_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.received_signal_message" title="Link to this definition">#</a></dt>
 <dd><p>Process the received signal message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -947,7 +954,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars">
-<span class="sig-name descname"><span class="pre">reset_runtime_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reset_runtime_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars" title="Link to this definition">#</a></dt>
 <dd><p>Reset the runtime variables for a new run.</p>
 </dd></dl>
 

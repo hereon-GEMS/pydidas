@@ -27,6 +27,10 @@ Programmatic changes
 - Reworked the Scan importer/exporter classes and made the imported
   params not a class variable but a local variable to preempt issues
   with multiple parallel importers.
+- Reworked the DiffractionExperiment importer/exporter classes and 
+  made the imported params not a class variable but a local variable 
+  to preempt issues with multiple parallel importers.
+- Improved test coverage for DiffractionExp.
 
 Bugfixes
 --------

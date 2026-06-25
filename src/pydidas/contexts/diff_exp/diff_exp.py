@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ about the experiment independent of the individual frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,7 +38,6 @@ from pyFAI.detectors import Detector
 from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
-from pydidas.contexts.diff_exp.diff_exp_io import DiffractionExperimentIo
 from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
@@ -79,80 +78,12 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, *args: tuple, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
-
-    def set_param_value(self, param_key: str, value: Any):
-        """
-        Set a Parameter value.
-
-        This method overloads the inherited set_param_value method to update
-        the linked parameters of X-ray energy and wavelength.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter identifier key.
-        value : Any
-            The new value for the parameter. Depending upon the parameter,
-            value can take any form (number, string, object, ...).
-
-        Raises
-        ------
-        KeyError
-            If the key does not exist.
-        """
-        self._check_key(param_key)
-        if self.get_param_value(param_key) == value:
-            return
-        if param_key == "xray_energy":
-            self.params.set_value("xray_energy", value)
-            self.params["xray_wavelength"].value = LAMBDA_IN_A_TO_E / value
-        elif param_key == "xray_wavelength":
-            self.params.set_value("xray_wavelength", value)
-            self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
-        elif param_key == "detector_name":
-            self.params.set_value(param_key, value)
-            if value in PYFAI_DETECTOR_NAMES:
-                self.set_detector_params_from_name(value, suppress_signal=True)
-        elif "npix" in param_key or "pxsize" in param_key:
-            _name = self.get_param_value("detector_name")
-            if _name in PYFAI_DETECTOR_NAMES:
-                # modify the detector name to indicate that the parameters were changed
-                self.params.set_value("detector_name", _name + " [modified]")
-            self.params.set_value(param_key, value)
-        else:
-            self.params.set_value(param_key, value)
-        self.sig_params_changed.emit()
-
-    def get_detector(self) -> Detector:
-        """
-        Get the pyFAI detector object.
-
-        If a pyFAI detector can be instantiated from the "detector" Parameter
-        value, this object will be used. Otherwise, a new detector is created
-        and values from the DiffractionExperimentContext are copied.
-
-        Returns
-        -------
-        det : Detector
-            The detector object.
-        """
-        _name = self.get_param_value("detector_name")
-        if _name in PYFAI_DETECTOR_NAMES:
-            _det = pyFAI.detector_factory(_name)
-        else:
-            _det = Detector()
-        for key, value in [
-            ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
-            ["pixel2", self.get_param_value("detector_pxsizex") * 1e-6],
-            ["max_shape", self.det_shape],
-        ]:
-            setattr(_det, key, value)
-        return _det
+        self._diff_exp_io = None
 
     @property
     def detector_is_valid(self) -> bool:
@@ -231,22 +162,95 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         with QtCore.QSignalBlocker(self):
             self.set_param_value("detector_npixy", shape[0])
             self.set_param_value("detector_npixx", shape[1])
-        if (
-            _current_shape != shape
-            and self.get_param_value("detector_name") in PYFAI_DETECTOR_NAMES
-        ):
-            # If the shape has changed, reset the detector name to keep consistency.
-            self.set_param_value("detector_name", "Custom Detector")
         self.sig_params_changed.emit()
 
     @property
     def det_corners(self) -> PointList:
-        """
-        Get a list of the detector corner points.
-        """
-        _nx = self.get_param_value("detector_npixx")
-        _ny = self.get_param_value("detector_npixy")
+        """Get a list of the detector corner points."""
+        _ny, _nx = self.det_shape
         return PointList([Point(0, 0), Point(0, _ny), Point(_nx, _ny), Point(_nx, 0)])
+
+    @property
+    def beamcenter(self) -> Point:
+        """
+        Get the beamcenter in detector pixel coordinates.
+
+        Returns
+        -------
+        Point
+            The beamcenter x coordinate (in pixels).
+        """
+        _f2d = self.as_fit2d_geometry_values()
+        return Point(_f2d["center_x"], _f2d["center_y"])
+
+    def set_param_value(self, param_key: str, value: Any):
+        """
+        Set a Parameter value.
+
+        This method overloads the inherited set_param_value method to update
+        the linked parameters of X-ray energy and wavelength.
+
+        Parameters
+        ----------
+        param_key : str
+            The Parameter identifier key.
+        value : Any
+            The new value for the parameter. Depending upon the parameter,
+            value can take any form (number, string, object, ...).
+
+        Raises
+        ------
+        KeyError
+            If the key does not exist.
+        """
+        self._check_key(param_key)
+        if self.get_param_value(param_key) == value:
+            return
+        if param_key == "xray_energy":
+            self.params.set_value("xray_energy", value)
+            self.params["xray_wavelength"].value = LAMBDA_IN_A_TO_E / value
+        elif param_key == "xray_wavelength":
+            self.params.set_value("xray_wavelength", value)
+            self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
+        elif param_key == "detector_name":
+            self.params.set_value(param_key, value)
+            if value in PYFAI_DETECTOR_NAMES:
+                self.set_detector_params_from_name(value, suppress_signal=True)
+        elif "npix" in param_key or "pxsize" in param_key:
+            _name = self.get_param_value("detector_name")
+            if _name in PYFAI_DETECTOR_NAMES:
+                # modify the detector name to indicate that the parameters were changed
+                self.params.set_value("detector_name", _name + " [modified]")
+            self.params.set_value(param_key, value)
+        else:
+            self.params.set_value(param_key, value)
+        self.sig_params_changed.emit()
+
+    def get_detector(self) -> Detector:
+        """
+        Get the pyFAI detector object.
+
+        If a pyFAI detector can be instantiated from the "detector" Parameter
+        value, this object will be used. Otherwise, a new detector is created
+        and values from the DiffractionExperimentContext are copied.
+
+        Returns
+        -------
+        det : Detector
+            The detector object.
+        """
+        _name = self.get_param_value("detector_name")
+        if _name in PYFAI_DETECTOR_NAMES:
+            _det = pyFAI.detector_factory(_name)
+        else:
+            _det = Detector()
+        for key, value in [
+            ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
+            ["pixel2", self.get_param_value("detector_pxsizex") * 1e-6],
+            ["max_shape", self.det_shape],
+        ]:
+            setattr(_det, key, value)
+        return _det
 
     def as_pyfai_geometry(self) -> Geometry:
         """
@@ -335,8 +339,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         with QtCore.QSignalBlocker(self):
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
-            if geometry.detector.name in Detector.registry:
-                self.set_detector_params_from_name(geometry.detector.name)
+            _det_name = geometry.detector.name
+            if _det_name in PYFAI_DETECTOR_NAMES:
+                self.set_detector_params_from_name(_det_name)
             else:
                 _det = geometry.detector
                 if _det.pixel1 is not None:
@@ -359,8 +364,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         filename : str | Path
             The full filename.
         """
+        if self._diff_exp_io is None:
+            from pydidas.contexts.diff_exp.diff_exp_io import DiffractionExperimentIo
+
+            self._diff_exp_io = DiffractionExperimentIo
+
         with QtCore.QSignalBlocker(self):
-            DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
+            self._diff_exp_io.import_from_file(filename, diffraction_exp=self)
         self.sig_params_changed.emit()
 
     def export_to_file(self, filename: str | Path, overwrite: bool = False):
@@ -374,7 +384,11 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         overwrite : bool, optional
             Keyword to allow overwriting of existing files.
         """
-        DiffractionExperimentIo.export_to_file(
+        if self._diff_exp_io is None:
+            from pydidas.contexts.diff_exp.diff_exp_io import DiffractionExperimentIo
+
+            self._diff_exp_io = DiffractionExperimentIo
+        self._diff_exp_io.export_to_file(
             filename, diffraction_exp=self, overwrite=overwrite
         )
 
@@ -443,19 +457,6 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
         self.sig_params_changed.emit()
-
-    @property
-    def beamcenter(self) -> Point:
-        """
-        Get the beamcenter in detector pixel coordinates.
-
-        Returns
-        -------
-        Point
-            The beamcenter x coordinate (in pixels).
-        """
-        _f2d = self.as_fit2d_geometry_values()
-        return Point(_f2d["center_x"], _f2d["center_y"])
 
     def as_fit2d_geometry_values(self) -> dict[str, float]:
         """

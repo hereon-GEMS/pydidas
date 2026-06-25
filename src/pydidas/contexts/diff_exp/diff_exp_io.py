@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,17 +22,22 @@ singleton and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIo"]
 
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, ClassVar
 
-from typing import Union
-
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils import get_extension
+
+
+if TYPE_CHECKING:
+    from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
 
 
 class DiffractionExperimentIo(GenericIoMeta):
@@ -42,24 +47,29 @@ class DiffractionExperimentIo(GenericIoMeta):
     DiffractionExperiment or DiffractionExperimentContexts.
     """
 
-    # need to redefine the registry to have a unique registry for
-    # DiffractionExperimentIo
-    registry = {}
+    registry: ClassVar[dict[str, type["DiffractionExperimentIoBase"]]] = {}
 
     @classmethod
     def import_from_file(
-        cls, filename: str, diffraction_exp: Union[object, None] = None
-    ):
+        cls,
+        filename: Path | str,
+        diffraction_exp: DiffractionExperiment | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The full filename and path.
-        diffraction_exp : Union[DiffractionExperiment, None], optional
-            The DiffractionExperiment instance to be updated.
+        diffraction_exp : DiffractionExperiment, optional
+            The DiffractionExperiment instance to be updated. If not
+            provided or set to None, the global context will be used.
+        **kwargs : Any
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)

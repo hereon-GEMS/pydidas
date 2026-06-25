@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ DiffractionExperiment(Context) should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIoBase"]
 
 
-from typing import Union
+from typing import Any
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
@@ -47,15 +47,20 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
 
     extensions = []
     format_name = "unknown"
-    imported_params = {}
 
-    @classmethod
-    def _verify_all_entries_present(cls, exclude_det_mask: bool = False):
+    @staticmethod
+    def verify_all_entries_present(
+        imported_params: dict[str, Any], exclude_det_mask: bool = False
+    ):
         """
         Verify that the tmp_params dictionary holds all required keys.
 
         Parameters
         ----------
+        imported_params : dict[str, Any]
+            The dictionary to be checked for the required keys. Note that
+            after import, the (temporary) parameter values will be stored in
+            a generic dict and not a ParameterCollection.
         exclude_det_mask : bool, optional
             Flag to skip checking for the detector_mask_file Parameter. Used for
             example when importing .poni files which do not support a detector mask.
@@ -63,7 +68,7 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
         """
         _missing_entries = []
         for _key in EXP.params:
-            if _key not in cls.imported_params:
+            if _key not in imported_params:
                 _missing_entries.append(_key)
         if exclude_det_mask and "detector_mask_file" in _missing_entries:
             _missing_entries.remove("detector_mask_file")
@@ -74,20 +79,22 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
             )
             raise UserConfigError(_text)
 
-    @classmethod
-    def _write_to_exp_settings(
-        cls, diffraction_exp: Union[DiffractionExperiment, None] = None
+    @staticmethod
+    def update_diffraction_exp(
+        imported_params: dict[str, Any],
+        diffraction_exp: DiffractionExperiment | None = None,
     ):
         """
-        Write the loaded (temporary) Parameters to a Diffraction.
+        Write the loaded (temporary) Parameters to a DiffractionExperiment.
 
         Parameters
         ----------
-        diffraction_exp : Union[DiffractionExperiment, None], optional
+        imported_params: dict[str, Any]
+            The dictionary with the imported parameter values.
+        diffraction_exp : DiffractionExperiment or None, optional
             The instance to be updated. If None, the generic
             DiffractionExperimentContext will be used. The default is None.
         """
         _exp = EXP if diffraction_exp is None else diffraction_exp
-        for _key, _value in cls.imported_params.items():
+        for _key, _value in imported_params.items():
             _exp.set_param_value(_key, _value)
-        cls.imported_params = {}

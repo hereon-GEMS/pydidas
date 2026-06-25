@@ -162,12 +162,12 @@ def test_verify_data_shape_valid__w_invalid_param(config, plugin, key, value):
 
 
 def test_update_filepath(config, plugin, empty_temp_path):
-    plugin._base_dir = Path("a/b")
-    plugin._filename = "abc"
+    plugin.base_dir = Path("a/b")
+    plugin.filename = "abc"
     plugin._config["filename"] = Path("a/b/abc")
     plugin.update_filepath()
-    assert plugin._base_dir == empty_temp_path
-    assert plugin._filename == _FILENAME
+    assert plugin.base_dir == empty_temp_path
+    assert plugin.filename == _FILENAME
     assert plugin._config["filename"] == empty_temp_path / _FILENAME
 
 

@@ -132,7 +132,7 @@ class NXdataResultLoader(InputPlugin):
     def update_filepath(self):
         """Update the stored filepath."""
         InputPlugin.update_filepath(self)
-        self._config["filename"] = self._base_dir / self._filename
+        self._config["filename"] = self.base_dir / self.filename
 
     def pre_execute(self) -> None:
         """Prepare the loader and read required metadata once."""

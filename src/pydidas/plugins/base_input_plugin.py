@@ -73,8 +73,8 @@ class InputPlugin(BasePlugin):
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
         self._config["pre_executed"] = False
-        self._base_dir = Path()
-        self._filename = ""
+        self.base_dir = Path()
+        self.filename = ""
         if self.base_output_data_dim == 2:
             self.add_params(
                 get_generic_parameter("roi_ylow"),
@@ -114,8 +114,8 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        self._base_dir = self._SCAN.get_param_value("scan_base_directory")
-        self._filename = self._SCAN.processed_file_naming_pattern
+        self.base_dir = self._SCAN.get_param_value("scan_base_directory")
+        self.filename = self._SCAN.processed_file_naming_pattern
 
     def input_available(self, ordinal: int) -> bool:
         """
@@ -164,7 +164,7 @@ class InputPlugin(BasePlugin):
         _file_index = _file_counter * self._SCAN.get_param_value(
             "pattern_number_delta"
         ) + self._SCAN.get_param_value("pattern_number_offset")
-        return self._base_dir / self._filename.format(index=_file_index)
+        return self.base_dir / self.filename.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """

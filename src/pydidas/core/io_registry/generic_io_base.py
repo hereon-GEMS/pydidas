@@ -29,7 +29,7 @@ __all__ = ["GenericIoBase"]
 
 
 from pathlib import Path
-from typing import Any, ClassVar, NoReturn, Sequence
+from typing import Any, ClassVar, Sequence
 
 from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 
@@ -91,32 +91,3 @@ class GenericIoBase(metaclass=GenericIoMeta):
             the specific implementation.
         """
         raise NotImplementedError
-
-    @classmethod
-    def check_for_existing_file(
-        cls, filename: str | Path, **kwargs: Any
-    ) -> None | NoReturn:
-        """
-        Check if the file exists and if the overwrite flag has been set.
-
-        Parameters
-        ----------
-        filename : str or Path
-            The full filename and path.
-        **kwargs : Any, optional
-            Any keyword arguments. Supported are:
-
-            overwrite : bool, optional
-                Flag to allow overwriting of existing files.
-
-        Raises
-        ------
-        FileExistsError
-            If a file with filename exists and the overwrite flag is not True.
-        """
-        _replace = kwargs.get("overwrite", False) or kwargs.get("replace", False)
-        if Path(filename).exists() and not _replace:
-            raise FileExistsError(
-                f"The file `{filename}` exists and replacing the file has "
-                "not been confirmed."
-            )

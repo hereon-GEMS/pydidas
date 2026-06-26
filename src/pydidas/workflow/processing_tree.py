@@ -31,7 +31,7 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Any, Literal
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -332,7 +332,7 @@ class ProcessingTree(GenericTree):
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 
-    def update_from_tree(self, tree: Self) -> None:
+    def update_from_tree(self, tree: "ProcessingTree") -> None:
         """
         Update this tree from another ProcessingTree instance.
 

@@ -52,10 +52,21 @@ class ProcessingTree(GenericTree):
     class instances but through the WorkflowTree singleton instance.
     """
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, filename: str | Path | None = None, **kwargs: Any) -> None:
+        """
+        Initialize the ProcessingTree instance.
+
+        Parameters
+        ----------
+        filename : str or Path, optional
+            File to load ProcessingTree configuration from.
+        """
         super().__init__(**kwargs)
         self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
+
+        if filename is not None:
+            self.import_from_file(filename)
 
     @property
     def active_plugin_header(self) -> str:

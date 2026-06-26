@@ -80,7 +80,7 @@ class ViewResultsFrame(BaseFrameWithApp):
             ProcessingResults(
                 diffraction_exp_context=self._EXP,
                 scan_context=self._SCAN,
-                workflow_tree=self._TREE,
+                processing_tree=self._TREE,
             ),
         )
         self._active_node_id = -1

@@ -40,7 +40,7 @@ from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors, str_repr_of_slice
 from pydidas.core.utils.converters import convert_to_slice
 from pydidas.core.utils.hdf5 import (
-    create_nxdata_entry,
+    nxs_write_nxdata,
 )
 from pydidas.data_io.implementations.io_base import IoBase
 
@@ -288,4 +288,4 @@ class Hdf5Io(IoBase):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         with h5py.File(filename, "w") as _file:
-            _data_group = create_nxdata_entry(_file, _dataset, data)
+            _data_group = nxs_write_nxdata(_file, _dataset, data)

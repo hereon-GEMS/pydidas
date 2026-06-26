@@ -59,7 +59,7 @@ class SelectionModel(QtCore.QIdentityProxyModel):
     unselectable.
     """
 
-    def flags(self, index: QModelIndex) -> QtCore.Qt.ItemFlag | QtCore.Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> QtCore.Qt.ItemFlags:
         """
         Return item flags for the given index.
 
@@ -76,7 +76,7 @@ class SelectionModel(QtCore.QIdentityProxyModel):
         _flags = QtCore.QIdentityProxyModel.flags(self, index)  # type: ignore[arg-type]
         if not self.sourceModel().isDir(index):  # type: ignore[attr-defined]
             _flags &= ~ITEM_SELECTABLE
-        return _flags
+        return _flags  # type: ignore[arg-type]
 
 
 class _PydidasFileDialog(

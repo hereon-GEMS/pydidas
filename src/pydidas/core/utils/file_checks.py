@@ -111,16 +111,19 @@ def verify_is_new_file_or_replace_set(
 
         replace : bool, optional
             Flag to allow overwriting of existing files.
+        overwrite : bool, optional
+            DEPRECATED: Flag to allow overwriting of existing files.
+            Please use `replace` instead.
 
     Raises
     ------
     FileExistsError
         If a file with filename exists and the overwrite flag is not True.
     """
-    _replace = kwargs.get("replace", False)
+    _replace = kwargs.get("replace", False) or kwargs.get("overwrite", False)
     if Path(filename).exists() and not _replace:
         raise FileExistsError(
-            f"The file `{filename}` exists and overwriting has not been confirmed."
+            f"The file `{filename}` exists and replacing has not been confirmed."
         )
 
 

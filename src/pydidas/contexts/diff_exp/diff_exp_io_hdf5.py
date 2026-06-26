@@ -71,6 +71,9 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
             diffraction_exp : DiffractionExperiment, optional
                 The DiffractionExperiment instance to be exported. The
                 default is the DiffractionExperimentContext.
+            replace : bool, optional
+                If True, replace the file if it already exists. The default is
+                False.
         """
         _EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         verify_is_new_file_or_replace_set(filename, **kwargs)

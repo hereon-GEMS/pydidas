@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ from the available datasets in a hdf5 file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -79,7 +79,6 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
             get_max_pixel_width_of_entries(items) + 60,
             min(20 * _font_height, (len(items) + 5) * (_font_height + 5)),
         )
-        print((20 * _font_height, (len(items) + 5) * (_font_height + 5)))
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 

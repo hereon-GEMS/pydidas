@@ -40,7 +40,9 @@ from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors, verify_is_new_file_or_replace_set
 from pydidas.core.utils.hdf5 import (
     get_hdf5_populated_dataset_keys,
+    nxs_create_recursive_groups,
     nxs_export_context,
+    nxs_write_dataset,
     read_and_decode_hdf5_dataset,
 )
 
@@ -76,6 +78,15 @@ class ScanIoHdf5(ScanIoBase):
         verify_is_new_file_or_replace_set(filename, **kwargs)
         with h5py.File(filename, "a") as h5file:
             nxs_export_context(h5file, _scan, "entry/pydidas_scan")
+            nxs_create_recursive_groups(h5file, "entry/instrument", "NXinstrument")
+            _det_group = nxs_create_recursive_groups(
+                h5file, "entry/instrument/detector", "NXdetector"
+            )
+            nxs_write_dataset(
+                _det_group,
+                "frame_start_number",
+                _scan.get_param_value("pattern_number_offset"),
+            )
 
     @classmethod
     def import_from_file(cls, filename: Path | str, scan: Scan | None = None) -> None:

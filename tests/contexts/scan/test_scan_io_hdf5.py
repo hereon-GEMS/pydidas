@@ -1,4 +1,4 @@
-# This file is part of pydidas.
+# This h5file is part of pydidas.
 #
 # Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
@@ -108,7 +108,7 @@ def _randomize_scan(scan: Scan):
 
 @pytest.fixture
 def create_hdf5_file(temp_dir) -> Path:
-    """Fixture to create a temporary HDF5 file."""
+    """Fixture to create a temporary HDF5 h5file."""
     hdf5_filename = temp_dir / "scan_io_hdf5.h5"
     with h5py.File(hdf5_filename, "a") as h5file:
         nxs_export_context(h5file, SCAN, "entry/pydidas_scan")
@@ -116,10 +116,10 @@ def create_hdf5_file(temp_dir) -> Path:
 
 
 def read_hdf5_file(file_path: Path) -> dict[str, Any]:
-    """Read the HDF5 file and return the data as a dictionary."""
-    with h5py.File(file_path, "r") as file:
+    """Read the HDF5 h5file and return the data as a dictionary."""
+    with h5py.File(file_path, "r") as h5file:
         data = {}
-        group = file["entry/pydidas_scan"]
+        group = h5file["entry/pydidas_scan"]
         for key in group.keys():
             data[key] = read_and_decode_hdf5_dataset(group[key])
     return data
@@ -129,12 +129,15 @@ def test_export_to_file__correct(modify_scan_context, temp_dir):
     """Test the export_to_file method."""
     hdf5_file = temp_dir / "scan_io_hdf5.h5"
     SCAN_IO_HDF5.export_to_file(hdf5_file)
-    with h5py.File(hdf5_file, "r") as file:
-        _group = file["entry/pydidas_scan"]
+    with h5py.File(hdf5_file, "r") as h5file:
+        _group = h5file["entry/pydidas_scan"]
         for _key, _param in SCAN.params.items():
             assert (
                 read_and_decode_hdf5_dataset(_group[_key]) == modify_scan_context[_key]
             )
+        assert "entry/instrument/detector/frame_start_number" in h5file
+        assert h5file["entry/instrument"].attrs.get("NX_class") == "NXinstrument"
+        assert h5file["entry/instrument/detector"].attrs.get("NX_class") == "NXdetector"
 
 
 def test_export_to_file__w_scan(temp_dir):
@@ -143,8 +146,8 @@ def test_export_to_file__w_scan(temp_dir):
     _randomize_scan(_local_scan)
     hdf5_file = temp_dir / "local_scan_io_hdf5.h5"
     SCAN_IO_HDF5.export_to_file(hdf5_file, scan=_local_scan)
-    with h5py.File(hdf5_file, "r") as file:
-        _group = file["entry/pydidas_scan"]
+    with h5py.File(hdf5_file, "r") as h5file:
+        _group = h5file["entry/pydidas_scan"]
         for _key, _param in SCAN.params.items():
             assert (
                 read_and_decode_hdf5_dataset(_group[_key])
@@ -154,9 +157,9 @@ def test_export_to_file__w_scan(temp_dir):
 
 def test_import_from_file__empty_file(temp_dir):
     _fname = temp_dir / "empty_file.h5"
-    with h5py.File(_fname, "w") as file:
+    with h5py.File(_fname, "w") as h5file:
         nxs_create_recursive_groups(
-            file, "entry/pydidas_scan", group_type="NXcollection"
+            h5file, "entry/pydidas_scan", group_type="NXcollection"
         )
     with pytest.raises(UserConfigError):
         SCAN_IO_HDF5.import_from_file(_fname)
@@ -189,11 +192,11 @@ def test_import_from_file__to_local_context(
 def test_import_from_file__from_exported_legacy_file(fname):
     _fname = _TEST_DIR / "_data" / fname
     _prefix = "/entry/pydidas_config/scan/"
-    with h5py.File(_fname, "r") as file:
+    with h5py.File(_fname, "r") as h5file:
         _keys = [
             _key.removeprefix(_prefix)
             for _key in get_hdf5_populated_dataset_keys(
-                file[_prefix], min_dim=0, min_size=0
+                h5file[_prefix], min_dim=0, min_size=0
             )
         ]
         _imported_values = {
@@ -208,8 +211,8 @@ def test_import_from_file__from_exported_legacy_file(fname):
         assert _val == SCAN.params[_scan_key].value_for_export
 
 
-def test_import_from_file__other_key():
-    _fname = _TEST_DIR / "_data" / "test_other_key.h5"
+def test_import_from_file__other_key(temp_dir):
+    _fname = temp_dir / "test_other_key.h5"
     with h5py.File(_fname, "a") as h5file:
         nxs_export_context(h5file, SCAN, "entry/other/custom_scan")
     with pytest.raises(UserConfigError):

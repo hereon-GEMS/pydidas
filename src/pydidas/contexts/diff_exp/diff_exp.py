@@ -158,11 +158,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         if len(shape) != 2:
             raise UserConfigError("The detector shape must be a tuple of length 2.")
-        _current_shape = self.det_shape
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             self.set_param_value("detector_npixy", shape[0])
             self.set_param_value("detector_npixx", shape[1])
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     @property
     def det_corners(self) -> PointList:
@@ -224,7 +223,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             self.params.set_value(param_key, value)
         else:
             self.params.set_value(param_key, value)
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def get_detector(self) -> Detector:
         """
@@ -300,7 +299,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             raise UserConfigError(
                 f"The detector name '{det_name}' is unknown to pyFAI."
             )
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             self.params.set_value("detector_pxsizey", _det.pixel1 * 1e6)
             self.params.set_value("detector_pxsizex", _det.pixel2 * 1e6)
             self.params.set_value("detector_npixy", _det.max_shape[0])
@@ -308,7 +307,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             if self.get_param_value("detector_name") != det_name:
                 self.params.set_value("detector_name", det_name)
         if not suppress_signal:
-            self.sig_params_changed.emit()
+            self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def update_from_diffraction_exp(self, diffraction_exp: Self):
         """
@@ -322,10 +321,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         diffraction_exp : DiffractionExperiment
             The other DiffractionExperiment from which the Parameters should be taken.
         """
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             for _key, _val in diffraction_exp.get_param_values_as_dict().items():
                 self.set_param_value(_key, _val)
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def update_from_pyfai_geometry(self, geometry: Geometry):
         """
@@ -336,14 +335,14 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         geometry : Geometry
             The geometry to be used.
         """
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
-            _det_name = geometry.detector.name
+            _det_name = geometry.detector.name  # type: ignore[type]
             if _det_name in PYFAI_DETECTOR_NAMES:
                 self.set_detector_params_from_name(_det_name)
             else:
-                _det = geometry.detector
+                _det: Detector = geometry.detector  # type: ignore[arg-type]
                 if _det.pixel1 is not None:
                     self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
                 if _det.pixel2 is not None:
@@ -353,7 +352,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     self.set_param_value("detector_npixx", _det.max_shape[1])
                 if [_det.pixel1, _det.pixel2, _det.max_shape] != [None, None, None]:
                     self.set_param_value("detector_name", _det.name)
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def import_from_file(self, filename: str | Path):
         """
@@ -369,9 +368,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
             self._diff_exp_io = DiffractionExperimentIo
 
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             self._diff_exp_io.import_from_file(filename, diffraction_exp=self)
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def export_to_file(self, filename: str | Path, overwrite: bool = False):
         """
@@ -453,10 +452,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     detector=self.get_detector(),
                 )
             )
-        with QtCore.QSignalBlocker(self):
+        with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
-        self.sig_params_changed.emit()
+        self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
     def as_fit2d_geometry_values(self) -> dict[str, float]:
         """

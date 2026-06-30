@@ -50,12 +50,8 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter import Parameter
+from pydidas.core.utils import iso_timestring
 from pydidas.version import VERSION
-
-
-def __iso_timestring() -> str:
-    """Get the current date and time as a ISOISO8601-compatible string"""
-    return datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
 def _name_with_leading_slash(name: str) -> str:
@@ -141,7 +137,7 @@ def nxs_write_root_metadata(h5file: h5py.File, default: str = "entry") -> None:
     default : str
         The default entry. The default is `entry`.
     """
-    _time_string = __iso_timestring()
+    _time_string = iso_timestring()
     for _key, _val in [
         ("NX_class", "NXroot"),
         ("HDF5_version", h5py.version.hdf5_version),
@@ -166,7 +162,7 @@ def nxs_update_nxroot_timestamp(h5file: h5py.File) -> None:
     h5file : h5py.File
         The NeXus file to update the file update time.
     """
-    h5file.attrs["file_update_time"] = __iso_timestring()
+    h5file.attrs["file_update_time"] = iso_timestring()
 
 
 def nxs_create_nxentry(h5file: h5py.File, entry: str = "entry") -> h5py.Group:

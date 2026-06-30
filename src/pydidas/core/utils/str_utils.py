@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The str_utils module includes convenience functions for string formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = [
     "get_fixed_length_str",
     "get_time_string",
     "get_short_time_string",
+    "iso_timestring",
     "timed_print",
     "get_warning",
     "print_warning",
@@ -46,7 +47,7 @@ __all__ = [
     "str_repr_of_slice",
 ]
 
-
+import datetime
 import os
 import random
 import re
@@ -88,6 +89,11 @@ def convert_str_to_number(input_str: str) -> Real | Integral | str:
             return float(input_str)
         except ValueError:
             return input_str
+
+
+def iso_timestring() -> str:
+    """Get the current date and time as a ISO8601-compatible string"""
+    return datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
 def get_fixed_length_str(

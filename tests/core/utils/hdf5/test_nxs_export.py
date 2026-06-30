@@ -260,6 +260,14 @@ def test_nxs_write_dataset__basic(hdf5_file):
             assert np.array_equal(dataset[()], data)
 
 
+def test_nxs_write_dataset__w_None(hdf5_file):
+    _group = hdf5_file.create_group("entry")
+    _name = "test_dataset"
+    dataset = nxs_write_dataset(_group, _name, None)
+    assert _name in _group
+    assert dataset[()] == b"::None::"
+
+
 def test_nxs_write_dataset__replace_existing(hdf5_file):
     _group = hdf5_file.create_group("entry")
     _test_data = np.random.random((10, 10))

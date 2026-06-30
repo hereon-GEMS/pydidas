@@ -38,7 +38,6 @@ __all__ = [
 ]
 
 import os
-from datetime import datetime
 from numbers import Number
 from pathlib import Path
 from typing import Any
@@ -50,7 +49,7 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter import Parameter
-from pydidas.core.utils import iso_timestring
+from pydidas.core.utils.str_utils import iso_timestring
 from pydidas.version import VERSION
 
 
@@ -301,7 +300,9 @@ def nxs_write_dataset(
     """
     if name in group:
         del group[name]
-    if isinstance(data, dict):
+    if data is None:
+        _dataset = group.create_dataset(name, data="::None::")
+    elif isinstance(data, dict):
         _dataset = group.create_dataset(name, **data)
     else:
         _dataset = group.create_dataset(name, data=data)

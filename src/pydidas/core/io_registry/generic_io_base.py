@@ -53,7 +53,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
         ----------
         filename : Path or str
             The filename of the file to be written.
-        **kwargs : Any, optional
+        **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """
@@ -70,7 +70,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
         ----------
         filename : str or Path
             The filename of the file to be imported.
-        **kwargs : Any, optional
+        **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """
@@ -86,7 +86,8 @@ class GenericIoBase(metaclass=GenericIoMeta):
         Parameters
         ----------
         filenames : Sequence[Path or str]
-        **kwargs : Any, optional
+            The filenames of the files to be imported.
+        **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """

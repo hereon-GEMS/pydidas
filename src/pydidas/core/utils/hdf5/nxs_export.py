@@ -40,7 +40,7 @@ __all__ = [
 import os
 from numbers import Number
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import h5py
 import numpy as np
@@ -180,14 +180,15 @@ def nxs_create_nxentry(h5file: h5py.File, entry: str = "entry") -> h5py.Group:
     h5py.Group
         The created NXentry group.
     """
-    if entry in h5file.keys():
-        return h5file[entry]
-    h5file.attrs["default"] = entry
-    _entry = h5file.create_group(entry)
-    _entry.attrs["NX_class"] = "NXentry"
-    _prg = _entry.create_dataset("program_name", data="pydidas")
-    _prg.attrs["version"] = VERSION
     nxs_update_nxroot_timestamp(h5file)
+    h5file.attrs["default"] = entry
+    if entry not in h5file.keys():
+        _entry = h5file.create_group(entry)
+    else:
+        _entry = h5file[entry]
+    _entry.attrs["NX_class"] = "NXentry"
+    _prg = nxs_write_dataset(_entry, "program_name", "pydidas")
+    _prg.attrs["version"] = VERSION
     return _entry
 
 
@@ -278,7 +279,7 @@ def nxs_write_nxdata(
 def nxs_write_dataset(
     group: h5py.Group,
     name: str,
-    data: dict[str, Any] | np.ndarray | str | Number,
+    data: dict[str, Any] | np.ndarray | str | Number | Sequence[str | Number],
     **attributes: Any,
 ) -> h5py.Dataset:
     """
@@ -291,7 +292,7 @@ def nxs_write_dataset(
         The group to create the dataset in.
     name : str
         The name of the dataset.
-    data: dict or np.ndarray or str or Number
+    data: dict or np.ndarray or str or Number or Sequence[str | Number]
         The data to be stored in the dataset. This should typically be a numpy array
         or a scalar value or a string. If a dict is given, this is interpreted as
         the arguments for calling the create_dataset method.

@@ -48,6 +48,8 @@ Bugfixes
   were squeezed during export.
 - Fixed an issue where the plotted labels for columnar data were not 
   properly reset on loading new data.
+- Fixed an issue in Parameter which raised an Exception when trying to set 
+  a number-tuple with a ndarray.
 
 
 v26.05.19

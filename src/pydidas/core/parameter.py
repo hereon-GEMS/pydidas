@@ -308,6 +308,8 @@ class Parameter:
         value : Any
             The value with the above-mentioned type conversions applied.
         """
+        if self.__type in _ITERATORS and isinstance(value, ndarray):
+            value = value.tolist()
         if self.__meta["allow_None"] and value in ["None", "", None]:
             return None
         if isinstance(value, str):

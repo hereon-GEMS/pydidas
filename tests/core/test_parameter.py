@@ -306,6 +306,16 @@ class TestParameter(unittest.TestCase):
                 obj.value = _val
                 self.assertEqual(obj.value, _ref)
 
+    def test_set_value__tuple_w_ndarray_input(self):
+        _val = (1, 4, 2)
+        for _allow_none in [True, False]:
+            with self.subTest(allow_None=_allow_none):
+                obj = Parameter(
+                    "Test0", tuple, (1, 2), subtype=int, allow_None=_allow_none
+                )
+                obj.value = np.array(_val)
+                self.assertEqual(obj.value, _val)
+
     def test_set_value__tuple_w_subtype_wrong_type(self):
         _val = (1, 2, "3b")
         obj = Parameter("Test0", tuple, (1, 2), subtype=int)

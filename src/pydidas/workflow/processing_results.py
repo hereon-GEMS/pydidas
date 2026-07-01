@@ -84,7 +84,22 @@ class ProcessingResults(ObjectWithParameterCollection):
         diffraction_exp_context: DiffractionExperiment | None = None,
         scan_context: Scan | None = None,
         workflow_tree: ProcessingTree | None = None,
+        directory: str | Path | None = None,
     ):
+        """
+        Initialize the ProcessingTree instance.
+
+        Parameters
+        ----------
+        diffraction_exp_context : DiffractionExperiment, optional
+            The diffraction experiment context.
+        scan_context : Scan, optional
+            The scan context.
+        workflow_tree : ProcessingTree, optional
+            The processing tree.
+        directory : str or Path, optional
+            Directory to load ProcessingResults data from.
+        """
         ObjectWithParameterCollection.__init__(self, parent=None)
         self._SCAN = ScanContext() if scan_context is None else scan_context
         self._EXP = (
@@ -101,6 +116,9 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._composites = {}
         self.__source_hash = -1
         self.clear_all_results()
+
+        if directory is not None:
+            self.import_data_from_directory(directory)
 
     def clear_all_results(self) -> None:
         """

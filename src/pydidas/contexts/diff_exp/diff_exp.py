@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ about the experiment independent of the individual frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -79,11 +79,22 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, *args: tuple, **kwargs: Any):
+    def __init__(self, filename: str | Path | None = None, *args: tuple, **kwargs: Any):
+        """
+        Initialize the DiffractionExperiment instance.
+
+        Parameters
+        ----------
+        filename : str or Path, optional
+            File to load DiffractionExperiment configuration from.
+        """
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
+
+        if filename is not None:
+            self.import_from_file(filename)
 
     def set_param_value(self, param_key: str, value: Any):
         """

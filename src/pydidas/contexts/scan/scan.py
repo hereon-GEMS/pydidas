@@ -90,10 +90,21 @@ class Scan(ObjectWithParameterCollection):
 
     default_params = SCAN_DEFAULT_PARAMS
 
-    def __init__(self) -> None:
+    def __init__(self, filename: str | Path | None = None) -> None:
+        """
+        Initialize the Scan instance.
+
+        Parameters
+        ----------
+        filename : str or Path, optional
+            File to load Scan configuration from.
+        """
         super().__init__()
         self.set_default_params()
         self._scan_io = None
+
+        if filename is not None:
+            self.import_from_file(filename)
 
     def get_indices_from_ordinal(self, ordinal: int) -> tuple[int, ...]:
         """

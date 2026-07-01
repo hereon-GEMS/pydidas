@@ -28,24 +28,33 @@ __all__ = ["ProcessingTreeIoHdf5"]
 
 
 from pathlib import Path
-from typing import Any, NewType
+from typing import TYPE_CHECKING, Any
 
 import h5py
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
+from pydidas.core.utils import iso_timestring
+from pydidas.core.utils.file_checks import verify_is_new_file_or_replace_set
 from pydidas.core.utils.hdf5 import (
-    create_nx_dataset,
-    create_nx_entry_groups,
+    nxs_create_recursive_groups,
+    nxs_param_config_for_dset,
+    nxs_write_dataset,
     read_and_decode_hdf5_dataset,
 )
+from pydidas.core.utils.hdf5.hdf5_pydidas_utils import get_exported_pydidas_version
+from pydidas.core.utils.hdf5.nxs_export import nxs_create_nxentry
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree_io.processing_tree_io_base import (
     ProcessingTreeIoBase,
 )
 
 
-ProcessingTree = NewType("ProcessingTree", type)
+if TYPE_CHECKING:
+    from pydidas.workflow.processing_tree import ProcessingTree
+
+
+_GENERIC_NODE_KEYS = ["node_id", "parent", "children", "plugin_class"]
 
 
 class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
@@ -57,14 +66,12 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
     format_name = "HDF5"
     default_suffix = ".nxs"
 
-    @classmethod
+    @staticmethod
     def export_to_file(
-        cls, filename: Path | str, tree: ProcessingTree, **kwargs: Any
+        filename: Path | str, tree: "ProcessingTree", **kwargs: Any
     ) -> None:
         """
-        Write the content to a file.
-
-        This method needs to be implemented by the concrete subclass.
+        Write the content of the ProcessingTree to an HDF5 file.
 
         Parameters
         ----------
@@ -75,44 +82,68 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
         **kwargs : Any
             Additional keyword arguments.
         """
-        cls.check_for_existing_file(filename, **kwargs)
-        _group_name = "entry/pydidas_config"
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         with h5py.File(filename, "a") as _file:
-            create_nx_entry_groups(_file, _group_name, group_type="NXcollection")
-            create_nx_dataset(_file[_group_name], "workflow", tree.export_to_string())
-            create_nx_dataset(_file[_group_name], "pydidas_version", VERSION)
+            _entry = nxs_create_nxentry(_file, "entry")
+            if "pydidas_workflow" in _entry:
+                del _entry["pydidas_workflow"]
+
+            _group = nxs_create_recursive_groups(
+                _entry, "pydidas_workflow", group_type="NXprocess"
+            )
+            nxs_write_dataset(_group, "program", "pydidas")
+            nxs_write_dataset(_group, "version", VERSION)
+            nxs_write_dataset(_group, "date", iso_timestring())
+            nxs_write_dataset(_group, "sequence_index", 1)
+
+            _config_group = nxs_create_recursive_groups(
+                _group, "workflow_info", group_type="NXparameters"
+            )
+            _node_names = [f"workflow_node_{_id:02d}" for _id in tree.nodes.keys()]
+            nxs_write_dataset(_config_group, "nodes", _node_names)
+            nxs_write_dataset(_config_group, "num_nodes", len(tree.nodes))
+
+            for _id, _node in tree.nodes.items():
+                _param_group = nxs_create_recursive_groups(
+                    _group, f"workflow_node_{_id:02d}", group_type="NXparameters"
+                )
+                _node_data = _node.dump()
+                for _key in ["node_id", "parent", "children", "plugin_class"]:
+                    nxs_write_dataset(_param_group, _key, _node_data[_key])
+                for _key, _param in _node.plugin.params.items():
+                    if _key.startswith("_"):
+                        continue
+                    _val, _attributes = nxs_param_config_for_dset(_param)
+                    nxs_write_dataset(_param_group, _key, _val, **_attributes)
 
     @classmethod
-    def import_from_file(cls, filename: Path | str) -> ProcessingTree:
+    def import_from_file(  # type: ignore[override]
+        cls, filename: Path | str, **kwargs: Any
+    ) -> "ProcessingTree":
         """
-        Restore the content from a file.
-
-        This method needs to be implemented by the concrete subclass.
+        Restore the content from an HDF5 file.
 
         Parameters
         ----------
         filename : Path or str
             The filename of the file to be read.
+        **kwargs : Any
+            Additional keyword arguments. Not used in the HDF5 implementation.
 
         Returns
         -------
         ProcessingTree
             The restored ProcessingTree.
         """
-        from pydidas.workflow.processing_tree import ProcessingTree
-
         _version = "23.7.5 or earlier"
 
-        with h5py.File(filename, "r") as _file:
+        with h5py.File(filename, "r") as _h5file:
             try:
-                _tree_repr = read_and_decode_hdf5_dataset(
-                    _file["entry/pydidas_config/workflow"]
-                )
-                _version = read_and_decode_hdf5_dataset(
-                    _file["entry/pydidas_config/pydidas_version"]
-                )
-                _tree = ProcessingTree()
-                _tree.restore_from_string(_tree_repr)
+                _version = get_exported_pydidas_version(_h5file)
+                if "/entry/pydidas_workflow/workflow_info" in _h5file:
+                    _tree = cls._import_processing_tree(_h5file)
+                else:
+                    _tree = cls._import_legacy_processing_tree(_h5file)
             except (KeyError, TypeError, UserConfigError, ValueError, NameError):
                 if _version < VERSION:
                     raise UserConfigError(
@@ -127,4 +158,68 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
                     f"\n    {filename}\nPlease check that the content of the file "
                     "is a Pydidas ProcessingTree."
                 )
+        return _tree
+
+    @staticmethod
+    def _import_legacy_processing_tree(hdf5_file: h5py.File) -> "ProcessingTree":
+        """
+        Import the ProcessingTree from the legacy HDF5 file.
+
+        Parameters
+        ----------
+        hdf5_file : h5py.File
+            The HDF5 file to be imported.
+
+        Returns
+        -------
+        ProcessingTree
+            The restored ProcessingTree from the legacy HDF5 file.
+        """
+        from pydidas.workflow.processing_tree import ProcessingTree
+
+        _tree_repr = read_and_decode_hdf5_dataset(
+            hdf5_file["entry/pydidas_config/workflow"]
+        )
+        _tree = ProcessingTree()
+        _tree.restore_from_string(_tree_repr)
+        return _tree
+
+    @staticmethod
+    def _import_processing_tree(hdf5_file: h5py.File) -> "ProcessingTree":
+        """
+        Import the ProcessingTree from the HDF5 file.#
+
+        Parameters
+        ----------
+        hdf5_file : h5py.File
+            The HDF5 file to be imported.
+
+        Returns
+        -------
+        ProcessingTree
+            The restored ProcessingTree from the HDF5 file.
+        """
+        from pydidas.workflow.processing_tree import ProcessingTree
+
+        _node_names = [
+            _key.decode()
+            for _key in read_and_decode_hdf5_dataset(
+                hdf5_file["entry/pydidas_workflow/workflow_info/nodes"]
+            )
+        ]
+        _nodes = []
+        for _node_key in _node_names:
+            _group = hdf5_file[f"entry/pydidas_workflow/{_node_key}"]
+            _node_data = {
+                _key: read_and_decode_hdf5_dataset(_group[_key])
+                for _key in _GENERIC_NODE_KEYS
+            }
+            _node_data["plugin_params"] = [
+                (_param_key, read_and_decode_hdf5_dataset(_group[_param_key]))
+                for _param_key in _group.keys()
+                if _param_key not in _GENERIC_NODE_KEYS
+            ]
+            _nodes.append(_node_data)
+        _tree = ProcessingTree()
+        _tree.restore_from_list_of_nodes(_nodes)
         return _tree

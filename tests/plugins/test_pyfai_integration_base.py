@@ -401,7 +401,6 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _input_low, _input_high = (12, 37)
         _target_low = q_to_2theta(_input_low * 1e9, self._lambda * 1e-10)
         _target_high = q_to_2theta(_input_high * 1e9, self._lambda * 1e-10)
-        print(_target_low, _target_high)
         plugin = pyFAIintegrationBase(
             rad_use_range="Specify radial range",
             rad_unit="Q / nm^-1",

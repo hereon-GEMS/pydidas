@@ -31,6 +31,7 @@ Programmatic changes
   made the imported params not a class variable but a local variable 
   to preempt issues with multiple parallel importers.
 - Improved test coverage for DiffractionExp.
+- Added a dataclass for PluginResultInfos.
 
 Bugfixes
 --------

@@ -51,6 +51,7 @@ from pydidas.core.utils import (
     strip_param_description_from_docstring,
 )
 from pydidas.managers import ImageMetadataManager
+from pydidas.plugins.plugin_result_info import PluginResultInfo
 
 
 ptype = {
@@ -322,6 +323,26 @@ class BasePlugin(ObjectWithParameterCollection):
         self._config["input_data"]: int | Dataset | None = None
         self.node_id = None
         self.advanced_params_visible = False
+
+    @property
+    def plugin_result_info(self) -> PluginResultInfo:
+        """
+        Get the initial plugin result info.
+
+        Note that the initial info is still missing information about the
+        full result shape (which includes the Scan shape as well as
+        metadata which might be passed on through the ProcessingTree.
+
+        Returns
+        -------
+        PluginResultInfo
+            The initial plugin result info.
+        """
+        return PluginResultInfo(
+            label=self.get_param_value("label"),
+            plugin_name=self.plugin_name,
+            result_title=self.result_title,
+        )
 
     def __copy__(self) -> Self:
         """

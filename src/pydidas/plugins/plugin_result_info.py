@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The workflow_results module includes the ProcessingResults and WorkflowResults
-singleton class for storing and accessing the composite results of the processing.
+The PluginResultInfo is a class for storing and accessing information
+about plugin results.
 """
 
 __author__ = "Malte Storm"
@@ -27,9 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginResultInfo"]
 
-
-from dataclasses import dataclass, field
+from copy import copy
+from dataclasses import dataclass, field, replace
 from typing import Any
+
+from numpy import ndarray
 
 
 @dataclass
@@ -38,7 +40,7 @@ class PluginResultInfo:
     A class for handling information of node results.
 
     In addition to the usual dataclass attributes, derived attributes
-    for the squeezed result shape is implemented.
+    for the squeezed result shape are implemented.
     """
 
     label: str = ""
@@ -47,15 +49,70 @@ class PluginResultInfo:
     result_title: str = ""
     result_metadata: dict[str, Any] = field(default_factory=dict)
     shape: tuple[int, ...] = field(default_factory=tuple)
+    squeeze: bool = False
+    data_label: str = ""
+    data_unit: str = ""
+    axis_labels: dict[int, str] = field(default_factory=dict)
+    axis_units: dict[int, str] = field(default_factory=dict)
+    axis_ranges: dict[int, ndarray] = field(default_factory=dict)
 
     @property
-    def squeezed_shape(self) -> tuple[int, ...]:
+    def export_shape(self) -> tuple[int, ...]:
         """
-        Get the squeezed shape of the result.
+        Get the shape of the result export.
+
+        Depending on the squeeze flag, the shape may be reduced by
+        removing dimensions of length 1.
 
         Returns
         -------
         tuple[int, ...]
-            The squeezed shape of the result.
+            The shape of the result export, potentially squeezed.
         """
-        return tuple(_n for _n in self.shape if _n > 1)
+        if self.squeeze:
+            return tuple(_n for _n in self.shape if _n > 1)
+        return self.shape
+
+    @property
+    def dataset_metadata(self) -> dict[str, Any]:
+        """
+        Get the metadata required to create a Dataset object from the result.
+
+        Returns
+        -------
+        dict[str, Any]
+            The metadata required to create a Dataset object from the result.
+        """
+        return {
+            "data_label": self.data_label,
+            "data_unit": self.data_unit,
+            "axis_labels": self.axis_labels,
+            "axis_units": self.axis_units,
+            "axis_ranges": self.axis_ranges,
+        }
+
+    @dataset_metadata.setter
+    def dataset_metadata(self, metadata_dict: dict[str, Any]) -> None:
+        """
+        Set the metadata required to create a Dataset object from the result.
+
+        Parameters
+        ----------
+        metadata_dict : dict[str, Any]
+            The metadata dictionary to set.
+        """
+        self.data_label = metadata_dict.get("data_label", "")
+        self.data_unit = metadata_dict.get("data_unit", "")
+        self.axis_labels = metadata_dict.get("axis_labels", {})
+        self.axis_units = metadata_dict.get("axis_units", {})
+        self.axis_ranges = metadata_dict.get("axis_ranges", {})
+
+    def copy(self) -> "PluginResultInfo":
+        """An alias for the __copy__ method."""
+        return self.__copy__()
+
+    def __copy__(self) -> "PluginResultInfo":
+        """A copy implementation to be used by the copy module."""
+        _copy = replace(self)
+        _copy.result_metadata = {_key: copy(_val) for _key, _val in self.result_metadata.items()}
+        return _copy

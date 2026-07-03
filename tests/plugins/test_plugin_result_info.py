@@ -51,15 +51,14 @@ def test_init__w_default():
     _info = PluginResultInfo()
     for _key, _val in _DEFAULT_VALUES.items():
         assert getattr(_info, _key) == _val
-    assert _info.squeezed_shape == ()
+    assert _info.export_shape == ()
 
 
 def test_init__w_customs():
     _info = PluginResultInfo(**_CUSTOM_VALUES)
     for _key, _val in _CUSTOM_VALUES.items():
         assert getattr(_info, _key) == _val
-    _shape: tuple[int, ...] = _CUSTOM_VALUES["shape"]  # type : ignore[type]
-    assert _info.squeezed_shape == tuple(_i for _i in _shape if _i != 1)
+    assert _info.export_shape == _CUSTOM_VALUES["shape"]  # type : ignore[type]
 
 
 @pytest.mark.parametrize("key, val", [(_k, _v) for _k, _v in _CUSTOM_VALUES.items()])
@@ -83,7 +82,7 @@ def test_metadata_independence():
 
 
 @pytest.mark.parametrize(
-    "shape, expected_squeezed",
+    "shape, expected_export",
     [
         ((), ()),
         ((1, 1, 1), ()),
@@ -95,18 +94,14 @@ def test_metadata_independence():
         ((1,), ()),
     ],
 )
-def test_squeezed_shape__w_various_shapes(shape, expected_squeezed):
-    _info = PluginResultInfo(shape=shape)
-    assert _info.squeezed_shape == expected_squeezed
+@pytest.mark.parametrize("squeeze", [True, False])
+def test_export_shape__w_various_shapes(shape, expected_export, squeeze):
+    _info = PluginResultInfo(shape=shape, squeeze=squeeze)
+    if squeeze:
+        assert _info.export_shape == expected_export
+    else:
+        assert _info.export_shape == shape
 
-
-def test_squeezed_shape_property_immutable():
-    """Test that squeezed_shape returns a new tuple each call."""
-    _info = PluginResultInfo(shape=(1, 100, 1))
-    _squeezed1 = _info.squeezed_shape
-    _squeezed2 = _info.squeezed_shape
-    assert _squeezed1 == _squeezed2
-    assert _squeezed1 is not _squeezed2  # Different tuple objects
 
 
 @pytest.mark.parametrize("node_id", [None, 0, 2, -1])
@@ -144,9 +139,12 @@ def test__modify_metadata_outside_dataclass():
 
 def test__modify_shape_after_initialization():
     _info = PluginResultInfo(shape=(100, 200))
-    assert _info.squeezed_shape == (100, 200)
-    _info.shape = (1, 200, 1, 50, 1)
-    assert _info.squeezed_shape == (200, 50)
+    assert _info.export_shape == (100, 200)
+    _new_shape = (1, 200, 1, 50, 1)
+    _info.shape = _new_shape
+    assert _info.export_shape == _new_shape
+    _info.squeeze = True
+    assert _info.export_shape == (200, 50)
 
 
 def test_dataclass__equality():
@@ -159,6 +157,17 @@ def test_dataclass__inequality():
     _info1 = PluginResultInfo(label="Test1")
     _info2 = PluginResultInfo(label="Test2")
     assert _info1 != _info2
+
+
+def test_copy():
+    _info1 = PluginResultInfo(**_CUSTOM_VALUES)
+    _info2 = _info1.copy()
+    assert _info1 == _info2
+    assert _info1 is not _info2
+    assert _info1.result_metadata is not _info2.result_metadata
+    _info2.result_metadata["key1"] = False
+    assert _info1.result_metadata['key1'] is True
+
 
 
 if __name__ == "__main__":

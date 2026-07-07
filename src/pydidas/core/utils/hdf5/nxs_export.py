@@ -37,7 +37,6 @@ __all__ = [
     "nxs_param_config_for_dset",
 ]
 
-import os
 from numbers import Number
 from pathlib import Path
 from typing import Any, Sequence
@@ -244,7 +243,7 @@ def nxs_write_nxdata(
     parent : h5py.File or h5py.Group
         The parent group or file object.
     name: str
-        The name of the NXdata data entry.
+        The *full* name of the NXdata data entry.
     data: np.ndarray
         The dataset to be stored in the group.
     **attributes : Any
@@ -252,7 +251,11 @@ def nxs_write_nxdata(
     """
     if not isinstance(data, Dataset):
         data = Dataset(data)
-    _data_group_name, _dset_name = os.path.split(name)
+    if "/" not in name:
+        raise UserConfigError(
+            "The NXdata entry must include both the group name and the signal name."
+        )
+    _data_group_name, _dset_name = name.rsplit("/", 1)
     _data_group = nxs_create_recursive_groups(
         parent,
         _data_group_name,

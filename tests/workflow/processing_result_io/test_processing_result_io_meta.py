@@ -62,14 +62,14 @@ def prepare_files_and_directories(
     node_info,
     scan_context=None,
     diffraction_exp_context=None,
-    workflow_tree=None,
+    processing_tree=None,
 ):
     saver._prepared = {
         "save_dir": save_dir,
         "node_info": node_info,
         "scan": scan_context,
         "exp": diffraction_exp_context,
-        "tree": workflow_tree,
+        "tree": processing_tree,
     }
 
 

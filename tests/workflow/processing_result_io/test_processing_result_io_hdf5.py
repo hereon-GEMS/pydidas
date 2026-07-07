@@ -430,9 +430,9 @@ def test_import_results_from_file__with_missing_data(
     _new_name = empty_temp_path / "import_test_with_None.h5"
     shutil.copy(_fname, _new_name)
     with h5py.File(_new_name, "r+") as _file:
-        del _file["entry/pydidas_config/scan/scan_dim0_n_points"]
-        del _file["entry/pydidas_config/scan/scan_dim0_unit"]
-        del _file["entry/pydidas_config/scan/scan_dim0_label"]
+        del _file["entry/pydidas_scan/scan_dim0_n_points"]
+        del _file["entry/pydidas_scan/scan_dim0_unit"]
+        del _file["entry/pydidas_scan/scan_dim0_label"]
     with pytest.raises(UserConfigError):
         _data, _node_info, _scan, _exp, _tree = H5SAVER.import_results_from_file(
             _new_name

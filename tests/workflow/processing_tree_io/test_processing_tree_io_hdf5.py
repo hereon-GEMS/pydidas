@@ -129,7 +129,7 @@ def test_import_from_file(temp_path, test_tree):
 
 def test__export_matches_template(temp_path, test_tree):
     _ref_filename = temp_path / "test_export_template.hdf5"
-    _filename = temp_path / "test_export.hdf5"
+    _filename = temp_path / "test_standard_export.hdf5"
     create_hdf5_results_file(
         _ref_filename, _TEST_DATA, Scan(), DiffractionExperiment(), test_tree
     )

@@ -33,7 +33,7 @@ import h5py
 import numpy as np
 import pytest
 
-from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts import DiffractionExperimentContext, Scan
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_io_hdf5 import DiffractionExperimentIoHdf5
 from pydidas.core import UserConfigError
@@ -46,6 +46,9 @@ from pydidas.core.utils.hdf5.nxs_export import (
     nxs_export_context,
     nxs_write_root_metadata,
 )
+from pydidas.unittest_objects import create_hdf5_results_file
+from pydidas.unittest_objects.create_dataset_ import create_dataset
+from pydidas.workflow import ProcessingTree
 
 
 EXP = DiffractionExperimentContext()
@@ -55,6 +58,7 @@ _LEGACY_FILES = [
     _TEST_DIR / "legacy_file_v240118.h5",
     _TEST_DIR / "legacy_file_v260519.h5",
 ]
+_TEST_DATA = create_dataset(3)
 
 
 @pytest.fixture(scope="module")
@@ -154,7 +158,9 @@ def test_import_from_file__to_local_context(
     _local_exp = DiffractionExperiment()
     EXP_IO_HDF5.import_from_file(hdf5_io_file, diffraction_exp=_local_exp)
     for _key, _param in _local_exp.params.items():
-        _param.value_for_export == pytest.approx(modify_diffraction_exp_context[_key])
+        assert _param.value_for_export == pytest.approx(
+            modify_diffraction_exp_context[_key]
+        )
 
 
 def test_import_from_file__w_illegal_location(modify_diffraction_exp_context, temp_dir):
@@ -163,6 +169,32 @@ def test_import_from_file__w_illegal_location(modify_diffraction_exp_context, te
         nxs_write_root_metadata(h5file)
     with pytest.raises(UserConfigError):
         EXP_IO_HDF5.import_from_file(_filename)
+
+
+def test__export_matches_template(modify_diffraction_exp_context, temp_path):
+    _ref_filename = temp_path / "test_export_template.hdf5"
+    _filename = temp_path / "test_export.hdf5"
+    create_hdf5_results_file(_ref_filename, _TEST_DATA, Scan(), EXP, ProcessingTree())
+    EXP_IO_HDF5.export_to_file(_filename)
+    with h5py.File(_filename, "r") as _h5file:
+        _keys = _h5file.keys()
+        _exported_data = {_key: _h5file[_key] for _key in _keys}
+        _exported_attrs = {
+            _key: {_k: _v for _k, _v in _h5file[_key].attrs.items()} for _key in _keys
+        }
+    with h5py.File(_ref_filename, "r") as _h5file:
+        _keys = _h5file.keys()
+        _ref_data = {_key: _h5file[_key] for _key in _keys}
+        _ref_attrs = {
+            _key: {_k: _v for _k, _v in _h5file[_key].attrs.items()} for _key in _keys
+        }
+    for _key, _val in _exported_data.items():
+        if isinstance(_val, np.ndarray):
+            assert np.allclose(_val, _ref_data[_key])
+        else:
+            assert _val == _ref_data[_key]
+        for _attr_key, _attr_val in _exported_attrs[_key].items():
+            assert _attr_val == _ref_attrs[_key][_attr_key]
 
 
 if __name__ == "__main__":

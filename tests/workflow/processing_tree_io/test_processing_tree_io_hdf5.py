@@ -31,8 +31,12 @@ import numpy as np
 import pytest
 
 import pydidas
+from pydidas.contexts import Scan
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.core.utils.hdf5 import read_and_decode_hdf5_dataset
+from pydidas.unittest_objects.create_dataset_ import create_dataset
+from pydidas.unittest_objects.create_hdf5_io_file_ import create_hdf5_results_file
 from pydidas.workflow import ProcessingTree
 from pydidas.workflow.processing_tree_io.processing_tree_io_hdf5 import (
     ProcessingTreeIoHdf5,
@@ -41,6 +45,7 @@ from pydidas.workflow.processing_tree_io.processing_tree_io_hdf5 import (
 
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
 _LEGACY_DIR = Path(__file__).parents[2] / "_data" / "NeXus"
+_TEST_DATA = create_dataset(3)
 
 
 def test_export_to_file(temp_path, test_tree):
@@ -123,6 +128,34 @@ def test_import_from_file(temp_path, test_tree):
     _new_tree = ProcessingTreeIoHdf5.import_from_file(_filename)
     for _id, _node in _new_tree.nodes.items():
         assert test_tree.nodes[_id].dump() == _node.dump()
+
+
+def test__export_matches_template(temp_path, test_tree):
+    _ref_filename = temp_path / "test_export_template.hdf5"
+    _filename = temp_path / "test_export.hdf5"
+    create_hdf5_results_file(
+        _ref_filename, _TEST_DATA, Scan(), DiffractionExperiment(), test_tree
+    )
+    ProcessingTreeIoHdf5.export_to_file(_filename, test_tree)
+    with h5py.File(_filename, "r") as _h5file:
+        _keys = _h5file.keys()
+        _exported_data = {_key: _h5file[_key] for _key in _keys}
+        _exported_attrs = {
+            _key: {_k: _v for _k, _v in _h5file[_key].attrs.items()} for _key in _keys
+        }
+    with h5py.File(_ref_filename, "r") as _h5file:
+        _keys = _h5file.keys()
+        _ref_data = {_key: _h5file[_key] for _key in _keys}
+        _ref_attrs = {
+            _key: {_k: _v for _k, _v in _h5file[_key].attrs.items()} for _key in _keys
+        }
+    for _key, _val in _exported_data.items():
+        if isinstance(_val, np.ndarray):
+            assert np.allclose(_val, _ref_data[_key])
+        else:
+            assert _val == _ref_data[_key]
+        for _attr_key, _attr_val in _exported_attrs[_key].items():
+            assert _attr_val == _ref_attrs[_key][_attr_key]
 
 
 if __name__ == "__main__":

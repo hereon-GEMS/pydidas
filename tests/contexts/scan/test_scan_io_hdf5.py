@@ -75,7 +75,7 @@ PARAMS_WITH_STR = [
     "scan_base_directory",
     "scan_title",
 ]
-_TEST_DIR = Path(__file__).parents[2]
+_TEST_FILENAMES = list((Path(__file__).parents[2] / "_data" / "Scan").iterdir())
 _TEST_DATA = create_dataset(3)
 
 
@@ -185,18 +185,10 @@ def test_import_from_file__to_local_context(
         assert SCAN.params[_key].value_for_export == modify_scan_context[_key]
 
 
-@pytest.mark.parametrize(
-    "fname",
-    [
-        "load_test_scan_context_legacy_v250616.h5",
-        "load_test_scan_context_legacy_v251028.h5",
-        "load_test_scan_context_legacy_v260519.h5",
-    ],
-)
+@pytest.mark.parametrize("fname", _TEST_FILENAMES)
 def test_import_from_file__from_exported_legacy_file(fname):
-    _fname = _TEST_DIR / "_data" / fname
     _prefix = "/entry/pydidas_config/scan/"
-    with h5py.File(_fname, "r") as h5file:
+    with h5py.File(fname, "r") as h5file:
         _keys = [
             _key.removeprefix(_prefix)
             for _key in get_hdf5_populated_dataset_keys(
@@ -207,7 +199,7 @@ def test_import_from_file__from_exported_legacy_file(fname):
             _key: read_and_decode_hdf5_dataset(h5file[f"{_prefix}{_key}"])
             for _key in _keys
         }
-    SCAN_IO_HDF5.import_from_file(_fname)
+    SCAN_IO_HDF5.import_from_file(fname)
     for _key, _val in _imported_values.items():
         _scan_key = SCAN_LEGACY_PARAMS[_key] if _key in SCAN_LEGACY_PARAMS else _key
         if _scan_key == "xray_energy":

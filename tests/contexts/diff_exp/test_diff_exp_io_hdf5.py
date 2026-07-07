@@ -53,11 +53,7 @@ from pydidas.workflow import ProcessingTree
 
 EXP = DiffractionExperimentContext()
 EXP_IO_HDF5 = DiffractionExperimentIoHdf5
-_TEST_DIR = Path(__file__).parents[2] / "_data" / "NeXus"
-_LEGACY_FILES = [
-    _TEST_DIR / "legacy_file_v240118.h5",
-    _TEST_DIR / "legacy_file_v260519.h5",
-]
+_LEGACY_FILES = list((Path(__file__).parents[2] / "_data" / "NeXus").iterdir())
 _TEST_DATA = create_dataset(3)
 
 

@@ -44,8 +44,8 @@ from pydidas.workflow.processing_tree_io.processing_tree_io_hdf5 import (
 
 
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
-_LEGACY_DIR = Path(__file__).parents[2] / "_data" / "NeXus"
 _TEST_DATA = create_dataset(3)
+_LEGACY_FILES = list((Path(__file__).parents[2] / "_data" / "NeXus").iterdir())
 
 
 def test_export_to_file(temp_path, test_tree):
@@ -95,12 +95,9 @@ def test_export_to_file__existing_entry(temp_path, test_tree):
             assert f"workflow_node_{_i:02d}" not in _workflow_group
 
 
-@pytest.mark.parametrize(
-    "filename", ["legacy_file_v240118.h5", "legacy_file_v260519.h5"]
-)
+@pytest.mark.parametrize("filename", _LEGACY_FILES)
 def test_import_from_file__w_legacy_data(filename):
-    _filename = _LEGACY_DIR / filename
-    _new = ProcessingTreeIoHdf5.import_from_file(_filename)
+    _new = ProcessingTreeIoHdf5.import_from_file(filename)
     assert isinstance(_new, ProcessingTree)
 
 

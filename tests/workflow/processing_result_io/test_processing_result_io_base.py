@@ -24,90 +24,154 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
-from pydidas.contexts import ScanContext
-from pydidas.workflow import ProcessingResults, WorkflowTree
+import pytest
+
+from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.workflow.result_io import ProcessingResultIoBase, ProcessingResultIoMeta
 
 
-TREE = WorkflowTree()
-SCAN = ScanContext()
-RESULTS = ProcessingResults()
-META = ProcessingResultIoMeta
+@pytest.fixture(scope="module")
+def saver_class():
+    _registry = ProcessingResultIoMeta.registry.copy()
+    ProcessingResultIoMeta.clear_registry()
+
+    class TestSaver(ProcessingResultIoBase):
+        extensions = ["TEST"]
+        default_suffix = ".Test"
+        format_name = "Test"
+
+    yield TestSaver
+    ProcessingResultIoMeta.clear_registry()
+    ProcessingResultIoMeta.registry = _registry
 
 
-class TestProcessingResultIoBase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._meta_registry = META.registry.copy()
-        cls._node_information = {
-            5: {"test": 42, "42": "test", "node_label": "__\n _ \t pretty@!%ugly_name"},
-            7: {"test": 12, "42": "spam", "node_label": "a_beautiful_name"},
+@pytest.fixture
+def saver(saver_class):
+    return saver_class()
+
+
+def test_class_base(saver_class):
+    assert ProcessingResultIoBase in saver_class.__bases__
+
+
+class SharedTestProcessingResultIo:
+    """Shared tests for ProcessingResultIoBase implementations."""
+
+    @staticmethod
+    def node_info():
+        return {
+            5: PluginResultInfo(label="__\n _ \t pretty@!%ugly_name", node_id=5),
+            7: PluginResultInfo(label="a_name", node_id=7),
         }
-        META.reset()
 
-        class SAVER(ProcessingResultIoBase):
-            extensions = ["TEST"]
-            default_suffix = ".Test"
-            format_name = "Test"
-            _node_information = cls._node_information
+    @pytest.mark.parametrize(
+        "node_id, label, expected",
+        [
+            (5, "__\n _ \t pretty@!%ugly_name", "node_05_pretty_ugly_name"),
+            (7, "a_name", "node_07_a_name"),
+            (3, "", "node_03"),
+            (9, None, "node_09"),
+            (1, "a__b____c", "node_01_a_b_c"),
+            (2, "my-label-name", "node_02_my-label-name"),
+        ],
+    )
+    def test_get_filenames(self, saver, node_id, label, expected):
+        _node_info = {node_id: PluginResultInfo(label=label, node_id=node_id)}
+        _names = saver.get_filenames(_node_info)
+        assert _names[node_id] == (expected + saver.default_suffix)
 
-        cls.SAVER = SAVER
+    def test_get_filenames__returns_all_node_ids(self, saver):
+        _names = saver.get_filenames(self.node_info())
+        assert set(_names.keys()) == {5, 7}
 
-    @classmethod
-    def tearDownClass(cls):
-        META.reset()
-        META.registry = cls._meta_registry.copy()
+    def test_get_filenames__w_empty_dict(self, saver):
+        _names = saver.get_filenames({})
+        assert _names == {}
 
-    def test_class_existance(self):
-        self.assertIn(ProcessingResultIoBase, self.SAVER.__bases__)
+    def test_prepare_files_and_directories__creates_dir(self, saver, tmp_path):
+        _new_dir = tmp_path / "output"
+        assert not _new_dir.exists()
+        saver.prepare_files_and_directories(_new_dir, {})
+        assert _new_dir.exists()
 
-    def test_get_attribute_dict(self):
-        _name = "test"
-        _dict = self.SAVER.get_attribute_dict(_name)
-        self.assertEqual(
-            _dict, {_id: self._node_information[_id][_name] for _id in _dict}
+    def test_prepare_files_and_directories__sets_save_dir(self, saver, tmp_path):
+        saver.prepare_files_and_directories(tmp_path, {})
+        assert saver._config["save_dir"] == Path(tmp_path)
+
+    def test_prepare_files_and_directories__sets_filenames(self, saver, tmp_path):
+        saver.prepare_files_and_directories(tmp_path, self.node_info())
+        _fnames = saver._config["filenames"]
+        assert _fnames[5] == tmp_path / (
+            "node_05_pretty_ugly_name" + saver.default_suffix
         )
+        assert _fnames[7] == tmp_path / ("node_07_a_name" + saver.default_suffix)
 
-    def test_get_attribute_value(self):
-        _name = "test"
-        _id = 5
-        _val = self.SAVER.get_node_attribute(_id, _name)
-        self.assertEqual(_val, self._node_information[_id][_name])
-
-    def test_export_frame_to_file(self):
-        with self.assertRaises(NotImplementedError):
-            self.SAVER.export_frame_to_file(0, {})
-
-    def test_export_full_data_to_file(self):
-        with self.assertRaises(NotImplementedError):
-            self.SAVER.export_full_data_to_file({})
-
-    def test_prepare_files_and_directories(self):
-        with self.assertRaises(NotImplementedError):
-            self.SAVER.prepare_files_and_directories("Dir", {})
-        # assert does not raise an Exception
-
-    def test_get_filenames_from_labels(self):
-        _names = self.SAVER.get_filenames_from_labels()
-        self.assertEqual(
-            _names,
-            {5: "node_05_pretty_ugly_name.Test", 7: "node_07_a_beautiful_name.Test"},
+    def test_prepare_files_and_directories__check_uses_kwargs(self, saver, tmp_path):
+        _scan = MagicMock()
+        _exp = MagicMock()
+        _tree = MagicMock()
+        saver.prepare_files_and_directories(
+            tmp_path, {}, scan=_scan, diffraction_exp=_exp, processing_tree=_tree
         )
+        assert saver._config["scan"] is _scan
+        assert saver._config["diffraction_exp"] is _exp
+        assert saver._config["processing_tree"] is _tree
 
-    def test_get_filenames_from_labels__with_labels(self):
-        _labels = {_id: self._node_information[_id]["node_label"] for _id in [5, 7]}
-        _names = self.SAVER.get_filenames_from_labels(_labels)
-        self.assertEqual(
-            _names,
-            {5: "node_05_pretty_ugly_name.Test", 7: "node_07_a_beautiful_name.Test"},
-        )
+    def test_prepare_files_and_directories__uses_defaults(self, saver, tmp_path):
+        _scan_mock = MagicMock()
+        _exp_mock = MagicMock()
+        _tree_mock = MagicMock()
+        with (
+            patch(
+                "pydidas.workflow.result_io.processing_result_io_base.ScanContext",
+                return_value=_scan_mock,
+            ),
+            patch(
+                "pydidas.workflow.result_io.processing_result_io_base.DiffractionExperimentContext",
+                return_value=_exp_mock,
+            ),
+            patch(
+                "pydidas.workflow.result_io.processing_result_io_base.WorkflowTree",
+                return_value=_tree_mock,
+            ),
+        ):
+            saver.prepare_files_and_directories(tmp_path, {})
+        assert saver._config["scan"] is _scan_mock
+        assert saver._config["diffraction_exp"] is _exp_mock
+        assert saver._config["processing_tree"] is _tree_mock
 
-    def test_import_results_from_file(self):
-        with self.assertRaises(NotImplementedError):
-            self.SAVER.import_results_from_file("dummy")
+
+def test_export_frame_to_file__raises(saver):
+    with pytest.raises(NotImplementedError):
+        saver.export_frame_to_file(0, {})
+
+
+def test_export_full_data_to_file__raises(saver):
+    with pytest.raises(NotImplementedError):
+        saver.export_full_data_to_file({})
+
+
+def test_update_result_metadata__raises(saver):
+    with pytest.raises(NotImplementedError):
+        saver.update_result_metadata({})
+
+
+def test_import_results_from_file__is_staticmethod():
+    assert isinstance(
+        ProcessingResultIoBase.__dict__["import_results_from_file"], staticmethod
+    )
+
+
+def test_import_results_from_file__raises(saver_class):
+    with pytest.raises(NotImplementedError):
+        saver_class.import_results_from_file("dummy")
+
+
+class TestProcessingResultIoBase(SharedTestProcessingResultIo): ...
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

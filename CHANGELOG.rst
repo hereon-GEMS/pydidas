@@ -32,6 +32,8 @@ Programmatic changes
   to preempt issues with multiple parallel importers.
 - Improved test coverage for DiffractionExp.
 - Added a dataclass for PluginResultInfos.
+- Modified the saver for ProcessingResults to be instance-based instead
+  of class-based
 
 Bugfixes
 --------

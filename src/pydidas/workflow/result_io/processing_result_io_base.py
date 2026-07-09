@@ -32,11 +32,18 @@ import re
 from pathlib import Path
 from typing import Any
 
-from pydidas.contexts import DiffractionExperiment, Scan
+from pydidas.contexts import (
+    DiffractionExperiment,
+    DiffractionExperimentContext,
+    Scan,
+    ScanContext,
+)
 from pydidas.core import Dataset
 from pydidas.core.io_registry import GenericIoBase
+from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io.processing_result_io_meta import ProcessingResultIoMeta
+from pydidas.workflow.workflow_tree import WorkflowTree
 
 
 class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
@@ -47,12 +54,15 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     extensions = []
     default_suffix = ""
     format_name = "unknown"
-    scan_title = ""
-    _node_information = {}
 
-    @classmethod
+    def __init__(self):
+        self._config: dict[str, Any] = {}
+
     def prepare_files_and_directories(
-        cls, save_dir: Path | str, node_information: dict, **kwargs: Any
+        self,
+        save_dir: Path | str,
+        node_information: dict[int, PluginResultInfo],
+        **kwargs: Any,
     ) -> None:
         """
         Prepare the required files and directories to write the data to disk.
@@ -61,69 +71,41 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         ----------
         save_dir : Path or str
             The full path for the data to be saved.
-        node_information : dict
-            A dictionary with nodeID keys and dictionary values. Each value dictionary
-            must have the following keys: shape, node_label, data_label, plugin_name
-            and the respective values. The shape (tuple) determines the shape of the
-            Dataset, the node_label is the user's name for the processing node. The
-            data_label gives the description of what the data shows (e.g. intensity)
-            and the plugin_name is simply the name of the plugin.
+        node_information : dict[int, PluginResultInfo]
+            A dictionary with nodeID keys and PluginResultInfo values.
         **kwargs:
             Supported kwargs are:
 
-            scan_context : Scan or None, optional
+            scan : Scan or None, optional
                 The scan context. If None, the generic context will be used.
                 Only specify this, if you explicitly require a different context.
                 The default is None.
-            diffraction_exp_context : DiffractionExp or None, optional
+            diffraction_exp : DiffractionExp or None, optional
                 The diffraction experiment context. If None, the generic context
                 will be used. Only specify this, if you explicitly require a
                 different context. The default is None.
-            workflow_tree : WorkflowTree or None, optional
-                The WorkflowTree. If None, the generic WorkflowTree will be used.
-                Only specify this, if you explicitly require a different context.
-                The default is None.
+            processing_tree : ProcessingTree or None, optional
+                The ProcessingTree. If None, the generic WorkflowTree will be
+                used. Only specify this, if you explicitly require a different
+                context. The default is None.
         """
-        raise NotImplementedError
+        _save_dir = Path(save_dir)
+        if not _save_dir.exists():
+            _save_dir.mkdir(parents=True)
+        self._config["save_dir"] = _save_dir
+        self._config["filenames"] = {
+            _node_id: _save_dir / _fname
+            for _node_id, _fname in self.get_filenames(node_information).items()
+        }
+        self._config["scan"] = kwargs.get("scan", ScanContext())
+        self._config["diffraction_exp"] = kwargs.get(
+            "diffraction_exp", DiffractionExperimentContext()
+        )
+        self._config["processing_tree"] = kwargs.get("processing_tree", WorkflowTree())
 
-    @classmethod
-    def get_attribute_dict(cls, name: str) -> dict:
-        """
-        Get a dictionary for a single attribute from the combined node information.
-
-        Parameters
-        ----------
-        name : str
-            The name of the attribute to extract.
-
-        Returns
-        -------
-        dict
-            The dictionary with the node IDs and the single attribute values.
-        """
-        return {_id: _item[name] for _id, _item in cls._node_information.items()}
-
-    @classmethod
-    def get_node_attribute(cls, node_id: int, name: str) -> object:
-        """
-        Get a single node attribute from the stored node information.
-
-        Parameters
-        ----------
-        node_id : int
-            The node number.
-        name : str
-            The required attribute name.
-
-        Returns
-        -------
-        object
-            The value of the required attribute
-        """
-        return cls._node_information[node_id][name]
-
-    @classmethod
-    def get_filenames_from_labels(cls, labels: dict | None = None) -> dict:
+    def get_filenames(
+        self, node_information: dict[int, PluginResultInfo]
+    ) -> dict[int, str]:
         """
         Get the directory names from labels.
 
@@ -133,34 +115,29 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Parameters
         ----------
-        labels : dict or None, optional
-            The labels to be used. If labels are not supplied, they will be taken from
-            the internally stored node information. The default is None.
+        node_information : dict[int, PluginResultInfo]
+            A dictionary with nodeID keys and PluginResultInfo values.
 
         Returns
         -------
-        names : dict
-            The dictionary of possible directory names.
+        names : dict[int, str]
+            The dictionary of filenames for all nodes to export.
         """
         _names = {}
-        if labels is None:
-            labels = cls.get_attribute_dict("node_label")
-        for _id, _label in labels.items():
+        for _id, _node in node_information.items():
+            _label = _node.label
             if _label is None or _label == "":
-                _names[_id] = f"node_{_id:02d}{cls.default_suffix}"
+                _names[_id] = f"node_{_id:02d}{self.default_suffix}"
             else:
                 _label = re.sub("[^a-zA-Z0-9_-]", "_", _label)
-                _label = re.sub("_+", "_", _label).strip("_")
-                _names[_id] = f"node_{_id:02d}_{_label}{cls.default_suffix}".replace(
-                    "__", "_"
-                )
+                _label = re.sub("_+", "_", _label.strip("_"))
+                _name = f"node_{_id:02d}_{_label}{self.default_suffix}"
+                _names[_id] = _name
         return _names
 
-    @classmethod
     def export_full_data_to_file(
-        cls,
+        self,
         full_data: dict[int, Dataset],
-        scan_context: Scan | None = None,
         squeeze: bool = False,
     ) -> None:
         """
@@ -173,21 +150,19 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
 
         Parameters
         ----------
-        full_data : dict
+        full_data : dict[int, Dataset]
             The result dictionary with nodeID keys and result values.
-        scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
         squeeze : bool, optional
             Flag to toggle squeezing of the data. If True, any empty dimensions will
             be squeezed from the data. The default is False.
-
         """
         raise NotImplementedError
 
-    @classmethod
     def export_frame_to_file(
-        cls, index: int, frame_result_dict: dict[int, Dataset], **kwargs: Any
+        self,
+        index: int,
+        frame_result_dict: dict[int, Dataset],
+        **kwargs: Any,
     ) -> None:
         """
         Export the results of one frame and store them on disk.
@@ -201,36 +176,29 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         ----------
         index : int
             The frame index.
-        frame_result_dict : dict
+        frame_result_dict : dict[int, Dataset]
             The result dictionary with nodeID keys and result values.
         **kwargs
             Any kwargs which should be passed to the underlying exporter.
         """
         raise NotImplementedError
 
-    @classmethod
-    def update_frame_metadata(cls, metadata: dict, scan: Scan | None = None) -> None:
+    def update_result_metadata(
+        self, result_metadata: dict[int, dict[str, Any]] | dict[int, Dataset]
+    ) -> None:
         """
-        Update the metadata of the individual frame.
-
-        Raises
-        ------
-        NotImplementedError
-            This method needs to be implemented by each concrete subclass.
+        Update the result metadata of the individual frame.
 
         Parameters
         ----------
-        metadata : dict
+        result_metadata : dict[int, dict[str, Any]] or dict[int, Dataset]
             The metadata dictionary with results of one frame for each node.
-        scan : Scan or None, optional
-            The Scan instance. If None, this will default to the generic ScanContext.
-            The default is None.
         """
         raise NotImplementedError
 
-    @classmethod
+    @staticmethod
     def import_results_from_file(
-        cls, filename: Path | str
+        filename: Path | str,
     ) -> tuple[Dataset, dict[str, Any], Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import results from a file and store them as a Dataset.
@@ -249,14 +217,14 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         -------
         data : pydidas.core.Dataset
             The dataset with the imported data.
-        node_info : dict
+        node_info : dict[str, Any]
             A dictionary with node_label, data_label, plugin_name keys and
             the respective values.
-        scan : pydidas.contexts.Scan
+        scan : Scan
             The imported scan configuration.
-        diffraction_exp : pydidas.contexts.DiffractionExperiment
+        diffraction_exp : DiffractionExperiment
             The imported diffraction experiment configuration.
-        tree : pydidas.workflow.WorkflowTree
-            The imported workflow tree.
+        tree : ProcessingTree
+            The imported processing tree.
         """
         raise NotImplementedError

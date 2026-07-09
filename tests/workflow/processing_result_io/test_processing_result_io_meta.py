@@ -24,16 +24,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import shutil
-import tempfile
-import unittest
-from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
+import pytest
 
-from pydidas.contexts import DiffractionExperimentContext, ScanContext
+from pydidas.contexts import DiffractionExperimentContext, Scan, ScanContext
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.core import Dataset, UserConfigError
+from pydidas.unittest_objects.create_dataset_ import create_dataset
 from pydidas.workflow import ProcessingResults, WorkflowTree
+from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io import ProcessingResultIoBase, ProcessingResultIoMeta
 
 
@@ -44,86 +45,33 @@ RESULTS = ProcessingResults()
 META = ProcessingResultIoMeta
 
 
-def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
-    saver._exported = {
-        "index": index,
-        "frame_results": frame_result_dict,
-        "kwargs": kwargs,
-    }
+@pytest.fixture
+def io_meta():
+    _backup = META.registry
+    META.registry = {}
+    yield META
+    META.registry = _backup
 
 
-def export_full_data_to_file(saver, full_data, scan, squeeze: bool = False):
-    saver._exported = {"full_data": full_data, "squeeze": squeeze}
+@pytest.fixture
+def temp_dir(tmp_path):
+    yield tmp_path
 
 
-def prepare_files_and_directories(
-    saver,
-    save_dir,
-    node_info,
-    scan_context=None,
-    diffraction_exp_context=None,
-    processing_tree=None,
-):
-    saver._prepared = {
-        "save_dir": save_dir,
-        "node_info": node_info,
-        "scan": scan_context,
-        "exp": diffraction_exp_context,
-        "tree": processing_tree,
-    }
+def create_saver_class(title, ext: str | list[str]):
+    if isinstance(ext, str):
+        ext = [ext.lower()]
+    _cls = META(
+        title.upper(),
+        (ProcessingResultIoBase,),
+        dict(extensions=ext, format_name=ext),
+    )
+    return _cls
 
 
-def import_results(saver, fname):
-    if Path(fname).name == "node_01.TEST":
-        _id = 1
-    elif Path(fname).name == "node_03.TEST":
-        _id = 3
-    _data = {
-        1: Dataset(np.arange(100).reshape((10, 10)) + 42.1),
-        3: Dataset(np.arange(400).reshape((20, 20)) - 1.2),
-    }
-    _node_info = {
-        1: {
-            "shape": (10, 10),
-            "plugin_name": "Ye olde plugin",
-            "data_label": "The data",
-            "node_label": "SPAM SPAM SPAM",
-        },
-        3: {
-            "shape": (20, 20),
-            "plugin_name": "A new plugin",
-            "data_label": "Label the data",
-            "node_label": "HAM and EGGS",
-        },
-    }
-    return _data[_id], _node_info[_id], SCAN, EXP, TREE
-
-
-def update_metadata(saver, metadata, scan):
-    saver._metadata = metadata
-
-
-class TestProcessingResultsSaverMeta(unittest.TestCase):
-    def setUp(self):
-        self._meta_registry = META.registry.copy()
-        self._dir = Path(tempfile.mkdtemp())
-
-        META.reset()
-
-    def tearDown(self):
-        META.reset()
-        META.registry = self._meta_registry
-        shutil.rmtree(self._dir)
-
-    def create_saver_class(self, title, ext):
-        _cls = META(
-            title.upper(),
-            (ProcessingResultIoBase,),
-            dict(extensions=[ext.lower()], format_name=ext),
-        )
-        return _cls
-
-    def get_save_dir_and_node_info(self):
+@pytest.fixture
+def get_save_dir_and_node_info():
+    def _factory():
         _save_dir = "dummy/directory/to/nowhere"
         _shapes = {1: (10, 10), 2: (11, 27)}
         _node_labels = {1: "unknown", 2: "result no 2"}
@@ -140,8 +88,13 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         }
         return _save_dir, _node_info
 
-    def generate_test_metadata(self):
-        _, _node_info = self.get_save_dir_and_node_info()
+    return _factory
+
+
+@pytest.fixture
+def generate_test_metadata(get_save_dir_and_node_info):
+    def _factory():
+        _, _node_info = get_save_dir_and_node_info()
         _shapes = {_id: _node_info[_id]["shape"] for _id in _node_info}
         _res1 = Dataset(
             np.random.random(_shapes[1]),
@@ -170,105 +123,120 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         }
         return {1: _meta1, 2: _meta2}
 
-    def test_class_type(self):
-        self.assertEqual(META.__class__, type)
+    return _factory
 
-    def test_class_attributes(self):
-        self.assertTrue(hasattr(META, "registry"))
-        self.assertTrue(hasattr(META, "active_savers"))
 
-    def test_set_active_savers_and_title(self):
-        _title = "no title"
-        self.create_saver_class("SAVER", ".Test")
-        self.create_saver_class("SAVER2", ".Test2")
-        META.set_active_savers_and_title([".TEST", ".TEST2"], _title)
-        self.assertTrue(".test" in META.active_savers)
-        self.assertTrue(".test2" in META.active_savers)
-        self.assertEqual(META.scan_title, _title)
+def test__class_type(io_meta):
+    assert type(io_meta) is type
 
-    def test_set_active_savers_and_title__not_registered(self):
-        self.create_saver_class("SAVER", ".Test")
-        with self.assertRaises(UserConfigError):
-            META.set_active_savers_and_title([".TEST", ".TEST2"])
 
-    def test_export_frame_to_file(self):
-        _index = 127
-        _frame_results = {1: np.random.random((10, 10)), 2: np.random.random((11, 27))}
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.export_frame_to_file = classmethod(export_frame_to_file)
-        META.export_frame_to_file(_index, ".TEST", _frame_results)
-        self.assertTrue(
-            np.equal(_Saver._exported["frame_results"][1], _frame_results[1]).all()
+def test__class_attributes(io_meta):
+    assert hasattr(io_meta, "registry")
+
+
+@pytest.mark.parametrize("savers", [None, ""])
+def test_get_savers__with_none(io_meta, savers):
+    result = io_meta.get_savers(savers)
+    assert result == {}
+    assert isinstance(result, dict)
+
+
+@pytest.mark.parametrize("savers", [".test", "test"])
+def test_get_savers__with_single_extension(io_meta, savers):
+    saver_test = create_saver_class("SAVER_TEST", ".test")
+    _res = io_meta.get_savers(savers)
+    assert ".test" in _res
+    assert isinstance(_res[".test"], saver_test)
+
+
+@pytest.mark.parametrize("savers", [[".test", "hdf5"], ".test; .hdf5"])
+def test_get_savers__with_multiple_extensions_list(io_meta, savers):
+    saver_test = create_saver_class("SAVER_TEST", ".test")
+    saver_hdf5 = create_saver_class("SAVER_HDF5", ".hdf5")
+    _res = io_meta.get_savers(savers)
+    assert len(_res) == 2
+    assert ".test" in _res
+    assert ".hdf5" in _res
+    assert isinstance(_res[".test"], saver_test)
+    assert isinstance(_res[".hdf5"], saver_hdf5)
+
+
+@pytest.mark.parametrize("ext", [".test", ".TeST", ".TEST", ".teST"])
+def test_get_savers__case_insensitivity(io_meta, ext):
+    saver_test = create_saver_class("SAVER_TEST", ".test")
+    result = io_meta.get_savers(ext)
+    assert ".test" in result
+    assert isinstance(result[".test"], saver_test)
+
+
+@pytest.mark.parametrize(
+    "ext", [[".test", ".test", ".dummy"], [".test", ".dummy"], [".dummy", ".test"]]
+)
+def test_get_savers__duplicate_formats(io_meta, ext):
+    create_saver_class("SAVER_TEST", [".test", ".dummy"])
+    result = io_meta.get_savers(ext)
+    assert len(result) == 1
+    assert ext[0] in result
+    assert ext[-1] not in result
+
+
+def test_get_savers__unregistered_format_raises(io_meta):
+    with pytest.raises(UserConfigError):
+        io_meta.get_savers(".unregistered")
+
+
+def test_get_savers__multiple_calls_different_instances(io_meta):
+    create_saver_class("SAVER_TEST", ".test")
+    result1 = io_meta.get_savers([".test"])
+    result2 = io_meta.get_savers([".test"])
+    assert result1[".test"] is not result2[".test"]
+    assert type(result1[".test"]) is type(result2[".test"])
+
+
+@pytest.mark.parametrize(
+    "node_id, filename", [(1, "node_01.test"), (3, "node_03.hdf5")]
+)
+def test_import_data_from_directory(io_meta, temp_dir, node_id, filename):
+    saver_test = create_saver_class("SAVER_TEST", ".test")
+    saver_hdf5 = create_saver_class("SAVER_HDF5", ".hdf5")
+
+    (temp_dir / filename).write_text("dummy")
+    _input_data = create_dataset(2, shape=(10, 10 * node_id))
+
+    def mock_import(_fname):
+        return _input_data, {}, SCAN, EXP, TREE
+
+    with (
+        patch.object(
+            saver_test, "import_results_from_file", side_effect=mock_import
+        ) as mock_test,
+        patch.object(
+            saver_hdf5, "import_results_from_file", side_effect=mock_import
+        ) as mock_hdf5,
+    ):
+        _data, _node_info, _scan, _exp, _tree = io_meta.import_data_from_directory(
+            temp_dir
         )
-        self.assertTrue(
-            np.equal(_Saver._exported["frame_results"][2], _frame_results[2]).all()
-        )
 
-    def test_export_frame_to_active_savers(self):
-        _index = 127
-        _frame_results = {1: np.random.random((10, 10)), 2: np.random.random((11, 27))}
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.export_frame_to_file = classmethod(export_frame_to_file)
-        META.set_active_savers_and_title([".TEST"])
-        META.export_frame_to_active_savers(_index, _frame_results)
-        self.assertTrue(
-            np.equal(_Saver._exported["frame_results"][1], _frame_results[1]).all()
-        )
-        self.assertTrue(
-            np.equal(_Saver._exported["frame_results"][2], _frame_results[2]).all()
-        )
+        if ".test" in filename:
+            assert mock_test.called
+            assert not mock_hdf5.called
+            mock_test.assert_called_once()
+            _test_call_arg = mock_test.call_args[0][0]
+            assert "node_01.test" in str(_test_call_arg)
+        if ".hdf5" in filename:
+            assert mock_hdf5.called
+            assert not mock_test.called
+            mock_hdf5.assert_called_once()
+            _hdf5_call_arg = mock_hdf5.call_args[0][0]
+            assert "node_03.hdf5" in str(_hdf5_call_arg)
 
-    def test_push_metadata_to_active_savers(self):
-        _metadata = self.generate_test_metadata()
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.update_metadata = classmethod(update_metadata)
-        META.set_active_savers_and_title([".TEST"])
-        META.push_metadata_to_active_savers(_metadata)
-        self.assertEqual(_Saver._metadata, _metadata)
-
-    def test_export_full_data_to_active_savers(self):
-        _results = {
-            1: np.random.random((10, 10, 10)),
-            2: np.random.random((11, 27, 25)),
-        }
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
-        META.set_active_savers_and_title([".TEST"])
-        META.export_full_data_to_active_savers(_results)
-        self.assertTrue(np.allclose(_Saver._exported["full_data"][1], _results[1]))
-        self.assertTrue(np.allclose(_Saver._exported["full_data"][2], _results[2]))
-
-    def test_prepare_active_savers(self):
-        _save_dir, _node_info = self.get_save_dir_and_node_info()
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.prepare_files_and_directories = classmethod(
-            prepare_files_and_directories
-        )
-        META.set_active_savers_and_title([".TEST"])
-        META.prepare_active_savers(_save_dir, _node_info)
-        self.assertEqual(_Saver._prepared["save_dir"], _save_dir)
-        self.assertEqual(_Saver._prepared["node_info"], _node_info)
-
-    def test_import_data_from_directory(self):
-        _Saver = self.create_saver_class("SAVER", ".Test")
-        _Saver.import_results_from_file = classmethod(import_results)
-        for _id in [1, 3]:
-            with (self._dir / f"node_{_id:02d}.TEST").open("w") as _file:
-                _file.write("dummy")
-        _data, _node_info, _scan, exp, _tree = META.import_data_from_directory(
-            self._dir
-        )
-        for _id in [1, 3]:
-            self.assertTrue(
-                np.allclose(
-                    _data[_id], import_results(None, f"test/node_{_id:02d}.TEST")[0]
-                )
-            )
-            self.assertEqual(
-                _node_info[_id], import_results(None, f"test/node_{_id:02d}.TEST")[1]
-            )
-        self.assertEqual(_scan, import_results(None, f"test/node_{_id:02d}.TEST")[2])
+    assert node_id in _data
+    assert np.allclose(_data[node_id], _input_data)
+    assert isinstance(_scan, Scan)
+    assert isinstance(_exp, DiffractionExperiment)
+    assert isinstance(_tree, ProcessingTree)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

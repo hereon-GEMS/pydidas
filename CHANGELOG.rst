@@ -34,6 +34,7 @@ Programmatic changes
 - Added a dataclass for PluginResultInfos.
 - Modified the saver for ProcessingResults to be instance-based instead
   of class-based
+- Added a ProcessingResultSaver class to handle export of results.
 
 Bugfixes
 --------

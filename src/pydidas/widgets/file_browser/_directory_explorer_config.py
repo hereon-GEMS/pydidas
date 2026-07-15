@@ -204,9 +204,17 @@ DIRECTORY_EXPLORER_DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter("use_custom_data_browsing_root"),
     get_generic_parameter("data_browsing_root"),
     Parameter(
-        "map_network_drives", bool, 1, name="Show network drives", choices=[0, 1]
+        "map_network_drives",
+        bool,
+        True,
+        name="Show network drives",
+        choices=[False, True],
     ),
     Parameter(
-        "case_sensitive", bool, 1, name="Sorting is case sensitive", choices=[0, 1]
+        "case_sensitive",
+        bool,
+        True,
+        name="Sorting is case sensitive",
+        choices=[False, True],
     ),
 )

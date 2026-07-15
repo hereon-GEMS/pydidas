@@ -36,8 +36,8 @@ GENERIC_PARAMS_OTHER = {
     # Generic processing parameters
     ###############################
     "live_processing": {
-        "type": int,
-        "default": 0,
+        "type": bool,
+        "default": False,
         "name": "Live processing",
         "choices": [True, False],
         "unit": "",
@@ -87,8 +87,8 @@ GENERIC_PARAMS_OTHER = {
         ),
     },
     "use_bg_file": {
-        "type": int,
-        "default": 0,
+        "type": bool,
+        "default": False,
         "name": "Subtract background image",
         "choices": [True, False],
         "allow_None": False,
@@ -322,8 +322,8 @@ GENERIC_PARAMS_OTHER = {
     # Autosave results settings
     ############################
     "autosave_results": {
-        "type": int,
-        "default": 0,
+        "type": bool,
+        "default": False,
         "name": "Autosave results",
         "choices": [True, False],
         "unit": "",
@@ -429,7 +429,7 @@ GENERIC_PARAMS_OTHER = {
         ),
     },
     "enable_overwrite": {
-        "type": int,
+        "type": bool,
         "default": False,
         "name": "Enable overwriting",
         "choices": [False, True],
@@ -442,7 +442,7 @@ GENERIC_PARAMS_OTHER = {
         ),
     },
     "use_scan_timeline": {
-        "type": int,
+        "type": bool,
         "default": False,
         "name": "Use scan timeline",
         "choices": [True, False],
@@ -466,7 +466,7 @@ GENERIC_PARAMS_OTHER = {
         ),
     },
     "use_data_range": {
-        "type": int,
+        "type": bool,
         "default": True,
         "name": "Use data range",
         "choices": [True, False],
@@ -478,7 +478,7 @@ GENERIC_PARAMS_OTHER = {
         ),
     },
     "scan_for_all": {
-        "type": int,
+        "type": bool,
         "default": False,
         "name": "Scan for all new files",
         "choices": [False, True],
@@ -697,7 +697,7 @@ GENERIC_PARAMS_OTHER = {
     # User Configuration
     ####################
     "auto_check_for_updates": {
-        "type": int,
+        "type": bool,
         "default": True,
         "name": "Check for updates",
         "choices": [False, True],

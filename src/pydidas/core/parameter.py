@@ -42,10 +42,10 @@ from pydidas.core.parameter_classes import Hdf5key, NXdataKey
 
 
 _ITERATORS = (list, set, tuple)
-_NUMBERS = [Integral, Real]
+_NUMBERS = [int, float]
 
 
-def _get_base_class(cls: type | None) -> type | Real | Integral | None:
+def _get_base_class(cls: type | None) -> type | float | int | None:
     """
     Filter numerical classes and return the corresponding abstract base class.
 
@@ -60,21 +60,21 @@ def _get_base_class(cls: type | None) -> type | Real | Integral | None:
 
     Returns
     -------
-    Type | Real | Integral | None
+    Type | float | int | None
         The base class of the input class if the input. If no class has been
         defined, return None.
     """
     if cls is None:
         return None
     if issubclass(cls, Integral):
-        return Integral
+        return int
     if issubclass(cls, Real):
-        return Real
+        return float
     return cls
 
 
 def _outside_range_string(val: Any, parameter: "Parameter") -> str:
-    if parameter.dtype == Integral:
+    if parameter.dtype == int:
         _range = (int(parameter.range[0]), int(parameter.range[1]))
     else:
         _range = parameter.range
@@ -276,6 +276,8 @@ class Parameter:
             return all(isinstance(item, self.__meta["subtype"]) for item in val)
         if isinstance(val, self.__type):
             return True
+        if self.__type is float and isinstance(val, int):
+            return True
         if val is None and self.__meta["allow_None"]:
             return True
         return False
@@ -313,13 +315,13 @@ class Parameter:
         if isinstance(value, str):
             if self.__type in [Path, Hdf5key, NXdataKey]:
                 return self.__type(value)
-            if self.__type == Integral and value in ["True", "False"]:
+            if self.__type == int and value in ["True", "False"]:
                 return value == "True"
             if self.__type in _ITERATORS and self.__meta["subtype"] in _NUMBERS:
                 return self.__get_as_numbers(value)
         if self.__type in _NUMBERS:
             try:
-                return float(value) if self.__type == Real else int(value)
+                return float(value) if self.__type is float else int(value)
             except ValueError:
                 pass
         if isinstance(value, Iterable):
@@ -414,9 +416,9 @@ class Parameter:
         _t = self.__meta["tooltip"]
         if self.unit:
             _t += f" (unit: {self.unit})"
-        if self.dtype == Integral:
+        if self.dtype == int:
             _t += " (type: integer)"
-        elif self.dtype == Real:
+        elif self.dtype == float:
             _t += " (type: float)"
         elif self.dtype == str:
             _t += " (type: str)"
@@ -551,9 +553,9 @@ class Parameter:
             return None
         if self.__type in (str, Hdf5key, NXdataKey, Path):
             return str(self.value)
-        if self.__type == Integral:
+        if self.__type is int:
             return int(self.value)
-        if self.__type == Real:
+        if self.__type is float:
             return float(self.value)
         if self.__type in (tuple, list, dict):
             return self.value
@@ -567,7 +569,7 @@ class Parameter:
         return self.__meta["range"]
 
     @range.setter
-    def range(self, new_range: None | tuple[Real, Real]):
+    def range(self, new_range: None | tuple[float, float]):
         """
         Set a new range for the Parameter.
 
@@ -748,7 +750,7 @@ class Parameter:
         )
 
     def __get_as_numbers(
-        self, value: str | Sequence[str | Real]
+        self, value: str | Sequence[str | float]
     ) -> Sequence[float | int]:
         """
         Get the input as iterable of numbers of the Parameter type.
@@ -765,7 +767,7 @@ class Parameter:
         """
         if self.__meta["subtype"] not in _NUMBERS:
             raise TypeError("The subtype must be either Real or Integral.")
-        __converter = float if self.__meta["subtype"] == Real else int
+        __converter = float if self.__meta["subtype"] is float else int
         if isinstance(value, str):
             value = [
                 item

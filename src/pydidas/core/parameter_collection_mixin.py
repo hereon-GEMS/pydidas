@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ParameterCollectionMixIn"]
 
 
-from numbers import Integral
 from typing import Any, NoReturn, Sequence
 
 from numpy import mod
@@ -373,7 +372,7 @@ class ParameterCollectionMixIn:
             The modulated Parameter value
         """
         _param = self.get_param(param_refkey)
-        if _param.dtype is not Integral:
+        if _param.dtype is not int:
             raise ValueError(
                 f"The datatype of Parameter *{_param.refkey}* is not integer."
             )

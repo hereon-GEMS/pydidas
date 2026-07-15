@@ -56,14 +56,14 @@ class TestParameter(unittest.TestCase):
     def test_get_base_class(self):
         test_cases = [
             (None, None),
-            (int, Integral),
-            (np.int32, Integral),
-            (np.int16, Integral),
-            (np.uint32, Integral),
-            (np.uint8, Integral),
-            (float, Real),
-            (np.float32, Real),
-            (np.float64, Real),
+            (int, int),
+            (np.int32, int),
+            (np.int16, int),
+            (np.uint32, int),
+            (np.uint8, int),
+            (float, float),
+            (np.float32, float),
+            (np.float64, float),
         ]
         for dtype, expected in test_cases:
             with self.subTest(dtype=dtype):
@@ -229,13 +229,13 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, optional=True)
         self.assertEqual(obj.optional, True)
 
-    def test_dtype__int(self):
-        obj = Parameter("Test0", int, 12)
-        self.assertEqual(obj.dtype, Integral)
+    def test_dtype__integral(self):
+        obj = Parameter("Test0", Integral, 12)
+        self.assertEqual(obj.dtype, int)
 
-    def test_dtype_float(self):
-        obj = Parameter("Test0", float, 12)
-        self.assertEqual(obj.dtype, Real)
+    def test_dtype_real(self):
+        obj = Parameter("Test0", Real, 12)
+        self.assertEqual(obj.dtype, float)
 
     def test_get_value(self):
         obj = Parameter("Test0", int, 12)
@@ -445,14 +445,11 @@ class TestParameter(unittest.TestCase):
 
     def test_dump(self):
         for _type, _val in TYPES_AND_VALS:
-            _ret_type = (
-                Integral if _type is int else (Real if _type is float else _type)
-            )
             with self.subTest(datatype=_type, value=_val):
                 obj = Parameter("Test0", _type, _val)
                 dump = obj.dump()
                 self.assertEqual(dump[0], "Test0")
-                self.assertEqual(dump[1], _ret_type)
+                self.assertEqual(dump[1], _type)
                 self.assertEqual(dump[2], _val)
                 self.assertEqual(
                     dump[3],

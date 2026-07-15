@@ -32,6 +32,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pytest
+from pytest import approx
 
 from pydidas.contexts import (
     DiffractionExperimentContext,
@@ -412,13 +413,13 @@ def test_import_results_from_file(setup_module_data):
         else:
             assert _input_data.axis_ranges[_ax] == _data.axis_ranges[_ax]
     for _key, _param in EXP.params.items():
-        if _param.dtype == Real:
-            assert abs(_param.value - _exp.get_param_value(_key)) < 1e-7
+        if _param.dtype == float:
+            assert _param.value == approx(_exp.get_param_value(_key))
         else:
             assert _param.value == _exp.get_param_value(_key)
     for _key, _param in SCAN.params.items():
-        if _param.dtype == Real:
-            assert abs(_param.value - _scan.get_param_value(_key)) < 1e-7
+        if _param.dtype == float:
+            assert _param.value == approx(_scan.get_param_value(_key))
         else:
             assert _param.value == _scan.get_param_value(_key)
 

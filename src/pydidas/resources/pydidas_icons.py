@@ -35,10 +35,12 @@ __all__ = [
 
 
 from pathlib import Path
+from xml.etree import ElementTree
 
-from qtpy import QtCore, QtGui
+from qtpy import QtCore, QtGui, QtSvg
 
 from pydidas.core import UserConfigError
+from pydidas_qtcore import PydidasQApplication
 
 
 ICON_PATH = Path(__file__).parent / "_icons"
@@ -122,6 +124,27 @@ def create_mdi_icon(icon_name: str) -> QtGui.QIcon:
 
 def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     """Create a QIcon from a svg image at the given path."""
-    icon = QtGui.QIcon()
-    icon.addFile(str(path), QtCore.QSize(128, 128))
-    return icon
+    _app = PydidasQApplication.instance()
+    _dark = _app.is_dark_mode if _app else False
+    _color = "#FFFFFF" if _dark else "#000000"
+
+    _tree = ElementTree.parse(path)
+    _root = _tree.getroot()
+    _root.set("fill", _color)
+    for elem in _root.iter():
+        if "fill" in elem.attrib and elem.attrib["fill"] != "none":
+            elem.set("fill", _color)
+        if "stroke" in elem.attrib and elem.attrib["stroke"] != "none":
+            elem.set("stroke", _color)
+    _svg_string = ElementTree.tostring(_root, encoding="utf-8")
+    _byte_array = QtCore.QByteArray(_svg_string)
+
+    _renderer = QtSvg.QSvgRenderer(_byte_array)
+    _pixmap = QtGui.QPixmap(128, 128)
+    _pixmap.fill(QtCore.Qt.GlobalColor.transparent)
+
+    _painter = QtGui.QPainter(_pixmap)
+    _renderer.render(_painter)
+    _painter.end()
+
+    return QtGui.QIcon(_pixmap)

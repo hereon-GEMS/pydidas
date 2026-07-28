@@ -127,6 +127,7 @@ def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     _app = PydidasQApplication.instance()
     _dark = _app.is_dark_mode if _app else False
     _color = "#ffffff" if _dark else "#000000"
+    _bg_color = "#000000" if _dark else "#ffffff"
 
     _tree = ElementTree.parse(path)
     _root = _tree.getroot()
@@ -136,6 +137,31 @@ def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
             elem.set("fill", _color)
         if "stroke" in elem.attrib and elem.attrib["stroke"] != "none":
             elem.set("stroke", _color)
+        if "style" in elem.attrib and elem.attrib["style"] != "none":
+            try:
+                style = elem.attrib["style"]
+                style_dict = {}
+                for item in style.split(";"):
+                    if ":" in item:
+                        k, v = item.split(":", 1)
+                        style_dict[k.strip()] = v.strip()
+                if "fill" in style_dict and style_dict["fill"] != "none":
+                    match style_dict["fill"]:
+                        case "#ffffff":
+                            style_dict["fill"] = _bg_color
+                        case "#000000":
+                            style_dict["fill"] = _color
+                if "stroke" in style_dict and style_dict["stroke"] != "none":
+                    match style_dict["stroke"]:
+                        case "#ffffff":
+                            style_dict["stroke"] = _bg_color
+                        case "#000000":
+                            style_dict["stroke"] = _color
+                elem.attrib["style"] = ";".join(
+                    [f"{k}:{v}" for k, v in style_dict.items()]
+                )
+            except Exception:
+                pass
     _svg_string = ElementTree.tostring(_root, encoding="utf-8")
     _byte_array = QtCore.QByteArray(_svg_string)
 

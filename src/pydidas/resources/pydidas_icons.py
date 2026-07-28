@@ -126,7 +126,7 @@ def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     """Create a QIcon from a svg image at the given path."""
     _app = PydidasQApplication.instance()
     _dark = _app.is_dark_mode if _app else False
-    _color = "#FFFFFF" if _dark else "#000000"
+    _color = "#ffffff" if _dark else "#000000"
 
     _tree = ElementTree.parse(path)
     _root = _tree.getroot()

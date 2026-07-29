@@ -25,860 +25,803 @@ __status__ = "Production"
 
 
 import os
-import shutil
-import tempfile
-import unittest
+import re
 from numbers import Real
 from pathlib import Path
+from typing import Any
 
 import h5py
 import numpy as np
+import pytest
 
-from pydidas import unittest_objects
+from pydidas import unittest_objects  # noqa: F401
 from pydidas.contexts import DiffractionExperiment
-from pydidas.contexts.diff_exp import DiffractionExperimentContext
 from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string
-from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import (
     DummyLoader,
     DummyProc,
     DummyProcNewDataset,
+    create_dataset,
     create_hdf5_results_file,
 )
 from pydidas.workflow import (
     ProcessingResults,
     ProcessingTree,
-    WorkflowTree,
 )
-from pydidas.workflow.result_io import ProcessingResultIoMeta
 
 
-SAVER = ProcessingResultIoMeta
-PLUGINS = PluginCollection()
-SCAN = ScanContext()
-TREE = WorkflowTree()
-EXP = DiffractionExperimentContext()
+_INPUT_SHAPE = (127, 324)
+_NEW_SHAPE = (12, 3, 1, 5)
+_DEFAULT_PLUGIN_METADATA = {
+    1: {
+        "axis_units": {0: "m", 1: "mm"},
+        "axis_labels": {0: "dim1", 1: "dim 2"},
+        "axis_ranges": {
+            0: np.arange(_INPUT_SHAPE[0]),
+            1: np.arange(_INPUT_SHAPE[1])[::-1],
+        },
+        "data_label": "Test",
+        "data_unit": "u1",
+    },
+    2: {
+        "axis_units": {0: "m", 1: "Test", 2: "", 3: "spam!"},
+        "axis_labels": {0: "dim1", 1: "2nd dim", 2: "dim #3", 3: "42"},
+        "axis_ranges": {
+            0: 12 + np.arange(_NEW_SHAPE[0]),
+            1: np.arange(_NEW_SHAPE[1]),
+            2: np.array([42]),
+            3: 4 + 0.5 * np.arange(_NEW_SHAPE[3]),
+        },
+        "data_label": "New dataset",
+        "data_unit": "u2",
+    },
+}
 
 
-class TestProcessingResults(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        _path = Path(unittest_objects.__file__).parent
-        if _path not in PLUGINS.registered_paths:
-            PLUGINS.find_and_register_plugins(_path)
-        cls._EXP = DiffractionExperimentContext()
-        cls._EXP.set_param_value("xray_wavelength", 1)
+@pytest.fixture
+def tree() -> ProcessingTree:
+    tree = ProcessingTree()
+    tree.create_and_add_node(DummyLoader())
+    tree.nodes[0].plugin.set_param_value("image_height", _INPUT_SHAPE[0])
+    tree.nodes[0].plugin.set_param_value("image_width", _INPUT_SHAPE[1])
+    _proc1 = DummyProc()
+    _proc1.set_param_value("label", "Test plugin 1")
+    _proc2 = DummyProcNewDataset(output_shape=_NEW_SHAPE)
+    _proc2.set_param_value("label", "Test plugin 2")
+    tree.create_and_add_node(_proc1)
+    tree.create_and_add_node(_proc2, parent=tree.root)
+    tree.prepare_execution()
+    return tree
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        PLUGINS.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
-    def setUp(self) -> None:
-        self.set_up_scan()
-        self.set_up_tree()
-        self._plugin_metadata = {
-            1: {
-                "axis_units": {0: "m", 1: "mm"},
-                "axis_labels": {0: "dim1", 1: "dim 2"},
-                "axis_ranges": {
-                    0: np.arange(self._input_shape[0]),
-                    1: self._input_shape[1] - np.arange(self._input_shape[1]),
-                },
-                "data_label": "Test",
-                "data_unit": "u1",
-            },
-            2: {
-                "axis_units": {0: "m", 1: "Test", 2: "", 3: "spam!"},
-                "axis_labels": {0: "dim1", 1: "2nd dim", 2: "dim #3", 3: "42"},
-                "axis_ranges": {
-                    0: 12 + np.arange(self._new_shape[0]),
-                    1: np.arange(self._new_shape[1]),
-                    2: np.array([42]),
-                    3: 4 + 0.5 * np.arange(self._new_shape[3]),
-                },
-                "data_label": "New dataset",
-                "data_unit": "u2",
-            },
-        }
-        SAVER.set_active_savers_and_title([])
-        self._tmpdir = Path(tempfile.mkdtemp())
+@pytest.fixture
+def clean_results(random_scan, random_diff_exp, tree) -> ProcessingResults:
+    _res = ProcessingResults(
+        scan=random_scan, processing_tree=tree, diffraction_exp=random_diff_exp
+    )
+    return _res
 
-    def tearDown(self) -> None:
-        shutil.rmtree(self._tmpdir)
 
-    def set_up_scan(self) -> None:
-        self._scan_n = (21, 3, 7)
-        self._scan_offsets = (-3, 0, 3.2)
-        self._scan_delta = (0.1, 1, 12)
-        self._scan_unit = ("m", "mm", "m")
-        self._scan_label = ("Test", "Dir 2", "other dim")
-        SCAN.set_param_value("scan_dim", len(self._scan_n))
-        for _dim in range(len(self._scan_n)):
-            SCAN.set_param_value(f"scan_dim{_dim}_n_points", self._scan_n[_dim])
-            SCAN.set_param_value(f"scan_dim{_dim}_offset", self._scan_offsets[_dim])
-            SCAN.set_param_value(f"scan_dim{_dim}_delta", self._scan_delta[_dim])
-            SCAN.set_param_value(f"scan_dim{_dim}_unit", self._scan_unit[_dim])
-            SCAN.set_param_value(f"scan_dim{_dim}_label", self._scan_label[_dim])
+@pytest.fixture
+def results(clean_results) -> ProcessingResults:
+    clean_results.prepare_new_results()
+    clean_results.update_result_metadata(_DEFAULT_PLUGIN_METADATA)
+    return clean_results
 
-    def set_up_tree(self) -> None:
-        self._input_shape = (127, 324)
-        self._new_shape = (12, 3, 1, 5)
-        self._node_labels = {1: "Test plugin 1", 2: "Test plugin 2"}
-        TREE.clear()
-        TREE.create_and_add_node(DummyLoader())
-        TREE.nodes[0].plugin.set_param_value("image_height", self._input_shape[0])
-        TREE.nodes[0].plugin.set_param_value("image_width", self._input_shape[1])
-        _proc1 = DummyProc()
-        _proc1.set_param_value("label", self._node_labels[1])
-        _proc2 = DummyProcNewDataset(output_shape=self._new_shape)
-        _proc2.set_param_value("label", self._node_labels[2])
-        TREE.create_and_add_node(_proc1)
-        TREE.create_and_add_node(_proc2, parent=TREE.root)
-        TREE.prepare_execution()
 
-    def generate_test_datasets(self) -> tuple[tuple, tuple, dict]:
-        _res1 = Dataset(np.random.random(self._input_shape), **self._plugin_metadata[1])
-        _res2 = Dataset(np.random.random(self._new_shape), **self._plugin_metadata[2])
-        _results = {1: _res1, 2: _res2}
-        return self._input_shape, self._new_shape, _results
+@pytest.fixture
+def result_data() -> dict[int, Dataset]:
+    _res1 = Dataset(np.random.random(_INPUT_SHAPE), **_DEFAULT_PLUGIN_METADATA[1])
+    _res2 = Dataset(np.random.random(_NEW_SHAPE), **_DEFAULT_PLUGIN_METADATA[2])
+    _results = {1: _res1, 2: _res2}
+    return _results
 
-    def get_test_metadata_with_scan(self) -> dict:
-        _scan_meta = [SCAN.get_metadata_for_dim(i) for i in range(SCAN.ndim)]
-        _scan_ax_meta = {
-            "axis_labels": {i: _item[0] for i, _item in enumerate(_scan_meta)},
-            "axis_units": {i: _item[1] for i, _item in enumerate(_scan_meta)},
-            "axis_ranges": {i: _item[2] for i, _item in enumerate(_scan_meta)},
-        }
-        _new_metadata = {}
-        for _node_id, _meta in self._plugin_metadata.items():
-            _node_metadata = _new_metadata[_node_id] = {}
-            for _key in ["axis_labels", "axis_units", "axis_ranges"]:
-                _node_metadata[_key] = {
-                    _i: _k
-                    for _i, _k in enumerate(
-                        list(_scan_ax_meta[_key].values()) + list(_meta[_key].values())
-                    )
-                }
-            _node_metadata["data_unit"] = _meta["data_unit"]
-            _node_metadata["data_label"] = _meta["data_label"]
-        return _new_metadata
 
-    def get_node_output_filename(self, node_id: int, extension: str = ".nxs") -> str:
-        _label = self._node_labels[node_id].replace(" ", "_")
-        return f"node_{node_id:02d}_{_label}{extension}"
+def _create_metadata_with_scan(plugin_metadata, scan) -> dict[int, dict[str, Any]]:
+    _scan_meta = {
+        "axis_ranges": scan.axis_ranges,
+        "axis_labels": scan.axis_labels,
+        "axis_units": scan.axis_units,
+    }
+    _new_metadata = {}
+    for _node_id, _meta in plugin_metadata.items():
+        _node_metadata = _new_metadata[_node_id] = {}
+        for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+            _items = _scan_meta[_key] + list(_meta[_key].values())
+            _node_metadata[_key] = {_i: _k for _i, _k in enumerate(_items)}
+        _node_metadata["data_unit"] = _meta["data_unit"]
+        _node_metadata["data_label"] = _meta["data_label"]
+    return _new_metadata
 
-    def get_node_output_path(self, node_id: int, extension: str = ".nxs") -> Path:
-        return self._tmpdir.joinpath(self.get_node_output_filename(node_id, extension))
 
-    def create_standard_workflow_results(self) -> ProcessingResults:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
+def _get_node_output_filename(node_id: int, tree: ProcessingTree) -> str:
+    _label = tree.nodes[node_id].plugin.get_param_value("label")
+    if _label:
+        _label = re.sub("[^a-zA-Z0-9_-]", "_", _label)
+        _label = re.sub("_+", "_", _label.strip("_"))
+        return f"node_{node_id:02d}_{_label}.nxs"
+    return f"node_{node_id:02d}.nxs"
+
+
+def _get_node_output_path(node_id: int, tree: ProcessingTree, tmpdir: Path) -> Path:
+    return tmpdir / _get_node_output_filename(node_id, tree)
+
+
+def _create_h5_test_file(
+    node_id: int,
+    res: ProcessingResults,
+    tmpdir: Path,
+    tree: ProcessingTree,
+    scan: Scan,
+    diff_exp: DiffractionExperiment,
+) -> None:
+    _path = _get_node_output_path(node_id, tree, tmpdir)
+    create_hdf5_results_file(
+        _path,
+        res._composites[node_id],
+        scan,
+        diff_exp,
+        tree,
+        node_id=node_id,
+        node_label=tree.nodes[node_id].plugin.get_param_value("label"),
+        plugin_name=tree.nodes[node_id].plugin.plugin_name,
+    )
+
+
+def _get_node_labels(res: ProcessingResults) -> dict[int, str]:
+    return {_key: _info.label for _key, _info in res._plugin_result_infos.items()}
+
+
+def _get_data_labels(res: ProcessingResults) -> dict[int, str]:
+    return {_key: _data.data_label for _key, _data in res._composites.items()}
+
+
+def _get_data_units(res: ProcessingResults) -> dict[int, str]:
+    return {_key: _data.data_unit for _key, _data in res._composites.items()}
+
+
+def test_init__plain() -> None:
+    res = ProcessingResults()
+    assert isinstance(res, ProcessingResults)
+    assert isinstance(res.scan_instance, Scan)
+    assert isinstance(res.diff_exp_instance, DiffractionExperiment)
+    assert isinstance(res.proc_tree_instance, ProcessingTree)
+
+
+def test_init__w_contexts() -> None:
+    _local_scan = Scan()
+    _local_exp = DiffractionExperiment()
+    _local_tree = ProcessingTree()
+    res = ProcessingResults(
+        scan=_local_scan,
+        diffraction_exp=_local_exp,
+        processing_tree=_local_tree,
+    )
+    assert id(_local_scan) == id(res.scan_instance)
+    assert id(_local_exp) == id(res.diff_exp_instance)
+    assert id(_local_tree) == id(res.proc_tree_instance)
+
+
+# --------------------
+# Tests of properties
+# --------------------
+
+
+def test_scan_instance(random_scan, clean_results) -> None:
+    assert isinstance(clean_results.scan_instance, Scan)
+    assert id(random_scan) == id(clean_results.scan_instance)
+
+
+def test_diff_exp_instance(random_diff_exp, clean_results) -> None:
+    assert isinstance(clean_results.diff_exp_instance, DiffractionExperiment)
+    assert id(random_diff_exp) == id(clean_results.diff_exp_instance)
+
+
+def test_proc_tree_instance(tree, clean_results) -> None:
+    assert isinstance(clean_results.proc_tree_instance, ProcessingTree)
+    assert id(tree) == id(clean_results.proc_tree_instance)
+
+
+def test_shapes__empty(clean_results) -> None:
+    assert clean_results.shapes == {}
+
+
+def test_shapes__w_results(results) -> None:
+    _shapes = results.shapes
+    assert isinstance(_shapes, dict)
+    assert all(isinstance(_key, int) for _key in _shapes.keys())
+    assert all(isinstance(_value, tuple) for _value in _shapes.values())
+
+
+def test_ndims__empty(clean_results) -> None:
+    assert clean_results.ndims == {}
+
+
+def test_ndims__w_results(results) -> None:
+    _ndims = results.ndims
+    assert isinstance(_ndims, dict)
+    assert all(isinstance(_key, int) for _key in _ndims.keys())
+    assert all(isinstance(_value, int) for _value in _ndims.values())
+
+
+def test_frozen_tree(clean_results) -> None:
+    clean_results.prepare_new_results()
+    assert isinstance(clean_results.frozen_tree, ProcessingTree)
+    assert id(clean_results.frozen_tree) != id(clean_results.proc_tree_instance)
+
+
+def test_frozen_exp(clean_results) -> None:
+    clean_results.prepare_new_results()
+    assert isinstance(clean_results.frozen_exp, DiffractionExperiment)
+    assert id(clean_results.frozen_exp) != id(clean_results.diff_exp_instance)
+
+
+def test_frozen_scan(clean_results) -> None:
+    clean_results.prepare_new_results()
+    assert isinstance(clean_results.frozen_scan, Scan)
+    assert id(clean_results.frozen_scan) != id(clean_results.scan_instance)
+
+
+def test_source_hash(results) -> None:
+    _scan_hash = hash(results.scan_instance)
+    _diff_exp_hash = hash(results.diff_exp_instance)
+    _tree_hash = hash(results.proc_tree_instance)
+    _hash = hash((_scan_hash, _tree_hash, _diff_exp_hash))
+    assert _hash == results.source_hash
+
+
+def test_result_titles__empty(clean_results) -> None:
+    assert clean_results.result_titles == {}
+
+
+def test_result_titles__w_results(results) -> None:
+    _titles = results.result_titles
+    assert isinstance(_titles, dict)
+    assert all(isinstance(_key, int) for _key in _titles.keys())
+    assert all(isinstance(_value, str) for _value in _titles.values())
+
+
+# --------------------
+# Tests of public methods
+# --------------------
+
+
+def test_clear_all_results(results) -> None:
+    results._saver.set_active_savers(".HDF5")
+    results.clear_all_results()
+    assert results._composites == {}
+    assert results._plugin_result_infos == {}
+    assert results._source_hash == -1
+    assert results._saver.current_formats == []
+    for _key in ["metadata_complete", "composites_created", "saver_metadata_set"]:
+        assert not results._config[_key]
+
+
+def test_prepare_new_results(random_scan, results) -> None:
+    for _key in [1, 2]:
+        _info = results._plugin_result_infos[_key]
+        assert _info.plugin_name != ""
+        assert _info.label != ""
+        assert _info.result_title != ""
+        assert _info.shape == (
+            random_scan.shape + (_INPUT_SHAPE if _key == 1 else _NEW_SHAPE)
+        )
+    assert hash(results._config["frozen_scan"]) == hash(results.scan_instance)
+    assert id(results._config["frozen_scan"]) != id(results.scan_instance)
+    assert hash(results._config["frozen_exp"]) == hash(results.diff_exp_instance)
+    assert id(results._config["frozen_exp"]) != id(results.diff_exp_instance)
+    for _id, _node in results.proc_tree_instance.nodes.items():
+        assert hash(results._config["frozen_tree"].nodes[_id]) == hash(_node)
+    assert id(results._config["frozen_tree"]) != id(results.proc_tree_instance)
+
+
+def test_update_result_metadata(results, random_scan) -> None:
+    _meta = _DEFAULT_PLUGIN_METADATA.copy()
+    _full_meta = _create_metadata_with_scan(_DEFAULT_PLUGIN_METADATA, random_scan)
+    results.update_result_metadata(_meta)
+    assert results._config["metadata_complete"]
+    for _node, _node_metadata in _full_meta.items():
+        _stored_meta = results._plugin_result_infos[_node].dataset_metadata
+        for _key, _val in _node_metadata.items():
+            _ref = _stored_meta[_key]
+            if _key == "axis_ranges":
+                for _dim, _range in _val.items():
+                    assert np.allclose(_range, _ref[_dim])
+            else:
+                assert _val == _ref
+    assert results.shapes[1] == random_scan.shape + _INPUT_SHAPE
+    assert results.shapes[2] == random_scan.shape + _NEW_SHAPE
+
+
+def test_store_scan_point_results__w_frame_metadata(
+    clean_results, result_data, random_scan
+) -> None:
+    results = clean_results
+    results.prepare_new_results()
+    results.update_result_metadata(_DEFAULT_PLUGIN_METADATA)
+    _index = random_scan.n_points - 1
+    results.store_scan_point_results(_index, result_data)
+    _scan_indices = random_scan.get_indices_from_ordinal(_index)
+    assert np.allclose(result_data[1], results._composites[1][_scan_indices])
+    assert np.allclose(result_data[2], results._composites[2][_scan_indices])
+
+
+def test_store_scan_point_results__no_previous_metadata(
+    clean_results, random_scan, result_data
+) -> None:
+    results = clean_results
+    results.prepare_new_results()
+    _index = random_scan.n_points - 1
+    results.store_scan_point_results(_index, result_data)
+    _scan_indices = random_scan.get_indices_from_ordinal(_index)
+    assert np.allclose(result_data[1], results._composites[1][_scan_indices])
+    assert np.allclose(result_data[2], results._composites[2][_scan_indices])
+    assert results._config["metadata_complete"]
+
+
+def test_store_scan_point_results__w_composites(
+    clean_results, random_scan, result_data
+) -> None:
+    results = clean_results
+    results.prepare_new_results()
+    results.update_result_metadata(_DEFAULT_PLUGIN_METADATA)
+    results._create_composites()
+    _index = random_scan.n_points - 2
+    results.store_scan_point_results(_index, result_data)
+    # repeat storing to verify saver_metadata flag works correctly
+    results.store_scan_point_results(_index + 1, result_data)
+    _scan_indices = random_scan.get_indices_from_ordinal(_index)
+    _scan_indices_b = random_scan.get_indices_from_ordinal(_index + 1)
+    assert np.allclose(result_data[1], results._composites[1][_scan_indices])
+    assert np.allclose(result_data[2], results._composites[2][_scan_indices])
+    assert np.allclose(result_data[1], results._composites[1][_scan_indices_b])
+    assert np.allclose(result_data[2], results._composites[2][_scan_indices_b])
+
+
+def test_get_result_ranges(results, random_scan) -> None:
+    _ranges = results.get_result_ranges(1)
+    for _dim, _range in _ranges.items():
+        _ref = (
+            random_scan.get_range_for_dim(_dim)
+            if _dim < random_scan.ndim
+            else _DEFAULT_PLUGIN_METADATA[1]["axis_ranges"][_dim - random_scan.ndim]
+        )
+        assert np.allclose(_range, _ref)
+
+
+def test_get_result_ranges__no_such_node(results) -> None:
+    with pytest.raises(UserConfigError):
+        results.get_result_ranges(42)
+
+
+@pytest.mark.parametrize("squeeze", [True, False])
+@pytest.mark.parametrize("flatten", [True, False])
+@pytest.mark.parametrize("copy_data", [True, False])
+def test_get_results(results, random_scan, squeeze, flatten, copy_data) -> None:
+    res = results
+    _res = res.get_results(
+        1, squeeze=squeeze, flatten_scan_dims=flatten, copy=copy_data
+    )
+    if flatten:
+        assert _res.shape == (random_scan.n_points,) + _INPUT_SHAPE
+    else:
+        assert _res.shape == random_scan.shape + _INPUT_SHAPE
+    assert (id(_res) != id(results._composites[1])) == copy_data
+
+
+def test_get_results__wrong_node_id() -> None:
+    res = ProcessingResults()
+    with pytest.raises(UserConfigError):
+        res.get_results(3)
+
+
+def test_store_frame_shapes(results, random_scan) -> None:
+    res = results
+    res.update_result_metadata(_DEFAULT_PLUGIN_METADATA)
+    assert res.shapes == {
+        1: random_scan.shape + _INPUT_SHAPE,
+        2: random_scan.shape + _NEW_SHAPE,
+    }
+    assert res._config["metadata_complete"]
+
+
+def test_store_frame_shapes__wrong_nodes(clean_results) -> None:
+    res = clean_results
+    res.prepare_new_results()
+    _metadata = {1: _DEFAULT_PLUGIN_METADATA[1], 3: _DEFAULT_PLUGIN_METADATA[2]}
+    with pytest.raises(KeyError):
+        res.update_result_metadata(_metadata)
+
+
+def test_create_composites(clean_results, random_scan) -> None:
+    res = clean_results
+    res.prepare_new_results()
+    res.update_result_metadata(_DEFAULT_PLUGIN_METADATA)
+    res._create_composites()
+    assert res._composites[1].shape == random_scan.shape + _INPUT_SHAPE
+    assert res._composites[2].shape == random_scan.shape + _NEW_SHAPE
+
+
+def test_create_composites__shapes_unset(clean_results) -> None:
+    res = clean_results
+    res.prepare_new_results()
+    with pytest.raises(UserConfigError):
         res._create_composites()
-        return res
 
-    def create_h5_test_file(
-        self, node_id: int, workflow_results_instance: ProcessingResults
-    ) -> None:
+
+def test_get_result_subset__wrong_node_id(results) -> None:
+    res = results
+    _slice = (0, 0, 0, 0, 0)
+    with pytest.raises(UserConfigError):
+        res.get_result_subset(42, *_slice)
+
+
+@pytest.mark.parametrize(
+    "flatten_scan_dims,slices",
+    [
+        (False, (0, 0, 0, 0, 0)),
+        (True, (0, 0, 0)),
+    ],
+    ids=["no_flatten", "flatten"],
+)
+def test_get_result_subset__single_point(results, flatten_scan_dims, slices) -> None:
+    _res = results.get_result_subset(1, *slices, flatten_scan_dims=flatten_scan_dims)
+    assert isinstance(_res, Real)
+
+
+@pytest.mark.parametrize(
+    "flatten_scan_dims,build_slices,build_shape",
+    [
+        (
+            False,
+            lambda n0, n2: (slice(0, n0), 0, slice(0, n2), 0, 0),
+            lambda n0, n2: (n0, n2),
+        ),
+        (
+            True,
+            lambda n0, n2: (slice(0, n0 - 3), 0, slice(0, n2)),
+            lambda n0, n2: (n0 - 3, n2),
+        ),
+    ],
+    ids=["no_flatten", "flatten"],
+)
+def test_get_result_subset__slice_array(
+    results, random_scan, flatten_scan_dims, build_slices, build_shape
+) -> None:
+    n0 = random_scan.get_param_value("scan_dim0_n_points")
+    n2 = random_scan.get_param_value("scan_dim2_n_points")
+    _res = results.get_result_subset(
+        1, *build_slices(n0, n2), flatten_scan_dims=flatten_scan_dims
+    )
+    assert isinstance(_res, np.ndarray)
+    assert _res.shape == build_shape(n0, n2)
+
+
+@pytest.mark.parametrize(
+    "squeeze,build_slices,build_shape",
+    [
+        (
+            False,
+            lambda n0, n2: (np.arange(n0), [0], np.arange(1, n2 - 1)),
+            lambda n0, n2: (n0, 1, n2 - 2) + _INPUT_SHAPE,
+        ),
+        (
+            True,
+            lambda n0, n2: (np.arange(n0), [0], np.arange(n2), 0, 0),
+            lambda n0, n2: (n0, n2),
+        ),
+    ],
+    ids=["no_squeeze", "squeezed"],
+)
+def test_get_result_subset__array_indices(
+    results, random_scan, squeeze, build_slices, build_shape
+) -> None:
+    n0 = random_scan.get_param_value("scan_dim0_n_points")
+    n2 = random_scan.get_param_value("scan_dim2_n_points")
+    _res = results.get_result_subset(1, *build_slices(n0, n2), squeeze=squeeze)
+    assert isinstance(_res, np.ndarray)
+    assert _res.shape == build_shape(n0, n2)
+
+
+def test_get_result_subset__ndarray_and_slice(results, random_scan) -> None:
+    n0 = random_scan.get_param_value("scan_dim0_n_points")
+    n2 = random_scan.get_param_value("scan_dim2_n_points")
+    _slices = (np.arange(n0), 0, np.arange(n2 - 2), (0, 2, 3), 0)
+    _res = results.get_result_subset(1, *_slices)
+    assert isinstance(_res, np.ndarray)
+    assert _res.shape == (n0, n2 - 2, 3)
+
+
+@pytest.mark.parametrize(
+    "build_slices,build_shape",
+    [
+        (
+            lambda n0: (
+                slice(0, n0 - 3),
+                slice(0, _NEW_SHAPE[0] - 1),
+                1,
+                0,
+                slice(1, _NEW_SHAPE[3] - 1),
+            ),
+            lambda n0: (n0 - 3, _NEW_SHAPE[0] - 1, _NEW_SHAPE[3] - 2),
+        ),
+        (
+            lambda n0: (np.arange(n0 - 3), 0, 0, 0, np.arange(_NEW_SHAPE[3] - 1)),
+            lambda n0: (n0 - 3, _NEW_SHAPE[3] - 1),
+        ),
+    ],
+    ids=["slices", "arrays"],
+)
+def test_get_result_subset__flatten_multidim(
+    results, random_scan, build_slices, build_shape
+) -> None:
+    n0 = random_scan.get_param_value("scan_dim0_n_points")
+    _res = results.get_result_subset(2, *build_slices(n0), flatten_scan_dims=True)
+    assert isinstance(_res, np.ndarray)
+    assert _res.shape == build_shape(n0)
+
+
+def test_prepare_result_export__setup_incomplete(results, empty_temp_path) -> None:
+    results._config["metadata_complete"] = False
+    with pytest.raises(UserConfigError):
+        results.prepare_result_export(empty_temp_path, ".HDF5")
+
+
+def test_prepare_result_export__simple(results, empty_temp_path, tree) -> None:
+    results.prepare_result_export(empty_temp_path, ".HDF5")
+    _files = os.listdir(empty_temp_path)
+    for _id in results._composites:
+        assert _get_node_output_filename(_id, tree) in _files
+
+
+def test_prepare_result_export__single_node(results, empty_temp_path, tree) -> None:
+    results.prepare_result_export(empty_temp_path, ".HDF5", single_node=1)
+    _files = os.listdir(empty_temp_path)
+    assert _get_node_output_filename(1, tree) in _files
+    assert _get_node_output_filename(2, tree) not in _files
+
+
+def test_prepare_result_export__w_existing_file_no_overwrite(
+    results, empty_temp_path, tree
+) -> None:
+    results.prepare_result_export(empty_temp_path, ".HDF5", single_node=1)
+    with open(empty_temp_path / _get_node_output_filename(1, tree), "w") as _file:
+        _file.write("test")
+    with pytest.raises(UserConfigError):
+        results.prepare_result_export(empty_temp_path, ".HDF5")
+
+
+def test_prepare_result_export__w_existing_file_w_overwrite(
+    results, empty_temp_path, tree
+) -> None:
+    with h5py.File(empty_temp_path / _get_node_output_filename(1, tree), "w"):
+        pass
+    results.prepare_result_export(empty_temp_path, ".HDF5", overwrite=True)
+    _files = os.listdir(empty_temp_path)
+    for _id in results._composites:
+        assert _get_node_output_filename(_id, tree) in _files
+
+
+def test_prepare_result_export__w_non_existing_dir(
+    results, empty_temp_path, tree
+) -> None:
+    empty_temp_path.rmdir()
+    results.prepare_result_export(empty_temp_path, ".HDF5")
+    _files = os.listdir(empty_temp_path)
+    for _id in results._composites:
+        assert _get_node_output_filename(_id, tree) in _files
+
+
+def test_save_results_to_disk__simple(results, empty_temp_path, tree) -> None:
+    results.save_results_to_disk(empty_temp_path, ".HDF5")
+    with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
+        _shape1 = f["entry/data/data"].shape
+    with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:
+        _shape2 = f["entry/data/data"].shape
+    assert _shape1 == results.shapes[1]
+    assert _shape2 == results.shapes[2]
+
+
+def test_save_results_to_disk__w_squeeze(results, empty_temp_path, tree) -> None:
+    results.save_results_to_disk(empty_temp_path, ".HDF5", squeeze=True)
+    with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
+        _shape1 = f["entry/data/data"].shape
+    with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:
+        _shape2 = f["entry/data/data"].shape
+    assert _shape1 == tuple(n for n in results.shapes[1] if n > 1)
+    assert _shape2 == tuple(n for n in results.shapes[2] if n > 1)
+
+
+def test_save_results_to_disk__single_node(results, empty_temp_path, tree) -> None:
+    results.save_results_to_disk(empty_temp_path, ".HDF5", node_id=1)
+    with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
+        _shape1 = f["entry/data/data"].shape
+    assert _shape1 == results.shapes[1]
+    assert not _get_node_output_path(2, tree, empty_temp_path).is_file()
+
+
+def test_get_node_result_metadata_string(results, random_scan) -> None:
+    _node_info = results.get_node_result_metadata_string(2, use_scan_timeline=False)
+    _ndim_scan = len(
+        [_dim for _dim in range(random_scan.ndim) if random_scan.shape[_dim] > 1]
+    )
+    _ndim_data = len([_dim for _dim in range(len(_NEW_SHAPE)) if _NEW_SHAPE[_dim] > 1])
+    for _dim in range(_ndim_scan):
+        assert f"Axis #{_dim:02d} (scan):" in _node_info
+    for _dim in range(_ndim_scan, _ndim_scan + _ndim_data):
+        assert f"Axis #{_dim:02d} (data):" in _node_info
+    assert f"Axis #{(_ndim_scan + _ndim_data):02d} (data):" not in _node_info
+
+
+def test_get_node_result_metadata_string__w_data_size_1(
+    random_scan, tree, random_diff_exp
+) -> None:
+    random_scan.set_param_value("scan_dim", 1)
+    random_scan.set_param_value("scan_dim0_n_points", 1)
+    tree.delete_node_by_id(1)
+    tree.delete_node_by_id(2)
+    _proc3 = DummyProcNewDataset(output_shape=(1,))
+    _proc3.set_param_value("label", "Test plugin 3")
+    tree.create_and_add_node(_proc3)
+    _plugin_metadata = {
+        1: {
+            "axis_units": {0: "m"},
+            "axis_labels": {0: "dim1"},
+            "axis_ranges": {0: np.array((7))},
+            "data_label": "Test",
+            "data_unit": "u1",
+        }
+    }
+    _res = ProcessingResults(
+        scan=random_scan, processing_tree=tree, diffraction_exp=random_diff_exp
+    )
+    _res.prepare_new_results()
+    _res.update_result_metadata(_plugin_metadata)
+    _str = _res.get_node_result_metadata_string(1)
+    assert "Data zero-dimensional" in _str
+
+
+def test_get_node_result_metadata_string__w_scan_timeline(results) -> None:
+    _node_info = results.get_node_result_metadata_string(1, use_scan_timeline=True)
+    assert "Axis #00 (scan):" in _node_info
+    for _dim in range(1, 1 + len(_INPUT_SHAPE)):
+        assert f"Axis #{_dim:02d} (data):" in _node_info
+
+
+def test_get_node_result_metadata_string__no_squeeze(results, random_scan) -> None:
+    _node_info = results.get_node_result_metadata_string(
+        2, use_scan_timeline=False, squeeze=False
+    )
+    for _dim in range(random_scan.ndim):
+        assert f"Axis #{_dim:02d} (scan):" in _node_info
+    for _dim in range(random_scan.ndim, random_scan.ndim + len(_NEW_SHAPE)):
+        assert f"Axis #{_dim:02d} (data):" in _node_info
+    assert f"Axis #{(random_scan.ndim + len(_NEW_SHAPE)):02d} (data):" not in _node_info
+
+
+def test_import_data_from_directory__empty_dir(empty_temp_path) -> None:
+    _scan_title = get_random_string(8)
+    ScanContext().set_param_value("scan_title", _scan_title)
+    res = ProcessingResults()
+    res.import_data_from_directory(empty_temp_path)
+    assert res.shapes == {}
+    assert res.scan_instance.get_param_value("scan_title") == _scan_title
+
+
+def test_import_data_from_directory__with_files(
+    results, result_data, empty_temp_path, tree, random_scan, random_diff_exp
+) -> None:
+    _data = {}
+    for _id, _shape in results.shapes.items():
+        _data[_id] = create_dataset(len(_shape), shape=_shape)
         create_hdf5_results_file(
-            self.get_node_output_path(node_id),
-            workflow_results_instance._composites[node_id],
-            workflow_results_instance._SCAN,
-            workflow_results_instance._EXP,
-            workflow_results_instance._TREE,
-            node_label=workflow_results_instance._config["node_labels"][
-                node_id  # type: ignore[assignment]
-            ],
-            plugin_name=workflow_results_instance._config["plugin_names"][
-                node_id  # type: ignore[assignment]
-            ],
-            node_id=node_id,  # type: ignore[assignment]
+            _get_node_output_path(_id, tree, empty_temp_path),
+            _data[_id],
+            random_scan,
+            random_diff_exp,
+            tree,
+            node_id=_id,
+            node_label=tree.nodes[_id].plugin.get_param_value("label"),
+            plugin_name=tree.nodes[_id].plugin.plugin_name,
+        )
+    results.clear_all_results()
+    results.import_data_from_directory(empty_temp_path)
+    for _id in [1, 2]:
+        _res_info = results._plugin_result_infos[_id]
+        assert _res_info.shape == (
+            random_scan.shape + (_INPUT_SHAPE if _id == 1 else _NEW_SHAPE)
+        )
+        assert _res_info.label == tree.nodes[_id].plugin.get_param_value("label")
+        assert _res_info.plugin_name == tree.nodes[_id].plugin.plugin_name
+        assert _res_info.result_title == tree.nodes[_id].plugin.result_title
+        for _dim in range(_res_info.ndim):
+            _ref = _data[_id].axis_ranges[_dim]
+            assert np.allclose(_res_info.axis_ranges[_dim], _ref)
+
+
+def test_update_from_processing_results__wrong_type() -> None:
+    res = ProcessingResults()
+    with pytest.raises(TypeError):
+        res.update_from_processing_results(  # type: ignore[arg-type]
+            "not a ProcessingResults instance"
         )
 
-    def test_init__plain(self) -> None:
-        res = ProcessingResults()
-        self.assertIsInstance(res, ProcessingResults)
-        self.assertIsInstance(res._SCAN, Scan)
-        self.assertIsInstance(res._EXP, DiffractionExperiment)
-        self.assertIsInstance(res._TREE, ProcessingTree)
 
-    def test_init__with_contexts(self) -> None:
-        _local_scan = Scan()
-        _local_exp = DiffractionExperiment()
-        _local_tree = ProcessingTree()
-        res = ProcessingResults(
-            scan_context=_local_scan,
-            diffraction_exp_context=_local_exp,
-            workflow_tree=_local_tree,  # type: ignore[arg-type]
-        )
-        self.assertNotEqual(id(SCAN), id(res._SCAN))
-        self.assertNotEqual(id(EXP), id(res._EXP))
-        self.assertNotEqual(id(TREE), id(res._TREE))
-
-    def test_clear_all_results(self) -> None:
-        res = ProcessingResults()
-        res._config["shapes"] = {1: (1, 2, 3), 2: (4, 5, 6)}
-        res._config["plugin_names"] = {1: "a", 2: "b"}
-        res._config["node_labels"] = {1: "c", 2: "d"}
-        res._config["result_tiles"] = {1: "e", 2: "f"}
-        res._config["plugin_res_metadata"] = self._plugin_metadata.copy()
-        res._config["metadata_complete"] = True
-        res._config["exported"] = True
-        res._config["shapes_set"] = True
-        res.clear_all_results()
-        for _key in [
-            "shapes",
-            "plugin_names",
-            "node_labels",
-            "result_titles",
-            "plugin_res_metadata",
-        ]:
-            self.assertEqual(res._config[_key], {})
-        for _key in ["metadata_complete", "composites_created", "shapes_set"]:
-            self.assertFalse(res._config[_key])
-
-    def test_prepare_new_results(self) -> None:
-        res = ProcessingResults()
-        res._TREE.prepare_execution()
-        res.prepare_new_results()
-        for _key in ["plugin_names", "node_labels", "result_titles"]:
-            self.assertNotEqual(res._config[_key][1], "")
-            self.assertNotEqual(res._config[_key][2], "")
-        self.assertEqual(res._config["shapes"], {})
-        self.assertEqual(res._config["plugin_res_metadata"][1], {})
-        self.assertEqual(res._config["plugin_res_metadata"][2], {})
-        self.assertEqual(hash(res._config["frozen_SCAN"]), hash(res._SCAN))
-        self.assertNotEqual(id(res._config["frozen_SCAN"]), id(res._SCAN))
-        self.assertEqual(hash(res._config["frozen_EXP"]), hash(res._EXP))
-        self.assertNotEqual(id(res._config["frozen_EXP"]), id(res._EXP))
-        for _id, _node in res._TREE.nodes.items():
-            self.assertEqual(hash(res._config["frozen_TREE"].nodes[_id]), hash(_node))
-        self.assertNotEqual(id(res._config["frozen_TREE"]), id(res._TREE))
-
-    def test_store_frame_shapes(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        _shapes = {1: self._input_shape, 2: self._new_shape}  # type: ignore[assignment]
-        res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
-        _full_shapes = {
-            1: SCAN.shape + self._input_shape,
-            2: SCAN.shape + self._new_shape,
-        }
-        self.assertEqual(res._config["shapes"], _full_shapes)
-        self.assertTrue(res._config["shapes_set"])
-
-    def test_store_frame_shapes__wrong_nodes(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        _shapes = {1: self._input_shape, 3: self._new_shape}  # type: ignore[assignment]
-        with self.assertRaises(UserConfigError):
-            res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
-
-    def test_store_frame_metadata(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        _meta = self._plugin_metadata.copy()
-        _full_meta = self.get_test_metadata_with_scan()
-        res.store_frame_metadata(_meta)
-        self.assertTrue(res._config["metadata_complete"])
-        for _node, _node_metadata in _full_meta.items():
-            _stored_meta = res._config["plugin_res_metadata"][_node]
-            for _key, _val in _node_metadata.items():
-                _ref = _stored_meta[_key]
-                if _key == "axis_ranges":
-                    for _dim, _range in _val.items():
-                        self.assertTrue(np.allclose(_range, _ref[_dim]))
-                else:
-                    self.assertEqual(_val, _ref)
-        self.assertEqual(res._config["shapes"][1], SCAN.shape + self._input_shape)
-        self.assertEqual(res._config["shapes"][2], SCAN.shape + self._new_shape)
-        self.assertTrue(res._config["shapes_set"])
-
-    def test_store_results__w_frame_metadata(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
-        res.store_frame_metadata(self._plugin_metadata)
-        _index = 247
-        _shape1, _shape2, _results = self.generate_test_datasets()
-        res.store_results(_index, _results)
-        _scan_indices = SCAN.get_indices_from_ordinal(_index)
-        self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
-        self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
-
-    def test_store_results__no_previous_metadata(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        _index = 247
-        _shape1, _shape2, _results = self.generate_test_datasets()
-        res.store_results(_index, _results)
-        _scan_indices = SCAN.get_indices_from_ordinal(_index)
-        self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
-        self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
-        self.assertTrue(res._config["metadata_complete"])
-
-    def test_store_results__w_composites(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
-        res._create_composites()
-        _index = 247
-        _shape1, _shape2, _results = self.generate_test_datasets()
-        res.store_results(_index, _results)
-        _scan_indices = SCAN.get_indices_from_ordinal(_index)
-        self.assertTrue(np.allclose(_results[1], res._composites[1][_scan_indices]))
-        self.assertTrue(np.allclose(_results[2], res._composites[2][_scan_indices]))
-
-    def test_create_composites(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_shapes({1: self._input_shape, 2: self._new_shape})  # type: ignore[arg-type]
-        res._create_composites()
-        self.assertEqual(res._composites[1].shape, SCAN.shape + self._input_shape)
-        self.assertEqual(res._composites[2].shape, SCAN.shape + self._new_shape)
-
-    def test_create_composites__shapes_unset(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        with self.assertRaises(UserConfigError):
-            res._create_composites()
-
-    def test_shapes(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        _shapes = {1: self._input_shape, 2: self._new_shape}  # type: ignore[assignment]
-        res.store_frame_shapes(_shapes)  # type: ignore[arg-type]
-        self.assertEqual(
-            res.shapes,
-            {
-                1: SCAN.shape + self._input_shape,
-                2: SCAN.shape + self._new_shape,
-            },
-        )
-
-    def test_shapes__empty(self) -> None:
-        res = ProcessingResults()
-        self.assertEqual(res.shapes, {})
-
-    def test_node_labels(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        self.assertEqual(
-            res.node_labels,
-            {
-                1: TREE.nodes[1].plugin.get_param_value("label"),
-                2: TREE.nodes[2].plugin.get_param_value("label"),
-            },
-        )
-
-    def test_node_labels__empty(self) -> None:
-        res = ProcessingResults()
-        self.assertEqual(res.node_labels, {})
-
-    def test_data_labels__empty_composites(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        self.assertEqual(res.data_labels, {})
-
-    def test_data_labels__w_composites(self) -> None:
-        res = self.create_standard_workflow_results()
-        self.assertEqual(
-            res.data_labels,
-            {
-                1: self._plugin_metadata[1]["data_label"],
-                2: self._plugin_metadata[2]["data_label"],
-            },
-        )
-
-    def test_data_units__empty_composites(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        self.assertEqual(res.data_units, {})
-
-    def test_data_units__w_composites(self) -> None:
-        res = self.create_standard_workflow_results()
-        self.assertEqual(
-            res.data_units,
-            {
-                1: self._plugin_metadata[1]["data_unit"],
-                2: self._plugin_metadata[2]["data_unit"],
-            },
-        )
-
-    def test_ndims__empty_composites(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        self.assertEqual(res.ndims, {})
-
-    def test_ndims__w_composites(self) -> None:
-        res = self.create_standard_workflow_results()
-        self.assertEqual(
-            res.ndims,
-            {
-                1: SCAN.ndim + len(self._input_shape),
-                2: SCAN.ndim + len(self._new_shape),
-            },
-        )
-
-    def test_frozen_tree(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        self.assertEqual(res.frozen_tree.export_to_string(), TREE.export_to_string())
-
-    def test_frozen_exp(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        self.assertEqual(res.frozen_exp.param_values, EXP.param_values)
-
-    def test_frozen_scan(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        self.assertEqual(res.frozen_scan.param_values, SCAN.param_values)
-
-    def test_source_hash(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        self.assertEqual(hash(TREE), hash(res._TREE))
-        self.assertEqual(res.source_hash, hash((hash(SCAN), hash(TREE), hash(EXP))))
-
-    def test_source_hash__custom_contexts(self) -> None:
-        _local_scan = Scan()
-        _local_exp = DiffractionExperiment()
-        _local_tree = ProcessingTree()
-        res = ProcessingResults(
-            scan_context=_local_scan,
-            diffraction_exp_context=_local_exp,
-            workflow_tree=_local_tree,  # type: ignore[arg-type]
-        )
-        self.assertEqual(
-            res.source_hash,
-            hash((hash(_local_scan), hash(_local_tree), hash(_local_exp))),
-        )
-
-    def test_result_titles(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        self.assertEqual(
-            res.result_titles,
-            {
-                1: TREE.nodes[1].plugin.result_title,
-                2: TREE.nodes[2].plugin.result_title,
-            },
-        )
-
-    def test_get_result_ranges(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        res._create_composites()
-        _ranges = res.get_result_ranges(1)
-        _ref = dict(
-            enumerate(
-                [SCAN.get_range_for_dim(i) for i in range(SCAN.ndim)]
-                + list(self._plugin_metadata[1]["axis_ranges"].values())
-            )
-        )
-        for _dim, _range in _ranges.items():
-            self.assertTrue(np.allclose(_range, _ref[_dim]))
-
-    def test_get_result_ranges__no_such_node(self) -> None:
-        res = ProcessingResults()
-        res.prepare_new_results()
-        res.store_frame_metadata(self._plugin_metadata)
-        with self.assertRaises(UserConfigError):
-            _ranges = res.get_result_ranges(42)
-
-    def test_get_results(self) -> None:
-        res = self.create_standard_workflow_results()
-        _res = res.get_results(1)
-        self.assertEqual(_res.shape, SCAN.shape + self._input_shape)
-
-    def test_get_results__wrong_node_id(self) -> None:
-        res = ProcessingResults()
-        with self.assertRaises(UserConfigError):
-            res.get_results(3)
-
-    def test_get_results_for_flattened_scan(self) -> None:
-        res = self.create_standard_workflow_results()
-        _res = res.get_results_for_flattened_scan(1)
-        self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
-
-    def test_get_results_for_flattened_scan__w_n1_scan_dim(self) -> None:
-        SCAN.set_param_value("scan_dim0_n_points", 1)
-        res = self.create_standard_workflow_results()
-        _res = res.get_results_for_flattened_scan(1)
-        self.assertEqual(_res.shape, (np.prod(SCAN.shape),) + self._input_shape)
-
-    def test_get_results_for_flattened_scan__wrong_node_id(self) -> None:
-        res = self.create_standard_workflow_results()
-        with self.assertRaises(UserConfigError):
-            _res = res.get_results_for_flattened_scan(42)
-
-    def test_get_results_for_flattened_scan__w_squeeze(self) -> None:
-        res = self.create_standard_workflow_results()
-        _res = res.get_results_for_flattened_scan(1, squeeze=True)
-        _res2 = res.get_results_for_flattened_scan(2, squeeze=True)
-        self.assertEqual(
-            _res.shape,
-            tuple(_i for _i in (np.prod(SCAN.shape),) + self._input_shape if _i > 1),
-        )
-        self.assertEqual(
-            _res2.shape,
-            tuple(_i for _i in (np.prod(SCAN.shape),) + self._new_shape if _i > 1),
-        )
-
-    def test_get_result_subset__wrong_node_id(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slice = (0, 0, 0, 0, 0)
-        with self.assertRaises(UserConfigError):
-            _res = res.get_result_subset(42, *_slice)
-
-    def test_get_result_subset__no_flatten_single_point(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slice = (0, 0, 0, 0, 0)
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slice)
-        self.assertIsInstance(_res, Real)
-
-    def test_get_result_subset__no_flatten_w_array(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slice = (slice(0, self._scan_n[0]), 0, slice(0, self._scan_n[2]), 0, 0)
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slice)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
-
-    def test_get_result_subset__no_flatten_w_array_indices(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slice = (np.arange(self._scan_n[0]), [0], np.arange(1, self._scan_n[2] - 1))
-        _res = res.get_result_subset(1, *_slice)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(
-            _res.shape, (self._scan_n[0], 1, self._scan_n[2] - 2) + self._input_shape
-        )
-
-    def test_get_result_subset__no_flatten_w_array_indices_squeezed(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slices = (np.arange(self._scan_n[0]), [0], np.arange(self._scan_n[2]), 0, 0)
-        _ref_shape = res._composites
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slices, squeeze=True)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
-
-    def test_get_result_subset__ndarray_and_slice(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slices = (
-            np.arange(self._scan_n[0]),
-            0,
-            np.arange(self._scan_n[2] - 2),
-            (0, 2, 3),
-            0,
-        )
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slices)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2] - 2, 3))
-
-    def test_get_result_subset__flatten_single_point(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slices = (0, 0, 0)
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slices, flattened_scan_dim=True)
-        self.assertIsInstance(_res, Real)
-
-    def test_get_result_subset__flatten_array(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slice = (slice(0, self._scan_n[0] - 3), 0, slice(0, self._scan_n[2]))
-        _node_id = 1
-        _res = res.get_result_subset(_node_id, *_slice, flattened_scan_dim=True)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0] - 3, self._scan_n[2]))
-
-    def test_get_result_subset__flatten_array_multidim(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slices = (
-            slice(0, self._scan_n[0] - 3),
-            slice(0, self._new_shape[0] - 1),
-            1,
-            0,
-            slice(1, self._new_shape[3] - 1),
-        )
-        _node_id = 2
-        _res = res.get_result_subset(_node_id, *_slices, flattened_scan_dim=True)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(
-            _res.shape,
-            (self._scan_n[0] - 3, self._new_shape[0] - 1, self._new_shape[3] - 2),
-        )
-
-    def test_get_result_subset__flatten_array_multidim_with_arrays(self) -> None:
-        res = self.create_standard_workflow_results()
-        _slices = (
-            np.arange(self._scan_n[0] - 3),
-            0,
-            0,
-            0,
-            np.arange(self._new_shape[3] - 1),
-        )
-        _node_id = 2
-        _res = res.get_result_subset(_node_id, *_slices, flattened_scan_dim=True)
-        self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0] - 3, self._new_shape[3] - 1))
-
-    def test_get_result_metadata__wrong_id(self) -> None:
-        res = self.create_standard_workflow_results()
-        with self.assertRaises(UserConfigError):
-            res.get_result_metadata(3)
-
-    def test_get_result_metadata(self) -> None:
-        res = self.create_standard_workflow_results()
-        _tmp_array = np.random.random((50, 50))
-        res._composites[0] = Dataset(
-            _tmp_array,
-            axis_labels=[chr(_i + 97) for _i in range(_tmp_array.ndim)],
-            axis_units=["unit_" + chr(_i + 97) for _i in range(_tmp_array.ndim)],
-            metadata={"spam": "eggs"},
-            axis_ranges={0: 2 + 0.4 * np.arange(50), 1: -3 * np.arange(50)},
-        )
-        _metadata = res.get_result_metadata(0)
-        self.assertIsInstance(_metadata, dict)
-        for _key in ["axis_labels", "axis_units", "metadata"]:
-            self.assertEqual(_metadata[_key], getattr(res._composites[0], _key))
-        for _dim in range(2):
-            self.assertTrue(
-                np.allclose(
-                    _metadata["axis_ranges"][_dim], res._composites[0].axis_ranges[_dim]
-                )
-            )
-
-    def test_get_result_metadata__use_scan_timeline(self) -> None:
-        res = self.create_standard_workflow_results()
-        _curr_meta_info = {"spam": "eggs"}
-        _tmp_array = np.random.random(SCAN.shape + (50, 50))
-        res._composites[0] = Dataset(
-            _tmp_array,
-            axis_labels=[chr(_i + 97) for _i in range(_tmp_array.ndim)],
-            axis_units=["unit_" + chr(_i + 97) for _i in range(_tmp_array.ndim)],
-            metadata=_curr_meta_info,
-        )
-        _metadata = res.get_result_metadata(0, use_scan_timeline=True)
-        self.assertIsInstance(_metadata, dict)
-        self.assertEqual(_metadata["metadata"], _curr_meta_info)
-        for _key in ["axis_labels", "axis_units"]:
-            _entries = list(_metadata[_key].values())[1:]
-            _ref = list(getattr(res._composites[0], _key).values())[SCAN.ndim :]
-            self.assertEqual(_entries, _ref)
-
-    def test_prepare_files_for_saving__setup_incomplete(self) -> None:
-        res = self.create_standard_workflow_results()
-        for _key in ["shapes_set", "metadata_complete"]:
-            res._config["shapes_set"] = _key != "shapes_set"
-            res._config["metadata_complete"] = _key != "metadata_complete"
-            with self.assertRaises(UserConfigError):
-                res.prepare_files_for_saving(self._tmpdir, ".HDF5")
-
-    def test_prepare_files_for_saving__simple(self) -> None:
-        res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, ".HDF5")
-        _files = os.listdir(self._tmpdir)
-        for _id in res._composites:
-            self.assertIn(self.get_node_output_filename(_id), _files)
-
-    def test_prepare_files_for_saving__single_node(self) -> None:
-        res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, ".HDF5", single_node=1)
-        _files = os.listdir(self._tmpdir)
-        self.assertIn(self.get_node_output_filename(1), _files)
-        self.assertNotIn(self.get_node_output_filename(2), _files)
-
-    def test_prepare_files_for_saving__w_existing_file_no_overwrite(self) -> None:
-        res = self.create_standard_workflow_results()
-        res.prepare_files_for_saving(self._tmpdir, ".HDF5", single_node=1)
-        with open(
-            self._tmpdir.joinpath(self.get_node_output_filename(1)), "w"
-        ) as _file:
-            _file.write("test")
-        with self.assertRaises(UserConfigError):
-            res.prepare_files_for_saving(self._tmpdir, ".HDF5")
-
-    def test_prepare_files_for_saving__w_existing_file_w_overwrite(self) -> None:
-        res = self.create_standard_workflow_results()
-        with open(
-            self._tmpdir.joinpath(self.get_node_output_filename(1)), "w"
-        ) as _file:
-            _file.write("test")
-        res.prepare_files_for_saving(self._tmpdir, ".HDF5", overwrite=True)
-        _files = os.listdir(self._tmpdir)
-        for _id in res._composites:
-            self.assertIn(self.get_node_output_filename(_id), _files)
-
-    def test_prepare_files_for_saving__w_non_existing_dir(self) -> None:
-        res = self.create_standard_workflow_results()
-        shutil.rmtree(self._tmpdir)
-        res.prepare_files_for_saving(self._tmpdir, ".HDF5")
-        _files = os.listdir(self._tmpdir)
-        for _id in res._composites:
-            self.assertIn(self.get_node_output_filename(_id), _files)
-
-    def test_save_results_to_disk__simple(self) -> None:
-        res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, ".HDF5")
-        with h5py.File(self.get_node_output_path(1), "r") as f:
-            _shape1 = f["entry/data/data"].shape
-        with h5py.File(self.get_node_output_path(2), "r") as f:
-            _shape2 = f["entry/data/data"].shape
-        self.assertEqual(_shape1, res.shapes[1])
-        self.assertEqual(_shape2, res.shapes[2])
-
-    def test_save_results_to_disk__w_squeeze(self) -> None:
-        self._plugin_metadata[2] = {
-            "axis_units": {0: "m", 1: "", 2: "spam!"},
-            "axis_labels": {0: "dim1", 1: "dim #3", 2: "42"},
-            "axis_ranges": {
-                0: 12 + np.arange(self._new_shape[0]),
-                1: np.array([42]),
-                2: 4 + 0.5 * np.arange(self._new_shape[3]),
-            },
-            "data_label": "New dataset",
-            "data_unit": "u2",
-        }
-        res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, ".HDF5", squeeze=True)
-        with h5py.File(self.get_node_output_path(1), "r") as f:
-            _shape1 = f["entry/data/data"].shape
-        with h5py.File(self.get_node_output_path(2), "r") as f:
-            _shape2 = f["entry/data/data"].shape
-        self.assertEqual(_shape1, tuple(n for n in res.shapes[1] if n > 1))
-        self.assertEqual(_shape2, tuple(n for n in res.shapes[2] if n > 1))
-
-    def test_save_results_to_disk__single_node(self) -> None:
-        res = self.create_standard_workflow_results()
-        res.save_results_to_disk(self._tmpdir, ".HDF5", node_id=1)
-        with h5py.File(self.get_node_output_path(1), "r") as f:
-            _shape1 = f["entry/data/data"].shape
-        self.assertEqual(_shape1, res.shapes[1])
-        self.assertFalse(self.get_node_output_path(2).is_file())
-
-    def test_get_node_result_metadata_string(self) -> None:
-        res = self.create_standard_workflow_results()
-        _node_info = res.get_node_result_metadata_string(2, use_scan_timeline=False)
-        _ndim_scan = len([_dim for _dim in range(SCAN.ndim) if SCAN.shape[_dim] > 1])
-        _ndim_data = len(
-            [_dim for _dim in range(len(self._new_shape)) if self._new_shape[_dim] > 1]
-        )
-        for _dim in range(_ndim_scan):
-            self.assertIn(f"Axis #{_dim:02d} (scan):", _node_info)
-        for _dim in range(_ndim_scan, _ndim_scan + _ndim_data):
-            self.assertIn(f"Axis #{_dim:02d} (data):", _node_info)
-        self.assertNotIn(f"Axis #{(_ndim_scan + _ndim_data):02d} (data):", _node_info)
-
-    def test_get_node_result_metadata_string__w_scan_timeline(self) -> None:
-        res = self.create_standard_workflow_results()
-        _node_info = res.get_node_result_metadata_string(1, use_scan_timeline=True)
-        self.assertIn("Axis #00 (scan):", _node_info)
-        for _dim in range(1, 1 + len(self._input_shape)):
-            self.assertIn(f"Axis #{_dim:02d} (data):", _node_info)
-
-    def test_get_node_result_metadata_string__no_squeeze(self) -> None:
-        res = self.create_standard_workflow_results()
-        _node_info = res.get_node_result_metadata_string(
-            2, use_scan_timeline=False, squeeze=False
-        )
-        for _dim in range(SCAN.ndim):
-            self.assertIn(f"Axis #{_dim:02d} (scan):", _node_info)
-        for _dim in range(SCAN.ndim, SCAN.ndim + len(self._new_shape)):
-            self.assertIn(f"Axis #{_dim:02d} (data):", _node_info)
-        self.assertNotIn(
-            f"Axis #{(SCAN.ndim + len(self._new_shape)):02d} (data):", _node_info
-        )
-
-    def test_import_data_from_directory__empty_dir(self) -> None:
-        _scan_title = get_random_string(8)
-        SCAN.set_param_value("scan_title", _scan_title)
-        res = ProcessingResults()
-        res.import_data_from_directory(self._tmpdir)
-        self.assertEqual(res.shapes, {})
-        self.assertEqual(res._SCAN.get_param_value("scan_title"), _scan_title)
-
-    def test_import_data_from_directory__with_files(self) -> None:
-        res = self.create_standard_workflow_results()
-        res._composites[1][:] = np.random.random(res._composites[1].shape)
-        res._composites[2][:] = np.random.random(res._composites[2].shape)
-        self.create_h5_test_file(1, res)
-        self.create_h5_test_file(2, res)
-        res.import_data_from_directory(self._tmpdir)
-        self.assertEqual(
-            res._config["shapes"],
-            {1: SCAN.shape + self._input_shape, 2: SCAN.shape + self._new_shape},
-        )
-        self.assertEqual(
-            res._config["node_labels"],
-            {1: self._node_labels[1], 2: self._node_labels[2]},
-        )
-        self.assertEqual(
-            res._config["plugin_names"],
-            {1: TREE.nodes[1].plugin.plugin_name, 2: TREE.nodes[2].plugin.plugin_name},
-        )
-        self.assertEqual(
-            res._config["result_titles"],
-            {
-                1: TREE.nodes[1].plugin.result_title,
-                2: TREE.nodes[2].plugin.result_title,
-            },
-        )
-        for _id in res._composites:
-            for _dim in range(SCAN.ndim, res._composites[_id].ndim):
-                _ref = self._plugin_metadata[_id]["axis_ranges"][_dim - SCAN.ndim]
-                self.assertTrue(
-                    np.allclose(res._composites[_id].axis_ranges[_dim], _ref)
-                )
-            self.assertIn(_id, res._config["plugin_res_metadata"])
-            _stored_metadata = res._config["plugin_res_metadata"][_id]
-            self.assertIsInstance(_stored_metadata, dict)
-            self.assertEqual(
-                set(_stored_metadata.keys()),
-                {
-                    "axis_labels",
-                    "axis_units",
-                    "axis_ranges",
-                    "data_unit",
-                    "data_label",
-                },
-            )
-
-    def test_update_from_processing_results__wrong_type(self) -> None:
-        res = ProcessingResults()
-        with self.assertRaises(TypeError):
-            res.update_from_processing_results(  # type: ignore[arg-type]
-                "not a ProcessingResults instance"
-            )
-
-    def test_update_from_processing_results(self) -> None:
-        res = self.create_standard_workflow_results()
-        _new_res = ProcessingResults()
-        _new_res.update_from_processing_results(res)
-        self.assertEqual(_new_res.shapes, res.shapes)
-        self.assertEqual(_new_res.node_labels, res.node_labels)
-        self.assertEqual(_new_res.data_labels, res.data_labels)
-        self.assertEqual(_new_res.data_units, res.data_units)
-        self.assertEqual(_new_res.ndims, res.ndims)
-        self.assertEqual(
-            _new_res.frozen_tree.export_to_string(),
-            res.frozen_tree.export_to_string(),
-        )
-        self.assertEqual(_new_res.frozen_exp.param_values, res.frozen_exp.param_values)
-        self.assertEqual(
-            _new_res.frozen_scan.param_values, res.frozen_scan.param_values
-        )
+def test_update_from_processing_results(results) -> None:
+    _new_res = ProcessingResults()
+    _new_res.update_from_processing_results(results)
+    assert _new_res.shapes == results.shapes
+    assert _get_node_labels(_new_res) == _get_node_labels(results)
+    assert _get_data_labels(_new_res) == _get_data_labels(results)
+    assert _get_data_units(_new_res) == _get_data_units(results)
+    assert _new_res.ndims == results.ndims
+    assert (
+        _new_res.frozen_tree.export_to_string()
+        == results.frozen_tree.export_to_string()
+    )
+    assert _new_res.frozen_exp.param_values == results.frozen_exp.param_values
+    assert _new_res.frozen_scan.param_values == results.frozen_scan.param_values
+
+
+#
+#
+#
+# def test_get_result_metadata__wrong_id(results) -> None:
+#     res = results
+#     with pytest.raises(UserConfigError):
+#         res._node_result_metadata(3)
+#
+#
+# def test_get_result_metadata(results) -> None:
+#     res = results
+#     _tmp_array = np.random.random((50, 50))
+#     res._composites[0] = Dataset(
+#         _tmp_array,
+#         axis_labels=[chr(_i + 97) for _i in range(_tmp_array.ndim)],
+#         axis_units=["unit_" + chr(_i + 97) for _i in range(_tmp_array.ndim)],
+#         metadata={"spam": "eggs"},
+#         axis_ranges={0: 2 + 0.4 * np.arange(50), 1: -3 * np.arange(50)},
+#     )
+#     _metadata = res._node_result_metadata(0)
+#     assert isinstance(_metadata, dict)
+#     for _key in ["axis_labels", "axis_units", "metadata"]:
+#         assert _metadata[_key] == getattr(res._composites[0], _key)
+#     for _dim in range(2):
+#         assert np.allclose(
+#             _metadata["axis_ranges"][_dim], res._composites[0].axis_ranges[_dim]
+#         )
+#
+#
+# def test_get_result_metadata__use_scan_timeline(results, random_scan) -> None:
+#     res = results
+#     _curr_meta_info = {"spam": "eggs"}
+#     _tmp_array = np.random.random(random_scan.shape + (50, 50))
+#     res._composites[0] = Dataset(
+#         _tmp_array,
+#         axis_labels=[chr(_i + 97) for _i in range(_tmp_array.ndim)],
+#         axis_units=["unit_" + chr(_i + 97) for _i in range(_tmp_array.ndim)],
+#         metadata=_curr_meta_info,
+#     )
+#     _metadata = res._node_result_metadata(0, use_scan_timeline=True)
+#     assert isinstance(_metadata, dict)
+#     assert _metadata["metadata"] == _curr_meta_info
+#     for _key in ["axis_labels", "axis_units"]:
+#         _entries = list(_metadata[_key].values())[1:]
+#         _ref = list(getattr(res._composites[0], _key).values())[random_scan.ndim :]
+#         assert _entries == _ref
+#
+#
+# def test_processing_result_saver__expected_export_filenames(results, tree) -> None:
+#     res = results
+#     saver = ProcessingResultSaver()
+#     saver.set_active_savers(".HDF5")
+#     _filenames = saver.expected_export_filenames(res._plugin_result_infos)
+#     assert sorted(_filenames) == sorted(
+#         [_get_node_output_filename(1, tree), _get_node_output_filename(2, tree)]
+#     )
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

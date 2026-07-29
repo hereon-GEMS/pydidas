@@ -23,27 +23,26 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+import numpy as np
 import pytest
 
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 
 
+_CUSTOM_SHAPE = (100, 1, 200, 50)
 _DEFAULT_VALUES = {
     "label": "",
     "node_id": None,
     "plugin_name": "",
     "result_title": "",
-    "result_metadata": {},
-    "shape": (),
+    "axis_ranges": {},
 }
 _CUSTOM_VALUES = {
     "label": "test",
     "node_id": 7,
     "plugin_name": "TestPlugin",
     "result_title": "Test Result",
-    "result_metadata": {"key1": True, "b": "test"},
-    "shape": (100, 1, 200, 50),
+    "axis_ranges": {_i: np.arange(_val) for _i, _val in enumerate(_CUSTOM_SHAPE)},
 }
 
 
@@ -58,27 +57,20 @@ def test_init__w_customs():
     _info = PluginResultInfo(**_CUSTOM_VALUES)
     for _key, _val in _CUSTOM_VALUES.items():
         assert getattr(_info, _key) == _val
-    assert _info.export_shape == _CUSTOM_VALUES["shape"]  # type : ignore[type]
+    assert _info.export_shape == _CUSTOM_SHAPE
 
 
 @pytest.mark.parametrize("key, val", [(_k, _v) for _k, _v in _CUSTOM_VALUES.items()])
 def test_init__w_partial_keys(key, val):
     _info = PluginResultInfo(**{key: val})
     for _key, _val in _CUSTOM_VALUES.items():
-        if _key == key:
+        if _key == key == "axis_ranges":
+            for _ax, _arr in _val.items():
+                assert np.allclose(_info.axis_ranges[_ax], _arr)
+        elif _key == key:
             assert getattr(_info, _key) == _val
         else:
             assert getattr(_info, _key) == _DEFAULT_VALUES[_key]
-
-
-def test_metadata_independence():
-    """Test that metadata dictionaries are independent between instances."""
-    _info1 = PluginResultInfo()
-    _info2 = PluginResultInfo()
-
-    _info1.result_metadata["key"] = "value1"
-    assert "key" not in _info2.result_metadata
-    assert _info2.result_metadata == {}
 
 
 @pytest.mark.parametrize(
@@ -96,12 +88,12 @@ def test_metadata_independence():
 )
 @pytest.mark.parametrize("squeeze", [True, False])
 def test_export_shape__w_various_shapes(shape, expected_export, squeeze):
-    _info = PluginResultInfo(shape=shape, squeeze=squeeze)
+    _ax_ranges = {_i: np.arange(_n) for _i, _n in enumerate(shape)}
+    _info = PluginResultInfo(axis_ranges=_ax_ranges, squeeze=squeeze)
     if squeeze:
         assert _info.export_shape == expected_export
     else:
         assert _info.export_shape == shape
-
 
 
 @pytest.mark.parametrize("node_id", [None, 0, 2, -1])
@@ -113,38 +105,93 @@ def test_node_id__w_different_values(node_id):
         assert info.node_id == node_id
 
 
-def test_metadata__with_complex_values():
-    metadata = {
-        "string": "value",
-        "int": 42,
-        "float": 3.14,
-        "list": [1, 2, 3],
-        "dict": {"nested": "value"},
-        "none": None,
-    }
-    info = PluginResultInfo(result_metadata=metadata)
-    assert info.result_metadata == metadata
-
-
-def test__modify_metadata_outside_dataclass():
-    metadata = {
-        "string": "value",
-        "int": 42,
-    }
-    _info = PluginResultInfo(result_metadata=metadata)
-    _meta = _info.result_metadata
-    _meta["string"] = "new value"
-    assert _info.result_metadata == _meta
-
-
 def test__modify_shape_after_initialization():
-    _info = PluginResultInfo(shape=(100, 200))
+    _ax_ranges = {_i: np.arange(_n) for _i, _n in enumerate((100, 200))}
+    _info = PluginResultInfo(axis_ranges=_ax_ranges)
     assert _info.export_shape == (100, 200)
     _new_shape = (1, 200, 1, 50, 1)
-    _info.shape = _new_shape
+    _new_ax_ranges = {_i: np.arange(_n) for _i, _n in enumerate(_new_shape)}
+    _info.axis_ranges = _new_ax_ranges
     assert _info.export_shape == _new_shape
     _info.squeeze = True
     assert _info.export_shape == (200, 50)
+
+
+def test_axis_ranges_setter():
+    _info = PluginResultInfo(**_CUSTOM_VALUES)
+    _new_ranges = {0: np.arange(24), 1: np.arange(42), 2: np.arange(75)}
+    _info.axis_ranges = _new_ranges
+    for _dim, _arr in _new_ranges.items():
+        assert np.allclose(_arr, _info.axis_ranges[_dim])
+    assert _info.shape == (24, 42, 75)
+
+
+def test_dataset_metadata_setter():
+    _info = PluginResultInfo()
+    _metadata = {
+        "data_label": "Test Label",
+        "data_unit": "Test Unit",
+        "axis_labels": {0: "X", 1: "Y"},
+        "axis_units": {0: "mm", 1: "mm"},
+        "axis_ranges": {0: np.arange(100), 1: np.arange(200)},
+    }
+    _info.dataset_metadata = _metadata
+    for _key, _val in _metadata.items():
+        assert getattr(_info, _key) == _val
+    assert _info.shape == (100, 200)
+
+
+@pytest.mark.parametrize("prop", ["data_label", "data_unit"])
+def test_dataset_metadata__w_str_fields(prop):
+    _info = PluginResultInfo(**_CUSTOM_VALUES)
+    _metadata = {prop: "Test Value"}
+    _info.dataset_metadata = _metadata
+    assert getattr(_info, prop) == "Test Value"
+    assert _info.axis_labels == {}
+    assert _info.axis_units == {}
+    assert _info.axis_ranges == {}
+    assert _info.shape == ()
+
+
+@pytest.mark.parametrize("prop", ["axis_labels", "axis_units"])
+def test_dataset_metadata__w_dict_fields(prop):
+    _info = PluginResultInfo(**_CUSTOM_VALUES)
+    _metadata = {prop: {0: "Test Value 0 ", 1: "Test Value 1"}}
+    _info.dataset_metadata = _metadata
+    assert getattr(_info, prop) == _metadata[prop]
+    assert _info.data_label == ""
+    assert _info.data_unit == ""
+    assert _info.axis_ranges == {}
+    assert _info.shape == ()
+    if prop == "axis_labels":
+        assert _info.axis_units == {}
+    if prop == "axis_units":
+        assert _info.axis_labels == {}
+
+
+def test_dataset_metadata__w_axis_ranges():
+    _info = PluginResultInfo(**_CUSTOM_VALUES)
+    _metadata = {"axis_ranges": {0: np.arange(42), 1: np.arange(123)}}
+    _info.dataset_metadata = _metadata
+    assert getattr(_info, "axis_ranges") == _metadata["axis_ranges"]
+    assert _info.data_label == ""
+    assert _info.data_unit == ""
+    assert _info.axis_labels == {}
+    assert _info.axis_units == {}
+    assert _info.shape == (42, 123)
+
+
+@pytest.mark.parametrize("scan_ndim", [1, 2, 3])
+def test_result_ndim(scan_ndim):
+    _info = PluginResultInfo(scan_ndim=scan_ndim, **_CUSTOM_VALUES)
+    assert _info.result_ndim == len(_CUSTOM_SHAPE) - scan_ndim
+
+
+@pytest.mark.parametrize("scan_ndim", [1, 2, 3])
+def test_result_shape(scan_ndim):
+    _expected_shape = _CUSTOM_SHAPE[scan_ndim:]
+    _info = PluginResultInfo(scan_ndim=scan_ndim, **_CUSTOM_VALUES)
+    assert _info.result_shape == _expected_shape
 
 
 def test_dataclass__equality():
@@ -164,10 +211,6 @@ def test_copy():
     _info2 = _info1.copy()
     assert _info1 == _info2
     assert _info1 is not _info2
-    assert _info1.result_metadata is not _info2.result_metadata
-    _info2.result_metadata["key1"] = False
-    assert _info1.result_metadata['key1'] is True
-
 
 
 if __name__ == "__main__":

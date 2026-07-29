@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginResultInfo"]
 
-from copy import copy
 from dataclasses import dataclass, field, replace
 from typing import Any
 
@@ -47,8 +46,7 @@ class PluginResultInfo:
     node_id: int | None = None
     plugin_name: str = ""
     result_title: str = ""
-    result_metadata: dict[str, Any] = field(default_factory=dict)
-    shape: tuple[int, ...] = field(default_factory=tuple)
+    scan_ndim: int = 0
     squeeze: bool = False
     data_label: str = ""
     data_unit: str = ""
@@ -107,6 +105,54 @@ class PluginResultInfo:
         self.axis_units = metadata_dict.get("axis_units", {})
         self.axis_ranges = metadata_dict.get("axis_ranges", {})
 
+    @property
+    def shape(self) -> tuple[int, ...]:
+        """
+        Get the shape of the result.
+
+        Returns
+        -------
+        tuple[int, ...]
+            The shape of the result.
+        """
+        return tuple(_range.size for _range in self.axis_ranges.values())
+
+    @property
+    def ndim(self) -> int:
+        """
+        Get the number of dimensions of the result.
+
+        Returns
+        -------
+        int
+            The number of dimensions of the result.
+        """
+        return len(self.shape)
+
+    @property
+    def result_ndim(self) -> int:
+        """
+        Get the number of dimensions of the result excluding scan dimensions.
+
+        Returns
+        -------
+        int
+            The number of dimensions of the result excluding scan dimensions.
+        """
+        return self.ndim - self.scan_ndim
+
+    @property
+    def result_shape(self) -> tuple[int, ...]:
+        """
+        Get the shape of the result excluding scan dimensions.
+
+        Returns
+        -------
+        tuple[int, ...]
+            The shape of the result excluding scan dimensions.
+        """
+        return self.shape[self.scan_ndim :]
+
     def copy(self) -> "PluginResultInfo":
         """An alias for the __copy__ method."""
         return self.__copy__()
@@ -114,5 +160,4 @@ class PluginResultInfo:
     def __copy__(self) -> "PluginResultInfo":
         """A copy implementation to be used by the copy module."""
         _copy = replace(self)
-        _copy.result_metadata = {_key: copy(_val) for _key, _val in self.result_metadata.items()}
         return _copy

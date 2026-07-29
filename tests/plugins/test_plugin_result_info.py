@@ -26,16 +26,21 @@ __status__ = "Production"
 import numpy as np
 import pytest
 
+from pydidas.core.utils import get_random_string
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 
 
-_CUSTOM_SHAPE = (100, 1, 200, 50)
+_CUSTOM_SHAPE = (1, 42, 200, 47)
 _DEFAULT_VALUES = {
     "label": "",
     "node_id": None,
     "plugin_name": "",
     "result_title": "",
     "axis_ranges": {},
+    "axis_labels": {},
+    "axis_units": {},
+    "data_label": "",
+    "data_unit": "",
 }
 _CUSTOM_VALUES = {
     "label": "test",
@@ -43,6 +48,10 @@ _CUSTOM_VALUES = {
     "plugin_name": "TestPlugin",
     "result_title": "Test Result",
     "axis_ranges": {_i: np.arange(_val) for _i, _val in enumerate(_CUSTOM_SHAPE)},
+    "axis_labels": {_i: get_random_string(5) for _i in range(len(_CUSTOM_SHAPE))},
+    "axis_units": {_i: get_random_string(3) for _i in range(len(_CUSTOM_SHAPE))},
+    "data_label": "d4t4",
+    "data_unit": "arb. u.",
 }
 
 
@@ -179,6 +188,67 @@ def test_dataset_metadata__w_axis_ranges():
     assert _info.axis_labels == {}
     assert _info.axis_units == {}
     assert _info.shape == (42, 123)
+
+
+@pytest.mark.parametrize("use_scan_timeline", [True, False])
+@pytest.mark.parametrize("scan_ndim", [1, 2, 3])
+def test_get_metadata(scan_ndim, use_scan_timeline):
+    _info = PluginResultInfo(scan_ndim=scan_ndim, **_CUSTOM_VALUES)
+    _res = _info.get_metadata(use_scan_timeline=use_scan_timeline)
+    if not use_scan_timeline:
+        assert _res["shape"] == _CUSTOM_SHAPE
+        assert _res["axis_types"] == ["(scan)"] * scan_ndim + ["(data)"] * (
+            len(_CUSTOM_SHAPE) - scan_ndim
+        )
+        return
+    _original_ax_info = {
+        _key: list(_CUSTOM_VALUES[_key].values())[scan_ndim:]
+        for _key in ["axis_labels", "axis_units", "axis_ranges"]
+    }
+    assert _info.data_label == _CUSTOM_VALUES["data_label"]
+    assert _info.data_unit == _CUSTOM_VALUES["data_unit"]
+    for _ax, _entry0 in [
+        ("axis_labels", ["Chronological scan points"]),
+        ("axis_units", [""]),
+    ]:
+        assert _res[_ax] == (_entry0 + _original_ax_info[_ax])
+    for _id, _arr in enumerate(_res["axis_ranges"]):
+        if _id == 0:
+            assert np.allclose(_arr, np.arange(np.prod(_CUSTOM_SHAPE[:scan_ndim])))
+        else:
+            assert np.allclose(_arr, _original_ax_info["axis_ranges"][_id - 1])
+
+
+@pytest.mark.parametrize("use_scan_timeline", [True, False])
+@pytest.mark.parametrize("ndim_scan", [1, 2, 3])
+@pytest.mark.parametrize("squeeze", [True, False])
+def test_get_metadata__check_ndim_scan(use_scan_timeline, ndim_scan, squeeze):
+    _shape = (1, 2, 3, 5)
+    _meta = _CUSTOM_VALUES | {
+        "axis_ranges": {i: np.arange(n) for i, n in enumerate(_shape)},
+        "scan_ndim": ndim_scan,
+    }
+    _info = PluginResultInfo(**_meta)
+    _res = _info.get_metadata(use_scan_timeline=use_scan_timeline, squeeze=squeeze)
+    _expected_ndim_scan = (
+        0
+        if ndim_scan == 1 and squeeze
+        else (1 if use_scan_timeline else (ndim_scan if not squeeze else ndim_scan - 1))
+    )
+    assert _res["ndim_scan"] == _expected_ndim_scan
+
+
+@pytest.mark.parametrize("squeeze", [True, False])
+def test_get_metadata__w_scan_size_1(squeeze):
+    _shape = (1, 2, 1, 5)
+    _meta = _CUSTOM_VALUES | {
+        "axis_ranges": {i: np.arange(n) for i, n in enumerate(_shape)},
+        "scan_ndim": 1,
+    }
+    _info = PluginResultInfo(**_meta)
+    _res = _info.get_metadata(squeeze=squeeze)
+    assert sum([_key == "(scan)" for _key in _res["axis_types"]]) == (not squeeze)
+    assert sum([_key == "(data)" for _key in _res["axis_types"]]) == (3 - squeeze)
 
 
 @pytest.mark.parametrize("scan_ndim", [1, 2, 3])

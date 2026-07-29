@@ -243,7 +243,7 @@ def test_write_results_to_disk__empty_dir(setup_module: object) -> None:
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     _dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
@@ -256,7 +256,7 @@ def test_write_results_to_disk__existing_empty_dir(setup_module: object) -> None
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
     assert (_dir / "node_01.nxs").is_file()
@@ -270,7 +270,7 @@ def test_write_results_to_disk__used_dir(setup_module: object) -> None:
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     with open(_dir / "node_02.nxs", "w") as f:
         f.write("dummy")
     obj = ExecuteWorkflowRunner(output_dir=_dir)

@@ -44,6 +44,7 @@ from pydidas_qtcore import PydidasQApplication
 
 
 PLUGIN_COLL = PluginCollection()
+PLUGIN_COLL.verify_is_initialized()
 
 
 @pytest.fixture(scope="session", autouse=True)

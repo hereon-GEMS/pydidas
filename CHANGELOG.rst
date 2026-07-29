@@ -15,6 +15,9 @@ Improvements
   workflows from stored intermediate data.
 - Reworked the way NeXus files are structured for stronger compliance
   with NeXus format.
+- Added an option to reference savers for ProcessingResults by their
+  *name* instead of the suffix (e.g. "NeXus (HDF5)" instead of only
+  ".nxs".
 
 Programmatic changes
 --------------------
@@ -35,6 +38,7 @@ Programmatic changes
 - Modified the saver for ProcessingResults to be instance-based instead
   of class-based
 - Added a ProcessingResultSaver class to handle export of results.
+
 
 Bugfixes
 --------

@@ -38,7 +38,7 @@ from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_io_hdf5 import DiffractionExperimentIoHdf5
 from pydidas.contexts.scan import Scan
 from pydidas.contexts.scan.scan_io_hdf5 import ScanIoHdf5
-from pydidas.core import Dataset, UserConfigError
+from pydidas.core import Dataset
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.exceptions import FileReadError
 from pydidas.core.utils.hdf5 import (
@@ -64,7 +64,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     """
 
     extensions = HDF5_EXTENSIONS
-    format_name = "HDF5"
+    format_name = "NeXus (HDF5)"
     default_suffix = ".nxs"
 
     def __init__(self):

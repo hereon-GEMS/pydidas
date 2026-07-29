@@ -27,21 +27,21 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
-from pydidas.contexts.scan.scan import Scan
-from pydidas.core.exceptions import UserConfigError, FileReadError
-from pydidas.workflow.processing_tree import ProcessingTree
 import pytest
 
 from tests.workflow.processing_result_io.test_processing_result_io_base import (
     SharedTestProcessingResultIo,
 )
 
+from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
+from pydidas.contexts.scan.scan import Scan
 from pydidas.core.constants.file_extensions import HDF5_EXTENSIONS
+from pydidas.core.exceptions import FileReadError
 from pydidas.core.utils.hdf5.hdf5_dataset_utils import read_and_decode_hdf5_dataset
 from pydidas.core.utils.iterable_utils import replace_item_in_iterable
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.unittest_objects.create_dataset_ import create_dataset
+from pydidas.workflow.processing_tree import ProcessingTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
 from pydidas.workflow.result_io.processing_result_io_hdf5 import ProcessingResultIoHdf5
 
@@ -94,6 +94,14 @@ def node_info(random_scan):
 
 
 class TestProcessingResultIoHdf5Generic(SharedTestProcessingResultIo): ...
+
+
+@pytest.mark.parametrize("key", H5SAVER.extensions + [H5SAVER.format_name])
+def test__metaclass_findability(key):
+    _savers = META.get_savers(key)
+    assert len(_savers) == 1
+    _instance = list(_savers.values())[0]
+    assert isinstance(_instance, H5SAVER)
 
 
 def test__class_attributes():
@@ -263,10 +271,11 @@ def test_import_results_from_file(saver, filename):
 
 
 def test_import_results_from_file__empty_file(saver, temp_path):
-    _fname = (temp_path / "empty_file.nxs")
+    _fname = temp_path / "empty_file.nxs"
     _fname.write_text("")
     with pytest.raises(FileReadError):
         saver.import_results_from_file(_fname)
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

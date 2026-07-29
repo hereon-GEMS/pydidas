@@ -30,7 +30,7 @@ __all__ = ["ProcessingResultIoBase"]
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from pydidas.contexts import (
     DiffractionExperiment,
@@ -51,9 +51,9 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     Base class for processing result importers and exporters.
     """
 
-    extensions = []
-    default_suffix = ""
-    format_name = "unknown"
+    extensions: ClassVar[list[str]] = []
+    default_suffix: ClassVar[str] = ""
+    format_name: ClassVar[str] = ""
 
     def __init__(self):
         self._config: dict[str, Any] = {}

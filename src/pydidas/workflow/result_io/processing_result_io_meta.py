@@ -54,6 +54,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
     """
 
     registry: ClassVar[dict[str, type["ProcessingResultIoBase"]]] = {}
+    format_registry: ClassVar[dict[str, str]] = {}
 
     @staticmethod
     def get_savers(
@@ -83,7 +84,10 @@ class ProcessingResultIoMeta(GenericIoMeta):
         if isinstance(formats, str):
             formats = formats.split(";")
         for _format in formats:
-            _format = _format.lower().strip()
+            _format = _format.strip()
+            if _format in ProcessingResultIoMeta.format_registry:
+                _format = ProcessingResultIoMeta.format_registry[_format]
+            _format = _format.lower()
             if not _format.startswith("."):
                 _format = "." + _format
             if not (_format is None or _format == "none"):
@@ -147,3 +151,32 @@ class ProcessingResultIoMeta(GenericIoMeta):
             _data_dict[_node_id] = _data
             _node_info_dict[_node_id] = _node_info
         return _data_dict, _node_info_dict, _scan, _exp, _tree
+
+    @classmethod
+    def register_class(
+        cls,
+        new_class: type["ProcessingResultIoBase"],
+        update_registry: bool = False,  # type: ignore[override]
+    ) -> None:
+        """
+        Register a class as object for its native extensions.
+
+        Parameters
+        ----------
+        new_class : type[ProcessingResultIoBase]
+            The class to be registered.
+        update_registry : bool
+            Keyword to allow updating / overwriting of registered extensions.
+            The default is False.
+
+        Raises
+        ------
+        KeyError
+            If an extension associated with new_class has already been
+            registered and update_registry is False.
+        """
+        if new_class.format_name:
+            ProcessingResultIoMeta.format_registry[new_class.format_name] = (
+                new_class.default_suffix
+            )
+        super().register_class(new_class, update_registry=update_registry)

@@ -32,6 +32,7 @@ import pytest
 from pydidas.contexts import DiffractionExperimentContext, Scan, ScanContext
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.core import Dataset, UserConfigError
+from pydidas.core.utils import get_random_string
 from pydidas.unittest_objects.create_dataset_ import create_dataset
 from pydidas.workflow import ProcessingResults, WorkflowTree
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -64,7 +65,7 @@ def create_saver_class(title, ext: str | list[str]):
     _cls = META(
         title.upper(),
         (ProcessingResultIoBase,),
-        dict(extensions=ext, format_name=ext),
+        dict(extensions=ext, format_name=get_random_string(10), default_suffix=ext[0]),
     )
     return _cls
 
@@ -134,6 +135,14 @@ def test__class_attributes(io_meta):
     assert hasattr(io_meta, "registry")
 
 
+def test_register_class(io_meta):
+    _saver = create_saver_class("SAVER_TEST", ".test")
+    assert ".test" in io_meta.registry
+    assert io_meta.registry[".test"] is _saver
+    assert _saver.format_name in io_meta.format_registry
+    assert io_meta.format_registry[_saver.format_name] == _saver.default_suffix
+
+
 @pytest.mark.parametrize("savers", [None, ""])
 def test_get_savers__with_none(io_meta, savers):
     result = io_meta.get_savers(savers)
@@ -178,6 +187,16 @@ def test_get_savers__duplicate_formats(io_meta, ext):
     assert len(result) == 1
     assert ext[0] in result
     assert ext[-1] not in result
+
+
+def test_get_savers__w_format_name(io_meta):
+    _cls = create_saver_class("SAVER_TEST", [".test", ".dummy"])
+    _ext = _cls.extensions
+    _format_name = _cls.format_name
+    _savers = io_meta.get_savers(_format_name)
+    assert len(_savers) == 1
+    assert _ext[0] in _savers
+    assert _ext[-1] not in _savers
 
 
 def test_get_savers__unregistered_format_raises(io_meta):

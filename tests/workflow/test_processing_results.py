@@ -319,7 +319,7 @@ def test_prepare_new_results(random_scan, results) -> None:
 
 def test_update_result_metadata(results, random_scan) -> None:
     _meta = _DEFAULT_PLUGIN_METADATA.copy()
-    _full_meta = _create_metadata_with_scan(_DEFAULT_PLUGIN_METADATA, random_scan)
+    _full_meta = _create_metadata_with_scan(_meta, random_scan)
     results.update_result_metadata(_meta)
     assert results._config["metadata_complete"]
     for _node, _node_metadata in _full_meta.items():
@@ -616,6 +616,16 @@ def test_prepare_result_export__w_non_existing_dir(
 
 def test_save_results_to_disk__simple(results, empty_temp_path, tree) -> None:
     results.save_results_to_disk(empty_temp_path, ".HDF5")
+    with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
+        _shape1 = f["entry/data/data"].shape
+    with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:
+        _shape2 = f["entry/data/data"].shape
+    assert _shape1 == results.shapes[1]
+    assert _shape2 == results.shapes[2]
+
+
+def test_save_results_to_disk__w_NeXus_name(results, empty_temp_path, tree) -> None:
+    results.save_results_to_disk(empty_temp_path, "NeXus (HDF5)")
     with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
         _shape1 = f["entry/data/data"].shape
     with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:

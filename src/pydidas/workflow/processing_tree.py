@@ -54,6 +54,7 @@ class ProcessingTree(GenericTree):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
+        self._root: WorkflowNode | None = None
         self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
@@ -71,6 +72,21 @@ class ProcessingTree(GenericTree):
         if self.active_node is None:
             return ""
         return f"#{self.active_node_id:03d} [{self.active_node.plugin.plugin_name}]"
+
+    # Re-implement the root property to have the correct types:
+
+    @property
+    def root(self) -> WorkflowNode | None:  # type: ignore[override]
+        """Root node of the tree."""
+        return self._root
+
+    @root.setter
+    def root(
+        self,
+        value: WorkflowNode | None,  # type: ignore[override]
+    ) -> None:
+        """Set the root node of the tree."""
+        super(ProcessingTree, self.__class__).root.fset(self, value)  # type: ignore[arg]
 
     def create_and_add_node(
         self,

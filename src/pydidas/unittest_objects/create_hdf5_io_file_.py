@@ -107,18 +107,15 @@ def create_hdf5_io_file(
     _mode = kwargs.get("write_mode", "w")
     with h5py.File(filename, _mode) as _h5file:
         nxs_write_root_metadata(_h5file)
-        _root_group = nxs_create_nxentry(_h5file, entry=_root_group_name)
-        _data_group = nxs_create_recursive_groups(
-            _root_group, _data_group_name, group_type="NXdata"
-        )
-        nxs_write_nxdata(_data_group, _dataset, data)
+        nxs_create_nxentry(_h5file, entry=_root_group_name)
+        nxs_write_nxdata(_h5file, _dataset, data)
 
 
 def create_hdf5_results_file(
     filename: Path | str,
     data: Dataset,
-    scan: Scan | dict[str, Any],
-    diffraction_exp: DiffractionExperiment | dict[str, Any],
+    scan: Scan,
+    diffraction_exp: DiffractionExperiment,
     processing_tree: ProcessingTree,
     **kwargs: Any,
 ) -> None:

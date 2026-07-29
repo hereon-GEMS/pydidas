@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -381,7 +381,7 @@ class ExecuteWorkflowApp(BaseApp):
                     _res.shape
                 )
         self.mp_manager["shapes_available"].set()
-        RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
+        RESULTS.update_result_metadata(dict(self.mp_manager["metadata_dict"]))
 
     def _create_shared_memory(self):
         """
@@ -575,7 +575,7 @@ class ExecuteWorkflowApp(BaseApp):
             )
             return
         if not self._config["result_metadata_set"]:
-            RESULTS.store_frame_metadata(dict(self.mp_manager["metadata_dict"]))
+            RESULTS.update_result_metadata(dict(self.mp_manager["metadata_dict"]))
             self._config["result_metadata_set"] = True
         with self.mp_manager["lock"]:
             _new_results = {
@@ -584,10 +584,10 @@ class ExecuteWorkflowApp(BaseApp):
                 if _key != "in_use_flag"
             }
             self._shared_arrays["in_use_flag"][data_index] = 0
-        RESULTS.store_results(index, _new_results)
+        RESULTS.store_scan_point_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             if not self._config["export_files_prepared"]:
-                RESULTS.prepare_files_for_saving(
+                RESULTS.prepare_result_export(
                     self.get_param_value("autosave_directory"),
                     self.get_param_value("autosave_format"),
                 )

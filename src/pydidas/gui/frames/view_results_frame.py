@@ -71,16 +71,18 @@ class ViewResultsFrame(BaseFrameWithApp):
     )
 
     def __init__(self, **kwargs: Any) -> None:
-        self._SCAN = kwargs.get("scan", Scan())
-        self._TREE = kwargs.get("processing_tree", ProcessingTree())
-        self._EXP = kwargs.get("diffraction_exp", DiffractionExperiment())
+        self._scan: Scan = kwargs.get("scan", Scan())
+        self._tree: ProcessingTree = kwargs.get("processing_tree", ProcessingTree())
+        self._exp: DiffractionExperiment = kwargs.get(
+            "diffraction_exp", DiffractionExperiment()
+        )
         BaseFrameWithApp.__init__(self, **kwargs)
-        self._RESULTS = kwargs.get(
+        self._results: ProcessingResults = kwargs.get(
             "workflow_results",
             ProcessingResults(
-                diffraction_exp_context=self._EXP,
-                scan_context=self._SCAN,
-                processing_tree=self._TREE,
+                diffraction_exp=self._exp,
+                scan=self._scan,
+                processing_tree=self._tree,
             ),
         )
         self._active_node_id = -1
@@ -103,7 +105,7 @@ class ViewResultsFrame(BaseFrameWithApp):
         self.create_any_widget(
             "data_viewer",
             DataViewer,
-            plot2d_diffraction_exp=self._EXP,
+            plot2d_diffraction_exp=self._exp,
             plot2d_use_data_info_action=True,
             gridPos=(1, 1, 2, 1),
         )
@@ -135,26 +137,26 @@ class ViewResultsFrame(BaseFrameWithApp):
             qsettings_ref="WorkflowResults__import",
         )
         if _dir is not None:
-            self._RESULTS.import_data_from_directory(_dir)
-            _tree = self._RESULTS._TREE
-            _tree.root.plugin._SCAN = self._RESULTS._SCAN
+            self._results.import_data_from_directory(_dir)
+            _tree = self._results._tree
+            _tree.root.plugin._scan = self._results._scan
             _tree.root.plugin.update_filepath()
             self.update_choices_of_selected_results()
             self._selected_new_node(-1)
 
     def update_choices_of_selected_results(self) -> None:
         """Update the choices of the selected results."""
-        _should_be_visible = len(self._RESULTS.result_titles) > 0
+        _should_be_visible = len(self._results.result_titles) > 0
         self._widgets["label_select_header"].setVisible(_should_be_visible)
         self._widgets["result_table"].setVisible(_should_be_visible)
         self._widgets["result_table"].update_node_descriptions(
-            self._RESULTS.result_titles
+            self._results.result_titles
         )
 
     def update_export_setting_visibility(self) -> None:
         """Update the enabled state of export buttons based on available
         results."""
-        _active = self._RESULTS.shapes != {}
+        _active = self._results.shapes != {}
         self._widgets["but_export_all"].setEnabled(_active)
         self._widgets["export_container"].setVisible(_active)
 
@@ -194,18 +196,17 @@ class ViewResultsFrame(BaseFrameWithApp):
         """
         if self._active_node_id == -1:
             return
-        if self.get_param_value("use_scan_timeline"):
-            self._data = self._RESULTS.get_results_for_flattened_scan(
-                self._active_node_id, squeeze=True
-            )
-        else:
-            self._data = self._RESULTS.get_results(self._active_node_id).squeeze()
-        _metadata_string = self._RESULTS.get_node_result_metadata_string(
+        self._data = self._results.get_results(
+            self._active_node_id,
+            squeeze=True,
+            flatten_scan_dims=self.get_param_value("use_scan_timeline"),
+        )
+        _metadata_string = self._results.get_node_result_metadata_string(
             self._active_node_id,
             self.get_param_value("use_scan_timeline"),
         )
         self._widgets["result_info"].setText(_metadata_string)
-        _title = self._RESULTS.result_titles[self._active_node_id]
+        _title = self._results.result_titles[self._active_node_id]
         if update and self._widgets["data_viewer"].data_is_set:
             self._widgets["data_viewer"].update_data(self._data, title=_title)
         else:
@@ -222,8 +223,8 @@ class ViewResultsFrame(BaseFrameWithApp):
             raise UserConfigError(
                 "No node has been selected. Please check the result selection"
             )
-        _loader_plugin = self._RESULTS.frozen_tree.root.plugin.copy()
-        _loader_plugin._SCAN = self._RESULTS.frozen_scan
+        _loader_plugin = self._results.frozen_tree.root.plugin.copy()
+        _loader_plugin._scan = self._results.frozen_scan
         if _loader_plugin._filename == "":
             # if the result has been imported from disk, set the local
             # images_per_file parameter to the counted value in case the
@@ -311,7 +312,7 @@ class ViewResultsFrame(BaseFrameWithApp):
             )
         if _dir_name is None:
             return
-        self._RESULTS.save_results_to_disk(
+        self._results.save_results_to_disk(
             _dir_name,
             _formats,
             overwrite=_overwrite,

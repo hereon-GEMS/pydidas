@@ -275,7 +275,8 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._config["metadata_complete"] = True
         self._update_composite_metadata()
 
-    def store_scan_point_results(self, index: int, results: dict[int, Dataset]) -> None:
+    def store_scan_point_results(self, index: int, results: dict[int, Dataset],
+                                 autosave: bool = False) -> None:
         """
         Store results from one scan point in the ProcessingResults.
 
@@ -286,6 +287,9 @@ class ProcessingResults(ObjectWithParameterCollection):
         results: dict[int, Dataset]
             The results as dictionary with entries of the type
             <node_id: array>.
+        autosave : bool
+            Flag whether to export the new data directly to the savers.
+            The default is False.
         """
         if not self._config["metadata_complete"]:
             self.update_result_metadata(results)
@@ -296,6 +300,9 @@ class ProcessingResults(ObjectWithParameterCollection):
         _scan_index = self._scan.get_indices_from_ordinal(index)
         for _key, _val in results.items():
             self._composites[_key][_scan_index] = _val
+        if autosave:
+            self._saver.export_frame_to_active_savers(index, results)
+
 
     def get_result_ranges(self, node_id: int) -> dict[int, np.ndarray]:
         """

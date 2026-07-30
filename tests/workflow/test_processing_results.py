@@ -39,6 +39,7 @@ from pydidas.contexts import DiffractionExperiment
 from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.utils import get_random_string
+from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import (
     DummyLoader,
     DummyProc,
@@ -78,6 +79,17 @@ _DEFAULT_PLUGIN_METADATA = {
         "data_unit": "u2",
     },
 }
+
+
+@pytest.fixture(scope="module", autouse=True)
+def verify_plugin_collection_valid() -> None:
+    """Verify that the plugin collection is loaded."""
+    _unittest_obj_dir = (
+        Path(__file__).parents[2] / "src" / "pydidas" / "unittest_objects"
+    )
+    _collection = PluginCollection()
+    _collection.verify_is_initialized()
+    _collection.find_and_register_plugins(_unittest_obj_dir)
 
 
 @pytest.fixture
@@ -379,6 +391,17 @@ def test_store_scan_point_results__w_composites(
     assert np.allclose(result_data[1], results._composites[1][_scan_indices_b])
     assert np.allclose(result_data[2], results._composites[2][_scan_indices_b])
 
+
+def test_store_scan_point_results__w_autosave(results, empty_temp_path, result_data, tree, random_scan) -> None:
+    results.prepare_result_export(empty_temp_path, ".nxs")
+    results.store_scan_point_results(0, result_data, autosave=True)
+    _indices = random_scan.get_indices_from_ordinal(0)
+    with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
+        _data1 = f["entry/data/data"][_indices]
+    with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:
+            _data2 = f["entry/data/data"][_indices]
+    assert np.allclose(_data1, result_data[1])
+    assert np.allclose(_data2, result_data[2])
 
 def test_get_result_ranges(results, random_scan) -> None:
     _ranges = results.get_result_ranges(1)

@@ -221,8 +221,9 @@ def test_import_from_file__no_file(temp_dir):
 
 
 def test__export_matches_template(modify_scan_context, temp_path):
-    _ref_filename = temp_path / "test_export_template.hdf5"
-    _filename = temp_path / "test_export.hdf5"
+    _ref_filename = temp_path / "test_scan_io_hdf5" / "test_export_template.hdf5"
+    _filename = temp_path / "test_scan_io_hdf5" / "test_export.hdf5"
+    (temp_path / "test_scan_io_hdf5").mkdir(exist_ok=True)
     create_hdf5_results_file(
         _ref_filename, _TEST_DATA, SCAN, DiffractionExperiment(), ProcessingTree()
     )

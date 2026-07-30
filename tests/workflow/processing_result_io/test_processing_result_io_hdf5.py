@@ -38,7 +38,6 @@ from pydidas.contexts.scan.scan import Scan
 from pydidas.core.constants.file_extensions import HDF5_EXTENSIONS
 from pydidas.core.exceptions import FileReadError
 from pydidas.core.utils.hdf5.hdf5_dataset_utils import read_and_decode_hdf5_dataset
-from pydidas.core.utils.iterable_utils import replace_item_in_iterable
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.unittest_objects.create_dataset_ import create_dataset
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -194,7 +193,9 @@ def test_export_full_data_to_file(
     if squeeze:
         random_scan.set_param_value("scan_dim1_n_points", 1)
         for _id, _node_info in node_info.items():
-            _node_info.shape = replace_item_in_iterable(_node_info.shape, 1, 1)  # type: ignore[arg-type]
+            _ax_info = _node_info.axis_ranges
+            _ax_info[1] = np.array((1))
+            _node_info.axis_ranges = _ax_info
     saver.prepare_files_and_directories(
         empty_temp_path,
         node_info,

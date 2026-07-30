@@ -88,9 +88,9 @@ class ProcessingResultIoMeta(GenericIoMeta):
             if _format in ProcessingResultIoMeta.format_registry:
                 _format = ProcessingResultIoMeta.format_registry[_format]
             _format = _format.lower()
-            if not _format.startswith("."):
-                _format = "." + _format
             if not (_format is None or _format == "none"):
+                if not _format.startswith("."):
+                    _format = "." + _format
                 ProcessingResultIoMeta.verify_extension_is_registered(_format)
                 _format_cls = ProcessingResultIoMeta.registry[_format]
                 if _format_cls not in _current_savers:

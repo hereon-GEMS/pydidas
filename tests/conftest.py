@@ -43,10 +43,6 @@ from pydidas.workflow import ProcessingTree
 from pydidas_qtcore import PydidasQApplication
 
 
-PLUGIN_COLL = PluginCollection()
-PLUGIN_COLL.verify_is_initialized()
-
-
 @pytest.fixture(scope="session", autouse=True)
 def temp_path():
     """
@@ -120,8 +116,9 @@ def test_tree() -> ProcessingTree:
         "Crop1dData",
         "FitSinglePeak",
     ]:
-        _plugin_class = PLUGIN_COLL.get_plugin_by_name(_class_name)
+        _pc = PluginCollection()
+        _plugin_class = _pc.get_plugin_by_name(_class_name)
         _tree.create_and_add_node(_plugin_class())
-    _plugin_class = PLUGIN_COLL.get_plugin_by_name("Sum2dData")
+    _plugin_class = _pc.get_plugin_by_name("Sum2dData")
     _tree.create_and_add_node(_plugin_class(), parent=_tree.nodes[0])
     return _tree

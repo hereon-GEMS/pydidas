@@ -29,8 +29,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-import pydidas
+from pydidas import VERSION
 from pydidas.core import UserConfigError
+from pydidas.plugins import PluginCollection
 from pydidas.workflow import ProcessingTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 from pydidas.workflow.processing_tree_io.processing_tree_io_yaml import (
@@ -38,7 +39,7 @@ from pydidas.workflow.processing_tree_io.processing_tree_io_yaml import (
 )
 
 
-PLUGIN_COLL = pydidas.plugins.PluginCollection()
+PLUGIN_COLL = PluginCollection()
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def create_correct_export(filename: Path, tree: ProcessingTree) -> None:
     with open(filename, "w") as _f:
         _dump = {
             "nodes": tree.export_to_list_of_nodes(),
-            "version": pydidas.VERSION,
+            "version": VERSION,
         }
         yaml.safe_dump(_dump, _f)
 
@@ -61,7 +62,7 @@ def test_export_to_file(yaml_filename: Path, test_tree: ProcessingTree) -> None:
         _save = yaml.safe_load(f)
     assert "version" in _save
     assert "nodes" in _save
-    assert _save["version"] == pydidas.VERSION
+    assert _save["version"] == VERSION
     # assert does not raise an error
     _new = ProcessingTree()
     _new.restore_from_list_of_nodes(_save["nodes"])
@@ -91,7 +92,7 @@ def test_import_from_file__w_version_and_error(
     yaml_filename: Path, test_tree: ProcessingTree
 ) -> None:
     with open(yaml_filename, "w") as _f:
-        _dump = {"nodes": "np.ndarrray((12))", "version": pydidas.VERSION}
+        _dump = {"nodes": "np.ndarrray((12))", "version": VERSION}
         yaml.safe_dump(_dump, _f)
     with pytest.raises(UserConfigError):
         ProcessingTreeIoYaml.import_from_file(yaml_filename)

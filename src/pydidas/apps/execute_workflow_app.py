@@ -219,7 +219,6 @@ class ExecuteWorkflowApp(BaseApp):
             self._recreate_context()
         else:
             self.close_shared_arrays_and_memory()
-            RESULT_SAVER.set_active_savers_and_title([])
             self._store_context()
             RESULTS.prepare_new_results()
             if self.get_param_value("autosave_results"):
@@ -381,7 +380,8 @@ class ExecuteWorkflowApp(BaseApp):
                     _res.shape
                 )
         self.mp_manager["shapes_available"].set()
-        RESULTS.update_result_metadata(dict(self.mp_manager["metadata_dict"]))
+        if not self.clone_mode:
+            RESULTS.update_result_metadata(dict(self.mp_manager["metadata_dict"]))
 
     def _create_shared_memory(self):
         """
@@ -584,7 +584,6 @@ class ExecuteWorkflowApp(BaseApp):
                 if _key != "in_use_flag"
             }
             self._shared_arrays["in_use_flag"][data_index] = 0
-        RESULTS.store_scan_point_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             if not self._config["export_files_prepared"]:
                 RESULTS.prepare_result_export(
@@ -596,7 +595,9 @@ class ExecuteWorkflowApp(BaseApp):
                     for _key, _val in _new_results.items()
                 }
                 self._config["export_files_prepared"] = True
-            RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
+        RESULTS.store_scan_point_results(
+            index, _new_results, autosave=self.get_param_value("autosave_results")
+        )
         self.sig_results_updated.emit()
 
     def deleteLater(self):

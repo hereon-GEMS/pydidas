@@ -392,16 +392,19 @@ def test_store_scan_point_results__w_composites(
     assert np.allclose(result_data[2], results._composites[2][_scan_indices_b])
 
 
-def test_store_scan_point_results__w_autosave(results, empty_temp_path, result_data, tree, random_scan) -> None:
+def test_store_scan_point_results__w_autosave(
+    results, empty_temp_path, result_data, tree, random_scan
+) -> None:
     results.prepare_result_export(empty_temp_path, ".nxs")
     results.store_scan_point_results(0, result_data, autosave=True)
     _indices = random_scan.get_indices_from_ordinal(0)
     with h5py.File(_get_node_output_path(1, tree, empty_temp_path), "r") as f:
         _data1 = f["entry/data/data"][_indices]
     with h5py.File(_get_node_output_path(2, tree, empty_temp_path), "r") as f:
-            _data2 = f["entry/data/data"][_indices]
+        _data2 = f["entry/data/data"][_indices]
     assert np.allclose(_data1, result_data[1])
     assert np.allclose(_data2, result_data[2])
+
 
 def test_get_result_ranges(results, random_scan) -> None:
     _ranges = results.get_result_ranges(1)

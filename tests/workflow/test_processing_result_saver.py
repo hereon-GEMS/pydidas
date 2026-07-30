@@ -57,7 +57,7 @@ def create_mock_saver_class(title: str, ext: str) -> type[ProcessingResultIoBase
     _cls = ProcessingResultIoMeta(
         title.upper(),
         (ProcessingResultIoBase,),
-        dict(extensions=[ext.lower()], format_name=ext),
+        dict(extensions=[ext.lower()], format_name=f"{ext} Saver", default_suffix=ext),
     )
     return _cls  # type: ignore[arg-type]
 
@@ -91,6 +91,13 @@ def test_set_active_savers__with_none(saver, io_meta):
 def test_set_active_savers__with_single_format(saver, io_meta):
     create_mock_saver_class("SAVER_TEST", ".test")
     saver.set_active_savers(".test")
+    assert ".test" in saver._active_savers
+    assert saver._config["savers_ready"] is False
+
+
+def test_set_active_savers__with_format_name(saver, io_meta):
+    create_mock_saver_class("SAVER_TEST", ".test")
+    saver.set_active_savers(".test Saver")
     assert ".test" in saver._active_savers
     assert saver._config["savers_ready"] is False
 

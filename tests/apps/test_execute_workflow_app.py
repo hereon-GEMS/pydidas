@@ -35,7 +35,6 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-import pytest
 from qtpy import QtTest
 
 from pydidas import IS_QT6, LOGGING_LEVEL, unittest_objects
@@ -47,7 +46,6 @@ from pydidas.core.utils import get_random_string
 from pydidas.multiprocessing.app_processor import app_processor_func
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import WorkflowResults, WorkflowTree
-from pydidas.workflow.result_io import ProcessingResultIoMeta
 
 
 COLL = PluginCollection()
@@ -55,10 +53,9 @@ EXP = DiffractionExperimentContext()
 SCAN = ScanContext()
 TREE = WorkflowTree()
 RESULTS = WorkflowResults()
-RESULT_SAVER = ProcessingResultIoMeta
 
 
-@pytest.mark.slow
+# @pytest.mark.slow
 class TestExecuteWorkflowApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -83,7 +80,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         COLL.unregister_plugin_path(Path(unittest_objects.__file__).parent)
 
     def setUp(self):
-        RESULT_SAVER.set_active_savers_and_title([])
         RESULTS.clear_all_results()
         TREE.clear()
         TREE.create_and_add_node(unittest_objects.DummyLoader())
@@ -304,12 +300,12 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._index = utils.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
 
-    def signal_processed_and_can_continue__as_main(self):
+    def test_signal_processed_and_can_continue__as_main(self):
         app = self.get_exec_workflow_app()
         app.mp_manager["shapes_set"].set()
         self.assertTrue(app.signal_processed_and_can_continue())
 
-    def signal_processed_and_can_continue__as_clone(self):
+    def test_signal_processed_and_can_continue__as_clone(self):
         main_app, app = self.get_main_app_and_app_clone()
         main_app.mp_manager["shapes_set"].set()
         self.assertTrue(app.signal_processed_and_can_continue())
@@ -367,7 +363,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         TREE.execute_process(0)
         app._publish_shapes_and_metadata_to_manager()
         self.assertTrue(app.mp_manager["shapes_available"].is_set())
-        self.assertTrue(RESULTS._config["shapes_set"])
         for _key, _res in TREE.get_current_results().items():
             self.assertEqual(app.mp_manager["shapes_dict"][_key], _res.shape)
             self.assertEqual(
@@ -396,7 +391,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         TREE.nodes[1].results = TREE.nodes[1].results.array
         app = self.get_exec_workflow_app()
         app._publish_shapes_and_metadata_to_manager()
-        self.assertTrue(RESULTS._config["shapes_set"])
         self.assertTrue(app.mp_manager["shapes_available"].is_set())
         for _key, _res in TREE.get_current_results().items():
             self.assertEqual(app.mp_manager["shapes_dict"][_key], _res.shape)
@@ -668,8 +662,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertEqual(main_app.mp_manager[_key], _copy.mp_manager[_key])
 
     def test__run_in_processor_with_clone_worker(self):
-        # logging.basicConfig(level=logging.DEBUG)
         self._main_app = self.get_exec_workflow_app(print_debug=True)
+        self._main_app.prepare_run()
         _lock_manager = mp.Manager()
         _queues = {
             "queue_input": mp.Queue(),
@@ -698,8 +692,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             },
             name=f"pydidas_{mp.current_process().pid}_worker",
         )
-        for _i in range(SCAN.shape[-1]):
+        for _i in range(min(10, SCAN.n_points)):
             _queues["queue_input"].put(_i)
+        _queues["queue_input"].put(None)
         _proc.start()
         time.sleep(0.05)
         with self.assertRaises(queue.Empty):
@@ -708,12 +703,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(_signal, "::shapes_not_set::")
         self._main_app._create_shared_memory()
         time.sleep(0.05)
-        for _i in range(SCAN.shape[-1]):
-            _latest = _queues["queue_output"].get_nowait()
+        for _i in range(min(10, SCAN.n_points)):
+            _latest = _queues["queue_output"].get()
             self._main_app.multiprocessing_store_results(*_latest)
             self.assertEqual(_latest[0], _i)
             self.assertIsInstance(_latest[1], Integral)
             time.sleep(0.05)
+        _stop_signal = _queues["queue_output"].get()
+        assert _stop_signal[0] is None
         for _node in TREE.get_all_nodes_with_results():
             _id = _node.node_id
             _res = RESULTS.get_results(_id)

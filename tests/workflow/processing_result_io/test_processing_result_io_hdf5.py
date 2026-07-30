@@ -81,13 +81,17 @@ def node_info(random_scan):
         0: PluginResultInfo(
             label="",
             node_id=0,
-            shape=random_scan.shape + (10, 20),
+            axis_ranges={
+                i: np.arange(n) for i, n in enumerate(random_scan.shape + (10, 20))
+            },
             plugin_name="InputTest",
         ),
         1: PluginResultInfo(
             label="result_node",
             node_id=1,
-            shape=random_scan.shape + (10,),
+            axis_ranges={
+                i: np.arange(n) for i, n in enumerate(random_scan.shape + (10,))
+            },
             plugin_name="Proc_Dummy",
         ),
     }
@@ -107,7 +111,7 @@ def test__metaclass_findability(key):
 def test__class_attributes():
     for _ext in HDF5_EXTENSIONS:
         assert _ext in H5SAVER.extensions
-    assert H5SAVER.format_name == "HDF5"
+    assert H5SAVER.format_name == "NeXus (HDF5)"
     assert H5SAVER.default_suffix == ".nxs"
 
 
@@ -146,6 +150,36 @@ def test_prepare_files_and_directories(
             assert node_info[_id].plugin_name == read_and_decode_hdf5_dataset(
                 _h5file["entry/node_info/plugin_name"]
             )
+            assert "entry/data" in _h5file
+            assert "entry/pydidas_scan" in _h5file
+            assert "entry/pydidas_diffraction_exp" in _h5file
+            assert "entry/pydidas_workflow" in _h5file
+
+
+def test_prepare_files_and_directories__w_existing_corrupt_file(
+    saver,
+    node_info,
+    random_scan,
+    random_diff_exp,
+    test_tree,
+    empty_temp_path,
+):
+    _fnames = [
+        empty_temp_path / _fname for _fname in saver.get_filenames(node_info).values()
+    ]
+    for _fname in _fnames:
+        with open(_fname, "w") as _file:
+            _file.write("no HDF5 file")
+    saver.prepare_files_and_directories(
+        empty_temp_path,
+        node_info,
+        scan=random_scan,
+        diffraction_exp=random_diff_exp,
+        processing_tree=test_tree,
+    )
+    for _fname in _fnames:
+        assert _fname.is_file()
+        with h5py.File(_fname, "r") as _h5file:
             assert "entry/data" in _h5file
             assert "entry/pydidas_scan" in _h5file
             assert "entry/pydidas_diffraction_exp" in _h5file

@@ -335,6 +335,8 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             The PluginResultInfo object for the node.
         """
         _file_path = self._config["filenames"][node_id]
+        if _file_path.is_file():
+            _file_path.unlink()
         ScanIoHdf5.export_to_file(_file_path, replace=True, scan=self._config["scan"])
         DiffractionExperimentIoHdf5.export_to_file(
             _file_path, replace=True, diffraction_exp=self._config["diffraction_exp"]

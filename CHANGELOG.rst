@@ -58,6 +58,7 @@ Bugfixes
   properly reset on loading new data.
 - Fixed an issue in Parameter which raised an Exception when trying to set 
   a number-tuple with a ndarray.
+- Fixed an issue which prevented saving results to a corrupted HDF5 file.
 
 
 v26.05.19

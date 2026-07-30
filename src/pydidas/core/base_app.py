@@ -30,11 +30,14 @@ __all__ = ["BaseApp"]
 from copy import copy
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import Any, Optional, Self
+from typing import Any
 
+import numpy as np
 from qtpy import QtCore
 
-from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
+from pydidas.core.object_with_parameter_collection import (
+    ObjectWithParameterCollection,
+)
 from pydidas.core.parameter_collection import ParameterCollection
 
 
@@ -93,7 +96,7 @@ class BaseApp(ObjectWithParameterCollection):
             self._mp_manager_instance.shutdown()
         super().deleteLater()
 
-    def must_send_signal_and_wait_for_response(self) -> Optional[str]:
+    def must_send_signal_and_wait_for_response(self) -> str | None:
         """
         Check whether the app must send a signal and wait for a response.
 
@@ -119,7 +122,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
-    def get_latest_results(self) -> Optional[object]:
+    def get_latest_results(self) -> object | None:
         """
         Get the latest results from the app.
 
@@ -170,7 +173,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
 
@@ -221,19 +224,18 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
-    def multiprocessing_store_results(self, index: int, *args: tuple) -> None:
+    def multiprocessing_store_results(self, index: int, result: Any) -> None:
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
         This method must be implemented by the BaseApp subclasses.
 
-
         Parameters
         ----------
         index : int
             The frame index
-        args : tuple
-            The results. The specific type depends on the app.
+        result : Any
+            The result. The specific type depends on the app.
         """
         raise NotImplementedError
 
@@ -275,28 +277,35 @@ class BaseApp(ObjectWithParameterCollection):
         }
 
     def import_state(self, state: dict) -> None:
-        """Import a stored state including Parameters and configuration."""
+        """
+        Import a stored state including Parameters and configuration.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with keys "params" and "config" containing the
+            exported state information to be restored.
+        """
         for _key, _val in state["params"].items():
             self.set_param_value(_key, _val)
         _new_cfg = {}
         for _key, _item in state["config"].items():
             if not isinstance(_item, str):
                 continue
-            _start = _stop = _step = None
-            if _item.startswith("::range::") or _item.startswith("::slice::"):
+            if _item.startswith("::range::"):
+                _, _, _start, _stop, _step = _item.split("::")
+                _new_cfg[_key] = range(int(_start), int(_stop), int(_step))
+            elif _item.startswith("::slice::"):
                 _, _, _start, _stop, _step = _item.split("::")
                 _start = None if _start == "None" else int(_start)
                 _stop = None if _stop == "None" else int(_stop)
                 _step = None if _step == "None" else int(_step)
-            if _item.startswith("::range::"):
-                _new_cfg[_key] = range(_start, _stop, _step)
-            if _item.startswith("::slice::"):
                 _new_cfg[_key] = slice(_start, _stop, _step)
-            if _item == "::None::":
+            elif _item == "::None::":
                 _new_cfg[_key] = None
         self._config = state["config"] | _new_cfg
 
-    def copy(self, clone_mode: bool = False) -> Self:
+    def copy(self, clone_mode: bool = False) -> "BaseApp":
         """
         Get a copy of the App.
 
@@ -304,16 +313,16 @@ class BaseApp(ObjectWithParameterCollection):
         ----------
         clone_mode : bool, optional
             Keyword to toggle creation of an app clone which does not include
-            attributes marked in the classes clone_mode attribute.
+            attributes marked in the classes' clone_mode attribute.
 
         Returns
         -------
-        App : BaseApp
+        BaseApp
             A copy of the App instance.
         """
         return self.__copy__(clone_mode)
 
-    def __copy__(self, clone_mode: bool = False) -> Self:
+    def __copy__(self, clone_mode: bool = False) -> "BaseApp":
         """
         Reimplement the generic copy method.
 

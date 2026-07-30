@@ -86,9 +86,9 @@ def test_update_filepath(
     if _proc_pattern.endswith(eiger_filename_suffix):
         _proc_pattern = _proc_pattern.removesuffix(eiger_filename_suffix)
     plugin.update_filepath()
-    assert plugin._base_dir == Path()
+    assert plugin.base_dir == Path()
     assert (
-        plugin._filename
+        plugin.filename
         == f"{_proc_pattern}/{eiger_dir}/{_proc_pattern}{eiger_filename_suffix}"
     )
 

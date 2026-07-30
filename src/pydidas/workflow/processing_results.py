@@ -83,6 +83,8 @@ class ProcessingResults(ObjectWithParameterCollection):
         The ProcessingTree. If None, the generic WorkflowTree will be used.
         Only specify this if you explicitly require a different context.
         The default is None.
+    directory : str or Path, optional
+        Directory to load ProcessingResults data from.
     """
 
     def __init__(
@@ -90,6 +92,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         scan: Scan | None = None,
         diffraction_exp: DiffractionExperiment | None = None,
         processing_tree: ProcessingTree | None = None,
+        directory: str | Path | None = None,
     ):
         super().__init__(parent=None)
         self.set_default_params()
@@ -109,6 +112,8 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._composites: dict[int, Dataset] = {}
         self._plugin_result_infos: dict[int, PluginResultInfo] = {}
         self._source_hash: int = -1
+        if directory is not None:
+            self.import_data_from_directory(directory)
 
     # ------------------
     # Public properties:

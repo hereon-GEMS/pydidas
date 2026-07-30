@@ -18,6 +18,8 @@ Improvements
 - Added an option to reference savers for ProcessingResults by their
   *name* instead of the suffix (e.g. "NeXus (HDF5)" instead of only
   ".nxs".
+- Added an options parser to the GUI starter script to set the state import
+  at calling time with an argument. Use '-restore_state None | exit | saved'
 
 Programmatic changes
 --------------------
@@ -30,8 +32,8 @@ Programmatic changes
 - Reworked the Scan importer/exporter classes and made the imported
   params not a class variable but a local variable to preempt issues
   with multiple parallel importers.
-- Reworked the DiffractionExperiment importer/exporter classes and 
-  made the imported params not a class variable but a local variable 
+- Reworked the DiffractionExperiment importer/exporter classes and
+  made the imported params not a class variable but a local variable
   to preempt issues with multiple parallel importers.
 - Improved test coverage for DiffractionExp.
 - Added a dataclass for PluginResultInfos.
@@ -56,7 +58,13 @@ Bugfixes
   were squeezed during export.
 - Fixed an issue where the plotted labels for columnar data were not 
   properly reset on loading new data.
-- Fixed an issue in Parameter which raised an Exception when trying to set 
+- Fixed an issue where results were accidentally overwritten in buffer before
+  storing them when using the autosave_results flag in the ExecuteWorkflowApp.
+- Fixed an issue in the BaseApp when exporting ranges where values defaulted
+  to None (not supported in range)
+- Fixed an issue where the filename parameter was exported in the data
+  browsing frame even though it was not intended.
+- Fixed an issue in Parameter which raised an Exception when trying to set
   a number-tuple with a ndarray.
 - Fixed an issue which prevented saving results to a corrupted HDF5 file.
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the BaseFitPlugin Plugin which holds generic methods for fitting plu
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -469,18 +469,48 @@ class BaseFitPlugin(ProcPlugin):
             "axis_units": self._data.axis_units,
             "data_unit": self._data.data_unit,
         }
+        _num_peaks = self._fitter.num_peaks
+        _num_peak_params = self._fitter.num_peak_params
+        _individual_plot_fitter = (
+            self._fitter.__mro__[1] if _num_peaks > 1 else self._fitter
+        )
         _datafit = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
         _startfit = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
         _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
         _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
-
+        individual_peaks = []
+        for i in range(_num_peaks):
+            if _individual_plot_fitter is None:
+                continue
+            _start = i * _num_peak_params
+            _end = _start + _num_peak_params
+            _peak_params = [
+                *_fit_param_vals[_start:_end],
+            ]
+            _peak_data = Dataset(
+                _individual_plot_fitter.profile(_peak_params, _xfit), **_dset_kws
+            )
+            individual_peaks.append(
+                {
+                    "plot": 1,
+                    "label": f"peak {i}",
+                    "data": _peak_data,
+                    "linewidth": 2.5,
+                }
+            )
         _details = {
-            "n_plots": 3,
-            "plot_titles": {0: "data and fit", 1: "residual", 2: "starting guess"},
+            "n_plots": 4,
+            "plot_titles": {
+                0: "data and fit",
+                1: "individual fits",
+                2: "residual",
+                3: "starting guess",
+            },
             "plot_ylabels": {
                 0: "intensity / a.u.",
                 1: "intensity / a.u.",
                 2: "intensity / a.u.",
+                3: "intensity / a.u.",
             },
             "metadata": (
                 (
@@ -505,19 +535,27 @@ class BaseFitPlugin(ProcPlugin):
                 {"plot": 0, "label": "fitted_data", "data": _datafit, "linewidth": 2.5},
                 {
                     "plot": 1,
+                    "label": "input data",
+                    "data": self._data,
+                    "symbol": "o",
+                    "linewidth": 0,
+                },
+                *individual_peaks,
+                {
+                    "plot": 2,
                     "label": "reference",
                     "data": _reference,
                     "linestyle": "--",
                 },
                 {
-                    "plot": 1,
+                    "plot": 2,
                     "label": "residual",
                     "data": _residual,
                     "symbol": "o",
                     "linewidth": 0,
                 },
-                {"plot": 2, "label": "input data", "data": self._data},
-                {"plot": 2, "label": "starting guess", "data": _startfit},
+                {"plot": 3, "label": "input data", "data": self._data},
+                {"plot": 3, "label": "starting guess", "data": _startfit},
             ],
         }
         if self.get_param_value("fit_bg_order") is not None:

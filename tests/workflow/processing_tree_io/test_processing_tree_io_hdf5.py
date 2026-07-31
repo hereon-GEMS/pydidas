@@ -71,15 +71,12 @@ def test_export_to_file(temp_path, test_tree):
                 == _node.plugin.__class__.__name__
             )
             for _key, _param in _node.plugin.params.items():
-                if _key.startswith("_"):
-                    assert _key not in _group
+                _ref = _param.value_for_export
+                _val = read_and_decode_hdf5_dataset(_group[_key])
+                if isinstance(_ref, (np.ndarray, list, tuple)):
+                    assert np.array_equal(_val, _ref)
                 else:
-                    _ref = _param.value_for_export
-                    _val = read_and_decode_hdf5_dataset(_group[_key])
-                    if isinstance(_ref, (np.ndarray, list, tuple)):
-                        assert np.array_equal(_val, _ref)
-                    else:
-                        assert _param.value_for_export == _val
+                    assert _param.value_for_export == _val
 
 
 def test_export_to_file__existing_entry(temp_path, test_tree):

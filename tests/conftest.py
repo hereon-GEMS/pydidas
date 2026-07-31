@@ -35,12 +35,24 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from pydidas import unittest_objects
 from pydidas.contexts import Scan
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import ProcessingTree
 from pydidas_qtcore import PydidasQApplication
+
+
+@pytest.fixture(scope="session", autouse=True)
+def patch_plugin_collection():
+    _pc = PluginCollection()
+    _path = Path(unittest_objects.__file__).parent
+    if _path not in _pc.registered_paths:
+        _pc.find_and_register_plugins(_path)
+    yield
+    if _path in _pc.registered_paths:
+        _pc.unregister_plugin_path(_path)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -75,6 +87,7 @@ def qapp_cls():
 @pytest.fixture
 def random_scan() -> Scan:
     """Create a Scan with random parameters."""
+    random.seed(a="pydidas testing seed")
     _scan = Scan()
     _scan.set_param_value("scan_dim", 3)
     for d in range(3):
@@ -121,4 +134,15 @@ def test_tree() -> ProcessingTree:
         _tree.create_and_add_node(_plugin_class())
     _plugin_class = _pc.get_plugin_by_name("Sum2dData")
     _tree.create_and_add_node(_plugin_class(), parent=_tree.nodes[0])
+    return _tree
+
+
+@pytest.fixture
+def dummy_tree() -> ProcessingTree:
+    """Fixture to create a test ProcessingTree with dummy plugins."""
+    _pc = PluginCollection()
+    _tree = ProcessingTree()
+    _tree.create_and_add_node(unittest_objects.DummyLoader())
+    _tree.create_and_add_node(unittest_objects.DummyProc())
+    _tree.create_and_add_node(unittest_objects.DummyProc(), parent=_tree.root)
     return _tree

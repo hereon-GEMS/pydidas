@@ -78,7 +78,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, filename: str  | Path  | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, filename: str | Path | None = None, *args: Any, **kwargs: Any):
         """
         Initialize the DiffractionExperiment instance.
 
@@ -191,8 +191,6 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         _f2d = self.as_fit2d_geometry_values()
         return Point(_f2d["center_x"], _f2d["center_y"])
-        if filename is not None:
-            self.import_from_file(filename)
 
     def set_param_value(self, param_key: str, value: Any):
         """

@@ -59,8 +59,8 @@ class GenericIoBase(metaclass=GenericIoMeta):
         """
         raise NotImplementedError
 
-    @classmethod
-    def import_from_file(cls, filename: str | Path, **kwargs: Any) -> None:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Any:
         """
         Restore the content from a file
 
@@ -76,10 +76,10 @@ class GenericIoBase(metaclass=GenericIoMeta):
         """
         raise NotImplementedError
 
-    @classmethod
+    @staticmethod
     def import_from_file_sequence(
-        cls, filenames: Sequence[Path | str], **kwargs: Any
-    ) -> None:
+        filenames: Sequence[Path | str], **kwargs: Any
+    ) -> Any:
         """
         Restore the content from a sequence of files.
 

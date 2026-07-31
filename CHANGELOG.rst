@@ -67,7 +67,9 @@ Bugfixes
 - Fixed an issue in Parameter which raised an Exception when trying to set
   a number-tuple with a ndarray.
 - Fixed an issue which prevented saving results to a corrupted HDF5 file.
-
+- Fixeed an issue in the ViewResultsFrame which did not properly count
+  the file number and frame number in loaded files in the 
+  ShowInformationForResult popup window.
 
 v26.05.19
 =========

@@ -55,7 +55,7 @@ class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
     @staticmethod
     def export_to_file(  # type: ignore[override]
         filename: Path | str, tree: "ProcessingTree", **kwargs: Any
-    ) -> None:  # type: ignore[override]
+    ) -> None:
         """
         Write the content to a file.
 
@@ -73,9 +73,7 @@ class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
         raise NotImplementedError
 
     @staticmethod
-    def import_from_file(  # type: ignore[override]
-        filename: Path | str, **kwargs: Any
-    ) -> "ProcessingTree":
+    def import_from_file(filename: Path | str, **kwargs: Any) -> "ProcessingTree":  # type: ignore[override]
         """
         Restore the content from a file.
 

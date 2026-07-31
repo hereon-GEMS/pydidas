@@ -111,13 +111,11 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
                 for _key in ["node_id", "parent", "children", "plugin_class"]:
                     nxs_write_dataset(_param_group, _key, _node_data[_key])
                 for _key, _param in _node.plugin.params.items():
-                    if _key.startswith("_"):
-                        continue
                     _val, _attributes = nxs_param_config_for_dset(_param)
                     nxs_write_dataset(_param_group, _key, _val, **_attributes)
 
     @classmethod
-    def import_from_file(  # type: ignore[override]
+    def import_from_file(  # type: ignore
         cls, filename: Path | str, **kwargs: Any
     ) -> "ProcessingTree":
         """

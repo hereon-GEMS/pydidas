@@ -96,12 +96,12 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             visible=False,
             minimumHeight=800,
             minimumWidth=800,
-            gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # noqa: E0602
+            gridPos=(2, 1, self.layout().rowCount() - 2, 1),  # type: ignore[attr-defined]
         )
         PydidasQApplication.instance().sig_font_metrics_changed.connect(
             self.process_font_metrics_changed
         )
-        self.layout().setColumnStretch(1, 1)  # noqa: E0602
+        self.layout().setColumnStretch(1, 1)  # type: ignore[attr-defined]
 
     def display_information(
         self,
@@ -138,7 +138,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         """
         self._loader_plugin = loader_plugin.copy()
         self._loader_plugin.update_filepath()
-        _scan = self._loader_plugin._SCAN  # noqa: W0212
+        _scan = self._loader_plugin._SCAN
         _ax_ranges = result_metadata["axis_ranges"]
         _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
         selected_indices[active_dims[0]] = _index_y
@@ -187,7 +187,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             )
         self._widgets["info_field"].setText(_info_str)
         self._widgets["edit_filename"].setText(
-            str(loader_plugin.get_filename(self._ordinal))
+            str(loader_plugin.get_filename(self._ordinal))  # type: ignore[type]
         )
         self._widgets["but_show_input"].setEnabled(True)
         self._widgets["plot"].setVisible(False)

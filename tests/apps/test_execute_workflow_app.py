@@ -61,70 +61,6 @@ _SCANDELTA = (0.1, -0.2, 1.1)
 _SCANOFFSET = (-5, 0, 1.2)
 
 
-# def _run_processor_with_clone_worker(    ,
-# ) -> ExecuteWorkflowApp:
-#     main_app = _get_exec_workflow_app(apps, print_debug=True)
-#     main_app.prepare_run()
-#     lock_manager = mp.Manager()
-#     queues = {
-#         "queue_input": mp.Queue(),
-#         "queue_output": mp.Queue(),
-#         "queue_stop": mp.Queue(),
-#         "queue_shutting_down": mp.Queue(),
-#         "queue_signal": mp.Queue(),
-#     }
-#     mp_kwargs = {
-#         "logging_level": LOGGING_LEVEL,
-#         "lock": lock_manager.Lock(),
-#         **queues,
-#     }
-#     proc = mp.Process(
-#         target=app_processor_func,
-#         args=(
-#             mp_kwargs,
-#             ExecuteWorkflowApp,
-#             main_app.params.copy(),
-#             main_app.get_config(),
-#         ),
-#         kwargs={
-#             "use_tasks": True,
-#             "app_mp_manager": main_app.mp_manager,
-#             "print_debug": True,
-#         },
-#         name=f"pydidas_{mp.current_process().pid}_worker",
-#     )
-#     for i in range(min(10, SCAN.n_points)):
-#         queues["queue_input"].put(i)
-#     queues["queue_input"].put(None)
-#     proc.start()
-#     time.sleep(0.05)
-#     with pytest.raises(queue.Empty):
-#         queues["queue_output"].get_nowait()
-#     signal = queues["queue_signal"].get()
-#     assert signal == "::shapes_not_set::"
-#     main_app._create_shared_memory()
-#     time.sleep(0.05)
-#     for i in range(min(10, SCAN.n_points)):
-#         latest = queues["queue_output"].get()
-#         main_app.multiprocessing_store_results(*latest)
-#         assert latest[0] == i
-#         assert isinstance(latest[1], Integral)
-#         time.sleep(0.05)
-#     stop_signal = queues["queue_output"].get()
-#     assert stop_signal[0] is None
-#     for node in TREE.get_all_nodes_with_results():
-#         node_id = node.node_id
-#         assert node_id is not None
-#         res = RESULTS.get_results(node_id)
-#         assert res is not None
-#         slices = cast(Any, ((0,) * (SCAN.ndim - 1)) + (slice(None),))
-#         assert np.all(res[slices] > 0)
-#     queues["queue_stop"].put(1)
-#     proc.join()
-#     time.sleep(0.05)
-#     return main_app
-
-
 @pytest.fixture(scope="module")
 def qsettings():
     _qsettings = PydidasQsettings()
@@ -136,7 +72,6 @@ def qsettings():
 
 @pytest.fixture(scope="module", autouse=True)
 def module_setup() -> Iterator[None]:
-    q_settings = PydidasQsettings()
     plugin_file = unittest_objects.__file__
     assert plugin_file is not None
     plugin_path = Path(plugin_file).parent

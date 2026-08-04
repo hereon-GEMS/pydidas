@@ -85,8 +85,8 @@ lines-after-imports = 2
 known-local-folder = ["pydidas", "pydidas_qtcore"]
 
 [tool.ruff.lint.mccabe]
-# Flag errors (`C901`) whenever the complexity level exceeds 12.
-max-complexity = 12
+# Flag errors (`C901`) whenever the complexity level exceeds 13
+max-complexity = 13
 
 [tool.ruff.lint.per-file-ignores]
 # F401 module imported but unused

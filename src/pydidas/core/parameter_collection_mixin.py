@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ class functionality to make simplified use of the pydidas ParameterCollection.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -65,10 +65,23 @@ class ParameterCollectionMixIn:
 
         Returns
         -------
-        Dict
+        dict
             The refkey, value pairs for all stored Parameters.
         """
         return self.get_param_values_as_dict()
+
+    @property
+    def param_export_values(self) -> dict:
+        """
+        Get the export-compatible values of all stored Parameters
+        along with their refkeys.
+
+        Returns
+        -------
+        dict
+            The refkey, value pairs for all stored Parameters.
+        """
+        return self.get_param_values_as_dict(filter_types_for_export=True)
 
     @property
     def param_keys(self) -> list[str]:

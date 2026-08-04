@@ -40,6 +40,8 @@ Programmatic changes
 - Modified the saver for ProcessingResults to be instance-based instead
   of class-based
 - Added a ProcessingResultSaver class to handle export of results.
+- Added an option to export all Parameter values as export types in 
+  the ParameterCollection
 
 
 Bugfixes

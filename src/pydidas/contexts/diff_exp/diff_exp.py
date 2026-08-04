@@ -30,7 +30,7 @@ __all__ = ["DiffractionExperiment"]
 
 from numbers import Real
 from pathlib import Path
-from typing import Any, Self
+from typing import Any
 
 import numpy as np
 import pyFAI
@@ -319,7 +319,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         if not suppress_signal:
             self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
-    def update_from_diffraction_exp(self, diffraction_exp: Self):
+    def update_from_diffraction_exp(self, diffraction_exp: "DiffractionExperiment"):
         """
         Update this DiffractionExperiment object's Parameters from another instance.
 

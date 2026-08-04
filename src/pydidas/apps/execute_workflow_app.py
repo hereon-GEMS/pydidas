@@ -139,13 +139,14 @@ class ExecuteWorkflowApp(BaseApp):
                 "scan_context": {},
                 "exp_context": {},
                 "export_files_prepared": False,
+                "shared_memory_created": False,
             }
         )
         self._index = -1
         self._locals = {"shared_memory_buffers": {}}
+        self._shared_arrays = {}
         if not self.clone_mode:
             self._prepare_mp_configuration()
-        self.reset_runtime_vars()
 
     def _prepare_mp_configuration(self) -> None:
         """
@@ -178,24 +179,17 @@ class ExecuteWorkflowApp(BaseApp):
         )
         self.mp_manager["buffer_n"] = self._mp_manager_instance.Value("I", 0)
 
-    def reset_runtime_vars(self) -> None:
-        """
-        Reset the runtime variables for a new run.
-        """
-        self._config["result_metadata_set"] = False
-        self._config["run_prepared"] = False
-        self._mp_tasks = np.array(())
-        self._index = None
+    def _reset_shared_runtime_vars(self) -> None:
+        """Reset the shared runtime variables for a new run."""
         self._shared_arrays = {}
+        self._config["shared_memory_created"] = False
         if not self.clone_mode:
             for _key, _val in self.mp_manager.items():
                 if _key.startswith("shape") or _key.endswith("_dict"):
                     _val.clear()
 
     def multiprocessing_pre_run(self) -> None:
-        """
-        Perform operations prior to running main parallel processing function.
-        """
+        """Perform operations prior to running main parallel processing function."""
         self.prepare_run()
 
     def prepare_run(self) -> None:
@@ -215,7 +209,8 @@ class ExecuteWorkflowApp(BaseApp):
         Both the cloned and the main applications then initialize local numpy
         arrays from the shared memory.
         """
-        self.reset_runtime_vars()
+        self._index = -1
+        self._reset_shared_runtime_vars()
         self._mp_tasks = np.arange(SCAN.n_points)
         if self.clone_mode:
             self._recreate_context()
@@ -228,14 +223,10 @@ class ExecuteWorkflowApp(BaseApp):
         self._config["export_files_prepared"] = False
 
     def _recreate_context(self) -> None:
-        """
-        Recreate the required context from the config for app clones.
-        """
+        """Recreate the required context from the config for app clones."""
         TREE.restore_from_string(self._config["tree_str_rep"])
-        for _key, _val in self._config["scan_context"].items():
-            SCAN.set_param_value(_key, _val)
-        for _key, _val in self._config["exp_context"].items():
-            EXP.set_param_value(_key, _val)
+        SCAN.update_param_values_from_kwargs(**self._config["scan_context"])
+        EXP.update_param_values_from_kwargs(**self._config["exp_context"])
 
     def close_shared_arrays_and_memory(self) -> None:
         """
@@ -245,6 +236,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _buffers = self._locals.get("shared_memory_buffers", {})
         self._shared_arrays = {}
+        self._config["shared_memory_created"] = False
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
@@ -252,16 +244,10 @@ class ExecuteWorkflowApp(BaseApp):
                 try:
                     _buffer.unlink()
                 except FileNotFoundError:
-                    logger.error(
-                        "Error while unlinking shared memory buffers from "
-                        f"app: {_buffer} {self}"
-                    )
                     pass
 
     def _store_context(self) -> None:
-        """
-        Store the current context for app clone instances.
-        """
+        """Store the current context for app clone instances."""
         self._config["tree_str_rep"] = TREE.export_to_string()
         self._config["scan_context"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
@@ -367,9 +353,7 @@ class ExecuteWorkflowApp(BaseApp):
         self.close_shared_arrays_and_memory()
 
     def _publish_shapes_and_metadata_to_manager(self) -> None:
-        """
-        Publish the shapes and metadata to the multiprocessing manager dictionaries.
-        """
+        """Publish the metadata to the multiprocessing manager dictionaries."""
         _results = TREE.get_current_results()
         for _node_id, _res in _results.items():
             self.mp_manager["shapes_dict"][_node_id] = _res.shape
@@ -392,19 +376,10 @@ class ExecuteWorkflowApp(BaseApp):
         workers and the size of the results. It will then create the shared
         memory buffers and initialize the numpy arrays from the shared memory.
         """
-        if not self.mp_manager["shapes_available"].is_set():
-            raise UserConfigError(
-                "The shapes of the results are not yet available. "
-                "Please run a processing step first to create results."
-            )
-        if len(self._locals["shared_memory_buffers"]) > 0:
-            raise UserConfigError(
-                "The shared memory buffers have already been created. "
-                "Please unlink them first."
-            )
         self._check_size_of_results_and_buffer()
         self._initialize_shared_memory()
         self._initialize_arrays_from_shared_memory()
+        self._config["shared_memory_created"] = True
 
     def _check_size_of_results_and_buffer(self) -> None:
         """
@@ -437,9 +412,7 @@ class ExecuteWorkflowApp(BaseApp):
         )
 
     def _initialize_shared_memory(self) -> None:
-        """
-        Initialize the shared arrays from the buffer size and result shapes.
-        """
+        """Initialize the shared arrays from the buffer size and result shapes."""
         _n = self.mp_manager["buffer_n"].value
         _pid = self.mp_manager["main_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
@@ -454,9 +427,7 @@ class ExecuteWorkflowApp(BaseApp):
         self.mp_manager["shapes_set"].set()
 
     def _initialize_arrays_from_shared_memory(self) -> None:
-        """
-        Initialize the numpy arrays from the shared memory buffers.
-        """
+        """Initialize the numpy arrays from the shared memory buffers."""
         _buffer_size = self.mp_manager["buffer_n"].value
         for _key, _shape in self.mp_manager["shapes_dict"].items():
             _shared_mem = self.__get_shared_memory(f"node_{_key:03d}")
@@ -471,7 +442,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __get_shared_memory(self, name: str | int) -> SharedMemory:
         """
-        Get the SharedMemory object from the shared memory buffers.
+        Get the SharedMemory object or create a new one, if required.
 
         Parameters
         ----------
@@ -483,8 +454,8 @@ class ExecuteWorkflowApp(BaseApp):
         SharedMemory
             The SharedMemory object.
         """
-        _main_pid = self.mp_manager["main_pid"].value
         if name not in self._locals["shared_memory_buffers"]:
+            _main_pid = self.mp_manager["main_pid"].value
             _mem_buffer = SharedMemory(name=f"share_{name}_{_main_pid}")
             self._locals["shared_memory_buffers"][name] = _mem_buffer
         return self._locals["shared_memory_buffers"][name]
@@ -567,8 +538,11 @@ class ExecuteWorkflowApp(BaseApp):
         """
         if self.clone_mode:
             return
-        if self._shared_arrays == dict():
-            self._initialize_arrays_from_shared_memory()
+        if data_index is None:
+            raise RuntimeError(
+                "Processing error: ExecuteWorkflowApp tried to store invalid "
+                "results from an app clone which waited for shared arrays."
+            )
         if data_index == -1:
             _filename = TREE.root.plugin.get_filename(index)
             PydidasQApplication.instance().set_status_message(
@@ -604,17 +578,14 @@ class ExecuteWorkflowApp(BaseApp):
         self.sig_results_updated.emit()
 
     def deleteLater(self) -> None:
-        """
-        Delete the instance of the ExecuteWorkflowApp.
-        """
+        """Call the QObject deletion routine of the ExecuteWorkflowApp."""
         self.__del__()
         super().deleteLater()
 
     def __del__(self) -> None:
-        """
-        Delete the ExecuteWorkflowApp.
-        """
+        """Delete the ExecuteWorkflowApp."""
         if not self.clone_mode:
             if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
                 self._mp_manager_instance.shutdown()
+                self._mp_manager_instance = None
         self.close_shared_arrays_and_memory()

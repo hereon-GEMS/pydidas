@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -67,8 +67,7 @@ def test_decode_chi_header__w_correct_ax_label(
         f.write(f"{written_ax_label}\n")
         f.write("y data / counts\n")
         f.write("\t62\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+        f.writelines(f"{x:.6e}\t{y:.6e}\n" for x, y in zip(_x_data, _y_data))
     _data_l, _data_u, _ax_l, _ax_u = decode_chi_header(temp_path / "test.chi")
     assert _ax_l == ax_label
     assert _ax_u == ax_unit
@@ -79,8 +78,7 @@ def test_decode_chi_header__w_correct_ax_label(
 def test_decode_chi_header__incorrect_header(temp_path):
     with open(temp_path / "test.chi", "w") as f:
         f.write("test.h5\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+        f.writelines(f"{x:.6e}\t{y:.6e}\n" for x, y in zip(_x_data, _y_data))
     with pytest.raises(FileReadError):
         _data = decode_chi_header(temp_path / "test.chi")
 
@@ -313,8 +311,7 @@ def test_decode_txt_header(temp_path, ax_label, ax_unit, data_label, data_unit, 
             f.write(f"# Data unit: {data_unit}\n")
         f.write("# --- end of metadata ---\n")
         f.write("# axis\tvalue\n")
-        for x, y in zip(_x_data, _y_data):
-            f.write(f"{x:.6e}\t{y:.6e}\n")
+        f.writelines(f"{x:.6e}\t{y:.6e}\n" for x, y in zip(_x_data, _y_data))
     _metadata = decode_txt_header(temp_path / "test.txt")
     assert _metadata.get("ax_label") == ax_label
     assert _metadata.get("ax_unit") == ax_unit

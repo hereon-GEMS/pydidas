@@ -91,7 +91,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
         self._plugin = plugin
-        self._EXP = plugin._EXP  # noqa: N806
+        self._EXP = plugin._EXP
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
         self._config = self._config | {

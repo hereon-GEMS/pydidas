@@ -29,7 +29,7 @@ __all__ = ["ProcessingResultIoHdf5"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import h5py
 import numpy as np
@@ -63,7 +63,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     Implementation of the ProcessingResultIoBase for HDF5 files.
     """
 
-    extensions = HDF5_EXTENSIONS
+    extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "NeXus (HDF5)"
     default_suffix = ".nxs"
 
@@ -260,7 +260,15 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         _exp.import_from_file(filename)
         try:
             _tree = ProcessingTreeIoHdf5.import_from_file(filename)
-        except Exception:
+        except (
+            OSError,
+            FileReadError,
+            FileNotFoundError,
+            PermissionError,
+            TypeError,
+            AttributeError,
+            ValueError,
+        ):
             raise FileReadError(
                 "The given file does not conform to the pydidas results data "
                 "standard and cannot be imported. Please check the input file."

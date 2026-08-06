@@ -284,7 +284,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self._data = None
         self._dtype = None
         with ShowBusyMouse():
-            for _index in range(0, _n_frames):
+            for _index in range(_n_frames):
                 _fname, _i_frame = self._get_fname_and_frame_number(_index)
                 _frame = import_data(
                     _fname,

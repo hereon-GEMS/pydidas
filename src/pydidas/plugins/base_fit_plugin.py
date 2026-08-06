@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
+from typing import ClassVar
 
 import numpy as np
 from qtpy import QtWidgets
@@ -63,7 +64,10 @@ class BaseFitPlugin(ProcPlugin):
     output_data_dim = -1
     num_peaks = 1
     new_dataset = True
-    advanced_parameters = ["fit_sigma_threshold", "fit_min_peak_height"]
+    advanced_parameters: ClassVar[list[str]] = [
+        "fit_sigma_threshold",
+        "fit_min_peak_height",
+    ]
     has_unique_parameter_config_widget = True
 
     def __init__(self, *args: tuple, **kwargs: dict):
@@ -276,11 +280,11 @@ class BaseFitPlugin(ProcPlugin):
         bool
             Flag whether all centers are in the input x range.
         """
-        return set([True]) == set(
+        return {True} == {
             self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
             for _key in self._fit_params
             if _key.startswith("center")
-        )
+        }
 
     def prepare_input_data(self, data: Dataset):
         """
@@ -325,12 +329,12 @@ class BaseFitPlugin(ProcPlugin):
             _xhigh = self.get_param_value("fit_upper_limit")
             self._config["data_x_hash"] = hash(self._data_x.tobytes())
             _range_low = (
-                np.where((self._data_x >= _xlow))[0]
+                np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
                 else np.arange(self._data_x.size)
             )
             _range_high = (
-                np.where((self._data_x <= _xhigh))[0]
+                np.where(self._data_x <= _xhigh)[0]
                 if _xhigh is not None
                 else np.arange(self._data_x.size)
             )
@@ -371,18 +375,18 @@ class BaseFitPlugin(ProcPlugin):
                 continue
             _index = self._config["param_labels"].index(_label)
             _xlow = np.amin(self._data_x)
-            if self._config["param_bounds_low"][_index] < _xlow:
-                self._config["param_bounds_low"][_index] = _xlow
+            self._config["param_bounds_low"][_index] = max(
+                self._config["param_bounds_low"][_index], _xlow
+            )
             _xhigh = np.amax(self._data_x)
-            if self._config["param_bounds_high"][_index] > _xhigh:
-                self._config["param_bounds_high"][_index] = _xhigh
+            self._config["param_bounds_high"][_index] = min(
+                self._config["param_bounds_high"][_index], _xhigh
+            )
 
     def update_fit_param_bounds(self):
         """Update the fitting bounds from Parameters."""
         for _key in self.params:
-            if _key.startswith("fit_peak") and (
-                _key.endswith("_xlow") or _key.endswith("_xhigh")
-            ):
+            if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
                 _suffix = "low" if _key.endswith("_xlow") else "high"
                 _index = _key[8 : -(len(_suffix) + 2)]
                 _label = f"center{_index}"

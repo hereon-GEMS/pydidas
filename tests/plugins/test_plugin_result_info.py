@@ -182,7 +182,7 @@ def test_dataset_metadata__w_axis_ranges():
     _info = PluginResultInfo(**_CUSTOM_VALUES)
     _metadata = {"axis_ranges": {0: np.arange(42), 1: np.arange(123)}}
     _info.dataset_metadata = _metadata
-    assert getattr(_info, "axis_ranges") == _metadata["axis_ranges"]
+    assert _info.axis_ranges == _metadata["axis_ranges"]
     assert _info.data_label == ""
     assert _info.data_unit == ""
     assert _info.axis_labels == {}

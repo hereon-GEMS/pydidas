@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["DiffractionExperimentIoBase"]
 
 
-from typing import Any
+from typing import Any, ClassVar
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
@@ -45,7 +45,7 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
     Base class for DiffractionExperimentContext importer/exporters.
     """
 
-    extensions = []
+    extensions: ClassVar[list[str]] = []
     format_name = "unknown"
 
     @staticmethod

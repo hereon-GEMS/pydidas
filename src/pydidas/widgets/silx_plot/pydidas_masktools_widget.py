@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ button sizes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasMaskToolsWidget"]
 
 
-from typing import Any, Union
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot2D
@@ -41,8 +41,8 @@ class PydidasMaskToolsWidget(MaskToolsWidget):
     def __init__(
         self,
         parent: QtWidgets.QWidget | None = None,
-        plot: Union[Plot2D, None] = None,
-        **kwargs: Any,  # noqa ARG001
+        plot: Plot2D | None = None,
+        **kwargs: Any,
     ) -> None:
         MaskToolsWidget.__init__(self, parent, plot)
 

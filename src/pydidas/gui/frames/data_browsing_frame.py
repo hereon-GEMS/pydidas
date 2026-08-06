@@ -29,7 +29,7 @@ __all__ = ["DataBrowsingFrame"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import h5py
 from qtpy import QtCore
@@ -82,7 +82,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             choices=[None],
         ),
     )
-    params_not_to_restore = ["xcol", "filename"]
+    params_not_to_restore: ClassVar[list[str]] = ["xcol", "filename"]
 
     def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)

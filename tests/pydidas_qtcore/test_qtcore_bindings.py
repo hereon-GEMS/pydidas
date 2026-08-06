@@ -36,10 +36,10 @@ import pytest
 def import_test_code(qt_api) -> str:
     return f"""
     import os
-    os.environ["QT_API"] = {repr(qt_api or "pyside6")}
+    os.environ["QT_API"] = {qt_api or "pyside6"!r}
     import qtpy
     import pydidas_qtcore
-    expected = {repr(qt_api or "pyside6")}
+    expected = {qt_api or "pyside6"!r}
     assert qtpy.API == expected, f"Expected {{expected}}, got {{qtpy.API}}"
     print(f"OK: {{qtpy.API}}")
     """.replace("\n    ", "\n")
@@ -61,7 +61,11 @@ def test_qtcore_bindings(ENV_QT_API, SYS_FLAGS):
 
     _test_code = import_test_code(ENV_QT_API)
     _result = subprocess.run(
-        [sys.executable, "-c", _test_code], env=env, capture_output=True, text=True
+        [sys.executable, "-c", _test_code],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
     )
     assert _result.returncode == 0, f"Failed: {_result.stderr}"
 

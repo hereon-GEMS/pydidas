@@ -41,8 +41,8 @@ if TYPE_CHECKING:
 
 class ProcessingTreeIoMeta(GenericIoMeta):
     """
-    Metaclass for WorkflowTree exporters and importers which holds the
-    registry with all associated file extensions for exporting WorkflowTrees.
+    Metaclass for ProcessingTree exporters and importers which holds the
+    registry with all associated file extensions for exporting ProcessingTrees.
     """
 
     registry: ClassVar[dict[str, type["ProcessingTreeIoMeta"]]] = {}

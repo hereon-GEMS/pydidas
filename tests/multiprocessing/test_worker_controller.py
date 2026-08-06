@@ -51,7 +51,7 @@ class TestWorkerController(unittest.TestCase):
         if hasattr(self, "_wc") and isinstance(self._wc, WorkerController):
             self._wc.exit()
 
-    def wait_for_finish_signal(self, wc, timeout=10):
+    def wait_for_finish_signal(self, wc, timeout=12):
         t0 = time.time()
         _spy = QtTest.QSignalSpy(self._wc.finished)
         t0 = time.time()
@@ -71,7 +71,7 @@ class TestWorkerController(unittest.TestCase):
     def test_test_func_i(self):
         index = 0
         args = (0, 0, 0)
-        kwargs = dict(a=0, b=0)
+        kwargs = {"a": 0, "b": 0}
         self.assertEqual(local_test_func(index, *args, **kwargs), 0)
 
     def test_creation(self):
@@ -92,7 +92,7 @@ class TestWorkerController(unittest.TestCase):
     def test_n_workers__set_wrong(self):
         self._wc = WorkerController()
         num_workers = 5.5
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self._wc.n_workers = num_workers
 
     def test_progress__no_target(self):

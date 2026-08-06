@@ -191,7 +191,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         key : str or None
             The key to identify the results.
         """
-        _has_metadata = "metadata" in self._results[key].keys()
+        _has_metadata = "metadata" in self._results[key]
         if _has_metadata:
             _meta_text = self._results[key]["metadata"]
             self._widgets["metadata_label"].setText(_meta_text)

@@ -41,9 +41,11 @@ class GenericIoMeta(type):
     different file extension.
     """
 
-    registry: ClassVar[dict[str, type]] = {}
+    registry: ClassVar[dict[str, type["GenericIoMeta"]]] = {}
 
-    def __new__(cls, clsname: str, bases: tuple[type], dct: dict) -> "GenericIoMeta":
+    def __new__(
+        cls, clsname: str, bases: tuple[type], attrs: dict[str, Any]
+    ) -> "GenericIoMeta":
         """
         Call the class' (i.e. the WorkflowTree exporter) __new__ method
         and register the class with the registry.
@@ -56,7 +58,7 @@ class GenericIoMeta(type):
             The name of the new class
         bases : tuple[type]
             The tuple of class bases.
-        dct : dict
+        attrs : dict[str, Any]
             The class attributes dict.
 
         Returns
@@ -64,8 +66,8 @@ class GenericIoMeta(type):
         type
             The new class.
         """
-        _new_class = super().__new__(cls, clsname, bases, dct)  # type: ignore[misc]
-        cls.register_class(_new_class)  # type: ignore[arg-type]
+        _new_class = super().__new__(cls, clsname, bases, attrs)  # type: ignore[misc]
+        cls.register_class(_new_class)  # type: ignore[misc]
         return _new_class  # type: ignore[return-value]
 
     @classmethod
@@ -158,7 +160,7 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = [f"*{_key}" for _key in cls.registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.registry]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
             f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]

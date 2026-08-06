@@ -25,8 +25,8 @@ __status__ = "Production"
 
 
 import warnings
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import patch
 
 import h5py

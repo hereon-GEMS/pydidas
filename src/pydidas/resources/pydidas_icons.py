@@ -26,11 +26,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "ICON_PATH",
-    "pydidas_icon_with_bg",
+    "create_mdi_icon",
+    "create_pydidas_icon",
     "pydidas_error_icon",
     "pydidas_error_icon_with_bg",
-    "create_pydidas_icon",
-    "create_mdi_icon",
+    "pydidas_icon_with_bg",
 ]
 
 

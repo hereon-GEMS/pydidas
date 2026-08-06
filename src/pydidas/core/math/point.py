@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -27,25 +27,25 @@ __status__ = "Production"
 __all__ = ["Point", "PointFromPolar"]
 
 
-import warnings
 from dataclasses import dataclass
 from numbers import Integral, Real
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 
 
 @dataclass
 class Point:
-    x: Real
-    y: Real
+    x: float
+    y: float
 
     """
     A Point class representing a point in 2D space.
     
-    The point can be initialized with either two float values for x and y coordinates,
-    or a tuple of two floats. The class supports basic arithmetic operations such as
-    addition, subtraction, multiplication by a scalar, and division by a scalar.
+    The point must be initialized with  two float values for x and y 
+    coordinates. The class supports basic arithmetic operations such as
+    addition, subtraction, multiplication by a scalar, and division 
+    by a scalar.
     """
 
     @staticmethod
@@ -69,7 +69,7 @@ class Point:
             and all(isinstance(coord, Real) for coord in item)
         )
 
-    def __init__(self, x: Real, y: Real = None) -> None:
+    def __init__(self, x: float, y: float) -> None:  # type: ignore[arg-type]
         """
         Construct a Point object.
 
@@ -78,18 +78,8 @@ class Point:
         operations such as addition, subtraction, multiplication by a scalar,
         and division by a scalar.
         """
-
-        if isinstance(x, tuple) and self._valid_input(x):
-            x, y = x
-            warnings.warn(
-                "Initializing Point with a tuple is deprecated, please use "
-                "two Real values instead.",
-                DeprecationWarning,
-            )
-        elif not (isinstance(x, Real) and isinstance(y, Real)):
-            raise TypeError(
-                "Point must be initialized with two floats or a 2-tuple of floats."
-            )
+        if not (isinstance(x, Real) and isinstance(y, Real)):
+            raise TypeError("Point must be initialized with two floats.")
         self._x = float(x)
         self._y = float(y)
 
@@ -190,7 +180,7 @@ class Point:
         elif obj == 1:
             return self._y
         elif isinstance(obj, slice):
-            return tuple(self)[obj]
+            return tuple(self)[obj]  # type: ignore[arg-type]
         else:
             raise IndexError("Index must be 0 or 1.")
 
@@ -208,11 +198,11 @@ class Point:
         bool
             True if the item is either equal to x or y coordinates.
         """
-        return isinstance(item, Real) and (
+        return isinstance(item, Real) and (  # type: ignore[arg-type]
             np.isclose(item, self._x) or np.isclose(item, self._y)
         )
 
-    def __add__(self, other: Union["Point", tuple[Real, Real]]) -> "Point":
+    def __add__(self, other: "Point | tuple[float, float]") -> "Point":
         """
         Add another Point or a tuple to this Point.
 
@@ -254,13 +244,13 @@ class Point:
     __isub__ = __sub__
     __rsub__ = __sub__
 
-    def __mul__(self, other: Real) -> "Point":
+    def __mul__(self, other: float) -> "Point":
         """
         Multiply the Point by a scalar.
 
         Parameters
         ----------
-        other : Real
+        other : float or int
             The scalar to multiply with.
 
         Returns
@@ -269,20 +259,20 @@ class Point:
             A new Point with the multiplied coordinates.
         """
         if isinstance(other, Real):
-            return Point(self._x * other, self._y * other)  # noqa
+            return Point(self._x * other, self._y * other)
         else:
             raise TypeError("Can only multiply a Point by a scalar number.")
 
     __rmul__ = __mul__
     __imul__ = __mul__
 
-    def __truediv__(self, other: Real) -> "Point":
+    def __truediv__(self, other: float) -> "Point":
         """
         Divide the Point by a scalar.
 
         Parameters
         ----------
-        other : Real
+        other : float or int
             The scalar to divide by.
 
         Returns
@@ -294,9 +284,9 @@ class Point:
             raise TypeError("Can only divide a Point by a scalar number.")
         if other == 0:
             raise ZeroDivisionError("Cannot divide by zero.")
-        return Point(self.x / other, self.y / other)  # noqa
+        return Point(self.x / other, self.y / other)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: "Point") -> bool:  # type: ignore[override]
         """
         Check if this Point is equal to another Point or a tuple.
 
@@ -337,7 +327,7 @@ class Point:
             The angle of the point in radians in the interval [0, 2 pi).
         """
         _angle = np.arctan2(self.y, self.x)
-        return np.mod(_angle, 2 * np.pi)
+        return np.mod(_angle, 2 * np.pi)  # type: ignore[arg-type]
 
     angle = theta
     chi = theta
@@ -408,15 +398,15 @@ class Point:
         return Point(round(self.x, decimals), round(self.y, decimals))
 
 
-def PointFromPolar(r: Real, theta: Real) -> Point:  # noqa C0103
+def PointFromPolar(r: float, theta: float) -> Point:
     """
     Create a Point from polar coordinates.
 
     Parameters
     ----------
-    r : Real
+    r : float
         The radius.
-    theta : Real
+    theta : float
         The angle in radians.
 
     Returns

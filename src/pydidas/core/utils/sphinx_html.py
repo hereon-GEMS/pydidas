@@ -120,7 +120,8 @@ def run_sphinx_html_build(
             "html",
             str(DOC_SOURCE_DIRECTORY / "src"),
             build_dir,
-        ]
+        ],
+        check=False,
     )
     try:
         with open(DOC_BUILD_PATH / "docs-built.yml", "w") as f:

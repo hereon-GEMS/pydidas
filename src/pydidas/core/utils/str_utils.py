@@ -25,26 +25,26 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "convert_str_to_number",
-    "get_fixed_length_str",
-    "get_time_string",
-    "get_short_time_string",
-    "iso_timestring",
-    "timed_print",
-    "get_warning",
-    "print_warning",
-    "convert_unicode_to_ascii",
     "convert_special_chars_to_unicode",
-    "get_range_as_formatted_string",
-    "update_separators",
+    "convert_str_to_number",
+    "convert_unicode_to_ascii",
     "format_input_to_multiline_str",
-    "get_random_string",
-    "get_simplified_array_representation",
-    "get_param_description_from_docstring",
-    "strip_param_description_from_docstring",
-    "get_formatted_blocks_from_docstring",
     "formatted_str_repr_of_dict",
+    "get_fixed_length_str",
+    "get_formatted_blocks_from_docstring",
+    "get_param_description_from_docstring",
+    "get_random_string",
+    "get_range_as_formatted_string",
+    "get_short_time_string",
+    "get_simplified_array_representation",
+    "get_time_string",
+    "get_warning",
+    "iso_timestring",
+    "print_warning",
     "str_repr_of_slice",
+    "strip_param_description_from_docstring",
+    "timed_print",
+    "update_separators",
 ]
 
 import datetime
@@ -345,7 +345,7 @@ def convert_special_chars_to_unicode(obj: str | list[str]) -> str | list[str]:
     if isinstance(obj, str):
         _parts = obj.split()
         for _index, _part in enumerate(_parts):
-            if _part in ASCII_TO_UNI.keys():
+            if _part in ASCII_TO_UNI:
                 _parts[_index] = ASCII_TO_UNI[_part]
         obj = " ".join(_parts)
         # insert Angstrom sign (in context of ^-1):
@@ -701,7 +701,7 @@ def formatted_str_repr_of_dict(
                 " " * max(2 * indent, indent + 2) + f"{_item}" for _item in _value
             )
         elif isinstance(_value, Real) and not isinstance(_value, Integral):
-            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"  # noqa
+            _formatter = "f" if 1e-4 <= abs(_value) < 1e4 else "e"
             _formatted_str += f" {_value:.{digits}{_formatter}}"
         else:
             _formatted_str += f" {_value}"
@@ -724,7 +724,7 @@ def str_repr_of_slice(item: slice | Integral) -> str:
         The string representation of the slice.
     """
     if not isinstance(item, (slice, Integral)):
-        raise ValueError("Only slice and integer objects are supported.")
+        raise TypeError("Only slice and integer objects are supported.")
     if isinstance(item, Integral):
         return str(item)
     if item.start is not None and item.stop is not None and item.stop - item.start == 1:
@@ -734,5 +734,5 @@ def str_repr_of_slice(item: slice | Integral) -> str:
         "" if item.stop is None else str(item.stop),
     ]
     if item.step is not None:
-        _parts.append((str(item.step)))
+        _parts.append(str(item.step))
     return ":".join(_parts)

@@ -77,8 +77,8 @@ class ProcessingResultIoMeta(GenericIoMeta):
             The dictionary with the active savers. Keys are the file extensions
             and values are the respective saver instances.
         """
-        _active_savers: dict[str, "ProcessingResultIoBase"] = {}
-        _current_savers: list[type["ProcessingResultIoBase"]] = []
+        _active_savers: dict[str, ProcessingResultIoBase] = {}
+        _current_savers: list[type[ProcessingResultIoBase]] = []
         if formats is None or formats == "":
             return _active_savers
         if isinstance(formats, str):

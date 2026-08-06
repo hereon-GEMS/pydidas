@@ -26,20 +26,21 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "nxs_create_recursive_groups",
-    "nxs_write_root_metadata",
-    "nxs_update_nxroot_timestamp",
     "nxs_create_nxentry",
-    "nxs_recursive_update_default_attr",
-    "nxs_write_dataset",
-    "nxs_write_nxdata",
+    "nxs_create_recursive_groups",
     "nxs_export_context",
     "nxs_param_config_for_dset",
+    "nxs_recursive_update_default_attr",
+    "nxs_update_nxroot_timestamp",
+    "nxs_write_dataset",
+    "nxs_write_nxdata",
+    "nxs_write_root_metadata",
 ]
 
+from collections.abc import Sequence
 from numbers import Number
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import h5py
 import numpy as np
@@ -181,7 +182,7 @@ def nxs_create_nxentry(h5file: h5py.File, entry: str = "entry") -> h5py.Group:
     """
     nxs_update_nxroot_timestamp(h5file)
     h5file.attrs["default"] = entry
-    if entry not in h5file.keys():
+    if entry not in h5file:
         _entry = h5file.create_group(entry)
     else:
         _entry = h5file[entry]

@@ -60,7 +60,7 @@ EXP = DiffractionExperimentContext()
 
 IMAGE_SELECTION_PARAM = Parameter(
     "image_selection",
-    str,  # noqa
+    str,
     "Use global index",
     name="Scan point selection",
     choices=[
@@ -260,7 +260,7 @@ class WorkflowTestFrame(BaseFrame):
         TREE.nodes[node_id].plugin.params = copy.deepcopy(
             self._tree.nodes[node_id].plugin.params
         )
-        _plugin_config = self._tree.nodes[node_id].plugin._config  # noqa W0212
+        _plugin_config = self._tree.nodes[node_id].plugin._config
         _arg = copy.copy(_plugin_config["input_data"])
         _kwargs = _plugin_config["input_kwargs"].copy() | {
             "force_store_results": True,

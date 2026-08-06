@@ -103,7 +103,7 @@ class TestProcessingResultIoHdf5Generic(SharedTestProcessingResultIo): ...
 def test__metaclass_findability(key):
     _savers = META.get_savers(key)
     assert len(_savers) == 1
-    _instance = list(_savers.values())[0]
+    _instance = next(iter(_savers.values()))
     assert isinstance(_instance, H5SAVER)
 
 
@@ -194,7 +194,7 @@ def test_export_full_data_to_file(
         random_scan.set_param_value("scan_dim1_n_points", 1)
         for _id, _node_info in node_info.items():
             _ax_info = _node_info.axis_ranges
-            _ax_info[1] = np.array((1))
+            _ax_info[1] = np.array(1)
             _node_info.axis_ranges = _ax_info
     saver.prepare_files_and_directories(
         empty_temp_path,
@@ -209,7 +209,7 @@ def test_export_full_data_to_file(
     }
     saver.export_full_data_to_file(_results, squeeze=squeeze)
     assert saver._config.get("metadata_written", False) is True
-    for _id in node_info.keys():
+    for _id in node_info:
         _name = saver.get_filenames(node_info)[_id]
         _data_ref = _results[_id].squeeze() if squeeze else _results[_id]
         assert (empty_temp_path / _name).is_file()
@@ -260,7 +260,7 @@ def test_create_result_nxdata_entry(
     if use_dict:
         _metadata = {_id: _val.property_dict for _id, _val in _metadata.items()}
     prepared_saver.create_result_nxdata_entry(_metadata)
-    for _id in node_info.keys():
+    for _id in node_info:
         _name = prepared_saver.get_filenames(node_info)[_id]
         assert (empty_temp_path / _name).is_file()
         with h5py.File(empty_temp_path / _name, "r") as _h5file:
@@ -286,13 +286,13 @@ def test_export_frame_to_file(
     }
     prepared_saver.export_frame_to_file(index, _frame_results)
     prepared_saver.export_frame_to_file(index + 1, _frame_results)
-    for _id in _frame_results.keys():
+    for _id, _frame_res in _frame_results.items():
         _name = prepared_saver.get_filenames(node_info)[_id]
         with h5py.File(empty_temp_path / _name, "r") as _h5file:
             _no_data = _h5file["entry/data/data"][_indices_m1]
             _data = _h5file["entry/data/data"][_indices]
             _data2 = _h5file["entry/data/data"][_indices_p1]
-            assert np.allclose(_data, _frame_results[_id])
+            assert np.allclose(_data, _frame_res)
 
 
 @pytest.mark.parametrize("filename", _TEST_FILES)

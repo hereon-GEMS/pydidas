@@ -57,7 +57,11 @@ def create_mock_saver_class(title: str, ext: str) -> type[ProcessingResultIoBase
     _cls = ProcessingResultIoMeta(
         title.upper(),
         (ProcessingResultIoBase,),
-        dict(extensions=[ext.lower()], format_name=f"{ext} Saver", default_suffix=ext),
+        {
+            "extensions": [ext.lower()],
+            "format_name": f"{ext} Saver",
+            "default_suffix": ext,
+        },
     )
     return _cls  # type: ignore[arg-type]
 

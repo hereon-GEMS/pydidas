@@ -30,7 +30,7 @@ __all__ = ["BaseApp"]
 from copy import copy
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -64,7 +64,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     default_params = ParameterCollection()
     parse_func = staticmethod(lambda: {})  # noqa E731
-    attributes_not_to_copy_to_app_clone = ["_mp_manager_instance"]
+    attributes_not_to_copy_to_app_clone: ClassVar[list[str]] = ["_mp_manager_instance"]
 
     def __init__(self, *args: Any, **kwargs: Any):
         self.clone_mode = kwargs.pop("clone_mode", False)

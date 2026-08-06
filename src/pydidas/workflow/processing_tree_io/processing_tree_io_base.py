@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ProcessingTreeIoBase"]
 
-
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 

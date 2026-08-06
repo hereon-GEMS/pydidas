@@ -161,7 +161,7 @@ class DefineScanFrame(BaseFrame):
             self._widgets[f"button_down_{i}"].setVisible(i < _dim - 1)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
-            if i in DIM_LABELS[_dim].keys():
+            if i in DIM_LABELS[_dim]:
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
         self._widgets["main"].font_metric_width_factor = (
             FONT_METRIC_WIDE_CONFIG_WIDTH

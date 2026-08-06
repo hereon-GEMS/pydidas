@@ -29,7 +29,7 @@ __all__ = ["DiffractionExperimentIoHdf5"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import h5py
 import numpy as np
@@ -51,7 +51,7 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
     Importer / Exporter for DiffractionExperiment metadata from HDF5 files
     """
 
-    extensions = HDF5_EXTENSIONS
+    extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "HDF5"
 
     @staticmethod
@@ -104,7 +104,7 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
             h5py.File(filename, "r") as _h5file,
         ):
             _root_key = cls._find_root_key(_h5file)
-            for _key in diffraction_exp.params.keys():
+            for _key in diffraction_exp.params:
                 _imported_params[_key] = read_and_decode_hdf5_dataset(
                     _h5file[f"{_root_key}{_key}"]
                 )

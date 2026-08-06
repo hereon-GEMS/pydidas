@@ -28,7 +28,7 @@ __all__ = ["DataViewer"]
 
 
 from functools import partial
-from typing import Any
+from typing import Any, ClassVar
 
 import h5py
 import numpy as np
@@ -59,7 +59,7 @@ class DataViewer(WidgetWithParameterCollection):
     The DataViewer allows to display data in multiple display modes.
     """
 
-    init_kwargs = [
+    init_kwargs: ClassVar[list[str]] = [
         "multiline_layout",
         "plot2d_diffraction_exp",
         "plot2d_use_data_info_action",

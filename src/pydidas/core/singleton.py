@@ -28,7 +28,8 @@ __all__ = ["QtSingleton", "Singleton"]
 
 
 import copy as copy_module
-from typing import Any, Callable, ClassVar
+from collections.abc import Callable
+from typing import Any, ClassVar
 
 from qtpy.QtCore import QObject
 
@@ -144,18 +145,22 @@ def create_singleton_metaclass(  # noqa: C901
                     pass
             return _fallback_copy(obj, _bc, copy_module.deepcopy)
 
-        def __new__(cls, name_: str, bases: tuple[type], dct: dict) -> "_SingletonMeta":
+        def __new__(
+            cls, name: str, bases: tuple[type], attrs: dict[str, Any], **kwargs: Any
+        ) -> "_SingletonMeta":
             """
             Create a new singleton class with copy redirection.
 
             Parameters
             ----------
-            name_ : str
+            name : str
                 The name of the new class being created.
             bases : tuple[type]
                 The base classes for the new class.
-            dct : dict
+            attrs : dict[str, Any]
                 The class dictionary containing class attributes and methods.
+            **kwargs : Any
+                Additional keyword arguments.
 
             Returns
             -------
@@ -166,9 +171,9 @@ def create_singleton_metaclass(  # noqa: C901
             # class was found, this reverts to ObjectWithParameterCollection:
             _base_class: type = ObjectWithParameterCollection
             if bases:
-                _non_singleton_bases = list(
+                _non_singleton_bases = [
                     _b for _b in bases[0].__mro__ if type(_b) is not cls
-                )
+                ]
                 if _non_singleton_bases:
                     _found_base = _non_singleton_bases[0]
                     # Only use the found base if it's not object itself
@@ -176,17 +181,18 @@ def create_singleton_metaclass(  # noqa: C901
                         _base_class = _found_base
 
             # Add methods from metaclass to instance methods:
-            dct["__copy__"] = cls._instance_copy
-            dct["__deepcopy__"] = cls._instance_deepcopy
+            attrs["__copy__"] = cls._instance_copy
+            attrs["__deepcopy__"] = cls._instance_deepcopy
+            attrs.update(kwargs)
             if hasattr(_base_class, "copy"):
-                dct["copy"] = cls._instance_copy
+                attrs["copy"] = cls._instance_copy
             if hasattr(_base_class, "deepcopy"):
-                dct["deepcopy"] = cls._instance_deepcopy
-            dct["reset_instance"] = classmethod(
+                attrs["deepcopy"] = cls._instance_deepcopy
+            attrs["reset_instance"] = classmethod(
                 lambda kls: cls._reset_instance(kls)  # type: ignore[arg-type]
             )
 
-            _singleton_class = super().__new__(cls, name_, bases, dct)
+            _singleton_class = super().__new__(cls, name, bases, attrs)
             cls._base_classes[_singleton_class] = _base_class
             return _singleton_class
 
@@ -245,9 +251,9 @@ def create_singleton_metaclass(  # noqa: C901
                 )
             return _base_class
 
-    _name = name or _SingletonMeta.__name__
-    _SingletonMeta.__name__ = _name
-    _SingletonMeta.__qualname__ = _name
+    _name = name or _SingletonMeta.__name_
+    _SingletonMeta.__name_ = _name
+    _SingletonMeta.__qualname_ = _name
     return _SingletonMeta
 
 

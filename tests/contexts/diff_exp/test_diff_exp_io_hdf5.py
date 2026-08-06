@@ -26,8 +26,9 @@ __status__ = "Production"
 
 import shutil
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import h5py
 import numpy as np
@@ -74,7 +75,7 @@ def modify_diffraction_exp_context(temp_dir) -> Generator[dict[str, Any], Any, A
 
 
 def _randomize_diffraction_exp(exp: DiffractionExperiment, local_dir: Path):
-    for _key, _param in exp.params.items():
+    for _key in exp.params:
         if _key in ["detector_npixx", "detector_npixy"]:
             _val = int(1000 * np.random.rand()) + 5
         elif _key in ["detector_mask_file"]:
@@ -101,7 +102,7 @@ def test_export_to_file__correct(modify_diffraction_exp_context, temp_dir):
     EXP_IO_HDF5.export_to_file(hdf5_file)
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_diffraction_exp"]
-        for _key, _param in EXP.params.items():
+        for _key in EXP.params:
             assert (
                 read_and_decode_hdf5_dataset(_group[_key])
                 == modify_diffraction_exp_context[_key]
@@ -116,7 +117,7 @@ def test_export_to_file__w_diffraction_exp(temp_dir):
     EXP_IO_HDF5.export_to_file(hdf5_file, diffraction_exp=_local_exp)
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_diffraction_exp"]
-        for _key, _param in EXP.params.items():
+        for _key in EXP.params:
             assert read_and_decode_hdf5_dataset(_group[_key]) == pytest.approx(
                 _local_exp.params[_key].value_for_export
             )

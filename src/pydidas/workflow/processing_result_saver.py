@@ -103,8 +103,7 @@ class ProcessingResultSaver(ObjectWithParameterCollection):
         _names = []
         for _saver in self._active_savers.values():
             _fnames = _saver.get_filenames(node_info)
-            for _name in _fnames.values():
-                _names.append(_name)
+            _names.extend(_name for _name in _fnames.values())
         return _names
 
     def prepare_active_savers(

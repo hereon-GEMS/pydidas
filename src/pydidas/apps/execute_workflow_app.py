@@ -198,7 +198,10 @@ class ExecuteWorkflowApp(BaseApp):
                 try:
                     _buffer.unlink()
                 except FileNotFoundError:
-                    pass
+                    logger.error(
+                        "Error while unlinking shared memory buffers from "
+                        f"app: {_buffer} {self}"
+                    )
 
     def multiprocessing_get_tasks(self) -> np.ndarray:
         """
@@ -321,17 +324,19 @@ class ExecuteWorkflowApp(BaseApp):
                 if _key != "in_use_flag"
             }
             self._shared_arrays["in_use_flag"][data_index] = 0
-        if self.get_param_value("autosave_results"):
-            if not self._config["export_files_prepared"]:
-                RESULTS.prepare_result_export(
-                    self.get_param_value("autosave_directory"),
-                    self.get_param_value("autosave_format"),
-                )
-                _new_results = {
-                    _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
-                    for _key, _val in _new_results.items()
-                }
-                self._config["export_files_prepared"] = True
+        if (
+            self.get_param_value("autosave_results")
+            and not self._config["export_files_prepared"]
+        ):
+            RESULTS.prepare_result_export(
+                self.get_param_value("autosave_directory"),
+                self.get_param_value("autosave_format"),
+            )
+            _new_results = {
+                _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
+                for _key, _val in _new_results.items()
+            }
+            self._config["export_files_prepared"] = True
         RESULTS.store_scan_point_results(
             index, _new_results, autosave=self.get_param_value("autosave_results")
         )
@@ -580,15 +585,19 @@ class ExecuteWorkflowApp(BaseApp):
                     break
             time.sleep(0.005)
         with self.mp_manager["lock"]:
-            for _node_id in self.mp_manager["shapes_dict"].keys():
+            # because the multiprocessing.Manager.dict is not iterable without
+            # keys, the .keys must be flagged for ruff
+            for _node_id in self.mp_manager["shapes_dict"].keys():  # noqa SIM118
                 self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[
                     _node_id
                 ].results
 
     def __del__(self) -> None:
-        """Delete the ExecuteWorkflowApp."""
-        if not self.clone_mode:
-            if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
-                self._mp_manager_instance.shutdown()
-                self._mp_manager_instance = None
+        """
+        Delete the ExecuteWorkflowApp.
+        """
+        if not self.clone_mode and isinstance(
+            self._mp_manager_instance, mp.managers.SyncManager
+        ):
+            self._mp_manager_instance.shutdown()
         self.close_shared_arrays_and_memory()

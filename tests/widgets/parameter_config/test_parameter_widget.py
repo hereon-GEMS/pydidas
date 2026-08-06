@@ -25,8 +25,8 @@ __status__ = "Production"
 
 
 import os
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import numpy as np
 import pytest
@@ -123,7 +123,7 @@ def test__creation__w__bool_choices(
         + 2 * LAYOUT_VERTICAL_SPACING
         + 2 * LAYOUT_TOP_BOTTOM_MARGIN
     )
-    _default = True if (choices is None or True in choices) else False
+    _default = choices is None or True in choices
     param = Parameter(
         "test_bool",
         int,

@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIoPoni"]
 
+
 from pathlib import Path
 from typing import Any
 
@@ -80,11 +81,11 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         }
         _pdata["detector"] = _det if _det in PYFAI_DETECTOR_NAMES else "Detector"
         _pdata["distance"] = _exp.get_param_value("detector_dist")
-        _pdata["detector_config"] = dict(
-            pixel1=(1e-6 * _exp.get_param_value("detector_pxsizey")),
-            pixel2=(1e-6 * _exp.get_param_value("detector_pxsizex")),
-            max_shape=_exp.det_shape,
-        )
+        _pdata["detector_config"] = {
+            "pixel1": (1e-6 * _exp.get_param_value("detector_pxsizey")),
+            "pixel2": (1e-6 * _exp.get_param_value("detector_pxsizex")),
+            "max_shape": _exp.det_shape,
+        }
         _pdata["wavelength"] = _exp.get_param_value("xray_wavelength") * 1e-10
         pfile = pyFAI.io.ponifile.PoniFile(data=_pdata)
         with open(filename, "w") as _file:

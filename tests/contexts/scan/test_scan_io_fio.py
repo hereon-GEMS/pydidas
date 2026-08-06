@@ -28,7 +28,6 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
@@ -68,8 +67,7 @@ def _write_fio_files_with_2moved_motors(filenames: list[Path]):
             _file.write(" COL0 x DOUBLE\n")
             _file.write(" COL1 ioni DOUBLE\n")
             _file.write(" COL2 dummy DOUBLE\n")
-            for _n in range(11):
-                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+            _file.writelines(f"{_n - 5} {143.256554} {42.5}\n" for _n in range(11))
 
 
 def assert_general_scan_params_in_order(
@@ -144,7 +142,7 @@ def test_import_from_file__wrong_type():
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan", "mesh", "dmesh"])
 def test_import_from_single_file__validation(
-    scan: Optional[Scan], scan_type: str, reset_scan_context
+    scan: Scan | None, scan_type: str, reset_scan_context
 ):
     _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
     ScanIoFio.import_from_file(_filename, scan=scan)
@@ -188,8 +186,8 @@ def test_import_from_single_file__empty(reset_scan_context, temp_dir):
 
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
-def test_import_from_files_sequence__validation(
-    scan: Optional[Scan], scan_type: str, reset_scan_context
+def test_import_from_multiple_files__validation(
+    scan: Scan | None, scan_type: str, reset_scan_context
 ):
     filenames = [
         _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{i:05d}.fio")
@@ -294,8 +292,7 @@ def test_import_from_files_sequence__different_scan_commands(
             _file.write(" COL0 x DOUBLE\n")
             _file.write(" COL1 ioni DOUBLE\n")
             _file.write(" COL2 dummy DOUBLE\n")
-            for _n in range(11):
-                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+            _file.writelines(f"{_n - 5} {143.256554} {42.5}\n" for _n in range(11))
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
         ScanIoFio.import_from_file_sequence(_filenames)

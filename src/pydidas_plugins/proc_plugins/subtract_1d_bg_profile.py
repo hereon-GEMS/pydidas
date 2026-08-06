@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,7 +30,7 @@ __all__ = ["Subtract1dBackgroundProfile"]
 
 
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 
@@ -95,7 +95,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             self._profile = self._profile * self.get_param_value("multiplicator")
 
     def execute(
-        self, data: Union[Dataset, np.ndarray], **kwargs: Any
+        self, data: Dataset | np.ndarray, **kwargs: Any
     ) -> tuple[Dataset, dict]:
         """
         Subtract a one-dimensional background profile.

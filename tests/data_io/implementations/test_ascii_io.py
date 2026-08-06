@@ -80,7 +80,7 @@ def write_asc_file(filename, skip_keys: list[str] | None = None, write_header=Tr
                 line for line in _full_header if not line.startswith(f"*{_key}")
             ]
     _full_header = "".join(_full_header) if write_header else ""
-    _raw_data = (50 * np.random.random((501))).astype(int)
+    _raw_data = (50 * np.random.random(501)).astype(int)
     _x_range = np.linspace(10, 60, 501)
     with open(filename, "w") as f:
         f.write(_full_header)
@@ -624,14 +624,14 @@ def test_read_metadata_from_file__chi(temp_path):
 def test_read_metadata_from_file__specfile(temp_path):
     _fname = temp_path / "test.dat"
     _epoch = time.time()
-    _datetime = datetime.datetime.now()
+    _datetime = datetime.datetime.now()  # noqa DTZ005
     AsciiIo.export_to_file(_fname, _test_data, x_column=True, overwrite=True)
     _metadata = AsciiIo.read_metadata_from_file(_fname)
     assert _metadata["filename"] == _fname.name
     assert _metadata["epoch"] - _epoch < 5  # within 5 seconds
     assert (
         _datetime
-        - datetime.datetime.strptime(_metadata["date"], "%a %b %d %H:%M:%S %Y")
+        - datetime.datetime.strptime(_metadata["date"], "%a %b %d %H:%M:%S %Y")  # noqa DTZ007
     ).seconds < 5
     assert _metadata["n_columns"] == 2
     assert _metadata["scan_title"] == "1 pydidas results"
@@ -711,7 +711,7 @@ def test_read_metadata_from_file__asc(temp_path, skip_key):
     with open(_fname, "r") as f:
         _metadata_ref = {
             _key.removeprefix("*").strip(): _val.strip()
-            for _line in f.readlines()
+            for _line in f
             if _line.startswith("*") and "=" in _line
             for _key, _val in [_line.split("=", 1)]
         }

@@ -102,12 +102,12 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
             "config_canvas",
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
         )
-        _section_options = dict(
-            bold=True,
-            fontsize_offset=3,
-            gridPos=(-1, 0, 1, 1),
-            parent_widget="config_canvas",
-        )
+        _section_options = {
+            "bold": True,
+            "fontsize_offset": 3,
+            "gridPos": (-1, 0, 1, 1),
+            "parent_widget": "config_canvas",
+        }
 
         self.create_button(
             "but_reset",

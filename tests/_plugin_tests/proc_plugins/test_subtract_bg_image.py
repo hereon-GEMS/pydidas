@@ -91,7 +91,7 @@ def test_pre_execute__hdf5(temp_path, ax, key, index):
     plugin = SubtractBackgroundImage()
     _shape = list(_IMAGE.shape)
     _shape.insert(ax, 30)
-    _tmp_data = np.random.random((_shape))
+    _tmp_data = np.random.random(_shape)
     _data_slice = (slice(None),) * ax + (index,) + (slice(None),) * (2 - ax)
     _tmp_data[_data_slice] = _IMAGE
     with h5py.File(temp_path / "test.h5", "w") as f:

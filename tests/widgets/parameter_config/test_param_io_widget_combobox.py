@@ -38,9 +38,7 @@ from pydidas_qtcore import PydidasQApplication
 
 
 _PARAM_CHOICES = ["value", "B", "C", "Tau", "Mu", "gamma", "Angstrom"]
-_UNICODE_CHOICES = [
-    (ASCII_TO_UNI[item] if item in ASCII_TO_UNI else item) for item in _PARAM_CHOICES
-]
+_UNICODE_CHOICES = [ASCII_TO_UNI.get(item, item) for item in _PARAM_CHOICES]
 _NEW_CHOICES = ["Mu", "value", "1.2 um"]
 
 

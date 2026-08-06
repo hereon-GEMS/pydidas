@@ -29,7 +29,6 @@ __all__ = ["ItemInListSelectionWidget"]
 
 
 from collections.abc import Iterable
-from typing import Optional
 
 from qtpy import QtWidgets
 
@@ -54,7 +53,7 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
     def __init__(
         self,
         options: list[str],
-        parent: Optional[QtWidgets.QWidget] = None,
+        parent: QtWidgets.QWidget | None = None,
         title="Select item",
         label="Items:",
     ):
@@ -82,7 +81,7 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
-    def get_item(self) -> Optional[str]:
+    def get_item(self) -> str | None:
         """
         Show the QInputDialog and get the selected item.
 

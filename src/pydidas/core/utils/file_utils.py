@@ -25,18 +25,19 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "CatchFileErrors",
+    "find_valid_python_files",
     "get_directory",
     "get_extension",
-    "has_extension",
-    "find_valid_python_files",
     "get_file_naming_scheme",
-    "CatchFileErrors",
+    "has_extension",
 ]
 
 
 import re
 from numbers import Integral
 from pathlib import Path
+from typing import Self
 
 from pydidas.core.constants import (
     FILENAME_DELIMITERS,
@@ -271,7 +272,7 @@ class CatchFileErrors:
         raise_file_read_error: bool = True,
         error_suffix: str = "",
     ):
-        self._exceptions = additional_exceptions + (  # noqa type: ignore
+        self._exceptions = additional_exceptions + (
             ValueError,
             FileNotFoundError,
             OSError,
@@ -283,7 +284,7 @@ class CatchFileErrors:
         self._raise_file_read_error = raise_file_read_error
         self._exception_msg_suffix = error_suffix
 
-    def __enter__(self) -> "CatchFileErrors":
+    def __enter__(self) -> Self:
         """Enter the context."""
         return self
 

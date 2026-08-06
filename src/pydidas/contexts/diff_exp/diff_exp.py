@@ -452,15 +452,15 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             _tilt = -_tilt
             _tilt_plane = 180 - _tilt_plane
         with NoPrint():
-            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(  # noqa E0602
-                dict(
-                    directDist=det_dist * 1e3,
-                    centerX=center_x,
-                    centerY=center_y,
-                    tilt=_tilt,
-                    tiltPlanRotation=_tilt_plane,
-                    detector=self.get_detector(),
-                )
+            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(
+                {
+                    "directDist": det_dist * 1e3,
+                    "centerX": center_x,
+                    "centerY": center_y,
+                    "tilt": _tilt,
+                    "tiltPlanRotation": _tilt_plane,
+                    "detector": self.get_detector(),
+                }
             )
         with QtCore.QSignalBlocker(self):  # type: ignore[arg-type]
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
@@ -485,7 +485,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 "The detector pixel size of 0 is invalid for a fit2d geometry."
             )
         _geo = self.as_pyfai_geometry()
-        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)  # noqa E0602
+        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
         return {
             "center_x": _f2d_geo.centerX,
             "center_y": _f2d_geo.centerY,

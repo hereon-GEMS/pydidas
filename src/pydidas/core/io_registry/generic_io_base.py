@@ -28,8 +28,9 @@ __status__ = "Production"
 __all__ = ["GenericIoBase"]
 
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, ClassVar, Sequence
+from typing import Any, ClassVar
 
 from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 

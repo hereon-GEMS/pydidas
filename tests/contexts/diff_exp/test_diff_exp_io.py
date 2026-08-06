@@ -26,7 +26,7 @@ __status__ = "Production"
 
 from unittest.mock import MagicMock
 
-import pytest  # pyright: ignore[reportMissingImports]
+import pytest
 
 from pydidas.contexts.diff_exp import (
     DiffractionExperiment,

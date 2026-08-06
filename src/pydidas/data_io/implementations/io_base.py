@@ -30,6 +30,7 @@ __all__ = ["IoBase"]
 
 from numbers import Integral
 from pathlib import Path
+from typing import ClassVar
 
 from numpy import amax, amin, ndarray
 
@@ -44,13 +45,13 @@ class IoBase(metaclass=IoManager):
     Base class for Metaclass-based importer/exporters.
     """
 
-    extensions_export = []
-    extensions_import = []
-    format_name = ""
-    dimensions = []
-    allows_metadata_import = False
+    extensions_export: ClassVar[list[str]] = []
+    extensions_import: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = ""
+    dimensions: ClassVar[list[int]] = []
+    allows_metadata_import: ClassVar[bool] = False
 
-    _roi_controller = RoiSliceManager()
+    _roi_controller: ClassVar[RoiSliceManager] = RoiSliceManager()
     _data = None
 
     @classmethod

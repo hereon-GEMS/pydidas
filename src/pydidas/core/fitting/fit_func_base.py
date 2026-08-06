@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the FitFuncBase class which all fitting functions should inherit fro
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,7 @@ __all__ = ["FitFuncBase"]
 
 import copy
 from numbers import Real
-from typing import Dict, Optional, Union
+from typing import ClassVar
 
 import numpy as np
 from numpy import amin, ndarray
@@ -47,9 +47,9 @@ class FitFuncBase(metaclass=FitFuncMeta):
     """
 
     name = "base fit function"
-    param_bounds_low = []
-    param_bounds_high = []
-    param_labels = []
+    param_bounds_low: ClassVar[list[str]] = []
+    param_bounds_high: ClassVar[list[str]] = []
+    param_labels: ClassVar[list[str]] = []
     num_peaks = 1
     num_peak_params = 3
     center_param_index = 2
@@ -174,7 +174,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         """
         _indices = [
             cls.amplitude_param_index + i * cls.num_peak_params
-            for i in range(0, cls.num_peaks)
+            for i in range(cls.num_peaks)
         ]
         return tuple(c[_index] for _index in _indices)
 
@@ -227,7 +227,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return tuple(c[_index] for _index in cls._center_param_indices())
 
     @classmethod
-    def _center_param_indices(cls, num_peaks: Optional[int] = None) -> list[int]:
+    def _center_param_indices(cls, num_peaks: int | None = None) -> list[int]:
         """
         Get the indices for the center parameters.
 
@@ -244,8 +244,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
                 f"number of peaks defined by the function: `{cls.num_peaks}`."
             )
         return [
-            cls.center_param_index + i * cls.num_peak_params
-            for i in range(0, num_peaks)
+            cls.center_param_index + i * cls.num_peak_params for i in range(num_peaks)
         ]
 
     @classmethod
@@ -293,7 +292,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
     @classmethod
     def guess_fit_start_params(
-        cls, x: ndarray, y: ndarray, **kwargs: Dict
+        cls, x: ndarray, y: ndarray, **kwargs: dict
     ) -> tuple[Real]:
         """
         Guess the start params for the fit for the given x and y values.
@@ -351,7 +350,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
     @classmethod
     def estimate_background_params(
-        cls, x: ndarray, y: ndarray, bg_order: Union[None, int]
+        cls, x: ndarray, y: ndarray, bg_order: None | int
     ) -> tuple[ndarray, tuple[Real]]:
         """
         Calculate the parameters for the background and remove it from the values.
@@ -387,7 +386,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs
+        cls, x: ndarray, y: ndarray, index: None | int, **kwargs
     ) -> tuple[Real]:
         """
         Guess the start params for the fit for the given x and y values.
@@ -469,7 +468,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
 
     @classmethod
     def sort_fitted_peaks_by_position(
-        cls, c: tuple[Real], num_peaks: Optional[int] = None
+        cls, c: tuple[Real], num_peaks: int | None = None
     ) -> tuple[Real]:
         """
         Sort the peaks by their center's position.

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@ The ellipse module includes functions for calculations pertaining to ellipses an
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "fit_ellipse_from_points",
     "axes_from_coeffs",
-    "fit_detector_center_and_tilt_from_points",
     "calc_points_on_ellipse",
     "fit_circle_from_points",
+    "fit_detector_center_and_tilt_from_points",
+    "fit_ellipse_from_points",
 ]
 
 
@@ -108,14 +108,14 @@ def fit_ellipse_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> np.ndar
         The coefficients for the formula
         F(x; y) = ax**2 + 2bxy + cy**2 + 2dx + 2fy + g = 0
     """
-    D1 = np.column_stack((xpoints**2, xpoints * ypoints, ypoints**2))  # noqa C0103
-    D2 = np.column_stack((xpoints, ypoints, np.ones(xpoints.size)))  # noqa C0103
-    S1 = np.matmul(D1.T, D1)  # noqa C0103
-    S2 = np.matmul(D1.T, D2)  # noqa C0103
-    S3 = np.matmul(D2.T, D2)  # noqa C0103
-    T = np.matmul(-np.linalg.inv(S3), S2.T)  # noqa C0103
-    inv_C1 = np.array(((0, 0, 0.5), (0, -1, 0), (0.5, 0, 0)))  # noqa C0103
-    M = np.matmul(inv_C1, S1 + np.matmul(S2, T))  # noqa C0103
+    D1 = np.column_stack((xpoints**2, xpoints * ypoints, ypoints**2))
+    D2 = np.column_stack((xpoints, ypoints, np.ones(xpoints.size)))
+    S1 = np.matmul(D1.T, D1)
+    S2 = np.matmul(D1.T, D2)
+    S3 = np.matmul(D2.T, D2)
+    T = np.matmul(-np.linalg.inv(S3), S2.T)
+    inv_C1 = np.array(((0, 0, 0.5), (0, -1, 0), (0.5, 0, 0)))
+    M = np.matmul(inv_C1, S1 + np.matmul(S2, T))
     _eigenvals, _eigenvecs = np.linalg.eig(M)
     _cond = 4 * _eigenvecs[0] * _eigenvecs[2] - _eigenvecs[1] ** 2
     _a1 = _eigenvecs[:, _cond > 0]
@@ -178,7 +178,7 @@ def params_from_coeffs(coeffs: tuple) -> tuple:
     axes : tuple
         The tuple with the two axes lengths.
     """
-    a, b, c, d, f, g = coeffs
+    a, b, c, d, f, _ = coeffs
     _center_x = (c * d - b * f) / (b**2 - a * c)
     _center_y = (a * f - b * d) / (b**2 - a * c)
     _axes = axes_from_coeffs(coeffs)

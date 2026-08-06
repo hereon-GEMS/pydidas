@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ Module with the Gaussian class for fitting a Gaussian peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Gaussian"]
 
 from numbers import Real
-from typing import Dict, Optional
+from typing import ClassVar
 
 from numpy import amax, amin, exp, inf, ndarray, pi
 
@@ -40,9 +40,9 @@ class Gaussian(FitFuncBase):
     """
 
     name = "Gaussian"
-    param_bounds_low = [0, 1e-20, -inf]
-    param_bounds_high = [inf, inf, inf]
-    param_labels = ["amplitude", "sigma", "center"]
+    param_bounds_low: ClassVar[list[float]] = [0, 1e-20, -inf]
+    param_bounds_high: ClassVar[list[float]] = [inf, inf, inf]
+    param_labels: ClassVar[list[str]] = ["amplitude", "sigma", "center"]
     num_peak_params = 3
     center_param_index = 2
     amplitude_param_index = 0
@@ -82,7 +82,7 @@ class Gaussian(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: Optional[int], **kwargs: Dict
+        cls, x: ndarray, y: ndarray, index: int | None, **kwargs: dict
     ) -> tuple[Real]:
         """
         Guess the starting parameters for a Gaussian peak fit.

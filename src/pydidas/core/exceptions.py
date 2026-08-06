@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Module with pydidas custom Exceptions which are used throughout the package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "PydidasGuiError",
-    "PydidasConfigError",
-    "UserConfigError",
     "FileReadError",
+    "PydidasConfigError",
+    "PydidasGuiError",
+    "UserConfigError",
 ]
 
 
@@ -71,7 +71,7 @@ class UserConfigError(Exception):
         str
             The representation string.
         """
-        return f"UserConfigError('{str(self)}')"
+        return f"UserConfigError('{self!s}')"
 
 
 class FileReadError(Exception):
@@ -96,4 +96,4 @@ class FileReadError(Exception):
         str
             The representation string.
         """
-        return f"FileReadError('{str(self)}')"
+        return f"FileReadError('{self!s}')"

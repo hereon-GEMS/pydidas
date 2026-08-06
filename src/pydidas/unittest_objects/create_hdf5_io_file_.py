@@ -28,8 +28,9 @@ __status__ = "Production"
 __all__ = ["create_hdf5_io_file", "create_hdf5_results_file"]
 
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import h5py  # type: ignore[import-untyped]
 
@@ -212,9 +213,7 @@ def create_hdf5_results_file(
         _config_group = nxs_create_recursive_groups(
             _workflow_group, "workflow_info", group_type="NXparameters"
         )
-        _node_names = [
-            f"workflow_node_{_id:02d}" for _id in processing_tree.nodes.keys()
-        ]
+        _node_names = [f"workflow_node_{_id:02d}" for _id in processing_tree.nodes]
         nxs_write_dataset(_config_group, "nodes", _node_names)
         nxs_write_dataset(_config_group, "num_nodes", len(processing_tree.nodes))
         for _id, _node in processing_tree.nodes.items():

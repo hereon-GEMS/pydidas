@@ -809,4 +809,4 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.set_param_and_widget_value(f"composite_n{dim2}", num2)
         self.set_param_and_widget_value(f"composite_n{dim}", abs(num1))
         if (num1 - 1) * num2 >= _n_total or num1 * (num2 - 1) >= _n_total:
-            self._update_composite_dim(dim2)  # noqa E1136
+            self._update_composite_dim(dim2)

@@ -31,7 +31,8 @@ __all__ = ["GenericTree"]
 import copy
 import time
 import warnings
-from typing import Any, Iterable, Self
+from collections.abc import Iterable
+from typing import Any, Self
 
 from qtpy import QtCore
 

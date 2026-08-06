@@ -65,7 +65,11 @@ def create_saver_class(title, ext: str | list[str]):
     _cls = META(
         title.upper(),
         (ProcessingResultIoBase,),
-        dict(extensions=ext, format_name=get_random_string(10), default_suffix=ext[0]),
+        {
+            "extensions": ext,
+            "format_name": get_random_string(10),
+            "default_suffix": ext[0],
+        },
     )
     return _cls
 
@@ -85,7 +89,7 @@ def get_save_dir_and_node_info():
                 "data_label": _data_labels[_id],
                 "plugin_name": _plugin_names[_id],
             }
-            for _id in _shapes.keys()
+            for _id in _shapes
         }
         return _save_dir, _node_info
 

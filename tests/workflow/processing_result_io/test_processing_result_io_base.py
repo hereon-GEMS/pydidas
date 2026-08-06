@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 from pathlib import Path
+from typing import ClassVar
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -39,7 +40,7 @@ def saver_class():
     ProcessingResultIoMeta.clear_registry()
 
     class TestSaver(ProcessingResultIoBase):
-        extensions = ["TEST"]
+        extensions: ClassVar[list[str]] = ["TEST"]
         default_suffix = ".Test"
         format_name = "Test"
 

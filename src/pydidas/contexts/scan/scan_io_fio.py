@@ -28,8 +28,9 @@ __all__ = ["ScanIoFio"]
 
 
 import os
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -51,7 +52,7 @@ class ScanIoFio(ScanIoBase):
     FIO importer/exporter for Scan objects.
     """
 
-    extensions = ["fio"]
+    extensions: ClassVar[list[str]] = ["fio"]
     format_name = "Sardana FIO"
     beamline_format = True
     import_only = True

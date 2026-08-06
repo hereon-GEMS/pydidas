@@ -78,7 +78,7 @@ class TestParameter(unittest.TestCase):
             Parameter()
 
     def test_creation__with_meta_dict(self):
-        obj = Parameter("Test0", int, 0, dict())
+        obj = Parameter("Test0", int, 0, {})
         self.assertIsInstance(obj, Parameter)
 
     def test_creation__missing_default(self):
@@ -209,7 +209,7 @@ class TestParameter(unittest.TestCase):
     def test_choices_setter__wrong_type(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         with self.assertRaises(TypeError):
-            obj.choices = dict(a=0, b=12)
+            obj.choices = {"a": 0, "b": 12}
 
     def test_choices_setter__value_not_included(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
@@ -417,7 +417,7 @@ class TestParameter(unittest.TestCase):
     def test_get_value_for_export__with_NoneType(self):
         obj = Parameter("Test0", None, 27.7)
         with self.assertRaises(TypeError):
-            obj.value_for_export
+            _ = obj.value_for_export
 
     def test_set_value_and_choices__wrong_type(self):
         obj = Parameter("Test0", float, 27.7)
@@ -467,7 +467,7 @@ class TestParameter(unittest.TestCase):
                 self.assertEqual(
                     dump[3],
                     {
-                        "tooltip": "<No description>",
+                        "tooltip": "",
                         "unit": "",
                         "optional": False,
                         "name": "",

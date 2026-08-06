@@ -64,7 +64,7 @@ def test_import_from_file__correct(scan_io_yaml, test_yaml_file, scan_context):
     scan_io_yaml.import_from_file(test_yaml_file)
     with open(test_yaml_file, "r") as stream:
         _data = yaml.safe_load(stream)
-    for key in scan_context.params.keys():
+    for key in scan_context.params:
         assert scan_context.get_param(key).value_for_export == _data[key]
 
 
@@ -72,7 +72,7 @@ def test_import_from_file__w_legacy_keys(scan_io_yaml, test_path, scan_context):
     scan_io_yaml.import_from_file(test_path / "load_test_scan_context_legacy.yml")
     with open(test_path / "load_test_scan_context.yml", "r") as stream:
         _data = yaml.safe_load(stream)
-    for key in scan_context.params.keys():
+    for key in scan_context.params:
         assert scan_context.get_param(key).value_for_export == _data[key]
 
 
@@ -81,7 +81,7 @@ def test_import_from_file__given_scan(scan_io_yaml, test_yaml_file, scan_context
     scan_io_yaml.import_from_file(test_yaml_file, scan=_scan)
     with open(test_yaml_file, "r") as stream:
         _data = yaml.safe_load(stream)
-    for key in scan_context.params.keys():
+    for key in scan_context.params:
         assert _scan.get_param(key).value_for_export == _data[key]
 
 

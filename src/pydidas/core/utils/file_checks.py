@@ -28,14 +28,14 @@ __status__ = "Production"
 __all__ = [
     "verify_file_exists",
     "verify_file_exists_and_extension_matches",
-    "verify_is_new_file_or_replace_set",
     "verify_filenames_have_same_parent",
     "verify_files_of_range_are_same_size",
+    "verify_is_new_file_or_replace_set",
 ]
 
 
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any
 
 from numpy import array
 
@@ -96,9 +96,7 @@ def verify_file_exists_and_extension_matches(
         )
 
 
-def verify_is_new_file_or_replace_set(
-    filename: str | Path, **kwargs: Any
-) -> None | NoReturn:
+def verify_is_new_file_or_replace_set(filename: str | Path, **kwargs: Any) -> None:
     """
     Check if the file exists and if the overwrite flag has been set.
 

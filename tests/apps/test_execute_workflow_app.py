@@ -370,13 +370,13 @@ def test_multiprocessing_func__w_shapes_not_set(app, app_list, clone) -> None:
         _ret_val = app.multiprocessing_func(1)
     if app.clone_mode:
         assert _ret_val is None
-        for _id, _res in TREE.get_current_results().items():
+        for _id in TREE.get_current_results():
             assert _id in app._config["latest_results"]
     else:  # main app:
         assert app.mp_manager["shapes_set"].is_set()
         assert "in_use_flag" in app._locals["shared_memory_buffers"]
         assert "in_use_flag" in app._shared_arrays
-        for _id in TREE.get_current_results().keys():
+        for _id in TREE.get_current_results():
             assert f"node_{_id:03d}" in app._locals["shared_memory_buffers"]
             assert _id in app._shared_arrays
 

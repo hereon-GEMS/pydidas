@@ -28,8 +28,9 @@ __status__ = "Production"
 __all__ = ["ParameterCollectionMixIn"]
 
 
+from collections.abc import Sequence
 from numbers import Integral
-from typing import Any, NoReturn, Sequence
+from typing import Any
 
 from numpy import mod
 
@@ -410,10 +411,10 @@ class ParameterCollectionMixIn:
         """
         if not confirm:
             raise UserConfigError("Restoration of defaults not confirmed. Aborting.")
-        for _key in self.params.keys():
+        for _key in self.params:
             self.params[_key].restore_default()
 
-    def _check_key(self, key: str) -> NoReturn | None:
+    def _check_key(self, key: str) -> None:
         """
         Check a key exists.
 

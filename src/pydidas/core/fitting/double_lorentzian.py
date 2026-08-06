@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,12 +20,13 @@ Module with the DoubleLorentzian class for fitting a double Lorentzian peak to d
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DoubleLorentzian"]
 
+from typing import ClassVar
 
 from pydidas.core.fitting.lorentzian import Lorentzian
 
@@ -51,6 +52,6 @@ class DoubleLorentzian(Lorentzian):
     num_peaks = 2
     param_bounds_low = Lorentzian.param_bounds_low * num_peaks
     param_bounds_high = Lorentzian.param_bounds_high * num_peaks
-    param_labels = [
+    param_labels: ClassVar[list[str]] = [
         f"{key}{i}" for i in range(num_peaks) for key in Lorentzian.param_labels
     ]

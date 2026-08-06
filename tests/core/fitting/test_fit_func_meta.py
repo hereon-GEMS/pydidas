@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import copy
 import unittest
+from typing import ClassVar
 
 from pydidas.core.fitting import FitFuncBase, FitFuncMeta
 
@@ -33,9 +34,9 @@ from pydidas.core.fitting import FitFuncBase, FitFuncMeta
 def create_test_class():
     class TestClass(FitFuncBase):
         name = "Test"
-        param_bounds_low = []
-        param_bounds_high = []
-        param_labels = []
+        param_bounds_low: ClassVar[list[float]] = []
+        param_bounds_high: ClassVar[list[float]] = []
+        param_labels: ClassVar[list[str]] = []
 
 
 class TestFitFuncMeta(unittest.TestCase):

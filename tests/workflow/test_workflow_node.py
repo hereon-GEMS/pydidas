@@ -154,7 +154,7 @@ def test_dump():
     _dump = obj.dump()
     assert isinstance(_dump, dict)
     for key in ("node_id", "parent", "children", "plugin_class", "plugin_params"):
-        assert key in _dump.keys()
+        assert key in _dump
 
 
 def test_execute_plugin_chain__w_plugin_modify_in_place():
@@ -185,7 +185,7 @@ def test_execute_plugin_chain__w_store_results(force_store):
     nodes = create_node_tree(depth=_depth)
     root = nodes[0]
     root.execute_plugin_chain(0, force_store_results=force_store)
-    for _id, _node in nodes.items():
+    for _node in nodes.values():
         if force_store or _node.is_leaf:
             assert _node.results is not None
             assert _node.result_kws is not None
@@ -421,7 +421,7 @@ def test_delete_note_references():
     nodes = create_node_tree()
     _root = nodes[0]
     _root.delete_node_references(recursive=True)
-    for _id, _node in nodes.items():
+    for _node in nodes.values():
         assert _node.parent is None
         assert _node.children == []
 

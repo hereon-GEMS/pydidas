@@ -82,4 +82,3 @@ def test_initialize_qsettings_values__default_value(mock_get_param, mock_setting
 
 if __name__ == "__main__":
     pytest.main([__file__])
-#

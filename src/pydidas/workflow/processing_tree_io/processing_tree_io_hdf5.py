@@ -28,7 +28,7 @@ __all__ = ["ProcessingTreeIoHdf5"]
 
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import h5py
 
@@ -62,7 +62,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
     Import/Export class for the ProcessingTree to/from HDF5 files.
     """
 
-    extensions = HDF5_EXTENSIONS
+    extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "HDF5"
     default_suffix = ".nxs"
 
@@ -99,7 +99,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
             _config_group = nxs_create_recursive_groups(
                 _group, "workflow_info", group_type="NXparameters"
             )
-            _node_names = [f"workflow_node_{_id:02d}" for _id in tree.nodes.keys()]
+            _node_names = [f"workflow_node_{_id:02d}" for _id in tree.nodes]
             nxs_write_dataset(_config_group, "nodes", _node_names)
             nxs_write_dataset(_config_group, "num_nodes", len(tree.nodes))
 
@@ -214,7 +214,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
             }
             _node_data["plugin_params"] = [
                 (_param_key, read_and_decode_hdf5_dataset(_group[_param_key]))
-                for _param_key in _group.keys()
+                for _param_key in _group
                 if _param_key not in _GENERIC_NODE_KEYS
             ]
             _nodes.append(_node_data)

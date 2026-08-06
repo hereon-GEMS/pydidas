@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ GUI is included in the gui module.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -38,12 +38,14 @@ from .execute_workflow_app import *
 from .execute_workflow_runner import *
 
 
-__all__ = ["parsers"] + (
-    composite_creator_app.__all__
+__all__ = (
+    ["parsers"]
+    + composite_creator_app.__all__
     + directory_spy_app.__all__
     + execute_workflow_app.__all__
     + execute_workflow_runner.__all__
 )
+
 
 del (
     composite_creator_app,

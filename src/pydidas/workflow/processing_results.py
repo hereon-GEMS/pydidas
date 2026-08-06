@@ -409,7 +409,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         Dataset
             The subset of the results.
         """
-        _slice_types = set(type(_slice) for _slice in slices)  # type: ignore[arg-type]
+        _slice_types = {type(_slice) for _slice in slices}
         _data = self.get_results(
             node_id, flatten_scan_dims=flatten_scan_dims, copy=False
         )
@@ -464,7 +464,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             else self._plugin_result_infos.copy()
         )
         _names = self._saver.expected_export_filenames(self._export_result_info)
-        if any([(_save_path / _name).is_file() for _name in _names]) and not overwrite:
+        if any((_save_path / _name).is_file() for _name in _names) and not overwrite:
             raise UserConfigError(
                 f"The specified directory `{_save_path}` exists and is not empty. "
                 "Please select a different directory."

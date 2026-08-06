@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = []
 
 import warnings
 from pathlib import Path
-from typing import Union
+from typing import ClassVar
 
 import numpy as np
 from skimage.io import imread, imsave
@@ -44,13 +44,13 @@ from pydidas.data_io.implementations.io_base import IoBase
 class TiffIo(IoBase):
     """IObase implementation for tiff files."""
 
-    extensions_export = TIFF_EXTENSIONS
-    extensions_import = TIFF_EXTENSIONS
-    format_name = "Tiff"
-    dimensions = [2]
+    extensions_export: ClassVar[list[str]] = TIFF_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = TIFF_EXTENSIONS
+    format_name: ClassVar[str] = "Tiff"
+    dimensions: ClassVar[list[int]] = [2]
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
+    def import_from_file(cls, filename: Path | str, **kwargs: dict) -> Dataset:
         """
         Read data from a tiff file.
 
@@ -79,18 +79,15 @@ class TiffIo(IoBase):
         data : pydidas.core.Dataset
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
-        with CatchFileErrors(filename, TiffFileError):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", UserWarning)
-                _data = imread(filename)
+        with CatchFileErrors(filename, TiffFileError), warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            _data = imread(filename)
 
         cls._data = Dataset(_data)
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: dict):
         """
         Export data to a tiff file.
 

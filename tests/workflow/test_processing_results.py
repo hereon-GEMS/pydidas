@@ -243,7 +243,7 @@ def test_shapes__empty(clean_results) -> None:
 def test_shapes__w_results(results) -> None:
     _shapes = results.shapes
     assert isinstance(_shapes, dict)
-    assert all(isinstance(_key, int) for _key in _shapes.keys())
+    assert all(isinstance(_key, int) for _key in _shapes)
     assert all(isinstance(_value, tuple) for _value in _shapes.values())
 
 
@@ -254,7 +254,7 @@ def test_ndims__empty(clean_results) -> None:
 def test_ndims__w_results(results) -> None:
     _ndims = results.ndims
     assert isinstance(_ndims, dict)
-    assert all(isinstance(_key, int) for _key in _ndims.keys())
+    assert all(isinstance(_key, int) for _key in _ndims)
     assert all(isinstance(_value, int) for _value in _ndims.values())
 
 
@@ -291,7 +291,7 @@ def test_result_titles__empty(clean_results) -> None:
 def test_result_titles__w_results(results) -> None:
     _titles = results.result_titles
     assert isinstance(_titles, dict)
-    assert all(isinstance(_key, int) for _key in _titles.keys())
+    assert all(isinstance(_key, int) for _key in _titles)
     assert all(isinstance(_value, str) for _value in _titles.values())
 
 
@@ -705,7 +705,7 @@ def test_get_node_result_metadata_string__w_data_size_1(
         1: {
             "axis_units": {0: "m"},
             "axis_labels": {0: "dim1"},
-            "axis_ranges": {0: np.array((7))},
+            "axis_ranges": {0: np.array(7)},
             "data_label": "Test",
             "data_unit": "u1",
         }

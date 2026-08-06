@@ -30,10 +30,10 @@ __all__ = ["Parameter"]
 
 import copy
 import warnings
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, NoReturn, Sequence
+from typing import Any, NoReturn
 
 from numpy import asarray, ndarray
 
@@ -201,16 +201,16 @@ class Parameter:
         self.__value = None
         if isinstance(meta, dict):
             kwargs.update(meta)
-        self.__meta = dict(
-            tooltip=kwargs.get("tooltip", "<No description>"),
-            unit=str(kwargs.get("unit")) if kwargs.get("unit") is not None else "",
-            optional=kwargs.get("optional", False),
-            name=kwargs.get("name", ""),
-            allow_None=kwargs.get("allow_None", False),
-            range=None,  # type: ignore
-            subtype=_get_base_class(kwargs.get("subtype", None)),
-            choices=None,  # type: ignore
-        )
+        self.__meta = {
+            "tooltip": kwargs.get("tooltip", ""),
+            "unit": str(kwargs.get("unit") or ""),
+            "optional": kwargs.get("optional", False),
+            "name": kwargs.get("name", ""),
+            "allow_None": kwargs.get("allow_None", False),
+            "range": None,  # type: ignore
+            "subtype": _get_base_class(kwargs.get("subtype", None)),
+            "choices": None,  # type: ignore
+        }
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
         self.value = kwargs.get("value", self.__meta["default"])
@@ -276,9 +276,7 @@ class Parameter:
             return all(isinstance(item, self.__meta["subtype"]) for item in val)
         if isinstance(val, self.__type):
             return True
-        if val is None and self.__meta["allow_None"]:
-            return True
-        return False
+        return val is None and self.__meta["allow_None"]
 
     def __convenience_type_conversion(self, value: Any) -> Any:
         """
@@ -356,7 +354,7 @@ class Parameter:
         return self.__meta["name"]
 
     @property
-    def allow_None(self) -> bool:  # noqa
+    def allow_None(self) -> bool:
         """
         Returns the flag to allow "None" as a value.
 
@@ -429,7 +427,7 @@ class Parameter:
         elif self.dtype == Path:
             _t += " (type: Path)"
         else:
-            _t += f" (type: {str(self.dtype)})"
+            _t += f" (type: {self.dtype!s})"
         return _t.replace(") (", ", ")
 
     @property
@@ -527,11 +525,11 @@ class Parameter:
             self.__type in _NUMBERS
             and self.__meta["range"] is not None
             and val is not None
+            and not self.__meta["range"][0] <= val <= self.__meta["range"][1]
         ):
-            if not self.__meta["range"][0] <= val <= self.__meta["range"][1]:
-                raise UserConfigError(_outside_range_string(val, self))
+            raise UserConfigError(_outside_range_string(val, self))
         if self.__meta["choices"] and val not in self.__meta["choices"]:
-            raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))  # type: ignore
+            raise ValueError(_invalid_choice_str(val, self.__meta["choices"]))
         if not (self.__typecheck(val) or (self.__meta["optional"] and val is None)):
             self._raise_value_set_valueerror(val)
         self.__value = val
@@ -823,7 +821,7 @@ class Parameter:
         """
         _hash_vals = []
         _choices = (
-            tuple() if self.__meta["choices"] is None else tuple(self.__meta["choices"])
+            () if self.__meta["choices"] is None else tuple(self.__meta["choices"])
         )
         for _item in [
             self.__refkey,

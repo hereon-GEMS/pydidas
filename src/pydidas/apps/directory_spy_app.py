@@ -30,7 +30,7 @@ __all__ = ["DirectorySpyApp"]
 
 import multiprocessing as mp
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -128,7 +128,7 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         "bg_hdf5_frame",
     )
     parse_func = directory_spy_app_parser
-    attributes_not_to_copy_to_app_clone = [
+    attributes_not_to_copy_to_app_clone: ClassVar[list[str]] = [
         "_shared_array",
         "_index",
         "multiprocessing_carryon",
@@ -433,7 +433,6 @@ class DirectorySpyApp(BaseApp, AssociatedFileMixin):
         """
         Perform operations after running main parallel processing function.
         """
-        pass
 
     def multiprocessing_get_tasks(self) -> list:
         """

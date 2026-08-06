@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["PydidasQTable"]
 
 
-from typing import Any
+from typing import Any, ClassVar
 
 from qtpy import QtCore, QtWidgets
 
@@ -41,7 +41,7 @@ class PydidasQTable(PydidasWidgetMixin, QtWidgets.QTableWidget):
     A QTableWidget used for selecting a dataset from the workflow results.
     """
 
-    init_kwargs = [
+    init_kwargs: ClassVar[list[str]] = [
         "font_metric_height_factor",
         "font_metric_width_factor",
         "vertical_header",

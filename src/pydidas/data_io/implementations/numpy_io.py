@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the NumpyIo class for importing and exporting numpy data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,7 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -41,10 +41,10 @@ from pydidas.data_io.implementations.io_base import IoBase
 class NumpyIo(IoBase):
     """The IObase implementation for numpy files."""
 
-    extensions_export = NUMPY_EXTENSIONS
-    extensions_import = NUMPY_EXTENSIONS
-    format_name = "Numpy"
-    dimensions = [1, 2, 3, 4, 5, 6]
+    extensions_export: ClassVar[list[str]] = NUMPY_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = NUMPY_EXTENSIONS
+    format_name: ClassVar[str] = "Numpy"
+    dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6]
 
     @classmethod
     def import_from_file(cls, filename: Path | str, **kwargs: Any):

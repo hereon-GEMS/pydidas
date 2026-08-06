@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+from typing import ClassVar
 
 import pytest
 
@@ -40,7 +41,7 @@ def clear_registry():
 @pytest.fixture
 def test_class():
     class TestClass(metaclass=GenericIoMeta):
-        extensions = [".dummy", ".test"]
+        extensions: ClassVar[list[str]] = [".dummy", ".test"]
         format_name = "TEST"
 
     return TestClass()
@@ -49,7 +50,7 @@ def test_class():
 @pytest.fixture
 def test_class2():
     class TestClass2(metaclass=GenericIoMeta):
-        extensions = [".test2"]
+        extensions: ClassVar[list[str]] = [".test2"]
         format_name = "Test2"
 
     return TestClass2()
@@ -58,7 +59,7 @@ def test_class2():
 @pytest.fixture
 def get_unregistered_test_class():
     class TestClass3:
-        extensions = [".test3", ".test4"]
+        extensions: ClassVar[list[str]] = [".test3", ".test4"]
         format_name = "Test3"
 
     return TestClass3
@@ -146,7 +147,7 @@ def test_register_class__same_ext_and_update(get_unregistered_test_class):
 
 def test_register_class__normalizes_extensions():
     class TestClassUpper(metaclass=GenericIoMeta):
-        extensions = ["DUMMY", ".TEST", "MiXeD"]
+        extensions: ClassVar[list[str]] = ["DUMMY", ".TEST", "MiXeD"]
         format_name = "NORM"
 
     assert ".dummy" in GenericIoMeta.registry
@@ -172,11 +173,11 @@ def test_registry__stores_extensions_normalized(test_class):
 
 def test_register_class__duplicate_after_normalization():
     class TestClass1(metaclass=GenericIoMeta):
-        extensions = [".TEST"]
+        extensions: ClassVar[list[str]] = [".TEST"]
         format_name = "A"
 
     class TestClass2:
-        extensions = ["test"]
+        extensions: ClassVar[list[str]] = ["test"]
         format_name = "B"
 
     with pytest.raises(KeyError):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Nonni Heere"
-__copyright__ = "Copyright 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -191,7 +191,7 @@ class TestMaskAndAverageImageStack(unittest.TestCase):
                 self._data[0:, 1, 1] = 0
                 plugin.pre_execute()
                 _data, _kwargs = plugin.execute(self._data)
-                if background_value is np.nan:
+                if np.isnan(background_value):
                     self.assertTrue(np.all(np.isnan(_data[1, 1])))
                 else:
                     self.assertTrue(_data[1, 1] == background_value)

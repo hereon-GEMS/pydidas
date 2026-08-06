@@ -26,12 +26,12 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "get_standard_state_full_filename",
-    "get_available_exit_states",
     "clear_local_log_files",
-    "open_doc_in_browser",
+    "get_available_exit_states",
     "get_latest_release_tag",
+    "get_standard_state_full_filename",
     "get_update_check_text",
+    "open_doc_in_browser",
     "restore_global_objects",
 ]
 
@@ -203,7 +203,7 @@ def restore_global_objects(state: dict) -> None:
         for _key, _val in state[f"context::{_context_key}"].items():
             try:
                 _context.set_param_value(_key, _val)
-            except Exception:
+            except (TypeError, ValueError, UserConfigError):
                 _errors += (
                     f"Context `{_context_key}`:\n- Error restoring parameter `{_key}`\n"
                 )

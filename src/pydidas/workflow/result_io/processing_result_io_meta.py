@@ -33,7 +33,7 @@ __all__ = ["ProcessingResultIoMeta"]
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
@@ -41,6 +41,10 @@ from pydidas.core import Dataset
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils import get_extension
 from pydidas.workflow.processing_tree import ProcessingTree
+
+
+if TYPE_CHECKING:
+    from pydidas.workflow.result_io import ProcessingResultIoBase
 
 
 class ProcessingResultIoMeta(GenericIoMeta):
@@ -51,9 +55,9 @@ class ProcessingResultIoMeta(GenericIoMeta):
 
     # need to redefine the registry to have a unique registry for
     # ProcessingResultsSaverMeta
-    registry = {}
-    active_savers = []
-    scan_title = ""
+    registry: ClassVar[dict[str, type["ProcessingResultIoBase"]]] = {}
+    active_savers: ClassVar[list[str]] = []
+    scan_title: ClassVar[str] = ""
 
     @classmethod
     def reset(cls):
@@ -109,8 +113,7 @@ class ProcessingResultIoMeta(GenericIoMeta):
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
             _fnames = _saver.get_filenames_from_labels(labels)
-            for _name in _fnames.values():
-                _names.append(_name)
+            _names.extend(_fnames.values())
         return _names
 
     @classmethod

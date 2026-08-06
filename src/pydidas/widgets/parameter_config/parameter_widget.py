@@ -331,7 +331,7 @@ class ParameterWidget(EmptyWidget):
         )
         self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
 
-    def sizeHint(self) -> QtCore.QSize:  # noqa C0103
+    def sizeHint(self) -> QtCore.QSize:
         """
         Set a reasonable sizeHint based on the font metrics and configuration.
 

@@ -181,7 +181,7 @@ class TestProcessingTree(unittest.TestCase):
     def test_execute_single_plugin__no_node(self):
         _depth = 3
         _data = np.random.random((20, 20))
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        nodes, _ = self.create_node_tree(depth=_depth)
         self._curr_tree.register_node(nodes[0][0])
         with self.assertRaises(KeyError):
             self._curr_tree.execute_single_plugin(114, _data)
@@ -192,14 +192,14 @@ class TestProcessingTree(unittest.TestCase):
         _offset = 0.4
         nodes, n_nodes = self.create_node_tree(depth=_depth)
         self._curr_tree.register_node(nodes[0][0])
-        _newdata, kwargs = self._curr_tree.execute_single_plugin(
+        _newdata, _ = self._curr_tree.execute_single_plugin(
             n_nodes - 2, _data, offset=_offset
         )
         self.assertTrue((abs(_newdata - _offset - _data) < 1e-15).all())
 
     def test_execute_process(self):
         _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        nodes, _ = self.create_node_tree(depth=_depth)
         self._curr_tree.register_node(nodes[0][0])
         self._curr_tree.execute_process(0)
         for _node in nodes[_depth]:
@@ -213,7 +213,7 @@ class TestProcessingTree(unittest.TestCase):
 
     def test_execute_process_and_get_results(self):
         _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        nodes, _ = self.create_node_tree(depth=_depth)
         self._curr_tree.register_node(nodes[0][0])
         _res = self._curr_tree.execute_process_and_get_results(0)
         for _leaf in self._curr_tree.get_all_leaves():
@@ -231,7 +231,7 @@ class TestProcessingTree(unittest.TestCase):
 
     def test_prepare_execution(self):
         _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        nodes, _ = self.create_node_tree(depth=_depth)
         self._curr_tree.register_node(nodes[0][0])
         self._curr_tree.prepare_execution()
         for _node in nodes[_depth]:
@@ -354,7 +354,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.restore_from_list_of_nodes(_dump)
         self.assertEqual(TREE.node_ids, _context_node_ids)
         for _id, _node in tree.nodes.items():
-            self.assertTrue(_id in self._curr_tree.nodes.keys())
+            self.assertTrue(_id in self._curr_tree.nodes)
             self.assertIsInstance(
                 self._curr_tree.nodes[_id].plugin, tree.nodes[_id].plugin.__class__
             )
@@ -372,8 +372,8 @@ class TestProcessingTree(unittest.TestCase):
         _str = self._curr_tree.export_to_string()
         tree = ProcessingTree()
         tree.restore_from_string(_str)
-        for _id, _node in tree.nodes.items():
-            self.assertTrue(_id in self._curr_tree.nodes.keys())
+        for _id in tree.nodes:
+            self.assertTrue(_id in self._curr_tree.nodes)
             self.assertIsInstance(
                 self._curr_tree.nodes[_id].plugin, tree.nodes[_id].plugin.__class__
             )
@@ -388,7 +388,7 @@ class TestProcessingTree(unittest.TestCase):
         _new_tree_nodes = _new_tree.node_ids
         self._curr_tree.update_from_tree(_new_tree)
         self.assertEqual(_new_tree.node_ids, _new_tree_nodes)
-        for _id, _node in self._curr_tree.nodes.items():
+        for _id in self._curr_tree.nodes:
             self.assertEqual(set(self._curr_tree.node_ids), set(_new_tree.node_ids))
             self.assertIsInstance(
                 self._curr_tree.nodes[_id].plugin, _new_tree.nodes[_id].plugin.__class__
@@ -412,7 +412,7 @@ class TestProcessingTree(unittest.TestCase):
     def test_restore_from_string__empty_list(self):
         self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
         self._curr_tree.restore_from_string("[]")
-        self.assertEqual(self._curr_tree.nodes, dict())
+        self.assertEqual(self._curr_tree.nodes, {})
 
     def test_get_complete_plugin_metadata__empty_tree(self):
         _meta = self._curr_tree.get_plugin_metadata("all")
@@ -485,12 +485,12 @@ class TestProcessingTree(unittest.TestCase):
         self.assertEqual(node.plugin.node_id, 0)
 
     def test_get_current_results__empty_tree(self):
-        self.assertEqual(self._curr_tree.get_current_results(), dict())
+        self.assertEqual(self._curr_tree.get_current_results(), {})
 
     def test_get_current_results__populated_tree_no_processing(self):
         _nodes, _index = self.create_node_tree(width=1, depth=3)
         self._curr_tree.set_root(_nodes[0][0])
-        self.assertEqual(self._curr_tree.get_current_results(), dict())
+        self.assertEqual(self._curr_tree.get_current_results(), {})
 
     def test_get_current_results__linear_tree(self):
         _nodes, _index = self.create_node_tree(width=1, depth=4)
@@ -498,7 +498,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.execute_process(0)
         _res = self._curr_tree.get_current_results()
         self.assertEqual(len(_res), 1)
-        for _key, _val in _res.items():
+        for _val in _res.values():
             self.assertIsInstance(_val, Dataset)
 
     def test_get_current_results__linear_tree_w_always_store_results(self):
@@ -508,7 +508,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.execute_process(0)
         _res = self._curr_tree.get_current_results()
         self.assertEqual(len(_res), 2)
-        for _key, _val in _res.items():
+        for _val in _res.values():
             self.assertIsInstance(_val, Dataset)
 
     def test_get_current_results__branching_tree(self):
@@ -518,7 +518,7 @@ class TestProcessingTree(unittest.TestCase):
         self._curr_tree.execute_process(0)
         _res = self._curr_tree.get_current_results()
         self.assertEqual(len(_res), 5)
-        for _key, _val in _res.items():
+        for _val in _res.values():
             self.assertIsInstance(_val, Dataset)
 
 

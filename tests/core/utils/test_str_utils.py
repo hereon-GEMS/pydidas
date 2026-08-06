@@ -183,9 +183,8 @@ class Test_str_utils(unittest.TestCase):
     def test_timed_print(self):
         _teststr = "afs 4-2 version 1.0"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                timed_print(_teststr)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            timed_print(_teststr)
         with _fname.open("r") as _f:
             _text = _f.read()
         self.assertIn(_teststr, _text)
@@ -193,9 +192,8 @@ class Test_str_utils(unittest.TestCase):
     def test_timed_print_verbose_false(self):
         _teststr = "afs 4-2 version 1.0"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                timed_print(_teststr, verbose=False)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            timed_print(_teststr, verbose=False)
         with _fname.open("r") as _f:
             _text = _f.read()
         self.assertNotIn(_teststr, _text)
@@ -213,9 +211,8 @@ class Test_str_utils(unittest.TestCase):
     def test_print_warning(self):
         _teststr = "test"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                print_warning(_teststr)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            print_warning(_teststr)
         with _fname.open("r") as _f:
             _text = _f.read().strip()
         w_parts = _text.split("\n")
@@ -362,7 +359,7 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(_output, "0 ... 3")
 
     def test_get_range_as_formatted_string__w_iterator(self):
-        _input = range(0, 4)
+        _input = range(4)
         _output = get_range_as_formatted_string(_input)
         self.assertEqual(_output, "0 ... 3")
 

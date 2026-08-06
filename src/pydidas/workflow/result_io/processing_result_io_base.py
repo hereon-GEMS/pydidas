@@ -30,7 +30,7 @@ __all__ = ["ProcessingResultIoBase"]
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from pydidas.contexts import DiffractionExperiment, Scan
 from pydidas.core import Dataset
@@ -44,11 +44,11 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     Base class for processing result importers and exporters.
     """
 
-    extensions = []
-    default_suffix = ""
-    format_name = "unknown"
-    scan_title = ""
-    _node_information = {}
+    extensions: ClassVar[list[str]] = []
+    default_suffix: ClassVar[str] = ""
+    format_name: ClassVar[str] = "unknown"
+    scan_title: ClassVar[str] = ""
+    _node_information: ClassVar[dict[int, dict[str, Any]]] = {}
 
     @classmethod
     def prepare_files_and_directories(

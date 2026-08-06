@@ -24,13 +24,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import io
 import multiprocessing as mp
 import queue
-import sys
 import threading
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 import pytest
@@ -149,20 +148,16 @@ def test_run__with_args(mp_config) -> None:
 def test_run__exception_in_func(mp_config) -> None:
     """Test processor_func with exception in function."""
     put_ints_in_queue(mp_config)
-    old_stdout = sys.stdout
-    sys.stdout = my_stdout = io.StringIO()
     processor_func(_test_func, mp_config)
-    sys.stdout = old_stdout
     # Assert that the processor_func returned directly and did not wait
     # for any queue timeouts.
-    assert len(my_stdout.getvalue()) > 0
     assert mp_config["queue_shutting_down"].get() == 1
 
 
 def test_run__with_kwargs(mp_config) -> None:
     """Test processor_func with keyword arguments."""
     _args = (0, 1)
-    _kwargs = dict(kw_arg=12)
+    _kwargs = {"kw_arg": 12}
     put_ints_in_queue(mp_config)
     processor_func(
         _test_func,

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The PydidasComboBox is a QComboBox with automatic font and width formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,7 +78,7 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
         if _items:
             self.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
 
-    def addItem(self, text: str, userData: Any = None) -> None:  # noqa ARG002
+    def addItem(self, text: str, userData: Any = None) -> None:
         super().addItem(text, userData)
         self._update_view_width()
 
@@ -86,7 +86,7 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
         super().addItems(texts)
         self._update_view_width()
 
-    def insertItem(self, index: int, text: str, userData: Any = None) -> None:  # noqa ARG002
+    def insertItem(self, index: int, text: str, userData: Any = None) -> None:
         super().insertItem(index, text, userData)
         self._update_view_width()
 

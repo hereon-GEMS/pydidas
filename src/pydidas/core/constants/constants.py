@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,25 +20,25 @@ The constants module holds constant number defitions needed in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "BASE_PLUGIN",
+    "FLOAT_REGEX",
+    "INPUT_PLUGIN",
+    "INTEGRATION_RESULT_UNITS",
     "LAMBDA_IN_A_TO_E",
     "LAMBDA_IN_M_TO_E",
-    "BASE_PLUGIN",
-    "INPUT_PLUGIN",
-    "PROC_PLUGIN",
     "OUTPUT_PLUGIN",
+    "PLUGIN_TYPE_NAMES",
+    "PROC_PLUGIN",
     "PROC_PLUGIN_GENERIC",
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
     "PROC_PLUGIN_STRESS_STRAIN",
     "PROC_PLUGIN_TYPE_NAMES",
-    "PLUGIN_TYPE_NAMES",
-    "FLOAT_REGEX",
-    "INTEGRATION_RESULT_UNITS",
 ]
 
 

@@ -49,6 +49,6 @@ __all__ = [
     "PydidasLineEdit",
     "PydidasListWidget",
     "PydidasPushButton",
-    "SquareButton",
     "RadioButtonGroup",
+    "SquareButton",
 ]

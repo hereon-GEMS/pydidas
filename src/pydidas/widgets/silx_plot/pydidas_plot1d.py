@@ -61,7 +61,7 @@ class PydidasPlot1D(Plot1D):
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self._update_mpl_fonts)
 
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self._add_lock_zoom_action()
         if kwargs.get("use_special_plots", True):
             self._add_special_plot_actions()

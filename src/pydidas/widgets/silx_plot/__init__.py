@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Package with subclassed silx widgets and actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,8 +33,9 @@ from .pydidas_plot2d_with_integration_regions import *
 from .pydidas_plot_stack import *
 
 
-__all__ = ["actions", "utilities"] + (
-    pydidas_masktools_widget.__all__
+__all__ = (
+    ["actions", "utilities"]
+    + pydidas_masktools_widget.__all__
     + pydidas_plot1d.__all__
     + pydidas_plot2d.__all__
     + pydidas_plot_stack.__all__
@@ -48,6 +49,6 @@ del (
     pydidas_plot2d,
     pydidas_plot_stack,
     pydidas_plot2d_with_integration_regions,
-    pydidas_position_info,  # noqa
-    silx_actions,  # noqa
+    pydidas_position_info,
+    silx_actions,
 )

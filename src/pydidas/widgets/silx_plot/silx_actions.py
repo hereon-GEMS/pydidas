@@ -26,20 +26,21 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "CropHistogramOutliersAction",
-    "LockZoomAction",
     "AutoscaleToMeanAndThreeSigmaAction",
     "AutoscaleToMinMaxAction",
     "ChangeCanvasAction",
-    "PydidasLoadImageAction",
+    "CropHistogramOutliersAction",
+    "LockZoomAction",
     "PydidasGetDataInfoAction",
+    "PydidasLoadImageAction",
 ]
 
 
-from typing import Any, Literal, NewType
+from typing import Any, ClassVar, Literal, NewType
 
 import silx.gui.plot
 from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtGui import QIcon
 from silx.gui.colors import Colormap
 from silx.gui.plot.actions import PlotAction
 
@@ -79,7 +80,7 @@ class _AutoscaleAction(PlotAction, PydidasQsettingsMixin):
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            plot,
             self.icon,
             self.action_text,
             triggered=self._actionTriggered,
@@ -89,7 +90,7 @@ class _AutoscaleAction(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+    def _actionTriggered(self, checked: bool = False) -> None:
         """
         Trigger the autoscale action.
 
@@ -119,15 +120,15 @@ class ChangeCanvasAction(PlotAction):
     available size to a tight fit for the data dimensions.
     """
 
-    toolTip = {
+    toolTip: ClassVar[dict[str, str]] = {
         "set_to_expand": "Maximize the canvas size to use the available screen space.",
         "set_to_tight": "Change the canvas shape to match the data aspect ratio.",
     }
-    icon = {
+    icon: ClassVar[dict[str, QIcon]] = {
         "set_to_expand": icons.create_pydidas_icon("silx_plot_canvas_full.png"),
         "set_to_tight": icons.create_pydidas_icon("silx_plot_canvas_tight.png"),
     }
-    text = {
+    text: ClassVar[dict[str, str]] = {
         "set_to_expand": "Maximize canvas size",
         "set_to_tight": "Change Canvas to data shape",
     }
@@ -135,7 +136,7 @@ class ChangeCanvasAction(PlotAction):
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            plot,
             icon=self.icon["set_to_tight"],
             text=self.text["set_to_tight"],
             triggered=self._actionTriggered,
@@ -147,7 +148,7 @@ class ChangeCanvasAction(PlotAction):
         if kwargs.get("visible") in [True, False]:
             self.setVisible(kwargs.get("visible"))
 
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+    def _actionTriggered(self, checked: bool = False) -> None:
         """
         Trigger the "change canvas to data" action.
 
@@ -186,18 +187,18 @@ class ChangeCanvasAction(PlotAction):
             return
         _plot_data_aspect = (
             1
-            if self.plot._backend.ax.get_aspect() == "auto"  # noqa W0212
-            else self.plot._backend.ax.get_aspect()  # noqa W0212
+            if self.plot._backend.ax.get_aspect() == "auto"
+            else self.plot._backend.ax.get_aspect()
         )
         _data_aspect = (_range.x[1] - _range.x[0]) / (_range.y[1] - _range.y[0])
-        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)  # noqa W0212
-        self.plot._backend.ax.set_anchor("C")  # noqa W0212
+        self.plot._backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)
+        self.plot._backend.ax.set_anchor("C")
         self.plot.resetZoom()
 
     def _expand_canvas(self) -> None:
         """Expand the canvas to the maximum available size."""
         self.plot.setKeepDataAspectRatio(False)
-        self.plot._backend.ax.set_box_aspect(None)  # noqa W0212
+        self.plot._backend.ax.set_box_aspect(None)
 
     def _update_description_from_canvas(self) -> None:
         """Expand the action's description from the canvas mode."""
@@ -214,11 +215,11 @@ class LockZoomAction(PlotAction):
     This action can be used to lock the zoom settings in its current mode.
     """
 
-    icon = {
+    icon: ClassVar[dict[str, QIcon]] = {
         "lock": icons.create_pydidas_icon("silx_zoom_lock.png"),
         "unlock": icons.create_pydidas_icon("silx_zoom_unlock.png"),
     }
-    text = {
+    text: ClassVar[dict[str, str]] = {
         "lock": "Lock the current zoom settings and disable automatic zoom resets",
         "unlock": "Unlock the current zoom settings for automatic resets",
     }
@@ -226,7 +227,7 @@ class LockZoomAction(PlotAction):
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            plot,
             icon=self.icon["lock"],
             text=self.text["lock"],
             triggered=self._actionTriggered,
@@ -243,7 +244,7 @@ class LockZoomAction(PlotAction):
         """Get the zoom lock state."""
         return self._zoom_locked
 
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+    def _actionTriggered(self, checked: bool = False) -> None:
         """
         Trigger the "zoom lock" action.
 
@@ -326,7 +327,7 @@ class CropHistogramOutliersAction(PlotAction, PydidasQsettingsMixin):
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            plot,
             icon=icons.create_pydidas_icon("silx_crop_histogram.png"),
             text="Crop colormap histogram outliers",
             tooltip="Crop the colormap's histogram outliers",
@@ -337,7 +338,7 @@ class CropHistogramOutliersAction(PlotAction, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self.__forced_image_legend = kwargs.get("forced_image_legend", None)
 
-    def _actionTriggered(self, checked: bool = False) -> None:  # noqa C0103
+    def _actionTriggered(self, checked: bool = False) -> None:
         """
         Trigger the crop histogram outliers action.
 
@@ -406,7 +407,7 @@ class PydidasLoadImageAction(QtWidgets.QAction):
                 _image = _image.mean(axis=0)
             if _image.ndim != 2:
                 raise UserConfigError("The input data is not a 2D image.")
-            self.parent()._setValue(filename=_filename, data=_image)  # noqa W0212
+            self.parent()._setValue(filename=_filename, data=_image)
 
 
 class PydidasGetDataInfoAction(PlotAction):
@@ -419,7 +420,7 @@ class PydidasGetDataInfoAction(PlotAction):
     def __init__(self, plot: PydidasPlot2d, **kwargs: Any) -> None:
         PlotAction.__init__(
             self,
-            plot,  # noqa -- wrong type hinting since PydidasPlot2d is a PlotWidget
+            plot,
             icon=icons.create_pydidas_icon("silx_get_data_info.png"),
             text="Show information of scan point",
             tooltip=(
@@ -431,7 +432,7 @@ class PydidasGetDataInfoAction(PlotAction):
         )
 
     @QtCore.Slot()
-    def _actionTriggered(self) -> None:  # noqa C0103
+    def _actionTriggered(self) -> None:
         """
         Execute the action and pick a mouse click.
         """

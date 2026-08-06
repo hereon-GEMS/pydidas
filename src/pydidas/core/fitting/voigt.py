@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ Module with the Voigt class for fitting a Voigt peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Voigt"]
 
 from numbers import Real
-from typing import Union
+from typing import ClassVar
 
 from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
@@ -41,9 +41,9 @@ class Voigt(FitFuncBase):
     """
 
     name = "Voigt"
-    param_bounds_low = [0, 0, 0, -inf]
-    param_bounds_high = [inf, inf, inf, inf]
-    param_labels = ["amplitude", "sigma", "gamma", "center"]
+    param_bounds_low: ClassVar[list[float]] = [0, 0, 0, -inf]
+    param_bounds_high: ClassVar[list[float]] = [inf, inf, inf, inf]
+    param_labels: ClassVar[list[str]] = ["amplitude", "sigma", "gamma", "center"]
     amplitude_param_index = 0
     num_peak_params = 4
     center_param_index = 3
@@ -76,7 +76,7 @@ class Voigt(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs: dict
+        cls, x: ndarray, y: ndarray, index: None | int, **kwargs: dict
     ) -> tuple[Real]:
         """
         Guess the starting parameters for a Voigt peak fit.

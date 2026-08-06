@@ -50,8 +50,8 @@ def import_from_file(cls, filename, scan=None, **kwargs):
 
 
 def create_test_class(
-    class_name: str = None,
-    extensions: list[str] = None,
+    class_name: str | None = None,
+    extensions: list[str] | None = None,
     format_name=None,
     **kwargs: Any,
 ) -> type:
@@ -74,7 +74,7 @@ def create_test_class(
 
 
 def create_bl_test_class(
-    class_name: str = None, extensions: list[str] = None, format_name=None
+    class_name: str | None = None, extensions: list[str] | None = None, format_name=None
 ) -> type:
     _class = create_test_class(
         "TestIoBeamline" if class_name is None else class_name,

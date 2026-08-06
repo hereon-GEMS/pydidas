@@ -27,11 +27,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "DOC_BUILD_PATH",
-    "DOC_SOURCE_DIRECTORY",
     "DOC_HOME_ADDRESS",
     "DOC_HOME_QURL",
-    "doc_qurl_for_gui_manual",
+    "DOC_SOURCE_DIRECTORY",
     "doc_path_for_gui_manual",
+    "doc_qurl_for_gui_manual",
     "doc_qurl_for_rel_address",
 ]
 

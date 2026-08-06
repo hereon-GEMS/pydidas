@@ -120,7 +120,7 @@ class Test_file_utils(unittest.TestCase):
     def test_find_valid_python_files__simple_path(self):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
-        _target = set([self._path / _file for _file in self._good_filenames])
+        _target = {self._path / _file for _file in self._good_filenames}
         self.assertEqual(_files, _target)
 
     def test_find_valid_python_files__path_tree(self):
@@ -231,20 +231,20 @@ class Test_file_utils(unittest.TestCase):
 
     def test_catchfileerrors__standard_exception(self):
         for _ex in (ValueError, FileNotFoundError, OSError):
-            with self.subTest(_ex):
-                with self.assertRaises(FileReadError):
-                    with CatchFileErrors("dummy"):
-                        raise _ex("dummy")
+            with (
+                self.subTest(_ex),
+                self.assertRaises(FileReadError),
+                CatchFileErrors("dummy"),
+            ):
+                raise _ex("dummy")
 
     def test_catchfileerrors__uncaught_exception(self):
-        with self.assertRaises(RuntimeError):
-            with CatchFileErrors("dummy"):
-                raise RuntimeError("dummy")
+        with self.assertRaises(RuntimeError), CatchFileErrors("dummy"):
+            raise RuntimeError("dummy")
 
     def test_catchfileerrors__additional_exception(self):
-        with self.assertRaises(FileReadError):
-            with CatchFileErrors("dummy", RuntimeError):
-                raise RuntimeError("dummy")
+        with self.assertRaises(FileReadError), CatchFileErrors("dummy", RuntimeError):
+            raise RuntimeError("dummy")
 
 
 @pytest.mark.parametrize("ext", [".aa", ".aA", ".AA", ".Aa"])

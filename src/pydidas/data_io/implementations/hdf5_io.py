@@ -29,8 +29,9 @@ __all__ = []
 
 import os
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, ClassVar
 
 import h5py
 from numpy import ndarray, squeeze
@@ -48,9 +49,10 @@ from pydidas.data_io.implementations.io_base import IoBase
 class Hdf5Io(IoBase):
     """IoBase implementation for Hdf5 files."""
 
-    extensions_import = extensions_export = HDF5_EXTENSIONS
-    format_name = "Hdf5"
-    dimensions = [1, 2, 3, 4, 5, 6, 7, 8]
+    extensions_import: ClassVar[list[str]] = HDF5_EXTENSIONS
+    extensions_export: ClassVar[list[str]] = HDF5_EXTENSIONS
+    format_name: ClassVar[str] = "Hdf5"
+    dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6, 7, 8]
 
     @classmethod
     def import_from_file(cls, filename: Path | str, **kwargs: Any) -> Dataset:
@@ -166,7 +168,7 @@ class Hdf5Io(IoBase):
         _data_group_name, _dset_name = dataset.rsplit("/", 1)
         _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         _data_group = h5file[_data_group_name]
-        if not _data_group.attrs.get("NX_class", "") == "NXdata":
+        if _data_group.attrs.get("NX_class", "") != "NXdata":
             return
         try:
             data.data_unit = h5file[dataset].attrs.get("units", "")

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -40,14 +40,7 @@ def test_point_initialization():
     assert point.y == 7.2
 
 
-def test_point_initialization__w_tuple():
-    with pytest.warns(DeprecationWarning):
-        point = Point((3.5, 7.2))  # noqa -- deliberate use of tuple
-    assert point.x == 3.5
-    assert point.y == 7.2
-
-
-@pytest.mark.parametrize("value", [(3.5, "7"), (1, 2, 3), ("2", 3, 2)])
+@pytest.mark.parametrize("value", [(3.5, 7), (3.5, "7"), (1, 2, 3), ("2", 3, 2)])
 def test_point_initialization__w_wrong_tuple(value):
     with pytest.raises(TypeError):
         Point(value)
@@ -86,7 +79,7 @@ def test_point__iter():
     assert next(iterator) == 3.5
     assert next(iterator) == 7.2
     with pytest.raises(StopIteration):
-        next(iterator)  # noqa
+        next(iterator)
 
 
 def test_point__getitem():
@@ -94,7 +87,7 @@ def test_point__getitem():
     assert point[0] == 3.5
     assert point[1] == 7.2
     with pytest.raises(IndexError):
-        _ = point[2]  # noqa
+        _ = point[2]
 
 
 @pytest.mark.parametrize("slicer", [slice(0, 1), slice(1, 2), slice(0, 2), slice(None)])
@@ -109,7 +102,7 @@ def test_point__contains():
     assert 3.5 in point
     assert 7.2 in point
     assert 4.0 not in point
-    assert "3.5" not in point  # noqa
+    assert "3.5" not in point
 
 
 def test_point_equality():
@@ -159,7 +152,7 @@ def test_point_addition_in_place():
 def test_point_addition__w_invalid_item(item):
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 + item  # noqa -- deliberate wrong type
+        point1 + item
 
 
 def test_point_subtraction__w_point():
@@ -193,7 +186,7 @@ def test_point_subtraction_in_place():
 def test_point_subtraction__w_invalid_item(item):
     point1 = Point(1.0, 2.0)
     with pytest.raises(TypeError):
-        point1 - item  # noqa -- deliberate wrong type
+        point1 - item
 
 
 def test_point_multiplication__w_scalar():
@@ -217,7 +210,7 @@ def test_point_multiplication__in_place():
 def test_point_multiplication__w_tuple():
     point = Point(2.0, 3.0)
     with pytest.raises(TypeError):
-        point * (2, 3)  # noqa
+        point * (2, 3)
 
 
 def test_point_division():
@@ -241,7 +234,7 @@ def test_point_division__zero():
 def test_point_division__wrong_type():
     point = Point(6.0, 8.0)
     with pytest.raises(TypeError):
-        point / "invalid"  # noqa
+        point / "invalid"
 
 
 def test_point_radius():

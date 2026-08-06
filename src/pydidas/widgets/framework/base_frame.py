@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["BaseFrame"]
 
 
-from typing import Any
+from typing import Any, ClassVar
 
 from qtpy import QtCore, QtWidgets
 
@@ -61,7 +61,7 @@ class BaseFrame(
     menu_icon = "qt-std::SP_TitleBarContextHelpButton"
     menu_title = ""
     menu_entry = ""
-    params_not_to_restore = []
+    params_not_to_restore: ClassVar[list[str]] = []
     status_msg = QtCore.Signal(str)
     sig_closed = QtCore.Signal()
     sig_this_frame_activated = QtCore.Signal()
@@ -130,15 +130,12 @@ class BaseFrame(
 
     def build_frame(self) -> None:
         """Build all widgets of the frame."""
-        pass
 
     def connect_signals(self) -> None:
         """Connect all the required signals for the frame."""
-        pass
 
     def finalize_ui(self) -> None:
         """finalize the UI initialization."""
-        pass
 
     def set_status(self, text: str) -> None:
         """
@@ -192,7 +189,7 @@ class BaseFrame(
             if _key in self.params and _key not in self.params_not_to_restore:
                 try:
                     self.set_param_value(_key, _val)
-                except Exception:
+                except (ValueError, TypeError):
                     raise UserConfigError(f"- Error restoring parameter '{_key}'\n")
 
     def restore_state(self, state: dict) -> None:
@@ -211,9 +208,8 @@ class BaseFrame(
             information for both.
         """
         for _key, _val in state["params"].items():
-            if _key not in self.params_not_to_restore:
-                if _key in self.param_widgets:
-                    self.update_param_widget_value(_key, _val)
+            if _key in self.param_widgets and _key not in self.params_not_to_restore:
+                self.update_param_widget_value(_key, _val)
 
     def closeEvent(self, event: QtCore.QEvent) -> None:
         """

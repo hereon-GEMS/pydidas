@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -57,7 +57,7 @@ class TestScanSetupIoYaml(unittest.TestCase):
         SCAN_IO_YAML.import_from_file(self._fpath)
         with open(self._fpath, "r") as stream:
             _data = yaml.safe_load(stream)
-        for key in SCAN.params.keys():
+        for key in SCAN.params:
             self.assertEqual(SCAN.get_param(key).value_for_export, _data[key])
 
     def test_import_from_file__w_legacy_keys(self):
@@ -66,7 +66,7 @@ class TestScanSetupIoYaml(unittest.TestCase):
         )
         with open(self._fpath, "r") as stream:
             _data = yaml.safe_load(stream)
-        for key in SCAN.params.keys():
+        for key in SCAN.params:
             self.assertEqual(SCAN.get_param(key).value_for_export, _data[key])
 
     def test_import_from_file__given_Scan(self):
@@ -74,7 +74,7 @@ class TestScanSetupIoYaml(unittest.TestCase):
         SCAN_IO_YAML.import_from_file(self._fpath, scan=_scan)
         with open(self._fpath, "r") as stream:
             _data = yaml.safe_load(stream)
-        for key in SCAN.params.keys():
+        for key in SCAN.params:
             self.assertEqual(_scan.get_param(key).value_for_export, _data[key])
 
     def test_import_from_file__missing_keys(self):

@@ -241,7 +241,7 @@ class TestPluginRegistry(unittest.TestCase):
 
     def test_get_plugin_by_name__known_name(self):
         PC = self.get_registry_with_random_plugins()
-        _name = list(PC.plugins.keys())[0]
+        _name = next(iter(PC.plugins))
         _plugin = PC.get_plugin_by_name(_name)
         self.assertTrue(issubclass(_plugin, BasePlugin))
 
@@ -259,7 +259,7 @@ class TestPluginRegistry(unittest.TestCase):
 
     def test_get_plugin_by_plugin_name__known_name(self):
         PC = self.get_registry_with_random_plugins()
-        _name = list(PC._plugin_names.keys())[0]
+        _name = next(iter(PC._plugin_names))
         _plugin = PC.get_plugin_by_plugin_name(_name)
         self.assertTrue(issubclass(_plugin, BasePlugin))
 

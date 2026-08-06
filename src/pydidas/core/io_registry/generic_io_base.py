@@ -29,7 +29,7 @@ __all__ = ["GenericIoBase"]
 
 
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any, ClassVar
 
 from pydidas.core.io_registry.generic_io_meta import GenericIoMeta
 
@@ -39,9 +39,9 @@ class GenericIoBase(metaclass=GenericIoMeta):
     Base class for Metaclass-based importer/exporters.
     """
 
-    extensions = []
-    format_name = ""
-    imported_params = {}
+    extensions: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = ""
+    imported_params: ClassVar[dict] = {}
 
     @classmethod
     def export_to_file(cls, filename: Path | str, *args: Any, **kwargs: Any) -> None:
@@ -77,9 +77,7 @@ class GenericIoBase(metaclass=GenericIoMeta):
         raise NotImplementedError
 
     @classmethod
-    def check_for_existing_file(
-        cls, filename: str | Path, **kwargs: Any
-    ) -> None | NoReturn:
+    def check_for_existing_file(cls, filename: str | Path, **kwargs: Any) -> None:
         """
         Check if the file exists and if the overwrite flag has been set.
 

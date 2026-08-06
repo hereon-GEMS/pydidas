@@ -25,15 +25,16 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "get_allowed_kwargs",
     "axis_is_columns",
-    "get_column_labels",
     "check_data_dimensions",
+    "get_allowed_kwargs",
+    "get_column_labels",
 ]
 
 
 import inspect
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 

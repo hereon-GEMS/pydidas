@@ -26,8 +26,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "create_nx_entry_groups",
     "create_nx_dataset",
+    "create_nx_entry_groups",
     "create_nxdata_entry",
     "export_context_to_nxs",
     "nx_dataset_config_from_param",
@@ -88,9 +88,8 @@ def create_nx_entry_groups(
         for key, value in attributes.items():
             _group.attrs[key] = value
         return _group
-    _parent_groups = list(
-        str(_path).replace(os.sep, "/") for _path in Path(group_name).parents
-    )[:-1][::-1]
+    _keys = [str(_path).replace(os.sep, "/") for _path in Path(group_name).parents]
+    _parent_groups = [_key for _key in _keys[::-1] if _key not in ["/", "."]]
     _default = attributes.get("default", group_name.split("/")[1:])
     for _i, _intermediate_group_key in enumerate(_parent_groups):
         if _intermediate_group_key in parent:

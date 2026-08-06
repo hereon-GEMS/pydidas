@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
+from typing import ClassVar
 
 from pydidas.core.constants.file_extensions import PNG_EXTENSIONS
 from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
@@ -34,6 +35,6 @@ from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMat
 class PngIo(IoExporterMatplotlib):
     """IObase implementation for png files."""
 
-    extensions_export = PNG_EXTENSIONS
-    extensions_import = []
-    format_name = "Png"
+    extensions_export: ClassVar[list[str]] = PNG_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = "Png"

@@ -29,7 +29,7 @@ __all__ = ["IoManager"]
 
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import numpy as np
 
@@ -46,8 +46,8 @@ class IoManager(type):
     Metaclass to manage imports and exporters for different file types.
     """
 
-    registry_import = {}
-    registry_export = {}
+    registry_import: ClassVar[dict[str, type["IoBase"]]] = {}
+    registry_export: ClassVar[dict[str, type["IoBase"]]] = {}
 
     def __new__(cls, clsname: str, bases: tuple[type], attrs: dict) -> type["IoBase"]:
         """

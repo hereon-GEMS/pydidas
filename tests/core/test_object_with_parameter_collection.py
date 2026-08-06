@@ -122,7 +122,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_update_param_values_from_kwargs__use_case(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(*self._params.values())
-        _new_vals = dict(Test0=42, Test1="new", Test2=17, Test3=3.15)
+        _new_vals = {"Test0": 42, "Test1": "new", "Test2": 17, "Test3": 3.15}
         obj.update_param_values_from_kwargs(**_new_vals)
         for _key, _val in _new_vals.items():
             self.assertEqual(_val, obj.get_param_value(_key))
@@ -361,7 +361,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj2 = obj.copy()
         for _param in obj.params.values():
             self.assertNotIn(_param, obj2.params.values())
-        for _key, _val in obj._config.items():
+        for (_key,) in obj._config:
             self.assertIn(_key, obj2._config)
             obj._config[_key] = 42
             self.assertNotEqual(id(obj._config[_key]), id(obj2._config[_key]))

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -90,8 +90,8 @@ def test_creation():
 def test_pre_execute__no_input(config):
     plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
     plugin.pre_execute()
-    assert "dataset" in plugin._standard_kwargs.keys()
-    assert "binning" in plugin._standard_kwargs.keys()
+    assert "dataset" in plugin._standard_kwargs
+    assert "binning" in plugin._standard_kwargs
 
 
 @pytest.mark.parametrize("slice_ax", [0, 1, 2])
@@ -103,8 +103,8 @@ def test_pre_execute(config, plugin, slice_ax, index, n_per_file):
     plugin.pre_execute()
     assert plugin.get_param_value("_counted_images_per_file") == _DATA_SHAPE[slice_ax]
     assert plugin._index_func(index) == (None,) * slice_ax + (index,)
-    assert "dataset" in plugin._standard_kwargs.keys()
-    assert "binning" in plugin._standard_kwargs.keys()
+    assert "dataset" in plugin._standard_kwargs
+    assert "binning" in plugin._standard_kwargs
 
 
 @pytest.mark.parametrize("index", [0, 3, 7])
@@ -115,8 +115,8 @@ def test_pre_execute__w_none_slice_ax(config, plugin, index, n_per_file):
     plugin.pre_execute()
     assert plugin.get_param_value("_counted_images_per_file") == 1
     assert plugin._index_func(index) is None
-    assert "dataset" in plugin._standard_kwargs.keys()
-    assert "binning" in plugin._standard_kwargs.keys()
+    assert "dataset" in plugin._standard_kwargs
+    assert "binning" in plugin._standard_kwargs
 
 
 @pytest.mark.parametrize("slice_ax", [0, 1, 2])

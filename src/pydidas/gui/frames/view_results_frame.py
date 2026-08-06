@@ -29,7 +29,7 @@ __all__ = ["ViewResultsFrame"]
 
 
 import os
-from typing import Any
+from typing import Any, ClassVar
 
 from qtpy import QtCore
 
@@ -62,7 +62,7 @@ class ViewResultsFrame(BaseFrameWithApp):
     menu_icon = "pydidas::frame_icon_workflow_results"
     menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
-    params_not_to_restore = ["use_scan_timeline"]
+    params_not_to_restore: ClassVar[list[str]] = ["use_scan_timeline"]
     default_params = get_generic_param_collection(
         "saving_format",
         "squeeze_empty_dims",

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,7 +32,7 @@ class TestApp(pydidas.core.BaseApp):
     def __init__(self, *args, **kwargs):
         pydidas.core.BaseApp.__init__(self, *args, **kwargs)
         self._n = 20
-        self.results = np.zeros((self._n))
+        self.results = np.zeros(self._n)
 
     def multiprocessing_get_tasks(self):
         return np.arange(self._n)

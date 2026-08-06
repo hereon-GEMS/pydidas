@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import shutil
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
@@ -84,7 +85,7 @@ def temp_dir() -> Path:
 
 
 @pytest.fixture
-def modify_scan_context() -> dict[str, Any]:
+def modify_scan_context() -> Generator[dict[str, Any], None, None]:
     """Fixture to modify the DiffractionExperimentContext."""
     _randomize_scan(SCAN)
     yield {_key: _param.value_for_export for _key, _param in SCAN.params.items()}
@@ -92,7 +93,7 @@ def modify_scan_context() -> dict[str, Any]:
 
 
 def _randomize_scan(scan: Scan):
-    for _key, _param in scan.params.items():
+    for _key in scan.params:
         if _key in PARAMS_WITH_INT:
             _val = int(1000 * np.random.rand()) + 5
         elif _key in PARAMS_WITH_STR:
@@ -119,7 +120,7 @@ def read_hdf5_file(file_path: Path) -> dict[str, Any]:
     with h5py.File(file_path, "r") as file:
         data = {}
         group = file["entry/pydidas_config/scan"]
-        for key in group.keys():
+        for key in group:
             data[key] = read_and_decode_hdf5_dataset(group[key])
     return data
 
@@ -130,7 +131,7 @@ def test_export_to_file__correct(modify_scan_context, temp_dir):
     SCAN_IO_HDF5.export_to_file(hdf5_file)
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_config/scan"]
-        for _key, _param in SCAN.params.items():
+        for _key in SCAN.params:
             assert (
                 read_and_decode_hdf5_dataset(_group[_key]) == modify_scan_context[_key]
             )
@@ -144,7 +145,7 @@ def test_export_to_file__w_scan(temp_dir):
     SCAN_IO_HDF5.export_to_file(hdf5_file, scan=local_SCAN)
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_config/scan"]
-        for _key, _param in SCAN.params.items():
+        for _key in SCAN.params:
             assert (
                 read_and_decode_hdf5_dataset(_group[_key])
                 == local_SCAN.params[_key].value_for_export
@@ -164,7 +165,7 @@ def test_import_from_file__empty_file(temp_dir):
 def test_import_from_file(temp_dir, modify_scan_context, create_hdf5_file):
     """Test the import_from_file method."""
     SCAN_IO_HDF5.import_from_file(create_hdf5_file)
-    for _key, _param in SCAN.params.items():
+    for _key in SCAN.params:
         assert SCAN.params[_key].value_for_export == modify_scan_context[_key]
 
 
@@ -174,7 +175,7 @@ def test_import_from_file__to_local_context(
     """Test the import_from_file method."""
     local_SCAN = Scan()
     SCAN_IO_HDF5.import_from_file(create_hdf5_file, scan=local_SCAN)
-    for _key, _param in local_SCAN.params.items():
+    for _key in local_SCAN.params:
         assert SCAN.params[_key].value_for_export == modify_scan_context[_key]
 
 
@@ -195,7 +196,7 @@ def test_import_from_file__from_exported_file(fname):
         }
     SCAN_IO_HDF5.import_from_file(_fname)
     for _key, _val in _imported_values.items():
-        _scan_key = SCAN_LEGACY_PARAMS[_key] if _key in SCAN_LEGACY_PARAMS else _key
+        _scan_key = SCAN_LEGACY_PARAMS.get(_key, _key)
         if _scan_key == "xray_energy":
             continue
         assert _val == SCAN.params[_scan_key].value_for_export

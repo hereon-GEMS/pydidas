@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@ Package with individual Parameter configuration widgets used for generic plugins
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,7 +37,7 @@ __all__ = (
     + generic_plugin_config_widget.__all__
     + fit_plugin_config_widget.__all__
     + pyfai_integration_config_widget.__all__
-    + plugin_config_widget_with_custom_xscale.__all__,
+    + plugin_config_widget_with_custom_xscale.__all__
 )
 
 del (

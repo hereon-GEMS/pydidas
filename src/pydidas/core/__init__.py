@@ -47,7 +47,7 @@ from .pydidas_q_settings_mixin import *
 from .singleton import *
 
 
-__all__: list[str] = (  # type: ignore[reportUnsupportedDunderAll]
+__all__: list[str] = (
     ["constants", "generic_params", "io_registry", "utils"]
     + base_app.__all__
     + dataset.__all__

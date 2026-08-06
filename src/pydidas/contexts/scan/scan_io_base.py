@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the ScanIoBase class which exporters/importers for Scan should inher
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,7 @@ __all__ = ["ScanIoBase"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.contexts.scan.scan_context import ScanContext
@@ -43,9 +43,9 @@ class ScanIoBase(GenericIoBase, metaclass=ScanIo):
     Base class for Scan importer/exporters.
     """
 
-    extensions = []
+    extensions: ClassVar[list[str]] = []
     format_name = "unknown"
-    imported_params = {}
+    imported_params: ClassVar[dict[str, Any]] = {}
     beamline_format = False
     import_only = False
 

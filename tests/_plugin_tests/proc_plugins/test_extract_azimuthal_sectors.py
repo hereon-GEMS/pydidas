@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -96,7 +96,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin = self.get_default_plugin()
         plugin.pre_execute()
         plugin._update_settings_from_data()
-        for _index, _factors in plugin._factors.items():
+        for _factors in plugin._factors.values():
             self.assertEqual(np.sum(_factors), 2)
 
     def test_update_settings_from_data__rad_width_10_deg(self):
@@ -109,7 +109,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin._data.update_axis_range(0, np.linspace(np.pi / 72, 143 / 72 * np.pi, 72))
         plugin.pre_execute()
         plugin._update_settings_from_data()
-        for _index, _factors in plugin._factors.items():
+        for _factors in plugin._factors.values():
             self.assertAlmostEqual(np.sum(_factors), 2, 4)
 
     def test_update_settings_from_data__degree_width_10_inconsistency_at_180(self):
@@ -117,7 +117,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin.pre_execute()
         plugin._data.update_axis_range(0, np.linspace(-177.5, 177.5, 72))
         plugin._update_settings_from_data()
-        for _index, _factors in plugin._factors.items():
+        for _factors in plugin._factors.values():
             self.assertEqual(np.sum(_factors), 2)
 
     def test_update_settings_from_data__degree_width_2(self):

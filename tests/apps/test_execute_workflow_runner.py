@@ -28,8 +28,8 @@ import io
 import shutil
 import sys
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import h5py
 import pytest
@@ -77,7 +77,7 @@ def setup_module() -> Generator[tuple, None, None]:
 
 @pytest.fixture(autouse=True)
 def setup_function(setup_module: object) -> Generator[None, None, None]:
-    _path, q_settings, n_workers, old_stdout, my_stdout = setup_module
+    _path, _, _, old_stdout, my_stdout = setup_module
     RESULT_SAVER.set_active_savers_and_title([])
     EXP.restore_all_defaults(True)
     generate_tree(_path)

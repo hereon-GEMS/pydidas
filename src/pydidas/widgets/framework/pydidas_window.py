@@ -90,7 +90,7 @@ class PydidasWindow(BaseFrame):
             self.setGeometry(self._geometry)
         super().show()
 
-    def closeEvent(self, event: QtGui.QCloseEvent):  # noqa
+    def closeEvent(self, event: QtGui.QCloseEvent):
         """
         Overload the closeEvent to store the window's geometry.
 

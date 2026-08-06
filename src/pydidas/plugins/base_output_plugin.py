@@ -28,6 +28,7 @@ __all__ = ["OutputPlugin"]
 
 
 import os
+from typing import ClassVar
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -52,7 +53,10 @@ class OutputPlugin(BasePlugin):
         )
     )
     default_params = BasePlugin.default_params.copy()
-    advanced_parameters = ["output_fname_digits", "output_index_offset"]
+    advanced_parameters: ClassVar[list[str]] = [
+        "output_fname_digits",
+        "output_index_offset",
+    ]
 
     def pre_execute(self):
         """
@@ -63,7 +67,7 @@ class OutputPlugin(BasePlugin):
         if self._path.is_dir() and len(os.listdir(self._path)) > 0 and (not _overwrite):
             self.raise_UserConfigError(
                 f"The given output path `{self._path}` (which resolves to "
-                f"`{str(self._path.absolute())}` is not empty and overwriting "
+                f"`{self._path.absolute()!s}` is not empty and overwriting "
                 "was not enabled. Please check the path or enable overwriting of "
                 "existing files."
             )

@@ -25,18 +25,18 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "update_child_qobject",
-    "update_size_policy",
+    "IS_QT6",
     "apply_qt_properties",
-    "update_palette",
-    "update_qwidget_font",
     "check_pydidas_qapp_instance",
     "get_single_shot_timer",
-    "IS_QT6",
+    "update_child_qobject",
+    "update_palette",
+    "update_qwidget_font",
+    "update_size_policy",
 ]
 
 
-from typing import Any, NoReturn
+from typing import Any
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QObject
@@ -213,7 +213,7 @@ def update_qwidget_font(obj: QWidget, **kwargs: Any) -> None:
     obj.setFont(_font)
 
 
-def check_pydidas_qapp_instance() -> None | NoReturn:
+def check_pydidas_qapp_instance() -> None:
     """
     Check if the QtWidgets.QApplication instance is a PydidasQApplication.
 
@@ -222,7 +222,7 @@ def check_pydidas_qapp_instance() -> None | NoReturn:
     """
     _app = QtWidgets.QApplication.instance()
     if not isinstance(_app, PydidasQApplication):
-        raise RuntimeError(
+        raise TypeError(
             "The current QApplication instance is not a "
             "PydidasQApplication. Pydidas widgets require a "
             "PydidasQApplication instance to work properly and are not "

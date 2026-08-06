@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ Module with methods to substitute the original in the original silx _TickBar cla
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,13 +31,13 @@ __all__ = ["tickbar_paintEvent", "tickbar_paintTick"]
 
 
 from qtpy import QtCore, QtGui
-from silx.gui.plot.ColorBar import _TickBar  # noqa W0212
+from silx.gui.plot.ColorBar import _TickBar
 
 from pydidas.core.utils import update_qwidget_font
 from pydidas_qtcore import PydidasQApplication
 
 
-def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent) -> None:  # noqa C0103
+def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent) -> None:
     """
     Handle the paintEvent with the global font.
 
@@ -53,27 +53,27 @@ def tickbar_paintEvent(instance: _TickBar, event: QtCore.QEvent) -> None:  # noq
     """
     _qtapp = PydidasQApplication.instance()
     painter = QtGui.QPainter(instance)
-    update_qwidget_font(painter, pointSizeF=_qtapp.font_size - 2)  # noqa
+    update_qwidget_font(painter, pointSizeF=_qtapp.font_size - 2)
     _font_metric = QtGui.QFontMetrics(painter.font())
     instance._WIDTH_DISP_VAL = int(
-        5.5 * (_font_metric.averageCharWidth()) + instance._LINE_WIDTH  # noqa W0212
+        5.5 * (_font_metric.averageCharWidth()) + instance._LINE_WIDTH
     )
-    instance._resetWidth()  # noqa W0212
+    instance._resetWidth()
 
     # paint ticks
     for val in instance.ticks:
-        instance._paintTick(val, painter, majorTick=True)  # noqa W0212
+        instance._paintTick(val, painter, majorTick=True)
 
     # paint subticks
     for val in instance.subTicks:
-        instance._paintTick(val, painter, majorTick=False)  # noqa W0212
+        instance._paintTick(val, painter, majorTick=False)
 
 
-def tickbar_paintTick(  # noqa C0103
+def tickbar_paintTick(
     instance: _TickBar,
     val: float,
     painter: QtGui.QPainter,
-    majorTick: bool = True,  # noqa C0103
+    majorTick: bool = True,
 ) -> None:
     """
     Paint a tick with the global font.
@@ -97,9 +97,9 @@ def tickbar_paintTick(  # noqa C0103
     _offset = _font_metric.tightBoundingRect(_value_str).height() / 2
 
     viewport_height = instance.rect().height() - instance.margin * 2 - 1
-    relative_pos = instance._getRelativePosition(val)  # noqa W0212
+    relative_pos = instance._getRelativePosition(val)
     height = int(viewport_height * relative_pos + instance.margin)
-    _line_y0 = int(instance.width() - _TickBar._LINE_WIDTH / (1 if majorTick else 2))  # noqa W0212
+    _line_y0 = int(instance.width() - _TickBar._LINE_WIDTH / (1 if majorTick else 2))
 
     painter.drawLine(QtCore.QLine(_line_y0, height, instance.width(), height))
     if instance.displayValues and majorTick is True:

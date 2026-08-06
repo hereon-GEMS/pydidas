@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ Module with paths which are used throughout the pydidas package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "GENERIC_PLUGIN_PATH",
     "PYDIDAS_CONFIG_PATHS",
     "PYDIDAS_STANDARD_CONFIG_PATH",
-    "GENERIC_PLUGIN_PATH",
 ]
 
 
@@ -42,8 +42,8 @@ for _path in QtCore.QStandardPaths.standardLocations(
     QtCore.QStandardPaths.ConfigLocation
 ):
     _config_path = Path(_path)
-    if not _config_path.stem == "pydidas":
-        if not _config_path.stem == "Hereon":
+    if _config_path.stem != "pydidas":
+        if _config_path.stem != "Hereon":
             _config_path = _config_path.joinpath("Hereon")
         _config_path = _config_path.joinpath("pydidas")
     PYDIDAS_CONFIG_PATHS.append(_config_path)

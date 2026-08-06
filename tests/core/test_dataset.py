@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -85,8 +85,7 @@ class TestDataset(unittest.TestCase):
         return obj
 
     def get_dset_prop(self, key: str, indices: tuple[int]):
-        if key.startswith("axis_"):
-            key = key[5:]
+        key = key.removeprefix("axis_")
         return [item for i, item in enumerate(self._dset[key]) if i in indices]
 
     def get_random_dataset(self, ndim: int, shape=None):
@@ -333,7 +332,7 @@ class TestDataset(unittest.TestCase):
 
     def test__comparison_with_allclose(self):
         obj = self.create_large_dataset()
-        _new = np.zeros((obj.shape))
+        _new = np.zeros(obj.shape)
         self.assertFalse(np.allclose(obj, _new))
 
     def test_array_finalize__multiple_ops(self):
@@ -405,7 +404,7 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(_new.shape, (5, 5))
 
     def test_transpose__1d(self):
-        obj = Dataset(np.random.random((12)), axis_labels=["0"], axis_units=["a"])
+        obj = Dataset(np.random.random(12), axis_labels=["0"], axis_units=["a"])
         _new = obj.transpose()
         self.assertEqual(obj.axis_labels[0], _new.axis_labels[0])
         self.assertEqual(obj.axis_units[0], _new.axis_units[0])
@@ -667,9 +666,11 @@ class TestDataset(unittest.TestCase):
         obj = self.create_simple_dataset()
         _entries = [["a", "b"], "c", "d"]
         for _method_name in ["axis_labels", "axis_units"]:
-            with self.subTest(method=_method_name):
-                with self.assertRaises(PydidasConfigError):
-                    setattr(obj, _method_name, _entries)
+            with (
+                self.subTest(method=_method_name),
+                self.assertRaises(PydidasConfigError),
+            ):
+                setattr(obj, _method_name, _entries)
 
     def test_axis_str_property__modify_copy(self):
         obj = self.create_simple_dataset()
@@ -790,7 +791,7 @@ class TestDataset(unittest.TestCase):
 
     def test_update_axis_label__w_none(self):
         obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             obj.update_axis_label(1, None)
 
     def test_update_axis_unit__single_val(self):
@@ -898,7 +899,7 @@ class TestDataset(unittest.TestCase):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array)
         _obj_state = obj.__reduce__()[2]
-        new_obj = Dataset((1))
+        new_obj = Dataset(1)
         new_obj.__setstate__(_obj_state)
         for key in obj.__dict__:
             self.assertEqual(obj.__dict__[key], new_obj.__dict__[key])

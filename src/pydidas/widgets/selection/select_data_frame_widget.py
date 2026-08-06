@@ -295,7 +295,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         )
 
     @QtCore.Slot(int, str)
-    def _new_frame_index(self, ax_index: int, frame_slice_str: str) -> None:  # noqa ARG001
+    def _new_frame_index(self, ax_index: int, frame_slice_str: str) -> None:
         """
         Process a new frame index from the axis selector.
 

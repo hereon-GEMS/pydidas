@@ -517,7 +517,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         else:
             self._check_that_results_are_available(node_id)
             _data = self._composites[node_id].copy()
-        if set(type(_slice) for _slice in slices).issubset({int, slice}):
+        if {type(_slice) for _slice in slices}.issubset({int, slice}):
             _data = _data[slices]
         else:
             for _index, _slice in enumerate(slices[::-1]):
@@ -727,10 +727,10 @@ class ProcessingResults(ObjectWithParameterCollection):
         _print_info = {
             "axis_labels": list(_metadata["axis_labels"].values()),
             "axis_units": list(_metadata["axis_units"].values()),
-            "axis_ranges": list(
+            "axis_ranges": [
                 utils.get_range_as_formatted_string(_range)
                 for _range in _metadata["axis_ranges"].values()
-            ),
+            ],
             "axis_types": (
                 ["(scan)"] * _nscan + ["(data)"] * (self.ndims[node_id] - _nscan)
             ),

@@ -377,7 +377,7 @@ class ProcessingTree(GenericTree):
             _plugin.node_id = _item["node_id"]
             _node = WorkflowNode(node_id=_item["node_id"], plugin=_plugin)
             for key, val in _item["plugin_params"]:
-                if key in _node.plugin.params.keys():
+                if key in _node.plugin.params:
                     _node.plugin.set_param_value(key, val)
             _new_nodes[_item["node_id"]] = _node
         for _item in list_of_nodes:
@@ -461,7 +461,7 @@ class ProcessingTree(GenericTree):
             for _node in self.nodes.values()
             if (
                 (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
-                and not _node.plugin.plugin_type == OUTPUT_PLUGIN
+                and _node.plugin.plugin_type != OUTPUT_PLUGIN
             )
         ]
         return _nodes_w_results

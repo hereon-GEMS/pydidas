@@ -33,12 +33,12 @@ from types import ModuleType
 
 # must import h5py and the hdf5plugin here to have the dll libraries linked
 # correctly in Windows before using them in the package in different orders
-import h5py as __h5py  # noqa: F401
-import hdf5plugin as __hdf5plugin  # noqa: F401
+import h5py as __h5py
+import hdf5plugin as __hdf5plugin
 
 # import pydidas_qtcore to set up the QApplication and assure
 # that the QT_API is set correctly
-import pydidas_qtcore as __pydidas_qtcore  # noqa: F401
+import pydidas_qtcore as __pydidas_qtcore
 
 # import local modules
 # import sub-packages:
@@ -66,21 +66,21 @@ from .version import VERSION, version
 
 __version__ = VERSION
 __all__ = [
-    "core",
-    "contexts",
-    "data_io",
-    "multiprocessing",
-    "managers",
-    "plugins",
-    "workflow",
-    "apps",
-    "unittest_objects",
-    "widgets",
-    "gui",
     "IS_QT6",
-    "version",
-    "VERSION",
     "LOGGING_LEVEL",
+    "VERSION",
+    "apps",
+    "contexts",
+    "core",
+    "data_io",
+    "gui",
+    "managers",
+    "multiprocessing",
+    "plugins",
+    "unittest_objects",
+    "version",
+    "widgets",
+    "workflow",
 ]
 
 

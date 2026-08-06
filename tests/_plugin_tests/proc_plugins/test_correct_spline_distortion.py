@@ -160,7 +160,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         _data_in = self.create_input_dataset()
         _data_out, _kws = plugin.execute(_data_in.copy())
         self.check_output_data_keys(_data_in, _data_out)
-        self.assertEqual(0, np.where(_data_out == np.nan)[0].size)
+        self.assertEqual(0, np.where(np.isnan(_data_out))[0].size)
 
     def test_execute__pyFAI_expand_no_fill(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("CorrectSplineDistortion")()
@@ -171,7 +171,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         _data_in = self.create_input_dataset()
         _data_out, _kws = plugin.execute(_data_in.copy())
         self.check_output_data_keys(_data_in, _data_out)
-        self.assertEqual(0, np.where(_data_out == np.nan)[0].size)
+        self.assertEqual(0, np.where(np.isnan(_data_out))[0].size)
 
     def test_execute__pyFAI_fill_nan_shrink(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("CorrectSplineDistortion")()

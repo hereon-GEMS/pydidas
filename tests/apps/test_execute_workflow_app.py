@@ -264,7 +264,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertEqual(len(main_app._locals["shared_memory_buffers"]), 2)
 
     def test_prepare_run__clone_mode(self):
-        main_app, app = self.get_main_app_and_app_clone()
+        _, app = self.get_main_app_and_app_clone()
         self.assertTrue(app._config["run_prepared"])
 
     def test_prepare_run__main_mode(self):
@@ -529,7 +529,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsNone(_sig)
 
     def test_get_latest_results__shapes_not_set(self):
-        main_app, app = self.get_main_app_and_app_clone()
+        _, app = self.get_main_app_and_app_clone()
         self.assertIsNone(app.get_latest_results())
 
     def test_get_latest_results__shapes_set(self):
@@ -550,7 +550,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             self.assertIsInstance(main_app._shared_arrays[_key], np.ndarray)
 
     def test_multiprocessing_store_results_as_clone(self):
-        main_app, app = self.get_main_app_and_app_clone()
+        _, app = self.get_main_app_and_app_clone()
         _spy = QtTest.QSignalSpy(app.sig_results_updated)
         _index = app.multiprocessing_func(0)
         app.multiprocessing_store_results(0, _index)

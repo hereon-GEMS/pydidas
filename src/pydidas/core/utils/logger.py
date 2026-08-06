@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["pydidas_logger", "get_logging_dir", "clear_logging_dir", "LOGGING_LEVEL"]
+__all__ = ["LOGGING_LEVEL", "clear_logging_dir", "get_logging_dir", "pydidas_logger"]
 
 
 import logging
@@ -33,7 +33,6 @@ import multiprocessing as mp
 import os
 import time
 from pathlib import Path
-from typing import List
 
 from qtpy import QtCore
 
@@ -125,7 +124,7 @@ def _get_todays_log_name() -> Path:
     return get_logging_dir() / "logs" / f"pydidas_log_{_timestr}.log"
 
 
-def clear_logging_dir() -> List[str]:
+def clear_logging_dir() -> list[str]:
     """
     Clear all files in the logging dir, if possible.
 

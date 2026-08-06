@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 import unittest
+from typing import ClassVar
 
 from pydidas.contexts import ScanContext
 from pydidas.workflow import ProcessingResults, WorkflowTree
@@ -48,9 +49,9 @@ class TestProcessingResultIoBase(unittest.TestCase):
         META.reset()
 
         class SAVER(ProcessingResultIoBase):
-            extensions = ["TEST"]
-            default_suffix = ".Test"
-            format_name = "Test"
+            extensions: ClassVar[list[str]] = ["TEST"]
+            default_suffix: ClassVar[str] = ".Test"
+            format_name: ClassVar[str] = "Test"
             _node_information = cls._node_information
 
         cls.SAVER = SAVER

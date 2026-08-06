@@ -33,4 +33,4 @@ from .processor import processor_func
 from .worker_controller import WorkerController
 
 
-__all__ = ["app_processor_func", "processor_func", "AppRunner", "WorkerController"]
+__all__ = ["AppRunner", "WorkerController", "app_processor_func", "processor_func"]

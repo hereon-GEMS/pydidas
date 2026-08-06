@@ -30,7 +30,7 @@ __all__ = ["PydidasPlot2D"]
 
 from contextlib import nullcontext
 from functools import partial
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from matplotlib.ticker import AutoLocator, ScalarFormatter
@@ -81,7 +81,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     sig_get_more_info_for_data = QtCore.Signal(float, float)
     sig_new_data_size = QtCore.Signal(int, int)
     sig_data_linearity = QtCore.Signal(bool)
-    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
+    init_kwargs: ClassVar[list[str]] = [
+        "cs_transform",
+        "use_data_info_action",
+        "diffraction_exp",
+    ]
 
     def __init__(self, **kwargs: Any) -> None:
         PydidasQsettingsMixin.__init__(self)
@@ -298,7 +302,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             _delta = (_ax.max() - _ax.min()) / _ax.size
             _scale.append(float(_delta * (_ax.size + 1) / _ax.size))
             _origin.append(float(_ax[0] - _delta / 2))
-        return _xlimit, _ylimit, tuple(_origin), tuple(_scale)  # noqa
+        return _xlimit, _ylimit, tuple(_origin), tuple(_scale)
 
     def _plot_nonlinear_axes_image(self, data: Dataset) -> None:
         """
@@ -474,7 +478,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "autoscale_mean_3sigma": self.keepDataAspectRatioAction,
             "data_info": None,
         }
-        for _key in self._actions.keys():
+        for _key in self._actions:
             if _key == "cs_transform":
                 continue
             self.group.addAction(self._actions[_key])

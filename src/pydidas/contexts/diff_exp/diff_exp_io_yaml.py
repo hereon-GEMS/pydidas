@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ export DiffractionExperimentContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,6 @@ __all__ = ["DiffractionExperimentIoYaml"]
 
 
 from numbers import Integral, Real
-from typing import Union
 
 import numpy as np
 import yaml
@@ -80,7 +79,7 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
 
     @classmethod
     def import_from_file(
-        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
+        cls, filename: str, diffraction_exp: DiffractionExperiment | None = None
     ):
         """
         Restore the DiffractionExperimentContext from a YAML file.

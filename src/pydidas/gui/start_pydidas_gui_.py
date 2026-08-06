@@ -115,7 +115,7 @@ def start_pydidas_gui(
         _gui.setWindowIcon(icons.pydidas_icon_with_bg())
         _gui.raise_()
         _ = _app.exec_()
-    except Exception as _e:
+    finally:
         _splash.close()
     if _app is not None:
         _app.deleteLater()

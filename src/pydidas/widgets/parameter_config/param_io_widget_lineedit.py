@@ -72,7 +72,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         self.update_validator()
         self.textEdited.connect(self._mark_as_user_edited)
         self.editingFinished.connect(self._round_on_editing_finished)
-        self.setSizePolicy(*POLICY_EXP_FIX)  # noqa E1120, E1121
+        self.setSizePolicy(*POLICY_EXP_FIX)
         self.setText(param.value)
 
     def setText(self, value: Any) -> None:

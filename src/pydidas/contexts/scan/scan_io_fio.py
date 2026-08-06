@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024-2025, Helmholtz-Zentrum Hereon
+# Copyright 2024-2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the ScanIoFio class which is used to importscan axes from fio file(s
 """
 
 __author__ = "Ilia Petrov, Malte Storm"
-__copyright__ = "Copyright 2024-2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024-2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = ["ScanIoFio"]
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -52,7 +52,7 @@ class ScanIoFio(ScanIoBase):
     FIO importer/exporter for Scan objects.
     """
 
-    extensions = ["fio"]
+    extensions: ClassVar[list[str]] = ["fio"]
     format_name = "Sardana FIO"
     beamline_format = True
     import_only = True
@@ -136,28 +136,6 @@ class ScanIoFio(ScanIoBase):
             ]
         )
 
-    @staticmethod
-    def _line_starts_with_scan_cmd(line: str) -> bool:
-        """
-        Check if a line starts with a scan command.
-
-        Parameters
-        ----------
-        line : str
-            The line to check.
-
-        Returns
-        -------
-        bool
-            True if the line starts with a scan command, False otherwise.
-        """
-        return (
-            line.startswith("ascan")
-            or line.startswith("dscan")
-            or line.startswith("mesh")
-            or line.startswith("dmesh")
-        )
-
     @classmethod
     def import_from_file(cls, filenames: Path | str | list[Path | str], **kwargs: Any):
         """
@@ -219,13 +197,13 @@ class ScanIoFio(ScanIoBase):
             cls.imported_params = {}
             raise UserConfigError from error
         for _i_line, _line in enumerate(file_lines):
-            if cls._line_starts_with_scan_cmd(_line):
+            if _line.startswith(("ascan", "dscan", "mesh", "dmesh")):
                 if _scan_command_found:
                     cls._process_duplicate_scan_command()
-                if _line.startswith("ascan") or _line.startswith("dscan"):
+                if _line.startswith(("ascan", "dscan")):
                     cls._process_1dscan_cmd(_i_line, _line, file_lines)
                     _scan_dim = 1
-                elif _line.startswith("mesh") or _line.startswith("dmesh"):
+                elif _line.startswith(("mesh", "dmesh")):
                     cls._process_mesh_cmd(_i_line, _line, file_lines)
                     _scan_dim = 2
                 _scan_command_found = True

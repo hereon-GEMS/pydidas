@@ -119,7 +119,7 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         _cls = META(
             title.upper(),
             (ProcessingResultIoBase,),
-            dict(extensions=[ext.lower()], format_name=ext),
+            {"extensions": [ext.lower()], "format_name": ext},
         )
         return _cls
 
@@ -136,7 +136,7 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
                 "data_label": _data_labels[_id],
                 "plugin_name": _plugin_names[_id],
             }
-            for _id in _shapes.keys()
+            for _id in _shapes
         }
         return _save_dir, _node_info
 
@@ -255,9 +255,7 @@ class TestProcessingResultsSaverMeta(unittest.TestCase):
         for _id in [1, 3]:
             with (self._dir / f"node_{_id:02d}.TEST").open("w") as _file:
                 _file.write("dummy")
-        _data, _node_info, _scan, exp, _tree = META.import_data_from_directory(
-            self._dir
-        )
+        _data, _node_info, _scan, _, _ = META.import_data_from_directory(self._dir)
         for _id in [1, 3]:
             self.assertTrue(
                 np.allclose(

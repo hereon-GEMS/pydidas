@@ -29,7 +29,7 @@ __all__ = ["GENERIC_PARAMS_METADATA"]
 
 
 import importlib
-from datetime import date
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pydidas.core.generic_params.generic_params_scan import GENERIC_PARAMS_SCAN
@@ -38,7 +38,7 @@ from pydidas.core.utils import format_input_to_multiline_str
 
 _prefix = "pydidas.core.generic_params."
 
-_metadata_by_module = dict()
+_metadata_by_module = {}
 for _module_name in [
     _object.stem
     for _object in Path(__file__).parent.iterdir()
@@ -49,10 +49,10 @@ for _module_name in [
         _module_name.upper(),
     )
 
-GENERIC_PARAMS_METADATA = dict()
-for key, value in _metadata_by_module.items():
-    for key2, value2 in value.items():
-        GENERIC_PARAMS_METADATA[key2] = value2
+GENERIC_PARAMS_METADATA = {}
+for _info in _metadata_by_module.values():
+    for _key, _value in _info.items():
+        GENERIC_PARAMS_METADATA[_key] = _value
 
 
 __DOC_FILE_HEADER = """
@@ -107,7 +107,7 @@ __SCAN_PARAMS_HEADER = """..
 
 List of all ScanContext Parameters
 ----------------------------------
-""".replace("YYYY", str(date.today().year))
+""".replace("YYYY", str(datetime.now(UTC).year))
 
 __SCAN_DIM_PARAMS = """
 
@@ -178,8 +178,7 @@ def create_generic_params_rst_docs(filename: Path):
                 __items_to_write.append(f"       | **{_key}** : {_write_val}\n")
     with open(filename, "w", encoding="utf-8") as f:
         f.write(__DOC_FILE_HEADER)
-        for _entry in __items_to_write:
-            f.write(_entry)
+        f.writelines(__items_to_write)
 
 
 def create_scan_context_params_rst_docs(filename: Path):
@@ -198,7 +197,7 @@ def create_scan_context_params_rst_docs(filename: Path):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(__SCAN_PARAMS_HEADER)
         for _key, _description in GENERIC_PARAMS_SCAN.items():
-            if _key.startswith("scan_dim") or _key.startswith("scan_index"):
+            if _key.startswith(("scan_dim", "scan_index")):
                 continue
             _type = _description["type"]
             f.write(

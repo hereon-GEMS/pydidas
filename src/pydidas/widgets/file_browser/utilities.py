@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ChangeFilter"]
 
-
-from typing import Any
+from types import TracebackType
+from typing import Self
 
 from qtpy.QtCore import QSortFilterProxyModel
 
@@ -60,7 +60,7 @@ class ChangeFilter:
         """
         self._model: QSortFilterProxyModel = model
 
-    def __enter__(self) -> "ChangeFilter":
+    def __enter__(self) -> Self:
         """Begin the filter-change block."""
         if IS_QT6:
             self._model.beginFilterChange()
@@ -70,7 +70,7 @@ class ChangeFilter:
         self,
         type_: type[BaseException] | None,
         value: BaseException | None,
-        traceback: Any,
+        traceback: TracebackType | None,
     ) -> None:
         """End the filter-change block and invalidate the filter."""
         if IS_QT6:

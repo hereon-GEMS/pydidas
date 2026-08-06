@@ -29,8 +29,9 @@ __all__ = ["create_hdf5_io_file", "create_hdf5_results_file"]
 
 
 import os.path
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import h5py  # type: ignore[import-untyped]
 

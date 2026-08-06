@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,18 +20,18 @@ The pyfai_names module holds names (constants) extracted from pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "PYFAI_DETECTOR_MANUFACTURERS",
+    "PYFAI_DETECTOR_MODELS_OF_SHAPES",
     "PYFAI_DETECTOR_NAMES",
     "PYFAI_MANUFACTURERS_OF_DETECTORS",
     "PYFAI_SHAPES_OF_DETECTOR_MODELS",
-    "PYFAI_DETECTOR_MODELS_OF_SHAPES",
-    "pyFAI_UNITS",
     "pyFAI_METHOD",
+    "pyFAI_UNITS",
 ]
 
 
@@ -66,7 +66,7 @@ PYFAI_MANUFACTURERS_OF_DETECTORS = {}
 PYFAI_SHAPES_OF_DETECTOR_MODELS = {}
 PYFAI_DETECTOR_MODELS_OF_SHAPES = {}
 
-for __name, __class in _Detector.registry.items():
+for __class in _Detector.registry.values():
     __manufacturer = "Custom" if __class.MANUFACTURER is None else __class.MANUFACTURER
     if isinstance(__manufacturer, list):
         __manufacturer = " / ".join(__manufacturer)

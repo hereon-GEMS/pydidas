@@ -88,7 +88,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self._nx = self._n_total // self._ny + int(
             np.ceil((self._n_total % self._ny) / self._ny)
         )
-        setattr(CompositeCreatorApp, "parse_func", lambda obj: {})
+        CompositeCreatorApp.parse_func = lambda obj: {}
         app = CompositeCreatorApp()
         app.set_param_value("first_file", self._fname(0))
         app.set_param_value("last_file", self._fname(self._n_total - 1))
@@ -281,7 +281,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_func(self):
         app = self.get_default_app()
         app._config["current_fname"] = self._hdf5_fnames[0]
-        app._config["current_kwargs"] = dict(dataset="/entry/data/data", indices=(0,))
+        app._config["current_kwargs"] = {"dataset": "/entry/data/data", "indices": (0,)}
         _image = app.multiprocessing_func(0)
         self.assertTrue((_image == self._data[0]).all())
 

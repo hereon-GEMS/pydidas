@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,6 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
@@ -68,8 +67,7 @@ def _write_fio_files_with_2moved_motors(filenames: list[Path]):
             _file.write(" COL0 x DOUBLE\n")
             _file.write(" COL1 ioni DOUBLE\n")
             _file.write(" COL2 dummy DOUBLE\n")
-            for _n in range(11):
-                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+            _file.writelines(f"{_n - 5} {143.256554} {42.5}\n" for _n in range(11))
 
 
 def assert_general_scan_params_in_order(
@@ -136,7 +134,7 @@ def test_import_from_file__no_file():
 
 def test_import_from_file__wrong_type():
     scan = Scan()
-    _filenames = set(["test_single_fio_ascan.fio", "test_single_fio_dscan.fio"])
+    _filenames = {"test_single_fio_ascan.fio", "test_single_fio_dscan.fio"}
     with pytest.raises(UserConfigError):
         ScanIoFio.import_from_file(_filenames, scan=scan)
 
@@ -144,7 +142,7 @@ def test_import_from_file__wrong_type():
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan", "mesh", "dmesh"])
 def test_import_from_single_file__validation(
-    scan: Optional[Scan], scan_type: str, reset_scan_context
+    scan: Scan | None, scan_type: str, reset_scan_context
 ):
     _filename = _TEST_DIR.joinpath("_data", f"test_single_fio_{scan_type}.fio")
     ScanIoFio.import_from_file(_filename, scan=scan)
@@ -191,7 +189,7 @@ def test_import_from_single_file__empty(reset_scan_context, temp_dir):
 @pytest.mark.parametrize("scan", [ScanContext(), Scan(), None])
 @pytest.mark.parametrize("scan_type", ["ascan", "dscan"])
 def test_import_from_multiple_files__validation(
-    scan: Optional[Scan], scan_type: str, reset_scan_context
+    scan: Scan | None, scan_type: str, reset_scan_context
 ):
     filenames = [
         _TEST_DIR.joinpath("_data", f"2d_mesh_fio_{scan_type}", f"2dmesh_{i:05d}.fio")
@@ -290,8 +288,7 @@ def test_import_from_multiple_files__different_scan_commands(
             _file.write(" COL0 x DOUBLE\n")
             _file.write(" COL1 ioni DOUBLE\n")
             _file.write(" COL2 dummy DOUBLE\n")
-            for _n in range(11):
-                _file.write(f"{_n - 5} {143.256554} {42.5}\n")
+            _file.writelines(f"{_n - 5} {143.256554} {42.5}\n" for _n in range(11))
     ScanIoFio.imported_params = {"test_entry": True}
     with pytest.raises(UserConfigError):
         ScanIoFio.import_from_file(_filenames)

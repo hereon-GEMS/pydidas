@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,11 +20,11 @@ Module with subclasses of silx widgets to allow direct access without data views
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasHdf5TableView", "PydidasArrayTableWidget"]
+__all__ = ["PydidasArrayTableWidget", "PydidasHdf5TableView"]
 
 
 from typing import Any
@@ -44,7 +44,7 @@ class PydidasHdf5TableView(Hdf5TableView):
     def display_data(
         self,
         data: h5py.Dataset | h5py.File | h5py.Group | H5Node,
-        **kwargs: Any,  # noqa ARG001
+        **kwargs: Any,
     ) -> None:
         """
         Display the data in the view.
@@ -63,9 +63,8 @@ class PydidasHdf5TableView(Hdf5TableView):
         """Clear the data reference."""
         self.setData(None)
 
-    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+    def setGraphTitle(self, title: str) -> None:
         """Set the graph title."""
-        pass
 
 
 class PydidasArrayTableWidget(ArrayTableWidget):
@@ -76,7 +75,7 @@ class PydidasArrayTableWidget(ArrayTableWidget):
     def display_data(
         self,
         data: np.ndarray | H5Node,
-        **kwargs: Any,  # noqa ARG001
+        **kwargs: Any,
     ) -> None:
         """
         Display the data in the view.
@@ -98,6 +97,5 @@ class PydidasArrayTableWidget(ArrayTableWidget):
         """Clear the table."""
         self.setArrayData(np.array([]))
 
-    def setGraphTitle(self, title: str) -> None:  # noqa ARG001
+    def setGraphTitle(self, title: str) -> None:
         """Set the graph title."""
-        pass

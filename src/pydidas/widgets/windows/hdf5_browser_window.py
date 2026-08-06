@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with custom Pydidas DataViews to be used in silx widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,6 @@ __all__ = ["Hdf5BrowserWindow"]
 
 from functools import partial
 from pathlib import Path
-from typing import Union
 
 import h5py
 from qtpy import QtCore, QtGui, QtWidgets
@@ -180,7 +179,7 @@ class Hdf5BrowserWindow(PydidasWindow):
         if expand:
             QtWidgets.QApplication.restoreOverrideCursor()
 
-    def open_file(self, filename: Union[str, Path]):
+    def open_file(self, filename: str | Path):
         """
         Open a file in the browser
         """

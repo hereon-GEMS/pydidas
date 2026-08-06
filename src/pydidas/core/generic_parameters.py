@@ -27,7 +27,7 @@ __license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["get_generic_parameter", "get_generic_param_collection"]
+__all__ = ["get_generic_param_collection", "get_generic_parameter"]
 
 
 from pathlib import Path

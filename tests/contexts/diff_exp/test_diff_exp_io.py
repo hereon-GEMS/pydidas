@@ -25,6 +25,7 @@ __status__ = "Production"
 
 
 import unittest
+from typing import ClassVar
 
 from pydidas.contexts.diff_exp import (
     DiffractionExperiment,
@@ -38,8 +39,8 @@ EXP = DiffractionExperimentContext()
 
 
 class TestIo(DiffractionExperimentIoBase):
-    extensions = [".test"]
-    format_name = "Test"
+    extensions: ClassVar[list[str]] = [".test"]
+    format_name: ClassVar[str] = "Test"
 
     @classmethod
     def reset(cls):

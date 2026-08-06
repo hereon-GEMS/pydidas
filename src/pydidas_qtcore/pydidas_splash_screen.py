@@ -105,7 +105,7 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
             The default is None.
         """
         if PydidasSplashScreen._instance is not None:
-            return PydidasSplashScreen._instance
+            raise RuntimeError("Cannot create a new instance of PydidasSplashScreen")
         if pixmap is None:
             _splash_path = (
                 custom_splash_image if custom_splash_image else _SPLASH_IMAGE_PATH
@@ -129,3 +129,8 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
             The message to be displayed.
         """
         self.showMessage(message, int(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom))
+
+    def deleteLater(self) -> None:
+        """Destructor for the PydidasSplashScreen class."""
+        PydidasSplashScreen._instance = None
+        super().deleteLater()

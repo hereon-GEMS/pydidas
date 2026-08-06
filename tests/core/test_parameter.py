@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,7 +78,7 @@ class TestParameter(unittest.TestCase):
             Parameter()
 
     def test_creation__with_meta_dict(self):
-        obj = Parameter("Test0", int, 0, dict())
+        obj = Parameter("Test0", int, 0, {})
         self.assertIsInstance(obj, Parameter)
 
     def test_creation__missing_default(self):
@@ -209,7 +209,7 @@ class TestParameter(unittest.TestCase):
     def test_choices_setter__wrong_type(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         with self.assertRaises(TypeError):
-            obj.choices = dict(a=0, b=12)
+            obj.choices = {"a": 0, "b": 12}
 
     def test_choices_setter__value_not_included(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
@@ -305,6 +305,16 @@ class TestParameter(unittest.TestCase):
                 obj = Parameter("Test0", tuple, (1, 2), subtype=int)
                 obj.value = _val
                 self.assertEqual(obj.value, _ref)
+
+    def test_set_value__tuple_w_ndarray_input(self):
+        _val = (1, 4, 2)
+        for _allow_none in [True, False]:
+            with self.subTest(allow_None=_allow_none):
+                obj = Parameter(
+                    "Test0", tuple, (1, 2), subtype=int, allow_None=_allow_none
+                )
+                obj.value = np.array(_val)
+                self.assertEqual(obj.value, _val)
 
     def test_set_value__tuple_w_subtype_wrong_type(self):
         _val = (1, 2, "3b")
@@ -407,7 +417,7 @@ class TestParameter(unittest.TestCase):
     def test_get_value_for_export__with_NoneType(self):
         obj = Parameter("Test0", None, 27.7)
         with self.assertRaises(TypeError):
-            obj.value_for_export
+            _ = obj.value_for_export
 
     def test_set_value_and_choices__wrong_type(self):
         obj = Parameter("Test0", float, 27.7)

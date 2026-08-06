@@ -392,9 +392,7 @@ class ParameterCollection(dict):
                 _msg = f"No Parameter with the key {_arg} has been registered."
                 raise KeyError(_msg)
             _vals.add(self.get_value(_arg))
-        if len(_vals) == 1:
-            return True
-        return False
+        return len(_vals) == 1
 
     # ----------------------------
     # Private methods:
@@ -425,7 +423,7 @@ class ParameterCollection(dict):
 
     def __check_key_available(
         self, param: Parameter, keys: Collection[str] | None = None
-    ) -> None | NoReturn:
+    ) -> None:
         """
         Check if the Parameter refkey is already a registered key.
 

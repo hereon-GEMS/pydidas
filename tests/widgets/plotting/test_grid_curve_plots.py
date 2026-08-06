@@ -24,9 +24,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+from collections.abc import Generator
 from copy import copy
 from numbers import Integral
-from typing import Generator
 
 import numpy as np
 import pytest
@@ -57,9 +57,9 @@ def datasets() -> dict[str, Dataset]:
 
 def test_init(grid_plot: GridCurvePlot) -> None:
     assert isinstance(grid_plot._local_scan, Scan)
-    assert grid_plot._datasets == dict()
-    assert grid_plot._yscaling == dict()
-    assert grid_plot._xscaling == dict()
+    assert grid_plot._datasets == {}
+    assert grid_plot._yscaling == {}
+    assert grid_plot._xscaling == {}
     assert isinstance(grid_plot._config, dict)
 
 
@@ -120,8 +120,8 @@ def test_clear(grid_plot: GridCurvePlot) -> None:
 def test_set_datasets(grid_plot: GridCurvePlot, datasets: dict) -> None:
     grid_plot.set_datasets(**datasets)
     assert grid_plot._datasets == datasets
-    assert grid_plot._yscaling == {k: (None, None) for k in datasets.keys()}
-    assert grid_plot._xscaling == {k: (None, None) for k in datasets.keys()}
+    assert grid_plot._yscaling == {k: (None, None) for k in datasets}
+    assert grid_plot._xscaling == {k: (None, None) for k in datasets}
     assert grid_plot._config["max_index"] == datasets["test1"].shape[0] - 1
 
 

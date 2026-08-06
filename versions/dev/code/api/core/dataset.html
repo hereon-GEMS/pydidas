@@ -1121,11 +1121,11 @@ data and not only a view to prevent inconsistent metadata.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<em>int</em>) – The dimension to be updated.</p></li>
-<li><p><strong>item</strong> (<em>str</em>) – The new item for the range of the selected dimension.</p></li>
+<li><p><strong>item</strong> (<em>str</em>) – The new item for the label of the selected dimension.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the index is not in range of the Dataset dimensions or if the item is
+<dd class="field-even"><p><strong>TypeError</strong> – If the index is not in range of the Dataset dimensions or if the item is
     not a string.</p>
 </dd>
 </dl>
@@ -1142,9 +1142,6 @@ data and not only a view to prevent inconsistent metadata.</p>
 <li><p><strong>item</strong> (<em>ArrayLike</em>) – The new item for the range of the selected dimension.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the index is not in range of the Dataset dimensions.</p>
-</dd>
 </dl>
 </dd></dl>
 
@@ -1160,7 +1157,7 @@ data and not only a view to prevent inconsistent metadata.</p>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the index is not in range of the Dataset dimensions or if the item is
+<dd class="field-even"><p><strong>TypeError</strong> – If the index is not in range of the Dataset dimensions or if the item is
     not a string.</p>
 </dd>
 </dl>

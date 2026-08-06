@@ -30,7 +30,7 @@ import datetime
 import time
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -48,11 +48,11 @@ from pydidas.data_io.implementations.io_base import IoBase
 class AsciiIo(IoBase):
     """I/O implementation for ASCII files."""
 
-    extensions_export = ASCII_EXPORT_EXTENSIONS
-    extensions_import = ASCII_IMPORT_EXTENSIONS
-    format_name = "ASCII"
-    dimensions = [1, 2]
-    allows_metadata_import = True
+    extensions_export: ClassVar[list[str]] = ASCII_EXPORT_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = ASCII_IMPORT_EXTENSIONS
+    format_name: ClassVar[str] = "ASCII"
+    dimensions: ClassVar[list[int]] = [1, 2]
+    allows_metadata_import: ClassVar[bool] = True
 
     @classmethod
     def export_to_file(cls, filename: str | Path, data: np.ndarray, **kwargs: Any):
@@ -185,7 +185,7 @@ class AsciiIo(IoBase):
             (as first column).
         """
         _header = ""
-        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
+        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")  # noqa: DTZ005
         _ncols = (data.shape[1] if data.ndim > 1 else 1) + write_x_column
         _header = (
             f"F {Path(filename).name}\nE {time.time()}\nD {_time}\n\n"

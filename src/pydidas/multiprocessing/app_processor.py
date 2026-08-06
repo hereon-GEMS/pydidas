@@ -158,18 +158,18 @@ def app_processor_func(
                     _debug_message("Received queue empty signal in input queue.")
                     _output_queue.put([None, None])
                     break
-                _debug_message('Received item "%s" from queue' % _arg)
+                _debug_message(f"Received item `{_arg}` from queue")
                 _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
-                _debug_message("Starting computation of item %s" % _arg)
+                _debug_message(f"Starting computation of item `{_arg}`")
                 _results = _app.multiprocessing_func(_arg)
                 _signal = _app.must_send_signal_and_wait_for_response()
                 if _signal is not None:
                     _signal_queue.put(_signal)
                     _results = _wait_for_app_response(_app, _results)
                 _output_queue.put([_arg, _results])
-                _debug_message("Finished computation of item %s" % _arg)
+                _debug_message(f"Finished computation of item `{_arg}`")
             else:
                 time.sleep(0.005)
         else:

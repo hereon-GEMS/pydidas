@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,24 +22,26 @@ required to allow pickling of Plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["plugin_getter"]
 
 
-from typing import NewType
+from typing import TYPE_CHECKING
 
 from pydidas.plugins.plugin_collection import PluginCollection
 
 
 COLL = PluginCollection()
 
-Plugin = NewType("BasePlugin", type)
+
+if TYPE_CHECKING:
+    from pydidas.plugins.base_plugin import BasePlugin
 
 
-def plugin_getter(plugin_name: str) -> Plugin:
+def plugin_getter(plugin_name: str) -> "BasePlugin":
     """
     Get a new Plugin instance from a Plugin name.
 
@@ -50,7 +52,7 @@ def plugin_getter(plugin_name: str) -> Plugin:
 
     Returns
     -------
-    plugin : pydidas.plugins.BasePlugin
+    plugin : BasePlugin
         The new Plugin instance.
     """
     plugin = COLL.get_plugin_by_name(plugin_name)

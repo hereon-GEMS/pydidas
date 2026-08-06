@@ -25,7 +25,8 @@ __status__ = "Production"
 
 
 import re
-from typing import Generator
+from collections.abc import Generator
+from functools import partial
 
 import numpy as np
 import pytest
@@ -249,7 +250,15 @@ def test_toggle_details(qtbot, widget) -> None:
         assert widget.param_composite_widgets[_key].isVisible()
     assert widget._widgets["show_decoding_details"].isVisible()
     assert widget._widgets["show_decoding_details"].isEnabled()
+
+    def _check_visibility(should_be_visible: bool) -> bool:
+        return all(
+            widget.param_composite_widgets[_key].isVisible() == should_be_visible
+            for _key in widget.param_composite_widgets
+        )
+
     for _run in range(2):
+        _checker = partial(_check_visibility, should_be_visible=_run)
         with qtbot.waitSignal(
             widget._widgets["show_decoding_details"].clicked, timeout=1000
         ):
@@ -258,13 +267,7 @@ def test_toggle_details(qtbot, widget) -> None:
                 QtCore.Qt.MouseButton.LeftButton,
             )
         # Allow event loop to process visibility changes
-        qtbot.waitUntil(
-            lambda: all(
-                widget.param_composite_widgets[_key].isVisible() == _run
-                for _key in widget.param_composite_widgets
-            ),
-            timeout=1000,
-        )
+        qtbot.waitUntil(_checker, timeout=1000)
         # Note: the above waitUntil also serves as assertion of visibility state
         # because if the condition is not met, the test will fail due to timeout
 

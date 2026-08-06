@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to import / export.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,8 +39,9 @@ from .workflow_results_selector import *
 from .workflow_tree import *
 
 
-__all__ = ["result_io", "processing_tree_io"] + (
-    generic_node.__all__
+__all__ = (
+    ["result_io", "processing_tree_io"]
+    + generic_node.__all__
     + generic_tree.__all__
     + plugin_position_node.__all__
     + processing_results.__all__

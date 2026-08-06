@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the sin square chi residual stress analysis plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -223,9 +223,9 @@ class SinSquareChiResultsFrame(BaseFrame):
         data_source : str
             The new data source to set.
         """
-        self.param_widgets["selected_data_source"].setReadOnly(False)  # noqa E1101
+        self.param_widgets["selected_data_source"].setReadOnly(False)
         self.set_param_and_widget_value("selected_data_source", data_source)
-        self.param_widgets["selected_data_source"].setReadOnly(True)  # noqa E1101
+        self.param_widgets["selected_data_source"].setReadOnly(True)
 
     @QtCore.Slot()
     def _import_workflow_results(self):
@@ -284,7 +284,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         } | {"no selection": -1}
         self.set_param_value_and_choices(
             "selected_sin_square_chi_node",
-            list(self._sin_square_chi_node_keys)[0],
+            next(iter(self._sin_square_chi_node_keys)),
             list(self._sin_square_chi_node_keys),
         )
         self.param_widgets["selected_sin_square_chi_node"].update_choices(
@@ -297,7 +297,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         } | {"no selection": -1}
         self.set_param_value_and_choices(
             "selected_sin_2chi_node",
-            list(self._sin_2chi_node_keys)[0],
+            next(iter(self._sin_2chi_node_keys)),
             list(self._sin_2chi_node_keys),
         )
         self.param_widgets["selected_sin_2chi_node"].update_choices(

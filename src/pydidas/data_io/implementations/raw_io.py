@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a header.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Union
+from typing import ClassVar
 
 import numpy as np
 
@@ -42,16 +42,16 @@ from pydidas.data_io.implementations.io_base import IoBase
 class RawIo(IoBase):
     """IObase implementation for raw binary files."""
 
-    extensions_export = BINARY_EXTENSIONS
-    extensions_import = BINARY_EXTENSIONS
-    format_name = "Raw binary"
-    dimensions = [1, 2, 3, 4, 5, 6]
+    extensions_export: ClassVar[list[str]] = BINARY_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = BINARY_EXTENSIONS
+    format_name: ClassVar[str] = "Raw binary"
+    dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6]
 
     @classmethod
     def import_from_file(
         cls,
-        filename: Union[Path, str],
-        datatype: Union[None, type],
+        filename: Path | str,
+        datatype: None | type,
         shape: tuple = (),
         **kwargs: dict,
     ) -> Dataset:
@@ -104,9 +104,7 @@ class RawIo(IoBase):
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: dict):
         """
         Export data to raw binary file without a header.
 

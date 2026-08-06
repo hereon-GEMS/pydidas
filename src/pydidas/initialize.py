@@ -26,8 +26,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "configure_pyFAI",
     "check_documentation",
+    "configure_pyFAI",
     "initialize_qsetting_values",
 ]
 
@@ -101,9 +101,10 @@ def initialize_qsetting_values():
     _settings_versions = []
     for _key in __settings.allKeys():
         _key_version = _key.split("/")[0]
-        if _key_version not in _settings_versions:
-            if re.search(r"^[0-9]{2}\.[0-9]{2}\.[0-9]{2}$", _key_version):
-                _settings_versions.append(_key.split("/")[0])
+        if _key_version not in _settings_versions and re.search(
+            r"^[0-9]{2}\.[0-9]{2}\.[0-9]{2}$", _key_version
+        ):
+            _settings_versions.append(_key.split("/")[0])
     _settings_versions.sort(reverse=True)
     for _prefix, _keys in (
         ("global", constants.QSETTINGS_GLOBAL_KEYS),

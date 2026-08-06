@@ -27,11 +27,13 @@ __status__ = "Production"
 __all__ = ["SpecialPlotTypesButton"]
 
 
+from collections.abc import Callable
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
+from qtpy.QtGui import QIcon
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from pydidas.resources import icons
@@ -49,7 +51,7 @@ class SpecialPlotTypesButton(PlotToolButton):
     a Kratky plot for SAXS data.
     """
 
-    PLOT_TYPE = {
+    PLOT_TYPE: ClassVar[dict[tuple[str, str], str | QIcon]] = {
         ("generic", "icon"): icons.create_pydidas_icon("silx_plot_type_generic.png"),
         ("generic", "state"): "Generic f(x) = y",
         ("generic", "action"): "Plot generic data",
@@ -112,7 +114,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         self.sig_new_plot_type.emit(plot_type)  # type: ignore[attr-defined]
 
     @staticmethod
-    def func_generic(x: np.ndarray, y: np.ndarray) -> np.ndarray:  # noqa ARG001
+    def func_generic(x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         The generic function which returns the identity for y.
 
@@ -131,7 +133,7 @@ class SpecialPlotTypesButton(PlotToolButton):
         return y
 
     @staticmethod
-    def label_generic(xlabel: str, xunit: str, ylabel: str, yunit: str) -> str:  # noqa ARG001
+    def label_generic(xlabel: str, xunit: str, ylabel: str, yunit: str) -> str:
         """
         Get the generic y label.
 

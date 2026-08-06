@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,10 +20,11 @@ Tests for the Sin_2chiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
+
 
 import re
 from dataclasses import dataclass
@@ -36,7 +37,6 @@ from pydidas_plugins.residual_stress_plugins.sin_2chi_grouping import (
     LABELS_DIM0,
     LABELS_SIN2CHI,
     LABELS_SIN_2CHI,
-    PARAMETER_KEEP_RESULTS,
     UNITS_ANGSTROM,
     UNITS_NANOMETER,
 )
@@ -374,5 +374,5 @@ def test_Sin_2chiGrouping_params(plugin_fixture):
     )
     assert plugin.new_dataset
 
-    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value
-    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].choices == [True]
+    assert plugin.generic_params["keep_results"].value
+    assert plugin.generic_params["keep_results"].choices == [True]

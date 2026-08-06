@@ -29,7 +29,7 @@ __all__ = ["InputPlugin"]
 
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -59,7 +59,7 @@ class InputPlugin(BasePlugin):
         get_generic_parameter("_counted_images_per_file"),
     )
     default_params = BasePlugin.default_params.copy()
-    advanced_parameters = [
+    advanced_parameters: ClassVar[list[str]] = [
         "use_roi",
         "roi_xlow",
         "roi_xhigh",

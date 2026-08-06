@@ -126,7 +126,7 @@ class Scan(ObjectWithParameterCollection):
                 f"The demanded frame number {ordinal} is out of the scope of the Scan "
                 f"indices (0, {self.n_points})."
             )
-        _ndim: int = self.get_param_value("scan_dim")  # noqa
+        _ndim: int = self.get_param_value("scan_dim")
         _N = self.shape + (1,)
         _indices = [0] * _ndim
         for _dim in range(_ndim):
@@ -157,8 +157,7 @@ class Scan(ObjectWithParameterCollection):
             indices = np.asarray(indices)
         _shapes = np.asarray(self.shape + (1,))
         _indices_okay = [
-            0 <= _index <= _shapes[_dim]  # noqa
-            for _dim, _index in enumerate(indices)
+            0 <= _index <= _shapes[_dim] for _dim, _index in enumerate(indices)
         ]
         if not all(_indices_okay):
             raise UserConfigError(
@@ -219,7 +218,7 @@ class Scan(ObjectWithParameterCollection):
         _f0 = self.get_param_value(f"scan_dim{index}_offset")
         _df = self.get_param_value(f"scan_dim{index}_delta")
         _n = self.get_param_value(f"scan_dim{index}_n_points")
-        return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)  # noqa
+        return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
     def update_from_scan(self, scan: "Scan") -> None:
         """
@@ -274,8 +273,7 @@ class Scan(ObjectWithParameterCollection):
             The tuple with an entry of the length for each dimension.
         """
         return tuple(
-            self.get_param_value(f"scan_dim{_i}_n_points")
-            for _i in range(self.ndim)  # noqa
+            self.get_param_value(f"scan_dim{_i}_n_points") for _i in range(self.ndim)
         )
 
     @property
@@ -290,7 +288,7 @@ class Scan(ObjectWithParameterCollection):
         """
         return tuple(
             self.get_param_value(f"scan_dim{_i}_n_points")
-            for _i in range(self.ndim)  # noqa
+            for _i in range(self.ndim)
             if self.get_param_value(f"scan_dim{_i}_n_points") > 1
         )
 

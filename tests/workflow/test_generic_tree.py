@@ -64,7 +64,7 @@ class TestGenericTree(unittest.TestCase):
 
     def test_clear(self):
         tree = GenericTree()
-        tree.nodes = dict(a=1, b="c")
+        tree.nodes = {"a": 1, "b": "c"}
         tree.node_ids = [0, 1]
         tree.root = GenericNode()
         tree.clear()

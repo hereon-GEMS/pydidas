@@ -28,7 +28,7 @@ __all__ = ["ProcessingTreeIoHdf5"]
 
 
 from pathlib import Path
-from typing import Any, NewType
+from typing import Any, ClassVar, NewType
 
 import h5py
 
@@ -53,7 +53,7 @@ class ProcessingTreeIoHdf5(ProcessingTreeIoBase):
     Import/Export class for the ProcessingTree to/from HDF5 files.
     """
 
-    extensions = HDF5_EXTENSIONS
+    extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "HDF5"
     default_suffix = ".nxs"
 

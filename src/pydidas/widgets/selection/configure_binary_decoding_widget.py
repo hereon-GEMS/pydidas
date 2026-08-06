@@ -29,7 +29,7 @@ __all__ = ["ConfigureBinaryDecodingWidget"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -69,7 +69,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
     default_params = get_generic_param_collection(
         "filename", "raw_datatype", "raw_n_y", "raw_n_x", "raw_header_size"
     )
-    init_kwargs = ["params"]
+    init_kwargs: ClassVar[list[str]] = ["params"]
     sig_new_binary_image = QtCore.Signal(Path, dict)
     sig_new_binary_config = QtCore.Signal(dict)
     sig_decoding_invalid = QtCore.Signal()

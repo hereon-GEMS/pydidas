@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ from the available datasets in a hdf5 file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,6 @@ __all__ = ["ItemInListSelectionWidget"]
 
 
 from collections.abc import Iterable
-from typing import Optional
 
 from qtpy import QtWidgets
 
@@ -54,7 +53,7 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
     def __init__(
         self,
         options: list[str],
-        parent: Optional[QtWidgets.QWidget] = None,
+        parent: QtWidgets.QWidget | None = None,
         title="Select item",
         label="Items:",
     ):
@@ -83,7 +82,7 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
-    def get_item(self) -> Optional[str]:
+    def get_item(self) -> str | None:
         """
         Show the QInputDialog and get the selected item.
 

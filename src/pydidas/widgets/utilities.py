@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "delete_all_items_in_layout",
-    "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
+    "get_pyqt_icon_from_str",
     "get_widget_layout_args",
     "icon_with_inverted_colors",
 ]

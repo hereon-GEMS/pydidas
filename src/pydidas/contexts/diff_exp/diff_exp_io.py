@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,14 +22,13 @@ singleton and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIo"]
 
-
-from typing import Union
+from typing import ClassVar
 
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils import get_extension
@@ -44,12 +43,10 @@ class DiffractionExperimentIo(GenericIoMeta):
 
     # need to redefine the registry to have a unique registry for
     # DiffractionExperimentIo
-    registry = {}
+    registry: ClassVar[dict[str, type["DiffractionExperimentIo"]]] = {}
 
     @classmethod
-    def import_from_file(
-        cls, filename: str, diffraction_exp: Union[object, None] = None
-    ):
+    def import_from_file(cls, filename: str, diffraction_exp: object | None = None):
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.

@@ -30,7 +30,7 @@ __all__ = ["pyFAIintegrationBase"]
 
 import multiprocessing as mp
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 import numpy as np
 from pyFAI.integrator.azimuthal import AzimuthalIntegrator
@@ -60,7 +60,7 @@ OCL = OpenCL()
 PI_STR = ASCII_TO_UNI["pi"]
 
 
-class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
+class pyFAIintegrationBase(ProcPlugin):
     """
     Provide basic functionality for the concrete integration plugins.
     """
@@ -88,7 +88,10 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
     output_data_unit = "a.u."
     new_dataset = True
     has_unique_parameter_config_widget = True
-    advanced_parameters = ["correct_solid_angle", "polarization_factor"]
+    advanced_parameters: ClassVar[list[str]] = [
+        "correct_solid_angle",
+        "polarization_factor",
+    ]
 
     def __init__(self, *args: tuple, **kwargs: Any):
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
@@ -176,9 +179,8 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
             The azimuthal range for the pyFAI integration in radian.
         """
         _range = self.get_azimuthal_range_native()
-        if _range is not None:
-            if "deg" in self.get_param_value("azi_unit"):
-                _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
+        if _range is not None and "deg" in self.get_param_value("azi_unit"):
+            _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
         return _range
 
     def get_azimuthal_range_in_deg(self) -> None | tuple[float, float]:
@@ -196,9 +198,8 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
             The azimuthal range for the pyFAI integration in degrees.
         """
         _range = self.get_azimuthal_range_native()
-        if _range is not None:
-            if "rad" in self.get_param_value("azi_unit"):
-                _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
+        if _range is not None and "rad" in self.get_param_value("azi_unit"):
+            _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
         return _range
 
     def get_azimuthal_range_native(self) -> tuple[float, float]:
@@ -327,7 +328,7 @@ class pyFAIintegrationBase(ProcPlugin):  # noqa C0103
             return _low < _high <= np.pi + 1e-7
         return 0 <= _low <= _high <= 2 * np.pi + 1e-7
 
-    def get_pyFAI_unit_from_param(self, param_name: str) -> str:  # noqa C0103
+    def get_pyFAI_unit_from_param(self, param_name: str) -> str:
         """
         Get the unit of the Parameter called param_name in pyFAI notation.
 

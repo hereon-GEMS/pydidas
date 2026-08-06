@@ -30,7 +30,7 @@ __all__ = ["QuickIntegrationFrame"]
 
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -75,7 +75,7 @@ class QuickIntegrationFrame(BaseFrame):
         "rad_npoint",
         "detector_model",
     )
-    params_not_to_restore = [
+    params_not_to_restore: ClassVar[list[str]] = [
         "integration_direction",
         "azi_npoint",
         "rad_npoint",
@@ -204,7 +204,7 @@ class QuickIntegrationFrame(BaseFrame):
         """
         self._image = import_data(filename, **open_image_kwargs)
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
-        self._widgets["input_plot"]._actions["canvas"].set_canvas_mode("tight")  # noqa W0212
+        self._widgets["input_plot"]._actions["canvas"].set_canvas_mode("tight")
         self._roi_controller.show_plot_items("roi")
         self._toggle_fname_valid(True)
         self._update_detector_model()
@@ -238,10 +238,9 @@ class QuickIntegrationFrame(BaseFrame):
     def _update_detector_model(self) -> None:
         """Update the detector model selection based on the input image shape."""
         _shape = self._image.shape
-        _det_models = (
-            PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._image.shape, [])
-            + ["Custom detector"]  # noqa
-        )
+        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._image.shape, []) + [
+            "Custom detector"
+        ]
         _old_model = self.get_param_value("detector_model")
         _old_available = _old_model in _det_models and _shape == self._EXP.det_shape
         if _old_available:

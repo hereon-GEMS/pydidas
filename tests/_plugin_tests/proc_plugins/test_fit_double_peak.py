@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -26,7 +26,6 @@ __status__ = "Production"
 
 import itertools
 import unittest
-from typing import Optional
 
 import numpy as np
 from qtpy import QtCore
@@ -48,7 +47,7 @@ class TestFitDoublePeak(unittest.TestCase):
 
     def setUp(self):
         self._data = Dataset(
-            np.ones((150)), data_unit="data unit", axis_units=["ax_unit"]
+            np.ones(150), data_unit="data unit", axis_units=["ax_unit"]
         )
         self._x = np.arange(self._data.size) * 0.5
         _index1 = 39
@@ -120,7 +119,7 @@ class TestFitDoublePeak(unittest.TestCase):
         self,
         fit_result_data: Dataset,
         params: dict,
-        bg_order: Optional[int],
+        bg_order: int | None,
         amplitude_tolerance=None,
     ):
         self.assertEqual(

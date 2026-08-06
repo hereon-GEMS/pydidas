@@ -48,8 +48,9 @@ from .str_utils import *
 from .timer import *
 
 
-__all__ = ["hdf5", "converters", "scattering_geometry"] + (
-    clipboard_.__all__
+__all__ = (
+    ["hdf5", "converters", "scattering_geometry"]
+    + clipboard_.__all__
     + decorators.__all__
     + file_checks.__all__
     + file_utils.__all__

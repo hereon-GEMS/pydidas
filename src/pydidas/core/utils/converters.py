@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Converters for generic type conversions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,10 +31,9 @@ __all__ = [
 
 from collections.abc import Iterable
 from numbers import Integral
-from typing import NoReturn
 
 
-def convert_to_slice(entry: object) -> slice | NoReturn:
+def convert_to_slice(entry: object) -> slice:
     """
     Create a slice object from the entry, if possible
 
@@ -76,7 +75,7 @@ def convert_to_slice(entry: object) -> slice | NoReturn:
     if (
         isinstance(entry, Iterable)
         and len(entry) == 2
-        and all([_item is None or isinstance(_item, Integral) for _item in entry])
+        and all(_item is None or isinstance(_item, Integral) for _item in entry)
     ):
         return slice(entry[0], entry[1])
     raise ValueError(f"Could not convert the entry `{entry}` to a slice object.")

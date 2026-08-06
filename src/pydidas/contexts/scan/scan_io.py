@@ -29,7 +29,7 @@ __all__ = ["ScanIo"]
 
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydidas.contexts.scan.scan import Scan
 from pydidas.core import UserConfigError
@@ -50,8 +50,8 @@ class ScanIo(GenericIoMeta):
     """
 
     # need to redefine the registry to have a unique registry for ScanIo
-    registry: dict[str, "ScanIoBase"] = {}
-    beamline_format_registry: dict[str, "ScanIoBase"] = {}
+    registry: ClassVar[dict[str, "ScanIoBase"]] = {}
+    beamline_format_registry: ClassVar[dict[str, "ScanIoBase"]] = {}
 
     @classmethod
     def register_class(cls, new_class: "ScanIoBase", update_registry=False):
@@ -154,7 +154,7 @@ class ScanIo(GenericIoMeta):
             scan_dim0_motor : str, optional
                 The motor name for the first dimension. The default is None.
         """
-        _extensions = set([get_extension(_filename) for _filename in filenames])
+        _extensions = {get_extension(_filename) for _filename in filenames}
         if len(_extensions) > 1:
             raise UserConfigError(
                 "All files must have the same extension for batch import."
@@ -187,7 +187,7 @@ class ScanIo(GenericIoMeta):
             A coded message about whether the files can be imported and additional
             information.
         """
-        _extensions = set([get_extension(_filename) for _filename in filenames])
+        _extensions = {get_extension(_filename) for _filename in filenames}
         if len(_extensions) > 1:
             raise UserConfigError(
                 "All files must have the same extension for batch import."
@@ -237,9 +237,7 @@ class ScanIo(GenericIoMeta):
         bool
             Flag whether the extension is registered or not.
         """
-        if extension in cls.registry or extension in cls.beamline_format_registry:
-            return True
-        return False
+        return extension in cls.registry or extension in cls.beamline_format_registry
 
     @classmethod
     def get_string_of_beamline_formats(cls) -> str:
@@ -259,7 +257,7 @@ class ScanIo(GenericIoMeta):
             _cls.format_name: _cls.extensions
             for _cls in cls.beamline_format_registry.values()
         }
-        _extensions = [f"*{_key}" for _key in cls.beamline_format_registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.beamline_format_registry]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
             f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]

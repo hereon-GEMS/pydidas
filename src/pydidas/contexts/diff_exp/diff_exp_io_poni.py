@@ -28,8 +28,6 @@ __status__ = "Production"
 __all__ = ["DiffractionExperimentIoPoni"]
 
 
-from typing import Union
-
 import pyFAI
 from pyFAI.io.ponifile import PoniFile
 
@@ -78,14 +76,14 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         ):
             _pdata["detector_config"] = {}
         else:
-            _pdata["detector_config"] = dict(
-                pixel1=(1e-6 * _EXP.get_param_value("detector_pxsizey")),
-                pixel2=(1e-6 * _EXP.get_param_value("detector_pxsizex")),
-                max_shape=(
+            _pdata["detector_config"] = {
+                "pixel1": (1e-6 * _EXP.get_param_value("detector_pxsizey")),
+                "pixel2": (1e-6 * _EXP.get_param_value("detector_pxsizex")),
+                "max_shape": (
                     _EXP.get_param_value("detector_npixy"),
                     _EXP.get_param_value("detector_npixx"),
                 ),
-            )
+            }
         _pdata["wavelength"] = _EXP.get_param_value("xray_wavelength") * 1e-10
         pfile = pyFAI.io.ponifile.PoniFile(data=_pdata)
         with open(filename, "w") as stream:
@@ -95,7 +93,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
 
     @classmethod
     def import_from_file(
-        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
+        cls, filename: str, diffraction_exp: DiffractionExperiment | None = None
     ):
         """
         Restore the DiffractionExperimentContext from a YAML file.

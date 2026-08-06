@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ get new instances of these plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -39,7 +39,7 @@ from .plugin_getter_ import *
 
 # The base plugins with references to widgets must be imported last:
 from .base_fit_plugin import *
-from .pyfai_integration_base import *  # noqa: I001
+from .pyfai_integration_base import *
 
 
 __all__ = (

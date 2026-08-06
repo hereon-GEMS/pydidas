@@ -26,20 +26,20 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "get_hdf5_populated_dataset_keys",
-    "get_hdf5_metadata",
-    "create_hdf5_dataset",
     "convert_data_for_writing_to_hdf5_dataset",
-    "read_and_decode_hdf5_dataset",
+    "create_hdf5_dataset",
     "get_generic_dataset",
+    "get_hdf5_metadata",
+    "get_hdf5_populated_dataset_keys",
+    "read_and_decode_hdf5_dataset",
     "verify_hdf5_dset_exists_in_file",
 ]
 
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from numbers import Integral, Real
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 import h5py
 import numpy as np
@@ -130,9 +130,10 @@ def get_hdf5_populated_dataset_keys(
     _nxdata_signal_only = kwargs.get("nxdata_signal_only", False)
     if _nxdata_signal_only and item.attrs.get("NX_class", "") == "NXdata":
         _signal_key = item.attrs.get("signal", "")
-        if _signal_key in item:
-            if _dataset_selection_valid_check(item[_signal_key], kwargs):
-                _datasets.append(f"{_item_name}/{_signal_key}")
+        if _signal_key in item and _dataset_selection_valid_check(
+            item[_signal_key], kwargs
+        ):
+            _datasets.append(f"{_item_name}/{_signal_key}")
     else:
         for _key in item:
             _item = item[_key]
@@ -295,7 +296,7 @@ def get_hdf5_metadata(
         if "nbytes" in meta:
             _results["nbytes"] = _file[_dset].nbytes
     if len(_results) == 1:
-        _results = tuple(_results.values())[0]
+        _results = next(iter(_results.values()))
     return _results
 
 
@@ -374,7 +375,7 @@ def create_hdf5_dataset(
         _group = origin.get(group)
         if _group is None:
             _group = origin.create_group(group)
-    if dset_name in _group.keys():
+    if dset_name in _group:
         del _group[dset_name]
     if "data" in dset_kws:
         dset_kws["data"] = convert_data_for_writing_to_hdf5_dataset(dset_kws["data"])

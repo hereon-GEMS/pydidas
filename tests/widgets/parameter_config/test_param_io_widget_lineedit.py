@@ -149,7 +149,7 @@ def test_set_text__w_precision(qtbot, precision, value):
     if value in [None, "None"]:
         assert widget.text() == "None"
         assert widget.current_text == "None"
-        widget.spy_new_value.results[0][0] is None
+        assert widget.spy_new_value.results[0][0] == "None"
     elif value in [np.nan, "nan"]:
         assert widget.text() == "nan"
         assert widget.current_text == "nan"

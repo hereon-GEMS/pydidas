@@ -111,11 +111,15 @@ def _create_calib_tasks() -> list[
         _autoscale_mean_3sigma_action = actions.AutoscaleToMeanAndThreeSigmaAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
-        _widget_action = [
-            _action
-            for _action in _toolbar.actions()
-            if isinstance(_action, QtWidgets.QWidgetAction)
-        ][0]
+        _widget_action = next(
+            iter(
+                [
+                    _action
+                    for _action in _toolbar.actions()
+                    if isinstance(_action, QtWidgets.QWidgetAction)
+                ]
+            )
+        )
         _toolbar.addAction(_histo_crop_action)
         _toolbar.addAction(_autoscale_min_max_action)
         _toolbar.addAction(_autoscale_mean_3sigma_action)
@@ -123,16 +127,12 @@ def _create_calib_tasks() -> list[
         _toolbar.insertAction(_widget_action, _autoscale_min_max_action)
         _toolbar.insertAction(_widget_action, _autoscale_mean_3sigma_action)
     # explicitly hide the toolbar with the 3D visualization:
-    getattr(_experiment_task, "_ExperimentTask__plot").findChildren(QToolBar)[
-        2
-    ].setVisible(False)
-    getattr(_geometry_task, "_GeometryTask__plot").findChildren(QToolBar)[2].setVisible(
-        False
-    )
+    _experiment_task._ExperimentTask__plot.findChildren(QToolBar)[2].setVisible(False)
+    _geometry_task._GeometryTask__plot.findChildren(QToolBar)[2].setVisible(False)
     # disable the default ring option in the peak picking task:
-    getattr(_peak_task, "_PeakPickingTask__createNewRingOption").setChecked(False)
+    _peak_task._PeakPickingTask__createNewRingOption.setChecked(False)
     # insert a button for exporting to DiffractionExperimentContext:
-    _save_poni_button = getattr(_integration_task, "_savePoniButton")
+    _save_poni_button = _integration_task._savePoniButton
     _parent = _save_poni_button.parent()
     _integration_task._update_context_button = QtWidgets.QPushButton(
         "Update pydidas diffraction setup from calibration"

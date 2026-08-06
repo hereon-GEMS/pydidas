@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the AxesSelector which allows to select slicing for a dataset.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -280,7 +280,7 @@ class AxesSelector(WidgetWithParameterCollection):
                 )
             with QtCore.QSignalBlocker(self._axis_widgets[_dim]):
                 self._axis_widgets[_dim].set_axis_metadata(
-                    *_args,  # noqa -- args is always set due to isinstance check above
+                    *_args,
                     ndim=self.filtered_data_ndim,
                 )
         self._verify_additional_choices_selected(-1, block_signals=True)
@@ -299,7 +299,7 @@ class AxesSelector(WidgetWithParameterCollection):
         """
         self._additional_choices_str = choices
         self._additional_choices = choices.split(";;") if choices else []
-        for _dim, _axwidget in self._axis_widgets.items():
+        for _axwidget in self._axis_widgets.values():
             with QtCore.QSignalBlocker(_axwidget):
                 _axwidget.define_additional_choices(choices)
         if choices == "":

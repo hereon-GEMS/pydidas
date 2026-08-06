@@ -29,7 +29,7 @@ __all__ = ["CompositeCreatorApp"]
 
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -118,7 +118,11 @@ class CompositeCreatorApp(BaseApp):
 
     default_params = COMPOSITE_CREATOR_DEFAULT_PARAMS
     parse_func = composite_creator_app_parser
-    attributes_not_to_copy_to_app_clone = ["_composite", "_det_mask", "_bg_image"]
+    attributes_not_to_copy_to_app_clone: ClassVar[list[str]] = [
+        "_composite",
+        "_det_mask",
+        "_bg_image",
+    ]
     mp_func_results = QtCore.Signal(object)
     updated_composite = QtCore.Signal()
 
@@ -287,9 +291,10 @@ class CompositeCreatorApp(BaseApp):
         """
         _bg_file = self.get_param_value("bg_file")
         verify_file_exists(_bg_file)
-        _params = dict(
-            binning=self.get_param_value("binning"), roi=self._image_metadata.roi
-        )
+        _params = {
+            "binning": self.get_param_value("binning"),
+            "roi": self._image_metadata.roi,
+        }
         if get_extension(_bg_file) in HDF5_EXTENSIONS:
             verify_hdf5_dset_exists_in_file(
                 _bg_file, self.get_param_value("bg_hdf5_key")
@@ -336,7 +341,7 @@ class CompositeCreatorApp(BaseApp):
         np.ndarray
             The array of tasks for multiprocessing.
         """
-        if "mp_tasks" not in self._config.keys():
+        if "mp_tasks" not in self._config:
             raise KeyError(
                 'Key "mp_tasks" not found. Please execute'
                 "multiprocessing_pre_run() first."
@@ -366,10 +371,10 @@ class CompositeCreatorApp(BaseApp):
         _images_per_file = self._image_metadata.images_per_file
         _i_file = index // _images_per_file
         _fname = self._filelist.get_filename(_i_file)
-        _params = dict(
-            binning=self.get_param_value("binning"),
-            roi=self._image_metadata.roi,
-        )
+        _params = {
+            "binning": self.get_param_value("binning"),
+            "roi": self._image_metadata.roi,
+        }
         if get_extension(_fname) in HDF5_EXTENSIONS:
             _slice_ax = self.get_param_value("hdf5_slicing_axis")
             _hdf_index = index % _images_per_file

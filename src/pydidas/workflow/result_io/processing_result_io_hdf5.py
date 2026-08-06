@@ -30,7 +30,7 @@ __all__ = ["ProcessingResultIoHdf5"]
 
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import h5py
 
@@ -145,12 +145,12 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
     Implementation of the ProcessingResultIoBase for Hdf5 files.
     """
 
-    extensions = HDF5_EXTENSIONS
+    extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "HDF5"
     default_suffix = ".nxs"
-    _filenames = []
-    _save_dir = None
-    _metadata_written = False
+    _filenames: ClassVar[list[str]] = []
+    _save_dir: ClassVar[Path | None] = None
+    _metadata_written: ClassVar[bool] = False
 
     @classmethod
     def prepare_files_and_directories(
@@ -197,7 +197,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         cls._node_information = node_information
         cls._filenames = cls.get_filenames_from_labels()
         cls._metadata_written = False
-        for _index in cls._node_information.keys():
+        for _index in cls._node_information:
             cls._create_file_and_populate_metadata(_index, _scan, _exp, _tree)
 
     @classmethod

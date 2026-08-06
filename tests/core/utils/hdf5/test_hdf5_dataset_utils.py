@@ -236,7 +236,7 @@ def test_get_hdf5_metadata_meta__wrong_type(hdf5_test_data, input_value):
 
 def test_get_hdf5_metadata_meta__other_str(hdf5_test_data):
     _res = get_hdf5_metadata(hdf5_test_data["ref"], "nokey")
-    assert _res == dict()
+    assert _res == {}
 
 
 def test_get_hdf5_metadata_meta__no_such_dset(hdf5_test_data):
@@ -252,15 +252,15 @@ def test_hdf5_dataset_filter_check__no_dset():
 def test_hdf5_dataset_filter_check__dim(hdf5_test_data, min_dim):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
         assert _dataset_selection_valid_check(
-            _file[_4d_DSETS[0]], dict(min_dim=min_dim)
+            _file[_4d_DSETS[0]], {"min_dim": min_dim}
         ) == (min_dim <= 4)
 
 
 def test_hdf5_dataset_filter_check__ignore_keys(hdf5_test_data):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
-        assert "4ddata" in _file["/test/path/"].keys()
+        assert "4ddata" in _file["/test/path/"]
         assert not _dataset_selection_valid_check(
-            _file["/test/path/4ddata"], dict(ignore_keys="/test/path")
+            _file["/test/path/4ddata"], {"ignore_keys": "/test/path"}
         )
 
 
@@ -300,7 +300,7 @@ def test_get_hdf5_populated_dataset_keys__min_dim(hdf5_test_data, n):
 def test_get_hdf5_populated_dataset_keys__w_h5py_dset(hdf5_test_data):
     with h5py.File(hdf5_test_data["fname"], "r") as _file:
         _res = get_hdf5_populated_dataset_keys(_file["test"])
-    assert set(_res) == set(k for k in _ALL_DSETS if k.startswith("/test/"))
+    assert set(_res) == {k for k in _ALL_DSETS if k.startswith("/test/")}
 
 
 @pytest.mark.parametrize("min_size", [5, 50, 500, 5000, 50000])
@@ -320,7 +320,7 @@ def test_get_hdf5_populated_dataset_keys__nxsignal_only(
     _res = get_hdf5_populated_dataset_keys(
         hdf5_test_data["nxs_fname"], nxdata_signal_only=nxsignal_only, min_dim=min_dim
     )
-    _expected = set(k for k, v in _NXS_DSETS.items() if v >= min_dim)
+    _expected = {k for k, v in _NXS_DSETS.items() if v >= min_dim}
     if nxsignal_only:
         assert set(_res) == _expected
     else:

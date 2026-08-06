@@ -28,8 +28,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "FILTER_KEYS",
     "FILTER_EXCEPTIONS",
+    "FILTER_KEYS",
     "FILTER_KEY_DEFAULT_ACTIVE",
     "FILTER_KEY_TITLE",
     "FILTER_KEY_TOOLTIP",

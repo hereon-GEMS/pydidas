@@ -88,7 +88,7 @@ def get_local_version() -> str:
             "pydidas automatically. Found versions in:\n"
             "\n- ".join([str(_fname) for _fname in _versions])
         )
-    return list(_versions.values())[0]
+    return next(iter(_versions.values()))
 
 
 def check_update_necessary_and_wanted(local_version: str, remote_version: str) -> bool:
@@ -161,8 +161,7 @@ def download_wheel(version: str, path: Path) -> Path:
     _response = requests.get(_url, stream=True)
     _response.raise_for_status()
     with open(path.joinpath(_wheel_filename), "wb") as _file:
-        for _chunk in _response.iter_content(chunk_size=8192):
-            _file.write(_chunk)
+        _file.writelines(_response.iter_content(chunk_size=8192))
     return path.joinpath(_wheel_filename)
 
 
@@ -382,7 +381,7 @@ def run_update():
         )
         remove_outdated_documentation()
         _success = True
-    except Exception:
+    except (OSError, PermissionError, FileNotFoundError, FileExistsError):
         restore_pre_update_files(_pydidas_location, _local_version, _remote_version)
         print_status(
             "An error occurred during the update. Restoring previous version "

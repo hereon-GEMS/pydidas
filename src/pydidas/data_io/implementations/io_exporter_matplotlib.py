@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ images.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Union
+from typing import ClassVar
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -42,15 +42,13 @@ from pydidas.data_io.utils import calculate_fig_size_arguments
 class IoExporterMatplotlib(IoBase):
     """IObase implementation for matplotlib based exporters."""
 
-    extensions_export = []
-    extensions_import = []
-    format_name = ""
-    dimensions = [1, 2]
+    extensions_export: ClassVar[list[str]] = []
+    extensions_import: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = ""
+    dimensions: ClassVar[list[int]] = [1, 2]
 
     @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: dict):
         """
         Export data as a matplotlib plot.
 
@@ -68,7 +66,7 @@ class IoExporterMatplotlib(IoBase):
 
     @classmethod
     def export_matplotlib_figure(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
+        cls, filename: Path | str, data: np.ndarray, **kwargs: dict
     ):
         """
         Export data to a matplotlib file.
@@ -108,7 +106,7 @@ class IoExporterMatplotlib(IoBase):
 
     @classmethod
     def export_matplotlib_plot(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
+        cls, filename: Path | str, data: np.ndarray, **kwargs: dict
     ):
         """
         Export data to a matplotlib file.

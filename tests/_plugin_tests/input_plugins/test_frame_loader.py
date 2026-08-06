@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -90,7 +90,7 @@ def test_get_frame(set_up_scan, ordinal, use_roi):
     plugin.set_param_value("use_roi", use_roi)
     plugin.set_param_value("roi_yhigh", 5)
     plugin.pre_execute()
-    _data, kwargs = plugin.get_frame(ordinal)
+    _data, _ = plugin.get_frame(ordinal)
     assert isinstance(_data, Dataset)
     assert _data.shape == (5 if use_roi else _IMG_SHAPE[0], _IMG_SHAPE[1])
     assert np.allclose(_data, ordinal)
@@ -103,7 +103,7 @@ def test__integration__execute(set_up_scan, ordinal, use_roi):
     plugin.set_param_value("use_roi", use_roi)
     plugin.set_param_value("roi_yhigh", 5)
     plugin.pre_execute()
-    _data, kwargs = plugin.execute(ordinal)
+    _data, _ = plugin.execute(ordinal)
     assert np.allclose(_data, ordinal)
     assert _data.shape == (5 if use_roi else _IMG_SHAPE[0], _IMG_SHAPE[1])
 

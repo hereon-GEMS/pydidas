@@ -25,8 +25,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "pydidas_logo_svg",
     "pydidas_error_svg",
+    "pydidas_logo_svg",
 ]
 
 

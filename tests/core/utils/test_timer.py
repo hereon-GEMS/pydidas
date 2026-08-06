@@ -43,10 +43,8 @@ class TestTimer(unittest.TestCase):
 
     def test_timer(self):
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                with Timer():
-                    time.sleep(0.01)
+        with _fname.open("w") as _f, redirect_stdout(_f), Timer():
+            time.sleep(0.01)
         with _fname.open("r") as _f:
             _text = _f.read()
         self.assertIn("Code runtime is ", _text)

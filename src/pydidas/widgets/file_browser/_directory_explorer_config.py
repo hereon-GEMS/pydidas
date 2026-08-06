@@ -26,8 +26,8 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG",
     "DIRECTORY_EXPLORER_DEFAULT_PARAMS",
+    "DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG",
 ]
 
 

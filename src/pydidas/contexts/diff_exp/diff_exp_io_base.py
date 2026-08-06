@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@ DiffractionExperiment(Context) should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DiffractionExperimentIoBase"]
 
-
-from typing import Union
+from typing import Any, ClassVar
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
@@ -45,9 +44,9 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
     Base class for DiffractionExperimentContext importer/exporters.
     """
 
-    extensions = []
+    extensions: ClassVar[list[str]] = []
     format_name = "unknown"
-    imported_params = {}
+    imported_params: ClassVar[dict[str, Any]] = {}
 
     @classmethod
     def _verify_all_entries_present(cls, exclude_det_mask: bool = False):
@@ -76,7 +75,7 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
 
     @classmethod
     def _write_to_exp_settings(
-        cls, diffraction_exp: Union[DiffractionExperiment, None] = None
+        cls, diffraction_exp: DiffractionExperiment | None = None
     ):
         """
         Write the loaded (temporary) Parameters to a Diffraction.

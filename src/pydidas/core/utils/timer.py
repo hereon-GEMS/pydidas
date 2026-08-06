@@ -28,7 +28,8 @@ __all__ = ["Timer", "TimerSaveRuntime"]
 
 
 import time
-from typing import Any
+import types
+from typing import Self
 
 
 class Timer:
@@ -54,7 +55,7 @@ class Timer:
         self._tstart: float | None = None
         self._msg = msg
 
-    def __enter__(self) -> "Timer":
+    def __enter__(self) -> Self:
         """Start the context manager."""
         self._tstart = time.perf_counter()
         return self
@@ -63,7 +64,7 @@ class Timer:
         self,
         type_: type[BaseException] | None,
         value: BaseException | None,
-        traceback: Any,
+        traceback: types.TracebackType | None,
     ) -> None:
         """Exit the context manager."""
         _delta = time.perf_counter() - self._tstart
@@ -94,7 +95,7 @@ class TimerSaveRuntime:
         self._tstart = 0
         self._tend = 0
 
-    def __enter__(self) -> "TimerSaveRuntime":
+    def __enter__(self) -> Self:
         """Start the context manager."""
         self._tstart = time.perf_counter()
         return self
@@ -103,7 +104,7 @@ class TimerSaveRuntime:
         self,
         type_: type[BaseException] | None,
         value: BaseException | None,
-        traceback: Any,
+        traceback: types.TracebackType | None,
     ) -> None:
         """Exit the context manager."""
         self._tend = time.perf_counter()

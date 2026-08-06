@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,23 +20,22 @@ Script to remove all files with stored GUI states, for example if they are broke
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["remove_pydidas_stored_gui_states", "remove_pydidas_log_files"]
+__all__ = ["remove_pydidas_log_files", "remove_pydidas_stored_gui_states"]
 
 
 import os
 import shutil
 from pathlib import Path
-from typing import Union
 
 from qtpy import QtCore
 
 
 def remove_pydidas_stored_gui_states(
-    version: Union[None, str] = None, confirm_finish: bool = True, verbose: bool = True
+    version: None | str = None, confirm_finish: bool = True, verbose: bool = True
 ):
     """
     Remove the stored GUI states in case they are broken.
@@ -57,8 +56,8 @@ def remove_pydidas_stored_gui_states(
     _config_path = Path(
         QtCore.QStandardPaths.standardLocations(QtCore.QStandardPaths.ConfigLocation)[0]
     )
-    if not _config_path.stem == "pydidas":
-        if not _config_path.stem == "Hereon":
+    if _config_path.stem != "pydidas":
+        if _config_path.stem != "Hereon":
             _config_path = _config_path.joinpath("Hereon")
         _config_path = _config_path.joinpath("pydidas")
     _state_fname = _config_path.joinpath(f"pydidas_gui_state_{_version}.yaml")
@@ -80,7 +79,7 @@ def remove_pydidas_stored_gui_states(
 
 
 def remove_pydidas_log_files(
-    version: Union[None, str] = None, confirm_finish: bool = True, verbose: bool = True
+    version: None | str = None, confirm_finish: bool = True, verbose: bool = True
 ):
     """
     Remove the stored log and exception files for the given version.

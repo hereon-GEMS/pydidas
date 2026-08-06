@@ -30,7 +30,7 @@ __all__ = ["DirectoryExplorerTreeView"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from qtpy import QtCore, QtWidgets
 
@@ -52,7 +52,7 @@ class DirectoryExplorerTreeView(QtWidgets.QTreeView):
         Supported keywords are any keywords that are supported by QTreeView.
     """
 
-    init_kwargs = ["parent"]
+    init_kwargs: ClassVar[list[str]] = ["parent"]
 
     def __init__(self, **kwargs: Any) -> None:
         QtWidgets.QTreeView.__init__(self, kwargs.get("parent", None))  # type: ignore[arg-type]

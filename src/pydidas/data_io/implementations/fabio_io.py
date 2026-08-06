@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the FabioIo class for reading ESRF-type images, e.g. EDF.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,7 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Union
+from typing import ClassVar
 
 import fabio
 
@@ -41,13 +41,13 @@ from pydidas.data_io.implementations.io_base import IoBase
 class FabioIo(IoBase):
     """IObase implementation for files supported by FabIO (e.g. EDF)."""
 
-    extensions_export = []
-    extensions_import = FABIO_EXTENSIONS
-    format_name = "FabIO reader"
-    dimensions = [2]
+    extensions_export: ClassVar[list[str]] = []
+    extensions_import: ClassVar[list[str]] = FABIO_EXTENSIONS
+    format_name: ClassVar[str] = "FabIO reader"
+    dimensions: ClassVar[list[int]] = [2]
 
     @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict):
+    def import_from_file(cls, filename: Path | str, **kwargs: dict):
         """
         Read an image from a FabIO-supported file format.
 
@@ -73,10 +73,9 @@ class FabioIo(IoBase):
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
         """
-        with CatchFileErrors(filename, Exception):
-            with fabio.open(filename) as _file:
-                _data = _file.data
-                _header = _file.header
+        with CatchFileErrors(filename, Exception), fabio.open(filename) as _file:
+            _data = _file.data
+            _header = _file.header
 
         cls._data = Dataset(_data, metadata=_header)
         return cls.return_data(**kwargs)

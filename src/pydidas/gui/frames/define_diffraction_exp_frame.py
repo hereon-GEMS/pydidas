@@ -98,7 +98,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             update_palette(
                 self.param_widgets[_p.refkey], base=QtGui.QColor(235, 235, 235)
             )
-            self.param_widgets[_p.refkey].setReadOnly(True)  # noqa E1101
+            self.param_widgets[_p.refkey].setReadOnly(True)
 
     def connect_signals(self) -> None:
         """Connect all signals and slots in the frame."""
@@ -111,7 +111,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         self._widgets["but_convert_fit2d"].clicked.connect(self.convert_from_fit2d)
 
         self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
-        for _param_key in self.params.keys():
+        for _param_key in self.params:
             param = self.get_param(_param_key)
             # disconnect directly setting the parameters and route
             # through update_param method to catch wavelength/energy updates
@@ -186,7 +186,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.copy_energy_from_pyFAI(show_warning=False)
         self.copy_geometry_from_pyFAI()
 
-    def copy_detector_from_pyFAI(self, show_warning: bool = True) -> None:  # noqa C0103
+    def copy_detector_from_pyFAI(self, show_warning: bool = True) -> None:
         """
         Copy the detector from the pyFAI CalibrationContext instance.
 
@@ -229,8 +229,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             self.set_param_and_widget_value("detector_pxsizex", 1e6 * det.pixel2)
             self.set_param_and_widget_value("detector_pxsizey", 1e6 * det.pixel1)
             if maskfile is not None:
-                if maskfile.startswith("fabio:///"):
-                    maskfile = maskfile[9:]
+                maskfile = maskfile.removeprefix("fabio:///")
                 self.set_param_and_widget_value("detector_mask_file", maskfile)
         elif show_warning:
             critical_warning(
@@ -238,7 +237,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 "No detector selected in pyFAI. Cannot copy information.",
             )
 
-    def copy_geometry_from_pyFAI(self, show_warning: bool = True) -> None:  # noqa C0103
+    def copy_geometry_from_pyFAI(self, show_warning: bool = True) -> None:
         """
         Copy the geometry from the pyFAI CalibrationContext instance.
 
@@ -263,7 +262,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
-    def copy_energy_from_pyFAI(self, show_warning: bool = True) -> None:  # noqa C0103
+    def copy_energy_from_pyFAI(self, show_warning: bool = True) -> None:
         """
         Copy the pyFAI energy and store it in the DiffractionExperimentContext.
 

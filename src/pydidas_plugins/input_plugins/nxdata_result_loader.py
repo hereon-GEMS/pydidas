@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["NXdataResultLoader"]
 
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any, ClassVar
 
 from pydidas.core import (
     Dataset,
@@ -69,7 +69,7 @@ class NXdataResultLoader(InputPlugin):
     plugin_name = "NXdata result loader"
     base_output_data_dim = None
     generic_params = BasePlugin.generic_params.copy()
-    advanced_parameters = []
+    advanced_parameters: ClassVar[list[str]] = []
 
     default_params = ParameterCollection(
         get_generic_parameter("nxdata_key"),
@@ -195,7 +195,7 @@ class NXdataResultLoader(InputPlugin):
     # private helper methods:
     # ------------------------------------
 
-    def _verify_data_shape_valid(self) -> None | NoReturn:
+    def _verify_data_shape_valid(self) -> None:
         """Verify that the shape of the data in the file matches the scan shape."""
         _scan_ndim = self._SCAN.ndim
         _scan_shape = self._SCAN.shape

@@ -26,6 +26,7 @@ __status__ = "Production"
 
 import shutil
 import tempfile
+from collections.abc import Generator
 from numbers import Real
 from pathlib import Path
 from typing import Any
@@ -56,7 +57,7 @@ def temp_dir() -> Path:
 
 
 @pytest.fixture
-def modify_diffraction_exp_context(temp_dir) -> dict[str, Any]:
+def modify_diffraction_exp_context(temp_dir) -> Generator[dict[str, Any], None, None]:
     """Fixture to modify the DiffractionExperimentContext."""
     _randomize_diffraction_exp(EXP, temp_dir)
     yield {_key: _param.value_for_export for _key, _param in EXP.params.items()}
@@ -64,7 +65,7 @@ def modify_diffraction_exp_context(temp_dir) -> dict[str, Any]:
 
 
 def _randomize_diffraction_exp(exp: DiffractionExperiment, local_dir: Path):
-    for _key, _param in exp.params.items():
+    for _key in exp.params:
         if _key in ["detector_npixx", "detector_npixy"]:
             _val = int(1000 * np.random.rand()) + 5
         elif _key in ["detector_mask_file"]:
@@ -90,7 +91,7 @@ def test_export_to_file__correct(modify_diffraction_exp_context, temp_dir):
     EXP_IO_HDF5.export_to_file(hdf5_file)
     with h5py.File(hdf5_file, "r") as file:
         _group = file["entry/pydidas_config/diffraction_exp"]
-        for _key, _param in EXP.params.items():
+        for _key in EXP.params:
             assert (
                 read_and_decode_hdf5_dataset(_group[_key])
                 == modify_diffraction_exp_context[_key]

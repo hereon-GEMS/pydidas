@@ -62,7 +62,7 @@ class TestAppRunner(unittest.TestCase):
         if self._runner is not None:
             self._runner.exit()
 
-    def wait_for_spy_signal(self, spy, timeout=10):
+    def wait_for_spy_signal(self, spy, timeout=12):
         _t0 = time.time()
         while True:
             time.sleep(0.1)

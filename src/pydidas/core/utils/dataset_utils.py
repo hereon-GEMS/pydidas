@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,32 +20,32 @@ Module with utility functions required for the Dataset class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "FLATTEN_DIM_DEFAULTS",
     "METADATA_KEYS",
-    "get_description_string",
-    "get_default_property_dict",
+    "convert_ranges_and_check_length",
     "dataset_default_attribute",
-    "update_dataset_properties_from_kwargs",
-    "get_number_of_entries",
     "get_axis_item_representation",
+    "get_corresponding_dims",
+    "get_default_property_dict",
+    "get_description_string",
     "get_dict_with_string_entries",
     "get_input_as_dict",
+    "get_number_of_entries",
     "replace_none_entries",
-    "convert_ranges_and_check_length",
-    "get_corresponding_dims",
+    "update_dataset_properties_from_kwargs",
 ]
 
 
 import textwrap
 import warnings
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from numbers import Integral, Real
-from typing import Any, Literal, NewType, Sequence, Union
+from typing import Any, Literal, NewType
 
 import numpy as np
 
@@ -72,7 +72,7 @@ METADATA_KEYS = [
 
 
 def get_description_string(
-    label: str, unit: str, sep: Literal["/", "/", "_", "(", "["] = "/"
+    label: str, unit: str, sep: Literal["/", "_", "(", "["] = "/"
 ) -> str:
     """
     Get a description based on label and unit.
@@ -173,7 +173,7 @@ def dataset_default_attribute(key: str, shape: tuple[int]) -> str | dict | tuple
     if key in ["data_unit", "data_label"]:
         return ""
     if key == "_get_item_key":
-        return tuple()
+        return ()
     if key == "metadata":
         return {}
     if key in ["axis_units", "axis_labels"]:
@@ -300,7 +300,7 @@ def get_dict_with_string_entries(
 
 
 def get_input_as_dict(
-    data: Union[dict, Sequence[float]],
+    data: dict | Sequence[float],
     target_shape: tuple[int],
     calling_method_name: str = "axis_labels",
 ) -> dict:
@@ -379,7 +379,7 @@ def replace_none_entries(metadict: dict) -> dict:
 
 
 def convert_ranges_and_check_length(
-    ranges: dict[int, Union[np.ndarray, list]], shape: tuple[int]
+    ranges: dict[int, np.ndarray | list], shape: tuple[int]
 ) -> dict[int, np.ndarray]:
     """
     Convert ranges to ndarrays and check their length with respect to the shape.
@@ -411,7 +411,7 @@ def convert_ranges_and_check_length(
         if _range is None:
             ranges[_dim] = np.arange(shape[_dim])
             continue
-        if isinstance(_range, list) or isinstance(_range, tuple):
+        if isinstance(_range, (list, tuple)):
             _range = np.asarray(_range)
             ranges[_dim] = _range
         if isinstance(_range, Real) and shape[_dim] == 1:

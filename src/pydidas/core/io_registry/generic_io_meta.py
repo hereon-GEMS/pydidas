@@ -27,7 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GenericIoMeta"]
 
-from typing import Any
+
+from typing import Any, ClassVar
 
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.utils.file_utils import get_extension
@@ -39,7 +40,7 @@ class GenericIoMeta(type):
     different file extension.
     """
 
-    registry = {}
+    registry: ClassVar[dict[str, type["GenericIoMeta"]]] = {}
 
     def __new__(cls, clsname, bases, attrs):
         """
@@ -62,7 +63,7 @@ class GenericIoMeta(type):
         type
             The new class.
         """
-        _new_class = super(GenericIoMeta, cls).__new__(cls, clsname, bases, attrs)
+        _new_class = super().__new__(cls, clsname, bases, attrs)
         cls.register_class(_new_class)
         return _new_class
 
@@ -140,9 +141,7 @@ class GenericIoMeta(type):
         """
         if not extension.startswith("."):
             extension = "." + extension
-        if extension.lower() in cls.registry:
-            return True
-        return False
+        return extension.lower() in cls.registry
 
     @classmethod
     def get_string_of_formats(cls):
@@ -159,7 +158,7 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = [f"*{_key}" for _key in cls.registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.registry]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
             f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The NumpyParser class is used to create numpy arrays from strings.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -164,8 +164,7 @@ class _NumpyParser:
         _raw_input_str = input_str
         try:
             for _item in ["np.", "numpy."]:
-                if input_str.startswith(_item):
-                    input_str = input_str[len(_item) :]
+                input_str = input_str.removeprefix(_item)
             for _func in self._supported_funcs:
                 if (
                     (input_str.startswith(_func) and input_str.endswith(")"))
@@ -182,10 +181,9 @@ class _NumpyParser:
             KeyError,
             argparse.ArgumentError,
         ):
-            raise
-        raise UserConfigError(
-            f"Could not parse the input string `{_raw_input_str}` to an ndarray."
-        )
+            raise UserConfigError(
+                f"Could not parse the input string `{_raw_input_str}` to an ndarray."
+            )
 
     @staticmethod
     def __parse_plain_string(

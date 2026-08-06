@@ -29,11 +29,11 @@ __all__ = ["Dataset"]
 
 
 import warnings
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 from functools import partialmethod
 from numbers import Integral
-from typing import Any, Callable, Literal, Self, SupportsIndex
+from typing import Any, Literal, Self, SupportsIndex
 
 import numpy as np
 from numpy import ndarray
@@ -155,7 +155,7 @@ class Dataset(ndarray):
             The new dataset object.
         """
         obj = np.array(array).view(cls)
-        update_dataset_properties_from_kwargs(obj, kwargs)  # noqa
+        update_dataset_properties_from_kwargs(obj, kwargs)
         return obj
 
     def __getitem__(self, key: int | tuple[int | slice] | slice) -> Self:
@@ -186,7 +186,7 @@ class Dataset(ndarray):
         axis_labels/_ranges/_units attributes, depending on the object
         dimensionality.
         """
-        if obj is None or self.shape == tuple():
+        if obj is None or self.shape == ():
             return
         self.__update_keys_from_object(obj)
         if hasattr(obj, "_meta"):
@@ -208,16 +208,16 @@ class Dataset(ndarray):
             for _key in METADATA_KEYS
         }
         # handle case of calling np.array with ndmin > self.ndim:
-        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():  # noqa
-            for _ in range(self.ndim - obj.ndim):  # noqa
+        if self.ndim > obj.ndim and self._meta["_get_item_key"] == ():
+            for _ in range(self.ndim - obj.ndim):
                 self.__insert_axis_keys(0)
         _keys_require_shifting = False
         for _dim, _slicer in enumerate(self._meta["_get_item_key"]):
             if (
                 isinstance(_slicer, ndarray)
                 and _slicer.dtype == np.bool_
-                and _slicer.shape == obj.shape  # noqa
-                and _slicer.ndim == obj.ndim  # noqa
+                and _slicer.shape == obj.shape
+                and _slicer.ndim == obj.ndim
                 and _slicer.ndim > 1
             ):
                 # in the case of an n-dim masked array, keep all axis keys.
@@ -404,7 +404,7 @@ class Dataset(ndarray):
 
         Raises
         ------
-        ValueError
+        TypeError
             If data_unit is not str
         """
         if not isinstance(data_unit, str):
@@ -435,7 +435,7 @@ class Dataset(ndarray):
 
         Raises
         ------
-        ValueError
+        TypeError
             If data_label is not str
         """
         if not isinstance(data_label, str):
@@ -479,7 +479,7 @@ class Dataset(ndarray):
 
         Raises
         ------
-        ValueError
+        TypeError
             If metadata is not None or dict
         """
         if not (isinstance(metadata, dict) or metadata is None):
@@ -641,11 +641,6 @@ class Dataset(ndarray):
             The dimension to be updated.
         item : ArrayLike
             The new item for the range of the selected dimension.
-
-        Raises
-        ------
-        ValueError
-            If the index is not in range of the Dataset dimensions.
         """
         index = index % self.ndim
         _new = convert_ranges_and_check_length({index: item}, self.shape)
@@ -660,17 +655,17 @@ class Dataset(ndarray):
         index : int
             The dimension to be updated.
         item : str
-            The new item for the range of the selected dimension.
+            The new item for the label of the selected dimension.
 
         Raises
         ------
-        ValueError
+        TypeError
             If the index is not in range of the Dataset dimensions or if the item is
             not a string.
         """
         index = index % self.ndim
         if not isinstance(item, str):
-            raise ValueError(
+            raise TypeError(
                 f"The item `{item}` is not a string. Cannot update the axis label."
             )
         self._meta["axis_labels"][index] = item
@@ -688,13 +683,13 @@ class Dataset(ndarray):
 
         Raises
         ------
-        ValueError
+        TypeError
             If the index is not in range of the Dataset dimensions or if the item is
             not a string.
         """
         index = index % self.ndim
         if not isinstance(item, str):
-            raise ValueError(
+            raise TypeError(
                 f"The item *{item}* is not a string. Cannot update the axis label."
             )
         self._meta["axis_units"][index] = item
@@ -834,7 +829,7 @@ class Dataset(ndarray):
         pydidas.core.Dataset
             The transposed Dataset.
         """
-        if axes is tuple():
+        if axes == ():
             axes = tuple(np.arange(self.ndim)[::-1])
         elif len(axes) == 1 and isinstance(axes[0], Iterable):
             axes = tuple(axes[0])
@@ -859,7 +854,7 @@ class Dataset(ndarray):
             The default is 'C'.
         """
         _new = ndarray.flatten(self, order)
-        _new._update_keys_in_flattened_array()  # noqa
+        _new._update_keys_in_flattened_array()
         return _new
 
     def reshape(
@@ -885,7 +880,7 @@ class Dataset(ndarray):
                 new_shape = tuple(new_shape[0])
             elif isinstance(new_shape[0], tuple):
                 new_shape = new_shape[0]
-        _new = ndarray.reshape(self, new_shape, order=order)  # noqa
+        _new = ndarray.reshape(self, new_shape, order=order)
         _dim_matches = (
             {} if self.shape == () else get_corresponding_dims(self.shape, _new.shape)
         )
@@ -929,9 +924,9 @@ class Dataset(ndarray):
             warnings.simplefilter("ignore", category=UserWarning)
             _new = ndarray.repeat(self, repeats, axis)
         if axis is None:
-            _new._update_keys_in_flattened_array()  # noqa
+            _new._update_keys_in_flattened_array()
         else:
-            _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)  # noqa E1101
+            _new._meta["axis_ranges"][axis] = np.repeat(self.axis_ranges[axis], repeats)
         return _new
 
     @property
@@ -1234,11 +1229,11 @@ class Dataset(ndarray):
         Dataset
             The rolled Dataset.
         """
-        _new = np.roll(self, shift, axis)  # noqa E1101
+        _new = np.roll(self, shift, axis)
         if self.ndim == 0:
             return _new
         elif self.ndim == 1:
-            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))  # noqa E1101
+            _new.update_axis_range(0, np.roll(self.axis_ranges[0], shift))
             return _new
         if axis is None:
             warnings.warn(
@@ -1248,7 +1243,7 @@ class Dataset(ndarray):
                 UserWarning,
             )
             return _new
-        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))  # noqa E1101
+        _new.update_axis_range(axis, np.roll(self.axis_ranges[axis], shift))
         return _new
 
     def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:

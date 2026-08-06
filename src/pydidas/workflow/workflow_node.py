@@ -30,7 +30,7 @@ __all__ = ["WorkflowNode"]
 
 from copy import deepcopy
 from numbers import Integral, Real
-from typing import Any, Self
+from typing import Any, ClassVar, Self
 
 from pydidas.core import Dataset
 from pydidas.core.utils import TimerSaveRuntime
@@ -46,7 +46,7 @@ class WorkflowNode(GenericNode):
     chain through the WorkflowTree.
     """
 
-    kwargs_for_copy_creation = ["plugin", "node_id"]
+    kwargs_for_copy_creation: ClassVar[list[str]] = ["plugin", "node_id"]
 
     def __init__(self, **kwargs: Any) -> None:
         self.__preprocess_kwargs(kwargs)

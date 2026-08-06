@@ -25,7 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-
+from numbers import Number
 from pathlib import Path
 from typing import Any
 
@@ -155,7 +155,7 @@ def test_get_value(qtbot, dtype, value, expected):
     widget = widget_with_param(qtbot, param)
     widget._val = str(value)
     _result = widget.get_value()
-    if expected is None or expected is np.nan:
+    if expected is None or (isinstance(expected, Number) and np.isnan(expected)):
         assert _result is expected
     elif dtype == np.ndarray:
         np.testing.assert_array_equal(_result, expected)
@@ -203,13 +203,13 @@ def test_set_value(qtbot, dtype, value, update, expected):
     widget = widget_with_param(qtbot, param)
     widget._val = update
     widget.set_value(update)
-    if value is None or value is np.nan:
+    if value is None or (isinstance(value, Number) and np.isnan(value)):
         assert param.value is value
     elif dtype == np.ndarray:
         np.testing.assert_array_equal(param.value, np.array(value))
     else:
         assert param.value == value
-    if update is None or update is np.nan:
+    if update is None or (isinstance(update, Number) and np.isnan(update)):
         assert widget._val is expected
     elif dtype == np.ndarray:
         np.testing.assert_array_equal(widget._val, np.array(expected))
@@ -264,7 +264,7 @@ def test_emit_signal(widget):
 def test_current_text_property():
     widget = BaseParamIoWidget(Parameter("test", str, "entry"))
     with pytest.raises(NotImplementedError):
-        widget.current_text
+        _ = widget.current_text
 
 
 @pytest.mark.gui

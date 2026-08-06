@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "COMPOSITE_CREATOR_FRAME_BUILD_CONFIG",
-    "ccf_param_widget_config",
     "KEYS_TO_INSERT_LINES_AFTER",
+    "ccf_param_widget_config",
 ]
 
 

@@ -29,7 +29,7 @@ __all__ = ["PydidasWidgetMixin"]
 
 
 from numbers import Real
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -54,7 +54,7 @@ class PydidasWidgetMixin:
     This class must be used in combination with a QWidget subclass.
     """
 
-    init_kwargs = [
+    init_kwargs: ClassVar[list[str]] = [
         "bold",
         "fontsize_offset",
         "font_metric_height_factor",
@@ -118,7 +118,7 @@ class PydidasWidgetMixin:
         self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
         self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
 
-        apply_qt_properties(self, **kwargs)  # noqa self is a QWidget from base class
+        apply_qt_properties(self, **kwargs)
         if self.layout() is not None:  # type: ignore[attr-defined]
             apply_qt_properties(
                 self.layout(),  # type: ignore[attr-defined]
@@ -136,14 +136,14 @@ class PydidasWidgetMixin:
         self._qtapp = PydidasQApplication.instance()
         self.update_fontsize(self._qtapp.font_size)
         self.update_font_family(self._qtapp.font_family)
-        if not all([_val == 0 for _val in self.__font_config.values()]):
-            update_qwidget_font(self, **self.__font_config)  # noqa (see above)
+        if not all(_val == 0 for _val in self.__font_config.values()):
+            update_qwidget_font(self, **self.__font_config)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
         self._qtapp.sig_new_font_family.connect(self.update_font_family)
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self.process_new_font_metrics(*self._qtapp.font_metrics)
 
-    def sizeHint(self) -> QtCore.QSize:  # noqa C0103
+    def sizeHint(self) -> QtCore.QSize:
         """
         Set a reasonable sizeHint based on the font metrics.
 

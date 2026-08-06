@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,13 @@ Module with the MaskImage Plugin which can be used to apply a mask to images.
 """
 
 __author__ = "Nonni Heere"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["MaskAndAverageImageStack"]
 
-
-from typing import Union
+from typing import ClassVar
 
 import numpy as np
 import scipy.ndimage
@@ -107,7 +106,11 @@ class MaskAndAverageImageStack(ProcPlugin):
         _ADC_MASK_PARAM,
         _ADC_THRESH_PARAM,
     )
-    advanced_parameters = ["background_value", "adc_mask", "adc_mask_threshold"]
+    advanced_parameters: ClassVar[list[str]] = [
+        "background_value",
+        "adc_mask",
+        "adc_mask_threshold",
+    ]
 
     input_data_dim = 3
     output_data_dim = 2
@@ -159,7 +162,7 @@ class MaskAndAverageImageStack(ProcPlugin):
             self._operation = scipy.ndimage.binary_dilation
 
     def execute(
-        self, data: Union[Dataset, np.ndarray], **kwargs: dict
+        self, data: Dataset | np.ndarray, **kwargs: dict
     ) -> tuple[Dataset, dict]:
         """
         Generate and apply dynamic mask for images, average the remaining pixels

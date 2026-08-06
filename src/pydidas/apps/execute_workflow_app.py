@@ -257,7 +257,6 @@ class ExecuteWorkflowApp(BaseApp):
                         "Error while unlinking shared memory buffers from "
                         f"app: {_buffer} {self}"
                     )
-                    pass
 
     def _store_context(self) -> None:
         """
@@ -491,7 +490,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __write_results_to_shared_arrays(self) -> None:
         """Write the results from the WorkflowTree execution to the shared array."""
-        if self._shared_arrays == dict():
+        if self._shared_arrays == {}:
             self._initialize_arrays_from_shared_memory()
         while True:
             with self.mp_manager["lock"]:
@@ -503,7 +502,9 @@ class ExecuteWorkflowApp(BaseApp):
                     break
             time.sleep(0.005)
         with self.mp_manager["lock"]:
-            for _node_id in self.mp_manager["shapes_dict"].keys():
+            # because the multiprocessing.Manager.dict is not iterable without
+            # keys, the .keys must be flagged for ruff
+            for _node_id in self.mp_manager["shapes_dict"].keys():  # noqa SIM118
                 self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[
                     _node_id
                 ].results
@@ -567,7 +568,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         if self.clone_mode:
             return
-        if self._shared_arrays == dict():
+        if self._shared_arrays == {}:
             self._initialize_arrays_from_shared_memory()
         if data_index == -1:
             _filename = TREE.root.plugin.get_filename(index)
@@ -613,7 +614,8 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Delete the ExecuteWorkflowApp.
         """
-        if not self.clone_mode:
-            if isinstance(self._mp_manager_instance, mp.managers.SyncManager):
-                self._mp_manager_instance.shutdown()
+        if not self.clone_mode and isinstance(
+            self._mp_manager_instance, mp.managers.SyncManager
+        ):
+            self._mp_manager_instance.shutdown()
         self.close_shared_arrays_and_memory()

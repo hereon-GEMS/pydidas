@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ objects for ROI cropping.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -30,10 +30,10 @@ __all__ = ["RoiSliceManager"]
 
 import copy
 from numbers import Integral
-from typing import Union
 
 from numpy import mod
 
+from pydidas.core import UserConfigError
 from pydidas.core.utils import flatten_all
 
 
@@ -90,12 +90,11 @@ class RoiSliceManager:
         self._original_roi = None
         self._input_shape = kwargs.get("input_shape", None)
         self._ndim = kwargs.get("dim", 2)
-        self._original_input_shape = None
         self._roi_key = kwargs.get("roi", None)
         self.create_roi_slices()
 
     @property
-    def input_shape(self) -> Union[None, tuple[float, float]]:
+    def input_shape(self) -> None | tuple[float, float]:
         """
         Get the shape of the input image, if given.
 
@@ -107,7 +106,7 @@ class RoiSliceManager:
         return self._input_shape
 
     @input_shape.setter
-    def input_shape(self, shape: Union[None, tuple[float, float]]):
+    def input_shape(self, shape: None | tuple[float, float]):
         """
         Set the input shape of the image.
 
@@ -117,7 +116,7 @@ class RoiSliceManager:
             The shape of the input image.
         """
         if not isinstance(shape, tuple):
-            raise TypeError("The input shape must be a tuple.")
+            raise UserConfigError("The input shape must be a tuple.")
         self._input_shape = shape
 
     @property
@@ -204,21 +203,21 @@ class RoiSliceManager:
 
         Raises
         ------
-        TypeError
+        UserConfigError
             If the ROI could not be added.
         """
         try:
             self._original_roi = self._roi
-            self._original_input_shape = self._input_shape
+            _original_input_shape = self._input_shape
             self._roi_key = roi2
             self._input_shape = tuple(_roi.stop - _roi.start for _roi in self._roi)
             self.create_roi_slices()
             self._merge_rois()
-        except ValueError as _error:
+        except (UserConfigError, ValueError, TypeError) as _error:
             self._roi = self._original_roi
-            raise TypeError(f"Cannot add second ROI: {_error}")
+            raise UserConfigError(f"Cannot add second ROI: {_error}")
         finally:
-            self._input_shape = self._original_input_shape
+            self._input_shape = _original_input_shape
 
     def _merge_rois(self):
         """
@@ -226,7 +225,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If negative stop indices are used. Merging only supports positive
             (i.e. absolute) slices ranges.
         """
@@ -244,7 +243,7 @@ class RoiSliceManager:
             _stop1 = _slice1.stop if _slice1.stop is not None else -1
             _stop2 = _slice2.stop if _slice2.stop is not None else -1
             if _stop1 < 0 or _stop2 < 0:
-                raise ValueError(
+                raise UserConfigError(
                     "Cannot merge ROIs with negative indices. "
                     "Please change indices to positive numbers."
                 )
@@ -273,7 +272,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If the ROI is not a list or tuple.
         """
         if self._roi_key is None:
@@ -283,7 +282,9 @@ class RoiSliceManager:
         elif isinstance(self._roi_key, (list, tuple)):
             self._roi_key = list(self._roi_key)
         else:
-            raise ValueError(error_msg(self._roi_key, "Not of type (list, tuple)."))
+            raise UserConfigError(
+                error_msg(self._roi_key, "Not of type (list, tuple).")
+            )
 
     def _convert_str_roi_key(self):
         """
@@ -322,7 +323,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If datatypes apart from integer and slice are encountered.
         """
         roi_dtypes = {
@@ -337,7 +338,7 @@ class RoiSliceManager:
             _msg = error_msg(
                 self._roi_key, "Non-integer, non-slice datatypes encountered."
             )
-            raise ValueError(_msg)
+            raise UserConfigError(_msg)
 
     def _convert_str_roi_key_entries(self):
         """
@@ -348,7 +349,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If the conversion of the string to a slice or interger object
             was not sucessful.
         """
@@ -372,8 +373,8 @@ class RoiSliceManager:
                     _newkeys.append(slice(_start, int(_end), _step))
                 else:
                     _newkeys.append(int(key))
-        except ValueError as _ve:
-            raise ValueError(error_msg(self._roi_key, _ve)) from _ve
+        except (TypeError, ValueError) as _ve:
+            raise UserConfigError(error_msg(self._roi_key, _ve)) from _ve
         self._roi_key = _newkeys
 
     def _check_length_of_roi_key_entries(self):
@@ -383,7 +384,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If the length of the items does not allow the creation of two
             slice objects.
         """
@@ -397,7 +398,7 @@ class RoiSliceManager:
             _msg = error_msg(
                 self._roi_key, "The input does not have the correct length."
             )
-            raise ValueError(_msg)
+            raise UserConfigError(_msg)
 
     def _convert_roi_key_to_slice_objects(self):
         """
@@ -405,7 +406,7 @@ class RoiSliceManager:
 
         Raises
         ------
-        ValueError
+        UserConfigError
             If the conversion does not succeed.
         """
         _roi = copy.copy(self._roi_key)
@@ -426,9 +427,9 @@ class RoiSliceManager:
                         self._roi_key,
                         f"Cannot create the slice object for dimension {_dim}.",
                     )
-                    raise ValueError(_msg)
-            except ValueError as _ve:
-                raise ValueError(error_msg(self._roi_key, _ve)) from _ve
+                    raise UserConfigError(_msg)
+            except (ValueError, TypeError) as _ve:
+                raise UserConfigError(error_msg(self._roi_key, _ve)) from _ve
         self._roi = tuple(_out)
 
     def _modulate_roi_keys(self):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ The SelectNewPluginWidget class allows to browse through all registered plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,7 +28,7 @@ __all__ = ["PluginRegistryTreeWidget", "SelectNewPluginWidget"]
 
 
 from functools import partial
-from typing import Union
+from typing import ClassVar
 
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
@@ -54,14 +54,14 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
     displays all the available plugins.
     """
 
-    init_kwargs = ["collection"]
+    init_kwargs: ClassVar[list[str]] = ["collection"]
 
     sig_plugin_preselected = QtCore.Signal(str)
     sig_add_plugin_to_tree = QtCore.Signal(str)
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, collection: Union[PluginRegistry, None] = None, **kwargs: dict):
+    def __init__(self, collection: PluginRegistry | None = None, **kwargs: dict):
         CreateWidgetsMixIn.__init__(self)
         EmptyWidget.__init__(self, **kwargs)
         self.add_any_widget(
@@ -138,7 +138,7 @@ class PluginRegistryTreeWidget(QtWidgets.QTreeView):
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, collection: Union[PluginRegistry, None] = None, **kwargs: dict):
+    def __init__(self, collection: PluginRegistry | None = None, **kwargs: dict):
         QtWidgets.QTreeView.__init__(self, parent=kwargs.get("parent", None))
         apply_qt_properties(self, **kwargs)
 

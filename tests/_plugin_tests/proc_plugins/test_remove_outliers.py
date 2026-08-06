@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -75,7 +75,7 @@ class TestRemoveOutliers(unittest.TestCase):
         """
         _cfg = cls.config
         _zone_len = 2 * (_cfg["zone_n"] + _cfg["trans_n"])
-        data = np.ones((_cfg["max_width"] * 12 * _zone_len))
+        data = np.ones(_cfg["max_width"] * 12 * _zone_len)
         for _index_width in range(_cfg["max_width"]):
             _i0 = _index_width * 12 * _zone_len
             for _index_cycle in range(12):

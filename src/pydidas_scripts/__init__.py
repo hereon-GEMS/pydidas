@@ -31,5 +31,5 @@ __status__ = "Production"
 
 # import pydidas_qtcore to set up the QApplication and assure
 # that the QT_API is set correctly
-import pydidas_qtcore as __pydidas_qtcore  # noqa: F401
+import pydidas_qtcore as __pydidas_qtcore
 from . import clear_local_settings, pydidas_gui, remove_local_files, remove_pydidas

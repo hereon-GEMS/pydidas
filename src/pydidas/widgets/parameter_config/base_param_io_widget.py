@@ -25,12 +25,12 @@ __copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["BaseParamIoWidgetMixIn", "BaseParamIoWidget"]
+__all__ = ["BaseParamIoWidget", "BaseParamIoWidgetMixIn"]
 
 
 import numbers
 import pathlib
-from typing import Any, Type
+from typing import Any, ClassVar
 
 from numpy import nan, ndarray
 from qtpy import QtCore, QtWidgets
@@ -53,8 +53,13 @@ class BaseParamIoWidgetMixIn:
     sig_new_value = QtCore.Signal(str)
     sig_value_changed = QtCore.Signal()
 
-    _SUPPORTED_TYPE_STRINGS = {"true": True, "false": False, "nan": nan, "none": None}
-    _TYPE_CONVERTERS: dict[Type, Type | Any] = {
+    _SUPPORTED_TYPE_STRINGS: ClassVar[dict[str, Any]] = {
+        "true": True,
+        "false": False,
+        "nan": nan,
+        "none": None,
+    }
+    _TYPE_CONVERTERS: ClassVar[dict[type, type]] = {
         numbers.Integral: int,
         numbers.Real: float,
         pathlib.Path: pathlib.Path,
@@ -164,7 +169,7 @@ class BaseParamIoWidgetMixIn:
         try:
             _converter = self._TYPE_CONVERTERS.get(self._linked_param.dtype, None)
             if _converter is not None:
-                return _converter(_text)  # noqa
+                return _converter(_text)
         except ValueError as _error:
             _msg = str(_error).capitalize()
             raise UserConfigError(f'ValueError! {_msg} Input text was "{_text}"')

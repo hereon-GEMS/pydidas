@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["Hdf5DatasetSelectionPopup"]
 
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from qtpy import QtWidgets
 

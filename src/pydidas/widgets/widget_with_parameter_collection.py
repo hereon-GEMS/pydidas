@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@ with full access to Pydidas' ParameterCollection and widget creation methods.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WidgetWithParameterCollection"]
 
 
-from typing import Any, NoReturn
+from typing import Any, ClassVar, NoReturn
 
 from qtpy import QtWidgets
 
@@ -55,7 +55,7 @@ class WidgetWithParameterCollection(
     methods.
     """
 
-    init_kwargs = ["parent"]
+    init_kwargs: ClassVar[list[str]] = ["parent"]
 
     def __init__(self, **kwargs: Any) -> None:
         self.params = ParameterCollection()

@@ -216,7 +216,7 @@ def setup_test_files(empty_temp_path, default_shapes):
             "shape": default_shapes["shapes"][_node],
             "plugin_name": default_shapes["plugin_names"][_node],
         }
-        for _node in default_shapes["shapes"].keys()
+        for _node in default_shapes["shapes"]
     }
     H5SAVER.prepare_files_and_directories(empty_temp_path, _node_infos)
 
@@ -336,13 +336,13 @@ def test_update_metadata__standard(setup_test_files):
         for _key, _shape in shapes.items()
     }
     _metadata = {
-        _key: dict(
-            axis_units=_item.axis_units,
-            axis_labels=_item.axis_labels,
-            axis_ranges=_item.axis_ranges,
-            data_label=_data[_key].data_label,
-            data_unit=_data[_key].data_unit,
-        )
+        _key: {
+            "axis_units": _item.axis_units,
+            "axis_labels": _item.axis_labels,
+            "axis_ranges": _item.axis_ranges,
+            "data_label": _item.data_label,
+            "data_unit": _item.data_unit,
+        }
         for _key, _item in _data.items()
     }
     H5SAVER.update_metadata(_metadata)

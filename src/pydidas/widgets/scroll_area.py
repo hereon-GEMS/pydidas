@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ScrollArea"]
 
 
-from typing import Any
+from typing import Any, ClassVar
 
 from qtpy.QtCore import QSize, Slot
 from qtpy.QtWidgets import QFrame, QScrollArea, QWidget
@@ -51,7 +51,7 @@ class ScrollArea(QScrollArea):
         setAttribute method are valid keywords.
     """
 
-    init_kwargs = ["resize_to_widget_width", "embedded_widget"]
+    init_kwargs: ClassVar[list[str]] = ["resize_to_widget_width", "embedded_widget"]
 
     def __init__(self, parent: QWidget | None = None, **kwargs: Any) -> None:
         QScrollArea.__init__(self, parent)  # type: ignore[arg-type]

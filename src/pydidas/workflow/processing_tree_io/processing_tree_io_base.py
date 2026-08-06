@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,13 @@ inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ProcessingTreeIoBase"]
 
+from typing import ClassVar
 
 from pydidas.core.io_registry import GenericIoBase
 from pydidas.workflow.processing_tree_io.processing_tree_io_meta import (
@@ -42,5 +43,5 @@ class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
     ProcessingTreeIo classes.
     """
 
-    extensions = []
+    extensions: ClassVar[list[str]] = []
     format_name = "unknown"

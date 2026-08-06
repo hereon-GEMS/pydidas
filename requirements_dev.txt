@@ -13,5 +13,5 @@ PySide6-stubs>=6.7
 pytest>=9.0.2
 pytest-qt>=4.5.0
 reuse>=6.2.0
-ruff>=0.14.13
+ruff>=0.16.1
 setuptools>=82.0.1

@@ -592,7 +592,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             try:
                 _func()
             except UserConfigError as exc:
-                _errors += f"{str(exc)}\n"
+                _errors += f"{exc!s}\n"
         if _errors:
             raise UserConfigError(_errors)
 
@@ -650,8 +650,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         for _key, _window in self._child_windows.items():
             try:
                 _window.restore_window_state(state[f"window::{_key}"])
-            except Exception as exc:
-                _errors += f"Window '{_key}':\n{str(exc)}\n"
+            except Exception as exc:  # noqa BLE001
+                _errors += f"Window '{_key}':\n{exc!s}\n"
         if _errors:
             raise UserConfigError(f"--- Window states ---\n{_errors}")
 
@@ -688,8 +688,8 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             if _frame_index >= 0:
                 self._frame_stack.setCurrentIndex(_frame_index)
             self.setGeometry(*state["geometry"])
-        except Exception as exc:
-            raise UserConfigError(f"--- Main window state ---\n{str(exc)}\n")
+        except Exception as exc:  # noqa BLE001
+            raise UserConfigError(f"--- Main window state ---\n{exc!s}\n")
 
     def restore_frame_states(self, state: dict) -> None:
         """

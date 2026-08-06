@@ -106,7 +106,7 @@ def test__creation(qtbot, param, test_dir, qref):
 
 @pytest.mark.gui
 @pytest.mark.parametrize("fname", [None, "test_file.h5"])
-@pytest.mark.parametrize("selected_dset", [None, list(_POPULATED_KEYS)[0]])
+@pytest.mark.parametrize("selected_dset", [None, next(iter(_POPULATED_KEYS))])
 def test_button_function(qtbot, test_dir, fname, selected_dset):
     widget = widget_instance(qtbot)
     if fname is not None:

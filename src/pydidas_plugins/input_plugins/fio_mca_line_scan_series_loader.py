@@ -142,7 +142,7 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
                 raise UserConfigError(
                     "The given directory for the first batch of fio files does not "
                     "exist. Please check the scan base directory and naming "
-                    f"pattern. \n\nDirectory name not found:\n{str(_path)}"
+                    f"pattern. \n\nDirectory name not found:\n{_path!s}"
                 )
             _n_files = sum(
                 1

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -171,7 +171,7 @@ def test_transpose_require__w_additional_choices_modified(
 @pytest.mark.gui
 def test_set_data_shape__invalid_type(selector):
     with pytest.raises(UserConfigError):
-        selector.set_data_shape([0, 4])  # noqa --deliberately wrong type
+        selector.set_data_shape([0, 4])
 
 
 @pytest.mark.gui
@@ -278,7 +278,7 @@ def test_set_metadata_from_dataset(selector):
 
 
 @pytest.mark.gui
-def test_set_metadata_from_dataset__w_h5py_Dataset(selector, temp_path):  # noqa C0103
+def test_set_metadata_from_dataset__w_h5py_Dataset(selector, temp_path):
     with h5py.File(temp_path / "test.h5", "w") as _f:
         _dset = _f.create_dataset("data", data=_DATA.array)
         selector.set_metadata_from_dataset(_dset)
@@ -356,7 +356,7 @@ def test_set_metadata_from_dataset__w_less_data_dims_than_choices_and_widgets(se
 @pytest.mark.gui
 def test_set_metadata_from_dataset__no_dataset(selector):
     with pytest.raises(UserConfigError):
-        selector.set_metadata_from_dataset("")  # noqa -- deliberately wrong type
+        selector.set_metadata_from_dataset("")
 
 
 @pytest.mark.gui
@@ -366,7 +366,7 @@ def test_define_additional_choices(selector, data):
     selector.define_additional_choices(_choices)
     assert selector._additional_choices_str == _choices
     assert selector._additional_choices == _choices.split(";;")
-    for _dim, _item in selector._axis_widgets.items():
+    for _item in selector._axis_widgets.values():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 
@@ -377,7 +377,7 @@ def test_define_additional_choices__no_metadata_set(selector, data):
     selector.define_additional_choices(_choices)
     assert selector._additional_choices_str == _choices
     assert selector._additional_choices == _choices.split(";;")
-    for _dim, _item in selector._axis_widgets.items():
+    for _item in selector._axis_widgets.values():
         assert "choice1" in _item.available_choices
         assert "choice2" in _item.available_choices
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -44,7 +44,7 @@ class TestRawIo(unittest.TestCase):
         cls._data_shape = (12, 13, 14)
         cls._data = np.random.random(cls._data_shape)
         cls._index = 0
-        cls._read_kws = dict(datatype=np.float64, shape=cls._data_shape)
+        cls._read_kws = {"datatype": np.float64, "shape": cls._data_shape}
         cls._data.tofile(cls._fname)
 
     @classmethod

@@ -30,14 +30,13 @@ __all__ = [
 
 
 from pathlib import Path, PurePosixPath
-from typing import NoReturn
 
 import h5py
 
 from pydidas.core.exceptions import UserConfigError
 
 
-def check_nxdata_adherence(filename: str | Path, dataset: str) -> None | NoReturn:
+def check_nxdata_adherence(filename: str | Path, dataset: str) -> None:
     """
     Check that the selected dataset in the given file adheres to the NXdata definition.
 

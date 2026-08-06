@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,11 @@ on a specific axis.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["DataAxisSelector", "GENERIC_AXIS_SELECTOR_CHOICES"]
+__all__ = ["GENERIC_AXIS_SELECTOR_CHOICES", "DataAxisSelector"]
 
 
 from functools import partial
@@ -677,7 +677,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets[edit_name].setPalette(self._palette_base)
 
     @QtCore.Slot(str)
-    def _check_edit_range_input(self, edit_name: str, new_text: str) -> None:  # noqa
+    def _check_edit_range_input(self, edit_name: str, new_text: str) -> None:
         """
         Check the input of the range edit widget.
 

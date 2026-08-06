@@ -84,7 +84,7 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
             yaml.safe_dump(_tmp_params, stream)
 
     @classmethod
-    def import_from_file(
+    def import_from_file(  # type: ignore[override]
         cls,
         filename: Path | str,
         diffraction_exp: DiffractionExperiment | None = None,
@@ -107,7 +107,7 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
         with open(filename, "r") as stream:
             try:
                 _imported_params = yaml.safe_load(stream)
-            except yaml.YAMLError:
+            except (yaml.YAMLError, UnicodeDecodeError):
                 _imported_params = None
         if not isinstance(_imported_params, dict):
             raise UserConfigError(

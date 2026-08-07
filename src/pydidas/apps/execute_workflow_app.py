@@ -440,7 +440,9 @@ class ExecuteWorkflowApp(BaseApp):
         self._shared_arrays = {}
         if not self.clone_mode:
             for _key, _val in self.mp_manager.items():
-                if _key.startswith("shape") or _key.endswith("_dict"):
+                if isinstance(_key, str) and (
+                    _key.startswith("shape") or _key.endswith("_dict")
+                ):
                     _val.clear()
 
     def _recreate_context(self) -> None:

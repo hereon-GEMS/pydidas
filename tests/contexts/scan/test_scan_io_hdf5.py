@@ -1,4 +1,4 @@
-# This h5file is part of pydidas.
+# This file is part of pydidas.
 #
 # Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only

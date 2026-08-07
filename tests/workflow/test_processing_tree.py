@@ -99,6 +99,7 @@ class TestProcessingTree(unittest.TestCase):
         assert len(_tree.nodes) > 0
         _tree2 = ProcessingTree()
         assert len(_tree.nodes) > 0
+        assert len(_tree2.nodes) == 0
 
     def test_active_plugin_header__no_nodes(self):
         self._curr_tree = ProcessingTree()

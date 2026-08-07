@@ -24,6 +24,7 @@ Programmatic changes
   architecture.
 - Reworked ReadOnlyTextWidget to allow appending and prepending text 
   to the widget text in a generic way.
+- Added information about python version and Qt binding to AboutWindow.
 
 Bugfixes
 --------
@@ -47,6 +48,7 @@ Bugfixes
   to None (not supported in range)
 - Fixed an issue where the filename parameter was exported in the data
   browsing frame even though it was not intended.
+
 
 
 v26.05.19

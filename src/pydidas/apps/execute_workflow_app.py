@@ -46,6 +46,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from pydidas.core.system.shared_memory import create_or_replace_shared_memory, close_shared_memory_dict
 from pydidas.core.utils import pydidas_logger
 from pydidas.core.utils.dataset_utils import get_default_property_dict
 from pydidas.workflow import WorkflowResults, WorkflowTree
@@ -189,17 +190,8 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _buffers = self._locals.get("shared_memory_buffers", {})
         self._shared_arrays = {}
-        while _buffers:
-            _key, _buffer = _buffers.popitem()
-            _buffer.close()
-            if not self.clone_mode:
-                try:
-                    _buffer.unlink()
-                except FileNotFoundError:
-                    logger.error(
-                        "Error while unlinking shared memory buffers from "
-                        f"app: {_buffer} {self}"
-                    )
+        close_shared_memory_dict(_buffers, unlink=not self.clone_mode)
+        self._locals["shared_memory_buffers"] = {}
 
     def multiprocessing_get_tasks(self) -> np.ndarray:
         """
@@ -525,13 +517,13 @@ class ExecuteWorkflowApp(BaseApp):
         _n = self.mp_manager["buffer_n"].value
         _pid = self.mp_manager["main_pid"].value
         _buffers = self._locals["shared_memory_buffers"] = {}
-        _buffers["in_use_flag"] = SharedMemory(
-            name=f"share_in_use_flag_{_pid}", create=True, size=4 * _n
+        _buffers["in_use_flag"] = create_or_replace_shared_memory(
+            name=f"share_in_use_flag_{_pid}", size=4 * _n
         )
         for _node_id, _shape in self.mp_manager["shapes_dict"].items():
             _num_bytes = int(4 * _n * np.prod(_shape))
-            _buffers[f"node_{_node_id:03d}"] = SharedMemory(
-                name=f"share_node_{_node_id:03d}_{_pid}", create=True, size=_num_bytes
+            _buffers[f"node_{_node_id:03d}"] = create_or_replace_shared_memory(
+                name=f"share_node_{_node_id:03d}_{_pid}", size=_num_bytes
             )
         self.mp_manager["shapes_set"].set()
 

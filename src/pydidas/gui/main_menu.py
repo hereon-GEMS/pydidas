@@ -682,7 +682,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
                 )
             state["geometry"][0] += _target_screen_geo.x()
             state["geometry"][1] += _target_screen_geo.y()
-            if state["maximized"]:
+            if state["maximized"] and sys.platform == "win32":
                 self.setWindowState(QtCore.Qt.WindowMaximized)
             _frame_index = state["frame_index"]
             if _frame_index >= 0:

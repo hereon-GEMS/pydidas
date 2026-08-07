@@ -48,7 +48,9 @@ Bugfixes
   to None (not supported in range)
 - Fixed an issue where the filename parameter was exported in the data
   browsing frame even though it was not intended.
-
+- Fixed an issue on Unix where the main window was always maximized even
+  when reduced in size. According to the Qt documentation, the maximized
+  flag should only be used on Windows.
 
 
 v26.05.19

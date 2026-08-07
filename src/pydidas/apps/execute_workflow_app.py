@@ -139,7 +139,6 @@ class ExecuteWorkflowApp(BaseApp):
                 "scan_context": {},
                 "exp_context": {},
                 "export_files_prepared": False,
-                "shared_memory_created": False,
             }
         )
         self._index = -1
@@ -190,7 +189,6 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _buffers = self._locals.get("shared_memory_buffers", {})
         self._shared_arrays = {}
-        self._config["shared_memory_created"] = False
         while _buffers:
             _key, _buffer = _buffers.popitem()
             _buffer.close()
@@ -403,7 +401,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def deleteLater(self) -> None:
         """Call the QObject deletion routine of the ExecuteWorkflowApp."""
-        self.__del__()
+        self._cleanup()
         super().deleteLater()
 
     def _prepare_mp_configuration(self) -> None:
@@ -440,7 +438,6 @@ class ExecuteWorkflowApp(BaseApp):
     def _reset_shared_runtime_vars(self) -> None:
         """Reset the shared runtime variables for a new run."""
         self._shared_arrays = {}
-        self._config["shared_memory_created"] = False
         if not self.clone_mode:
             for _key, _val in self.mp_manager.items():
                 if _key.startswith("shape") or _key.endswith("_dict"):
@@ -490,7 +487,6 @@ class ExecuteWorkflowApp(BaseApp):
         self._check_size_of_results_and_buffer()
         self._initialize_shared_memory()
         self._initialize_arrays_from_shared_memory()
-        self._config["shared_memory_created"] = True
 
     def _check_size_of_results_and_buffer(self) -> None:
         """
@@ -592,12 +588,14 @@ class ExecuteWorkflowApp(BaseApp):
                     _node_id
                 ].results
 
-    def __del__(self) -> None:
-        """
-        Delete the ExecuteWorkflowApp.
-        """
+    def _cleanup(self) -> None:
+        """Clean up the app after"""
         if not self.clone_mode and isinstance(
             self._mp_manager_instance, mp.managers.SyncManager
         ):
             self._mp_manager_instance.shutdown()
         self.close_shared_arrays_and_memory()
+
+    def __del__(self) -> None:
+        """Delete the ExecuteWorkflowApp."""
+        self._cleanup()

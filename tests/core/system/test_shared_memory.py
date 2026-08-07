@@ -79,12 +79,14 @@ def test_create_or_replace_shared_memory__logs_warning_for_stale(shm_name):
 
     import pydidas.core.system.shared_memory as sm_module
 
-    with patch.object(sm_module.logger, "warning") as mock_warn:
-        with patch(
+    with (
+        patch.object(sm_module.logger, "warning") as mock_warn,
+        patch(
             "pydidas.core.system.shared_memory.SharedMemory",
             side_effect=[FileExistsError(), MagicMock(), MagicMock()],
-        ):
-            create_or_replace_shared_memory(shm_name, 64)
+        ),
+    ):
+        create_or_replace_shared_memory(shm_name, 64)
     mock_warn.assert_called_once()
     assert shm_name in mock_warn.call_args[0][0]
 

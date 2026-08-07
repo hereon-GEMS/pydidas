@@ -70,7 +70,9 @@ def create_or_replace_shared_memory(name: str, size: int) -> SharedMemory:
         return SharedMemory(name=name, create=True, size=size)
 
 
-def close_shared_memory_dict(shares: dict[Any, SharedMemory], unlink: bool=False) -> None:
+def close_shared_memory_dict(
+    shares: dict[Any, SharedMemory], unlink: bool = False
+) -> None:
     """
     Close all shared memory segments and unlink the shared memory if specified.
 

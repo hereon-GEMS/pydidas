@@ -46,7 +46,10 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.system.shared_memory import create_or_replace_shared_memory, close_shared_memory_dict
+from pydidas.core.system.shared_memory import (
+    close_shared_memory_dict,
+    create_or_replace_shared_memory,
+)
 from pydidas.core.utils import pydidas_logger
 from pydidas.core.utils.dataset_utils import get_default_property_dict
 from pydidas.workflow import WorkflowResults, WorkflowTree

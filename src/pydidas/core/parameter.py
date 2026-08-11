@@ -203,7 +203,7 @@ class Parameter:
             kwargs.update(meta)
         self.__meta = {
             "tooltip": kwargs.get("tooltip", ""),
-            "unit": str(kwargs.get("unit")) if kwargs.get("unit") is not None else "",
+            "unit": str(kwargs.get("unit") or ""),
             "optional": kwargs.get("optional", False),
             "name": kwargs.get("name", ""),
             "allow_None": kwargs.get("allow_None", False),
@@ -306,11 +306,9 @@ class Parameter:
         value : Any
             The value with the above-mentioned type conversions applied.
         """
-        if (
-            not isinstance(value, ndarray)
-            and self.__meta["allow_None"]
-            and value in ["None", "", None]
-        ):
+        if self.__type in _ITERATORS and isinstance(value, ndarray):
+            value = value.tolist()
+        if self.__meta["allow_None"] and value in ["None", "", None]:
             return None
         if isinstance(value, str):
             if self.__type in [Path, Hdf5key, NXdataKey]:

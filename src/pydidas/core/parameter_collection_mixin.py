@@ -66,10 +66,23 @@ class ParameterCollectionMixIn:
 
         Returns
         -------
-        Dict
+        dict
             The refkey, value pairs for all stored Parameters.
         """
         return self.get_param_values_as_dict()
+
+    @property
+    def param_export_values(self) -> dict:
+        """
+        Get the export-compatible values of all stored Parameters
+        along with their refkeys.
+
+        Returns
+        -------
+        dict
+            The refkey, value pairs for all stored Parameters.
+        """
+        return self.get_param_values_as_dict(filter_types_for_export=True)
 
     @property
     def param_keys(self) -> list[str]:

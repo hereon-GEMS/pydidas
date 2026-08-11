@@ -30,10 +30,12 @@ __all__ = [
     "verify_file_exists_and_extension_matches",
     "verify_filenames_have_same_parent",
     "verify_files_of_range_are_same_size",
+    "verify_is_new_file_or_replace_set",
 ]
 
 
 from pathlib import Path
+from typing import Any
 
 from numpy import array
 
@@ -91,6 +93,35 @@ def verify_file_exists_and_extension_matches(
         raise FileReadError(
             f"The selected file `{fname.name}` does not have a valid "
             f"extension. Allowed extensions are: {extensions}"
+        )
+
+
+def verify_is_new_file_or_replace_set(filename: str | Path, **kwargs: Any) -> None:
+    """
+    Check if the file exists and if the overwrite flag has been set.
+
+    Parameters
+    ----------
+    filename : str or Path
+        The full filename and path.
+    **kwargs : Any
+        Any keyword arguments. Supported are:
+
+        replace : bool, optional
+            Flag to allow overwriting of existing files.
+        overwrite : bool, optional
+            DEPRECATED: Flag to allow overwriting of existing files.
+            Please use `replace` instead.
+
+    Raises
+    ------
+    FileExistsError
+        If a file with filename exists and the overwrite flag is not True.
+    """
+    _replace = kwargs.get("replace", False) or kwargs.get("overwrite", False)
+    if Path(filename).exists() and not _replace:
+        raise FileExistsError(
+            f"The file `{filename}` exists and replacing has not been confirmed."
         )
 
 

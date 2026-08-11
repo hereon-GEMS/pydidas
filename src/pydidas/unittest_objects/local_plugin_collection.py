@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ without setting the global QSettings.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["LocalPluginCollection"]
 
 
 from pathlib import Path
+from typing import Any
 
 import pydidas
 from pydidas.plugins.plugin_registry import PluginRegistry
@@ -42,10 +43,16 @@ class LocalPluginCollection(PluginRegistry):
     "testing" QSetting registry key.
     """
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         kwargs["plugin_path"] = [
-            Path(pydidas.__file__).parent.parent.joinpath("pydidas_plugins"),
-            Path(pydidas.__file__).parent.joinpath("unittest_objects"),
+            Path(
+                pydidas.__file__  # type: ignore[arg-type]
+            ).parents[1]
+            / "pydidas_plugins",
+            Path(
+                pydidas.__file__  # type: ignore[arg-type]
+            ).parent
+            / "unittest_objects",
         ]
-        PluginRegistry.__init__(self, *args, **kwargs)
+        PluginRegistry.__init__(self, **kwargs)
         self.q_settings_version = "unittesting"

@@ -210,7 +210,7 @@ class DefineScanFrame(BaseFrame):
         if len(_fnames) > 0:
             _return = ScanIo.check_multiple_files(_fnames, scan=SCAN)
             if _return[0] == "::no_error::":
-                _return = ScanIo.import_from_multiple_files(_fnames, scan=SCAN)
+                _return = ScanIo.import_from_file_sequence(_fnames, scan=SCAN)
             elif _return[0] == "::multiple_motors::":
                 _choice = ItemInListSelectionWidget(
                     _return[1:],
@@ -226,7 +226,7 @@ class DefineScanFrame(BaseFrame):
                         "No motor selected for scan dimension 0. Aborting import of "
                         "Scan from beamline files."
                     )
-                ScanIo.import_from_multiple_files(
+                ScanIo.import_from_file_sequence(
                     _fnames, scan=SCAN, scan_dim0_motor=_choice
                 )
             else:

@@ -30,8 +30,6 @@ __all__ = []
 from pathlib import Path
 from typing import ClassVar
 
-import fabio
-
 from pydidas.core import Dataset
 from pydidas.core.constants import FABIO_EXTENSIONS
 from pydidas.core.utils import CatchFileErrors
@@ -73,6 +71,8 @@ class FabioIo(IoBase):
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
         """
+        import fabio
+
         with CatchFileErrors(filename, Exception), fabio.open(filename) as _file:
             _data = _file.data
             _header = _file.header

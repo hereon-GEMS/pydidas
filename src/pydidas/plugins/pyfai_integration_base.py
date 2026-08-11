@@ -33,9 +33,7 @@ from pathlib import Path
 from typing import Any, ClassVar, Literal
 
 import numpy as np
-from pyFAI.integrator.azimuthal import AzimuthalIntegrator
 from qtpy import QtWidgets
-from silx.opencl.common import OpenCL
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import UserConfigError, get_generic_param_collection
@@ -55,7 +53,7 @@ from pydidas.plugins.base_proc_plugin import ProcPlugin
 logger = pydidas_logger()
 
 
-OCL = OpenCL()
+_OCL = None
 
 PI_STR = ASCII_TO_UNI["pi"]
 
@@ -107,6 +105,8 @@ class pyFAIintegrationBase(ProcPlugin):
         Check and load the mask and set up the AzimuthalIntegrator.
         """
         if self._exp_hash != hash(self._EXP):
+            from pyFAI.integrator.azimuthal import AzimuthalIntegrator
+
             _lambda_in_A = self._EXP.get_param_value("xray_wavelength")
             self._ai = AzimuthalIntegrator(
                 dist=self._EXP.get_param_value("detector_dist"),
@@ -155,10 +155,15 @@ class pyFAIintegrationBase(ProcPlugin):
         if _method[2] != "opencl":
             return
         _name = mp.current_process().name
-        _platforms = [_platform.name for _platform in OCL.platforms]
+        global _OCL
+        if _OCL is None:
+            from silx.opencl.common import OpenCL
+
+            _OCL = OpenCL()
+        _platforms = [_platform.name for _platform in _OCL.platforms]
         if "NVIDIA CUDA" in _platforms and _name.startswith("pydidas_"):
             _index = int(_name.split("-")[1])
-            _platform = OCL.get_platform("NVIDIA CUDA")
+            _platform = _OCL.get_platform("NVIDIA CUDA")
             _n_device = len(_platform.devices)
             _device = _index % _n_device
             _method = _method + ((_platform.id, _device),)

@@ -31,7 +31,6 @@ __all__ = []
 from pathlib import Path
 from typing import ClassVar
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 from pydidas.core import Dataset
@@ -86,6 +85,8 @@ class IoExporterMatplotlib(IoBase):
             The range with lower and upper bounds for the data export.
         """
         cls.check_for_existing_file(filename, **kwargs)
+        import matplotlib.pyplot as plt
+
         _range = cls.get_data_range(data, **kwargs)
         _cmap = kwargs.get("colormap", "gray")
         _backend = plt.get_backend()
@@ -121,6 +122,8 @@ class IoExporterMatplotlib(IoBase):
             Flag to allow overwriting of existing files. The default is False.
         """
         cls.check_for_existing_file(filename, **kwargs)
+        import matplotlib.pyplot as plt
+
         _range = cls.get_data_range(data, **kwargs)
         _backend = plt.get_backend()
         try:

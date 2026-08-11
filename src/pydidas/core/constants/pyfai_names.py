@@ -35,7 +35,68 @@ __all__ = [
 ]
 
 
-from pyFAI.detectors import Detector as _Detector
+_pyfai_detector_data_initialized = False
+
+
+def _initialize_pyfai_detector_data() -> None:
+    """Populate the detector-name containers by lazily importing pyFAI."""
+    global _pyfai_detector_data_initialized
+    if _pyfai_detector_data_initialized:
+        return
+    # Set the flag before the import so re-entrant calls are handled gracefully.
+    _pyfai_detector_data_initialized = True
+    from pyFAI.detectors import Detector as _Detector
+
+    for __class in _Detector.registry.values():
+        __manufacturer = (
+            "Custom" if __class.MANUFACTURER is None else __class.MANUFACTURER
+        )
+        if isinstance(__manufacturer, list):
+            __manufacturer = " / ".join(__manufacturer)
+        __model = __class.aliases
+        if len(__model) > 0:
+            PYFAI_DETECTOR_NAMES.update(__model)
+            PYFAI_MANUFACTURERS_OF_DETECTORS[__model[0]] = __manufacturer
+            PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __class.MAX_SHAPE
+            PYFAI_DETECTOR_MANUFACTURERS.add(__manufacturer)
+            if __class.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
+                _label = f"[{__manufacturer}] {__model[0]}"
+                if _label not in PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]:
+                    PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
+                        PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] + [_label]
+                    )
+            else:
+                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = [
+                    f"[{__manufacturer}] {__model[0]}"
+                ]
+
+
+class _LazyPyfaiSet(set):
+    """
+    A set subclass that populates itself with pyFAI detector names on first access.
+
+    This defers the import of pyFAI.detectors (and therefore the entire pyFAI
+    package) until the set is actually queried, rather than at module import time.
+    """
+
+    def _ensure_initialized(self) -> None:
+        _initialize_pyfai_detector_data()
+
+    def __contains__(self, item: object) -> bool:
+        self._ensure_initialized()
+        return super().__contains__(item)
+
+    def __iter__(self):
+        self._ensure_initialized()
+        return super().__iter__()
+
+    def __len__(self) -> int:
+        self._ensure_initialized()
+        return super().__len__()
+
+    def __bool__(self) -> bool:
+        self._ensure_initialized()
+        return super().__bool__()
 
 
 pyFAI_UNITS = {
@@ -61,28 +122,7 @@ pyFAI_METHOD = {
 
 
 PYFAI_DETECTOR_MANUFACTURERS = set()
-PYFAI_DETECTOR_NAMES = set()
+PYFAI_DETECTOR_NAMES = _LazyPyfaiSet()
 PYFAI_MANUFACTURERS_OF_DETECTORS = {}
 PYFAI_SHAPES_OF_DETECTOR_MODELS = {}
 PYFAI_DETECTOR_MODELS_OF_SHAPES = {}
-
-for __class in _Detector.registry.values():
-    __manufacturer = "Custom" if __class.MANUFACTURER is None else __class.MANUFACTURER
-    if isinstance(__manufacturer, list):
-        __manufacturer = " / ".join(__manufacturer)
-    __model = __class.aliases
-    if len(__model) > 0:
-        PYFAI_DETECTOR_NAMES.update(__model)
-        PYFAI_MANUFACTURERS_OF_DETECTORS[__model[0]] = __manufacturer
-        PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __class.MAX_SHAPE
-        PYFAI_DETECTOR_MANUFACTURERS.add(__manufacturer)
-        if __class.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
-            _label = f"[{__manufacturer}] {__model[0]}"
-            if _label not in PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]:
-                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
-                    PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] + [_label]
-                )
-        else:
-            PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = [
-                f"[{__manufacturer}] {__model[0]}"
-            ]

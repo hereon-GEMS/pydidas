@@ -28,14 +28,13 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
+from __future__ import annotations
+
 from numbers import Real
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pyFAI
-from pyFAI.detectors import Detector
-from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
 from pydidas.core import (
@@ -248,6 +247,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         det : Detector
             The detector object.
         """
+        import pyFAI
+        from pyFAI.detectors import Detector
+
         _name = self.get_param_value("detector_name")
         if _name in PYFAI_DETECTOR_NAMES:
             _det = pyFAI.detector_factory(_name)
@@ -270,6 +272,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         Geometry :
             The pyFAI geometry object corresponding to the DiffractionExperiment config.
         """
+        from pyFAI.geometry import Geometry
+
         return Geometry(
             dist=self.get_param_value("detector_dist"),
             poni1=self.get_param_value("detector_poni1"),
@@ -304,6 +308,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             If the specified detector name is unknown by pyFAI.
         """
         if det_name in PYFAI_DETECTOR_NAMES:
+            import pyFAI
+
             _det = pyFAI.detector_factory(det_name)
         else:
             raise UserConfigError(
@@ -452,6 +458,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             _tilt = -_tilt
             _tilt_plane = 180 - _tilt_plane
         with NoPrint():
+            import pyFAI
+
             _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(
                 {
                     "directDist": det_dist * 1e3,
@@ -485,6 +493,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 "The detector pixel size of 0 is invalid for a fit2d geometry."
             )
         _geo = self.as_pyfai_geometry()
+        import pyFAI
+
         _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
         return {
             "center_x": _f2d_geo.centerX,

@@ -208,7 +208,18 @@ def check_version_tags(directory: Path | None = None):
     _updater_version_okay = _updater_version == _version
     if not _updater_version_okay:
         _timed_print("The pydidas/version.py differs from the src version.")
-    if not (_citation_okay and _changelog_okay and _updater_version_okay):
+    # Check that a NeXus test file was written with the current version
+    _nexus_test_file = (
+        Path(__file__).parent / "tests" / "_data" / "NeXus" / f"file_v{_version}.nxs"
+    ).is_file()
+    if not _nexus_test_file:
+        _timed_print("The NeXus test files do not include the current version.")
+    if not (
+        _citation_okay
+        and _changelog_okay
+        and _updater_version_okay
+        and _nexus_test_file
+    ):
         sys.exit(1)
     _timed_print("Version tag check successfully concluded.")
 

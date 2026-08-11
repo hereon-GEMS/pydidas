@@ -33,7 +33,7 @@ __all__ = ["ProcessingResultIoMeta"]
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
@@ -49,224 +49,64 @@ if TYPE_CHECKING:
 
 class ProcessingResultIoMeta(GenericIoMeta):
     """
-    Metaclass for WorkflowTree exporters and importers which holds the
-    registry with all associated file extensions for exporting WorkflowTrees.
+    Metaclass for ProcessingResult exporters and importers which holds the
+    registry with all associated file extensions for exporting ProcessingResults.
     """
 
-    # need to redefine the registry to have a unique registry for
-    # ProcessingResultsSaverMeta
     registry: ClassVar[dict[str, type["ProcessingResultIoBase"]]] = {}
-    active_savers: ClassVar[list[str]] = []
-    scan_title: ClassVar[str] = ""
+    format_registry: ClassVar[dict[str, str]] = {}
 
-    @classmethod
-    def reset(cls):
+    @staticmethod
+    def get_savers(
+        formats: str | list[str] | None = None,
+    ) -> dict[str, "ProcessingResultIoBase"]:
         """
-        Reset the Meta registry and clear all entries.
-        """
-        cls.registry = {}
-        cls.active_savers = []
-
-    @classmethod
-    def set_active_savers_and_title(cls, savers: list[str], title: str = "unknown"):
-        """
-        Set the active savers so they do not need to be specified individually
-        later on.
+        Get the savers based on the selected formats.
 
         Parameters
         ----------
-        savers : list
-            A list of the names of the savers. "None" is a valid Saver to
-            clear the list.
-        title : str, optional
-            The title of the scan. If not provided, the title will default to
-            "unknown".
-        """
-        cls.active_savers = []
-        cls.scan_title = title
-        for _saver in savers:
-            _saver = _saver.lower()
-            if not _saver.startswith("."):
-                _saver = "." + _saver
-            if not (_saver is None or _saver == "None"):
-                cls.verify_extension_is_registered(_saver)
-                if _saver not in cls.active_savers:
-                    cls.active_savers.append(_saver)
-
-    @classmethod
-    def get_filenames_from_active_savers(cls, labels: dict) -> list[dict]:
-        """
-        Get the filenames from all active savers based on the supplied labels.
-
-        Parameters
-        ----------
-        labels : dict
-            The labels of the results in form of a dictionary with nodeID
-            keys and label values.
+        formats : str or list[str] or None
+            A single string with the name of the format or a list of names
+            of the formats. None is a valid format to get an empty dictionary.
+            Multiple formats can also be given as a single string if they are
+            separated by a semicolon `;`.
 
         Returns
         -------
-        list
-            A list will all filenames for all selected nodes and exporters.
+        dict[str, ProcessingResultIoBase]
+            The dictionary with the active savers. Keys are the file extensions
+            and values are the respective saver instances.
         """
-        _names = []
-        for _ext in cls.active_savers:
-            _saver = cls.registry[_ext]
-            _fnames = _saver.get_filenames_from_labels(labels)
-            _names.extend(_fnames.values())
-        return _names
+        _active_savers: dict[str, ProcessingResultIoBase] = {}
+        _current_savers: list[type[ProcessingResultIoBase]] = []
+        if formats is None or formats == "":
+            return _active_savers
+        if isinstance(formats, str):
+            formats = formats.split(";")
+        for _format in formats:
+            _format = _format.strip()
+            if _format in ProcessingResultIoMeta.format_registry:
+                _format = ProcessingResultIoMeta.format_registry[_format]
+            _format = _format.lower()
+            if not (_format is None or _format == "none"):
+                if not _format.startswith("."):
+                    _format = "." + _format
+                ProcessingResultIoMeta.verify_extension_is_registered(_format)
+                _format_cls = ProcessingResultIoMeta.registry[_format]
+                if _format_cls not in _current_savers:
+                    _active_savers[_format] = _format_cls()
+                    _current_savers.append(_format_cls)
+        return _active_savers
 
-    @classmethod
-    def prepare_active_savers(
-        cls,
-        save_dir: Path | str,
-        node_information: dict,
-        scan_context: Scan | None = None,
-        diffraction_exp: DiffractionExperiment | None = None,
-        workflow_tree: ProcessingTree | None = None,
-    ):
-        """
-        Prepare the active savers for storing data.
-
-        This method creates the required files and directories.
-
-        Parameters
-        ----------
-        save_dir : Path or str
-            The full path for the data to be saved.
-        node_information : dict
-            A dictionary with nodeID keys and dictionary values. Each value dictionary
-            must have the following keys: shape, node_label, data_label, plugin_name
-            and the respective values. The shape (tuple) determines the shape of the
-            Dataset, the node_label is the user's name for the processing node. The
-            data_label gives the description of what the data shows (e.g. intensity)
-            and the plugin_name is simply the name of the plugin.
-        scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        diffraction_exp : DiffractionExp or None, optional
-            The diffraction experiment context. If None, the generic context will be
-            used. Only specify this, if you explicitly require a different context. The
-            default is None.
-        workflow_tree : WorkflowTree or None, optional
-            The WorkflowTree. If None, the generic WorkflowTree will be used. Only
-            specify this, if you explicitly require a different context. The default is
-            None.
-        """
-        for _ext in cls.active_savers:
-            _saver = cls.registry[_ext]
-            _saver.scan_title = cls.scan_title
-            _saver.prepare_files_and_directories(
-                save_dir,
-                node_information,
-                scan_context=scan_context,
-                diffraction_exp_context=diffraction_exp,
-                workflow_tree=workflow_tree,
-            )
-
-    @classmethod
-    def push_metadata_to_active_savers(cls, metadata: dict, scan: Scan | None = None):
-        """
-        Push the metadata to all active savers.
-
-        This method is required if the ExecuteWorkflowApp is used with the
-        AppRunner because the metadata cannot be transferred through the
-        shared numpy.buffers and needs to be forwarded independently of the
-        frame data.
-
-        Parameters
-        ----------
-        metadata : dict
-            The dictionary with the metadata.
-        scan : Scan or None, optional
-            The Scan instance. If None, this will default to the generic ScanContext.
-            The default is None.
-        """
-        for _ext in cls.active_savers:
-            _saver = cls.registry[_ext]
-            _saver.update_metadata(metadata, scan)
-
-    @classmethod
-    def export_frame_to_active_savers(
-        cls, index: int, frame_result_dict: dict, **kwargs: dict
-    ):
-        """
-        Export the results of a frame to all active savers.
-
-        Parameters
-        ----------
-        index : int
-            The frame index.
-        frame_result_dict : dict
-            The result dictionary with nodeID keys and result values.
-        kwargs : dict
-            Any kwargs which should be passed to the underlying exporter.
-        """
-        for _ext in cls.active_savers:
-            _saver = cls.registry[_ext]
-            _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
-
-    @classmethod
-    def export_full_data_to_active_savers(
-        cls,
-        data: dict[int, Dataset],
-        scan_context: Scan | None = None,
-        squeeze: bool = False,
-    ):
-        """
-        Export the full data to all active savers.
-
-        Parameters
-        ----------
-        data : dict
-            The result dictionary with nodeID keys and result values.
-        scan_context : Scan or None, optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        squeeze : bool, optional
-            Flag to toggle squeezing of the data. If True, any empty dimensions will
-            be squeezed from the data. The default is False.
-        """
-        for _ext in cls.active_savers:
-            _saver = cls.registry[_ext]
-            _saver.export_full_data_to_file(data, scan_context, squeeze=squeeze)
-
-    @classmethod
-    def export_frame_to_file(
-        cls,
-        index: int,
-        extension: str,
-        frame_result_dict: dict[int, Dataset],
-        **kwargs: Any,
-    ):
-        """
-        Call the concrete export_to_file method in the subclass registered
-        to the extension of the filename.
-
-        Parameters
-        ----------
-        index : int
-            The frame index.
-        extension : str
-            The file extension for the saver.
-        frame_result_dict : dict
-            The result dictionary with nodeID keys and result values.
-        kwargs : Any
-            Any kwargs which should be passed to the underlying exporter.
-        """
-        cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension.lower()]
-        _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
-
-    @classmethod
+    @staticmethod
     def import_data_from_directory(
-        cls, dir_name: Path | str
+        dir_name: Path | str,
     ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, ProcessingTree]:
         """
         Import data from files in a directory.
 
         This method imports data, reads the metadata and passes it in a format for
-        the ProcessingResults to update itself.
+        the ProcessingResults to update it
 
         Parameters
         ----------
@@ -284,8 +124,9 @@ class ProcessingResultIoMeta(GenericIoMeta):
             A pydidas Scan instance with the scan's context
         exp: DiffractionExperiment
             A pydidas DiffractionExperiment instance with the experiment's context
-        tree : WorkflowTree
-            A pydidas WorkflowTree instance with the workflow's context
+        tree : ProcessingTree
+            A pydidas ProcessingTree instance (i.e. possibly also the
+            WorkflowTree) with the workflow configuration.
         """
         _data_dict = {}
         _node_info_dict = {}
@@ -300,8 +141,8 @@ class ProcessingResultIoMeta(GenericIoMeta):
         ]
         for _file in _files:
             _ext = get_extension(_file)
-            cls.verify_extension_is_registered(_ext)
-            _importer = cls.registry[_ext]
+            ProcessingResultIoMeta.verify_extension_is_registered(_ext)
+            _importer = ProcessingResultIoMeta.registry[_ext]
             _node_id = int(_file[5:7])
             _path = dir_name / _file
             _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
@@ -310,3 +151,32 @@ class ProcessingResultIoMeta(GenericIoMeta):
             _data_dict[_node_id] = _data
             _node_info_dict[_node_id] = _node_info
         return _data_dict, _node_info_dict, _scan, _exp, _tree
+
+    @classmethod
+    def register_class(
+        cls,
+        new_class: type["ProcessingResultIoBase"],
+        update_registry: bool = False,  # type: ignore[override]
+    ) -> None:
+        """
+        Register a class as object for its native extensions.
+
+        Parameters
+        ----------
+        new_class : type[ProcessingResultIoBase]
+            The class to be registered.
+        update_registry : bool
+            Keyword to allow updating / overwriting of registered extensions.
+            The default is False.
+
+        Raises
+        ------
+        KeyError
+            If an extension associated with new_class has already been
+            registered and update_registry is False.
+        """
+        if new_class.format_name:
+            ProcessingResultIoMeta.format_registry[new_class.format_name] = (
+                new_class.default_suffix
+            )
+        super().register_class(new_class, update_registry=update_registry)

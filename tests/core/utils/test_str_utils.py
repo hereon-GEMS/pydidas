@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+import datetime
 import random
 import shutil
 import string
@@ -45,6 +46,7 @@ from pydidas.core.utils.str_utils import (
     get_short_time_string,
     get_time_string,
     get_warning,
+    iso_timestring,
     print_warning,
     timed_print,
     update_separators,
@@ -73,6 +75,13 @@ class Test_str_utils(unittest.TestCase):
         for _s in ["-42.5.5", "   abc ", "\n a -42.5", "this is -42.5  \n"]:
             with self.subTest(s=_s):
                 self.assertEqual(_s.strip(), convert_str_to_number(_s))
+
+    def test_iso_timestring(self):
+        _now = datetime.datetime.now().astimezone()
+        _str = iso_timestring()
+        _date = datetime.datetime.fromisoformat(_str)
+        self.assertIsInstance(_str, str)
+        self.assertTrue(abs((_now - _date).total_seconds()) < 1)
 
     def test_get_fixed_length_str_length(self):
         self.assertEqual(len(get_fixed_length_str("test", self.length)), self.length)

@@ -28,6 +28,9 @@ __status__ = "Production"
 __all__ = ["ScanIoYaml"]
 
 
+from pathlib import Path
+from typing import Any
+
 import yaml
 
 from pydidas.contexts.scan.scan import Scan
@@ -35,6 +38,7 @@ from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
 from pydidas.core.constants import YAML_EXTENSIONS
+from pydidas.core.utils.file_checks import verify_is_new_file_or_replace_set
 
 
 SCAN = ScanContext()
@@ -48,45 +52,59 @@ class ScanIoYaml(ScanIoBase):
     extensions = YAML_EXTENSIONS
     format_name = "YAML"
 
-    @classmethod
-    def export_to_file(cls, filename: str, **kwargs: dict):
+    @staticmethod
+    def export_to_file(filename: Path | str, **kwargs: Any) -> None:
         """
         Write the ScanTree to a file.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
+        **kwargs : Any
+            Optional keyword arguments. Supported keywords:
+
+            scan : Scan, optional
+                The Scan instance to export. If not provided, uses
+                ScanContext.
         """
         _scan = kwargs.get("scan", SCAN)
-        cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = _scan.get_param_values_as_dict(filter_types_for_export=True)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        _tmp_params = _scan.get_param_values_as_dict(filter_types_for_export=True)
         with open(filename, "w") as stream:
-            yaml.safe_dump(tmp_params, stream)
+            yaml.safe_dump(_tmp_params, stream)
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Scan | None = None):
+    def import_from_file(
+        cls,
+        filename: str | Path,
+        scan: Scan | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Restore the ScanContext from a YAML file.
 
         Parameters
         ----------
-        filename : str
-            The filename of the file to be written.
-        scan : Union[None, pydidas.contexts.scan.Scan], optional
-            The Scan instance to be updated. If None, the ScanContext instance is used.
-            The default is None.
+        filename : str or Path
+            The filename of the file to be imported.
+        scan : Scan or None, optional
+            The Scan instance to be updated. If None, the ScanContext
+            instance is used. The default is None.
+        **kwargs : Any
+            Optional keyword arguments. Not used in this implementation
+            but supported for consistency.
         """
         _scan = SCAN if scan is None else scan
         with open(filename, "r") as stream:
             try:
-                cls.imported_params = yaml.safe_load(stream)
-            except (yaml.YAMLError, UnicodeError) as yerr:
-                cls.imported_params = {}
-                raise yaml.YAMLError from yerr
-        if not isinstance(cls.imported_params, dict):
+                _imported_params = yaml.safe_load(stream)
+            except (yaml.YAMLError, UnicodeError) as _yaml_error:
+                _imported_params = {}
+                raise yaml.YAMLError from _yaml_error
+        if not isinstance(_imported_params, dict):
             raise UserConfigError(
                 "The imported YAML file for the Scan does not contain a valid "
                 "dictionary."
             )
-        cls.update_scan_from_import(scan)
+        cls.update_scan_from_import(_imported_params, _scan)

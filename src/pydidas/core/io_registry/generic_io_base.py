@@ -28,6 +28,7 @@ __status__ = "Production"
 __all__ = ["GenericIoBase"]
 
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -41,10 +42,9 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
     extensions: ClassVar[list[str]] = []
     format_name: ClassVar[str] = ""
-    imported_params: ClassVar[dict] = {}
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, *args: Any, **kwargs: Any) -> None:
+    @staticmethod
+    def export_to_file(filename: Path | str, **kwargs: Any) -> None:
         """
         Write the content to a file.
 
@@ -60,10 +60,8 @@ class GenericIoBase(metaclass=GenericIoMeta):
         """
         raise NotImplementedError
 
-    @classmethod
-    def import_from_file(
-        cls, filename: str | Path | list[Path | str], **kwargs: Any
-    ) -> None:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Any:
         """
         Restore the content from a file
 
@@ -71,33 +69,27 @@ class GenericIoBase(metaclass=GenericIoMeta):
 
         Parameters
         ----------
-        filename : str or Path or list[Path or str]
+        filename : str or Path
             The filename of the file to be imported.
+        **kwargs : Any
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
         raise NotImplementedError
 
-    @classmethod
-    def check_for_existing_file(cls, filename: str | Path, **kwargs: Any) -> None:
+    @staticmethod
+    def import_from_file_sequence(
+        filenames: Sequence[Path | str], **kwargs: Any
+    ) -> Any:
         """
-        Check if the file exists and if the overwrite flag has been set.
+        Restore the content from a sequence of files.
 
         Parameters
         ----------
-        filename : str or Path
-            The full filename and path.
+        filenames : Sequence[Path or str]
+            The filenames of the files to be imported.
         **kwargs : Any
-            Any keyword arguments. Supported are:
-
-            overwrite : bool, optional
-                Flag to allow overwriting of existing files.
-
-        Raises
-        ------
-        FileExistsError
-            If a file with filename exists and the overwrite flag is not True.
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
-        _overwrite = kwargs.get("overwrite", False)
-        if Path(filename).exists() and not _overwrite:
-            raise FileExistsError(
-                f"The file `{filename}` exists and overwriting has not been confirmed."
-            )
+        raise NotImplementedError

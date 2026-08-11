@@ -92,6 +92,15 @@ class TestProcessingTree(unittest.TestCase):
     def get_dummy_proc_plugin(self):
         return COLL.get_plugin_by_name("DummyProc")()
 
+    def test__duplicate_tree_creation(self):
+        _nodes, _ids = self.create_node_tree()
+        _tree = ProcessingTree()
+        _tree.root = _nodes[0][0]
+        assert len(_tree.nodes) > 0
+        _tree2 = ProcessingTree()
+        assert len(_tree.nodes) > 0
+        assert len(_tree2.nodes) == 0
+
     def test_active_plugin_header__no_nodes(self):
         self._curr_tree = ProcessingTree()
         self.assertEqual(self._curr_tree.active_plugin_header, "")

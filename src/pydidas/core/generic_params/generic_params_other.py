@@ -345,9 +345,9 @@ GENERIC_PARAMS_OTHER = {
     },
     "autosave_format": {
         "type": str,
-        "default": "HDF5",
+        "default": "NeXus (HDF5)",
         "name": "Autosave formats",
-        "choices": [None, "HDF5"],
+        "choices": [None, "NeXus (HDF5)"],
         "unit": "",
         "allow_None": True,
         "tooltip": (
@@ -418,9 +418,9 @@ GENERIC_PARAMS_OTHER = {
     },
     "saving_format": {
         "type": str,
-        "default": "HDF5",
+        "default": "NeXus (HDF5)",
         "name": "Save to format",
-        "choices": [None, "HDF5"],
+        "choices": [None, "NeXus (HDF5)"],
         "unit": "",
         "allow_None": True,
         "tooltip": (

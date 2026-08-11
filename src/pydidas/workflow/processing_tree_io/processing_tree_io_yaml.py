@@ -29,19 +29,21 @@ __all__ = ["ProcessingTreeIoYaml"]
 
 
 from pathlib import Path
-from typing import Any, NewType
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import YAML_EXTENSIONS
+from pydidas.core.utils.file_checks import verify_is_new_file_or_replace_set
 from pydidas.version import VERSION
 from pydidas.workflow.processing_tree_io.processing_tree_io_base import (
     ProcessingTreeIoBase,
 )
 
 
-ProcessingTree = NewType("ProcessingTree", type)
+if TYPE_CHECKING:
+    from pydidas.workflow.processing_tree import ProcessingTree
 
 
 class ProcessingTreeIoYaml(ProcessingTreeIoBase):
@@ -53,9 +55,9 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
     format_name = "YAML"
     default_suffix = ".yaml"
 
-    @classmethod
+    @staticmethod
     def export_to_file(
-        cls, filename: Path | str, tree: ProcessingTree, **kwargs: Any
+        filename: Path | str, tree: "ProcessingTree", **kwargs: Any
     ) -> None:
         """
         Write the content to a file.
@@ -68,8 +70,10 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
             The filename of the file to be written.
         tree : ProcessingTree
             The workflow tree instance.
+        **kwargs : Any
+            Additional keyword arguments.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         _dump = {
             "version": VERSION,
             "nodes": tree.export_to_list_of_nodes(),
@@ -77,8 +81,8 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
         with open(filename, "w") as _file:
             yaml.safe_dump(_dump, _file)
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str) -> ProcessingTree:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> "ProcessingTree":
         """
         Restore the content from a file.
 
@@ -88,15 +92,18 @@ class ProcessingTreeIoYaml(ProcessingTreeIoBase):
         ----------
         filename : Path or str
             The filename of the file to be read.
+        **kwargs : Any
+            Additional keyword arguments. Not used in the YAML implementation.
 
         Returns
         -------
-        pydidas.workflow.ProcessingTree
+        ProcessingTree
             The restored ProcessingTree.
         """
+        # Need to import here to prevent circular imports
         from pydidas.workflow.processing_tree import ProcessingTree
 
-        _version = "23.7.5 or earlier"
+        _version = "23.07.05 or earlier"
 
         with open(filename, "r") as _file:
             _restoration = yaml.safe_load(_file)

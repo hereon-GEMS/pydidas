@@ -27,12 +27,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ProcessingTreeIoBase"]
 
-from typing import ClassVar
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydidas.core.io_registry import GenericIoBase
 from pydidas.workflow.processing_tree_io.processing_tree_io_meta import (
     ProcessingTreeIoMeta,
 )
+
+
+if TYPE_CHECKING:
+    from pydidas.workflow.processing_tree import ProcessingTree
 
 
 class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
@@ -44,4 +49,45 @@ class ProcessingTreeIoBase(GenericIoBase, metaclass=ProcessingTreeIoMeta):
     """
 
     extensions: ClassVar[list[str]] = []
-    format_name = "unknown"
+    format_name: ClassVar[str] = "unknown"
+
+    @staticmethod
+    def export_to_file(  # type: ignore[override]
+        filename: Path | str, tree: "ProcessingTree", **kwargs: Any
+    ) -> None:
+        """
+        Write the content to a file.
+
+        This method needs to be implemented by the concrete subclass.
+
+        Parameters
+        ----------
+        filename : Path or str
+            The filename of the file to be written.
+        tree : ProcessingTree
+            The workflow tree instance.
+        **kwargs : Any
+            Additional keyword arguments.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> "ProcessingTree":  # type: ignore[override]
+        """
+        Restore the content from a file.
+
+        This method needs to be implemented by the concrete subclass.
+
+        Parameters
+        ----------
+        filename : Path or str
+            The filename of the file to be read.
+        **kwargs : Any
+            Additional keyword arguments.
+
+        Returns
+        -------
+        ProcessingTree
+            The restored ProcessingTree.
+        """
+        raise NotImplementedError

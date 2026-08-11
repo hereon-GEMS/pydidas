@@ -99,32 +99,6 @@ Accessing results
 Accessing a full Plugin Dataset
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Metadata
-""""""""
-
-The metadata of a node ID's Dataset can be accessed using the
-:py:meth:`get_result_metadata(node_id)
-<pydidas.workflow.ProcessingResults.get_result_metadata>` method. It will return
-a dictionary with the metadata keys and their respective data:
-
-.. code-block::
-
-    >>> import pydidas
-    >>> RESULTS = pydidas.workflow.WorkflowResults()
-    >>> RESULTS.get_result_metadata(1)
-    {'axis_labels': {0: 'Scan position', 1: 'Repeat', 2: '2theta'},
-     'axis_units': {0: 'm', 1: 'number', 2: 'deg'},
-     'axis_ranges': {0: array([1.  , 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09, 1.1 ,
-             1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.2 ]),
-      1: array([0., 1., 2., 3.]),
-      2: array([1.88768122e-02, 5.66304366e-02, 9.43840610e-02, ...,
-             3.76592403e+01, 3.76969939e+01, 3.77347476e+01])},
-     'metadata': {}}
-
-Note that the metadata is also included in the full :py:class:`Dataset
-<pydidas.core.Dataset>` and this method is primarily intended if the user needs
-the metadata without creating a copy of the full data.
-
 Generic Data
 """"""""""""
 
@@ -144,7 +118,7 @@ An example is given below:
     >>> RESULTS = pydidas.workflow.WorkflowResults()
     >>> res1 = RESULTS.get_results(1)
     >>> type(res1)
-    pydidas.core.dataset.Dataset
+    pydidas.core.Dataset
     >>> res1.shape
     (21, 4, 1000)
     >>> res1
@@ -251,7 +225,7 @@ well:
 .. automethod:: pydidas.workflow.ProcessingResults.get_result_subset
     :noindex:
 
-This method is interesing if the user wants to access a specific subset in the
+This method is interesting if the user wants to access a specific subset in the
 flattened data, for example the results for the frames 40 to 55 of the
 experiment. This can easily be done using the :py:meth:`get_result_subset
 <pydidas.workflow.ProcessingResults.get_result_subset>` method, as demonstrated

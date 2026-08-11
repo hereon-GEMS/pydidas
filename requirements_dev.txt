@@ -7,6 +7,7 @@ GitPython>=3.1.46
 ipython>=9.9
 isort>=7.0.0
 pip-audit
+pip-compile-cross-platform>=2.0
 pip-tools>=7.5.2
 PyQt5-stubs>=5.15.6
 PySide6-stubs>=6.7

@@ -76,6 +76,8 @@ Bugfixes
 - Fixed an issue on Unix where the main window was always maximized even
   when reduced in size. According to the Qt documentation, the maximized
   flag should only be used on Windows.
+- Fixed an issue with the ChangeCanvasAction which was incompatible with the
+  latest silx update to 3.1.0
 
 
 v26.05.19

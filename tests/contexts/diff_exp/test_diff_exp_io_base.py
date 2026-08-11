@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for DiffractionExperimentIoBase."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -24,10 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import shutil
-import tempfile
-import unittest
-from pathlib import Path
+import pytest  # pyright: ignore[reportMissingImports]
 
 from pydidas.contexts.diff_exp import (
     DiffractionExperiment,
@@ -38,55 +35,71 @@ from pydidas.core import UserConfigError
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO = DiffractionExperimentIoBase
 
 
-class TestDiffractionExperimentIoBase(unittest.TestCase):
-    def setUp(self):
-        _test_dir = Path(__file__).parents[2]
-        self._path = str(_test_dir / "_data" / "load_test_exp_settings_")
-        self._tmppath = tempfile.mkdtemp()
-        EXP_IO.imported_params = {}
+@pytest.fixture
+def exp_context():
+    """Provide a fresh DiffractionExperimentContext for each test."""
+    _exp = DiffractionExperimentContext()
+    _exp.restore_all_defaults(True)
+    return _exp
 
-    def tearDown(self):
-        del self._path
-        shutil.rmtree(self._tmppath)
 
-    def test_verify_all_entries_present__correct(self):
-        for param in EXP.params:
-            EXP_IO.imported_params[param] = True
-        EXP_IO._verify_all_entries_present()
+@pytest.fixture
+def complete_params_dict(exp_context):
+    """Provide a dictionary with all required parameters."""
+    _params = {}
+    for param in exp_context.params:
+        _params[param] = exp_context.get_param_value(param)
+    return _params
 
-    def test_verify_all_entries_present__missing_keys(self):
-        with self.assertRaises(UserConfigError):
-            EXP_IO._verify_all_entries_present()
 
-    def test_verify_all_entries_present__exclude_det_mask(self):
-        for param in EXP.params:
-            EXP_IO.imported_params[param] = True
-        del EXP_IO.imported_params["detector_mask_file"]
-        EXP_IO._verify_all_entries_present(exclude_det_mask=True)
+def test_verify_all_entries_present__correct(complete_params_dict):
+    _reply = DiffractionExperimentIoBase.verify_all_entries_present(
+        complete_params_dict
+    )
+    assert _reply is None  # i.e. check that no Exception was raised
 
-    def test_write_to_exp_settings(self):
-        _det_name = "Test Name"
-        _energy = 123.45
-        EXP_IO.imported_params = {"detector_name": _det_name, "xray_energy": _energy}
-        EXP_IO._write_to_exp_settings()
-        self.assertEqual(EXP.get_param_value("detector_name"), _det_name)
-        self.assertEqual(EXP.get_param_value("xray_energy"), _energy)
 
-    def test_write_to_exp_settings__with_diffraction_exp(self):
-        EXP.restore_all_defaults(True)
-        _exp = DiffractionExperiment()
-        _det_name = "Test Name"
-        _energy = 123.45
-        EXP_IO.imported_params = {"detector_name": _det_name, "xray_energy": _energy}
-        EXP_IO._write_to_exp_settings(diffraction_exp=_exp)
-        self.assertEqual(_exp.get_param_value("detector_name"), _det_name)
-        self.assertEqual(_exp.get_param_value("xray_energy"), _energy)
-        self.assertNotEqual(EXP.get_param_value("detector_name"), _det_name)
-        self.assertNotEqual(EXP.get_param_value("xray_energy"), _energy)
+def test_verify_all_entries_present__missing_keys(complete_params_dict):
+    del complete_params_dict["detector_name"]
+    with pytest.raises(UserConfigError):
+        DiffractionExperimentIoBase.verify_all_entries_present(complete_params_dict)
+
+
+def test_verify_all_entries_present__exclude_det_mask(complete_params_dict):
+    del complete_params_dict["detector_mask_file"]
+    _reply = DiffractionExperimentIoBase.verify_all_entries_present(
+        complete_params_dict, exclude_det_mask=True
+    )
+    assert _reply is None  # i.e. check that no Exception was raised
+
+
+def test_update_diffraction_exp__w_global_context(exp_context, complete_params_dict):
+    _det_name = "Test Detector"
+    _energy = 123.45
+    complete_params_dict["detector_name"] = _det_name
+    complete_params_dict["xray_energy"] = _energy
+    DiffractionExperimentIoBase.update_diffraction_exp(complete_params_dict)
+    assert exp_context.get_param_value("detector_name") == _det_name
+    assert exp_context.get_param_value("xray_energy") == _energy
+
+
+def test_update_diffraction_exp__with_instance(complete_params_dict):
+    _exp = DiffractionExperiment()
+    _exp.restore_all_defaults(True)
+    _det_name = "Test Detector"
+    _energy = 123.45
+    complete_params_dict["detector_name"] = _det_name
+    complete_params_dict["xray_energy"] = _energy
+    DiffractionExperimentIoBase.update_diffraction_exp(
+        complete_params_dict, diffraction_exp=_exp
+    )
+    assert _exp.get_param_value("detector_name") == _det_name
+    assert _exp.get_param_value("xray_energy") == _energy
+    assert EXP.get_param_value("detector_name") != _det_name
+    assert EXP.get_param_value("xray_energy") != _energy
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

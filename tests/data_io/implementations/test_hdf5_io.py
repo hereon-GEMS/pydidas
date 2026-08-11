@@ -30,7 +30,7 @@ import pytest
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils.hdf5 import create_nxdata_entry
+from pydidas.core.utils.hdf5 import nxs_write_nxdata
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 
 
@@ -61,9 +61,9 @@ def config(temp_path):
         _file["data"] = np.arange(10)
         for _path in ["test/path/res", "entry/data/data"]:
             _local_data = data if _path == "test/path/res" else data[data_slice]
-            create_nxdata_entry(_file, _path, _local_data)
-        create_nxdata_entry(_file, "entry/scalar/data", 1.5)
-        create_nxdata_entry(_file, "entry/0d/data", [1.5])
+            nxs_write_nxdata(_file, _path, _local_data)
+        nxs_write_nxdata(_file, "entry/scalar/data", 1.5)
+        nxs_write_nxdata(_file, "entry/0d/data", [1.5])
     yield {
         "path": temp_path,
         "fname": fname,

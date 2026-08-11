@@ -29,14 +29,14 @@ __all__ = ["ProcessingTreeIoMeta"]
 
 
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from pydidas.core.io_registry import GenericIoMeta
 from pydidas.core.utils import get_extension
 
 
 if TYPE_CHECKING:
-    from pydidas.workflow import ProcessingTree
+    from pydidas.workflow.processing_tree import ProcessingTree
 
 
 class ProcessingTreeIoMeta(GenericIoMeta):
@@ -45,25 +45,23 @@ class ProcessingTreeIoMeta(GenericIoMeta):
     registry with all associated file extensions for exporting ProcessingTrees.
     """
 
-    # need to redefine the registry to have a unique registry for
-    # ProcessingTreeIoMeta
     registry: ClassVar[dict[str, type["ProcessingTreeIoMeta"]]] = {}
 
     @classmethod
-    def export_to_file(
-        cls, filename: Path | str, tree: "ProcessingTree", **kwargs: dict
-    ):
+    def export_to_file(  # type: ignore[override]
+        cls, filename: Path | str, tree: "ProcessingTree", **kwargs: Any
+    ) -> None:
         """
         Call the export_to_file method associated with extension of the filename.
 
         Parameters
         ----------
-        filename : Union[Path, str]
+        filename : Path or str
             The full filename and path.
         tree : ProcessingTree
             The instance of the ProcessingTree.
-        kwargs : dict
-            Any kwargs which should be passed to the udnerlying exporter.
+        **kwargs : Any
+            Any kwargs which should be passed to the underlying exporter.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
@@ -71,20 +69,22 @@ class ProcessingTreeIoMeta(GenericIoMeta):
         _io_class.export_to_file(filename, tree, **kwargs)
 
     @classmethod
-    def import_from_file(cls, filename: Path | str) -> "ProcessingTree":
+    def import_from_file(  # type: ignore[override]
+        cls, filename: Path | str
+    ) -> "ProcessingTree":
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : Union[Path, str]
+        filename : Path or str
             The full filename and path.
 
         Returns
         -------
-        pydidas.workflow.WorkflowTree
-            The new WorkflowTree instance.
+        ProcessingTree
+            The new ProcessingTree instance.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)

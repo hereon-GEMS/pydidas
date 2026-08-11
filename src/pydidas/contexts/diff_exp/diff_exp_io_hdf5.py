@@ -41,8 +41,9 @@ from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS, LAMBDA_IN_A_TO_E
 from pydidas.core.utils import (
     CatchFileErrors,
+    verify_is_new_file_or_replace_set,
 )
-from pydidas.core.utils.hdf5 import export_context_to_nxs, read_and_decode_hdf5_dataset
+from pydidas.core.utils.hdf5 import nxs_export_context, read_and_decode_hdf5_dataset
 
 
 class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
@@ -53,8 +54,10 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
     extensions: ClassVar[list[str]] = HDF5_EXTENSIONS
     format_name = "HDF5"
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, **kwargs: Any) -> None:
+    @staticmethod
+    def export_to_file(  # type: ignore[override]
+        filename: Path | str, **kwargs: Any
+    ) -> None:
         """
         Write the ExperimentalTree to a HDF5 file.
 
@@ -68,13 +71,17 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
             diffraction_exp : DiffractionExperiment, optional
                 The DiffractionExperiment instance to be exported. The
                 default is the DiffractionExperimentContext.
+            replace : bool, optional
+                If True, replace the file if it already exists. The default is
+                False.
         """
         _EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
-        cls.check_for_existing_file(filename, **kwargs)
-        export_context_to_nxs(filename, _EXP, "entry/pydidas_config/diffraction_exp")
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        with h5py.File(filename, "a") as h5file:
+            nxs_export_context(h5file, _EXP, "entry/pydidas_diffraction_exp")
 
     @classmethod
-    def import_from_file(
+    def import_from_file(  # type: ignore[override]
         cls,
         filename: Path | str,
         diffraction_exp: DiffractionExperiment | None = None,
@@ -85,21 +92,21 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
         Parameters
         ----------
         filename : Path or str
-            The filename of the file to be written.
+            The filename of the file to be read.
         diffraction_exp : DiffractionExperiment or None, optional
             The DiffractionExperiment instance to be updated. The default is
             None.
         """
-        if diffraction_exp is None:
-            diffraction_exp = DiffractionExperimentContext()
+        diffraction_exp = diffraction_exp or DiffractionExperimentContext()
+        _imported_params = {}
         with (
             CatchFileErrors(filename, KeyError, raise_file_read_error=False) as catcher,
-            h5py.File(filename, "r") as file,
+            h5py.File(filename, "r") as _h5file,
         ):
-            cls.imported_params = {}
+            _root_key = cls._find_root_key(_h5file)
             for _key in diffraction_exp.params:
-                cls.imported_params[_key] = read_and_decode_hdf5_dataset(
-                    file[f"entry/pydidas_config/diffraction_exp/{_key}"]
+                _imported_params[_key] = read_and_decode_hdf5_dataset(
+                    _h5file[f"{_root_key}{_key}"]
                 )
         if catcher.raised_exception:
             raise UserConfigError(
@@ -107,8 +114,36 @@ class DiffractionExperimentIoHdf5(DiffractionExperimentIoBase):
                 "saved instance of DiffractionExperimentContext. Please "
                 "check the file format and content."
             )
-        cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
+        _imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / _imported_params.get(
             "xray_wavelength", np.nan
         )
-        cls._verify_all_entries_present()
-        cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
+        cls.verify_all_entries_present(_imported_params)
+        cls.update_diffraction_exp(_imported_params, diffraction_exp=diffraction_exp)
+
+    @staticmethod
+    def _find_root_key(h5file: h5py.File) -> str:
+        """
+        Find the root key for diffraction experiment exported settings.
+
+        This method checks for legacy key locations and returns
+        the appropriate root key for the diffraction experiment settings
+        in the HDF5 file.
+
+        Parameters
+        ----------
+        h5file : h5py.File
+            The HDF5 file object to search for the root key.
+
+        Returns
+        -------
+        str
+            The root key for the diffraction experiment settings
+            in the HDF5 file.
+        """
+        for _key in [
+            "/entry/pydidas_diffraction_exp/",
+            "/entry/pydidas_config/diffraction_exp/",
+        ]:
+            if _key in h5file:
+                return _key
+        raise KeyError("No valid key location found")

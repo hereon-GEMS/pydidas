@@ -319,7 +319,9 @@ class SinSquareChiResultsFrame(BaseFrame):
             _node_id = getattr(self, f"_sin_{_key}_node_keys")[_node_str]
             _show = self.get_param_value(f"show_sin_{_key}_results")
             if _node_id > 0 and _show:
-                _data = self.__current_results.get_results_for_flattened_scan(_node_id)
+                _data = self.__current_results.get_results(
+                    _node_id, flatten_scan_dims=True
+                )
                 if _key == "square_chi" and not self.get_param_value(
                     "show_sin_square_chi_branches"
                 ):

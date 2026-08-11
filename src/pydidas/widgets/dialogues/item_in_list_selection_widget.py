@@ -78,7 +78,6 @@ class ItemInListSelectionWidget(QtWidgets.QInputDialog):
             get_max_pixel_width_of_entries(items) + 60,
             min(20 * _font_height, (len(items) + 5) * (_font_height + 5)),
         )
-        print((20 * _font_height, (len(items) + 5) * (_font_height + 5)))
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 

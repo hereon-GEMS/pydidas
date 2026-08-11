@@ -28,19 +28,22 @@ __status__ = "Production"
 __all__ = ["ScanIoHdf5"]
 
 
+from pathlib import Path
 from typing import Any
 
 import h5py
 
-from pydidas.contexts.scan.scan import SCAN_LEGACY_PARAMS, Scan
+from pydidas.contexts.scan.scan import SCAN_LEGACY_PARAMS, Scan  # type: ignore[import]
 from pydidas.contexts.scan.scan_context import ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
 from pydidas.core import UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils import CatchFileErrors, verify_is_new_file_or_replace_set
 from pydidas.core.utils.hdf5 import (
-    export_context_to_nxs,
     get_hdf5_populated_dataset_keys,
+    nxs_create_recursive_groups,
+    nxs_export_context,
+    nxs_write_dataset,
     read_and_decode_hdf5_dataset,
 )
 
@@ -56,14 +59,14 @@ class ScanIoHdf5(ScanIoBase):
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
 
-    @classmethod
-    def export_to_file(cls, filename: str, **kwargs: Any) -> None:
+    @staticmethod
+    def export_to_file(filename: str | Path, **kwargs: Any) -> None:
         """
         Write the ScanTree to a file.
 
         Parameters
         ----------
-        filename : str
+        filename : str or Path
             The filename of the file to be written.
         **kwargs : Any
             Keyword arguments. Supported kwargs are:
@@ -73,18 +76,28 @@ class ScanIoHdf5(ScanIoBase):
                 ScanContext instance.
         """
         _scan = kwargs.get("scan", SCAN)
-        cls.check_for_existing_file(filename, **kwargs)
-        export_context_to_nxs(filename, _scan, "entry/pydidas_config/scan")
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        with h5py.File(filename, "a") as h5file:
+            nxs_export_context(h5file, _scan, "entry/pydidas_scan")
+            nxs_create_recursive_groups(h5file, "entry/instrument", "NXinstrument")
+            _det_group = nxs_create_recursive_groups(
+                h5file, "entry/instrument/detector", "NXdetector"
+            )
+            nxs_write_dataset(
+                _det_group,
+                "frame_start_number",
+                _scan.get_param_value("pattern_number_offset"),
+            )
 
     @classmethod
-    def import_from_file(cls, filename: str, scan: Scan | None = None) -> None:
+    def import_from_file(cls, filename: Path | str, scan: Scan | None = None) -> None:
         """
         Restore the ScanContext from a HDF5 file.
 
         Parameters
         ----------
-        filename : str
-            The filename of the file to be written.
+        filename : Path or str
+            The filename of the file to be read.
         scan : Scan or None, optional
             The Scan instance to be updated. If None, the ScanContext
             instance is used. The default is None.
@@ -93,20 +106,21 @@ class ScanIoHdf5(ScanIoBase):
         _scan = SCAN if scan is None else scan
         with (
             CatchFileErrors(filename, KeyError, raise_file_read_error=False) as catcher,
-            h5py.File(filename, "r") as file,
+            h5py.File(filename, "r") as _h5file,
         ):
+            _root_key = cls._find_root_key(_h5file)
             _present_keys = [
-                _key.removeprefix("/entry/pydidas_config/scan/")
+                _key.removeprefix(_root_key)
                 for _key in get_hdf5_populated_dataset_keys(
-                    file["entry/pydidas_config/scan"], min_dim=0, min_size=0
+                    _h5file[_root_key], min_dim=0, min_size=0
                 )
             ]
-            cls.imported_params = {}
+            _imported_params = {}
             for _key in list(_scan.params) + list(SCAN_LEGACY_PARAMS):
                 if _key not in _present_keys:
                     continue
-                cls.imported_params[_key] = read_and_decode_hdf5_dataset(
-                    file[f"entry/pydidas_config/scan/{_key}"]
+                _imported_params[_key] = read_and_decode_hdf5_dataset(
+                    _h5file[f"{_root_key}{_key}"]
                 )
         if catcher.raised_exception:
             raise UserConfigError(
@@ -114,4 +128,30 @@ class ScanIoHdf5(ScanIoBase):
                 "saved instance of ScanContext. Please check the file "
                 "format and content."
             )
-        cls.update_scan_from_import(scan)
+        cls.update_scan_from_import(_imported_params, scan)  # type: ignore[type]
+
+    @staticmethod
+    def _find_root_key(h5file: h5py.File) -> str:
+        """
+        Find the root key for scan exported Scan settings.
+
+        This method checks for legacy key locations and returns
+        the appropriate root key for the scan settings in the HDF5 file.
+
+        Parameters
+        ----------
+        h5file : h5py.File
+            The HDF5 file object to search for the root key.
+
+        Returns
+        -------
+        str
+            The root key for the scan settings in the HDF5 file.
+        """
+        for _key in [
+            "/entry/pydidas_scan/",
+            "/entry/pydidas_config/scan/",
+        ]:
+            if _key in h5file:
+                return _key
+        raise KeyError("No valid key location found")

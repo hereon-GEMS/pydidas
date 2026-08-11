@@ -39,6 +39,7 @@ __all__ = [
     "get_simplified_array_representation",
     "get_time_string",
     "get_warning",
+    "iso_timestring",
     "print_warning",
     "str_repr_of_slice",
     "strip_param_description_from_docstring",
@@ -46,7 +47,7 @@ __all__ = [
     "update_separators",
 ]
 
-
+import datetime
 import os
 import random
 import re
@@ -88,6 +89,11 @@ def convert_str_to_number(input_str: str) -> Real | Integral | str:
             return float(input_str)
         except ValueError:
             return input_str
+
+
+def iso_timestring() -> str:
+    """Get the current date and time as a ISO8601-compatible string"""
+    return datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
 def get_fixed_length_str(

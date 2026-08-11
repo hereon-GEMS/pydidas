@@ -430,7 +430,7 @@ def read_and_decode_hdf5_dataset(
     dataset : str or None, optional
         The dataset key. If not specified, the h5object will be used
         directly. The default is None.
-    return_dataset : bool, optional
+    return_dataset : bool
         Flag to toggle returning arrays as pydidas.core.Dataset. If False,
         generic np.ndarrays are returned. The default is True.
 

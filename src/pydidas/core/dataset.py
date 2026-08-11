@@ -193,7 +193,7 @@ class Dataset(ndarray):
             obj._meta["_get_item_key"] = ()
         self._meta["_get_item_key"] = ()
 
-    def __update_keys_from_object(self, obj: ndarray) -> None:  # noqa C901
+    def __update_keys_from_object(self, obj: ndarray) -> None:
         """
         Update the axis keys from the original object.
 

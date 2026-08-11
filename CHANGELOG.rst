@@ -42,6 +42,7 @@ Programmatic changes
 - Added a ProcessingResultSaver class to handle export of results.
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
+- Added information about python version and Qt binding to AboutWindow.
 
 
 Bugfixes
@@ -72,6 +73,9 @@ Bugfixes
 - Fixed an issue in the ViewResultsFrame which did not properly count
   the file number and frame number in loaded files in the
   ShowInformationForResult popup window.
+- Fixed an issue on Unix where the main window was always maximized even
+  when reduced in size. According to the Qt documentation, the maximized
+  flag should only be used on Windows.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
 

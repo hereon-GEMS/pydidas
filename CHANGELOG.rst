@@ -47,6 +47,8 @@ Bugfixes
   to None (not supported in range)
 - Fixed an issue where the filename parameter was exported in the data
   browsing frame even though it was not intended.
+- Fixed an issue with the ChangeCanvasAction which was incompatible with the
+  latest silx update to 3.1.0
 
 
 v26.05.19

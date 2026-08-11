@@ -540,27 +540,6 @@ corresponding node in the <a class="reference internal" href="../../code/api/wor
 <h2>Accessing results<a class="headerlink" href="#accessing-results" title="Link to this heading">#</a></h2>
 <section id="accessing-a-full-plugin-dataset">
 <h3>Accessing a full Plugin Dataset<a class="headerlink" href="#accessing-a-full-plugin-dataset" title="Link to this heading">#</a></h3>
-<section id="metadata">
-<h4>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">#</a></h4>
-<p>The metadata of a node ID’s Dataset can be accessed using the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_metadata(node_id)</span></code> method. It will return
-a dictionary with the metadata keys and their respective data:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span><span class="o">.</span><span class="n">get_result_metadata</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="go">{&#39;axis_labels&#39;: {0: &#39;Scan position&#39;, 1: &#39;Repeat&#39;, 2: &#39;2theta&#39;},</span>
-<span class="go"> &#39;axis_units&#39;: {0: &#39;m&#39;, 1: &#39;number&#39;, 2: &#39;deg&#39;},</span>
-<span class="go"> &#39;axis_ranges&#39;: {0: array([1.  , 1.01, 1.02, 1.03, 1.04, 1.05, 1.06, 1.07, 1.08, 1.09, 1.1 ,</span>
-<span class="go">         1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.2 ]),</span>
-<span class="go">  1: array([0., 1., 2., 3.]),</span>
-<span class="go">  2: array([1.88768122e-02, 5.66304366e-02, 9.43840610e-02, ...,</span>
-<span class="go">         3.76592403e+01, 3.76969939e+01, 3.77347476e+01])},</span>
-<span class="go"> &#39;metadata&#39;: {}}</span>
-</pre></div>
-</div>
-<p>Note that the metadata is also included in the full <a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and this method is primarily intended if the user needs
-the metadata without creating a copy of the full data.</p>
-</section>
 <section id="generic-data">
 <h4>Generic Data<a class="headerlink" href="#generic-data" title="Link to this heading">#</a></h4>
 <p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results(node_id)</span></code> method is available to access
@@ -568,11 +547,24 @@ the full Dataset with the results of a Plugin. The calling parameter is the node
 ID of the particular Plugin corresponding to the results:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_scan_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
 <dd><p>Get the combined results for the requested node_id.</p>
+<p>The squeeze and flatten_scan_dims flags can be used to modify
+the shape of the returned dataset. Please see the Parameter
+documentation below for more information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em>) – Flag to squeeze the results of the requested node ID to
+remove dimensions of size 1.</p></li>
+<li><p><strong>flatten_scan_dims</strong> (<em>bool</em>) – Flag to flatten all result dimensions of the Scan into
+a single timeline. All other dimensions are unchanged.
+This option can be combined with squeeze.</p></li>
+<li><p><strong>copy</strong> (<em>bool</em>) – Flag to return a copy of the results. If False, the ndarray
+will be returned and the data can be changed in place.
+The default is True.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The combined results of all frames for a specific node.</p>
@@ -588,7 +580,7 @@ ID of the particular Plugin corresponding to the results:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span> <span class="o">=</span> <span class="n">RESULTS</span><span class="o">.</span><span class="n">get_results</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">res1</span><span class="p">)</span>
-<span class="go">pydidas.core.dataset.Dataset</span>
+<span class="go">pydidas.core.Dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(21, 4, 1000)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span>
@@ -637,31 +629,6 @@ the scan and flatten the scan to a <em>timeline</em>. The
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code> method
 allows to get a Dataset with all the scan dimensions flattened to a single
 dimension renamed to <em>timeline</em>:</p>
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results_for_flattened_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
-<dd><p>Get the results for the requested node_id with all scan dimensions flatted.</p>
-<p>This method will essentially flatten all scan dimensions into a timeline for
-convenience. The squeeze Parameter can be used to remove all dimensions of
-length 1 from the data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle squeezing of data dimensions of the final dataset. If
-True, all dimensions with a length of 1 will be removed. The default is
-False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The combined results of all frames for a specific node.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <p>An example is given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
@@ -713,7 +680,7 @@ False.</p></li>
 well:</p>
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flattened_scan_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_result_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_scan_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
 <dd><p>Get a sliced subset of a node_id result.</p>
 <p>Note that numpy’s slicing always squeezes dimensions with a length of 1 if
 they are given as integers, or slices. Iterable objects keep a
@@ -722,8 +689,8 @@ dimension of length 1.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
-<li><p><strong>*slices</strong> (<em>int</em><em> or </em><em>slice</em>) – The tuple used for slicing/indexing the np.ndarray.</p></li>
-<li><p><strong>flattened_scan_dim</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to process flattened Scan dimensions. If True, the Scan
+<li><p><strong>*slices</strong> (<em>int</em><em> or </em><em>tuple</em><em>[</em><em>int</em><em>] or </em><em>slice</em>) – The integer, tuple or slice  used for indexing the np.ndarray.</p></li>
+<li><p><strong>flatten_scan_dims</strong> (<em>bool</em>) – Keyword to process flattened Scan dimensions. If True, the Scan
 is assumed to be 1-d only and the first slice item will be used
 for the Scan whereas the remaining slice items will be used for
 the resulting data. The default is False.</p></li>
@@ -739,7 +706,7 @@ the resulting data. The default is False.</p></li>
 </dl>
 </dd></dl>
 
-<p>This method is interesing if the user wants to access a specific subset in the
+<p>This method is interesting if the user wants to access a specific subset in the
 flattened data, for example the results for the frames 40 to 55 of the
 experiment. This can easily be done using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result_subset</span></code> method, as demonstrated
 in the example below:</p>
@@ -806,8 +773,8 @@ node_id keyword.</p>
 <li><p><strong>save_formats</strong> (<em>str</em>) – Strings of all formats to be written. Individual formats can be
 also be given in a single string if they are separated by comma
 (“,”), ampersand (”&amp;”) or slash (“/”) characters.</p></li>
-<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Flag to enable overwriting of existing files. The default is False.</p></li>
-<li><p><strong>squeeze</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Flag to enable squeezing of empty dimensions. The default is False.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Flag to enable overwriting of existing files. The default is False.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em>) – Flag to enable squeezing of empty dimensions. The default is False.</p></li>
 <li><p><strong>node_id</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The node ID for which data shall be saved. If None, this defaults
 to all nodes. The default is None.</p></li>
 </ul>
@@ -886,7 +853,6 @@ based on users’ requests if deemed feasible with the file system structure.</p
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-information-about-the-results">Getting information about the results</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-results">Accessing results</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accessing-a-full-plugin-dataset">Accessing a full Plugin Dataset</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#metadata">Metadata</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#generic-data">Generic Data</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#flattened-scan-dimensions">Flattened scan dimensions</a></li>
 </ul>

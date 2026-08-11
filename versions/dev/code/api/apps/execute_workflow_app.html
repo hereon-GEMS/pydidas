@@ -572,7 +572,7 @@ attributes marked in the classes’ clone_mode attribute.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.deleteLater">
 <span class="sig-name descname"><span class="pre">deleteLater</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.deleteLater" title="Link to this definition">#</a></dt>
-<dd><p>Delete the instance of the ExecuteWorkflowApp.</p>
+<dd><p>Call the QObject deletion routine of the ExecuteWorkflowApp.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -785,13 +785,14 @@ they will be published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results">
-<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store the results of the multiprocessing operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<em>int</em>) – The index of the processed task.</p></li>
-<li><p><strong>data_index</strong> (<em>int</em>) – The index to retrieve the results from multiprocessing_func.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The index of the processed task. Can only be None if the cloned
+app did not communicate properly with the main app.</p></li>
+<li><p><strong>data_index</strong> (<em>int</em><em> or </em><em>None</em>) – The index to retrieve the results from multiprocessing_func.</p></li>
 </ul>
 </dd>
 </dl>
@@ -801,13 +802,29 @@ they will be published.</p>
 <dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.must_send_signal_and_wait_for_response">
 <span class="sig-name descname"><span class="pre">must_send_signal_and_wait_for_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.must_send_signal_and_wait_for_response" title="Link to this definition">#</a></dt>
 <dd><p>Check if a signal must be sent and wait for the response.</p>
-<p>The ExecuteWorkflowApp sends a signal</p>
+<p>The ExecuteWorkflowApp sends a signal to request shared memory creation
+from the main process when shapes are not yet set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The signal to be sent.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.param_export_values">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_export_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.param_export_values" title="Link to this definition">#</a></dt>
+<dd><p>Get the export-compatible values of all stored Parameters
+along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -835,7 +852,7 @@ they will be published.</p>
 <dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -950,12 +967,6 @@ referenced by param_key or dtype, if given.</p>
 <dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – The received message.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars">
-<span class="sig-name descname"><span class="pre">reset_runtime_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars" title="Link to this definition">#</a></dt>
-<dd><p>Reset the runtime variables for a new run.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1153,6 +1164,7 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_pre_run"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.multiprocessing_pre_run</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.multiprocessing_store_results"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.multiprocessing_store_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.must_send_signal_and_wait_for_response"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.must_send_signal_and_wait_for_response</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.param_export_values"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.param_export_values</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.param_keys"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.param_keys</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.param_values"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.param_values</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.parse_args_and_set_params"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.parse_args_and_set_params</span></code></a></li>
@@ -1163,7 +1175,6 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.q_settings_remove"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.q_settings_remove</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.q_settings_set"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.q_settings_set</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.received_signal_message"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.received_signal_message</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.reset_runtime_vars"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.reset_runtime_vars</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.restore_all_defaults"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.restore_all_defaults</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.run"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.run</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.ExecuteWorkflowApp.set_default_params"><code class="docutils literal notranslate"><span class="pre">ExecuteWorkflowApp.set_default_params</span></code></a></li>

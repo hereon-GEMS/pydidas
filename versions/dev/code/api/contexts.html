@@ -450,7 +450,7 @@
 <h1>The contexts sub-package<a class="headerlink" href="#the-contexts-sub-package" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="core/object_with_prm_cllct.html#pydidas.core.ObjectWithParameterCollection" title="pydidas.core.object_with_parameter_collection.ObjectWithParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a></p>
 <p>Class which holds experimental settings for diffraction experiments.</p>
 <p>This class must be used with care. Usually, the unique DiffractionExperimentContext
@@ -742,6 +742,21 @@ keys.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment.param_export_values">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_export_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.param_export_values" title="Link to this definition">#</a></dt>
+<dd><p>Get the export-compatible values of all stored Parameters
+along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment.param_keys">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_keys</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.param_keys" title="Link to this definition">#</a></dt>
 <dd><p>Get the keys of all stored Parameters.</p>
@@ -764,7 +779,7 @@ keys.</p>
 <dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -964,7 +979,7 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment.update_from_diffraction_exp">
-<span class="sig-name descname"><span class="pre">update_from_diffraction_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.update_from_diffraction_exp" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_diffraction_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.update_from_diffraction_exp" title="Link to this definition">#</a></dt>
 <dd><p>Update this DiffractionExperiment object’s Parameters from another instance.</p>
 <p>The purpose of this method is to “copy” the other DiffractionExperiment’s
 Parameter values while keeping the reference to this object.</p>
@@ -1375,6 +1390,21 @@ convention of starting with zero.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.Scan.param_export_values">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_export_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.contexts.Scan.param_export_values" title="Link to this definition">#</a></dt>
+<dd><p>Get the export-compatible values of all stored Parameters
+along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.Scan.param_keys">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_keys</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.Scan.param_keys" title="Link to this definition">#</a></dt>
 <dd><p>Get the keys of all stored Parameters.</p>
@@ -1397,7 +1427,7 @@ convention of starting with zero.</p>
 <dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1895,6 +1925,21 @@ keys.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.param_export_values">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_export_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.param_export_values" title="Link to this definition">#</a></dt>
+<dd><p>Get the export-compatible values of all stored Parameters
+along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.param_keys">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_keys</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.param_keys" title="Link to this definition">#</a></dt>
 <dd><p>Get the keys of all stored Parameters.</p>
@@ -1917,7 +1962,7 @@ keys.</p>
 <dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2117,7 +2162,7 @@ for the Parameter will be disabled.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.update_from_diffraction_exp">
-<span class="sig-name descname"><span class="pre">update_from_diffraction_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.update_from_diffraction_exp" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">update_from_diffraction_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.update_from_diffraction_exp" title="Link to this definition">#</a></dt>
 <dd><p>Update this DiffractionExperiment object’s Parameters from another instance.</p>
 <p>The purpose of this method is to “copy” the other DiffractionExperiment’s
 Parameter values while keeping the reference to this object.</p>
@@ -2182,27 +2227,26 @@ Parameter values while keeping the reference to this object.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperimentIo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">DiffractionExperimentIo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo" title="Link to this definition">#</a></dt>
 <dd><p>Metaclass for DiffractionExperiment exporters and importers which holds the
 registry with all associated file extensions for importing / exporting
 DiffractionExperiment or DiffractionExperimentContexts.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.clear_registry">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">clear_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.clear_registry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">clear_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.clear_registry" title="Link to this definition">#</a></dt>
 <dd><p>Clear the registry and remove all items.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.export_to_file">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.export_to_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the concrete export_to_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – The full filename and path.</p></li>
-<li><p><strong>tree</strong> (<a class="reference internal" href="workflow/workflow.html#pydidas.workflow.WorkflowTree" title="pydidas.workflow.WorkflowTree"><em>pydidas.workflow.WorkflowTree</em></a>) – The instance of the WorkflowTree</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – Any kwargs which should be passed to the underlying exporter.</p></li>
+<li><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full filename and path.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Any kwargs which should be passed to the underlying exporter.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2210,7 +2254,7 @@ to the extension of the filename.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.get_registered_formats">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_registered_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.get_registered_formats" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_registered_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.get_registered_formats" title="Link to this definition">#</a></dt>
 <dd><p>Get the names of all registered formats and the corresponding
 file extensions.</p>
 <dl class="field-list simple">
@@ -2218,14 +2262,14 @@ file extensions.</p>
 <dd class="field-odd"><p>A dictionary with &lt;format name&gt; : &lt;extensions&gt; entries.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
+<dd class="field-even"><p>dict[str, list[str]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.get_string_of_formats">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_string_of_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.get_string_of_formats" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_string_of_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.get_string_of_formats" title="Link to this definition">#</a></dt>
 <dd><p>Get a list of strings with the different formats and extensions.</p>
 <p>This class method is designed to have an easy way of creating the
 required lists for QFileDialog windows.</p>
@@ -2242,14 +2286,17 @@ each separated by a “;;”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.import_from_file">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.import_from_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffraction_exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the concrete import_from_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – The full filename and path.</p></li>
-<li><p><strong>diffraction_exp</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.DiffractionExperiment"><em>DiffractionExperiment</em></a><em>, </em><em>None</em><em>]</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The DiffractionExperiment instance to be updated.</p></li>
+<li><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full filename and path.</p></li>
+<li><p><strong>diffraction_exp</strong> (<a class="reference internal" href="#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.DiffractionExperiment"><em>DiffractionExperiment</em></a><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The DiffractionExperiment instance to be updated. If not
+provided or set to None, the global context will be used.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any keyword arguments. Supported keywords must be specified by
+the specific implementation.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2257,7 +2304,7 @@ to the extension of the filename.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.is_extension_registered">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.is_extension_registered" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.is_extension_registered" title="Link to this definition">#</a></dt>
 <dd><p>Check if the extension of filename corresponds to a registered
 class.</p>
 <dl class="field-list simple">
@@ -2281,13 +2328,13 @@ class.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.register_class">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.register_class" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_registry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.register_class" title="Link to this definition">#</a></dt>
 <dd><p>Register a class as object for its native extensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>new_class</strong> (<em>type</em>) – The class to be registered.</p></li>
-<li><p><strong>update_registry</strong> (<em>bool</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to allow updating / overwriting of registered extensions.
+<li><p><strong>update_registry</strong> (<em>bool</em>) – Keyword to allow updating / overwriting of registered extensions.
 The default is False.</p></li>
 </ul>
 </dd>
@@ -2300,7 +2347,7 @@ The default is False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentIo.verify_extension_is_registered">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verify_extension_is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.verify_extension_is_registered" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verify_extension_is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentIo.verify_extension_is_registered" title="Link to this definition">#</a></dt>
 <dd><p>Verify the extension is registered with the MetaClass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2641,6 +2688,21 @@ convention of starting with zero.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydidas.contexts.ScanContext.param_export_values">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_export_values</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.param_export_values" title="Link to this definition">#</a></dt>
+<dd><p>Get the export-compatible values of all stored Parameters
+along with their refkeys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanContext.param_keys">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">param_keys</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanContext.param_keys" title="Link to this definition">#</a></dt>
 <dd><p>Get the keys of all stored Parameters.</p>
@@ -2663,7 +2725,7 @@ convention of starting with zero.</p>
 <dd class="field-odd"><p>The refkey, value pairs for all stored Parameters.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2891,23 +2953,23 @@ Parameter values while keeping the reference to this object.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">ScanIo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.contexts.</span></span><span class="sig-name descname"><span class="pre">ScanIo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clsname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">type</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo" title="Link to this definition">#</a></dt>
 <dd><p>Metaclass for ScanContext exporters and importers.</p>
 <p>The ScanIo holds the registry with all associated file extensions
 for importing / exporting Scan (and ScanContexts).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.check_multiple_files">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">check_multiple_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.check_multiple_files" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">check_multiple_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.check_multiple_files" title="Link to this definition">#</a></dt>
 <dd><p>Check whether a selection of multiple files can be imported.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filenames</strong> (<em>list</em><em>[</em><em>Path</em><em> | </em><em>str</em><em>]</em>) – The list of full filenames and paths.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any kwargs which should be passed to the underlying importer.
+<li><p><strong>filenames</strong> (<em>Sequence</em><em>[</em><em>Path</em><em> or </em><em>str</em><em>]</em>) – The list of full filenames and paths.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – <p>Any kwargs which should be passed to the underlying importer.
 Supported kwargs are:</p>
 <dl class="simple">
-<dt>scan<span class="classifier">Scan, optional</span></dt><dd><p>The Scan object to be updated. If None, the generic ScanContext is used.
-The default is None.</p>
+<dt>scan<span class="classifier">Scan, optional</span></dt><dd><p>The Scan object to be updated. If None, the generic
+ScanContext is used. The default is None.</p>
 </dd>
 </dl>
 </p></li>
@@ -2925,20 +2987,20 @@ information.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.clear_registry">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">clear_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.clear_registry" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">clear_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.clear_registry" title="Link to this definition">#</a></dt>
 <dd><p>Clear the registry and remove all items.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.export_to_file">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.export_to_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">export_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.export_to_file" title="Link to this definition">#</a></dt>
 <dd><p>Call the concrete export_to_file method in the subclass registered
 to the extension of the filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>Path</em><em> | </em><em>str</em>) – The full filename and path.</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – Any kwargs which should be passed to the underlying exporter.</p></li>
+<li><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full filename and path.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Any kwargs which should be passed to the underlying exporter.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2946,24 +3008,24 @@ to the extension of the filename.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.get_io_class">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_io_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ScanIoBase</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_io_class" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_io_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">ScanIoBase</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_io_class" title="Link to this definition">#</a></dt>
 <dd><p>Get the IO class for a given filename.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> | </em><em>str</em>) – The filename with extension.</p>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The filename with extension.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The IO class.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ScanIoBase</p>
+<dd class="field-odd"><p>type[“ScanIoBase”]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.get_registered_formats">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_registered_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_registered_formats" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_registered_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_registered_formats" title="Link to this definition">#</a></dt>
 <dd><p>Get the names of all registered formats and the corresponding
 file extensions.</p>
 <dl class="field-list simple">
@@ -2971,7 +3033,7 @@ file extensions.</p>
 <dd class="field-odd"><p>A dictionary with &lt;format name&gt; : &lt;extensions&gt; entries.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
+<dd class="field-even"><p>dict[str, list[str]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2995,7 +3057,7 @@ each separated by a “;;”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.get_string_of_formats">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_string_of_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_string_of_formats" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_string_of_formats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.get_string_of_formats" title="Link to this definition">#</a></dt>
 <dd><p>Get a list of strings with the different formats and extensions.</p>
 <p>This class method is designed to have an easy way of creating the
 required lists for QFileDialog windows.</p>
@@ -3012,7 +3074,7 @@ each separated by a “;;”.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.import_from_file">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.scan.scan.Scan"><span class="pre">Scan</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_file" title="Link to this definition">#</a></dt>
 <dd><p>Import a Scan from file and update the given Scan object.</p>
 <p>Call the concrete import_from_file method in the subclass registered
 to the extension of the filename.</p>
@@ -3020,26 +3082,26 @@ to the extension of the filename.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename</strong> (<em>Path</em><em> or </em><em>str</em>) – The full filename and path.</p></li>
-<li><p><strong>scan</strong> (<a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The Scan object to be updated. If None, the generic ScanContext is used.
-The default is None.</p></li>
+<li><p><strong>scan</strong> (<a class="reference internal" href="#pydidas.contexts.Scan" title="pydidas.contexts.Scan"><em>Scan</em></a><em> or </em><em>None</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The Scan object to be updated. If None, the generic
+ScanContext is used. The default is None.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pydidas.contexts.ScanIo.import_from_multiple_files">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_multiple_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_multiple_files" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pydidas.contexts.ScanIo.import_from_file_sequence">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">import_from_file_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.import_from_file_sequence" title="Link to this definition">#</a></dt>
 <dd><p>Import a Scan from multiple files and update the given Scan object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filenames</strong> (<em>list</em><em>[</em><em>Path</em><em> | </em><em>str</em><em>]</em>) – The list of full filenames and paths.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any kwargs which should be passed to the underlying importer.
+<li><p><strong>filenames</strong> (<em>Sequence</em><em>[</em><em>Path</em><em> or </em><em>str</em><em>]</em>) – The sequence of full filenames and paths.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – <p>Any kwargs which should be passed to the underlying importer.
 Supported kwargs are:</p>
 <dl class="simple">
-<dt>scan<span class="classifier">Scan, optional</span></dt><dd><p>The Scan object to be updated. If None, the generic ScanContext is used.
-The default is None.</p>
+<dt>scan<span class="classifier">Scan, optional</span></dt><dd><p>The Scan object to be updated. If None, the generic
+ScanContext is used. The default is None.</p>
 </dd>
 <dt>scan_dim0_motor<span class="classifier">str, optional</span></dt><dd><p>The motor name for the first dimension. The default is None.</p>
 </dd>
@@ -3052,7 +3114,7 @@ The default is None.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.is_extension_registered">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.is_extension_registered" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_extension_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.is_extension_registered" title="Link to this definition">#</a></dt>
 <dd><p>Check if the extension of filename corresponds to a registered
 class.</p>
 <dl class="field-list simple">
@@ -3076,13 +3138,13 @@ class.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.register_class">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ScanIoBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.register_class" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">register_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">ScanIoBase</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_registry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.register_class" title="Link to this definition">#</a></dt>
 <dd><p>Register a class as object for its native extensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>new_class</strong> (<em>ScanIoBase</em>) – The class to be registered.</p></li>
-<li><p><strong>update_registry</strong> (<em>bool</em><em>, </em><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to allow updating / overwriting of registered extensions.
+<li><p><strong>new_class</strong> (<em>type</em><em>[</em><em>&quot;ScanIoBase&quot;</em><em>]</em>) – The class to be registered.</p></li>
+<li><p><strong>update_registry</strong> (<em>bool</em>) – Keyword to allow updating / overwriting of registered extensions.
 The default is False.</p></li>
 </ul>
 </dd>
@@ -3095,7 +3157,7 @@ The default is False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.ScanIo.verify_extension_is_registered">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verify_extension_is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.ScanIo.verify_extension_is_registered" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verify_extension_is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.contexts.ScanIo.verify_extension_is_registered" title="Link to this definition">#</a></dt>
 <dd><p>Verify the extension is registered with the MetaClass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3178,6 +3240,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.get_param_values_as_dict"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.get_param_values_as_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.get_params"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.get_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.import_from_file"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.import_from_file</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.param_export_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.param_export_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.param_keys"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.param_keys</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.param_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperiment.print_param_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperiment.print_param_values</span></code></a></li>
@@ -3221,6 +3284,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.n_frames_required"><code class="docutils literal notranslate"><span class="pre">Scan.n_frames_required</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.n_points"><code class="docutils literal notranslate"><span class="pre">Scan.n_points</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.ndim"><code class="docutils literal notranslate"><span class="pre">Scan.ndim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.param_export_values"><code class="docutils literal notranslate"><span class="pre">Scan.param_export_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.param_keys"><code class="docutils literal notranslate"><span class="pre">Scan.param_keys</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.param_values"><code class="docutils literal notranslate"><span class="pre">Scan.param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.Scan.print_param_values"><code class="docutils literal notranslate"><span class="pre">Scan.print_param_values</span></code></a></li>
@@ -3262,6 +3326,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.get_param_values_as_dict"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.get_param_values_as_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.get_params"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.get_params</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.import_from_file"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.import_from_file</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.param_export_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.param_export_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.param_keys"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.param_keys</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.param_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.DiffractionExperimentContext.print_param_values"><code class="docutils literal notranslate"><span class="pre">DiffractionExperimentContext.print_param_values</span></code></a></li>
@@ -3317,6 +3382,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.n_frames_required"><code class="docutils literal notranslate"><span class="pre">ScanContext.n_frames_required</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.n_points"><code class="docutils literal notranslate"><span class="pre">ScanContext.n_points</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.ndim"><code class="docutils literal notranslate"><span class="pre">ScanContext.ndim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.param_export_values"><code class="docutils literal notranslate"><span class="pre">ScanContext.param_export_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.param_keys"><code class="docutils literal notranslate"><span class="pre">ScanContext.param_keys</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.param_values"><code class="docutils literal notranslate"><span class="pre">ScanContext.param_values</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanContext.print_param_values"><code class="docutils literal notranslate"><span class="pre">ScanContext.print_param_values</span></code></a></li>
@@ -3347,7 +3413,7 @@ The default is False.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.get_string_of_beamline_formats"><code class="docutils literal notranslate"><span class="pre">ScanIo.get_string_of_beamline_formats</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.get_string_of_formats"><code class="docutils literal notranslate"><span class="pre">ScanIo.get_string_of_formats</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.import_from_file"><code class="docutils literal notranslate"><span class="pre">ScanIo.import_from_file</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.import_from_multiple_files"><code class="docutils literal notranslate"><span class="pre">ScanIo.import_from_multiple_files</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.import_from_file_sequence"><code class="docutils literal notranslate"><span class="pre">ScanIo.import_from_file_sequence</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.is_extension_registered"><code class="docutils literal notranslate"><span class="pre">ScanIo.is_extension_registered</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.mro"><code class="docutils literal notranslate"><span class="pre">ScanIo.mro</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.contexts.ScanIo.register_class"><code class="docutils literal notranslate"><span class="pre">ScanIo.register_class</span></code></a></li>

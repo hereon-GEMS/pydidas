@@ -40,7 +40,7 @@ Programmatic changes
 - Modified the saver for ProcessingResults to be instance-based instead
   of class-based
 - Added a ProcessingResultSaver class to handle export of results.
-- Added an option to export all Parameter values as export types in 
+- Added an option to export all Parameter values as export types in
   the ParameterCollection
 
 
@@ -70,8 +70,11 @@ Bugfixes
   a number-tuple with a ndarray.
 - Fixed an issue which prevented saving results to a corrupted HDF5 file.
 - Fixed an issue in the ViewResultsFrame which did not properly count
-  the file number and frame number in loaded files in the 
+  the file number and frame number in loaded files in the
   ShowInformationForResult popup window.
+- Fixed an issue with the ChangeCanvasAction which was incompatible with the
+  latest silx update to 3.1.0
+
 
 v26.05.19
 =========

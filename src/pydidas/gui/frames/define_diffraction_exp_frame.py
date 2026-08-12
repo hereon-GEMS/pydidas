@@ -34,13 +34,13 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from pyFAI.detectors import Detector
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.core import get_generic_param_collection
+from pydidas.core.lazy_imports.pyFAI import Detector
 from pydidas.core.utils import update_palette
 from pydidas.gui.frames.builders.define_diffraction_exp_frame_build_config import (
     DIFFRACTION_EXP_FRAME_BUILD_CONFIG,

@@ -37,13 +37,9 @@ from qtpy import QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import UserConfigError, get_generic_param_collection
-from pydidas.core.constants import (
-    ASCII_TO_UNI,
-    PROC_PLUGIN,
-    PROC_PLUGIN_IMAGE,
-    pyFAI_METHOD,
-    pyFAI_UNITS,
-)
+from pydidas.core.constants import ASCII_TO_UNI, PROC_PLUGIN, PROC_PLUGIN_IMAGE
+from pydidas.core.constants.pyfai_names import pyFAI_METHOD, pyFAI_UNITS
+from pydidas.core.lazy_imports.pyFAI import AzimuthalIntegrator
 from pydidas.core.utils import pydidas_logger
 from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.data_io import import_data
@@ -105,8 +101,6 @@ class pyFAIintegrationBase(ProcPlugin):
         Check and load the mask and set up the AzimuthalIntegrator.
         """
         if self._exp_hash != hash(self._EXP):
-            from pyFAI.integrator.azimuthal import AzimuthalIntegrator
-
             _lambda_in_A = self._EXP.get_param_value("xray_wavelength")
             self._ai = AzimuthalIntegrator(
                 dist=self._EXP.get_param_value("detector_dist"),

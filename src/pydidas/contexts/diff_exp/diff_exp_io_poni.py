@@ -28,16 +28,16 @@ __status__ = "Production"
 __all__ = ["DiffractionExperimentIoPoni"]
 
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
-from pydidas.core.constants import LAMBDA_IN_M_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import LAMBDA_IN_M_TO_E
 from pydidas.core.constants.file_extensions import PONI_EXTENSIONS
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
+from pydidas.core.lazy_imports.pyFAI import Detector, Geometry, PoniFile
 from pydidas.core.utils import verify_is_new_file_or_replace_set
 
 
@@ -71,8 +71,6 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
             "diffraction_exp", DiffractionExperimentContext()
         )
         verify_is_new_file_or_replace_set(filename, **kwargs)
-        from pyFAI.io.ponifile import PoniFile
-
         _det = _exp.get_param_value("detector_name")
         _pdata = {
             key: _exp.get_param_value(f"detector_{key}")
@@ -112,9 +110,6 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         **kwargs : Any, optional
             Additional keyword arguments. Not used in this implementation.
         """
-        from pyFAI.geometry import Geometry
-        from pyFAI.io.ponifile import PoniFile
-
         geo = Geometry().load(PoniFile(data=filename))  # type: ignore[arg-type]
         with open(filename, "r") as _file:
             _content = _file.readlines()
@@ -144,8 +139,6 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         dict[str, Any]
             A dictionary with the detector parameters.
         """
-        from pyFAI.detectors import Detector
-
         if not isinstance(det, Detector):
             raise TypeError(
                 f"Object '{det} (type {type(det)}' is not a Detector instance."
@@ -173,8 +166,6 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
         dict[str, Any]
             A dictionary with the geometry parameters.
         """
-        from pyFAI.geometry import Geometry
-
         if not isinstance(geo, Geometry):
             raise TypeError(
                 f"Object '{geo} (type {type(geo)}' is not a "

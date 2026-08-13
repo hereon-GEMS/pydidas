@@ -235,6 +235,12 @@ def test_lazy_set__not_initialized_before_first_access():
     assert not ls._initialized
 
 
+def test_lazy_set__named_methods_replaced_with_native_after_init():
+    ls = _make_lazy_set({1, 2, 3})
+    _ = 1 in ls
+    assert type(ls.copy) is type(set.__dict__["copy"].__get__(ls))
+
+
 def test_lazy_set__contains_triggers_initialization():
     ls = _make_lazy_set({10, 20, 30})
     _ = 10 in ls
@@ -329,6 +335,12 @@ def _make_lazy_dict(mapping):
 def test_lazy_dict__not_initialized_before_first_access():
     ld = _make_lazy_dict({"a": 1})
     assert not ld._initialized
+
+
+def test_lazy_dict__named_methods_replaced_with_native_after_init():
+    ld = _make_lazy_dict({"a": 1})
+    _ = ld["a"]
+    assert type(ld.keys) is type(dict.__dict__["keys"].__get__(ld))
 
 
 def test_lazy_dict__getitem_triggers_initialization():
@@ -459,6 +471,412 @@ def test_lazy_dict__get_triggers_initialization():
     ld = _make_lazy_dict({"x": 1})
     _ = ld.get("x")
     assert ld._initialized
+
+
+def test_lazy_set__copy_triggers_initialization():
+    ls = _make_lazy_set({1, 2, 3})
+    _ = ls.copy()
+    assert ls._initialized
+
+
+def test_lazy_set__copy_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert ls.copy() == {1, 2, 3}
+
+
+def test_lazy_set__eq_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    _ = ls == {1, 2}
+    assert ls._initialized
+
+
+def test_lazy_set__eq_correct():
+    ls = _make_lazy_set({1, 2, 3})
+    assert ls == {1, 2, 3}
+    assert not (ls == {1, 2})
+
+
+def test_lazy_set__union_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    _ = ls.union({3})
+    assert ls._initialized
+
+
+def test_lazy_set__union_returns_correct_set():
+    ls = _make_lazy_set({1, 2})
+    assert ls.union({3}) == {1, 2, 3}
+
+
+def test_lazy_set__intersection_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert ls.intersection({2, 3, 4}) == {2, 3}
+
+
+def test_lazy_set__difference_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert ls.difference({2}) == {1, 3}
+
+
+def test_lazy_set__symmetric_difference_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert ls.symmetric_difference({2, 4}) == {1, 3, 4}
+
+
+def test_lazy_set__issubset_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    _ = ls.issubset({1, 2, 3})
+    assert ls._initialized
+
+
+@pytest.mark.parametrize(
+    "items,other,expected",
+    [
+        ({1, 2}, {1, 2, 3}, True),
+        ({1, 2}, {1}, False),
+    ],
+)
+def test_lazy_set__issubset(items, other, expected):
+    ls = _make_lazy_set(items)
+    assert ls.issubset(other) == expected
+
+
+@pytest.mark.parametrize(
+    "items,other,expected",
+    [
+        ({1, 2, 3}, {1, 2}, True),
+        ({1}, {1, 2}, False),
+    ],
+)
+def test_lazy_set__issuperset(items, other, expected):
+    ls = _make_lazy_set(items)
+    assert ls.issuperset(other) == expected
+
+
+@pytest.mark.parametrize(
+    "items,other,expected",
+    [
+        ({1, 2}, {3, 4}, True),
+        ({1, 2}, {2, 3}, False),
+    ],
+)
+def test_lazy_set__isdisjoint(items, other, expected):
+    ls = _make_lazy_set(items)
+    assert ls.isdisjoint(other) == expected
+
+
+def test_lazy_set__or_operator_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    _ = ls | {3}
+    assert ls._initialized
+
+
+def test_lazy_set__or_operator_returns_correct_set():
+    ls = _make_lazy_set({1, 2})
+    assert (ls | {3}) == {1, 2, 3}
+
+
+def test_lazy_set__and_operator_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert (ls & {2, 3, 4}) == {2, 3}
+
+
+def test_lazy_set__sub_operator_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert (ls - {2}) == {1, 3}
+
+
+def test_lazy_set__xor_operator_returns_correct_set():
+    ls = _make_lazy_set({1, 2, 3})
+    assert (ls ^ {2, 4}) == {1, 3, 4}
+
+
+def test_lazy_set__ior_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    ls |= {3}
+    assert ls._initialized
+
+
+def test_lazy_set__ior_updates_correctly():
+    ls = _make_lazy_set({1, 2})
+    ls |= {3}
+    assert 3 in ls
+
+
+def test_lazy_set__iand_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls &= {2, 3}
+    assert ls == {2, 3}
+
+
+def test_lazy_set__isub_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls -= {2}
+    assert ls == {1, 3}
+
+
+def test_lazy_set__ixor_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls ^= {2, 4}
+    assert ls == {1, 3, 4}
+
+
+def test_lazy_set__add_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    ls.add(99)
+    assert ls._initialized
+
+
+def test_lazy_set__add_includes_existing_and_new_elements():
+    ls = _make_lazy_set({1, 2})
+    ls.add(3)
+    assert ls == {1, 2, 3}
+
+
+def test_lazy_set__remove_triggers_initialization():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.remove(1)
+    assert ls._initialized
+
+
+def test_lazy_set__remove_deletes_element():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.remove(2)
+    assert ls == {1, 3}
+
+
+def test_lazy_set__discard_does_not_raise_for_missing():
+    ls = _make_lazy_set({1, 2})
+    ls.discard(99)
+    assert ls == {1, 2}
+
+
+def test_lazy_set__pop_triggers_initialization():
+    ls = _make_lazy_set({42})
+    _ = ls.pop()
+    assert ls._initialized
+
+
+def test_lazy_set__pop_reduces_length():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.pop()
+    assert len(ls) == 2
+
+
+def test_lazy_set__clear_triggers_initialization():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.clear()
+    assert ls._initialized
+
+
+def test_lazy_set__clear_empties_set():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.clear()
+    assert len(ls) == 0
+
+
+def test_lazy_set__update_triggers_initialization():
+    ls = _make_lazy_set({1, 2})
+    ls.update({3})
+    assert ls._initialized
+
+
+def test_lazy_set__update_adds_elements():
+    ls = _make_lazy_set({1, 2})
+    ls.update({3, 4})
+    assert ls == {1, 2, 3, 4}
+
+
+def test_lazy_set__intersection_update_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.intersection_update({2, 3})
+    assert ls == {2, 3}
+
+
+def test_lazy_set__difference_update_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.difference_update({2})
+    assert ls == {1, 3}
+
+
+def test_lazy_set__symmetric_difference_update_updates_correctly():
+    ls = _make_lazy_set({1, 2, 3})
+    ls.symmetric_difference_update({2, 4})
+    assert ls == {1, 3, 4}
+
+
+# ---------------------------------------------------------------------------
+# LazyDict — additional mapping API
+# ---------------------------------------------------------------------------
+
+
+def test_lazy_dict__keys_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1, "b": 2})
+    _ = list(ld.keys())
+    assert ld._initialized
+
+
+def test_lazy_dict__keys_returns_all_keys():
+    mapping = {"a": 1, "b": 2}
+    ld = _make_lazy_dict(mapping)
+    assert set(ld.keys()) == set(mapping.keys())
+
+
+def test_lazy_dict__values_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = list(ld.values())
+    assert ld._initialized
+
+
+def test_lazy_dict__values_returns_all_values():
+    ld = _make_lazy_dict({"a": 1, "b": 2})
+    assert sorted(ld.values()) == [1, 2]
+
+
+def test_lazy_dict__items_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = list(ld.items())
+    assert ld._initialized
+
+
+def test_lazy_dict__items_returns_all_pairs():
+    mapping = {"a": 1, "b": 2}
+    ld = _make_lazy_dict(mapping)
+    assert dict(ld.items()) == mapping
+
+
+def test_lazy_dict__copy_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = ld.copy()
+    assert ld._initialized
+
+
+def test_lazy_dict__copy_returns_correct_dict():
+    mapping = {"a": 1, "b": 2}
+    ld = _make_lazy_dict(mapping)
+    assert ld.copy() == mapping
+
+
+def test_lazy_dict__eq_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = ld == {"a": 1}
+    assert ld._initialized
+
+
+def test_lazy_dict__eq_correct():
+    mapping = {"a": 1, "b": 2}
+    ld = _make_lazy_dict(mapping)
+    assert ld == mapping
+    assert not (ld == {"a": 1})
+
+
+def test_lazy_dict__pop_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1, "b": 2})
+    _ = ld.pop("a")
+    assert ld._initialized
+
+
+def test_lazy_dict__pop_removes_and_returns_value():
+    ld = _make_lazy_dict({"a": 1, "b": 2})
+    val = ld.pop("a")
+    assert val == 1
+    assert "a" not in ld
+
+
+def test_lazy_dict__pop_returns_default_for_missing_key():
+    ld = _make_lazy_dict({"a": 1})
+    assert ld.pop("missing", 99) == 99
+
+
+def test_lazy_dict__popitem_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = ld.popitem()
+    assert ld._initialized
+
+
+def test_lazy_dict__popitem_removes_and_returns_pair():
+    ld = _make_lazy_dict({"a": 1})
+    key, val = ld.popitem()
+    assert key == "a"
+    assert val == 1
+    assert len(ld) == 0
+
+
+def test_lazy_dict__update_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    ld.update({"b": 2})
+    assert ld._initialized
+
+
+def test_lazy_dict__update_merges_entries():
+    ld = _make_lazy_dict({"a": 1})
+    ld.update({"b": 2, "c": 3})
+    assert ld["a"] == 1
+    assert ld["b"] == 2
+    assert ld["c"] == 3
+
+
+def test_lazy_dict__setdefault_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    ld.setdefault("b", 99)
+    assert ld._initialized
+
+
+def test_lazy_dict__setdefault_returns_existing_value():
+    ld = _make_lazy_dict({"a": 1})
+    assert ld.setdefault("a", 99) == 1
+
+
+def test_lazy_dict__setdefault_inserts_and_returns_default():
+    ld = _make_lazy_dict({"a": 1})
+    assert ld.setdefault("new", 42) == 42
+    assert ld["new"] == 42
+
+
+def test_lazy_dict__or_operator_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1})
+    _ = ld | {"b": 2}
+    assert ld._initialized
+
+
+def test_lazy_dict__or_operator_merges_correctly():
+    ld = _make_lazy_dict({"a": 1})
+    result = ld | {"b": 2}
+    assert result == {"a": 1, "b": 2}
+
+
+def test_lazy_dict__ior_operator_merges_correctly():
+    ld = _make_lazy_dict({"a": 1})
+    ld |= {"b": 2}
+    assert ld["a"] == 1
+    assert ld["b"] == 2
+
+
+# ---------------------------------------------------------------------------
+# Startup import contract (subprocess isolation)
+# ---------------------------------------------------------------------------
+
+
+def test_pydidas_import__does_not_eagerly_load_heavy_deps():
+    import subprocess
+    import sys
+
+    script = (
+        "import sys; "
+        "import pydidas; "
+        "heavy = ['pyFAI', 'fabio', 'skimage', 'matplotlib.pyplot']; "
+        "loaded = [m for m in heavy if m in sys.modules]; "
+        "print(loaded)"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", script],
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "[]", (
+        f"Unexpected eager imports after 'import pydidas': {result.stdout.strip()}"
+    )
 
 
 if __name__ == "__main__":

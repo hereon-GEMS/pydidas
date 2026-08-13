@@ -29,7 +29,78 @@ __status__ = "Production"
 
 
 import importlib
+from functools import partial, partialmethod
 from typing import Any
+
+
+# Named (non-dunder) public methods that are bound lazily at instance level
+# in __init__ and replaced with native C-level bound methods after first init.
+_NAMED_SET_METHODS: tuple[str, ...] = (
+    "add",
+    "clear",
+    "copy",
+    "difference",
+    "difference_update",
+    "discard",
+    "intersection",
+    "intersection_update",
+    "isdisjoint",
+    "issubset",
+    "issuperset",
+    "pop",
+    "remove",
+    "symmetric_difference",
+    "symmetric_difference_update",
+    "union",
+    "update",
+)
+
+_NAMED_DICT_METHODS: tuple[str, ...] = (
+    "copy",
+    "get",
+    "items",
+    "keys",
+    "pop",
+    "popitem",
+    "setdefault",
+    "update",
+    "values",
+)
+
+# Dunder methods that exist in the native type's __dict__ and are wired up
+# via partialmethod after each class definition.  __bool__ is excluded because
+# neither set nor dict define it (both derive truthiness from __len__).
+_DUNDER_SET_METHODS: tuple[str, ...] = (
+    "__contains__",
+    "__iter__",
+    "__len__",
+    "__eq__",
+    "__ne__",
+    "__le__",
+    "__lt__",
+    "__ge__",
+    "__gt__",
+    "__or__",
+    "__and__",
+    "__sub__",
+    "__xor__",
+    "__ior__",
+    "__iand__",
+    "__isub__",
+    "__ixor__",
+)
+
+_DUNDER_DICT_METHODS: tuple[str, ...] = (
+    "__getitem__",
+    "__setitem__",
+    "__contains__",
+    "__iter__",
+    "__len__",
+    "__eq__",
+    "__ne__",
+    "__or__",
+    "__ior__",
+)
 
 
 class LazyObject:
@@ -123,35 +194,41 @@ class LazySet(set):
     This defers the import of the initialization function (and therefore
     any heavy imports) until the set is actually queried, rather than at
     module import time.
+
+    Named public methods are bound as lazy wrappers at instance level during
+    ``__init__`` and replaced with native ``set`` methods after the first
+    access.  All dunder methods (except ``__bool__``) are wired up via
+    ``partialmethod`` after the class definition so the class body stays
+    compact.
     """
 
     def __init__(self, init_function: callable) -> None:
         super().__init__()
         self._initialized = False
         self._init_function = init_function
+        for _name in _NAMED_SET_METHODS:
+            object.__setattr__(self, _name, partial(self._lazy_call, _name))
 
     def _ensure_initialized(self) -> None:
-        """Call the initialization function to populate the set."""
+        """Populate the set on first use and replace lazy wrappers with native methods."""
         if not self._initialized:
-            _members = self._init_function()
-            self.update(_members)
+            super().update(self._init_function())
             self._initialized = True
+            for _name in _NAMED_SET_METHODS:
+                object.__setattr__(self, _name, set.__dict__[_name].__get__(self))
 
-    def __contains__(self, item: object) -> bool:
+    def _lazy_call(self, method_name: str, /, *args: Any, **kwargs: Any) -> Any:
+        """Ensure initialized, then delegate to the named ``set`` method."""
         self._ensure_initialized()
-        return super().__contains__(item)
-
-    def __iter__(self):
-        self._ensure_initialized()
-        return super().__iter__()
-
-    def __len__(self) -> int:
-        self._ensure_initialized()
-        return super().__len__()
+        return set.__dict__[method_name](self, *args, **kwargs)
 
     def __bool__(self) -> bool:
         self._ensure_initialized()
-        return len(self) > 0
+        return super().__len__() > 0
+
+
+for _name in _DUNDER_SET_METHODS:
+    setattr(LazySet, _name, partialmethod(LazySet._lazy_call, _name))
 
 
 class LazyDict(dict):
@@ -161,59 +238,38 @@ class LazyDict(dict):
     This defers the import of the initialization function (and therefore
     any heavy imports) until the dict is actually queried, rather than at
     module import time.
+
+    Named public methods are bound as lazy wrappers at instance level during
+    ``__init__`` and replaced with native ``dict`` methods after the first
+    access.  All dunder methods (except ``__bool__``) are wired up via
+    ``partialmethod`` after the class definition so the class body stays
+    compact.
     """
 
     def __init__(self, init_function: callable) -> None:
         super().__init__()
         self._initialized = False
         self._init_function = init_function
+        for _name in _NAMED_DICT_METHODS:
+            object.__setattr__(self, _name, partial(self._lazy_call, _name))
 
     def _ensure_initialized(self) -> None:
-        """Call the initialization function to populate the dict."""
+        """Populate the dict on first use and replace lazy wrappers with native methods."""
         if not self._initialized:
-            _members = self._init_function()
-            self.update(_members)
+            super().update(self._init_function())
             self._initialized = True
+            for _name in _NAMED_DICT_METHODS:
+                object.__setattr__(self, _name, dict.__dict__[_name].__get__(self))
 
-    def __getitem__(self, key: object) -> Any:
+    def _lazy_call(self, method_name: str, /, *args: Any, **kwargs: Any) -> Any:
+        """Ensure initialized, then delegate to the named ``dict`` method."""
         self._ensure_initialized()
-        return super().__getitem__(key)
-
-    def __setitem__(self, key: object, value: Any) -> None:
-        self._ensure_initialized()
-        super().__setitem__(key, value)
-
-    def __contains__(self, key: object) -> bool:
-        self._ensure_initialized()
-        return super().__contains__(key)
-
-    def __iter__(self):
-        self._ensure_initialized()
-        return super().__iter__()
-
-    def __len__(self) -> int:
-        self._ensure_initialized()
-        return super().__len__()
+        return dict.__dict__[method_name](self, *args, **kwargs)
 
     def __bool__(self) -> bool:
         self._ensure_initialized()
-        return len(self) > 0
+        return super().__len__() > 0
 
-    def get(self, key: object, default: Any = None) -> Any:
-        """
-        Return the value for *key* if present, else *default*.
 
-        Parameters
-        ----------
-        key : object
-            The key to look up.
-        default : object, optional
-            Value returned when *key* is absent. Default is None.
-
-        Returns
-        -------
-        Any
-            The stored value or *default*.
-        """
-        self._ensure_initialized()
-        return super().get(key, default)
+for _name in _DUNDER_DICT_METHODS:
+    setattr(LazyDict, _name, partialmethod(LazyDict._lazy_call, _name))

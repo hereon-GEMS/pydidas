@@ -169,6 +169,25 @@ def test_lazy_object__invalid_attr_raises_on_resolve():
         proxy()
 
 
+def test_lazy_object__mro_entries_used_as_base_class():
+    from pathlib import PurePath
+
+    proxy = LazyObject("pathlib", "PurePath")
+
+    class MyPath(proxy):
+        pass
+
+    assert issubclass(MyPath, PurePath)
+
+
+def test_lazy_object__mro_entries_returns_tuple_with_real_class():
+    proxy = LazyObject("pathlib", "Path")
+    result = proxy.__mro_entries__(())
+    from pathlib import Path
+
+    assert result == (Path,)
+
+
 # ---------------------------------------------------------------------------
 # LazySet
 # ---------------------------------------------------------------------------
@@ -201,10 +220,22 @@ def test_lazy_set__contains_false_for_non_member():
     assert "z" not in ls
 
 
+def test_lazy_set__iter_triggers_initialization():
+    ls = _make_lazy_set({1, 2, 3})
+    _ = list(ls)
+    assert ls._initialized
+
+
 def test_lazy_set__iter_yields_all_items():
     items = {1, 2, 3, 4}
     ls = _make_lazy_set(items)
     assert {x for x in ls} == items
+
+
+def test_lazy_set__len_triggers_initialization():
+    ls = _make_lazy_set({1, 2, 3})
+    _ = len(ls)
+    assert ls._initialized
 
 
 def test_lazy_set__len_returns_correct_count():
@@ -215,6 +246,12 @@ def test_lazy_set__len_returns_correct_count():
 def test_lazy_set__len_empty_set_is_zero():
     ls = _make_lazy_set(set())
     assert len(ls) == 0
+
+
+def test_lazy_set__bool_triggers_initialization():
+    ls = _make_lazy_set({1})
+    _ = bool(ls)
+    assert ls._initialized
 
 
 def test_lazy_set__bool_true_for_non_empty():
@@ -280,6 +317,12 @@ def test_lazy_dict__getitem_missing_key_raises():
         _ = ld["missing"]
 
 
+def test_lazy_dict__contains_triggers_initialization():
+    ld = _make_lazy_dict({"hello": "world"})
+    _ = "hello" in ld
+    assert ld._initialized
+
+
 def test_lazy_dict__contains_true_for_existing_key():
     ld = _make_lazy_dict({"hello": "world"})
     assert "hello" in ld
@@ -302,10 +345,22 @@ def test_lazy_dict__setitem_triggers_initialization():
     assert ld._initialized
 
 
+def test_lazy_dict__iter_triggers_initialization():
+    ld = _make_lazy_dict({"x": 1, "y": 2})
+    _ = list(ld)
+    assert ld._initialized
+
+
 def test_lazy_dict__iter_yields_all_keys():
     mapping = {"x": 1, "y": 2, "z": 3}
     ld = _make_lazy_dict(mapping)
     assert set(ld) == set(mapping)
+
+
+def test_lazy_dict__len_triggers_initialization():
+    ld = _make_lazy_dict({"a": 1, "b": 2})
+    _ = len(ld)
+    assert ld._initialized
 
 
 def test_lazy_dict__len_returns_correct_count():
@@ -316,6 +371,12 @@ def test_lazy_dict__len_returns_correct_count():
 def test_lazy_dict__len_empty_dict_is_zero():
     ld = _make_lazy_dict({})
     assert len(ld) == 0
+
+
+def test_lazy_dict__bool_triggers_initialization():
+    ld = _make_lazy_dict({"k": "v"})
+    _ = bool(ld)
+    assert ld._initialized
 
 
 def test_lazy_dict__bool_true_for_non_empty():

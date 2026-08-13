@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2026, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,10 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The lazy_imports package defines lazy-loaded imports.
-
-These imports are only loaded when they are actually used, which can
-help to reduce the initial loading time of the pydidas suite.
+The fabio module holds functions exposed by the fabio package, which
+are lazily imported to reduce initial loading time.
 """
 
 __author__ = "Malte Storm"
@@ -27,9 +25,15 @@ __copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+__all__ = ["fabio_open"]
 
 
-from . import fabio, pyFAI
+from typing import TYPE_CHECKING
+
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 
 
-__all__: list[str] = ["fabio", "pyFAI"]
+if TYPE_CHECKING:
+    from fabio import open as fabio_open
+else:
+    fabio_open = LazyObject("fabio", "open")

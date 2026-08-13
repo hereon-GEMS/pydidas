@@ -84,6 +84,10 @@ class LazyObject:
     def __subclasscheck__(self, subclass: type) -> bool:
         return issubclass(subclass, self._resolve())  # type: ignore[arg-type]
 
+    def __mro_entries__(self, bases: tuple) -> tuple:
+        """Support using a LazyObject as a base class."""
+        return (self._resolve(),)
+
     def __repr__(self) -> str:
         return f"<lazy proxy for {self._module_path}.{self._attr_name}>"
 

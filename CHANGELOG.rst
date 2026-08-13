@@ -43,6 +43,7 @@ Programmatic changes
 - Added a ProcessingResultSaver class to handle export of results.
 - Added an option to export all Parameter values as export types in 
   the ParameterCollection
+- Updated the way pydidas handles font scaling on silx colorbars
 
 
 Bugfixes

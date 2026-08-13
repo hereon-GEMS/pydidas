@@ -493,7 +493,8 @@ def test_lazy_set__eq_triggers_initialization():
 def test_lazy_set__eq_correct():
     ls = _make_lazy_set({1, 2, 3})
     assert ls == {1, 2, 3}
-    assert not (ls == {1, 2})
+    # explicitly test equality, therefore not ( a == b) instead of a != b:
+    assert not (ls == {1, 2})  # noqa: SIM201
 
 
 def test_lazy_set__union_triggers_initialization():

@@ -44,6 +44,8 @@ class _PydidasTickBar(_TickBar):
     This class is used to replace the original _TickBar class in silx.gui.plot.ColorBar.
     """
 
+    _DEFAULT_WIDTH_DELTA = _TickBar._WIDTH_DISP_VAL - _TickBar._WIDTH_NO_DISP_VAL
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
         Initialize the _PydidasTickBar instance.
@@ -65,11 +67,7 @@ class _PydidasTickBar(_TickBar):
     def _on_font_size_changed(self, new_font_size: float) -> None:
         """Handle the font size change signal."""
         _width = (
-            int(
-                3.5
-                * (self._WIDTH_DISP_VAL - self._WIDTH_NO_DISP_VAL)
-                * (new_font_size / 10)
-            )
+            int(3.5 * self._DEFAULT_WIDTH_DELTA * (new_font_size / 10))
             + self._WIDTH_NO_DISP_VAL
         )
         for _item in [_TickBar, self]:

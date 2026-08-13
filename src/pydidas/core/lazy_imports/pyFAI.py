@@ -39,12 +39,14 @@ __all__ = [
     "PeakPickingTask",
     "PixelMarker",
     "PoniFile",
+    "calib2_configure_parser_arguments",
+    "calib2_setup_model",
     "convert_from_Fit2d",
     "convert_to_Fit2d",
     "get_documentation_url",
+    "pyFAI_root_file",
     "silx_integration",
 ]
-
 
 from typing import TYPE_CHECKING
 
@@ -52,6 +54,11 @@ from pydidas.core.lazy_imports.lazy_objects import LazyObject
 
 
 if TYPE_CHECKING:
+    import pyFAI
+    from pyFAI.app.calib2 import (
+        configure_parser_arguments as calib2_configure_parser_arguments,
+    )
+    from pyFAI.app.calib2 import setup_model as calib2_setup_model
     from pyFAI.detectors import Detector
     from pyFAI.distortion import Distortion
     from pyFAI.geometry import Geometry
@@ -68,6 +75,8 @@ if TYPE_CHECKING:
     from pyFAI.integrator.azimuthal import AzimuthalIntegrator
     from pyFAI.io.ponifile import PoniFile
     from pyFAI.resources import silx_integration
+
+    pyFAI_root_file: str = pyFAI.__file__
 else:
     # base classes:
     AzimuthalIntegrator = LazyObject(
@@ -77,10 +86,14 @@ else:
     Distortion = LazyObject("pyFAI.distortion", "Distortion")
     Geometry = LazyObject("pyFAI.geometry.core", "Geometry")
 
-    # Contexts
+    # Calibration
     CalibrationContext = LazyObject(
         "pyFAI.gui.CalibrationContext", "CalibrationContext"
     )
+    calib2_configure_parser_arguments = LazyObject(
+        "pyFAI.app.calib2", "configure_parser_arguments"
+    )
+    calib2_setup_model = LazyObject("pyFAI.app.calib2", "setup_model")
 
     # GUI classes:
     CalibWindowMenuItem = LazyObject("pyFAI.gui.CalibrationWindow", "MenuItem")
@@ -93,9 +106,11 @@ else:
 
     # utilities:
     PoniFile = LazyObject("pyFAI.io.ponifile", "PoniFile")
+    calib2 = LazyObject("pyFAI.app", "calib2")
     convert_from_Fit2d = LazyObject("pyFAI.geometry.fit2d", "convert_from_Fit2d")
     convert_to_Fit2d = LazyObject("pyFAI.geometry.fit2d", "convert_to_Fit2d")
     get_documentation_url = LazyObject(
         "pyFAI.gui.utils.projecturl", "get_documentation_url"
     )
     silx_integration = LazyObject("pyFAI.resources", "silx_integration")
+    pyFAI_root_file = LazyObject("pyFAI", "__file__")

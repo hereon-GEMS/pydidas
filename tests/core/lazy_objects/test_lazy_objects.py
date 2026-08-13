@@ -766,7 +766,8 @@ def test_lazy_dict__eq_correct():
     mapping = {"a": 1, "b": 2}
     ld = _make_lazy_dict(mapping)
     assert ld == mapping
-    assert not (ld == {"a": 1})
+    # explicitly test equality, therefore not ( a == b) instead of a != b:
+    assert not (ld == {"a": 1})  # noqa: SIM201
 
 
 def test_lazy_dict__pop_triggers_initialization():
@@ -872,6 +873,7 @@ def test_pydidas_import__does_not_eagerly_load_heavy_deps():
         capture_output=True,
         text=True,
         timeout=120,
+        check=False,
     )
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "[]", (

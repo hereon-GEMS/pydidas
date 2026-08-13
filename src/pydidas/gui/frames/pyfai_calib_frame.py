@@ -30,32 +30,35 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PyfaiCalibFrame"]
 
-
 import argparse
 import functools
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pyFAI
-from pyFAI.app import calib2
-from pyFAI.gui.CalibrationContext import CalibrationContext
-from pyFAI.gui.CalibrationWindow import MenuItem
-from pyFAI.gui.model import MarkerModel
-from pyFAI.gui.tasks.ExperimentTask import ExperimentTask
-from pyFAI.gui.tasks.GeometryTask import GeometryTask
-from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
-from pyFAI.gui.tasks.MaskTask import MaskTask
-from pyFAI.gui.tasks.PeakPickingTask import PeakPickingTask
-from pyFAI.gui.utils import projecturl
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.plot.tools import ImageToolBar
-from silx.gui.qt import QToolBar
+from qtpy.QtWidgets import QToolBar
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
+from pydidas.core.lazy_imports.pyFAI import (
+    CalibrationContext,
+    CalibWindowMenuItem,
+    ExperimentTask,
+    GeometryTask,
+    IntegrationTask,
+    MaskTask,
+    PeakPickingTask,
+    PixelMarker,
+    calib2_configure_parser_arguments,
+    calib2_setup_model,
+    get_documentation_url,
+    pyFAI_root_file,
+    silx_integration,
+)
+from pydidas.core.lazy_imports.silx import ImageToolBar
 from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.silx_plot import actions
@@ -78,7 +81,6 @@ def _create_calib_tasks() -> list[
     -------
     tasks : list
         The list with the task instances.
-
     """
     _experiment_task: ExperimentTask = ExperimentTask()
     _mask_task: MaskTask = MaskTask()
@@ -101,7 +103,7 @@ def _create_calib_tasks() -> list[
         _obj.setText("...")
     for _task in [_experiment_task, _mask_task, _peak_task, _geometry_task]:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
-        _toolbar = _plot.findChildren(ImageToolBar)[0]
+        _toolbar = _plot.findChildren(ImageToolBar.resolve())[0]
         _histo_crop_action = actions.CropHistogramOutliersAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
@@ -112,13 +114,9 @@ def _create_calib_tasks() -> list[
             _plot, parent=_plot, forced_image_legend="image"
         )
         _widget_action = next(
-            iter(
-                [
-                    _action
-                    for _action in _toolbar.actions()
-                    if isinstance(_action, QtWidgets.QWidgetAction)
-                ]
-            )
+            _action
+            for _action in _toolbar.actions()
+            if isinstance(_action, QtWidgets.QWidgetAction)
         )
         _toolbar.addAction(_histo_crop_action)
         _toolbar.addAction(_autoscale_min_max_action)
@@ -126,18 +124,22 @@ def _create_calib_tasks() -> list[
         _toolbar.insertAction(_widget_action, _histo_crop_action)
         _toolbar.insertAction(_widget_action, _autoscale_min_max_action)
         _toolbar.insertAction(_widget_action, _autoscale_mean_3sigma_action)
-    # explicitly hide the toolbar with the 3D visualization:
-    _experiment_task._ExperimentTask__plot.findChildren(QToolBar)[2].setVisible(False)
-    _geometry_task._GeometryTask__plot.findChildren(QToolBar)[2].setVisible(False)
+    # explicitly hide the "3D visualization" action:
+    for _task in [_experiment_task, _geometry_task]:
+        _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
+        for tb in _plot.findChildren(QToolBar):
+            for _action in tb.actions():
+                if _action.text() == "3D visualization":
+                    _action.setVisible(False)
     # disable the default ring option in the peak picking task:
     _peak_task._PeakPickingTask__createNewRingOption.setChecked(False)
     # insert a button for exporting to DiffractionExperimentContext:
     _save_poni_button = _integration_task._savePoniButton
-    _parent = _save_poni_button.parent()
+    _save_poni_button_parent_layout = _save_poni_button.parent().layout()
     _integration_task._update_context_button = QtWidgets.QPushButton(
         "Update pydidas diffraction setup from calibration"
     )
-    _parent.layout().addWidget(_integration_task._update_context_button)
+    _save_poni_button_parent_layout.addWidget(_integration_task._update_context_button)
     return _tasks
 
 
@@ -153,9 +155,8 @@ class PyfaiCalibFrame(BaseFrame):
     available.
     """
 
-    menu_icon = "path::" + str(
-        Path(pyFAI.__file__).parent / "resources" / "gui" / "images" / "icon.png"
-    )
+    _root_dir = Path(pyFAI_root_file.resolve()).parent
+    menu_icon = "path::" + str(_root_dir / "resources" / "gui" / "images" / "icon.png")
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
 
@@ -167,8 +168,6 @@ class PyfaiCalibFrame(BaseFrame):
 
     def _setup_pyfai_context(self) -> None:
         """Set up the context for the pyfai calibration."""
-        pyFAI.resources.silx_integration()  # type: ignore[attr-defined]
-
         _settings = QtCore.QSettings(
             QtCore.QSettings.IniFormat,
             QtCore.QSettings.UserScope,
@@ -176,16 +175,15 @@ class PyfaiCalibFrame(BaseFrame):
             "pyfai-calib2",
             None,
         )
-        CalibrationContext._releaseSingleton()
-        _calib_context = CalibrationContext(_settings)
-        _calib_context.restoreSettings()
-        parser = argparse.ArgumentParser()
-        calib2.configure_parser_arguments(parser)
-        options, _ = parser.parse_known_args()
-        calib2.setup_model(_calib_context.getCalibrationModel(), options)
-        self._calibration_context = _calib_context
-        self._calibration_context.setParent(self)
-        self._calibration_model = _calib_context.getCalibrationModel()
+        silx_integration()
+        _parser = argparse.ArgumentParser()
+        calib2_configure_parser_arguments(_parser)
+        _parsed_options, _ = _parser.parse_known_args()
+        _calibration_context = CalibrationContext(_settings)
+        _calibration_context.restoreSettings()
+        _calibration_context.setParent(self)
+        self._calibration_model = _calibration_context.getCalibrationModel()
+        calib2_setup_model(self._calibration_model, _parsed_options)
 
     def build_frame(self) -> None:
         """Build the frame with all required widgets."""
@@ -227,7 +225,7 @@ class PyfaiCalibFrame(BaseFrame):
         for _task in self._tasks:
             _task.nextTaskRequested.connect(self.display_next_task)
             _inverted_icon = icon_with_inverted_colors(_task.windowIcon())
-            _menu_item = MenuItem(self._widgets["task_list"])
+            _menu_item = CalibWindowMenuItem(self._widgets["task_list"])
             _menu_item.setText(_task.windowTitle())
             _menu_item.setIcon(_inverted_icon)
             _task.warningUpdated.connect(
@@ -249,7 +247,7 @@ class PyfaiCalibFrame(BaseFrame):
     def finalize_ui(self) -> None:
         """Run the UI finalization after creating widgets and connecting signals."""
         if len(self._calibration_model.markerModel()) == 0:
-            origin = MarkerModel.PixelMarker("Origin", 0, 0)
+            origin = PixelMarker("Origin", 0, 0)
             self._calibration_model.markerModel().add(origin)
         for task in self._tasks:
             task.setModel(self._calibration_model)
@@ -267,11 +265,11 @@ class PyfaiCalibFrame(BaseFrame):
     @QtCore.Slot()
     def _display_help(self) -> None:
         """Display the help for the pyFAI calibration."""
-        _url = projecturl.get_documentation_url("usage/cookbook/calib-gui/index.html")
+        _url = get_documentation_url("usage/cookbook/calib-gui/index.html")
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(_url))
 
     @QtCore.Slot(object, object)
-    def _update_task_state(self, task: Any, item: MenuItem) -> None:
+    def _update_task_state(self, task: Any, item: "CalibWindowMenuItem") -> None:
         """
         Update the task state.
 
@@ -282,7 +280,7 @@ class PyfaiCalibFrame(BaseFrame):
         ----------
         task : Any
             The associated task widget.
-        item : MenuItem
+        item : CalibWindowMenuItem
             The associated menu item.
         """
         _task: Any = task

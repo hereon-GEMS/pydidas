@@ -30,7 +30,7 @@ __all__ = ["ManuallySetBeamcenterController"]
 
 from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from qtpy import QtCore
@@ -46,22 +46,26 @@ from pydidas.core.math.ellipse import (
 from pydidas.data_io import import_data
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.misc import PointsForBeamcenterWidget
-from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
 class ManuallySetBeamcenterController(QtCore.QObject):
     """
     This class manages manually selecting and editing the beamcenter.
 
-    This controller requires a PydidasPlot2D to pick up selected points and to draw the
-    markers, as well as a parent widget which controls the beamcenter Parameters and a
-    PointPositionTableWidget to represent the points.
+    This controller requires a PydidasPlot2D to pick up selected points
+    and to draw the markers, as well as a parent widget which controls
+    the beamcenter Parameters and a PointPositionTableWidget to represent
+    the points.
 
     Parameters
     ----------
     parent_frame : pydidas.widgets.framework.BaseFrame
         The parent widget which displays the information.
-    plot : pydidas.widgets.silx_plot.PydidasPlot2D
+    plot : PydidasPlot2D
         The plot to draw markers etc.
     point_table : pydidas.widgets.misc.PointsForBeamcenterWidget
         The table to store the selected points.
@@ -96,7 +100,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
     def __init__(
         self,
         parent_frame: BaseFrame,
-        plot: PydidasPlot2D,
+        plot: "PydidasPlot2D",
         point_table: PointsForBeamcenterWidget,
         **kwargs: Any,
     ) -> None:

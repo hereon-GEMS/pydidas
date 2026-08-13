@@ -29,24 +29,18 @@ __all__ = ["PydidasPlot2D"]
 
 
 from contextlib import nullcontext
-from functools import partial
 from typing import Any, ClassVar
 
 import numpy as np
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
-from silx.gui.plot.items import Scatter
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, PydidasQsettingsMixin
+from pydidas.core.lazy_imports.silx import Colormap, Scatter
 from pydidas.widgets.silx_plot._coordinate_transform_button import (
     CoordinateTransformButton,
-)
-from pydidas.widgets.silx_plot._silx_tickbar import (
-    tickbar_paintEvent,
-    tickbar_paintTick,
 )
 from pydidas.widgets.silx_plot.pydidas_position_info import PydidasPositionInfo
 from pydidas.widgets.silx_plot.silx_actions import (
@@ -72,7 +66,7 @@ _IMAGE_LEGEND = "pydidas image"
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
-    A customized silx.gui.plot.Plot2D with an additional features.
+    A customized silx Plot2D with an additional features.
 
     Additional features are implemented through additional SilxActions which
     are added to the toolbar.
@@ -296,7 +290,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _scale: list[float] = []
         _xlimit = self.getGraphXLimits() if self._actions["lock_zoom"].locked else None
         _ylimit = self.getGraphYLimits() if self._actions["lock_zoom"].locked else None
-        # calling axis #1 [with x values]  first because silx expects (x, y) values.
+        # calling axis #1 [with x values] first because silx expects (x, y) values.
         for _dim in (1, 0):
             _ax = data.get_axis_range(_dim)
             _delta = (_ax.max() - _ax.min()) / _ax.size
@@ -519,9 +513,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             )
             _cmap.setNaNColor(self.q_settings_get("user/cmap_nan_color"))
             self.setDefaultColormap(_cmap)
-        _tb = self.getColorBarWidget().getColorScaleBar().getTickBar()
-        _tb.paintEvent = partial(tickbar_paintEvent, _tb)
-        _tb._paintTick = partial(tickbar_paintTick, _tb)
 
     # -----------------------------------------#
     # private update methods                   #

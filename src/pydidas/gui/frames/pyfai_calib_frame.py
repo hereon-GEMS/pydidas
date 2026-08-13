@@ -179,6 +179,7 @@ class PyfaiCalibFrame(BaseFrame):
         _parser = argparse.ArgumentParser()
         calib2_configure_parser_arguments(_parser)
         _parsed_options, _ = _parser.parse_known_args()
+        CalibrationContext._releaseSingleton()
         _calibration_context = CalibrationContext(_settings)
         _calibration_context.restoreSettings()
         _calibration_context.setParent(self)

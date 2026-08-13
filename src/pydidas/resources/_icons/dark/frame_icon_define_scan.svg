@@ -162,9 +162,9 @@
     <ns0:path style="fill:#00aae6;fill-opacity:1;stroke:none;stroke-width:1.34266;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1" d="M 22.857143,11.5 24,10.558824 h 2.285714 L 25.142857,11.5 Z" id="path1-60-5-0" />
     <ns0:path style="fill:#00aae6;fill-opacity:1;stroke:none;stroke-width:1.34266;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1" d="m 27.428571,11.5 1.142858,-0.941176 h 2.285714 L 29.714286,11.5 Z" id="path1-53-9-1" />
     <ns0:path style="fill:#00aae6;fill-opacity:1;stroke:none;stroke-width:1.33471;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1" d="M 36.52174,28.416783 37.68116,27.5 H 40 l -1.15942,0.916783 z" id="path1-53-8" />
-    <ns0:path style="fill:#3c3c3c;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 17,34 3,6 3,-6 H 21 V 5 h 2 L 20,0 17,5 h 2 v 29 z" id="path2" />
-    <ns0:path style="fill:#3c3c3c;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 6,17 -6,3 6,3 v -2 h 29 v 2 l 5,-3 -5,-3 v 2 H 6 Z" id="path2-4" />
-    <ns0:path style="fill:#3c3c3c;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 7.0522638,26.136853 4.1218586,32.171148 10.707536,30.894895 9.4891109,29.308881 32.486316,11.641721 33.704742,13.227735 35.84214,7.8026497 30.049467,8.4696905 31.267892,10.055705 8.270688,27.722867 Z" id="path2-4-9" />
+    <ns0:path style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 17,34 3,6 3,-6 H 21 V 5 h 2 L 20,0 17,5 h 2 v 29 z" id="path2" />
+    <ns0:path style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 6,17 -6,3 6,3 v -2 h 29 v 2 l 5,-3 -5,-3 v 2 H 6 Z" id="path2-4" />
+    <ns0:path style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.14285px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 7.0522638,26.136853 4.1218586,32.171148 10.707536,30.894895 9.4891109,29.308881 32.486316,11.641721 33.704742,13.227735 35.84214,7.8026497 30.049467,8.4696905 31.267892,10.055705 8.270688,27.722867 Z" id="path2-4-9" />
   </ns0:g>
   <ns0:metadata id="metadata1">
     <rdf:RDF>

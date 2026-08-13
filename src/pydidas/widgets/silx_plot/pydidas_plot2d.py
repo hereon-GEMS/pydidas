@@ -38,7 +38,7 @@ from silx.gui.plot import Plot2D
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, PydidasQsettingsMixin
-from pydidas.core.lazy_imports.silx import Colormap, Scatter
+from pydidas.core.lazy_imports.silx import BackendMatplotlib, Colormap, Scatter
 from pydidas.widgets.silx_plot._coordinate_transform_button import (
     CoordinateTransformButton,
 )
@@ -86,6 +86,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
+        if not isinstance(self.getBackend(), BackendMatplotlib):
+            raise TypeError("PydidasPlot2D only supports the matplotlib backend.")
         self._default_unit: str = "no unit"
         self.__plotted_data_shape: tuple[int, int] = (0, 0)
         self._qtapp = PydidasQApplication.instance()
@@ -426,12 +428,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         # The ChangeCanvasAction will toggle between expanding the canvas
         # and setting a tight canvas fitting to the data
         # noinspection PyTypeChecker
-        self._actions["canvas"] = ChangeCanvasAction(self, parent=self)  # type: ignore[arg-type]
+        self._actions["canvas"] = ChangeCanvasAction(self, parent=self)
 
         # The CropHistogramOutliersAction is used to crop the histogram
         # to ignore low and high outliers in the scaling
         # noinspection PyTypeChecker
-        self._actions["outliers"] = CropHistogramOutliersAction(self, parent=self)  # type: ignore[arg-type]
+        self._actions["outliers"] = CropHistogramOutliersAction(self, parent=self)
 
         # The AutoscaleToMinMaxAction is used to reset the colormap to
         # autoscaling to min / max of the image.

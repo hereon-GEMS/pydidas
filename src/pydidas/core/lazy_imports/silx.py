@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "BackendMatplotlib",
     "Colormap",
     "ImageToolBar",
     "Plot1D",
@@ -47,15 +48,19 @@ if TYPE_CHECKING:
     from silx.gui.plot import Plot1D, Plot2D
     from silx.gui.plot import items as plot_items
     from silx.gui.plot.actions import PlotAction
+    from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlib
     from silx.gui.plot.items import Scatter
     from silx.gui.plot.PlotToolButtons import PlotToolButton
     from silx.gui.plot.tools import ImageToolBar
 else:
+    BackendMatplotlib = LazyObject(
+        "silx.gui.plot.backends.BackendMatplotlib", "BackendMatplotlib"
+    )
     Colormap = LazyObject("silx.gui.colors", "Colormap")
     ImageToolBar = LazyObject("silx.gui.plot.tools", "ImageToolBar")
     Plot1D = LazyObject("silx.gui.plot", "Plot1D")
     Plot2D = LazyObject("silx.gui.plot", "Plot2D")
     PlotAction = LazyObject("silx.gui.plot.actions", "PlotAction")
     PlotToolButton = LazyObject("silx.gui.plot.PlotToolButtons", "PlotToolButton")
-    Scatter = LazyObject("silx.gui.plot", "Scatter")
+    Scatter = LazyObject("silx.gui.plot.items", "Scatter")
     plot_items = LazyObject("silx.gui.plot", "items")

@@ -172,8 +172,14 @@ class ChangeCanvasAction(PlotAction):
             flag for the full canvas mode.
         """
         self._full_canvas = mode in ["full", True]
+        self.plot.setKeepDataAspectRatio(False)
+        if self.plot.keepDataAspectRatioButton.isVisible():
+            self.plot.keepDataAspectRatioButton.setEnabled(self._full_canvas)
         if self._full_canvas:
-            self._expand_canvas()
+            # Expand the canvas to the maximum available size. This is done by
+            # removing the box aspect:
+            _backend = self.plot.getBackend()
+            _backend.ax.set_box_aspect(None)
         else:
             self._restrict_canvas_to_data()
         self._update_description_from_canvas()
@@ -181,23 +187,21 @@ class ChangeCanvasAction(PlotAction):
 
     def _restrict_canvas_to_data(self) -> None:
         """Restrict the canvas size to match the data aspect ratio."""
-        self.plot.setKeepDataAspectRatio(True)
-        _backend = self.plot.getBackend()
         _range = self.plot.getDataRange()
         if _range.x is None or _range.y is None:
             return
+        _backend = self.plot.getBackend()
         _plot_data_aspect = (
             1 if _backend.ax.get_aspect() == "auto" else _backend.ax.get_aspect()
         )
         _data_aspect = (_range.x[1] - _range.x[0]) / (_range.y[1] - _range.y[0])
         _backend.ax.set_box_aspect(_plot_data_aspect / _data_aspect)
-        _backend.ax.set_anchor("C")
-        self.plot.resetZoom()
 
     def _expand_canvas(self) -> None:
         """Expand the canvas to the maximum available size."""
         self.plot.setKeepDataAspectRatio(False)
-        self.plot._backend.ax.set_box_aspect(None)
+        _backend = self.plot.getBackend()
+        _backend.ax.set_box_aspect(None)
 
     def _update_description_from_canvas(self) -> None:
         """Expand the action's description from the canvas mode."""

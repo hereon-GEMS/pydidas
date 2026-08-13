@@ -1,0 +1,49 @@
+<ns0:svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns1="http://www.inkscape.org/namespaces/inkscape" xmlns:ns2="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns4="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="40" height="40" viewBox="0 0 40 40" version="1.1" id="svg1" ns1:version="1.4 (86a8ad7, 2024-10-11)" ns2:docname="analysis_tools_expand.svg" fill="#ffffff">
+  <ns0:title id="title1">Pydidas icon: Hide Workflow Processing</ns0:title>
+  <ns2:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" ns1:showpageshadow="2" ns1:pageopacity="0.0" ns1:pagecheckerboard="0" ns1:deskcolor="#d1d1d1" ns1:document-units="px" ns1:zoom="13.075" ns1:cx="23.594647" ns1:cy="12.007648" ns1:window-width="1732" ns1:window-height="1248" ns1:window-x="3240" ns1:window-y="53" ns1:window-maximized="0" ns1:current-layer="layer1" showgrid="true" showguides="true">
+    <ns1:grid id="grid1" units="px" originx="0" originy="0" spacingx="1" spacingy="1" empcolor="#0099e5" empopacity="0.30196078" color="#0099e5" opacity="0.14901961" empspacing="5" enabled="true" visible="true" />
+  </ns2:namedview>
+  <ns0:defs id="defs1" />
+  <ns0:g ns1:label="Layer 1" ns1:groupmode="layer" id="layer1">
+    <ns0:path ns2:type="star" style="fill:#989898;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000" id="path9651-4" ns1:flatsided="true" ns2:sides="3" ns2:cx="236.41924" ns2:cy="-98.927208" ns2:r1="42.764889" ns2:r2="21.382446" ns2:arg1="-0.019605331" ns2:arg2="1.0275922" ns1:rounded="0" ns1:randomized="0" d="m 279.17591,-99.765574 -63.40896,38.285912 -1.4521,-74.056728 z" ns1:transform-center-x="-1.4000148" ns1:transform-center-y="0.056442687" transform="matrix(0.13557985,0,0,0.13465135,1.6912944,47.845658)" />
+    <ns0:path ns2:type="star" style="fill:#989898;fill-opacity:1;stroke:#000000;stroke-width:4.99999;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000" id="path9651-5-3" ns1:flatsided="true" ns2:sides="3" ns2:cx="236.41924" ns2:cy="-98.927208" ns2:r1="42.764889" ns2:r2="21.382446" ns2:arg1="-0.019605331" ns2:arg2="1.0275922" ns1:rounded="0" ns1:randomized="0" d="m 279.17591,-99.765574 -63.40896,38.285912 -1.4521,-74.056728 z" ns1:transform-center-x="-1.4000148" ns1:transform-center-y="0.056443678" transform="matrix(0.13557985,0,0,0.13465135,-2.7776906,47.840654)" />
+    <ns0:polyline points="16,40 26,32 36,36 46,20 54,24" fill="none" stroke="#ffffff" stroke-width="3" id="polyline1" transform="matrix(0.40603645,0,0,0.40603645,-3.8181963,-1.0632461)" style="stroke:#00aae6;stroke-opacity:1;opacity:1" />
+    <ns0:line x1="0" y1="19.75" x2="12.863989" y2="19.75" stroke="#ffffff" stroke-width="0.941397" id="line5" style="opacity:1;stroke-width:1.5;stroke-dasharray:none" />
+    <ns0:line x1="0.75" y1="2" x2="0.75" y2="19" stroke="#ffffff" stroke-width="0.952328" id="line6" style="opacity:1;stroke-width:1.5;stroke-dasharray:none" />
+    <ns0:rect x="23.264595" y="0.66871631" width="16.118788" height="18.064917" rx="1.0074242" fill="#ffffff" stroke="#ffffff" stroke-width="0.953914" id="rect1" style="opacity:1" />
+    <ns0:line x1="25.051785" y1="2.9289169" x2="37.974762" y2="2.9289169" stroke="#ffffff" stroke-width="0.987582" id="line1" style="stroke-width:1.5;stroke-dasharray:none;opacity:1" />
+    <ns0:line x1="25.051939" y1="5.2959561" x2="37.974918" y2="5.2959561" stroke="#ffffff" stroke-width="0.987582" id="line1-5" style="stroke-width:1.5;stroke-dasharray:none;opacity:1" />
+    <ns0:line x1="25.051939" y1="7.7499995" x2="37.974918" y2="7.7499995" stroke="#ffffff" stroke-width="0.987582" id="line1-5-1" style="stroke-width:1.5;stroke-dasharray:none;opacity:1" />
+    <ns0:rect x="25.001421" y="13.677581" width="1.8113172" height="3.6226344" fill="#ffffff" id="rect2" style="fill:#00aae6;fill-opacity:1;stroke-width:0.452829;opacity:1" />
+    <ns0:rect x="27.718397" y="11.866261" width="1.8113172" height="5.4339514" fill="#ffffff" id="rect3" style="fill:#e60046;fill-opacity:1;stroke-width:0.452829;opacity:1" />
+    <ns0:rect x="35.89283" y="11.866414" width="1.8113172" height="5.4339514" fill="#ffffff" id="rect3-6" style="fill:#e60046;fill-opacity:1;stroke-width:0.452829;opacity:1" />
+    <ns0:rect x="30.435373" y="10.054945" width="1.8113172" height="7.2452688" fill="#ffffff" id="rect4" style="fill:#0091a0;fill-opacity:1;stroke-width:0.452829;opacity:1" />
+    <ns0:rect x="33.152348" y="11.65072" width="1.8113172" height="5.6494942" fill="#ffffff" id="rect5" style="fill:#00aae6;fill-opacity:1;stroke-width:0.357649;opacity:1" />
+    <ns0:path d="m 26.914894,27.19767 -1.085969,1.085969 a 0.76476704,0.76476704 0 0 1 -1.078321,0 l -9.085433,-9.070138 a 2.9137625,2.9137625 0 0 1 -0.764767,0.114714 3.0590681,3.0590681 0 0 1 -2.89082,-4.053266 l 1.942508,1.942509 0.405326,-0.405326 1.085971,-1.08597 0.405326,-0.405326 -1.942509,-1.942509 a 3.0590681,3.0590681 0 0 1 4.053266,2.890821 2.9137625,2.9137625 0 0 1 -0.114714,0.764767 l 9.070137,9.085432 a 0.76476704,0.76476704 0 0 1 0,1.078321 m -14.851778,-1.07832 a 0.76476704,0.76476704 0 0 0 0,1.078322 l 1.08597,1.085969 a 0.76476704,0.76476704 0 0 0 1.078321,0 l 4.183276,-4.175629 -2.164291,-2.16429 m 9.360749,-8.733641 -3.059067,1.529534 v 1.529536 l -1.659546,1.659544 1.529534,1.529533 1.659545,-1.659544 h 1.529534 l 1.529535,-3.059069 z" id="path1" style="fill:#323246;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill;opacity:1" />
+  </ns0:g>
+  <ns0:metadata id="metadata1">
+    <rdf:RDF>
+      <ns4:Work rdf:about="">
+        <dc:title>Pydidas icon: Hide Workflow Processing</dc:title>
+        <dc:creator>
+          <ns4:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </ns4:Agent>
+        </dc:creator>
+        <dc:rights>
+          <ns4:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </ns4:Agent>
+        </dc:rights>
+        <ns4:license rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </ns4:Work>
+      <ns4:License rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <ns4:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns4:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns4:requires rdf:resource="http://creativecommons.org/ns#Notice" />
+        <ns4:requires rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <ns4:prohibits rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </ns4:License>
+    </rdf:RDF>
+  </ns0:metadata>
+</ns0:svg>

@@ -35,11 +35,11 @@ __all__ = [
 
 
 from pathlib import Path
-from xml.etree import ElementTree
 
-from qtpy import QtCore, QtGui, QtSvg
+from qtpy import QtCore, QtGui
 
 from pydidas.core import UserConfigError
+from pydidas.core.utils import get_extension
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -126,51 +126,15 @@ def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     """Create a QIcon from a svg image at the given path."""
     _app = PydidasQApplication.instance()
     _dark = _app.is_dark_mode if _app else False
-    _color = "#ffffff" if _dark else "#000000"
-    _bg_color = "#000000" if _dark else "#ffffff"
+    path = Path(path)
 
-    _tree = ElementTree.parse(path)
-    _root = _tree.getroot()
-    _root.set("fill", _color)
-    for elem in _root.iter():
-        if "fill" in elem.attrib and elem.attrib["fill"] != "none":
-            elem.set("fill", _color)
-        if "stroke" in elem.attrib and elem.attrib["stroke"] != "none":
-            elem.set("stroke", _color)
-        if "style" in elem.attrib and elem.attrib["style"] != "none":
-            try:
-                style = elem.attrib["style"]
-                style_dict = {}
-                for item in style.split(";"):
-                    if ":" in item:
-                        k, v = item.split(":", 1)
-                        style_dict[k.strip()] = v.strip()
-                if "fill" in style_dict and style_dict["fill"] != "none":
-                    match style_dict["fill"]:
-                        case "#ffffff":
-                            style_dict["fill"] = _bg_color
-                        case "#000000":
-                            style_dict["fill"] = _color
-                if "stroke" in style_dict and style_dict["stroke"] != "none":
-                    match style_dict["stroke"]:
-                        case "#ffffff":
-                            style_dict["stroke"] = _bg_color
-                        case "#000000":
-                            style_dict["stroke"] = _color
-                elem.attrib["style"] = ";".join(
-                    [f"{k}:{v}" for k, v in style_dict.items()]
-                )
-            except Exception:
-                pass
-    _svg_string = ElementTree.tostring(_root, encoding="utf-8")
-    _byte_array = QtCore.QByteArray(_svg_string)
+    if (
+        _dark
+        and path.parent.name in ["_icons", "_mdi_icons"]
+        and get_extension(path) == ".svg"
+    ):
+        path = path.parent / "dark" / path.name
 
-    _renderer = QtSvg.QSvgRenderer(_byte_array)
-    _pixmap = QtGui.QPixmap(128, 128)
-    _pixmap.fill(QtCore.Qt.GlobalColor.transparent)
-
-    _painter = QtGui.QPainter(_pixmap)
-    _renderer.render(_painter)
-    _painter.end()
-
-    return QtGui.QIcon(_pixmap)
+    icon = QtGui.QIcon()
+    icon.addFile(str(path), QtCore.QSize(128, 128))
+    return icon

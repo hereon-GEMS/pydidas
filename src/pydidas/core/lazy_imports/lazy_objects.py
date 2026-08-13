@@ -198,3 +198,22 @@ class LazyDict(dict):
     def __bool__(self) -> bool:
         self._ensure_initialized()
         return len(self) > 0
+
+    def get(self, key: object, default: Any = None) -> Any:
+        """
+        Return the value for *key* if present, else *default*.
+
+        Parameters
+        ----------
+        key : object
+            The key to look up.
+        default : object, optional
+            Value returned when *key* is absent. Default is None.
+
+        Returns
+        -------
+        Any
+            The stored value or *default*.
+        """
+        self._ensure_initialized()
+        return super().get(key, default)

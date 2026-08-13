@@ -444,5 +444,22 @@ def test_lazy_dict__parametrized_contents(mapping):
     assert {k: ld[k] for k in ld} == mapping
 
 
+def test_lazy_dict__get_returns_value_for_existing_key():
+    ld = _make_lazy_dict({"x": 42})
+    assert ld.get("x") == 42
+
+
+def test_lazy_dict__get_returns_default_for_missing_key():
+    ld = _make_lazy_dict({"x": 42})
+    assert ld.get("missing") is None
+    assert ld.get("missing", 99) == 99
+
+
+def test_lazy_dict__get_triggers_initialization():
+    ld = _make_lazy_dict({"x": 1})
+    _ = ld.get("x")
+    assert ld._initialized
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

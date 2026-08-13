@@ -80,6 +80,13 @@ def test_lazy_object__call_various_signatures(args):
     assert isinstance(result, Path)
 
 
+def test_lazy_object__resolve_returns_real_class():
+    from pathlib import Path
+
+    proxy = LazyObject("pathlib", "Path")
+    assert proxy.resolve() is Path
+
+
 def test_lazy_object__real_obj_cached_after_call():
     proxy = LazyObject("pathlib", "Path")
     proxy()
@@ -186,6 +193,31 @@ def test_lazy_object__mro_entries_returns_tuple_with_real_class():
     from pathlib import Path
 
     assert result == (Path,)
+
+
+def test_lazy_object__or_two_lazy_objects():
+    import types
+
+    proxy_a = LazyObject("pathlib", "Path")
+    proxy_b = LazyObject("pathlib", "PurePath")
+    union = proxy_a | proxy_b
+    assert isinstance(union, types.UnionType)
+
+
+def test_lazy_object__or_with_real_type():
+    import types
+
+    proxy = LazyObject("pathlib", "Path")
+    union = proxy | int
+    assert isinstance(union, types.UnionType)
+
+
+def test_lazy_object__ror_with_real_type():
+    import types
+
+    proxy = LazyObject("pathlib", "Path")
+    union = int | proxy
+    assert isinstance(union, types.UnionType)
 
 
 # ---------------------------------------------------------------------------

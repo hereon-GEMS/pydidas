@@ -31,7 +31,12 @@ __all__ = [
     "CalibrationContext",
     "Detector",
     "Distortion",
+    "ExperimentTask",
     "Geometry",
+    "GeometryTask",
+    "IntegrationTask",
+    "MaskTask",
+    "PeakPickingTask",
     "PixelMarker",
     "PoniFile",
     "convert_from_Fit2d",
@@ -54,22 +59,39 @@ if TYPE_CHECKING:
     from pyFAI.gui.CalibrationContext import CalibrationContext
     from pyFAI.gui.CalibrationWindow import MenuItem as CalibWindowMenuItem
     from pyFAI.gui.model.MarkerModel import PixelMarker
+    from pyFAI.gui.tasks.ExperimentTask import ExperimentTask
+    from pyFAI.gui.tasks.GeometryTask import GeometryTask
+    from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
+    from pyFAI.gui.tasks.MaskTask import MaskTask
+    from pyFAI.gui.tasks.PeakPickingTask import PeakPickingTask
     from pyFAI.gui.utils.projecturl import get_documentation_url
     from pyFAI.integrator.azimuthal import AzimuthalIntegrator
     from pyFAI.io.ponifile import PoniFile
     from pyFAI.resources import silx_integration
 else:
-    CalibrationContext = LazyObject(
-        "pyFAI.gui.CalibrationContext", "CalibrationContext"
-    )
-    CalibWindowMenuItem = LazyObject("pyFAI.gui.CalibrationWindow", "MenuItem")
-    Detector = LazyObject("pyFAI.detectors", "Detector")
-    Distortion = LazyObject("pyFAI.distortion", "Distortion")
-    Geometry = LazyObject("pyFAI.geometry.core", "Geometry")
+    # base classes:
     AzimuthalIntegrator = LazyObject(
         "pyFAI.integrator.azimuthal", "AzimuthalIntegrator"
     )
+    Detector = LazyObject("pyFAI.detectors", "Detector")
+    Distortion = LazyObject("pyFAI.distortion", "Distortion")
+    Geometry = LazyObject("pyFAI.geometry.core", "Geometry")
+
+    # Contexts
+    CalibrationContext = LazyObject(
+        "pyFAI.gui.CalibrationContext", "CalibrationContext"
+    )
+
+    # GUI classes:
+    CalibWindowMenuItem = LazyObject("pyFAI.gui.CalibrationWindow", "MenuItem")
+    GeometryTask = LazyObject("pyFAI.gui.tasks.GeometryTask", "GeometryTask")
+    ExperimentTask = LazyObject("pyFAI.gui.tasks.ExperimentTask", "ExperimentTask")
+    IntegrationTask = LazyObject("pyFAI.gui.tasks.IntegrationTask", "IntegrationTask")
+    MaskTask = LazyObject("pyFAI.gui.tasks.MaskTask", "MaskTask")
+    PeakPickingTask = LazyObject("pyFAI.gui.tasks.PeakPickingTask", "PeakPickingTask")
     PixelMarker = LazyObject("pyFAI.gui.model.MarkerModel", "PixelMarker")
+
+    # utilities:
     PoniFile = LazyObject("pyFAI.io.ponifile", "PoniFile")
     convert_from_Fit2d = LazyObject("pyFAI.geometry.fit2d", "convert_from_Fit2d")
     convert_to_Fit2d = LazyObject("pyFAI.geometry.fit2d", "convert_to_Fit2d")

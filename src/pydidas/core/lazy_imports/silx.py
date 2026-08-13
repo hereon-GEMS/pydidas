@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "Colormap",
+    "ImageToolBar",
     "Plot1D",
     "Plot2D",
     "PlotAction",
@@ -48,8 +49,10 @@ if TYPE_CHECKING:
     from silx.gui.plot.actions import PlotAction
     from silx.gui.plot.items import Scatter
     from silx.gui.plot.PlotToolButtons import PlotToolButton
+    from silx.gui.plot.tools import ImageToolBar
 else:
     Colormap = LazyObject("silx.gui.colors", "Colormap")
+    ImageToolBar = LazyObject("silx.gui.plot.tools", "ImageToolBar")
     Plot1D = LazyObject("silx.gui.plot", "Plot1D")
     Plot2D = LazyObject("silx.gui.plot", "Plot2D")
     PlotAction = LazyObject("silx.gui.plot.actions", "PlotAction")

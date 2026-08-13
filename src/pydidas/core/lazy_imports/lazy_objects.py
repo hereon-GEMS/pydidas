@@ -71,6 +71,20 @@ class LazyObject:
             self._real_obj = getattr(_module, self._attr_name)
         return self._real_obj
 
+    def resolve(self) -> object:
+        """
+        Return the real underlying object, importing it if necessary.
+
+        Use this when the proxy must be passed to code that requires an
+        actual Python type (e.g. Qt's ``findChildren``).
+
+        Returns
+        -------
+        object
+            The resolved class or callable.
+        """
+        return self._resolve()
+
     def __call__(self, *args: object, **kwargs: object) -> object:
         _object = self._resolve()
         return _object(*args, **kwargs)
@@ -87,6 +101,16 @@ class LazyObject:
     def __mro_entries__(self, bases: tuple) -> tuple:
         """Support using a LazyObject as a base class."""
         return (self._resolve(),)
+
+    def __or__(self, other: object) -> object:
+        """Support the | operator for type union expressions."""
+        _other = other._resolve() if isinstance(other, LazyObject) else other
+        return self._resolve() | _other
+
+    def __ror__(self, other: object) -> object:
+        """Support the | operator when LazyObject is on the right-hand side."""
+        _other = other._resolve() if isinstance(other, LazyObject) else other
+        return _other | self._resolve()
 
     def __repr__(self) -> str:
         return f"<lazy proxy for {self._module_path}.{self._attr_name}>"

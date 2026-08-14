@@ -853,7 +853,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperiment.set_beamcenter_from_fit2d_params">
-<span class="sig-name descname"><span class="pre">set_beamcenter_from_fit2d_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.set_beamcenter_from_fit2d_params" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_beamcenter_from_fit2d_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperiment.set_beamcenter_from_fit2d_params" title="Link to this definition">#</a></dt>
 <dd><p>Set the beamcenter in detector pixel coordinates.</p>
 <p>The center_x and center_y parameters define the position of the beam center on
 the detector. The optional rot_x, rot_y and rot_beam allow to add a rotation
@@ -865,15 +865,15 @@ the image geometry of Fit2D (flipped horizontally) is assumed by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>center_x</strong> (<em>Real</em>) – The position of the x beam center in pixels.</p></li>
-<li><p><strong>center_y</strong> (<em>Real</em>) – The position of the y beam center in pixels.</p></li>
-<li><p><strong>det_dist</strong> (<em>Real</em>) – The distance between sample and detector beam center in meters.</p></li>
+<li><p><strong>center_x</strong> (<em>float</em>) – The position of the x beam center in pixels.</p></li>
+<li><p><strong>center_y</strong> (<em>float</em>) – The position of the y beam center in pixels.</p></li>
+<li><p><strong>det_dist</strong> (<em>float</em>) – The distance between sample and detector beam center in meters.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are:</p>
 <dl class="simple">
-<dt>tilt<span class="classifier">Real, optional</span></dt><dd><p>The tilt of the detector, given in rotation unit. The default is 0.</p>
+<dt>tilt<span class="classifier">float, optional</span></dt><dd><p>The tilt of the detector, given in rotation unit. The default is 0.</p>
 </dd>
-<dt>tilt_plane: Real, optional</dt><dd><p>The rotation of the tilt plane of the detector, given in rot unit. The
-default is 0.</p>
+<dt>tilt_plane: float, optional</dt><dd><p>The rotation of the tilt plane of the detector, given in the
+selected rotation unit (can be degree or rad). The default is 0.</p>
 </dd>
 <dt>rot_unit<span class="classifier">str, optional</span></dt><dd><p>The unit of the rotation angles. Allowed choices are ‘degree’ and ‘rad’.
 The default is degree.</p>
@@ -2036,7 +2036,7 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.contexts.DiffractionExperimentContext.set_beamcenter_from_fit2d_params">
-<span class="sig-name descname"><span class="pre">set_beamcenter_from_fit2d_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Real</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.set_beamcenter_from_fit2d_params" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_beamcenter_from_fit2d_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.contexts.DiffractionExperimentContext.set_beamcenter_from_fit2d_params" title="Link to this definition">#</a></dt>
 <dd><p>Set the beamcenter in detector pixel coordinates.</p>
 <p>The center_x and center_y parameters define the position of the beam center on
 the detector. The optional rot_x, rot_y and rot_beam allow to add a rotation
@@ -2048,15 +2048,15 @@ the image geometry of Fit2D (flipped horizontally) is assumed by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>center_x</strong> (<em>Real</em>) – The position of the x beam center in pixels.</p></li>
-<li><p><strong>center_y</strong> (<em>Real</em>) – The position of the y beam center in pixels.</p></li>
-<li><p><strong>det_dist</strong> (<em>Real</em>) – The distance between sample and detector beam center in meters.</p></li>
+<li><p><strong>center_x</strong> (<em>float</em>) – The position of the x beam center in pixels.</p></li>
+<li><p><strong>center_y</strong> (<em>float</em>) – The position of the y beam center in pixels.</p></li>
+<li><p><strong>det_dist</strong> (<em>float</em>) – The distance between sample and detector beam center in meters.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Supported keyword arguments are:</p>
 <dl class="simple">
-<dt>tilt<span class="classifier">Real, optional</span></dt><dd><p>The tilt of the detector, given in rotation unit. The default is 0.</p>
+<dt>tilt<span class="classifier">float, optional</span></dt><dd><p>The tilt of the detector, given in rotation unit. The default is 0.</p>
 </dd>
-<dt>tilt_plane: Real, optional</dt><dd><p>The rotation of the tilt plane of the detector, given in rot unit. The
-default is 0.</p>
+<dt>tilt_plane: float, optional</dt><dd><p>The rotation of the tilt plane of the detector, given in the
+selected rotation unit (can be degree or rad). The default is 0.</p>
 </dd>
 <dt>rot_unit<span class="classifier">str, optional</span></dt><dd><p>The unit of the rotation angles. Allowed choices are ‘degree’ and ‘rad’.
 The default is degree.</p>

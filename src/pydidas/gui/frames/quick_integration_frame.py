@@ -38,7 +38,7 @@ from qtpy import QtCore
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import get_generic_param_collection
-from pydidas.core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_MODELS_OF_SHAPES
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.data_io import import_data
 from pydidas.gui.frames.builders.quick_integration_frame_builder import (

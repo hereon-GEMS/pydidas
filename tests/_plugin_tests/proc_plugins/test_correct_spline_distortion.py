@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import shutil
 import tempfile
 import unittest
@@ -30,8 +31,9 @@ import warnings
 from pathlib import Path
 
 import numpy as np
-import pyFAI
+from pyFAI.detectors import Detector
 from pyFAI.distortion import Distortion
+from pyFAI.spline import Spline
 from qtpy import QtCore
 
 from pydidas.core import Dataset, UserConfigError
@@ -63,7 +65,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         for _dir, _ext in enumerate(["shrink", "expand"]):
             _factor = 1 - 2 * _dir
             cls._spline_files[_ext] = cls._temppath / f"spline_file_{_ext}.txt"
-            _spline = pyFAI.spline.Spline()
+            _spline = Spline()
             _spline.zeros(
                 xmax=cls.data_shape[1], ymax=cls.data_shape[0], pixSize=(1, 1)
             )
@@ -82,7 +84,7 @@ class TestCorrectSplineDistortion(unittest.TestCase):
             _spline.write(cls._spline_files[_ext])
 
             cls.spline = _spline
-            _detector = pyFAI.detector_factory("FReLoN")
+            _detector = Detector.factory("FReLoN")
             _detector.set_splineFile(cls._spline_files[_ext])
             cls._detectors[_ext] = _detector
             cls._corrections[_ext] = Distortion(cls._detectors[_ext])
@@ -129,8 +131,8 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         plugin.set_param_value("spline_file", self._spline_files["shrink"])
         plugin.set_param_value("geometry", "Fit2D")
         plugin.pre_execute()
-        self.assertIsInstance(plugin._detector, pyFAI.detectors.Detector)
-        self.assertIsInstance(plugin._correction, pyFAI.distortion.Distortion)
+        self.assertIsInstance(plugin._detector, Detector)
+        self.assertIsInstance(plugin._correction, Distortion)
         self.check_shrunk_nan_mask(plugin._nan_mask)
 
     def test_pre_execute__fit2d_geo_expand(self):
@@ -138,8 +140,8 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         plugin.set_param_value("spline_file", self._spline_files["expand"])
         plugin.set_param_value("geometry", "Fit2D")
         plugin.pre_execute()
-        self.assertIsInstance(plugin._detector, pyFAI.detectors.Detector)
-        self.assertIsInstance(plugin._correction, pyFAI.distortion.Distortion)
+        self.assertIsInstance(plugin._detector, Detector)
+        self.assertIsInstance(plugin._correction, Distortion)
         self.assertTrue(np.allclose(plugin._nan_mask, 0))
 
     def test_pre_execute__pyFAI_spline_geometry(self):
@@ -147,8 +149,8 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         plugin.set_param_value("spline_file", self._spline_files["shrink"])
         plugin.set_param_value("geometry", "pyFAI")
         plugin.pre_execute()
-        self.assertIsInstance(plugin._detector, pyFAI.detectors.Detector)
-        self.assertIsInstance(plugin._correction, pyFAI.distortion.Distortion)
+        self.assertIsInstance(plugin._detector, Detector)
+        self.assertIsInstance(plugin._correction, Distortion)
         self.check_shrunk_nan_mask(np.flipud(plugin._nan_mask))
 
     def test_execute__pyFAI_shrink_no_fill(self):

@@ -36,10 +36,8 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, get_generic_param_collection
-from pydidas.core.constants import (
-    FONT_METRIC_CONFIG_WIDTH,
-    PYFAI_DETECTOR_NAMES,
-)
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
 from pydidas.data_io import import_data
 from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,

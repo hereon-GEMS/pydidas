@@ -32,8 +32,6 @@ from pathlib import Path
 from typing import ClassVar
 
 import numpy as np
-from skimage.io import imread, imsave
-from tifffile import TiffFileError
 
 from pydidas.core import Dataset
 from pydidas.core.constants import TIFF_EXTENSIONS
@@ -79,6 +77,9 @@ class TiffIo(IoBase):
         data : pydidas.core.Dataset
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
+        from skimage.io import imread
+        from tifffile import TiffFileError
+
         with CatchFileErrors(filename, TiffFileError), warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             _data = imread(filename)
@@ -112,6 +113,8 @@ class TiffIo(IoBase):
 
         """
         cls.check_for_existing_file(filename, **kwargs)
+        from skimage.io import imsave
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             if data.dtype.type in [np.float64, np.longdouble]:

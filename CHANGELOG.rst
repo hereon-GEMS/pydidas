@@ -20,6 +20,7 @@ Improvements
   ".nxs".
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
+- Added lazy imports of pyFAI to improve startup time.
 
 Programmatic changes
 --------------------
@@ -42,6 +43,7 @@ Programmatic changes
 - Added a ProcessingResultSaver class to handle export of results.
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
+- Updated the way pydidas handles font scaling on silx colorbars
 
 
 Bugfixes

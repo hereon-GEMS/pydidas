@@ -89,15 +89,18 @@ known-local-folder = ["pydidas", "pydidas_qtcore"]
 max-complexity = 13
 
 [tool.ruff.lint.per-file-ignores]
+# C901: complex structure
+# E402 module level import not at top of file
 # F401 module imported but unused
 # F403 ‘from module import *’ used; unable to detect undefined names
 # F405 name may be undefined, or defined from star imports: module
-# E402 module level import not at top of file
-# E501 line too long
-# W605 invalid escape sequence
+# N999: invalid-module-name
 "__init__.py" = ["F401", "F403", "F405", "F821"]
 "pydidas/__init__.py" = ["F401", "F403", "F405", "E402", "I"]
 "app_processor.py" = ["C901"]
+# ignore invalid module name for pyFAI.py, which is a lazy wrapper for
+# the pyFAI library:
+"pyFAI.py" = ["N999"]
 
 [tool.pytest.ini_options]
 addopts = "-m 'not slow and not gui'"

@@ -28,12 +28,11 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import ClassVar
-
-import fabio
+from typing import Any, ClassVar
 
 from pydidas.core import Dataset
 from pydidas.core.constants import FABIO_EXTENSIONS
+from pydidas.core.lazy_imports.fabio import fabio_open
 from pydidas.core.utils import CatchFileErrors
 from pydidas.data_io.implementations.io_base import IoBase
 
@@ -47,33 +46,37 @@ class FabioIo(IoBase):
     dimensions: ClassVar[list[int]] = [2]
 
     @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: dict):
+    def import_from_file(cls, filename: Path | str, **kwargs: Any):
         """
         Read an image from a FabIO-supported file format.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
-            The filename
-        roi : Union[tuple, None], optional
-            A region of interest for cropping. Acceptable are both 4-tuples
-            of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice objects. If None, the full image
-            will be returned. The default is None.
-        returnType : Union[datatype, 'auto'], optional
-            If 'auto', the image will be returned in its native data type.
-            If a specific datatype has been selected, the image is converted
-            to this type. The default is 'auto'.
-        binning : int, optional
-            The rebinning factor to be applied to the image. The default
-            is 1.
+        filename : Path or str
+            The filename to read the image from.
+        **kwargs : Any
+            Additional keyword arguments to be passed to the import function.
+            Supported keywords are:
+
+            roi : tuple or None, optional
+                A region of interest for cropping. Acceptable are both
+                4-tuples of integers in the format (y_low, y_high, x_low,
+                x_high) and 2-tuples of integers or slice objects.
+                If None, the full image will be returned. The default is None.
+            returnType : datatype or 'auto', optional
+                If 'auto', the image will be returned in its native data
+                type. If a specific datatype has been selected, the image
+                is converted to this type. The default is 'auto'.
+            binning : int, optional
+                The rebinning factor to be applied to the image. The default
+                is 1.
 
         Returns
         -------
-        image : pydidas.core.Dataset
+        image : Dataset
             The image in form of a Dataset (with embedded metadata)
         """
-        with CatchFileErrors(filename, Exception), fabio.open(filename) as _file:
+        with CatchFileErrors(filename, Exception), fabio_open(filename) as _file:
             _data = _file.data
             _header = _file.header
 

@@ -28,15 +28,14 @@ import logging
 from numbers import Real
 
 import numpy as np
-import pyFAI
 import pytest
+from pyFAI.detectors import Detector
+from pyFAI.geometry import Geometry
 from qtpy import QtTest
 
 from pydidas import IS_QT6
 from pydidas.contexts import DiffractionExperimentIo
-from pydidas.contexts.diff_exp import (
-    DiffractionExperiment,
-)
+from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.core.math import Point
 from pydidas.unittest_objects import SignalSpy
@@ -151,7 +150,7 @@ def test_get_detector(diff_exp, det_name):
     diff_exp.set_param_value("detector_name", det_name)
     _target_pxsize = _pixelsize * 1e-6 if det_name == "Custom 9M" else 75e-6
     _det = diff_exp.get_detector()
-    assert isinstance(_det, pyFAI.detectors.Detector)
+    assert isinstance(_det, Detector)
     assert _det.max_shape == (_TEST_SHAPE if det_name == "Custom 9M" else (3269, 3110))
     assert _det.pixel1 == pytest.approx(_target_pxsize)
     assert _det.pixel2 == pytest.approx(_target_pxsize)
@@ -191,7 +190,7 @@ def test_det_shape__setter_w_generic_detector(diff_exp):
 
 def test_det_corners__getter(exp_with_Eiger9M):
     _corners = exp_with_Eiger9M.det_corners
-    _ref_det = pyFAI.detector_factory("Eiger 9M")
+    _ref_det = Detector.factory("Eiger 9M")
     _ny, _nx = _ref_det.max_shape
     assert len(_corners) == 4
     assert isinstance(_corners, list)
@@ -217,7 +216,7 @@ def test_as_pyfai_geometry(exp_with_Eiger9M):
     for _key, _val in _pyfai_geo_params.items():
         exp_with_Eiger9M.set_param_value(f"detector_{_key}", _val)
     _geo = exp_with_Eiger9M.as_pyfai_geometry()
-    assert isinstance(_geo, pyFAI.geometry.Geometry)
+    assert isinstance(_geo, Geometry)
     for _key, _val in _pyfai_geo_params.items():
         assert getattr(_geo, _key) == pytest.approx(_val)
 
@@ -309,7 +308,7 @@ def test_update_from_diffraction_exp(diff_exp):
 
 def test_update_from_pyfai_geometry__no_detector(diff_exp):
     diff_exp.set_param_value("detector_name", "Eiger 9M")
-    _geo = pyFAI.geometry.Geometry()
+    _geo = Geometry()
     for _key, _val in _pyfai_geo_params.items():
         setattr(_geo, _key, _val)
     diff_exp.update_from_pyfai_geometry(_geo)
@@ -319,9 +318,9 @@ def test_update_from_pyfai_geometry__no_detector(diff_exp):
 
 
 def test_update_from_pyfai_geometry__custom_detector(diff_exp):
-    _det = pyFAI.detectors.Detector(pixel1=12e-6, pixel2=24e-6, max_shape=(1234, 567))
+    _det = Detector(pixel1=12e-6, pixel2=24e-6, max_shape=(1234, 567))
     _det.aliases = ["Dummy"]
-    _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector=_det)
+    _geo = Geometry(**_pyfai_geo_params, detector=_det)
     diff_exp.update_from_pyfai_geometry(_geo)
     for _key, _val in _pyfai_geo_params.items():
         assert diff_exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)
@@ -336,8 +335,8 @@ def test_update_from_pyfai_geometry__custom_detector(diff_exp):
 
 
 def test_update_from_pyfai_geometry__generic_detector(diff_exp):
-    _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector="Eiger 9M")
-    _det = pyFAI.detector_factory("Eiger 9M")
+    _geo = Geometry(**_pyfai_geo_params, detector="Eiger 9M")
+    _det = Detector.factory("Eiger 9M")
     diff_exp.update_from_pyfai_geometry(_geo)
     for _key, _val in _pyfai_geo_params.items():
         assert diff_exp.get_param_value(f"detector_{_key}") == pytest.approx(_val)

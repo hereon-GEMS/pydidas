@@ -76,6 +76,9 @@ Bugfixes
   ShowInformationForResult popup window.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
+- Fixed an issue with selecting binary and HDF5 files in the 
+  SelectDataFrameWidget which did not correctly reset the parameter 
+  widgets.
 
 
 v26.05.19

@@ -92,6 +92,10 @@ def create_pydidas_icon(icon_name: str) -> QtGui.QIcon:
     _filename = _filenames[0]
     if _filename.suffix == ".svg":
         return _create_icon_from_svg(_filename)
+    _app = PydidasQApplication.instance()
+    _dark = _app.is_dark_mode if _app else False
+    if _dark and (_filename.parent / "dark" / _filename.name).is_file():
+        return QtGui.QIcon(str(_filename.parent / "dark" / _filename.name))
     return QtGui.QIcon(str(_filename))
 
 

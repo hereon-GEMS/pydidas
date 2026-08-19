@@ -81,7 +81,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, filename: str | Path | None = None, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, filename: str | Path | None = None, **kwargs: Any):
         """
         Initialize the DiffractionExperiment instance.
 
@@ -480,10 +480,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             The geometry in Fit2D nomenclature with center_x, center_y, det_dist,
             tilt and tilt_plane keys and float values.
         """
-        if (
-            self.get_param_value("detector_pxsizex") == 0
-            or self.get_param_value("detector_pxsizey") == 0
-        ):
+        if not self.detector_is_valid:
             raise UserConfigError(
                 "The detector pixel size of 0 is invalid for a fit2d geometry."
             )

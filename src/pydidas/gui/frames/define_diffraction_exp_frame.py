@@ -440,3 +440,4 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.set_param_and_widget_value("detector_rot1", rot1)
         self.set_param_and_widget_value("detector_rot2", rot2)
         self.set_param_and_widget_value("detector_rot3", rot3)
+        self._update_beamcenter()

@@ -81,6 +81,8 @@ Bugfixes
   widgets.
 - Fixed an issue in the FileDialog which displayed a text field by default
   even if empty.
+- Fixed an issue in the DefineDiffractionExperiment frame which did not update
+  the displayed beamcenter after importing Fit2d parameters.
 
 
 v26.05.19

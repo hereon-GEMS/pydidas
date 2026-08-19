@@ -30,27 +30,23 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PyfaiCalibFrame"]
 
+
 import argparse
-import functools
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+from pyFAI.gui.tasks import AbstractCalibrationTask
 from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtWidgets import QToolBar
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.core.lazy_imports.pyFAI import (
+    AbstractCalibrationTask,
     CalibrationContext,
-    CalibWindowMenuItem,
-    ExperimentTask,
-    GeometryTask,
     IntegrationTask,
-    MaskTask,
-    PeakPickingTask,
     PixelMarker,
     calib2_configure_parser_arguments,
     calib2_setup_model,
@@ -58,89 +54,12 @@ from pydidas.core.lazy_imports.pyFAI import (
     pyFAI_root_file,
     silx_integration,
 )
-from pydidas.core.lazy_imports.silx import ImageToolBar
-from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
+from pydidas.gui.utils.pyfai_calib_frame_utils import create_calib_tasks, populate_menu
+from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.silx_plot import actions
 
 
 EXP = DiffractionExperimentContext()
-
-
-def _create_calib_tasks() -> list[
-    ExperimentTask | MaskTask | PeakPickingTask | GeometryTask | IntegrationTask
-]:
-    """
-    Create the tasks for the calibration.
-
-    This function will also overload the generic tasks and add a CropHistogramOutlier
-    action to the toolbars and change the default file dialog to use the pydidas
-    file dialog.
-
-    Returns
-    -------
-    tasks : list
-        The list with the task instances.
-    """
-    _experiment_task: ExperimentTask = ExperimentTask()
-    _mask_task: MaskTask = MaskTask()
-    _peak_task: PeakPickingTask = PeakPickingTask()
-    _geometry_task: GeometryTask = GeometryTask()
-    _integration_task: IntegrationTask = IntegrationTask()
-    _tasks = [
-        _experiment_task,
-        _mask_task,
-        _peak_task,
-        _geometry_task,
-        _integration_task,
-    ]
-
-    for _item in ["_imageLoader", "_maskLoader", "_darkLoader", "_flatLoader"]:
-        _obj = getattr(_experiment_task, _item)
-        _action = actions.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
-        _obj.addAction(_action)
-        _obj.setDefaultAction(_action)
-        _obj.setText("...")
-    for _task in [_experiment_task, _mask_task, _peak_task, _geometry_task]:
-        _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
-        _toolbar = _plot.findChildren(ImageToolBar.resolve())[0]
-        _histo_crop_action = actions.CropHistogramOutliersAction(
-            _plot, parent=_plot, forced_image_legend="image"
-        )
-        _autoscale_min_max_action = actions.AutoscaleToMinMaxAction(
-            _plot, parent=_plot, forced_image_legend="image"
-        )
-        _autoscale_mean_3sigma_action = actions.AutoscaleToMeanAndThreeSigmaAction(
-            _plot, parent=_plot, forced_image_legend="image"
-        )
-        _widget_action = next(
-            _action
-            for _action in _toolbar.actions()
-            if isinstance(_action, QtWidgets.QWidgetAction)
-        )
-        _toolbar.addAction(_histo_crop_action)
-        _toolbar.addAction(_autoscale_min_max_action)
-        _toolbar.addAction(_autoscale_mean_3sigma_action)
-        _toolbar.insertAction(_widget_action, _histo_crop_action)
-        _toolbar.insertAction(_widget_action, _autoscale_min_max_action)
-        _toolbar.insertAction(_widget_action, _autoscale_mean_3sigma_action)
-    # explicitly hide the "3D visualization" action:
-    for _task in [_experiment_task, _geometry_task]:
-        _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
-        for tb in _plot.findChildren(QToolBar):
-            for _action in tb.actions():
-                if _action.text() == "3D visualization":
-                    _action.setVisible(False)
-    # disable the default ring option in the peak picking task:
-    _peak_task._PeakPickingTask__createNewRingOption.setChecked(False)
-    # insert a button for exporting to DiffractionExperimentContext:
-    _save_poni_button = _integration_task._savePoniButton
-    _save_poni_button_parent_layout = _save_poni_button.parent().layout()
-    _integration_task._update_context_button = QtWidgets.QPushButton(
-        "Update pydidas diffraction setup from calibration"
-    )
-    _save_poni_button_parent_layout.addWidget(_integration_task._update_context_button)
-    return _tasks
 
 
 class PyfaiCalibFrame(BaseFrame):
@@ -163,7 +82,7 @@ class PyfaiCalibFrame(BaseFrame):
     def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         self._setup_pyfai_context()
-        self._tasks = _create_calib_tasks()
+        self._tasks : list[AbstractCalibrationTask] = create_calib_tasks()
         self.__export_dialog = PydidasFileDialog()
 
     def _setup_pyfai_context(self) -> None:
@@ -179,7 +98,6 @@ class PyfaiCalibFrame(BaseFrame):
         _parser = argparse.ArgumentParser()
         calib2_configure_parser_arguments(_parser)
         _parsed_options, _ = _parser.parse_known_args()
-        CalibrationContext._releaseSingleton()
         _calibration_context = CalibrationContext(_settings)
         _calibration_context.restoreSettings()
         _calibration_context.setParent(self)
@@ -215,6 +133,7 @@ class PyfaiCalibFrame(BaseFrame):
         )
         for task in self._tasks:
             self._widgets["task_stack"].addWidget(task)
+        populate_menu(self._widgets["task_list"], self._tasks)
         self.setUpdatesEnabled(True)
 
     def connect_signals(self) -> None:
@@ -225,19 +144,7 @@ class PyfaiCalibFrame(BaseFrame):
         self._widgets["but_help"].clicked.connect(self._display_help)
         for _task in self._tasks:
             _task.nextTaskRequested.connect(self.display_next_task)
-            _inverted_icon = icon_with_inverted_colors(_task.windowIcon())
-            _menu_item = CalibWindowMenuItem(self._widgets["task_list"])
-            _menu_item.setText(_task.windowTitle())
-            _menu_item.setIcon(_inverted_icon)
-            _task.warningUpdated.connect(
-                functools.partial(self._update_task_state, _task, _menu_item)
-            )
-        self._tasks[2].widgetShow.connect(self._update_peak_picking_task_menu)
-        if len(self._tasks) > 0:
-            self._widgets["task_list"].setCurrentRow(0)
-            # Hide the nextStep button of the last task
-            _last_task: Any = self._tasks[-1]
-            _last_task.setNextStepVisible(False)
+        self._widgets["task_list"].setCurrentRow(0)
         _integration_task: IntegrationTask = self._tasks[4]
         _integration_task._savePoniButton.clicked.disconnect()
         _integration_task._savePoniButton.clicked.connect(self._export_poni)
@@ -254,38 +161,10 @@ class PyfaiCalibFrame(BaseFrame):
             task.setModel(self._calibration_model)
 
     @QtCore.Slot()
-    def _update_peak_picking_task_menu(self) -> None:
-        """Update the peak picking task menu width to show all actions."""
-        _peak_task: PeakPickingTask = self._tasks[2]
-        _splitter: QtWidgets.QSplitter = _peak_task.splitter
-        _sizes = _splitter.sizes()
-        _splitter.setSizes([_sizes[0], int(1.2 * _sizes[1])])
-        # disconnect slot to make sure the modification is only applied once:
-        _peak_task.widgetShow.disconnect(self._update_peak_picking_task_menu)
-
-    @QtCore.Slot()
     def _display_help(self) -> None:
         """Display the help for the pyFAI calibration."""
         _url = get_documentation_url("usage/cookbook/calib-gui/index.html")
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(_url))
-
-    @QtCore.Slot(object, object)
-    def _update_task_state(self, task: Any, item: "CalibWindowMenuItem") -> None:
-        """
-        Update the task state.
-
-        This method re-implements the generic CalibrationWindow method which
-        would be missing in the pydidas implementation.
-
-        Parameters
-        ----------
-        task : Any
-            The associated task widget.
-        item : CalibWindowMenuItem
-            The associated menu item.
-        """
-        _task: Any = task
-        item.setWarnings(_task.nextStepWarning())
 
     @QtCore.Slot()
     def display_next_task(self) -> None:
@@ -362,20 +241,26 @@ class PyfaiCalibFrame(BaseFrame):
         """Store the fitted geometry in the DiffractionExperimentContext."""
         geo = self._calibration_model.fittedGeometry()
         det = self._calibration_model.experimentSettingsModel().detector()
-        EXP.set_param_value(
-            "xray_wavelength", float(np.round(geo.wavelength().value() * 1e10, 12))
-        )
-        EXP.set_param_value("detector_dist", geo.distance().value())
-        EXP.set_param_value("detector_poni1", geo.poni1().value())
-        EXP.set_param_value("detector_poni2", geo.poni2().value())
-        EXP.set_param_value("detector_rot1", geo.rotation1().value())
-        EXP.set_param_value("detector_rot2", geo.rotation2().value())
-        EXP.set_param_value("detector_rot3", geo.rotation3().value())
-        EXP.set_param_value("detector_name", det.name)
-        EXP.set_param_value("detector_npixx", det.shape[1])
-        EXP.set_param_value("detector_npixy", det.shape[0])
-        EXP.set_param_value("detector_pxsizex", 1e6 * det.pixel2)
-        EXP.set_param_value("detector_pxsizey", 1e6 * det.pixel1)
-        _mask = self._get_mask_filename()
-        if _mask is not None:
-            EXP.set_param_value("detector_mask_file", _mask)
+        try:
+            EXP.set_param_value(
+                "xray_wavelength", float(np.round(geo.wavelength().value() * 1e10, 12))
+            )
+            EXP.set_param_value("detector_dist", geo.distance().value())
+            EXP.set_param_value("detector_poni1", geo.poni1().value())
+            EXP.set_param_value("detector_poni2", geo.poni2().value())
+            EXP.set_param_value("detector_rot1", geo.rotation1().value())
+            EXP.set_param_value("detector_rot2", geo.rotation2().value())
+            EXP.set_param_value("detector_rot3", geo.rotation3().value())
+            EXP.set_param_value("detector_name", det.name)
+            EXP.set_param_value("detector_npixx", det.shape[1])
+            EXP.set_param_value("detector_npixy", det.shape[0])
+            EXP.set_param_value("detector_pxsizex", 1e6 * det.pixel2)
+            EXP.set_param_value("detector_pxsizey", 1e6 * det.pixel1)
+            _mask = self._get_mask_filename()
+            if _mask is not None:
+                EXP.set_param_value("detector_mask_file", _mask)
+        except (TypeError, ValueError):
+            raise UserConfigError(
+                "Cannot export the fitted model. Please verify that the fit was "
+                "successful."
+            )

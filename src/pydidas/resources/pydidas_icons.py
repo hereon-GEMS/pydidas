@@ -47,6 +47,10 @@ ICON_PATH = Path(__file__).parent / "_icons"
 MDI_ICON_PATH = Path(__file__).parent / "_mdi_icons"
 
 
+_app = PydidasQApplication.instance()
+APP_IN_DARK_MODE = _app.is_dark_mode if _app else False
+
+
 def pydidas_icon() -> QtGui.QIcon:
     """Create a QIcon from the pydidas icon."""
     return QtGui.QIcon(str(ICON_PATH / "pydidas_snakes.svg"))
@@ -92,9 +96,7 @@ def create_pydidas_icon(icon_name: str) -> QtGui.QIcon:
     _filename = _filenames[0]
     if _filename.suffix == ".svg":
         return _create_icon_from_svg(_filename)
-    _app = PydidasQApplication.instance()
-    _dark = _app.is_dark_mode if _app else False
-    if _dark and (_filename.parent / "dark" / _filename.name).is_file():
+    if APP_IN_DARK_MODE and (_filename.parent / "dark" / _filename.name).is_file():
         return QtGui.QIcon(str(_filename.parent / "dark" / _filename.name))
     return QtGui.QIcon(str(_filename))
 
@@ -128,12 +130,10 @@ def create_mdi_icon(icon_name: str) -> QtGui.QIcon:
 
 def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     """Create a QIcon from a svg image at the given path."""
-    _app = PydidasQApplication.instance()
-    _dark = _app.is_dark_mode if _app else False
     path = Path(path)
 
     if (
-        _dark
+        APP_IN_DARK_MODE
         and path.parent.name in ["_icons", "_mdi_icons"]
         and get_extension(path) == ".svg"
     ):

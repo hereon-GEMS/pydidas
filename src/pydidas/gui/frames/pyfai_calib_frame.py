@@ -36,7 +36,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from pyFAI.gui.tasks import AbstractCalibrationTask
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
@@ -82,7 +81,7 @@ class PyfaiCalibFrame(BaseFrame):
     def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         self._setup_pyfai_context()
-        self._tasks : list[AbstractCalibrationTask] = create_calib_tasks()
+        self._tasks: list[AbstractCalibrationTask] = create_calib_tasks()
         self.__export_dialog = PydidasFileDialog()
 
     def _setup_pyfai_context(self) -> None:

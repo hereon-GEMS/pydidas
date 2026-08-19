@@ -50,6 +50,7 @@ from pydidas.data_io import IoManager, import_data
 from pydidas.resources import icons
 from pydidas.widgets.dialogues.select_data_frame_dialog import SelectDataFrameDialog
 from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 if TYPE_CHECKING:
@@ -390,7 +391,8 @@ class PydidasLoadImageAction(QtWidgets.QAction):
             "caption": caption,
             "qsettings_ref": ref,
         }
-        self.setText("Use pydidas file dialog")
+        self.setText("Use pydidas file dialog to open an image")
+        self.setIcon(get_pyqt_icon_from_str("qt-std::SP_DialogOpenButton"))
 
     @QtCore.Slot()
     def _execute(self) -> None:

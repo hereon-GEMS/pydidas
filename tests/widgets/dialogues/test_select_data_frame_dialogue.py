@@ -193,9 +193,9 @@ def test__load_and_display__on_file_read_error__clears_plot(dialog) -> None:
             side_effect=FileReadError("read error"),
         ),
         patch.object(dialog._widgets["plot"], "clear") as mock_clear,
+        pytest.raises(FileReadError),
     ):
-        with pytest.raises(FileReadError):
-            dialog._load_and_display("bad_file.npy", {})
+        dialog._load_and_display("bad_file.npy", {})
     mock_clear.assert_called_once()
 
 

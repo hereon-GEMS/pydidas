@@ -79,6 +79,8 @@ Bugfixes
 - Fixed an issue with selecting binary and HDF5 files in the 
   SelectDataFrameWidget which did not correctly reset the parameter 
   widgets.
+- Fixed an issue in the FileDialog which displayed a text field by default
+  even if empty.
 
 
 v26.05.19

@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["SelectDataFrameDialog"]
 
 
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -132,6 +133,7 @@ class SelectDataFrameDialog(QtWidgets.QDialog, CreateWidgetsMixIn):
         self._widgets["selector"].sig_file_valid.connect(self._process_file_validity)
         self._widgets["but_confirm"].clicked.connect(self._confirm)
         self._widgets["but_abort"].clicked.connect(self.reject)
+        self.rejected.connect(partial(self._process_file_validity, False))
 
     # ========================================================================
     # Public methods and attributes

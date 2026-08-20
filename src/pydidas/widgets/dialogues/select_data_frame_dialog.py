@@ -207,9 +207,9 @@ class SelectDataFrameDialog(QtWidgets.QDialog, CreateWidgetsMixIn):
             _data = import_data(fname, **config)
             self._selected_frame = _data
             self._widgets["plot"].plot_pydidas_dataset(_data)
+            self._process_file_validity(True)
         except FileReadError:
-            self._selected_frame = None
-            self._widgets["plot"].clear()
+            self._process_file_validity(False)
             raise
 
     @QtCore.Slot()

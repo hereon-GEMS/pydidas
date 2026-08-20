@@ -175,8 +175,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self._toggle_file_selection(False, emit_signal=False)
             self._widgets["binary_decoder"].set_new_filename(_fname)
         else:
-            self._toggle_file_selection(True)
             self._selected_new_frame()
+            self._toggle_file_selection(True)
 
     def _toggle_file_selection(self, selected: bool, emit_signal: bool = True) -> None:
         """

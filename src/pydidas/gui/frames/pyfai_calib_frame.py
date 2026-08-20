@@ -145,7 +145,6 @@ class PyfaiCalibFrame(BaseFrame):
             _task.nextTaskRequested.connect(self.display_next_task)
         self._widgets["task_list"].setCurrentRow(0)
         _integration_task: IntegrationTask = self._tasks[4]
-        _integration_task._savePoniButton.clicked.disconnect()
         _integration_task._savePoniButton.clicked.connect(self._export_poni)
         _integration_task._update_context_button.clicked.connect(
             self._update_pydidas_diffraction_exp_context

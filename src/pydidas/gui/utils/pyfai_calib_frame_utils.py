@@ -80,10 +80,9 @@ def create_calib_tasks() -> list[AbstractCalibrationTask]:
     _mask_task: MaskTask = MaskTask()
 
     _peak_task: PeakPickingTask = PeakPickingTask()
+    _peak_task._update_menu_width = _update_peak_picking_task_menu_width
     _disable_new_ring_option(_peak_task)
-    _peak_task.widgetShow.connect(
-        partial(_update_peak_picking_task_menu_width, _peak_task)
-    )
+    _peak_task.widgetShow.connect(_peak_task._update_menu_width)
 
     _geo_task: GeometryTask = GeometryTask()
 

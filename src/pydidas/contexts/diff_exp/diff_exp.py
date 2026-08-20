@@ -36,6 +36,7 @@ from qtpy import QtCore
 
 from pydidas.core import (
     ObjectWithParameterCollection,
+    Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
@@ -81,14 +82,22 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, *args: Any, filename: str | Path | None = None, **kwargs: Any):
+    def __init__(
+        self, *args: Parameter, filename: str | Path | None = None, **kwargs: Any
+    ):
         """
         Initialize the DiffractionExperiment instance.
 
         Parameters
         ----------
+        *args : Parameter
+            Any Parameter instances to add to the DiffractionExperiment.
         filename : str or Path, optional
             File to load DiffractionExperiment configuration from.
+        **kwargs : Any
+            Any additional keyword arguments to set Parameter values. The
+            keys must correspond to the Parameter keys and the values to
+            the new Parameter values.
         """
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
@@ -482,7 +491,8 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         if not self.detector_is_valid:
             raise UserConfigError(
-                "The detector pixel size of 0 is invalid for a fit2d geometry."
+                "The detector is invalid for a fit2d geometry: "
+                "Please check the detector pixel sizes and numbers of pixels."
             )
         _geo = self.as_pyfai_geometry()
         _f2d_geo = convert_to_Fit2d(_geo)

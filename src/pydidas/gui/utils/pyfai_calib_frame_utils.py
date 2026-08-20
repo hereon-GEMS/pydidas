@@ -80,7 +80,9 @@ def create_calib_tasks() -> list[AbstractCalibrationTask]:
     _mask_task: MaskTask = MaskTask()
 
     _peak_task: PeakPickingTask = PeakPickingTask()
-    _peak_task._update_menu_width = _update_peak_picking_task_menu_width
+    _peak_task._update_menu_width = partial(
+        _update_peak_picking_task_menu_width, _peak_task
+    )
     _disable_new_ring_option(_peak_task)
     _peak_task.widgetShow.connect(_peak_task._update_menu_width)
 
@@ -124,7 +126,7 @@ def _update_peak_picking_task_menu_width(task: PeakPickingTask) -> None:
     _sizes = _splitter.sizes()
     _splitter.setSizes([_sizes[0], int(1.2 * _sizes[1])])
     # disconnect slot to make sure the modification is only applied once:
-    task.widgetShow.disconnect(_update_peak_picking_task_menu_width)
+    task.widgetShow.disconnect(task._update_menu_width)
 
 
 def _replace_exp_task_button_actions(exp_task: ExperimentTask) -> None:

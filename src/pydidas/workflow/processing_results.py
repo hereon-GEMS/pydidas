@@ -120,6 +120,11 @@ class ProcessingResults(ObjectWithParameterCollection):
     # ------------------
 
     @property
+    def result_infos(self) -> dict[int, PluginResultInfo]:
+        """Return the dictionary with the result infos for all node IDs."""
+        return {_key: _val.copy() for _key, _val in self._plugin_result_infos.items()}
+
+    @property
     def scan_instance(self) -> Scan:
         """Return the current scan instance."""
         return self._scan

@@ -172,7 +172,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if self.hdf5_file:
             self._process_new_hdf5_filename()
         elif self.binary_file:
-            self._toggle_file_selection(True, emit_signal=False)
+            self._toggle_file_selection(False, emit_signal=False)
             self._widgets["binary_decoder"].set_new_filename(_fname)
         else:
             self._toggle_file_selection(True)

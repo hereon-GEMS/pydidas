@@ -85,6 +85,8 @@ Bugfixes
   the displayed beamcenter after importing Fit2d parameters.
 - Fixed an issue which did not update the derived beamcenter in the 
   DefineDiffractionExperimentFrame on startup with value import.
+- Fixed an issue in the SelectDataFrameWidget which occured when did not allow
+  to open binary images when no other image format was selected beforehand.
 
 
 v26.05.19

@@ -74,8 +74,8 @@ class PydidasPositionInfo(PositionInfo):
             converters=kwargs.get("converters", None),
             parent=kwargs.get("parent", None),
         )
-        self._EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
-        self._EXP.sig_params_changed.connect(self.update_exp_setup_params)
+        self._exp = kwargs.get("diffraction_exp", DiffractionExperimentContext())
+        self._exp.sig_params_changed.connect(self.update_exp_setup_params)
         self._x_widget = self.layout().itemAt(0).widget()
         self._y_widget = self.layout().itemAt(2).widget()
         self._cs_name = "cartesian"
@@ -130,17 +130,14 @@ class PydidasPositionInfo(PositionInfo):
 
     @QtCore.Slot()
     def update_exp_setup_params(self) -> None:
-        """
-        Update beamcenter and detector distance from the DiffractionExperiment.
-        """
+        """Update beamcenter and detector distance from the DiffractionExperiment."""
         try:
-            _fit2d_geo = self._EXP.as_fit2d_geometry_values()
+            _fit2d_geo = self._exp.as_fit2d_geometry_values()
         except UserConfigError:
-            self._plotRef().enable_cs_transform(False)
             return
         self._pixelsize = (
-            self._EXP.get_param_value("detector_pxsizex") * 1e-6,
-            self._EXP.get_param_value("detector_pxsizey") * 1e-6,
+            self._exp.get_param_value("detector_pxsizex") * 1e-6,
+            self._exp.get_param_value("detector_pxsizey") * 1e-6,
         )
         self._beam_center = (
             _fit2d_geo["center_y"],
@@ -247,7 +244,7 @@ class PydidasPositionInfo(PositionInfo):
         tuple[float, float]
             The tuple with the polar q, chi coordinates.
         """
-        _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
+        _lambda = self._exp.get_param_value("xray_wavelength") * 1e-10
         _2theta, _chi = self.pixel_to_cs_2theta_chi(x_pix, y_pix)
         _q = (4 * np.pi / _lambda) * np.sin(_2theta * np.pi / 180 / 2) * 1e-9
         return _q, _chi

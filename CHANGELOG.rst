@@ -83,6 +83,8 @@ Bugfixes
   even if empty.
 - Fixed an issue in the DefineDiffractionExperiment frame which did not update
   the displayed beamcenter after importing Fit2d parameters.
+- Fixed an issue which did not update the derived beamcenter in the 
+  DefineDiffractionExperimentFrame on startup with value import.
 
 
 v26.05.19

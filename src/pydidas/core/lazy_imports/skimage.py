@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The fabio module holds functions exposed by the fabio package, which
+The skimage module holds functions exposed by the skimage package, which
 are lazily imported to reduce initial loading time.
 """
 

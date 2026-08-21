@@ -102,7 +102,7 @@ def test_export_to_file__file_exists_and_overwrite(tmp_path, raw_file):
     _fname = tmp_path / "test_overwrite.bin"
     RawIo.export_to_file(_fname, _data[:11])
     RawIo.export_to_file(_fname, _data, overwrite=True)
-    assert RawIo.import_from_file(_fname_orig, **_READ_KWS).shape == _DATA_SHAPE
+    assert RawIo.import_from_file(_fname, **_READ_KWS).shape == _DATA_SHAPE
 
 
 def test_export_to_file__simple(tmp_path):

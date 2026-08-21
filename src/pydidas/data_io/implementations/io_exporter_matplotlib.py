@@ -91,7 +91,8 @@ class IoExporterMatplotlib(IoBase):
         try:
             plt.rcParams["backend"] = "Agg"
             _figshape, _dpi = calculate_fig_size_arguments(data.shape)
-            fig1, ax = plt.subplots(figsize=_figshape, dpi=50)
+            fig1 = plt.figure(figsize=_figshape, dpi=50)
+            ax = fig1.add_axes([0, 0, 1, 1])
             ax.imshow(
                 data,
                 interpolation="none",
@@ -129,7 +130,7 @@ class IoExporterMatplotlib(IoBase):
         _backend = plt.get_backend()
         try:
             plt.rcParams["backend"] = "Agg"
-            # artifically set the size to a 60:100 ratio for 1D plots
+            # artificially set the size to a 60:100 ratio for 1D plots
             _figshape, _dpi = calculate_fig_size_arguments((60, 100))
             fig1, ax = plt.subplots(figsize=_figshape, dpi=50)
 

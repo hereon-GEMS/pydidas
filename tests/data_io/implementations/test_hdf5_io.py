@@ -28,10 +28,21 @@ import h5py
 import numpy as np
 import pytest
 
+from tests.data_io.implementations.test_io_base import IoBaseTests
+
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils.hdf5 import nxs_write_nxdata
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
+
+
+@pytest.fixture
+def io_class():
+    return Hdf5Io
+
+
+class TestHdf5Io(IoBaseTests):
+    """Runs the generic IoBase tests against Hdf5Io."""
 
 
 @pytest.fixture()
@@ -100,6 +111,15 @@ def test_import_from_file__w_metadata(config):
         assert np.allclose(_data.axis_ranges[_ax], _ref_data.axis_ranges[_ax])
     assert _data.data_label == config["data"].data_label
     assert _data.data_unit == config["data"].data_unit
+
+
+def test_import_from_file__w_metadata_requested_no_nxdata(config):
+    _fname = config["fname"]
+    with h5py.File(_fname, "r+") as _file:
+        _file["entry/data"].attrs["NX_class"] = ""
+    _data = Hdf5Io.import_from_file(config["fname"])
+    _ref_data = config["data"][config["data_slice"]]
+    assert np.allclose(_data, _ref_data)
 
 
 def test_import_from_file__w_metadata__from_axis_1(config):
@@ -286,9 +306,6 @@ def test_import_from_file__w_legacy_data(config, dataset):
                 f"entry/data/axis_{_i}",
                 f"entry/data/axis_{_i}_repr",
             )
-            # _file["entry/data"].attrs["axes"] = [
-            #     f"axis_{_i}_repr" for _i in range(_ref.ndim)
-            # ]
             _file["entry/data/"].create_group(f"axis_{_i}")
             _file[f"entry/data/axis_{_i}"].create_dataset(
                 "range", data=_ref.axis_ranges[_i]
@@ -329,6 +346,14 @@ def test_export_to_file__wrong_structure(config):
 def test_export_to_file__file_exists(config):
     with pytest.raises(FileExistsError):
         Hdf5Io.export_to_file(config["fname"], config["data"])
+
+
+def test_export_to_file__ndarray(config):
+    data = np.random.random((12, 13, 14))
+    Hdf5Io.export_to_file(config["fname"], data, overwrite=True)
+    with h5py.File(config["fname"], "r") as _file:
+        _written_data = _file["entry/data/data"][()]
+    assert np.allclose(_written_data, data)
 
 
 def test_export_to_file_file_exists_and_overwrite(config):

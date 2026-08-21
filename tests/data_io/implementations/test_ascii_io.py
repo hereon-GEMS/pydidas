@@ -30,6 +30,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from tests.data_io.implementations.test_io_base import IoBaseTests
+
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.data_io.implementations.ascii_io import AsciiIo
 
@@ -44,7 +46,7 @@ _test_data = Dataset(
     axis_units=["deg"],
     data_label="test data",
     data_unit="counts",
-    metadata={"test_metadata": 42, "creator": "pytest"},
+    metadata={"test_metadata": 42, "creator": "pytest", "float_item": -1.5},
 )
 
 _TEST_DIR = Path(__file__).parents[2] / "_data"
@@ -99,6 +101,15 @@ def get_data_with_ncols(ncols):
     _properties["axis_units"][1] = ""
     _properties["axis_ranges"][1] = np.arange(ncols)
     return Dataset(_new, **_properties)
+
+
+@pytest.fixture
+def io_class():
+    return AsciiIo
+
+
+class TestAsciiIo(IoBaseTests):
+    """Runs the generic IoBase tests against AsciiIo."""
 
 
 def test_export_to_file__higher_data_dim(temp_path):
@@ -645,6 +656,19 @@ def test_read_metadata_from_file__specfile__corrupt_header(temp_path):
         f.write("#N ab\n1 2 3\n4 5 6\n7 8 9\n")
     with pytest.raises(UserConfigError):
         _metadata = AsciiIo.read_metadata_from_file(temp_path / "test.dat")
+
+
+def test_read_metadata_from_file__txt_wo_metadata(temp_path):
+    _fname = temp_path / "test.txt"
+    _data = _test_data.copy()
+    _data.metadata = {}
+    AsciiIo.export_to_file(_fname, _data, x_column=True, overwrite=True)
+    with open(_fname, "r+") as f:
+        _lines = [l for l in f if l != "'# Metadata:\n'"]
+    with open(_fname, "w") as f:
+        f.writelines(_lines)
+    _metadata = AsciiIo.read_metadata_from_file(_fname)
+    assert "metadata" not in _metadata
 
 
 @pytest.mark.parametrize("ncols", [1, 2, 3])

@@ -29,13 +29,16 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import BINARY_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils import (
+    CatchFileErrors,
+    verify_is_new_file_or_replace_set,
+)
 from pydidas.data_io.implementations.io_base import IoBase
 
 
@@ -47,34 +50,28 @@ class RawIo(IoBase):
     format_name: ClassVar[str] = "Raw binary"
     dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6]
 
-    @classmethod
-    def import_from_file(
-        cls,
-        filename: Path | str,
-        datatype: None | type,
-        shape: tuple = (),
-        **kwargs: dict,
-    ) -> Dataset:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read data from a raw binary data without a header.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename of the file with the data to be imported.
-        datatype : object
+        datatype : type
             The python datatype used for decoding the bit-information of the
             binary file. The default is None which will raise an exception.
-        shape : Union[tuple, list]
+        shape : tuple or list
             The shape of the raw data to be imported. This keyword must be
             used to allow a correct shaping of the raw data. If the shape is
             empty, an Exception will be raised. The default is [].
-        roi : Union[tuple, None], optional
+        roi : tuple or None, optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
             as 2-tuples of integers or slice objects. If None, the full image
             will be returned. The default is None.
-        returnType : Union[datatype, 'auto'], optional
+        astype : type or 'auto', optional
             If 'auto', the image will be returned in its native data type.
             If a specific datatype has been selected, the image is converted
             to this type. The default is 'auto'.
@@ -87,37 +84,44 @@ class RawIo(IoBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        if datatype is None:
-            raise KeyError("The datatype has not been specified.")
+        _dtype = kwargs.get("datatype")
+        if _dtype is None:
+            raise UserConfigError(
+                "The datatype must be specified when importing raw binary data."
+            )
+        _shape = kwargs.get("shape", [])
+        if not _shape:
+            raise UserConfigError(
+                "The shape must be specified when importing raw binary data."
+            )
         _offset = kwargs.get("offset", 0)
         with CatchFileErrors(filename):
-            _data = np.fromfile(filename, dtype=datatype, offset=_offset)
-        if _data.size != np.prod(shape):
-            cls.raise_filereaderror_from_exception(
+            _data = np.fromfile(filename, dtype=_dtype, offset=_offset)
+        if _data.size != np.prod(_shape):
+            RawIo.raise_filereaderror_from_exception(
                 ValueError("The given shape does not match the data size."),
                 str(filename),
             )
-        cls._data = Dataset(_data.reshape(shape))
-        return cls.return_data(**kwargs)
+        _data = Dataset(_data.reshape(_shape))
+        return RawIo.return_data(_data, **kwargs)
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: dict):
+    @staticmethod
+    def export_to_file(filename: Path | str, data: np.ndarray, **kwargs: Any) -> None:
         """
         Export data to raw binary file without a header.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
         overwrite : bool, optional
             Flag to allow overwriting of existing files. The default is False.
-
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         with open(filename, "wb") as _file:
             data.tofile(_file)

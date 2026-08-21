@@ -14,8 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+#
+# Parts of this file have been created using AI tools.
 
-"""Unit tests for pydidas modules."""
+"""Unit tests for pydidas.data_io.implementations.io_base module."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -24,123 +26,134 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import tempfile
-import unittest
-from pathlib import Path
-
 import numpy as np
+import pytest
 
-from pydidas.data_io import IoManager
+from pydidas.core import FileReadError
 from pydidas.data_io.implementations import IoBase
 
 
-def create_tester_class():
-    class Tester(IoBase):
-        format_name = "Tester"
-
-        @classmethod
-        def export_to_file(cls, filename, data, **kwargs):
-            cls._exported = [filename, data, kwargs]
-
-        @classmethod
-        def import_from_file(cls, filename, **kwargs):
-            cls._imported = [filename, kwargs]
+@pytest.fixture
+def io_class():
+    return IoBase
 
 
-class TestIoBase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls._stored_exts_import = IoManager.registry_import.copy()
-        cls._stored_exts_export = IoManager.registry_export.copy()
-        create_tester_class()
-        cls._tmpdir = Path(tempfile.mkdtemp())
+class IoBaseTests:
+    """
+    Generic test class for shared IoBase functionality.
 
-    @classmethod
-    def tearDownClass(cls):
-        IoManager.registry_import = cls._stored_exts_import
-        IoManager.registry_export = cls._stored_exts_export
+    Concrete IoBase subclass test suites can inherit from this class to run
+    all generic tests against their implementation. Redefine the module-level
+    ``io_class`` fixture in the subclass test module to provide the class
+    under test.
+    """
 
-    def setUp(self): ...
+    def test_return_data__no_data(self, io_class):
+        with pytest.raises(ValueError):
+            io_class.return_data(None)
 
-    def tearDown(self): ...
+    def test_return_data__plain(self, io_class):
+        _input = np.random.random((10, 10))
+        _data = io_class.return_data(_input)
+        assert (_input == _data).all()
 
-    def test_export_to_file(self):
-        with self.assertRaises(NotImplementedError):
-            IoBase.export_to_file("", None)
-
-    def test_import_from_file(self):
-        with self.assertRaises(NotImplementedError):
-            IoBase.export_to_file("", None)
-
-    def test_check_for_existing_file__file_exists(self):
-        _fname = self._tmpdir / "test.txt"
-        with _fname.open("w") as f:
-            f.write("Test text")
-        with self.assertRaises(FileExistsError):
-            IoBase.check_for_existing_file(_fname)
-
-    def test_check_for_existing_file__file_exists_overwrite(self):
-        _fname = self._tmpdir / "test.txt"
-        with _fname.open("w") as f:
-            f.write("Test text")
-        IoBase.check_for_existing_file(_fname, overwrite=True)
-        # assert does not raise an error
-
-    def test_check_for_existing_file__file_does_not_exist(self):
-        _fname = self._tmpdir / "test.txt"
-        IoBase.check_for_existing_file(_fname)
-        # assert does not raise an error
-
-    def test_return_data__no_data(self):
-        with self.assertRaises(ValueError):
-            IoBase.return_data()
-
-    def test_return_data__plain(self):
-        IoBase._data = np.random.random((10, 10))
-        _data = IoBase.return_data()
-        self.assertTrue((IoBase._data == _data).all())
-
-    def test_return_data_w_roi(self):
+    def test_return_data__with_roi(self, io_class):
         _roi = [2, 8, 2, 8]
-        IoBase._data = np.random.random((10, 10))
-        _cropped_data = IoBase._data[_roi[0] : _roi[1], _roi[2] : _roi[3]]
-        _data = IoBase.return_data(roi=_roi)
-        self.assertTrue((_cropped_data == _data).all())
+        _input = np.random.random((10, 10))
+        _expected = _input[2:8, 2:8].copy()
+        _data = io_class.return_data(_input, roi=_roi)
+        assert (_expected == _data).all()
 
-    def test_return_data_w_return_type(self):
-        IoBase._data = np.random.random((10, 10))
-        _data = IoBase.return_data(datatype=np.float32)
-        self.assertEqual(_data.dtype, np.float32)
+    def test_return_data__with_return_type(self, io_class):
+        _input = np.random.random((10, 10))
+        _data = io_class.return_data(_input, astype=np.float32)
+        assert _data.dtype == np.float32
 
-    def test_return_data_w_binning(self):
-        IoBase._data = np.random.random((10, 10))
-        _data = IoBase.return_data(binning=2)
-        self.assertEqual(_data.shape, (5, 5))
+    def test_return_data__with_binning(self, io_class):
+        _input = np.random.random((10, 10))
+        _data = io_class.return_data(_input, binning=2)
+        assert _data.shape == (5, 5)
 
-    def test_get_data_range__simple(self):
+    def test_get_data_range__no_bounds(self, io_class):
         _data = np.random.random((15, 15))
-        _range = IoBase.get_data_range(_data)
-        self.assertEqual(_range[0], np.amin(_data))
-        self.assertEqual(_range[1], np.amax(_data))
+        _range = io_class.get_data_range(_data)
+        assert _range[0] == np.amin(_data)
+        assert _range[1] == np.amax(_data)
 
-    def test_get_data_range__lower_bound_only(self):
+    @pytest.mark.parametrize(
+        "data_range,expected_min,expected_max",
+        [
+            ((0.4, None), 0.4, None),
+            ((None, 0.8), None, 0.8),
+            ((0.3, 0.8), 0.3, 0.8),
+        ],
+    )
+    def test_get_data_range__with_bounds(
+        self, io_class, data_range, expected_min, expected_max
+    ):
         _data = np.random.random((15, 15))
-        _range = IoBase.get_data_range(_data, data_range=(0.4, None))
-        self.assertEqual(_range[0], 0.4)
-        self.assertEqual(_range[1], np.amax(_data))
+        _range = io_class.get_data_range(_data, data_range=data_range)
+        assert _range[0] == (
+            expected_min if expected_min is not None else np.amin(_data)
+        )
+        assert _range[1] == (
+            expected_max if expected_max is not None else np.amax(_data)
+        )
 
-    def test_get_data_range__upper_bound_only(self):
-        _data = np.random.random((15, 15))
-        _range = IoBase.get_data_range(_data, data_range=(None, 0.8))
-        self.assertEqual(_range[0], np.amin(_data))
-        self.assertEqual(_range[1], 0.8)
 
-    def test_get_data_range__both_bounds(self):
-        _data = np.random.random((15, 15))
-        _range = IoBase.get_data_range(_data, data_range=(0.3, 0.8))
-        self.assertEqual(_range[0], 0.3)
-        self.assertEqual(_range[1], 0.8)
+class TestIoBase(IoBaseTests):
+    """Runs the generic IoBase tests against IoBase itself."""
+
+
+# ------------------------------------------------------------------
+# IoBase-specific tests (abstract interface)
+# ------------------------------------------------------------------
+
+
+def test_export_to_file__raises_not_implemented():
+    with pytest.raises(NotImplementedError):
+        IoBase.export_to_file("", None)
+
+
+def test_import_from_file__raises_not_implemented():
+    with pytest.raises(NotImplementedError):
+        IoBase.import_from_file("")
+
+
+# ------------------------------------------------------------------
+# raise_filereaderror_from_exception
+# ------------------------------------------------------------------
+
+
+def test_raise_filereaderror_from_exception__raises_file_read_error():
+    _ex = RuntimeError("Something went wrong")
+    with pytest.raises(FileReadError):
+        IoBase.raise_filereaderror_from_exception(_ex, "file.txt")
+
+
+def test_raise_filereaderror_from_exception__short_filename_not_truncated():
+    _ex = RuntimeError("Some error")
+    _fname = "short_file.txt"
+    with pytest.raises(FileReadError) as exc_info:
+        IoBase.raise_filereaderror_from_exception(_ex, _fname)
+    assert _fname in str(exc_info.value)
+    assert "[...]" not in str(exc_info.value)
+
+
+def test_raise_filereaderror_from_exception__long_filename_truncated():
+    _ex = RuntimeError("Some error")
+    _fname = "a" * 70 + ".txt"
+    with pytest.raises(FileReadError) as exc_info:
+        IoBase.raise_filereaderror_from_exception(_ex, _fname)
+    assert "[...]" in str(exc_info.value)
+
+
+def test_raise_filereaderror_from_exception__numeric_first_arg_uses_second():
+    _ex = RuntimeError(42, "Descriptive error message")
+    with pytest.raises(FileReadError) as exc_info:
+        IoBase.raise_filereaderror_from_exception(_ex, "file.txt")
+    assert "Descriptive error message" in str(exc_info.value)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

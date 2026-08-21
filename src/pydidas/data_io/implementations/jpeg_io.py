@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
+
 from typing import ClassVar
 
 from pydidas.core.constants import JPG_EXTENSIONS

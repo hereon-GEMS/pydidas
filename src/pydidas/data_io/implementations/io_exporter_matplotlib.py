@@ -15,10 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Module with the IoExporterMatplotlib class for exporting data in form of matplotlib
-images.
-"""
+"""Module with the IoExporterMatplotlib class for matplotlib-based exports."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -29,11 +26,12 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 
 from pydidas.core import Dataset
+from pydidas.core.utils import verify_is_new_file_or_replace_set
 from pydidas.data_io.implementations.io_base import IoBase
 from pydidas.data_io.utils import calculate_fig_size_arguments
 
@@ -46,33 +44,33 @@ class IoExporterMatplotlib(IoBase):
     format_name: ClassVar[str] = ""
     dimensions: ClassVar[list[int]] = [1, 2]
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: dict):
+    @staticmethod
+    def export_to_file(filename: Path | str, data: np.ndarray, **kwargs: Any) -> None:
         """
         Export data as a matplotlib plot.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
         """
         if data.ndim == 1:
-            cls.export_matplotlib_plot(filename, data, **kwargs)
+            IoExporterMatplotlib.export_matplotlib_plot(filename, data, **kwargs)
         else:
-            cls.export_matplotlib_figure(filename, data, **kwargs)
+            IoExporterMatplotlib.export_matplotlib_figure(filename, data, **kwargs)
 
-    @classmethod
+    @staticmethod
     def export_matplotlib_figure(
-        cls, filename: Path | str, data: np.ndarray, **kwargs: dict
-    ):
+        filename: Path | str, data: np.ndarray, **kwargs: Any
+    ) -> None:
         """
         Export data to a matplotlib file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
@@ -84,19 +82,22 @@ class IoExporterMatplotlib(IoBase):
         data_range : list, optional
             The range with lower and upper bounds for the data export.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         import matplotlib.pyplot as plt
 
-        _range = cls.get_data_range(data, **kwargs)
+        _data_range = IoExporterMatplotlib.get_data_range(data, **kwargs)
         _cmap = kwargs.get("colormap", "gray")
         _backend = plt.get_backend()
         try:
             plt.rcParams["backend"] = "Agg"
             _figshape, _dpi = calculate_fig_size_arguments(data.shape)
-            fig1 = plt.figure(figsize=_figshape, dpi=50)
-            ax = fig1.add_axes([0, 0, 1, 1])
+            fig1, ax = plt.subplots(figsize=_figshape, dpi=50)
             ax.imshow(
-                data, interpolation="none", vmin=_range[0], vmax=_range[1], cmap=_cmap
+                data,
+                interpolation="none",
+                vmin=_data_range[0],
+                vmax=_data_range[1],
+                cmap=_cmap,
             )
             ax.set_xticks([])
             ax.set_yticks([])
@@ -105,32 +106,32 @@ class IoExporterMatplotlib(IoBase):
         finally:
             plt.rcParams["backend"] = _backend
 
-    @classmethod
+    @staticmethod
     def export_matplotlib_plot(
-        cls, filename: Path | str, data: np.ndarray, **kwargs: dict
-    ):
+        filename: Path | str, data: np.ndarray, **kwargs: Any
+    ) -> None:
         """
         Export data to a matplotlib file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
         overwrite : bool, optional
             Flag to allow overwriting of existing files. The default is False.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         import matplotlib.pyplot as plt
 
-        _range = cls.get_data_range(data, **kwargs)
+        _data_range = IoExporterMatplotlib.get_data_range(data, **kwargs)
         _backend = plt.get_backend()
         try:
             plt.rcParams["backend"] = "Agg"
-            _figshape, _dpi = calculate_fig_size_arguments(data.shape)
-            fig1 = plt.figure(figsize=_figshape, dpi=50)
-            ax = fig1.add_axes([0, 0, 1, 1])
+            # artifically set the size to a 60:100 ratio for 1D plots
+            _figshape, _dpi = calculate_fig_size_arguments((60, 100))
+            fig1, ax = plt.subplots(figsize=_figshape, dpi=50)
 
             _x = (
                 data.axis_ranges[0]
@@ -138,7 +139,8 @@ class IoExporterMatplotlib(IoBase):
                 else np.arange(data.size)
             )
 
-            ax.plot(_x, data, vmin=_range[0], vmax=_range[1])
+            ax.plot(_x, data)
+            ax.set_ylim(*_data_range)
             fig1.savefig(filename, dpi=_dpi)
             plt.close(fig1)
         finally:

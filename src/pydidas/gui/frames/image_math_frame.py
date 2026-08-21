@@ -156,7 +156,7 @@ class ImageMathFrame(BaseFrame):
                 f"::{self.get_param_value('hdf5_key', dtype=str)}"
                 f"::{self.get_param_value('hdf5_frame')}"
             )
-        open_kwargs["datatype"] = np.float32
+        open_kwargs["astype"] = np.float32
         self._input["data"] = import_data(filename, **open_kwargs)
         self._input["name"] = _fname
         self._input["path"] = filename

@@ -44,6 +44,8 @@ Programmatic changes
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
 - Updated the way pydidas handles font scaling on silx colorbars
+- When importing data, the return datatype in `import_data` calls must
+  be specified with `astype` instead of `datatype`.
 
 
 Bugfixes
@@ -76,6 +78,8 @@ Bugfixes
   ShowInformationForResult popup window.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
+- Fixed an issue in RawIo class which did not clearly separate input and
+  output datatype assignments.
 
 
 v26.05.19

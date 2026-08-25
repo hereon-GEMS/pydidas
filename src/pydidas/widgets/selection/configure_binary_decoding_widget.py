@@ -64,6 +64,9 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         params : ParameterCollection, optional
             A ParameterCollection with Parameters to share with this widget.
             If not given, new Parameters will be created.
+        show_checkbox : bool
+            Flag whether to show the checkbox to toggle the visibility of the
+            detailed decoding settings. Default is True.
     """
 
     default_params = get_generic_param_collection(
@@ -85,6 +88,8 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "filesize": 0,
         }
         self.__create_widgets()
+        if not kwargs.get("show_checkbox", True):
+            self._widgets["show_decoding_details"].setVisible(False)
 
     def __create_widgets(self) -> None:
         """Create all required widgets."""

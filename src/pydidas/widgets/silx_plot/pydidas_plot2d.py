@@ -390,9 +390,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "cs_transform_valid": False,
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "diffraction_exp": (
-                DiffractionExperimentContext()
-                if kwargs.get("diffraction_exp", None) is None
-                else kwargs.get("diffraction_exp")
+                kwargs.get("diffraction_exp") or DiffractionExperimentContext()
             ),
         }
 
@@ -407,7 +405,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             diffraction_exp=self._config["diffraction_exp"],
         )
         _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
-        # _layout = self.findChild(self._positionWidget.__class__).parent().layout()
         _layout = self._positionWidget.parent().layout()
         _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self._positionWidget = _new_position_widget
@@ -422,17 +419,14 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """Create the custom actions"""
         self._actions: dict[str, QtGui.QAction | QtWidgets.QToolButton] = {}
         # The LockZoomAction can be used to disable automatic zooming
-        # noinspection PyTypeChecker
         self._actions["lock_zoom"] = LockZoomAction(self, parent=self)
 
         # The ChangeCanvasAction will toggle between expanding the canvas
         # and setting a tight canvas fitting to the data
-        # noinspection PyTypeChecker
         self._actions["canvas"] = ChangeCanvasAction(self, parent=self)
 
         # The CropHistogramOutliersAction is used to crop the histogram
         # to ignore low and high outliers in the scaling
-        # noinspection PyTypeChecker
         self._actions["outliers"] = CropHistogramOutliersAction(self, parent=self)
 
         # The AutoscaleToMinMaxAction is used to reset the colormap to
@@ -441,7 +435,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         # The AutoscaleToMeanAndThreeSigmaAction resets the automatic histogram
         # mode to the data mean and 3 sigma ranges
-        # noinspection PyTypeChecker
         self._actions["autoscale_mean_3sigma"] = AutoscaleToMeanAndThreeSigmaAction(
             self, parent=self
         )  # type: ignore[arg-type]
@@ -457,7 +450,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             # allow to transform the coordinate system and to display image
             # coordinates in polar coordinates
             # (with r / mm, 2theta / deg or q / nm^-1) scaling.
-            # noinspection PyTypeChecker
             self._actions["cs_transform"] = CoordinateTransformButton(
                 parent=self,
                 plot=self,

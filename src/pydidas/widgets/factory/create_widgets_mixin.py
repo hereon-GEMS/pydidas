@@ -112,10 +112,19 @@ class CreateWidgetsMixIn:
             The label's displayed text.
         **kwargs : Any
             Any attributes supported by QLabel with a setAttribute method
-            are valid kwargs. In addition, the 'gridPos' keyword can be used
-            to specify the label's position in its parent's layout.
-            The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
-            be used to control the font properties.
+            are valid kwargs. In addition, the following pydidas keywords
+            are supported:
+
+            gridPos : tuple[int, int, int, int]
+                The position of the label in its parent's layout.
+            fontsize_offset : int
+                The offset to the standard font size.
+            bold : bool
+                Whether the font should be bold.
+            italic : bool
+                Whether the font should be italic.
+            underline : bool
+                Whether the font should be underlined.
         """
         self.create_any_widget(ref, PydidasLabel, text, **kwargs)
 

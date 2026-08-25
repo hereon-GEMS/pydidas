@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "AbstractCalibrationTask",
     "AzimuthalIntegrator",
     "CalibWindowMenuItem",
     "CalibrationContext",
@@ -66,6 +67,7 @@ if TYPE_CHECKING:
     from pyFAI.gui.CalibrationContext import CalibrationContext
     from pyFAI.gui.CalibrationWindow import MenuItem as CalibWindowMenuItem
     from pyFAI.gui.model.MarkerModel import PixelMarker
+    from pyFAI.gui.tasks.AbstractCalibrationTask import AbstractCalibrationTask
     from pyFAI.gui.tasks.ExperimentTask import ExperimentTask
     from pyFAI.gui.tasks.GeometryTask import GeometryTask
     from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
@@ -97,6 +99,9 @@ else:
 
     # GUI classes:
     CalibWindowMenuItem = LazyObject("pyFAI.gui.CalibrationWindow", "MenuItem")
+    AbstractCalibrationTask = LazyObject(
+        "pyFAI.gui.tasks.AbstractCalibrationTask", "AbstractCalibrationTask"
+    )
     GeometryTask = LazyObject("pyFAI.gui.tasks.GeometryTask", "GeometryTask")
     ExperimentTask = LazyObject("pyFAI.gui.tasks.ExperimentTask", "ExperimentTask")
     IntegrationTask = LazyObject("pyFAI.gui.tasks.IntegrationTask", "IntegrationTask")

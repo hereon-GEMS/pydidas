@@ -544,6 +544,12 @@ for the DiffractionExperimentContext to file.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pydidas.gui.frames.DefineDiffractionExpFrame.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineDiffractionExpFrame.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the UI and update the beamcenter display.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.frames.DefineDiffractionExpFrame.frame_activated">
 <span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Integral</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.frames.DefineDiffractionExpFrame.frame_activated" title="Link to this definition">#</a></dt>
 <dd><p>Add a check whether the DiffractionExperimentContext has changed from some
@@ -893,11 +899,22 @@ to specify the QWidget’s position in its parent’s layout.</p></li>
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLabel with a setAttribute method
-are valid kwargs. In addition, the ‘gridPos’ keyword can be used
-to specify the label’s position in its parent’s layout.
-The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
-be used to control the font properties.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any attributes supported by QLabel with a setAttribute method
+are valid kwargs. In addition, the following pydidas keywords
+are supported:</p>
+<dl class="simple">
+<dt>gridPos<span class="classifier">tuple[int, int, int, int]</span></dt><dd><p>The position of the label in its parent’s layout.</p>
+</dd>
+<dt>fontsize_offset<span class="classifier">int</span></dt><dd><p>The offset to the standard font size.</p>
+</dd>
+<dt>bold<span class="classifier">bool</span></dt><dd><p>Whether the font should be bold.</p>
+</dd>
+<dt>italic<span class="classifier">bool</span></dt><dd><p>Whether the font should be italic.</p>
+</dd>
+<dt>underline<span class="classifier">bool</span></dt><dd><p>Whether the font should be underlined.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -1175,7 +1192,7 @@ for the DiffractionExperimentContext to file.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
-<dd><p>finalize the UI initialization.</p>
+<dd><p>Finalize the UI and update the beamcenter display.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1694,6 +1711,7 @@ converted to string for display purposes.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.copy_energy_from_pyFAI"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.copy_energy_from_pyFAI</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.copy_geometry_from_pyFAI"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.copy_geometry_from_pyFAI</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.export_to_file"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.export_to_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.finalize_ui"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.finalize_ui</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.frame_activated"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.frame_activated</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.import_from_file"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.import_from_file</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.gui.frames.DefineDiffractionExpFrame.select_beamcenter_manually"><code class="docutils literal notranslate"><span class="pre">DefineDiffractionExpFrame.select_beamcenter_manually</span></code></a></li>

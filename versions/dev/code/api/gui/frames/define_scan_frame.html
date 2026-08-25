@@ -760,11 +760,22 @@ to specify the QWidget’s position in its parent’s layout.</p></li>
 <li><p><strong>ref</strong> (<em>str</em><em> | </em><em>None</em>) – The reference string for storing the widget. If None, the widget
 will automatically get a unique reference number.</p></li>
 <li><p><strong>text</strong> (<em>str</em>) – The label’s displayed text.</p></li>
-<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any attributes supported by QLabel with a setAttribute method
-are valid kwargs. In addition, the ‘gridPos’ keyword can be used
-to specify the label’s position in its parent’s layout.
-The ‘fontsize_offset’, ‘bold’, ‘italic’, ‘underline’ keywords can
-be used to control the font properties.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any attributes supported by QLabel with a setAttribute method
+are valid kwargs. In addition, the following pydidas keywords
+are supported:</p>
+<dl class="simple">
+<dt>gridPos<span class="classifier">tuple[int, int, int, int]</span></dt><dd><p>The position of the label in its parent’s layout.</p>
+</dd>
+<dt>fontsize_offset<span class="classifier">int</span></dt><dd><p>The offset to the standard font size.</p>
+</dd>
+<dt>bold<span class="classifier">bool</span></dt><dd><p>Whether the font should be bold.</p>
+</dd>
+<dt>italic<span class="classifier">bool</span></dt><dd><p>Whether the font should be italic.</p>
+</dd>
+<dt>underline<span class="classifier">bool</span></dt><dd><p>Whether the font should be underlined.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>

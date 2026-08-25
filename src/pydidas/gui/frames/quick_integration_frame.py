@@ -116,8 +116,10 @@ class QuickIntegrationFrame(BaseFrame):
         Build the frame and create all widgets.
         """
         for _method, _args, _kwargs in QUICK_INTEGRATION_FRAME_BUILD_CONFIG:
-            if "input_plot" in _args or "res_plot" in _args:
+            if "input_plot" in _args:
                 _kwargs["diffraction_exp"] = self._EXP
+            if "res_plot" in _args:
+                _kwargs["plot2d_diffraction_exp"] = self._EXP
             if "input_beamcenter_points" in _args:
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:

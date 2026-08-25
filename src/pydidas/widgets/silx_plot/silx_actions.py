@@ -43,11 +43,14 @@ from qtpy.QtGui import QIcon
 from silx.gui.plot.actions import PlotAction
 
 from pydidas.core import PydidasQsettingsMixin, UserConfigError
+from pydidas.core.constants import BINARY_EXTENSIONS, HDF5_EXTENSIONS
 from pydidas.core.lazy_imports.silx import Colormap, plot_items
-from pydidas.core.utils import calculate_histogram_limits
+from pydidas.core.utils import calculate_histogram_limits, has_extension
 from pydidas.data_io import IoManager, import_data
 from pydidas.resources import icons
+from pydidas.widgets.dialogues.select_data_frame_dialog import SelectDataFrameDialog
 from pydidas.widgets.file_dialog import PydidasFileDialog
+from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
 if TYPE_CHECKING:
@@ -382,28 +385,32 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         ref: str | None = None,
     ) -> None:
         QtWidgets.QAction.__init__(self, parent)
-        self.triggered.connect(self.__execute)  # type: ignore[attr-defined]
+        self.triggered.connect(self._execute)  # type: ignore[attr-defined]
         self._dialog = PydidasFileDialog()
         self._dialog_kwargs = {
             "caption": caption,
             "qsettings_ref": ref,
         }
-        self.setText("Use pydidas file dialog")
+        self.setText("Use pydidas file dialog to open an image")
+        self.setIcon(get_pyqt_icon_from_str("qt-std::SP_DialogOpenButton"))
 
     @QtCore.Slot()
-    def __execute(self) -> None:
-        """
-        Execute the dialog and select a filename.
-        """
+    def _execute(self) -> None:
+        """Execute the dialog and select a filename."""
         _filename = self._dialog.get_existing_filename(
             caption=self._dialog_kwargs["caption"],
             formats=IoManager.get_string_of_formats(),
             qsettings_ref=self._dialog_kwargs["qsettings_ref"],
         )
         if _filename is not None:
-            _image = import_data(_filename).array
-            if _image.ndim == 3:
-                _image = _image.mean(axis=0)
+            if has_extension(_filename, HDF5_EXTENSIONS + BINARY_EXTENSIONS):
+                _image = SelectDataFrameDialog.get_frame(filename=_filename)
+                if _image is None:
+                    return
+            else:
+                _image = import_data(_filename).array
+                if _image.ndim == 3:
+                    _image = _image.mean(axis=0)
             if _image.ndim != 2:
                 raise UserConfigError("The input data is not a 2D image.")
             self.parent()._setValue(filename=_filename, data=_image)  # type: ignore[attr-defined]

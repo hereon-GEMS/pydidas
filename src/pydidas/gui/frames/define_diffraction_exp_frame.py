@@ -122,6 +122,11 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
+    def finalize_ui(self) -> None:
+        """Finalize the UI and update the beamcenter display."""
+        super().finalize_ui()
+        self._update_beamcenter()
+
     def set_param_and_widget_value(
         self, key: str, value: Any, emit_signal: bool = True
     ) -> None:
@@ -440,3 +445,4 @@ class DefineDiffractionExpFrame(BaseFrame):
         self.set_param_and_widget_value("detector_rot1", rot1)
         self.set_param_and_widget_value("detector_rot2", rot2)
         self.set_param_and_widget_value("detector_rot3", rot3)
+        self._update_beamcenter()

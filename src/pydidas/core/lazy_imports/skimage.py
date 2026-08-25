@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
+# Copyright 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,26 +16,27 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PngIo class for exporting png data.
+The skimage module holds functions exposed by the skimage package, which
+are lazily imported to reduce initial loading time.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = []
+__all__ = ["TiffFileError", "imread", "imsave"]
 
 
-from typing import ClassVar
+from typing import TYPE_CHECKING
 
-from pydidas.core.constants.file_extensions import PNG_EXTENSIONS
-from pydidas.data_io.implementations.io_exporter_matplotlib import IoExporterMatplotlib
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 
 
-class PngIo(IoExporterMatplotlib):
-    """IObase implementation for png files."""
-
-    extensions_export: ClassVar[list[str]] = PNG_EXTENSIONS
-    extensions_import: ClassVar[list[str]] = []
-    format_name: ClassVar[str] = "Png"
+if TYPE_CHECKING:
+    from skimage.io import imread, imsave
+    from tifffile import TiffFileError
+else:
+    imsave = LazyObject("skimage.io", "imsave")
+    imread = LazyObject("skimage.io", "imread")
+    TiffFileError = LazyObject("tifffile", "TiffFileError")

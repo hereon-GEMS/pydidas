@@ -32,6 +32,7 @@ from typing import Any
 import numpy as np
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtWidgets
+from silx.gui import qt
 from silx.gui.plot import Plot1D
 
 from pydidas.core import Dataset
@@ -43,6 +44,7 @@ from pydidas.widgets.silx_plot.utilities import (
     get_allowed_kwargs,
     get_column_labels,
 )
+from pydidas_qtcore import PydidasQApplication
 
 
 class PydidasPlot1D(Plot1D):
@@ -58,10 +60,11 @@ class PydidasPlot1D(Plot1D):
         self.getFitAction().setVisible(False)  # type: ignore[attr-defined]
 
         self._qtapp = QtWidgets.QApplication.instance()
+        self._pydidasapp = PydidasQApplication.instance()
         if hasattr(self._qtapp, "sig_mpl_font_change"):
             self._qtapp.sig_mpl_font_change.connect(self._update_mpl_fonts)
 
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)  # noqa
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self._add_lock_zoom_action()
         if kwargs.get("use_special_plots", True):
             self._add_special_plot_actions()
@@ -207,6 +210,8 @@ class PydidasPlot1D(Plot1D):
             self.setActiveCurve(_label.format(value=data.axis_ranges[0][0]))
         if _reset_zoom and not self._lock_zoom_action.locked:
             QtCore.QTimer.singleShot(0, self.resetZoom)
+        if self._pydidasapp.is_dark_mode:
+            self.invert_plot1d_icons()
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes
@@ -339,3 +344,32 @@ class PydidasPlot1D(Plot1D):
         if _curve is None:
             return
         self.setBackend("matplotlib")  # type: ignore[arg-type]
+
+    def invert_plot1d_icons(self):
+        """
+        Inverts some buttons in the toolbar for darkmode
+        """
+        _icons_to_invert = [
+            "Pan mode",
+            "X Autoscale",
+            "Y Autoscale",
+            "X Log. scale",
+            "Y Log. scale",
+            "Grid",
+            "Curve style",
+            "Save as...",
+            "Print...",
+        ]
+        for _action in self.findChildren(qt.QAction):
+            if _action.property("_is_inverted"):
+                continue
+            _text = _action.text() if callable(_action.text) else _action.text
+            if _text in _icons_to_invert:
+                _icon = _action.icon()
+                if not _icon.isNull():
+                    _pixmap = _icon.pixmap(32, 32)
+                    _image = _pixmap.toImage()
+                    _image.invertPixels()
+                    _new_icon = qt.QIcon(qt.QPixmap.fromImage(_image))
+                    _action.setIcon(_new_icon)
+                    _ = _action.setProperty("_is_inverted", True)

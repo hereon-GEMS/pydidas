@@ -31,7 +31,6 @@ import argparse
 import signal
 import sys
 import weakref
-from typing import Tuple
 
 import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager
@@ -51,7 +50,7 @@ QtCore.QLocale.setDefault(_LOCALE)
 
 
 _TEST_TEXT = (
-    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z abcdefghijklmnopqrstuvwxyz"  # noqa
+    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z abcdefghijklmnopqrstuvwxyz"
 )
 
 
@@ -82,7 +81,7 @@ def parse_cmd_args():
     return _kwargs
 
 
-def sigint_signal_handler(signal_num: int, frame: object):  # noqa
+def sigint_signal_handler(signal_num: int, frame: object):
     """
     Handle the SIGINT signal to gracefully shut down when pressing Ctrl+C.
 
@@ -322,7 +321,7 @@ class PydidasQApplication(QApplication):
         self.sig_font_size_changed.emit()
         self._update_matplotlib_font_family()
 
-    def qFontMetrics(self) -> QtGui.QFontMetrics:  # noqa C0103
+    def qFontMetrics(self) -> QtGui.QFontMetrics:
         """
         Get the QFontMetrics object for the current font.
 
@@ -380,7 +379,7 @@ class PydidasQApplication(QApplication):
         return self.__font_config["font_metric_width"]
 
     @property
-    def font_metrics(self) -> Tuple[float, float]:
+    def font_metrics(self) -> tuple[float, float]:
         """
         Get the font metrics for width and height.
 

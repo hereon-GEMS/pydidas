@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
 from numbers import Integral
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -61,7 +61,12 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             Flag to enable coordinate system transformations.
     """
 
-    init_kwargs = ["parent", "cs_transform", "use_data_info_action", "diffraction_exp"]
+    init_kwargs: ClassVar[list[str]] = [
+        "parent",
+        "cs_transform",
+        "use_data_info_action",
+        "diffraction_exp",
+    ]
     sig_get_more_info_for_data = QtCore.Signal(float, float)
 
     def __init__(self, **kwargs: Any) -> None:

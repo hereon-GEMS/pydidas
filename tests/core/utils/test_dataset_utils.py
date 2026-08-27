@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -93,7 +93,7 @@ class Test_dataset_utils(unittest.TestCase):
         self.assertEqual(dataset_default_attribute("data_unit", (1,)), "")
 
     def dataset_default_attribute___get_item_key(self):
-        self.assertEqual(dataset_default_attribute("_get_item_key", (1,)), tuple())
+        self.assertEqual(dataset_default_attribute("_get_item_key", (1,)), ())
 
     def test_get_number_of_entries__ndarray(self):
         _arr = np.arange(27)
@@ -206,9 +206,8 @@ class Test_dataset_utils(unittest.TestCase):
         ]
         _shape = (10, 10)
         for _curr_ranges in _ranges:
-            with self.subTest(range=_curr_ranges):
-                with self.assertRaises(ValueError):
-                    convert_ranges_and_check_length(_curr_ranges, _shape)
+            with self.subTest(range=_curr_ranges), self.assertRaises(ValueError):
+                convert_ranges_and_check_length(_curr_ranges, _shape)
 
     def test_convert_ranges_and_check_length__incorrect_type(self):
         _ranges = [
@@ -218,9 +217,8 @@ class Test_dataset_utils(unittest.TestCase):
         ]
         _shape = (10, 10)
         for _curr_ranges in _ranges:
-            with self.subTest(range=_curr_ranges):
-                with self.assertRaises(ValueError):
-                    convert_ranges_and_check_length(_curr_ranges, _shape)
+            with self.subTest(range=_curr_ranges), self.assertRaises(ValueError):
+                convert_ranges_and_check_length(_curr_ranges, _shape)
 
     def test_convert_ranges_and_check_length__single_value(self):
         _ranges = {0: np.arange(10), 1: 5, 2: 20 - np.arange(10)}

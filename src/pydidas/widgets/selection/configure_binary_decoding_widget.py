@@ -29,7 +29,7 @@ __all__ = ["ConfigureBinaryDecodingWidget"]
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -64,12 +64,15 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
         params : ParameterCollection, optional
             A ParameterCollection with Parameters to share with this widget.
             If not given, new Parameters will be created.
+        show_checkbox : bool
+            Flag whether to show the checkbox to toggle the visibility of the
+            detailed decoding settings. Default is True.
     """
 
     default_params = get_generic_param_collection(
         "filename", "raw_datatype", "raw_n_y", "raw_n_x", "raw_header_size"
     )
-    init_kwargs = ["params"]
+    init_kwargs: ClassVar[list[str]] = ["params"]
     sig_new_binary_image = QtCore.Signal(Path, dict)
     sig_new_binary_config = QtCore.Signal(dict)
     sig_decoding_invalid = QtCore.Signal()
@@ -85,6 +88,8 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameterCollection, AssociatedFil
             "filesize": 0,
         }
         self.__create_widgets()
+        if not kwargs.get("show_checkbox", True):
+            self._widgets["show_decoding_details"].setVisible(False)
 
     def __create_widgets(self) -> None:
         """Create all required widgets."""

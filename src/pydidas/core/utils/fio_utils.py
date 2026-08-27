@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Module with utilites for reading and analyzing fio files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "update_config_from_fio_file",
-    "determine_header_and_data_lines",
     "create_x_scale",
+    "determine_header_and_data_lines",
     "load_fio_spectrum",
+    "update_config_from_fio_file",
 ]
 
 
@@ -91,9 +91,8 @@ def determine_header_and_data_lines(filename: Path | str) -> tuple[int, int]:
     data_lines : int
         The number of data lines.
     """
-    with CatchFileErrors(filename):
-        with open(filename, "r") as _f:
-            _lines = _f.readlines()
+    with CatchFileErrors(filename), open(filename, "r") as _f:
+        _lines = _f.readlines()
     _lines_total = len(_lines)
     _n_header = _lines.index("! Data \n") + 2
     _lines = _lines[_n_header:]

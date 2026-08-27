@@ -30,7 +30,7 @@ __all__ = ["GenericNode"]
 
 import copy
 from numbers import Integral
-from typing import Any, Self
+from typing import Any, ClassVar, Self
 
 from qtpy import QtCore
 
@@ -40,7 +40,7 @@ from pydidas.core import UserConfigError
 class GenericNode:
     """The GenericNode class is used by trees to manage connections between items."""
 
-    kwargs_for_copy_creation = []
+    kwargs_for_copy_creation: ClassVar[list[str]] = []
 
     @staticmethod
     def _verify_type(item: Any, allowNone: bool = False) -> None:
@@ -161,9 +161,7 @@ class GenericNode:
         bool
             True if the node has no children, else False.
         """
-        if len(self._children) > 0:
-            return False
-        return True
+        return len(self._children) == 0
 
     @property
     def n_children(self) -> int:

@@ -30,7 +30,13 @@ __all__ = ["processor_func"]
 
 import queue
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
+
+from pydidas.core.utils import pydidas_logger
+
+
+logger = pydidas_logger()
 
 
 def processor_func(
@@ -81,8 +87,16 @@ def processor_func(
                 break
             try:
                 _results = function(_arg1, *func_args, **func_kwargs)
-            except Exception as ex:
-                print(f"Exception occurred during function call to: {function}: {ex}")
+            except (
+                ValueError,
+                FileNotFoundError,
+                OSError,
+                TypeError,
+                ArithmeticError,
+            ) as ex:
+                logger.debug(
+                    f"Exception occurred during function call to: {function}: {ex}"
+                )
                 # For some arcane reason, sleep time required to stop queues from
                 # becoming corrupted.
                 time.sleep(0.02)

@@ -392,7 +392,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
             try:
                 self.get_widget_by_name(_frame_name).inject_frame_state(_state)
             except UserConfigError as exc:
-                _errors += f"Frame '{_frame_name}':\n{str(exc)}\n"
+                _errors += f"Frame '{_frame_name}':\n{exc!s}\n"
             _unrestored_frames.remove(_frame_name)
         if _errors:
             raise UserConfigError(f"--- Frame states ---\n{_errors}")

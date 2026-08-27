@@ -28,9 +28,10 @@ __all__ = ["CoordinateTransformButton"]
 
 
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from qtpy import QtCore, QtWidgets
+from qtpy.QtGui import QIcon
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from pydidas.contexts import DiffractionExperimentContext
@@ -51,7 +52,7 @@ class CoordinateTransformButton(PlotToolButton):
     Tool button to change the coordinate system in 2d plots to use radial geometries.
     """
 
-    CS_CONFIG = {
+    CS_CONFIG: ClassVar[dict[tuple[str, str], str | QIcon]] = {
         ("cartesian", "icon"): create_pydidas_icon("silx_coordinates_xy_cartesian.png"),
         ("cartesian", "state"): "Cartesian x/y coordinates",
         ("cartesian", "action"): "Use cartesian x / y coordinates [px]",

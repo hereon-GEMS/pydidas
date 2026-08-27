@@ -7,11 +7,12 @@ GitPython>=3.1.46
 ipython>=9.9
 isort>=7.0.0
 pip-audit
+pip-compile-cross-platform>=2.0
 pip-tools>=7.5.2
 PyQt5-stubs>=5.15.6
 PySide6-stubs>=6.7
 pytest>=9.0.2
 pytest-qt>=4.5.0
 reuse>=6.2.0
-ruff>=0.14.13
+ruff>=0.16.1
 setuptools>=82.0.1

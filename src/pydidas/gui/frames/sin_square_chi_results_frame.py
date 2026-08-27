@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the sin square chi residual stress analysis plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -223,9 +223,9 @@ class SinSquareChiResultsFrame(BaseFrame):
         data_source : str
             The new data source to set.
         """
-        self.param_widgets["selected_data_source"].setReadOnly(False)  # noqa E1101
+        self.param_widgets["selected_data_source"].setReadOnly(False)
         self.set_param_and_widget_value("selected_data_source", data_source)
-        self.param_widgets["selected_data_source"].setReadOnly(True)  # noqa E1101
+        self.param_widgets["selected_data_source"].setReadOnly(True)
 
     @QtCore.Slot()
     def _import_workflow_results(self):
@@ -278,26 +278,26 @@ class SinSquareChiResultsFrame(BaseFrame):
         """
         self._plots.set_scan(self.__current_results.frozen_scan)
         self._sin_square_chi_node_keys = {
-            self.__current_results._config["result_titles"][_key]: _key
-            for _key, _val in self.__current_results._config["plugin_names"].items()
-            if StoreSinSquareChiData.plugin_name in _val
+            _info.result_title: _key
+            for _key, _info in self.__current_results.result_infos.items()
+            if StoreSinSquareChiData.plugin_name == _info.plugin_name
         } | {"no selection": -1}
         self.set_param_value_and_choices(
             "selected_sin_square_chi_node",
-            list(self._sin_square_chi_node_keys)[0],
+            next(iter(self._sin_square_chi_node_keys)),
             list(self._sin_square_chi_node_keys),
         )
         self.param_widgets["selected_sin_square_chi_node"].update_choices(
             self.params["selected_sin_square_chi_node"].choices
         )
         self._sin_2chi_node_keys = {
-            self.__current_results._config["result_titles"][_key]: _key
-            for _key, _val in self.__current_results._config["plugin_names"].items()
-            if StoreSinTwoChiData.plugin_name in _val
+            _info.result_title: _key
+            for _key, _info in self.__current_results.result_infos.items()
+            if StoreSinTwoChiData.plugin_name == _info.plugin_name
         } | {"no selection": -1}
         self.set_param_value_and_choices(
             "selected_sin_2chi_node",
-            list(self._sin_2chi_node_keys)[0],
+            next(iter(self._sin_2chi_node_keys)),
             list(self._sin_2chi_node_keys),
         )
         self.param_widgets["selected_sin_2chi_node"].update_choices(
@@ -319,7 +319,9 @@ class SinSquareChiResultsFrame(BaseFrame):
             _node_id = getattr(self, f"_sin_{_key}_node_keys")[_node_str]
             _show = self.get_param_value(f"show_sin_{_key}_results")
             if _node_id > 0 and _show:
-                _data = self.__current_results.get_results_for_flattened_scan(_node_id)
+                _data = self.__current_results.get_results(
+                    _node_id, flatten_scan_dims=True
+                )
                 if _key == "square_chi" and not self.get_param_value(
                     "show_sin_square_chi_branches"
                 ):

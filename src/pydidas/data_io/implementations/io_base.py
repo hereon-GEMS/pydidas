@@ -30,6 +30,7 @@ __all__ = ["IoBase"]
 
 from numbers import Integral
 from pathlib import Path
+from typing import Any, ClassVar
 
 from numpy import amax, amin, ndarray
 
@@ -44,17 +45,17 @@ class IoBase(metaclass=IoManager):
     Base class for Metaclass-based importer/exporters.
     """
 
-    extensions_export = []
-    extensions_import = []
-    format_name = ""
-    dimensions = []
-    allows_metadata_import = False
+    extensions_export: ClassVar[list[str]] = []
+    extensions_import: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = ""
+    dimensions: ClassVar[list[int]] = []
+    allows_metadata_import: ClassVar[bool] = False
 
-    _roi_controller = RoiSliceManager()
+    _roi_controller: ClassVar[RoiSliceManager] = RoiSliceManager()
     _data = None
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: dict):
+    @staticmethod
+    def export_to_file(filename: Path | str, data: ndarray, **kwargs: Any) -> None:
         """
         Write the content to a file.
 
@@ -67,14 +68,14 @@ class IoBase(metaclass=IoManager):
         data : ndarray
             The data to be written to the file. Pydidas Dataset objects will
             also export their metadata if the file format allows it.
-        **kwargs : dict
+        **kwargs : Any
             Any keyword arguments. Supported keywords must be specified by
             the specific implementation.
         """
         raise NotImplementedError
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: dict) -> Dataset:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Restore the content from a file
 
@@ -82,47 +83,77 @@ class IoBase(metaclass=IoManager):
 
         Parameters
         ----------
-        filename: Path or str
+        filename : Path or str
             The filename of the data file to be imported.
+        **kwargs : Any
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
         raise NotImplementedError
 
-    @classmethod
-    def check_for_existing_file(cls, filename: Path | str, **kwargs: dict):
+    @staticmethod
+    def return_data(data: Dataset, **kwargs: Any) -> Dataset:
         """
-        Check if the file exists and if the overwrite flag has been set.
+        Return the stored data.
 
         Parameters
         ----------
-        filename: Path or str
-            The full filename and path.
-        **kwargs : dict
-            Any keyword arguments. Supported is 'overwrite' [bool], a flag to allow
-            overwriting of existing files.
+        data : Dataset
+            The data to be returned.
+        **kwargs : Any
+            A dictionary of keyword arguments. Supported keyword arguments
+            are:
+
+            astype : type or 'auto', optional
+                The datatype to which the data should be converted. If
+                "auto", the data will be returned in its native datatype.
+                The default is "auto".
+            binning : int, optional
+                The rebinning factor to be applied to the data. The default
+                is 1.
+            roi : tuple or None, optional
+                A region of interest for cropping. Acceptable are both 4-tuples
+                of integers in the format (y_low, y_high, x_low, x_high)
+                and 2-tuples of integers or slice objects. If None, the full
+                image will be returned. The default is None.
 
         Raises
         ------
-        FileExistsError
-            If a file with a filename exists and the overwrite flag is not True.
-        """
-        _overwrite = kwargs.get("overwrite", False)
-        if Path(filename).exists() and not _overwrite:
-            raise FileExistsError(
-                f"The file `{filename}` exists and overwriting has not been confirmed."
-            )
+        ValueError
+            If no data has been read.
 
-    @classmethod
-    def get_data_range(cls, data: Dataset, **kwargs: dict):
+        Returns
+        -------
+        data : Dataset
+            The data in the form of a pydidas Dataset.
+        """
+        _return_type = kwargs.get("astype", "auto")
+        _local_roi = kwargs.get("roi", None)
+        _binning = kwargs.get("binning", 1)
+        if data is None:
+            raise ValueError("No image has been read.")
+        if _local_roi is not None:
+            IoBase._roi_controller.ndim = kwargs.get("ndim", 2)
+            IoBase._roi_controller.roi = _local_roi
+            data = data[IoBase._roi_controller.roi]
+        if _binning != 1:
+            data = rebin(data, int(_binning))
+        if _return_type not in ("auto", data.dtype):
+            data = data.astype(_return_type)
+        return data
+
+    @staticmethod
+    def get_data_range(data: ndarray, **kwargs: Any) -> list:
         """
         Get the data range from the keyword arguments or the data values.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
-            The data to be exported.
-        **kwargs : dict
-            The keyword arguments. This method will only use the "data_range"
-            keyword.
+        data : np.ndarray
+            The data to be inspected.
+        **kwargs : Any
+            The keyword arguments. This method will only use the
+            `data_range` keyword.
 
         Returns
         -------
@@ -137,49 +168,8 @@ class IoBase(metaclass=IoManager):
             _range[1] = amax(data)
         return _range
 
-    @classmethod
-    def return_data(cls, **kwargs: dict) -> Dataset:
-        """
-        Return the stored data.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            A dictionary of keyword arguments. Supported keyword arguments
-            are: "datatype", "binning", "roi".
-
-            "datatype" can be either "auto" for the native datatype or the
-            specified type. "Binning" can be any integer number, and "roi" can
-            be either None or a 4-tuple of float.
-
-        Raises
-        ------
-        ValueError
-            If no data has been read.
-
-        Returns
-        -------
-        _data : pydidas.core.Dataset
-            The data in the form of a pydidas Dataset (a subclassed numpy.ndarray).
-        """
-        _return_type = kwargs.get("datatype", "auto")
-        _local_roi = kwargs.get("roi", None)
-        _binning = kwargs.get("binning", 1)
-        if cls._data is None:
-            raise ValueError("No image has been read.")
-        _data = cls._data
-        if _local_roi is not None:
-            cls._roi_controller.ndim = kwargs.get("ndim", 2)
-            cls._roi_controller.roi = _local_roi
-            _data = _data[cls._roi_controller.roi]
-        if _binning != 1:
-            _data = rebin(_data, int(_binning))
-        if _return_type not in ("auto", _data.dtype):
-            _data = _data.astype(_return_type)
-        return _data
-
     @staticmethod
-    def raise_filereaderror_from_exception(ex: Exception, filename: str):
+    def raise_filereaderror_from_exception(ex: Exception, filename: str) -> None:
         """
         Raise a FileReadError from the given Exception.
 

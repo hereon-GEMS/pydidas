@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ format with different metadata headers.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -31,7 +31,6 @@ __all__ = ["GeneralAsciiSaver"]
 import datetime
 import time
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 
@@ -80,7 +79,7 @@ class GeneralAsciiSaver(OutputPlugin):
         )
     )
 
-    def execute(self, data: Union[np.ndarray, Dataset], **kwargs: dict):
+    def execute(self, data: np.ndarray | Dataset, **kwargs: dict):
         """
         Save data to file in raw ascii text format.
 
@@ -113,8 +112,9 @@ class GeneralAsciiSaver(OutputPlugin):
         _ext, _header = self._get_ext_and_header()
         with open(self.get_output_filename(_ext), "w") as _file:
             _file.write(_header)
-            for _x, _y in zip(data.axis_ranges[0], data.array):
-                _file.write(f"{_x}\t{_y}\n")
+            _file.writelines(
+                f"{_x}\t{_y}\n" for _x, _y in zip(data.axis_ranges[0], data.array)
+            )
         return data, kwargs
 
     def _get_ext_and_header(self) -> tuple[str, str]:
@@ -182,7 +182,7 @@ class GeneralAsciiSaver(OutputPlugin):
         str
             The header string.
         """
-        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
+        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")  # noqa DTZ005
         return (
             f"#F {Path(self.get_output_filename('dat')).name}\n"
             + f"#E {time.time()}\n"

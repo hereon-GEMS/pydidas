@@ -23,7 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
-from typing import Literal
+from typing import ClassVar, Literal
 
 import numpy as np
 import pytest
@@ -35,9 +35,9 @@ from pydidas.data_io.implementations import IoBase
 
 
 class _IoTestClass(IoBase):
-    extensions_export = [".test", ".export"]
-    extensions_import = [".test", ".import"]
-    format_name = "_IoTestClass"
+    extensions_export: ClassVar[list[str]] = [".test", ".export"]
+    extensions_import: ClassVar[list[str]] = [".test", ".import"]
+    format_name: ClassVar[str] = "_IoTestClass"
 
     @classmethod
     def export_to_file(cls, filename, data, **kwargs):
@@ -50,13 +50,13 @@ class _IoTestClass(IoBase):
 
 
 class _IoTestClassWithMetadataImporter(_IoTestClass):
-    extensions_import = [".meta_test"]
-    extensions_export = []
-    format_name = "_IoTestClassWithMetadataImporter"
-    allows_metadata_import = True
+    extensions_import: ClassVar[list[str]] = [".meta_test"]
+    extensions_export: ClassVar[list[str]] = []
+    format_name: ClassVar[str] = "_IoTestClassWithMetadataImporter"
+    allows_metadata_import: ClassVar[bool] = True
 
     @classmethod
-    def read_metadata_from_file(cls, _, **kwargs):  # noqa
+    def read_metadata_from_file(cls, _, **kwargs):
         return {"meta_data": True}
 
 
@@ -160,7 +160,7 @@ def test_get_string_of_formats__simple(
 def test_export_to_file(io_manager_with_test_class):
     _fname = get_random_string(12) + ".test"
     _data = np.random.random((10, 10))
-    _kws = dict(test_kw=True)
+    _kws = {"test_kw": True}
     IoManager.export_to_file(_fname, _data, **_kws)
     assert _IoTestClass._exported[0] == _fname
     assert np.allclose(_IoTestClass._exported[1], _data)
@@ -169,7 +169,7 @@ def test_export_to_file(io_manager_with_test_class):
 
 def test_import_from_file(io_manager_with_test_class):
     _fname = get_random_string(12) + ".test"
-    _kws = dict(test_kw=True)
+    _kws = {"test_kw": True}
     IoManager.import_from_file(_fname, **_kws)
     assert _IoTestClass._imported[0] == _fname
     assert _IoTestClass._imported[1] == _kws

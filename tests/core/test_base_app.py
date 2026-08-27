@@ -155,7 +155,7 @@ def test_copy(base_app):
     _copy = base_app.copy()
     assert base_app != _copy
     assert isinstance(_copy, BaseApp)
-    for _key in _items.keys():
+    for _key in _items:
         assert hasattr(_copy, _key)
     assert base_app.mp_manager["lock"] == _copy.mp_manager["lock"]
     assert base_app.mp_manager["shared_dict"] == _copy.mp_manager["shared_dict"]

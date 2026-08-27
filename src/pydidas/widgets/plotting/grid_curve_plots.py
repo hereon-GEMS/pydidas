@@ -30,7 +30,7 @@ __all__ = ["GridCurvePlot"]
 from functools import partial
 from itertools import product
 from numbers import Integral, Real
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -57,7 +57,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
     A widget to display curve plots in a grid layout.
     """
 
-    init_kwargs = ["n_hor", "n_vert"]
+    init_kwargs: ClassVar[list[str]] = ["n_hor", "n_vert"]
 
     @staticmethod
     def __check_scaling(scaling: Any) -> None:
@@ -111,7 +111,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         self._local_scan = Scan()
 
         self._current_index = -1
-        self.setSizePolicy(*POLICY_EXP_EXP)  # noqa E1120, E1121
+        self.setSizePolicy(*POLICY_EXP_EXP)
         self.create_empty_widget("grid", parent_widget=self, sizePolicy=POLICY_EXP_EXP)
         apply_qt_properties(
             self._widgets["grid"].layout(), horizontalSpacing=30, verticalSpacing=0
@@ -278,7 +278,6 @@ class GridCurvePlot(WidgetWithParameterCollection):
         )
         self._config["active_plot_indices"] = _indices
         self._config["active_plot_keys"] = [f"plot_{_i}_{_j}" for _i, _j in _indices]
-        #
         self._config["plot_visibility_changed"] = True
         self._current_index = min(
             self._config["max_index"] - (self.n_plots - 1), self._current_index
@@ -340,12 +339,12 @@ class GridCurvePlot(WidgetWithParameterCollection):
         """
         if not datasets:
             raise UserConfigError("No datasets provided for plotting.")
-        _sizes = set(_data.shape[0] for _data in datasets.values() if _data is not None)
+        _sizes = {_data.shape[0] for _data in datasets.values() if _data is not None}
         if len(_sizes) > 1:
             raise UserConfigError(
                 "All datasets must have the same size of the 1st dimension."
             )
-        _ndims = set(_data.ndim for _data in datasets.values() if _data is not None)
+        _ndims = {_data.ndim for _data in datasets.values() if _data is not None}
         if not _ndims.issubset({2, 3}):
             raise UserConfigError(
                 "All datasets must be 2- or 3-dimensional (i.e. have 2 or 3 axes)."
@@ -527,7 +526,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         """
         _plot_layout = self._widgets["grid"].layout()
         for _key in [_key for _key in self._widgets if _key.startswith("plot_")]:
-            _comparator = _key.rstrip("_title") if _key.endswith("_title") else _key
+            _comparator = _key.removesuffix("_title")
             self._widgets[_key].setVisible(
                 _comparator in self._config["active_plot_keys"]
             )

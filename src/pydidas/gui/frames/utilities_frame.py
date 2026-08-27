@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Module with the UtilitiesFrame which allows to present and open various utilitie
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,7 @@ __all__ = ["UtilitiesFrame"]
 
 
 from functools import partial
-from typing import Any, Type
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -113,7 +113,7 @@ class UtilitiesFrame(BaseFrame):
         # )
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window: Type[QtWidgets.QWidget]):
+    def create_and_show_temp_window(self, window: type[QtWidgets.QWidget]):
         """
         Show the given temporary window.
 
@@ -132,7 +132,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)
-    def create_and_show_frame(self, frame: Type[BaseFrame]):
+    def create_and_show_frame(self, frame: type[BaseFrame]):
         """
         Show the given frame.
 

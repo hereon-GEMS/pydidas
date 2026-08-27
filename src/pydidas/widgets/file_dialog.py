@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
+from qtpy.QtCore import QModelIndex
 
 from pydidas.contexts import ScanContext
 from pydidas.core import (
@@ -58,7 +59,7 @@ class SelectionModel(QtCore.QIdentityProxyModel):
     unselectable.
     """
 
-    def flags(self, index) -> QtCore.Qt.ItemFlags:
+    def flags(self, index: QModelIndex) -> QtCore.Qt.ItemFlags:
         """
         Return item flags for the given index.
 
@@ -72,10 +73,10 @@ class SelectionModel(QtCore.QIdentityProxyModel):
         QtCore.Qt.ItemFlags
             The flags for the given index.
         """
-        _flags = QtCore.QIdentityProxyModel.flags(self, index)
+        _flags = QtCore.QIdentityProxyModel.flags(self, index)  # type: ignore[arg-type]
         if not self.sourceModel().isDir(index):  # type: ignore[attr-defined]
             _flags &= ~ITEM_SELECTABLE
-        return _flags
+        return _flags  # type: ignore[arg-type]
 
 
 class _PydidasFileDialog(
@@ -116,7 +117,7 @@ class _PydidasFileDialog(
                 An additional information string which is displayed in
                 the FileDialog widget. The default is None.
         """
-        QtWidgets.QFileDialog.__init__(self)
+        QtWidgets.QFileDialog.__init__(self)  # type: ignore[type]
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._files_unselectable_model = SelectionModel(self)
@@ -158,14 +159,14 @@ class _PydidasFileDialog(
                 QtCore.QUrl.fromLocalFile(_docs),
             ]
         )
-        _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
+        _sidebar = self.findChild(QtWidgets.QListView, "sidebar")  # type: ignore[type]
         if _sidebar:
             _sidebar.setMinimumWidth(180)
-        self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
+        self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)  # type: ignore[type]
 
     def _insert_buttons_into_sidebar(self) -> None:
         """Insert buttons to access specific locations and optional text fields."""
-        _splitter = self.findChild(QtWidgets.QSplitter)
+        _splitter = self.findChild(QtWidgets.QSplitter)  # type: ignore[type]
         _sidebar = _splitter.widget(0)
         _fileview = _splitter.widget(1)
         if _sidebar is None or _fileview is None:
@@ -204,6 +205,7 @@ class _PydidasFileDialog(
             "",
             parent_widget=self._widgets["fileview_frame"],
             margin=15,
+            visible=False,
         )
         self.add_any_widget(
             "fileview", _fileview, parent_widget=self._widgets["fileview_frame"]
@@ -263,7 +265,7 @@ class _PydidasFileDialog(
             self.setDirectory(_stored_dir)
             self.selectFile(_stored_selection)
         self._widgets["selection"].setText(_stored_selection)
-        return QtWidgets.QFileDialog.exec_(self)
+        return super().exec_()
 
     def get_existing_directory(self, **kwargs: Any) -> str | None:
         """
@@ -331,8 +333,8 @@ class _PydidasFileDialog(
 
         Returns
         -------
-        str or None
-            The full file path, if selected, or None.
+        str  or None
+            The full file path, if selected, or None if the dialog was aborted.
         """
         self._store_calling_kwargs(kwargs)
         _select_multiple = kwargs.get("select_multiple", False)
@@ -349,8 +351,6 @@ class _PydidasFileDialog(
         if res == 0:
             return None
         self._store_current_directory()
-        if _select_multiple:
-            return self.selectedFiles()  # type: ignore[return-value]
         return self.selectedFiles()[0]
 
     def get_existing_filenames(self, **kwargs: Any) -> list[str]:
@@ -365,8 +365,8 @@ class _PydidasFileDialog(
         """
         kwargs["caption"] = "Select existing files"
         kwargs["select_multiple"] = True
-        _names = self.get_existing_filename(**kwargs)
-        return [] if _names is None else _names
+        _name = self.get_existing_filename(**kwargs)
+        return [] if _name is None else self.selectedFiles()
 
     def get_saving_filename(self, **kwargs: Any) -> str | None:
         """
@@ -472,7 +472,7 @@ class _PydidasFileDialog(
             The stored directory, if existing or None.
         """
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
+            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             return self._stored_selections.get(_key, ""), self.q_settings_get(_key)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")
@@ -488,7 +488,7 @@ class _PydidasFileDialog(
         self.q_settings_set("dialogues/current", _curr_dir)
         _key = None
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")
+            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             self.q_settings_set(_key, _curr_dir)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")
@@ -498,7 +498,7 @@ class _PydidasFileDialog(
 
     def _set_name_filter(self) -> None:
         """Set the file dialog's nameFilter based on the specified formats."""
-        _formats = self._calling_kwargs.get("formats")
+        _formats: str = self._calling_kwargs.get("formats", "")
         self.setNameFilter(_formats)
         self._config["valid_extensions"] = None
         if _formats is not None:
@@ -533,7 +533,7 @@ class _PydidasFileDialog(
         ]
         if _filtered_extensions in ([""], []):
             return ""
-        _default = self._calling_kwargs.get("default_suffix")
+        _default: str | None = self._calling_kwargs.get("default_suffix")
         if _default is not None and _default in _filtered_extensions:
             return _default
         for _suffix in _global_default_suffixes:

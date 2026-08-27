@@ -31,7 +31,7 @@ __all__ = ["ProcessingTree"]
 import ast
 from numbers import Integral
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Any, Literal
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -62,6 +62,7 @@ class ProcessingTree(GenericTree):
             File to load ProcessingTree configuration from.
         """
         super().__init__(**kwargs)
+        self._root: WorkflowNode | None = None
         self._pre_executed = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
@@ -82,6 +83,21 @@ class ProcessingTree(GenericTree):
         if self.active_node is None:
             return ""
         return f"#{self.active_node_id:03d} [{self.active_node.plugin.plugin_name}]"
+
+    # Re-implement the root property to have the correct types:
+
+    @property
+    def root(self) -> WorkflowNode | None:  # type: ignore[override]
+        """Root node of the tree."""
+        return self._root
+
+    @root.setter
+    def root(
+        self,
+        value: WorkflowNode | None,  # type: ignore[override]
+    ) -> None:
+        """Set the root node of the tree."""
+        super(ProcessingTree, self.__class__).root.fset(self, value)  # type: ignore[arg]
 
     def create_and_add_node(
         self,
@@ -343,7 +359,7 @@ class ProcessingTree(GenericTree):
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 
-    def update_from_tree(self, tree: Self) -> None:
+    def update_from_tree(self, tree: "ProcessingTree") -> None:
         """
         Update this tree from another ProcessingTree instance.
 
@@ -377,7 +393,7 @@ class ProcessingTree(GenericTree):
             _plugin.node_id = _item["node_id"]
             _node = WorkflowNode(node_id=_item["node_id"], plugin=_plugin)
             for key, val in _item["plugin_params"]:
-                if key in _node.plugin.params.keys():
+                if key in _node.plugin.params:
                     _node.plugin.set_param_value(key, val)
             _new_nodes[_item["node_id"]] = _node
         for _item in list_of_nodes:
@@ -461,7 +477,7 @@ class ProcessingTree(GenericTree):
             for _node in self.nodes.values()
             if (
                 (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
-                and not _node.plugin.plugin_type == OUTPUT_PLUGIN
+                and _node.plugin.plugin_type != OUTPUT_PLUGIN
             )
         ]
         return _nodes_w_results

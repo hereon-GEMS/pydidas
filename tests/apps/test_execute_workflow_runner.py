@@ -28,8 +28,8 @@ import io
 import shutil
 import sys
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 import h5py
 import pytest
@@ -42,6 +42,7 @@ from pydidas.contexts.scan import Scan
 from pydidas.core import PydidasQsettings, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
+from pydidas.unittest_objects import create_dataset
 from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
 from pydidas.workflow.result_io import ProcessingResultIoMeta
 
@@ -62,23 +63,22 @@ def setup_module() -> Generator[tuple, None, None]:
     q_settings = PydidasQsettings()
     n_workers = q_settings.value("global/mp_n_workers", dtype=int)
     q_settings.set_value("global/mp_n_workers", 1)
-    plugin_path = Path(unittest_objects.__file__).parent
-    if plugin_path not in COLL.registered_paths:
-        COLL.find_and_register_plugins(plugin_path)
+    _test_plugin_path = Path(unittest_objects.__file__).parent
+    if _test_plugin_path not in COLL.registered_paths:
+        COLL.find_and_register_plugins(_test_plugin_path)
     old_stdout = sys.stdout
     my_stdout = io.StringIO()
     EXP.export_to_file(path / "diffraction_exp.yml")
     yield path, q_settings, n_workers, old_stdout, my_stdout
     shutil.rmtree(path)
     q_settings.set_value("global/mp_n_workers", n_workers)
-    COLL.unregister_plugin_path(plugin_path)
+    COLL.unregister_plugin_path(_test_plugin_path)
     sys.stdout = old_stdout
 
 
 @pytest.fixture(autouse=True)
 def setup_function(setup_module: object) -> Generator[None, None, None]:
-    _path, q_settings, n_workers, old_stdout, my_stdout = setup_module
-    RESULT_SAVER.set_active_savers_and_title([])
+    _path, _, _, old_stdout, my_stdout = setup_module
     EXP.restore_all_defaults(True)
     generate_tree(_path)
     generate_scan(_path)
@@ -243,7 +243,7 @@ def test_write_results_to_disk__empty_dir(setup_module: object) -> None:
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     _dir = get_empty_dir_name(path)
     obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
@@ -256,7 +256,7 @@ def test_write_results_to_disk__existing_empty_dir(setup_module: object) -> None
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     obj = ExecuteWorkflowRunner(output_dir=_dir)
     obj._write_results_to_disk()  # type: ignore[attr-defined]
     assert (_dir / "node_01.nxs").is_file()
@@ -270,7 +270,7 @@ def test_write_results_to_disk__used_dir(setup_module: object) -> None:
     TREE.prepare_execution()
     _res = TREE.execute_process_and_get_results(0)
     RESULTS.prepare_new_results()
-    RESULTS.store_results(0, _res)
+    RESULTS.store_scan_point_results(0, _res)
     with open(_dir / "node_02.nxs", "w") as f:
         f.write("dummy")
     obj = ExecuteWorkflowRunner(output_dir=_dir)
@@ -280,12 +280,16 @@ def test_write_results_to_disk__used_dir(setup_module: object) -> None:
 
 def test_write_results_to_disk__used_dir_w_overwrite(setup_module: object) -> None:
     path, _, _, _, _ = setup_module
+    _data1 = create_dataset(2, shape=(10, 10))
+    _data2 = create_dataset(2, shape=(10, 10))
+    RESULTS.prepare_new_results()
+    RESULTS.update_result_metadata({1: _data1, 2: _data2})
     _dir = get_empty_dir_name(path)
     _dir.mkdir()
     with open(_dir / "node_02.nxs", "w") as f:
         f.write("dummy")
     obj = ExecuteWorkflowRunner(output_dir=_dir, overwrite=True)
-    obj._write_results_to_disk()  # type: ignore[attr-defined]
+    obj._write_results_to_disk()
     assert (_dir / "node_01.nxs").is_file()
     assert (_dir / "node_02.nxs").is_file()
 

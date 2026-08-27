@@ -34,7 +34,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from qtpy import QtCore
 
 from pydidas.contexts import (
     DiffractionExperiment,
@@ -46,11 +45,19 @@ from pydidas.core import (
     Dataset,
     ObjectWithParameterCollection,
     UserConfigError,
-    utils,
 )
+from pydidas.plugins.plugin_result_info import PluginResultInfo
+from pydidas.workflow.processing_result_saver import ProcessingResultSaver
 from pydidas.workflow.processing_tree import ProcessingTree
-from pydidas.workflow.result_io import ProcessingResultIoMeta as ResultSaver
+from pydidas.workflow.result_io import ProcessingResultIoMeta as ResultIo
 from pydidas.workflow.workflow_tree import WorkflowTree
+
+
+_STANDARD_CONFIG = {
+    "metadata_complete": False,
+    "composites_created": False,
+    "saver_metadata_set": False,
+}
 
 
 class ProcessingResults(ObjectWithParameterCollection):
@@ -65,263 +72,89 @@ class ProcessingResults(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    scan_context : Scan, optional
+    scan : Scan, optional
         The scan context. If None, the generic context will be used. Only specify this,
         if you explicitly require a different context. The default is None.
-    diffraction_exp_context : DiffractionExp, optional
+    diffraction_exp : DiffractionExperiment, optional
         The diffraction experiment context. If None, the generic context will be used.
         Only specify this if you explicitly require a different context. The default
         is None.
-    workflow_tree : WorkflowTree, optional
-        The WorkflowTree. If None, the generic WorkflowTree will be used. Only specify
-        this if you explicitly require a different context. The default is None.
+    processing_tree : ProcessingTree, optional
+        The ProcessingTree. If None, the generic WorkflowTree will be used.
+        Only specify this if you explicitly require a different context.
+        The default is None.
+    directory : str or Path, optional
+        Directory to load ProcessingResults data from.
     """
-
-    new_results = QtCore.Signal()
 
     def __init__(
         self,
-        diffraction_exp_context: DiffractionExperiment | None = None,
-        scan_context: Scan | None = None,
-        workflow_tree: ProcessingTree | None = None,
+        scan: Scan | None = None,
+        diffraction_exp: DiffractionExperiment | None = None,
+        processing_tree: ProcessingTree | None = None,
         directory: str | Path | None = None,
     ):
-        """
-        Initialize the ProcessingTree instance.
-
-        Parameters
-        ----------
-        diffraction_exp_context : DiffractionExperiment, optional
-            The diffraction experiment context.
-        scan_context : Scan, optional
-            The scan context.
-        workflow_tree : ProcessingTree, optional
-            The processing tree.
-        directory : str or Path, optional
-            Directory to load ProcessingResults data from.
-        """
-        ObjectWithParameterCollection.__init__(self, parent=None)
-        self._SCAN = ScanContext() if scan_context is None else scan_context
-        self._EXP = (
+        super().__init__(parent=None)
+        self.set_default_params()
+        self._scan = ScanContext() if scan is None else scan
+        self._exp = (
             DiffractionExperimentContext()
-            if diffraction_exp_context is None
-            else diffraction_exp_context
+            if diffraction_exp is None
+            else diffraction_exp
         )
-        self._TREE = WorkflowTree() if workflow_tree is None else workflow_tree
+        self._tree = WorkflowTree() if processing_tree is None else processing_tree
+        self._saver = ProcessingResultSaver()
         self._config: dict[str, Any] = {
-            "frozen_SCAN": self._SCAN.copy(),
-            "frozen_EXP": self._EXP.copy(),
-            "frozen_TREE": self._TREE.copy(),
-        }
-        self._composites = {}
-        self.__source_hash = -1
-        self.clear_all_results()
-
+            "frozen_scan": Scan(),
+            "frozen_exp": DiffractionExperiment(),
+            "frozen_tree": ProcessingTree(),
+        } | _STANDARD_CONFIG
+        self._composites: dict[int, Dataset] = {}
+        self._plugin_result_infos: dict[int, PluginResultInfo] = {}
+        self._source_hash: int = -1
         if directory is not None:
             self.import_data_from_directory(directory)
 
-    def clear_all_results(self) -> None:
-        """
-        Clear all internally stored results and reset the instance attributes.
-        """
-        self._composites = {}
-        self.__source_hash = -1
-        for _key in (
-            "shapes",
-            "plugin_names",
-            "result_titles",
-            "node_labels",
-            "plugin_res_metadata",
-        ):
-            self._config[_key] = {}
-        for _key in ("metadata_complete", "composites_created", "shapes_set"):
-            self._config[_key] = False
-
-    def prepare_new_results(self) -> None:
-        """
-        Prepare the ProcessingResults for new results.
-        """
-        self.clear_all_results()
-        for _node in self._TREE.get_all_nodes_with_results():
-            _node_id = _node.node_id
-            _plugin = self._TREE.nodes[_node_id].plugin
-            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["plugin_names"][_node_id] = _plugin.plugin_name
-            self._config["result_titles"][_node_id] = _plugin.result_title
-            self._config["plugin_res_metadata"][_node_id] = {}
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE), hash(self._EXP)))
-        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-        self._config["frozen_TREE"].update_from_tree(self._TREE)
-        self._config["frozen_TREE"].prepare_execution()
-
-    def store_frame_shapes(self, shapes: dict[int, tuple[int]]) -> None:
-        """
-        Store the shapes of the results in the ProcessingResults.
-
-        Parameters
-        ----------
-        shapes : dict[int, tuple[int]]
-            The shapes in the form of a dictionary with nodeID keys and shape
-            values.
-        """
-        if shapes.keys() != self._config["plugin_res_metadata"].keys():
-            raise UserConfigError(
-                "The provided node IDs of the shapes do not match the node IDs "
-                "given during the preparation of the ProcessingResults."
-            )
-        _shapes = {
-            _key: self._config["frozen_SCAN"].shape + tuple(_shape)
-            for _key, _shape in shapes.items()
-        }
-        self._config["shapes"] = _shapes
-        self._config["shapes_set"] = True
-
-    def store_frame_metadata(self, metadata: dict[int, dict]) -> None:
-        """
-        Store the metadata for plugin results.
-
-        Parameters
-        ----------
-        metadata : dict[int, dict]
-            The metadata in form of a dictionary with nodeID keys and dict
-            items containing the axis_units, -_labels, and -_ranges keys with
-            the associated data.
-        """
-        _scan_metadata = [
-            self._config["frozen_SCAN"].get_metadata_for_dim(i)
-            for i in range(self._config["frozen_SCAN"].ndim)
-        ]
-        _scan_ax_labels = [_item[0] for _item in _scan_metadata]
-        _scan_ax_units = [_item[1] for _item in _scan_metadata]
-        _scan_ax_ranges = [_item[2] for _item in _scan_metadata]
-        _meta = {}
-        for node_id, _meta in metadata.items():
-            _curr_metadata = self._config["plugin_res_metadata"].get(node_id, {})
-            _curr_metadata["axis_labels"] = dict(
-                enumerate(_scan_ax_labels + list(_meta["axis_labels"].values()))
-            )
-            _curr_metadata["axis_units"] = dict(
-                enumerate(_scan_ax_units + list(_meta["axis_units"].values()))
-            )
-            _curr_metadata["axis_ranges"] = dict(
-                enumerate(_scan_ax_ranges + list(_meta["axis_ranges"].values()))
-            )
-            _curr_metadata["data_label"] = _meta.get("data_label", "")
-            _curr_metadata["data_unit"] = _meta.get("data_unit", "")
-            self._config["plugin_res_metadata"][node_id] = _curr_metadata
-            if node_id not in self._config["shapes"]:
-                self._config["shapes"][node_id] = self._config[
-                    "frozen_SCAN"
-                ].shape + tuple(
-                    [_range.size for _range in _meta["axis_ranges"].values()]
-                )
-            if node_id in self._composites:
-                self._composites[node_id].axis_labels = _curr_metadata["axis_labels"]
-                self._composites[node_id].axis_units = _curr_metadata["axis_units"]
-                self._composites[node_id].axis_ranges = _curr_metadata["axis_ranges"]
-                self._composites[node_id].data_label = _curr_metadata["data_label"]
-                self._composites[node_id].data_unit = _curr_metadata["data_unit"]
-        self._config["shapes_set"] = True
-        self._config["metadata_complete"] = True
-        ResultSaver.push_metadata_to_active_savers(_meta, self._config["frozen_SCAN"])
-
-    def store_results(self, index: int, results: dict[int, Dataset]) -> None:
-        """
-        Store results from one scan point in the ProcessingResults.
-
-        Parameters
-        ----------
-        index : int
-            The index of the scan point.
-        results: dict
-            The results as dictionary with entries of the type
-            <node_id: array>.
-        """
-        if not self._config["metadata_complete"]:
-            self.store_frame_metadata(
-                {_node_id: _data.property_dict for _node_id, _data in results.items()}
-            )
-        if not self._config["composites_created"]:
-            self._create_composites()
-        _scan_index = self._SCAN.get_indices_from_ordinal(index)
-        for _key, _val in results.items():
-            self._composites[_key][_scan_index] = _val
-        self.new_results.emit()
-
-    def _create_composites(self) -> None:
-        """
-        Create the composite datasets for all node results.
-        """
-        if not self._config["shapes_set"]:
-            raise UserConfigError(
-                "The shapes of the results have not been set. Please set the shapes "
-                "before storing results."
-            )
-        self._composites = {
-            _key: Dataset(
-                np.full(_shape, np.nan, dtype=np.float32),
-                **self._config["plugin_res_metadata"].get(_key, {}),
-            )
-            for _key, _shape in self._config["shapes"].items()
-        }
-        self._config["composites_created"] = True
+    # ------------------
+    # Public properties:
+    # ------------------
 
     @property
-    def shapes(self) -> dict[int, tuple[int]]:
+    def result_infos(self) -> dict[int, PluginResultInfo]:
+        """Return the dictionary with the result infos for all node IDs."""
+        return {_key: _val.copy() for _key, _val in self._plugin_result_infos.items()}
+
+    @property
+    def scan_instance(self) -> Scan:
+        """Return the current scan instance."""
+        return self._scan
+
+    @property
+    def diff_exp_instance(self) -> DiffractionExperiment:
+        """Return the current diffraction experiment instance."""
+        return self._exp
+
+    @property
+    def proc_tree_instance(self) -> ProcessingTree:
+        """Return the current processing tree instance."""
+        return self._tree
+
+    @property
+    def shapes(self) -> dict[int, tuple[int, ...]]:
         """
         Return the shapes of the results in the form of a dictionary.
 
         Returns
         -------
-        dict
+        dict[int, tuple[int, ...]]
             A dictionary with entries of the form <node_id: results_shape>
         """
-        return self._config["shapes"].copy()
-
-    @property
-    def node_labels(self) -> dict[int, str]:
-        """
-        Return the labels of the results in the form of a dictionary.
-
-        Returns
-        -------
-        dict[int, str]
-            A dictionary with entries of the form <node_id: label>
-        """
-        return self._config["node_labels"].copy()
-
-    @property
-    def data_labels(self) -> dict[int, str]:
-        """
-        Return the data labels of the different Plugins to in form of a
-        dictionary.
-
-        Returns
-        -------
-        dict[int, str]
-            A dictionary with entries of the form <node_id: label>
-        """
-        return {_key: _item.data_label for _key, _item in self._composites.items()}
-
-    @property
-    def data_units(self) -> dict[int, str]:
-        """
-        Return the data units of the different Plugins to in form of a
-        dictionary.
-
-        Returns
-        -------
-        dict[int, str]
-            A dictionary with entries of the form <node_id: label>
-        """
-        return {_key: _item.data_unit for _key, _item in self._composites.items()}
+        return {_key: _item.shape for _key, _item in self._plugin_result_infos.items()}
 
     @property
     def ndims(self) -> dict[int, int]:
         """
-        Return the number of dimensions for each of the results in the form
-        of a dictionary.
+        Return a dictionary with the number of dimensions for each of the results.
 
         Returns
         -------
@@ -340,7 +173,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         WorkflowTree
             The WorkflowTree at the time of processing.
         """
-        return self._config["frozen_TREE"]
+        return self._config.get("frozen_tree", ProcessingTree())
 
     @property
     def frozen_exp(self) -> DiffractionExperiment:
@@ -352,7 +185,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         DiffractionExperiment
             The DiffractionExperiment at the time of processing.
         """
-        return self._config["frozen_EXP"]
+        return self._config.get("frozen_exp", DiffractionExperiment())
 
     @property
     def frozen_scan(self) -> Scan:
@@ -364,7 +197,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         Scan
             The Scan at the time of processing.
         """
-        return self._config["frozen_SCAN"]
+        return self._config.get("frozen_scan", Scan())
 
     @property
     def source_hash(self) -> int:
@@ -376,38 +209,110 @@ class ProcessingResults(ObjectWithParameterCollection):
         int
             The hash value of the combined input data.
         """
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE), hash(self._EXP)))
-        return self.__source_hash
+        self._source_hash = hash((hash(self._scan), hash(self._tree), hash(self._exp)))
+        return self._source_hash
 
     @property
     def result_titles(self) -> dict[int, str]:
         """
-        Return the result titles for all node IDs in form of a dictionary.
+        Return a dictionary with the result titles for all node IDs.
 
         Returns
         -------
-        dict
+        dict[int, str]
             The result titles in the form of a dictionary with <node_id: result_title>
             entries.
         """
-        return self._config["result_titles"].copy()
+        return {
+            _key: _item.result_title
+            for _key, _item in self._plugin_result_infos.items()
+        }
 
-    def _check_that_results_are_available(self, node_id: int):
+    # ------------------
+    # Public methods:
+    # ------------------
+
+    def clear_all_results(self) -> None:
+        """Clear all internally stored results and reset the instance attributes."""
+        self._composites = {}
+        self._saver.set_active_savers(None)
+        self._plugin_result_infos = {}
+        self._source_hash = -1
+        self._config.update(_STANDARD_CONFIG)
+
+    def prepare_new_results(self) -> None:
+        """Prepare the ProcessingResults for newly created results."""
+        self.clear_all_results()
+        for _node in self._tree.get_all_nodes_with_results():
+            _node_id: int = _node.node_id  # type: ignore[type]
+            self._plugin_result_infos[_node_id] = _node.plugin.plugin_result_info
+        self._source_hash = hash((hash(self._scan), hash(self._tree), hash(self._exp)))
+        self._config["frozen_scan"].update_from_scan(self._scan)
+        self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
+        self._config["frozen_tree"].update_from_tree(self._tree)
+        self._config["frozen_tree"].prepare_execution()
+
+    def update_result_metadata(
+        self, metadata: dict[int, Dataset] | dict[int, dict[str, Any]]
+    ) -> None:
         """
-        Check if results are available for the specified node ID.
+        Update the stored metadata from plugin results.
 
         Parameters
         ----------
-        node_id : int
-            The node ID for which results should be checked.
+        metadata : dict[int, Dataset] or dict[int, dict[str, Any]]
+            The metadata in form of a dictionary with nodeID keys and dict
+            items containing the axis_units, -_labels, and -_ranges keys with
+            the associated data. Alternatively, the Datasets can also be used
+            directly as dict values.
         """
-        if node_id not in self._composites:
-            raise UserConfigError(
-                f"The selected node ID `{node_id}` does not have any results "
-                "associated with it. Please verify that that selected node is "
-                "either a leaf node (i.e. it does not have any children) or that "
-                "the `keep_results` flag is set to True in the plugin."
-            )
+        _scan_shape = self._config["frozen_scan"].shape
+        _scan_meta = {
+            "axis_labels": self._config["frozen_scan"].axis_labels,
+            "axis_units": self._config["frozen_scan"].axis_units,
+            "axis_ranges": self._config["frozen_scan"].axis_ranges,
+        }
+        for _node_id, _meta in metadata.items():
+            if isinstance(_meta, Dataset):
+                _meta = _meta.property_dict
+            _info = self._plugin_result_infos[_node_id]
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+                _val = dict(enumerate(_scan_meta[_key] + list(_meta[_key].values())))
+                setattr(_info, _key, _val)
+            _info.data_label = _meta.get("data_label", "")
+            _info.data_unit = _meta.get("data_unit", "")
+            _info.scan_ndim = self._config["frozen_scan"].ndim
+        self._config["metadata_complete"] = True
+        self._update_composite_metadata()
+
+    def store_scan_point_results(
+        self, index: int, results: dict[int, Dataset], autosave: bool = False
+    ) -> None:
+        """
+        Store results from one scan point in the ProcessingResults.
+
+        Parameters
+        ----------
+        index : int
+            The index of the scan point.
+        results: dict[int, Dataset]
+            The results as dictionary with entries of the type
+            <node_id: array>.
+        autosave : bool
+            Flag whether to export the new data directly to the savers.
+            The default is False.
+        """
+        if not self._config["metadata_complete"]:
+            self.update_result_metadata(results)
+        if not self._config["saver_metadata_set"]:
+            _info = {_id: _val.property_dict for _id, _val in self._composites.items()}
+            self._saver.update_saver_metadata(_info)
+            self._config["saver_metadata_set"] = True
+        _scan_index = self._scan.get_indices_from_ordinal(index)
+        for _key, _val in results.items():
+            self._composites[_key][_scan_index] = _val
+        if autosave:
+            self._saver.export_frame_to_active_savers(index, results)
 
     def get_result_ranges(self, node_id: int) -> dict[int, np.ndarray]:
         """
@@ -425,16 +330,37 @@ class ProcessingResults(ObjectWithParameterCollection):
             values.
         """
         self._check_that_results_are_available(node_id)
-        return self._config["plugin_res_metadata"].get(node_id).get("axis_ranges")
+        return self._plugin_result_infos[node_id].axis_ranges
 
-    def get_results(self, node_id: int) -> Dataset:
+    def get_results(
+        self,
+        node_id: int,
+        squeeze: bool = False,
+        flatten_scan_dims: bool = False,
+        copy: bool = True,
+    ) -> Dataset:
         """
         Get the combined results for the requested node_id.
 
+        The squeeze and flatten_scan_dims flags can be used to modify
+        the shape of the returned dataset. Please see the Parameter
+        documentation below for more information.
+
         Parameters
         ----------
         node_id : int
             The node ID for which results should be returned.
+        squeeze: bool
+            Flag to squeeze the results of the requested node ID to
+            remove dimensions of size 1.
+        flatten_scan_dims: bool
+            Flag to flatten all result dimensions of the Scan into
+            a single timeline. All other dimensions are unchanged.
+            This option can be combined with squeeze.
+        copy : bool
+            Flag to return a copy of the results. If False, the ndarray
+            will be returned and the data can be changed in place.
+            The default is True.
 
         Returns
         -------
@@ -442,39 +368,15 @@ class ProcessingResults(ObjectWithParameterCollection):
             The combined results of all frames for a specific node.
         """
         self._check_that_results_are_available(node_id)
-        return self._composites[node_id]
-
-    def get_results_for_flattened_scan(
-        self, node_id: int, squeeze: bool = False
-    ) -> Dataset:
-        """
-        Get the results for the requested node_id with all scan dimensions flatted.
-
-        This method will essentially flatten all scan dimensions into a timeline for
-        convenience. The squeeze Parameter can be used to remove all dimensions of
-        length 1 from the data.
-
-        Parameters
-        ----------
-        node_id : int
-            The node ID for which results should be returned.
-        squeeze : bool, optional
-            Keyword to toggle squeezing of data dimensions of the final dataset. If
-            True, all dimensions with a length of 1 will be removed. The default is
-            False.
-
-        Returns
-        -------
-        Dataset
-            The combined results of all frames for a specific node.
-        """
-        self._check_that_results_are_available(node_id)
-        _data = self._composites[node_id].copy()
-        _data.flatten_dims(
-            *range(self._config["frozen_SCAN"].ndim),
-            new_dim_label="Chronological scan points",
-            new_dim_range=np.arange(self._config["frozen_SCAN"].n_points),
-        )
+        _data = self._composites[node_id]
+        if copy:
+            _data = _data.copy()
+        if flatten_scan_dims:
+            _data.flatten_dims(
+                *range(self._config["frozen_scan"].ndim),
+                new_dim_label="Chronological scan points",
+                new_dim_range=np.arange(self._config["frozen_scan"].n_points),
+            )
         if squeeze:
             return _data.squeeze()
         return _data
@@ -482,8 +384,8 @@ class ProcessingResults(ObjectWithParameterCollection):
     def get_result_subset(
         self,
         node_id: int,
-        *slices: int | slice,
-        flattened_scan_dim: bool = False,
+        *slices: int | tuple[int] | slice,
+        flatten_scan_dims: bool = False,
         squeeze: bool = False,
     ) -> Dataset:
         """
@@ -497,9 +399,9 @@ class ProcessingResults(ObjectWithParameterCollection):
         ----------
         node_id : int
             The node ID for which results should be returned.
-        *slices : int or slice
-            The tuple used for slicing/indexing the np.ndarray.
-        flattened_scan_dim : bool, optional
+        *slices : int or tuple[int] or slice
+            The integer, tuple or slice  used for indexing the np.ndarray.
+        flatten_scan_dims : bool
             Keyword to process flattened Scan dimensions. If True, the Scan
             is assumed to be 1-d only and the first slice item will be used
             for the Scan whereas the remaining slice items will be used for
@@ -512,58 +414,73 @@ class ProcessingResults(ObjectWithParameterCollection):
         Dataset
             The subset of the results.
         """
-        if flattened_scan_dim:
-            _data = self.get_results_for_flattened_scan(node_id)
+        _slice_types = {type(_slice) for _slice in slices}
+        _data = self.get_results(
+            node_id, flatten_scan_dims=flatten_scan_dims, copy=False
+        )
+        if _slice_types.issubset({int, slice}):
+            _data = _data[slices].copy()  # type: ignore[arg-type]
         else:
-            self._check_that_results_are_available(node_id)
-            _data = self._composites[node_id].copy()
-        if set(type(_slice) for _slice in slices).issubset({int, slice}):
-            _data = _data[slices]
-        else:
-            for _index, _slice in enumerate(slices[::-1]):
-                _dim = len(slices) - _index - 1
+            for _index, _slice in enumerate(slices[::-1]):  # type: ignore[arg-type]
+                _dim = len(slices) - _index - 1  # type: ignore[arg-type]
                 _data = _data.take(_slice, axis=_dim)
         if squeeze:
             return _data.squeeze()
         return _data
 
-    def get_result_metadata(
-        self, node_id: int, use_scan_timeline: bool = False
-    ) -> dict[str, Any]:
+    def prepare_result_export(
+        self,
+        save_dir: str | Path,
+        save_formats: str,
+        overwrite: bool = False,
+        single_node: int | None = None,
+    ):
         """
-        Get the stored metadata for the results of the specified node.
+        Prepare the required files and directories for saving.
+
+        Note that the directory needs to be empty (or non-existing) if
+        the overwrite keyword is not set.
 
         Parameters
         ----------
-        node_id : int
-            The node ID identifier.
-        use_scan_timeline : bool, optional
-            Flag to collapse all scan dimensions into a single timeline.
-
-        Returns
-        -------
-        dict[str, Any]
-            A dictionary with the metadata retrieved from the Dataset plus the shape
-            and `node_label`.
+        save_dir : str or Path
+            The basepath for all saved data.
+        save_formats : str
+            A string of all formats to be written. Individual formats can be
+            separated by comma (","), ampersand ("&") or slash ("/")
+            characters.
+        overwrite : bool
+            Flag to enable overwriting of existing files. The default is False.
+        single_node: int or None
+            Keyword to select a single node. If None, all nodes will be
+            selected. The default is None.
         """
-        self._check_that_results_are_available(node_id)
-        _metadata = self._composites[node_id].property_dict
-        _metadata["node_label"] = self._config["node_labels"].get(node_id, "")
-        if not use_scan_timeline:
-            _metadata["shape"] = self._composites[node_id].shape
-            return _metadata
-        _scan_ndim = self._config["frozen_SCAN"].ndim
-        _metadata["shape"] = (self._config["frozen_SCAN"].n_points,) + self._composites[
-            node_id
-        ].shape[_scan_ndim:]
-        for _key, _entry in [
-            ["axis_labels", "Chronological scan points"],
-            ["axis_units", ""],
-            ["axis_ranges", np.arange(self._config["frozen_SCAN"].n_points)],
-        ]:
-            _entries = [_entry] + list(_metadata[_key].values())[_scan_ndim:]
-            _metadata[_key] = dict(enumerate(_entries))
-        return _metadata
+        _save_path = Path(save_dir)
+        if not self._config["metadata_complete"]:
+            raise UserConfigError(
+                "The metadata has not been set from the results yet. Cannot "
+                "save results."
+            )
+        _format_list = [s.strip() for s in re.split("[&/,]", save_formats)]
+        self._saver.set_active_savers(_format_list)
+        self._export_result_info = (
+            {single_node: self._plugin_result_infos[single_node]}
+            if single_node
+            else self._plugin_result_infos.copy()
+        )
+        _names = self._saver.expected_export_filenames(self._export_result_info)
+        if any((_save_path / _name).is_file() for _name in _names) and not overwrite:
+            raise UserConfigError(
+                f"The specified directory `{_save_path}` exists and is not empty. "
+                "Please select a different directory."
+            )
+        self._saver.prepare_active_savers(
+            _save_path,
+            self._export_result_info,
+            scan=self._config["frozen_scan"],
+            diffraction_exp=self._config["frozen_exp"],
+            processing_tree=self._config["frozen_tree"],
+        )
 
     def save_results_to_disk(
         self,
@@ -592,110 +509,31 @@ class ProcessingResults(ObjectWithParameterCollection):
             Strings of all formats to be written. Individual formats can be
             also be given in a single string if they are separated by comma
             (","), ampersand ("&") or slash ("/") characters.
-        overwrite : bool, optional
+        overwrite : bool
             Flag to enable overwriting of existing files. The default is False.
-        squeeze : bool, optional
+        squeeze : bool
             Flag to enable squeezing of empty dimensions. The default is False.
         node_id : int or None, optional
             The node ID for which data shall be saved. If None, this defaults
             to all nodes. The default is None.
         """
-        self.prepare_files_for_saving(
+        self.prepare_result_export(
             save_dir,
             ",".join(save_formats),
             overwrite,
             single_node=node_id,
-            squeeze=squeeze,
         )
         if node_id is None:
             _res = self._composites
         else:
             _res = {node_id: self._composites[node_id]}
-        ResultSaver.export_full_data_to_active_savers(
+        self._saver.export_full_data_to_active_savers(
             _res,
-            scan_context=self._config["frozen_SCAN"],
             squeeze=squeeze,
         )
 
     # alias
     export_data_to_directory = save_results_to_disk
-
-    def prepare_files_for_saving(
-        self,
-        save_dir: str | Path,
-        save_formats: str,
-        overwrite: bool = False,
-        single_node: int | None = None,
-        squeeze: bool = False,
-    ):
-        """
-        Prepare the required files and directories for saving.
-
-        Note that the directory needs to be empty (or non-existing) if
-        the overwrite keyword is not set.
-
-        Parameters
-        ----------
-        save_dir : str or Path
-            The basepath for all saved data.
-        save_formats : str
-            A string of all formats to be written. Individual formats can be
-            separated by comma (","), ampersand ("&") or slash ("/")
-            characters.
-        overwrite : bool, optional
-            Flag to enable overwriting of existing files. The default is False.
-        single_node: int or None, optional
-            Keyword to select a single node. If None, all nodes will be
-            selected. The default is None.
-        squeeze : bool, optional
-            Flag to enable squeezing of empty dimensions. The default is False.
-
-        Raises
-        ------
-        FileExistsError
-            If the directory exists and is not empty and overwrite is not
-            enabled.
-        """
-        if not self._config["shapes_set"] or not self._config["metadata_complete"]:
-            raise UserConfigError(
-                "The shapes and metadata have not been set. Cannot save results yet."
-            )
-        save_dir = Path(save_dir)
-        save_formats = [s.strip() for s in re.split("[&/,]", save_formats)]
-        _name = self._config["frozen_SCAN"].get_param_value("scan_title")
-        ResultSaver.set_active_savers_and_title(save_formats, _name)
-        if single_node is None:
-            _keys = list(self._composites.keys())
-        else:
-            _keys = [single_node]
-        _node_info = {
-            _id: {
-                "shape": (
-                    self._config["shapes"][_id]
-                    if not squeeze
-                    else tuple(_n for _n in self._config["shapes"][_id] if _n > 1)
-                ),
-                "node_label": self._config["node_labels"][_id],
-                "plugin_name": self._config["plugin_names"][_id],
-            }
-            for _id in _keys
-        }
-        _names = ResultSaver.get_filenames_from_active_savers(self.node_labels)
-        _exist_check = [save_dir.joinpath(_name).is_file() for _name in _names]
-        if True in _exist_check and not overwrite:
-            raise UserConfigError(
-                f'The specified directory "{save_dir}" exists and is not empty. Please '
-                "select a different directory."
-            )
-        if not save_dir.exists():
-            save_dir.mkdir(parents=True)
-        ResultSaver.prepare_active_savers(
-            save_dir,
-            _node_info,
-            scan_context=self._config["frozen_SCAN"],
-            diffraction_exp=self._config["frozen_EXP"],
-            workflow_tree=self._config["frozen_TREE"],
-        )
 
     def get_node_result_metadata_string(
         self,
@@ -722,43 +560,22 @@ class ProcessingResults(ObjectWithParameterCollection):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _metadata = self.get_result_metadata(node_id, use_scan_timeline)
-        _nscan = 1 if use_scan_timeline else self._config["frozen_SCAN"].ndim
-        _print_info = {
-            "axis_labels": list(_metadata["axis_labels"].values()),
-            "axis_units": list(_metadata["axis_units"].values()),
-            "axis_ranges": list(
-                utils.get_range_as_formatted_string(_range)
-                for _range in _metadata["axis_ranges"].values()
-            ),
-            "axis_types": (
-                ["(scan)"] * _nscan + ["(data)"] * (self.ndims[node_id] - _nscan)
-            ),
-            "axis_points": list(_metadata["shape"]),
-        }
-        if squeeze:
-            _squeezed_dims = np.where(np.asarray(_print_info["axis_points"]) == 1)[0]
-            _print_info = {
-                _key: [
-                    _item
-                    for _index, _item in enumerate(_print_info[_key])
-                    if _index not in _squeezed_dims
-                ]
-                for _key in _print_info
-            }
+        self._check_that_results_are_available(node_id)
+        _result_info = self._plugin_result_infos[node_id]
+        _metadata = _result_info.get_metadata(use_scan_timeline, squeeze)
         _node_info = (
-            self._config["plugin_names"][node_id]
+            _result_info.plugin_name
             + ":\n\n"
             + f"Data: {self._composites[node_id].data_description}\n\n"
             + "".join(
                 (
-                    f"Axis #{_dim:02d} {_print_info['axis_types'][_dim]}:\n"
+                    f"Axis #{_dim:02d} {_metadata['axis_types'][_dim]}:\n"
                     f"  Label: {_label}\n"
-                    f"  N points: {_print_info['axis_points'][_dim]}\n"
-                    f"  Range: {_print_info['axis_ranges'][_dim]} "
-                    f"{_print_info['axis_units'][_dim]}\n"
+                    f"  N points: {_metadata['shape'][_dim]}\n"
+                    f"  Range: {_metadata['axis_ranges'][_dim]} "
+                    f"{_metadata['axis_units'][_dim]}\n"
                 )
-                for _dim, _label in enumerate(_print_info["axis_labels"])
+                for _dim, _label in enumerate(_metadata["axis_labels"])
             )
         )
         if self._composites[node_id].size == 1:
@@ -776,25 +593,28 @@ class ProcessingResults(ObjectWithParameterCollection):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _import = ResultSaver.import_data_from_directory(directory)
+        _import = ResultIo.import_data_from_directory(directory)
         _data, _node_info, _scan, _exp, _tree = _import[:]
-        for _key in ["shape", "node_label", "plugin_name", "result_title"]:
-            self._config[f"{_key}s"] = {
-                _id: _item[_key] for _id, _item in _node_info.items()
-            }
+        for _id, _metadata in _node_info.items():
+            _curr_data = _data[_id]
+            _res_info = PluginResultInfo(
+                label=_metadata["node_label"],
+                node_id=_id,
+                plugin_name=_metadata["plugin_name"],
+                result_title=_metadata["result_title"],
+            )
+            _res_info.dataset_metadata = _data[_id].property_dict
+            _res_info.scan_ndim = _scan.ndim
+            self._plugin_result_infos[_id] = _res_info
         self._composites = _data
         if _data != {}:
-            self._SCAN.update_from_scan(_scan)
-            self._EXP.update_from_diffraction_exp(_exp)
-            self._TREE.update_from_tree(_tree)
-            self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-            self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-            self._config["frozen_TREE"].update_from_tree(self._TREE)
-            self._config["shapes_set"] = True
+            self._scan.update_from_scan(_scan)
+            self._exp.update_from_diffraction_exp(_exp)
+            self._tree.update_from_tree(_tree)
+            self._config["frozen_scan"].update_from_scan(self._scan)
+            self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
+            self._config["frozen_tree"].update_from_tree(self._tree)
             self._config["metadata_complete"] = True
-            for _id, _array in _data.items():
-                self._config["plugin_res_metadata"][_id] = _array.property_dict
-                self._config["plugin_res_metadata"][_id].pop("metadata")
 
     def update_from_processing_results(self, results: "ProcessingResults"):
         """
@@ -807,13 +627,63 @@ class ProcessingResults(ObjectWithParameterCollection):
         """
         if not isinstance(results, ProcessingResults):
             raise TypeError("The provided object is not a ProcessingResults instance.")
-        self._SCAN.update_from_scan(results._SCAN)
-        self._EXP.update_from_diffraction_exp(results._EXP)
-        self._TREE.update_from_tree(results._TREE)
-        self._config["frozen_SCAN"].update_from_scan(self._SCAN)
-        self._config["frozen_EXP"].update_from_diffraction_exp(self._EXP)
-        self._config["frozen_TREE"].update_from_tree(self._TREE)
+        self._scan.update_from_scan(results.scan_instance)
+        self._exp.update_from_diffraction_exp(results.diff_exp_instance)
+        self._tree.update_from_tree(results.proc_tree_instance)
+        self._config["frozen_scan"].update_from_scan(self._scan)
+        self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
+        self._config["frozen_tree"].update_from_tree(self._tree)
         self._composites = {
             _key: deepcopy(_val) for _key, _val in results._composites.items()
         }
         self._config = {_key: deepcopy(_val) for _key, _val in results._config.items()}
+        self._plugin_result_infos = deepcopy(results._plugin_result_infos)
+
+    # ------------------
+    # Private methods:
+    # ------------------
+
+    def _create_composites(self) -> None:
+        """Create the composite datasets for all node results."""
+        if not self._config["metadata_complete"]:
+            raise UserConfigError(
+                "The shapes of the results have not been set. Please set the shapes "
+                "before storing results."
+            )
+        self._composites = {
+            _node_id: Dataset(
+                np.full(_info.shape, np.nan, dtype=np.float32),
+                **_info.dataset_metadata,
+            )
+            for _node_id, _info in self._plugin_result_infos.items()
+        }
+        self._config["composites_created"] = True
+
+    def _update_composite_metadata(self) -> None:
+        """Update the metadata of the composite datasets with the stored metadata."""
+        if not self._config["composites_created"]:
+            self._create_composites()
+        for _node_id, _metadata in self._plugin_result_infos.items():
+            _metadata = self._plugin_result_infos[_node_id].dataset_metadata
+            self._composites[_node_id].axis_labels = _metadata["axis_labels"]
+            self._composites[_node_id].axis_units = _metadata["axis_units"]
+            self._composites[_node_id].axis_ranges = _metadata["axis_ranges"]
+            self._composites[_node_id].data_label = _metadata["data_label"]
+            self._composites[_node_id].data_unit = _metadata["data_unit"]
+
+    def _check_that_results_are_available(self, node_id: int) -> None:
+        """
+        Check if results are available for the specified node ID.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which results should be checked.
+        """
+        if node_id not in self._composites:
+            raise UserConfigError(
+                f"The selected node ID `{node_id}` does not have any results "
+                "associated with it. Please verify that that selected node is "
+                "either a leaf node (i.e. it does not have any children) or that "
+                "the `keep_results` flag is set to True in the plugin."
+            )

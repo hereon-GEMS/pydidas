@@ -29,18 +29,23 @@ __all__ = []
 
 import os
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, ClassVar
 
 import h5py
-from numpy import ndarray, squeeze
+from numpy import ndarray
 
 from pydidas.core import Dataset, FileReadError, UserConfigError
 from pydidas.core.constants import HDF5_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors, str_repr_of_slice
+from pydidas.core.utils import (
+    CatchFileErrors,
+    str_repr_of_slice,
+    verify_is_new_file_or_replace_set,
+)
 from pydidas.core.utils.converters import convert_to_slice
 from pydidas.core.utils.hdf5 import (
-    create_nxdata_entry,
+    nxs_write_nxdata,
 )
 from pydidas.data_io.implementations.io_base import IoBase
 
@@ -48,12 +53,13 @@ from pydidas.data_io.implementations.io_base import IoBase
 class Hdf5Io(IoBase):
     """IoBase implementation for Hdf5 files."""
 
-    extensions_import = extensions_export = HDF5_EXTENSIONS
-    format_name = "Hdf5"
-    dimensions = [1, 2, 3, 4, 5, 6, 7, 8]
+    extensions_import: ClassVar[list[str]] = HDF5_EXTENSIONS
+    extensions_export: ClassVar[list[str]] = HDF5_EXTENSIONS
+    format_name: ClassVar[str] = "Hdf5"
+    dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6, 7, 8]
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: Any) -> Dataset:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read data from an Hdf5 file.
 
@@ -80,7 +86,7 @@ class Hdf5Io(IoBase):
                 x_low, x_high) or 2-tuples of integers or slice
                 objects. If None, the full image will be returned. The
                 default is None.
-            returnType : type or 'auto', optional
+            astype : type or 'auto', optional
                 If 'auto', the image will be returned in its native data
                 type. If a specific datatype has been selected, the image
                 is converted to this type. The default is 'auto'.
@@ -96,7 +102,7 @@ class Hdf5Io(IoBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The data in the form of a pydidas Dataset (with embedded
             metadata)
         """
@@ -128,30 +134,36 @@ class Hdf5Io(IoBase):
                 )
             _data = Dataset(
                 _raw_data,
-                metadata={"indices": _human_readable_indices, "dataset": dataset},
+                metadata={
+                    "indices": _human_readable_indices,
+                    "dataset": dataset,
+                },
             )
             if kwargs.get("import_metadata", True):
-                cls._update_dataset_metadata(_data, _h5file, dataset, _indices)
-                # TODO [future]: deprecate the axes group reading from legacy results
-                cls.__read_legacy_metadata(_data, _h5file, dataset, _indices)
+                Hdf5Io._update_dataset_metadata(_data, _h5file, dataset, _indices)
+                # TODO [future]: deprecate the axes group reading from
+                # legacy results
+                Hdf5Io.__read_legacy_metadata(_data, _h5file, dataset, _indices)
             if auto_squeeze:
-                _data = squeeze(_data)
-            cls._data = _data
-        return cls.return_data(**kwargs)
+                _data = _data.squeeze()
+        return Hdf5Io.return_data(_data, **kwargs)
 
     @staticmethod
     def _update_dataset_metadata(
-        data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
+        data: Dataset,
+        h5file: h5py.File,
+        dataset: str,
+        slicing_indices: tuple[slice, ...],
     ) -> None:
         """
-        Check the hdf5 file for Dataset metadata and update the data's properties.
+        Check the hdf5 file for Dataset metadata and update its properties.
 
-        This method reads NeXus-compliant metadata from the hdf5 file and updates
-        the Dataset's axis labels, units, and ranges accordingly.
+        This method reads NeXus-compliant metadata from the hdf5 file and
+        updates the Dataset's axis labels, units, and ranges accordingly.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             The Dataset with the raw data.
         h5file : h5py.File
             The open h5py file object.
@@ -166,7 +178,7 @@ class Hdf5Io(IoBase):
         _data_group_name, _dset_name = dataset.rsplit("/", 1)
         _slicers = {index: _slice for index, _slice in enumerate(slicing_indices)}
         _data_group = h5file[_data_group_name]
-        if not _data_group.attrs.get("NX_class", "") == "NXdata":
+        if _data_group.attrs.get("NX_class", "") != "NXdata":
             return
         try:
             data.data_unit = h5file[dataset].attrs.get("units", "")
@@ -201,14 +213,17 @@ class Hdf5Io(IoBase):
 
     @staticmethod
     def __read_legacy_metadata(
-        data: Dataset, h5file: h5py.File, dataset: str, slicing_indices: tuple[slice]
+        data: Dataset,
+        h5file: h5py.File,
+        dataset: str,
+        slicing_indices: tuple[slice, ...],
     ) -> None:
         """
         Read legacy metadata from hdf5 files.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             The Dataset with the raw data.
         h5file : h5py.File
             The open h5py file object.
@@ -254,8 +269,8 @@ class Hdf5Io(IoBase):
             if _key in h5file[_root] and getattr(data, _key) == "":
                 setattr(data, _key, h5file[_root][_key][()].decode())
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, data: ndarray, **kwargs: Any) -> None:
+    @staticmethod
+    def export_to_file(filename: Path | str, data: ndarray, **kwargs: Any) -> None:
         """
         Export data to an Hdf5 file.
 
@@ -275,9 +290,9 @@ class Hdf5Io(IoBase):
                 Flag to allow overwriting of existing files. The default
                 is False.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         _dataset = kwargs.get("dataset", "entry/data/data")
-        _data_group_name, _dset_name = os.path.split(_dataset)
+        _data_group_name = os.path.dirname(_dataset)
         _root_group_name = os.path.dirname(_data_group_name)
         if _root_group_name == "":
             raise UserConfigError(
@@ -288,4 +303,4 @@ class Hdf5Io(IoBase):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         with h5py.File(filename, "w") as _file:
-            _data_group = create_nxdata_entry(_file, _dataset, data)
+            nxs_write_nxdata(_file, _dataset, data)

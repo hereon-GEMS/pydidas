@@ -38,6 +38,7 @@ from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.contexts.scan import Scan
 from pydidas.core import UserConfigError
+from pydidas.core.utils import timed_print
 from pydidas.multiprocessing import AppRunner
 from pydidas.workflow import ProcessingTree, WorkflowResults, WorkflowTree
 
@@ -56,7 +57,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
     a Qt EventLoop for processing.
 
     Parameters are all handled as kwargs to allow argument parsing and arbitrary
-    orders, but an output directory as well as all three of Workflow, Scan, and
+    orders. An output directory as well as all three of Workflow, Scan, and
     DiffractionExperiment must be supplied, either through parsed command line
     arguments or as keyword arguments.
 
@@ -102,7 +103,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
         parser.add_argument(
             "--overwrite",
             action="store_true",
-            help=("Enable overwriting of existing results."),
+            help="Enable overwriting of existing results.",
         )
         parser.add_argument(
             "-workflow", "-w", help="The filename with the Workflow to use."
@@ -273,7 +274,7 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             raise UserConfigError(
                 "The specified output directory is not empty and overwriting of "
                 "existing files has not been enabled. Please change the output "
-                "directory or enable overwriting of existing files-"
+                "directory or enable overwriting of existing files."
             )
 
     def execute_workflow_in_apprunner(self) -> None:
@@ -297,13 +298,17 @@ class ExecuteWorkflowRunner(QtCore.QObject):
             if self.parsed_args["verbose"]:
                 print("Processing progress:")
             self._loop.exec()
-            if self.parsed_args["verbose"]:
-                print("\nProcessing finished successfully.")
+            timed_print(
+                "\nProcessing finished successfully.",
+                verbose=self.parsed_args["verbose"],
+            )
         except UserConfigError:
             if runner is not None:
                 runner.requestInterruption()
-            if self.parsed_args["verbose"]:
-                print("\nAborted workflow processing because of illegal configuration.")
+            timed_print(
+                "\nAborted workflow processing because of illegal configuration.",
+                verbose=self.parsed_args["verbose"],
+            )
         finally:
             if self._loop.isRunning():
                 self._loop.quit()

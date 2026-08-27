@@ -31,9 +31,9 @@ import re
 import subprocess
 import sys
 import time
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal, Optional
+from typing import ClassVar, Literal
 
 import git
 
@@ -170,7 +170,7 @@ def run_module(module_name: Literal["black", "flake8", "isort", "reuse"]):
         _timed_print(_job_label.capitalize() + " failed.", new_lines=1)
 
 
-def check_version_tags(directory: Optional[Path] = None):
+def check_version_tags(directory: Path | None = None):
     """
     Check that all version tags are consistent.
 
@@ -185,7 +185,7 @@ def check_version_tags(directory: Optional[Path] = None):
     """
     _directory = Path(__file__).parent if directory is None else Path(directory)
     with open(_directory.joinpath("src", "pydidas", "version.py"), "r") as f:
-        _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
+        _line = [_line for _line in f if _line.startswith("__version__")]
     _version = _line[0].split("=")[1].strip().strip('"')
     _timed_print("Starting version tag check.", new_lines=1)
     # check the CHANGELOG:
@@ -196,19 +196,30 @@ def check_version_tags(directory: Optional[Path] = None):
         _timed_print("The CHANGELOG does not include a current version tag.")
     # check the CITATION.cff:
     with open(_directory.joinpath("CITATION.cff"), "r") as f:
-        _lines = [_line.strip() for _line in f.readlines()]
+        _lines = [_line.strip() for _line in f]
     _citation_okay = f"version: {_version}" in _lines
     if not _citation_okay:
         _timed_print("The CITATION.cff does not include the latest version tag.")
     # check the pydidas/version.py file which is required for consistency with old
     # updaters:
     with open(_directory.joinpath("pydidas", "version.py"), "r") as f:
-        _line = [_line for _line in f.readlines() if _line.startswith("__version__")]
+        _line = [_line for _line in f if _line.startswith("__version__")]
     _updater_version = _line[0].split("=")[1].strip().strip('"')
     _updater_version_okay = _updater_version == _version
     if not _updater_version_okay:
         _timed_print("The pydidas/version.py differs from the src version.")
-    if not (_citation_okay and _changelog_okay and _updater_version_okay):
+    # Check that a NeXus test file was written with the current version
+    _nexus_test_file = (
+        Path(__file__).parent / "tests" / "_data" / "NeXus" / f"file_v{_version}.nxs"
+    ).is_file()
+    if not _nexus_test_file:
+        _timed_print("The NeXus test files do not include the current version.")
+    if not (
+        _citation_okay
+        and _changelog_okay
+        and _updater_version_okay
+        and _nexus_test_file
+    ):
         sys.exit(1)
     _timed_print("Version tag check successfully concluded.")
 
@@ -242,12 +253,20 @@ class CopyrightYearUpdater:
             The default is True.
     """
 
-    THIS_YEAR = datetime.fromtimestamp(time.time()).year
-    SUFFIX_WHITELIST = [".py", ".rst", "", ".cff", ".md", ".in", ".toml"]
+    THIS_YEAR: ClassVar[int] = datetime.fromtimestamp(time.time(), tz=UTC).year
+    SUFFIX_WHITELIST: ClassVar[list[str]] = [
+        ".py",
+        ".rst",
+        "",
+        ".cff",
+        ".md",
+        ".in",
+        ".toml",
+    ]
     _regex_full = re.compile("Copyright 20[0-9][0-9] ?- ?20[0-9][0-9],")
     _regex_short = re.compile("Copyright 20[0-9][0-9],")
 
-    def __init__(self, directory: Optional[Path] = None, **kwargs):
+    def __init__(self, directory: Path | None = None, **kwargs):
         self._flags = {
             "check": kwargs.get("check", "--check" in sys.argv),
             "git-only": kwargs.get("git_only", "--git-only" in sys.argv),
@@ -288,10 +307,10 @@ class CopyrightYearUpdater:
             _rel_fname = str(fname.relative_to(self._directory))
             _commit_epoch = self.__repo.git.log("-1", "--format=%at", _rel_fname)
             if _commit_epoch.strip():
-                _commit_year = datetime.fromtimestamp(int(_commit_epoch)).year
+                _commit_year = datetime.fromtimestamp(int(_commit_epoch), tz=UTC).year
                 return fname, _commit_year
             return fname, -1
-        except Exception:
+        except (ValueError, FileNotFoundError, OSError):
             return fname, -1
 
     def run_copyright_check(self):
@@ -387,7 +406,7 @@ class CopyrightYearUpdater:
                 ):
                     _unversioned_files.append(_fname)
         return {
-            _fname: datetime.fromtimestamp(Path(_fname).stat().st_mtime).year
+            _fname: datetime.fromtimestamp(Path(_fname).stat().st_mtime, tz=UTC).year
             for _fname in _unversioned_files
         }
 

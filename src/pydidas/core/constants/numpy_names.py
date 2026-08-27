@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,14 @@ The colors module holds color names and RGB codes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
-    "NUMPY_HUMAN_READABLE_DATATYPES",
-    "NUMPY_DTYPES",
     "NUMPY_ARGPARSE_ARGS",
+    "NUMPY_DTYPES",
+    "NUMPY_HUMAN_READABLE_DATATYPES",
 ]
 
 import argparse

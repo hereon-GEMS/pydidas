@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ chi values [deg]. Label for d-spacing is `position`.
 """
 
 __author__ = "Gudrun Lotze, Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
@@ -57,8 +57,6 @@ UNITS_DEGREE = "deg"
 S2C_TOLERANCE = 1e-6
 NPT_AZIM_LIMIT = 3000
 
-PARAMETER_KEEP_RESULTS = "keep_results"
-
 
 # Define the Enum
 # 1 is close to zero
@@ -68,6 +66,11 @@ class Category(IntEnum):
     NEGATIVE: int = 0
     ZERO: int = 1
     POSITIVE: int = 2
+
+
+# modification of the keep_results parameter to ensure results are always stored
+_GENERIC_PARAMS = ProcPlugin.generic_params.copy()
+_GENERIC_PARAMS.get_param("keep_results").set_value_and_choices(True, [True])
 
 
 class DictViaAttrs:
@@ -148,11 +151,7 @@ class SinSquareChiGrouping(ProcPlugin):
     output_data_label = "invalid - must be set based on input data"
     new_dataset = True
 
-    # modification of the keep_results parameter to ensure results are always stored
-    _generics = ProcPlugin.generic_params.copy()
-    _generics[PARAMETER_KEEP_RESULTS].value = True
-    _generics[PARAMETER_KEEP_RESULTS].choices = [True]
-    generic_params = _generics
+    generic_params = _GENERIC_PARAMS
 
     def _ensure_dataset_instance(self, ds: Dataset) -> None:
         """
@@ -512,7 +511,7 @@ class SinSquareChiGrouping(ProcPlugin):
         # Only chi in degree is allowed.
         chi_units_allowed: list[str] = [UNITS_DEGREE]
 
-        for _, val in ds_units.items():
+        for val in ds_units.values():
             # First item in the value list is the label (e.g., 'position', 'chi')
             # Second item is the unit (e.g., 'nm', 'deg')
             label, unit = val

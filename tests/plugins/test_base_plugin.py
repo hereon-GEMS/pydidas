@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -217,11 +217,11 @@ class TestBasePlugin(unittest.TestCase):
         _new_params = {
             utils.get_random_string(6): utils.get_random_string(12) for i in range(7)
         }
-        for _key, _val in _new_params.items():
+        for _key in _new_params:
             plugin.add_param(Parameter(_key, str, ""))
         _state = {"params": plugin.params.copy()}
         for _key, _param in _new_params.items():
-            _state["params"][_key].value = _new_params[_key]
+            _state["params"][_key].value = _param
         plugin.__setstate__(_state)
         for key, val in _new_params.items():
             self.assertEqual(plugin.get_param_value(key), val)

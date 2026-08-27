@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["create_splitter", "DATA_BROWSING_FRAME_BUILD_CONFIG"]
+__all__ = ["DATA_BROWSING_FRAME_BUILD_CONFIG", "create_splitter"]
 
 
 from typing import Any

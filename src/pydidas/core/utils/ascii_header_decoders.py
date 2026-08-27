@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -51,7 +51,7 @@ def decode_chi_header(filename: Path | str) -> tuple[str, str, str, str]:
         _lines = _file.readlines()
     try:
         _size = int(_lines[3].strip())
-    except Exception:
+    except (ValueError, TypeError):
         raise FileReadError("Cannot read CHI header.")
     _meta: dict[str, str] = {}
     for _key, _line_no in (("data", 2), ("ax", 1)):
@@ -81,7 +81,7 @@ def __split_key_list(key_list: list[str]) -> tuple[list[str], list[str]]:
             if key_list:
                 _units.append(key_list.pop(0))
             _curr = ""
-        elif _label.startswith("(") or _label.startswith("["):
+        elif _label.startswith(("(", "[")):
             _labels.append(_curr)
             _units.append(_label.lstrip("([").rstrip("])"))
             _curr = ""
@@ -95,7 +95,7 @@ def __split_key_list(key_list: list[str]) -> tuple[list[str], list[str]]:
 
 def decode_specfile_header(
     filename: Path | str, read_x_column: bool = True, x_column_index: int = 0
-) -> tuple[list[str], list[str]]:  # noqa
+) -> tuple[list[str], list[str]]:
     """
     Decode the header of a SpecFile (.dat) file.
 
@@ -118,7 +118,7 @@ def decode_specfile_header(
     _n_col = None
     _raw_labels = ""
     with CatchFileErrors(filename), open(filename, "r") as _file:
-        _lines = [_l.strip() for _l in _file.readlines()]
+        _lines = [_l.strip() for _l in _file]
     for _line in _lines:
         if _line.startswith("#N") and _n_col is None:
             _n_col = int(_line.removeprefix("#N"))

@@ -24,13 +24,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import shutil
-import tempfile
-import unittest
 from numbers import Integral, Real
-from pathlib import Path
 
 import numpy as np
+import pytest
 
 from pydidas.contexts.scan import Scan, ScanContext
 from pydidas.contexts.scan.scan_io_base import ScanIoBase
@@ -39,120 +36,114 @@ from pydidas.core.utils import get_random_string
 
 
 SCAN = ScanContext()
-SCAN_IO = ScanIoBase
 
 
-class TestScanIoBase(unittest.TestCase):
-    def setUp(self):
-        _test_dir = Path(__file__).parents[2]
-        self._path = str(_test_dir / "_data" / "load_test_scan_context_")
-        self._tmppath = tempfile.mkdtemp()
-        SCAN_IO.imported_params = {}
+@pytest.fixture
+def populated_scan() -> Scan:
+    """Return a Scan with randomized parameter values."""
+    _scan = Scan()
+    for _param in _scan.params.values():
+        if _param.dtype == str and _param.choices is None:
+            _param.value = get_random_string(6)
+        elif _param.dtype == Real:
+            _param.value = np.random.random()
+        elif _param.dtype == Integral and _param.refkey != "scan_dim":
+            _param.value = int(100 * np.random.random())
+    return _scan
 
-    def tearDown(self):
-        del self._path
-        shutil.rmtree(self._tmppath)
 
-    def test_verify_all_entries_present__correct(self):
-        for param in SCAN.params:
-            SCAN_IO.imported_params[param] = True
-        SCAN_IO._verify_all_entries_present()
+def test_verify_all_entries_present__correct() -> None:
+    _params = {param: True for param in SCAN.params}
+    ScanIoBase._verify_all_entries_present(_params)
 
-    def test_verify_all_entries_present__missing_keys(self):
-        with self.assertRaises(UserConfigError):
-            SCAN_IO._verify_all_entries_present()
 
-    def test_write_to_scan_settings__generic_ScanContext(self):
-        _scan = Scan()
-        for _param in _scan.params.values():
-            if _param.dtype == str and _param.choices is None:
-                _param.value = get_random_string(6)
-            elif _param.dtype == Real:
-                _param.value = np.random.random()
-            elif _param.dtype == Integral and _param.refkey != "scan_dim":
-                _param.value = int(100 * np.random.random())
-        SCAN_IO.imported_params = _scan.get_param_values_as_dict()
-        SCAN_IO._write_to_scan_settings()
-        for _key, _value in _scan.get_param_values_as_dict().items():
-            self.assertEqual(SCAN.get_param_value(_key), _value)
+def test_verify_all_entries_present__missing_keys() -> None:
+    with pytest.raises(UserConfigError):
+        ScanIoBase._verify_all_entries_present({})
 
-    def test_write_to_scan_settings__given_scan(self):
-        _scan = Scan()
-        for _param in _scan.params.values():
-            if _param.dtype == str and _param.choices is None:
-                _param.value = get_random_string(6)
-            elif _param.dtype == Real:
-                _param.value = np.random.random()
-            elif _param.dtype == Integral and _param.refkey != "scan_dim":
-                _param.value = int(100 * np.random.random())
-        _new_scan = Scan()
-        SCAN_IO.imported_params = _scan.get_param_values_as_dict()
-        SCAN_IO._write_to_scan_settings(scan=_new_scan)
-        SCAN.restore_all_defaults(True)
-        for _key, _value in _scan.get_param_values_as_dict().items():
-            self.assertEqual(_new_scan.get_param_value(_key), _value)
-        self.assertEqual(SCAN.get_param_value("scan_dim1_label"), "")
 
-    def test_convert_legacy_param_names__w_scan_start_index(self):
-        SCAN_IO.imported_params = {"scan_start_index": 42}
-        SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(SCAN_IO.imported_params["pattern_number_offset"], 42)
-        self.assertEqual(SCAN_IO.imported_params["pattern_number_delta"], 1)
-        self.assertNotIn("scan_start_index", SCAN_IO.imported_params)
+def test_write_to_scan_settings__generic_ScanContext(populated_scan: Scan) -> None:
+    _params = populated_scan.get_param_values_as_dict()
+    ScanIoBase._write_to_scan_settings(_params)
+    for _key, _value in _params.items():
+        assert SCAN.get_param_value(_key) == _value
 
-    def test_convert_legacy_param_names__w_scan_start_index__duplicate(self):
-        SCAN_IO.imported_params = {"scan_start_index": 42, "pattern_number_offset": 0}
-        with self.assertRaises(UserConfigError):
-            SCAN_IO._convert_legacy_param_names()
 
-    def test_convert_legacy_params__w_scan_index_stepping(self):
-        SCAN_IO.imported_params = {"scan_index_stepping": 2}
-        SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(SCAN_IO.imported_params["frame_indices_per_scan_point"], 2)
-        self.assertNotIn("scan_index_stepping", SCAN_IO.imported_params)
+def test_write_to_scan_settings__given_scan(populated_scan: Scan) -> None:
+    _new_scan = Scan()
+    _params = populated_scan.get_param_values_as_dict()
+    ScanIoBase._write_to_scan_settings(_params, scan=_new_scan)
+    SCAN.restore_all_defaults(True)
+    for _key, _value in _params.items():
+        assert _new_scan.get_param_value(_key) == _value
+    assert SCAN.get_param_value("scan_dim1_label") == ""
 
-    def test_convert_legacy_params__w_scan_index_stepping__duplicate(self):
-        SCAN_IO.imported_params = {
-            "scan_index_stepping": 2,
-            "frame_indices_per_scan_point": 0,
-        }
-        with self.assertRaises(UserConfigError):
-            SCAN_IO._convert_legacy_param_names()
 
-    def test_convert_legacy_params__w_scan_multiplicity(self):
-        SCAN_IO.imported_params = {"scan_multiplicity": 7}
-        SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(SCAN_IO.imported_params["scan_frames_per_point"], 7)
-        self.assertNotIn("scan_multiplicity", SCAN_IO.imported_params)
+def test_convert_legacy_param_names__w_scan_start_index() -> None:
+    _params = {"scan_start_index": 42}
+    ScanIoBase._convert_legacy_param_names(_params)
+    assert _params["pattern_number_offset"] == 42
+    assert _params["pattern_number_delta"] == 1
+    assert "scan_start_index" not in _params
 
-    def test_convert_legacy_params__w_scan_multiplicity__duplicate(self):
-        SCAN_IO.imported_params = {
-            "scan_multiplicity": 7,
-            "scan_frames_per_point": 2,
-        }
-        with self.assertRaises(UserConfigError):
-            SCAN_IO._convert_legacy_param_names()
 
-    def test_convert_legacy_params__w_scan_multi_image_handling(self):
-        SCAN_IO.imported_params = {"scan_multi_image_handling": "Average"}
-        SCAN_IO._convert_legacy_param_names()
-        self.assertEqual(
-            SCAN_IO.imported_params["scan_multi_frame_handling"], "Average"
-        )
-        self.assertNotIn("scan_multi_image_handling", SCAN_IO.imported_params)
+def test_convert_legacy_param_names__w_scan_start_index__duplicate() -> None:
+    _params = {"scan_start_index": 42, "pattern_number_offset": 0}
+    with pytest.raises(UserConfigError):
+        ScanIoBase._convert_legacy_param_names(_params)
 
-    def test_convert_legacy_params__w_scan_multi_image_handling__duplicate(self):
-        SCAN_IO.imported_params = {
-            "scan_multi_image_handling": "Average",
-            "scan_multi_frame_handling": "Sum",
-        }
-        with self.assertRaises(UserConfigError):
-            SCAN_IO._convert_legacy_param_names()
 
-    def test_check_file_list(self):
-        _res = SCAN_IO.check_file_list(["scan_0001.h5", "scan_0002.h5"])
-        self.assertEqual(_res, ["::no_error::"])
+def test_convert_legacy_param_names__w_scan_index_stepping() -> None:
+    _params = {"scan_index_stepping": 2}
+    ScanIoBase._convert_legacy_param_names(_params)
+    assert _params["frame_indices_per_scan_point"] == 2
+    assert "scan_index_stepping" not in _params
+
+
+def test_convert_legacy_param_names__w_scan_index_stepping__duplicate() -> None:
+    _params = {"scan_index_stepping": 2, "frame_indices_per_scan_point": 0}
+    with pytest.raises(UserConfigError):
+        ScanIoBase._convert_legacy_param_names(_params)
+
+
+def test_convert_legacy_param_names__w_scan_multiplicity() -> None:
+    _params = {"scan_multiplicity": 7}
+    ScanIoBase._convert_legacy_param_names(_params)
+    assert _params["scan_frames_per_point"] == 7
+    assert "scan_multiplicity" not in _params
+
+
+def test_convert_legacy_param_names__w_scan_multiplicity__duplicate() -> None:
+    _params = {"scan_multiplicity": 7, "scan_frames_per_point": 2}
+    with pytest.raises(UserConfigError):
+        ScanIoBase._convert_legacy_param_names(_params)
+
+
+def test_convert_legacy_param_names__w_scan_multi_image_handling() -> None:
+    _params = {"scan_multi_image_handling": "Average"}
+    ScanIoBase._convert_legacy_param_names(_params)
+    assert _params["scan_multi_frame_handling"] == "Average"
+    assert "scan_multi_image_handling" not in _params
+
+
+def test_convert_legacy_param_names__w_scan_multi_image_handling__duplicate() -> None:
+    _params = {
+        "scan_multi_image_handling": "Average",
+        "scan_multi_frame_handling": "Sum",
+    }
+    with pytest.raises(UserConfigError):
+        ScanIoBase._convert_legacy_param_names(_params)
+
+
+def test_check_file_list() -> None:
+    _res = ScanIoBase.check_file_list(["scan_0001.h5", "scan_0002.h5"])
+    assert _res == ["::no_error::"]
+
+
+def test_import_from_file():
+    with pytest.raises(NotImplementedError):
+        ScanIoBase.import_from_file("dummy_file.h5")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

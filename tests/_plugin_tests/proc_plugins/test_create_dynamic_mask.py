@@ -110,7 +110,7 @@ class TestCreateDynamicMask(unittest.TestCase):
         plugin = self.create_plugin(high=None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        self.assertEqual(_kwargs, dict())
+        self.assertEqual(_kwargs, {})
 
     def test_execute__low_thresh(self):
         plugin = self.create_plugin(low=30, high=None)

@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+import datetime
 import random
 import shutil
 import string
@@ -45,6 +46,7 @@ from pydidas.core.utils.str_utils import (
     get_short_time_string,
     get_time_string,
     get_warning,
+    iso_timestring,
     print_warning,
     timed_print,
     update_separators,
@@ -73,6 +75,13 @@ class Test_str_utils(unittest.TestCase):
         for _s in ["-42.5.5", "   abc ", "\n a -42.5", "this is -42.5  \n"]:
             with self.subTest(s=_s):
                 self.assertEqual(_s.strip(), convert_str_to_number(_s))
+
+    def test_iso_timestring(self):
+        _now = datetime.datetime.now().astimezone()
+        _str = iso_timestring()
+        _date = datetime.datetime.fromisoformat(_str)
+        self.assertIsInstance(_str, str)
+        self.assertTrue(abs((_now - _date).total_seconds()) < 1)
 
     def test_get_fixed_length_str_length(self):
         self.assertEqual(len(get_fixed_length_str("test", self.length)), self.length)
@@ -183,9 +192,8 @@ class Test_str_utils(unittest.TestCase):
     def test_timed_print(self):
         _teststr = "afs 4-2 version 1.0"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                timed_print(_teststr)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            timed_print(_teststr)
         with _fname.open("r") as _f:
             _text = _f.read()
         self.assertIn(_teststr, _text)
@@ -193,9 +201,8 @@ class Test_str_utils(unittest.TestCase):
     def test_timed_print_verbose_false(self):
         _teststr = "afs 4-2 version 1.0"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                timed_print(_teststr, verbose=False)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            timed_print(_teststr, verbose=False)
         with _fname.open("r") as _f:
             _text = _f.read()
         self.assertNotIn(_teststr, _text)
@@ -213,9 +220,8 @@ class Test_str_utils(unittest.TestCase):
     def test_print_warning(self):
         _teststr = "test"
         _fname = self._tmpdir / "out.txt"
-        with _fname.open("w") as _f:
-            with redirect_stdout(_f):
-                print_warning(_teststr)
+        with _fname.open("w") as _f, redirect_stdout(_f):
+            print_warning(_teststr)
         with _fname.open("r") as _f:
             _text = _f.read().strip()
         w_parts = _text.split("\n")
@@ -362,7 +368,7 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(_output, "0 ... 3")
 
     def test_get_range_as_formatted_string__w_iterator(self):
-        _input = range(0, 4)
+        _input = range(4)
         _output = get_range_as_formatted_string(_input)
         self.assertEqual(_output, "0 ... 3")
 

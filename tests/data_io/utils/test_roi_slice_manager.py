@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2024, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2024, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -27,6 +27,7 @@ __status__ = "Production"
 import copy
 import unittest
 
+from pydidas.core import UserConfigError
 from pydidas.data_io.utils import RoiSliceManager
 
 
@@ -136,7 +137,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _roi = {"Test", "Test2"}
         obj = RoiSliceManager()
         obj._roi_key = _roi
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_types_roi_key()
 
     def test_convert_str_roi_key_to_list__simple(self):
@@ -198,12 +199,12 @@ class TestRoiSliceManager(unittest.TestCase):
     def test_check_types_roi_key_entries(self):
         obj = RoiSliceManager()
         obj._roi_key = [12, slice(0, 2)]
-        obj._check_types_roi_key_entries
+        obj._check_types_roi_key_entries()
 
     def test_check_types_roi_key_entries__w_float(self):
         obj = self.create_RoiSliceManager()
         obj._roi_key = [12, slice(0, 15), 12.3]
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_types_roi_key_entries()
 
     def test_convert_str_roi_key_entries__int(self):
@@ -217,7 +218,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _roi = [1, 2, 3, 4.0]
         _strroi = ", ".join(str(item) for item in _roi)
         obj = self.create_RoiSliceManager(_strroi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._convert_str_roi_key_entries()
 
     def test_convert_str_roi_key_entries__slice_last(self):
@@ -261,13 +262,13 @@ class TestRoiSliceManager(unittest.TestCase):
     def test_check_length_of_roi_key_entries__too_long(self):
         _roi = [1, 2, slice(0, 2), 4]
         obj = self.create_RoiSliceManager(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_length_of_roi_key_entries()
 
     def test_check_length_of_roi_key_entries__too_short(self):
         _roi = [1, 2, 4]
         obj = self.create_RoiSliceManager(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_length_of_roi_key_entries()
 
     def test_convert_roi_key_to_slice_objects__4_ints(self):
@@ -297,19 +298,19 @@ class TestRoiSliceManager(unittest.TestCase):
     def test_convert_roi_key_to_slice_objects__wrong_order(self):
         _roi = [1, slice(0, 5), 1]
         obj = self.create_RoiSliceManager(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._convert_roi_key_to_slice_objects()
 
     def test_convert_roi_key_to_slice_objects__wrong_trailing_order(self):
         obj = RoiSliceManager()
         obj._roi_key = [slice(0, 5), 1, slice(0, 5)]
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._convert_roi_key_to_slice_objects()
 
     def test_convert_roi_key_to_slice_objects__wrong_length(self):
         _roi = [1, slice(0, 5)]
         obj = self.create_RoiSliceManager(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._convert_roi_key_to_slice_objects()
 
     def test_full_init(self):
@@ -417,7 +418,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _x2 = (43, -4)
         obj = RoiSliceManager(roi=[slice(*_y1), slice(*_x1)])
         _roi2 = [slice(*_y2), slice(*_x2)]
-        with self.assertRaises(TypeError):
+        with self.assertRaises(UserConfigError):
             obj.apply_second_roi(_roi2)
         self.assertEqual(obj.roi, (slice(*_y1), slice(*_x1)))
 
@@ -510,13 +511,13 @@ class TestRoiSliceManager(unittest.TestCase):
     def test_check_length_of_roi_key_entries_1d__too_long(self):
         _roi = [1, slice(0, 2)]
         obj = self.create_RoiSliceManager1d(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_length_of_roi_key_entries()
 
     def test_check_length_of_roi_key_entries_1d__too_short(self):
         _roi = [1]
         obj = self.create_RoiSliceManager1d(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._check_length_of_roi_key_entries()
 
     def test_convert_roi_key_to_slice_objects_1d__2_ints(self):
@@ -534,7 +535,7 @@ class TestRoiSliceManager(unittest.TestCase):
     def test_convert_roi_key_to_slice_objects_1d__wrong_length(self):
         _roi = [1, slice(0, 5)]
         obj = self.create_RoiSliceManager1d(_roi)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._convert_roi_key_to_slice_objects()
 
     def test_ndim_setter_simple(self):
@@ -542,7 +543,7 @@ class TestRoiSliceManager(unittest.TestCase):
         obj = RoiSliceManager(roi=_roi, dim=1)
         obj.ndim = 2
         self.assertEqual(obj.ndim, 2)
-        obj.roi
+        self.assertIsNone(obj.roi)
 
     def test_ndim_setter_previous_roi(self):
         _roi = (slice(0, 5), slice(10, 20))
@@ -646,7 +647,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _x2 = (43, -2)
         obj = RoiSliceManager(roi=[slice(*_x1)], dim=1)
         _roi2 = [slice(*_x2)]
-        with self.assertRaises(TypeError):
+        with self.assertRaises(UserConfigError):
             obj.apply_second_roi(_roi2)
         self.assertEqual(obj.roi, (slice(*_x1),))
 

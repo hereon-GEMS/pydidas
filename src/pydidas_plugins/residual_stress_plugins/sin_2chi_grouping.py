@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,11 +22,12 @@ This plugin expects the output from the SinSquareChiGrouping plugin as input.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 __all__ = ["Sin_2chiGrouping"]
+
 
 from typing import Any
 
@@ -47,7 +48,9 @@ LABELS_DIM0 = "0: d-, 1: d+, 2: d_mean"
 UNITS_NANOMETER = "nm"
 UNITS_ANGSTROM = "A"
 
-PARAMETER_KEEP_RESULTS = "keep_results"
+# modification of the keep_results parameter to ensure results are always stored
+_GENERIC_PARAMS = ProcPlugin.generic_params.copy()
+_GENERIC_PARAMS.get_param("keep_results").set_value_and_choices(True, [True])
 
 
 class Sin_2chiGrouping(ProcPlugin):
@@ -91,11 +94,7 @@ class Sin_2chiGrouping(ProcPlugin):
     )
     new_dataset = True
 
-    # modification of the keep_results parameter to ensure results are always stored
-    _generics = ProcPlugin.generic_params.copy()
-    _generics[PARAMETER_KEEP_RESULTS].value = True
-    _generics[PARAMETER_KEEP_RESULTS].choices = [True]
-    generic_params = _generics
+    generic_params = _GENERIC_PARAMS
 
     def execute(self, ds: Dataset, **kwargs: dict[str, Any]) -> tuple[Dataset, dict]:
         d_output_sin_2chi_method = self._calculate_diff_d_spacing_vs_sin_2chi(ds)

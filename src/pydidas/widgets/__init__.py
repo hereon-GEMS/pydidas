@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ interface.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+from types import ModuleType
 
 from . import (
     controllers,
@@ -37,7 +38,6 @@ from . import (
     parameter_config,
     plugin_config_widgets,
     selection,
-    silx_plot,
     windows,
     workflow_edit,
 )
@@ -48,22 +48,34 @@ from .utilities import *
 from .widget_with_parameter_collection import *
 
 
-__all__ = [
-    "controllers",
-    "data_viewer",
-    "dialogues",
-    "factory",
-    "framework",
-    "misc",
-    "parameter_config",
-    "plugin_config_widgets",
-    "selection",
-    "silx_plot",
-    "windows",
-    "workflow_edit",
-    "CreateWidgetsMixIn",
-] + (
-    file_dialog.__all__
+def __getattr__(name: str) -> ModuleType:
+    """Lazy-load the silx_plot module on demand."""
+    if name in ("silx_plot",):
+        import importlib
+
+        module = importlib.import_module(f".{name}", __name__)
+        globals()[name] = module  # Cache in module globals
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+__all__ = (
+    [
+        "controllers",
+        "data_viewer",
+        "dialogues",
+        "factory",
+        "framework",
+        "misc",
+        "parameter_config",
+        "plugin_config_widgets",
+        "selection",
+        "silx_plot",
+        "windows",
+        "workflow_edit",
+        "CreateWidgetsMixIn",
+    ]
+    + file_dialog.__all__
     + scroll_area.__all__
     + utilities.__all__
     + widget_with_parameter_collection.__all__

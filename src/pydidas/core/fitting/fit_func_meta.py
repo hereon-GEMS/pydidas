@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,17 +20,18 @@ Module with the FitFuncMeta class which is used for creating fit function classe
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FitFuncMeta"]
 
 
-from typing import TypeVar
+from typing import TYPE_CHECKING, ClassVar
 
 
-FitFuncBase = TypeVar("FitFuncBase")
+if TYPE_CHECKING:
+    from pydidas.core.fitting import FitFuncBase
 
 
 class FitFuncMeta(type):
@@ -38,7 +39,7 @@ class FitFuncMeta(type):
     Metaclass for fitting functions to store them in a registry.
     """
 
-    registry = {}
+    registry: ClassVar[dict[str, type["FitFuncBase"]]] = {}
 
     def __new__(mcls, cls_name: str, bases: tuple, attrs: dict):
         """
@@ -60,7 +61,7 @@ class FitFuncMeta(type):
         type
             The new class.
         """
-        _new_class = super(FitFuncMeta, mcls).__new__(mcls, cls_name, bases, attrs)
+        _new_class = super().__new__(mcls, cls_name, bases, attrs)
         mcls.register_class(_new_class)
         return _new_class
 
@@ -72,7 +73,9 @@ class FitFuncMeta(type):
         mcls.registry = {}
 
     @classmethod
-    def register_class(mcls, new_class: FitFuncBase, update_registry: bool = False):
+    def register_class(
+        mcls, new_class: type["FitFuncBase"], update_registry: bool = False
+    ):
         """
         Register a fit function class.
 
@@ -100,7 +103,7 @@ class FitFuncMeta(type):
         mcls.registry[_name] = new_class
 
     @classmethod
-    def get_fitter(mcls, name: str) -> FitFuncBase:
+    def get_fitter(mcls, name: str) -> type["FitFuncBase"]:
         """
         Get the fit function class referenced by given name.
 
@@ -111,7 +114,7 @@ class FitFuncMeta(type):
 
         Returns
         -------
-        FitFuncBase
+        type["FitFuncBase"]
             The fitter class.
         """
         return mcls.registry[name]

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,22 +20,97 @@ The pyfai_names module holds names (constants) extracted from pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "PYFAI_DETECTOR_MANUFACTURERS",
-    "PYFAI_DETECTOR_NAMES",
-    "PYFAI_MANUFACTURERS_OF_DETECTORS",
-    "PYFAI_SHAPES_OF_DETECTOR_MODELS",
     "PYFAI_DETECTOR_MODELS_OF_SHAPES",
-    "pyFAI_UNITS",
+    "PYFAI_DETECTOR_NAMES",
     "pyFAI_METHOD",
+    "pyFAI_UNITS",
 ]
 
+from pydidas.core.lazy_imports.lazy_objects import LazyDict, LazySet
 
-from pyFAI.detectors import Detector as _Detector
+
+def _pyfai_detector_manufacturers() -> set[str]:
+    """
+    Return the set of pyFAI detector manufacturers.
+
+    Returns
+    -------
+    set[str]
+        A set of unique detector manufacturers from pyFAI. Entries
+        are all string entries of the .MANUFACTURER attribute of the
+        pyFAI Detector classes. If a detector class has no manufacturer,
+        it is labeled as "Custom". If a detector class has multiple
+        manufacturers, they are joined with a " / " separator.
+    """
+    from pyFAI.detectors import Detector
+
+    _manufacturers = set()
+    for _class in Detector.registry.values():
+        _manufacturer = _class.MANUFACTURER or "Custom"
+        if isinstance(_manufacturer, list):
+            _manufacturer = " / ".join(_manufacturer)
+        _manufacturers.add(_manufacturer)
+    return _manufacturers
+
+
+def _pyfai_detector_names() -> set[str]:
+    """
+    Return the set of pyFAI detector names.
+
+    Returns
+    -------
+    set[str]
+        A set of unique detector names from pyFAI. Entries are all string
+        entries of the .__name__ attribute of the pyFAI Detector classes,
+        as well as any aliases defined in the .aliases attribute of those
+        classes.
+    """
+    from pyFAI.detectors import Detector
+
+    _names = set()
+    for _class in Detector.registry.values():
+        _aliases = _class.aliases
+        if _aliases:
+            _names.add(_class.__name__)
+            _names.update(_aliases)
+    return _names
+
+
+def _pyfai_det_models_of_shapes() -> dict[tuple[int, int], list[str]]:
+    """
+    Return a dictionary mapping detector shapes to their corresponding models.
+
+    Returns
+    -------
+    dict[tuple[int, int], list[str]]
+        A dictionary where keys are tuples representing the maximum shape
+        of detectors (height, width), and values are lists of strings
+        representing the corresponding detector models. Each model is
+        formatted as "[Manufacturer] ModelName".
+    """
+    from pyFAI.detectors import Detector
+
+    _models_of_shapes = {}
+    for _class in Detector.registry.values():
+        if not hasattr(_class, "MAX_SHAPE"):
+            continue
+        _manufacturer = _class.MANUFACTURER or "Custom"
+        if isinstance(_manufacturer, list):
+            _manufacturer = " / ".join(_manufacturer)
+        _model = _class.aliases[0] if _class.aliases else _class.__name__
+        _shape = _class.MAX_SHAPE
+        if _shape not in _models_of_shapes:
+            _models_of_shapes[_shape] = []
+        label = f"[{_manufacturer}] {_model}"
+        if label not in _models_of_shapes[_shape]:
+            _models_of_shapes[_shape].append(label)
+    return _models_of_shapes
 
 
 pyFAI_UNITS = {
@@ -60,29 +135,8 @@ pyFAI_METHOD = {
 }
 
 
-PYFAI_DETECTOR_MANUFACTURERS = set()
-PYFAI_DETECTOR_NAMES = set()
-PYFAI_MANUFACTURERS_OF_DETECTORS = {}
-PYFAI_SHAPES_OF_DETECTOR_MODELS = {}
-PYFAI_DETECTOR_MODELS_OF_SHAPES = {}
-
-for __name, __class in _Detector.registry.items():
-    __manufacturer = "Custom" if __class.MANUFACTURER is None else __class.MANUFACTURER
-    if isinstance(__manufacturer, list):
-        __manufacturer = " / ".join(__manufacturer)
-    __model = __class.aliases
-    if len(__model) > 0:
-        PYFAI_DETECTOR_NAMES.update(__model)
-        PYFAI_MANUFACTURERS_OF_DETECTORS[__model[0]] = __manufacturer
-        PYFAI_SHAPES_OF_DETECTOR_MODELS[__model[0]] = __class.MAX_SHAPE
-        PYFAI_DETECTOR_MANUFACTURERS.add(__manufacturer)
-        if __class.MAX_SHAPE in PYFAI_DETECTOR_MODELS_OF_SHAPES:
-            _label = f"[{__manufacturer}] {__model[0]}"
-            if _label not in PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE]:
-                PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = (
-                    PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] + [_label]
-                )
-        else:
-            PYFAI_DETECTOR_MODELS_OF_SHAPES[__class.MAX_SHAPE] = [
-                f"[{__manufacturer}] {__model[0]}"
-            ]
+PYFAI_DETECTOR_MANUFACTURERS: set[str] = LazySet(_pyfai_detector_manufacturers)
+PYFAI_DETECTOR_NAMES: set[str] = LazySet(_pyfai_detector_names)
+PYFAI_DETECTOR_MODELS_OF_SHAPES: dict[tuple[int, int], list[str]] = LazyDict(
+    _pyfai_det_models_of_shapes
+)

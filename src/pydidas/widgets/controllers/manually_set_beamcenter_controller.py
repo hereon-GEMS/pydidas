@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,23 +21,23 @@ beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ManuallySetBeamcenterController"]
 
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Any, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-import pyFAI
 from qtpy import QtCore
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import PYDIDAS_COLORS
+from pydidas.core.lazy_imports.pyFAI import Detector
 from pydidas.core.math.ellipse import (
     calc_points_on_ellipse,
     fit_circle_from_points,
@@ -46,22 +46,26 @@ from pydidas.core.math.ellipse import (
 from pydidas.data_io import import_data
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.misc import PointsForBeamcenterWidget
-from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
 class ManuallySetBeamcenterController(QtCore.QObject):
     """
     This class manages manually selecting and editing the beamcenter.
 
-    This controller requires a PydidasPlot2D to pick up selected points and to draw the
-    markers, as well as a parent widget which controls the beamcenter Parameters and a
-    PointPositionTableWidget to represent the points.
+    This controller requires a PydidasPlot2D to pick up selected points
+    and to draw the markers, as well as a parent widget which controls
+    the beamcenter Parameters and a PointPositionTableWidget to represent
+    the points.
 
     Parameters
     ----------
     parent_frame : pydidas.widgets.framework.BaseFrame
         The parent widget which displays the information.
-    plot : pydidas.widgets.silx_plot.PydidasPlot2D
+    plot : PydidasPlot2D
         The plot to draw markers etc.
     point_table : pydidas.widgets.misc.PointsForBeamcenterWidget
         The table to store the selected points.
@@ -86,8 +90,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         np.ndarray, np.ndarray :
             The x and y positions of the selected points.
         """
-        _x = np.zeros((len(points)))
-        _y = np.zeros((len(points)))
+        _x = np.zeros(len(points))
+        _y = np.zeros(len(points))
         for _index, (_xpos, _ypos) in enumerate(points):
             _x[_index] = _xpos
             _y[_index] = _ypos
@@ -96,7 +100,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
     def __init__(
         self,
         parent_frame: BaseFrame,
-        plot: PydidasPlot2D,
+        plot: "PydidasPlot2D",
         point_table: PointsForBeamcenterWidget,
         **kwargs: Any,
     ) -> None:
@@ -198,10 +202,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _marker_keys = [f"marker_{_point[0]}_{_point[1]}" for _point in self._points]
         _marker_keys.append("beamcenter")
         for _key in _marker_keys:
-            _item = self._plot._getItem("marker", legend=_key)  # noqa W0212
+            _item = self._plot._getItem("marker", legend=_key)
             if _item is not None:
                 _item.setColor(self._config["overlay_color"])
-        _item = self._plot._getItem("item", legend="beamcenter_outline")  # noqa W0212
+        _item = self._plot._getItem("item", legend="beamcenter_outline")
         if _item is not None:
             _item.setColor(self._config["overlay_color"])
 
@@ -475,7 +479,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         detector_name : str
             The name of the detector.
         """
-        self._mask = pyFAI.detector_factory(detector_name).mask
+        self._mask = Detector.factory(detector_name).mask
         self._mask_hash = hash("detector-name::" + detector_name)
 
     def _toggle_beamcenter_is_set(self, is_set: bool) -> None:
@@ -504,7 +508,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["selected_points"] = points
         for _point in self._points:
             _label = f"marker_{_point[0]}_{_point[1]}"
-            _marker = self._plot._getItem("marker", _label)  # noqa W0212
+            _marker = self._plot._getItem("marker", _label)
             _symbol = "o" if _point in points else "x"
             _marker.setSymbol(_symbol)
 

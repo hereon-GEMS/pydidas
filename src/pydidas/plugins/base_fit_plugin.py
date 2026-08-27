@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,12 +20,13 @@ Module with the BaseFitPlugin Plugin which holds generic methods for fitting plu
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
+from typing import ClassVar
 
 import numpy as np
 from qtpy import QtWidgets
@@ -63,7 +64,10 @@ class BaseFitPlugin(ProcPlugin):
     output_data_dim = -1
     num_peaks = 1
     new_dataset = True
-    advanced_parameters = ["fit_sigma_threshold", "fit_min_peak_height"]
+    advanced_parameters: ClassVar[list[str]] = [
+        "fit_sigma_threshold",
+        "fit_min_peak_height",
+    ]
     has_unique_parameter_config_widget = True
 
     def __init__(self, *args: tuple, **kwargs: dict):
@@ -276,11 +280,11 @@ class BaseFitPlugin(ProcPlugin):
         bool
             Flag whether all centers are in the input x range.
         """
-        return set([True]) == set(
+        return {True} == {
             self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
             for _key in self._fit_params
             if _key.startswith("center")
-        )
+        }
 
     def prepare_input_data(self, data: Dataset):
         """
@@ -325,12 +329,12 @@ class BaseFitPlugin(ProcPlugin):
             _xhigh = self.get_param_value("fit_upper_limit")
             self._config["data_x_hash"] = hash(self._data_x.tobytes())
             _range_low = (
-                np.where((self._data_x >= _xlow))[0]
+                np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
                 else np.arange(self._data_x.size)
             )
             _range_high = (
-                np.where((self._data_x <= _xhigh))[0]
+                np.where(self._data_x <= _xhigh)[0]
                 if _xhigh is not None
                 else np.arange(self._data_x.size)
             )
@@ -371,18 +375,18 @@ class BaseFitPlugin(ProcPlugin):
                 continue
             _index = self._config["param_labels"].index(_label)
             _xlow = np.amin(self._data_x)
-            if self._config["param_bounds_low"][_index] < _xlow:
-                self._config["param_bounds_low"][_index] = _xlow
+            self._config["param_bounds_low"][_index] = max(
+                self._config["param_bounds_low"][_index], _xlow
+            )
             _xhigh = np.amax(self._data_x)
-            if self._config["param_bounds_high"][_index] > _xhigh:
-                self._config["param_bounds_high"][_index] = _xhigh
+            self._config["param_bounds_high"][_index] = min(
+                self._config["param_bounds_high"][_index], _xhigh
+            )
 
     def update_fit_param_bounds(self):
         """Update the fitting bounds from Parameters."""
         for _key in self.params:
-            if _key.startswith("fit_peak") and (
-                _key.endswith("_xlow") or _key.endswith("_xhigh")
-            ):
+            if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
                 _suffix = "low" if _key.endswith("_xlow") else "high"
                 _index = _key[8 : -(len(_suffix) + 2)]
                 _label = f"center{_index}"
@@ -469,18 +473,48 @@ class BaseFitPlugin(ProcPlugin):
             "axis_units": self._data.axis_units,
             "data_unit": self._data.data_unit,
         }
+        _num_peaks = self._fitter.num_peaks
+        _num_peak_params = self._fitter.num_peak_params
+        _individual_plot_fitter = (
+            self._fitter.__mro__[1] if _num_peaks > 1 else self._fitter
+        )
         _datafit = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
         _startfit = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
         _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
         _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
-
+        individual_peaks = []
+        for i in range(_num_peaks):
+            if _individual_plot_fitter is None:
+                continue
+            _start = i * _num_peak_params
+            _end = _start + _num_peak_params
+            _peak_params = [
+                *_fit_param_vals[_start:_end],
+            ]
+            _peak_data = Dataset(
+                _individual_plot_fitter.profile(_peak_params, _xfit), **_dset_kws
+            )
+            individual_peaks.append(
+                {
+                    "plot": 1,
+                    "label": f"peak {i}",
+                    "data": _peak_data,
+                    "linewidth": 2.5,
+                }
+            )
         _details = {
-            "n_plots": 3,
-            "plot_titles": {0: "data and fit", 1: "residual", 2: "starting guess"},
+            "n_plots": 4,
+            "plot_titles": {
+                0: "data and fit",
+                1: "individual fits",
+                2: "residual",
+                3: "starting guess",
+            },
             "plot_ylabels": {
                 0: "intensity / a.u.",
                 1: "intensity / a.u.",
                 2: "intensity / a.u.",
+                3: "intensity / a.u.",
             },
             "metadata": (
                 (
@@ -505,19 +539,27 @@ class BaseFitPlugin(ProcPlugin):
                 {"plot": 0, "label": "fitted_data", "data": _datafit, "linewidth": 2.5},
                 {
                     "plot": 1,
+                    "label": "input data",
+                    "data": self._data,
+                    "symbol": "o",
+                    "linewidth": 0,
+                },
+                *individual_peaks,
+                {
+                    "plot": 2,
                     "label": "reference",
                     "data": _reference,
                     "linestyle": "--",
                 },
                 {
-                    "plot": 1,
+                    "plot": 2,
                     "label": "residual",
                     "data": _residual,
                     "symbol": "o",
                     "linewidth": 0,
                 },
-                {"plot": 2, "label": "input data", "data": self._data},
-                {"plot": 2, "label": "starting guess", "data": _startfit},
+                {"plot": 3, "label": "input data", "data": self._data},
+                {"plot": 3, "label": "starting guess", "data": _startfit},
             ],
         }
         if self.get_param_value("fit_bg_order") is not None:

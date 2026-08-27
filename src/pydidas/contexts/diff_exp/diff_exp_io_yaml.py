@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ export DiffractionExperimentContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,7 +29,8 @@ __all__ = ["DiffractionExperimentIoYaml"]
 
 
 from numbers import Integral, Real
-from typing import Union
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import yaml
@@ -39,6 +40,7 @@ from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentCont
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
 from pydidas.core import UserConfigError
 from pydidas.core.constants import LAMBDA_IN_A_TO_E, YAML_EXTENSIONS
+from pydidas.core.utils import verify_is_new_file_or_replace_set
 
 
 EXP = DiffractionExperimentContext()
@@ -52,59 +54,68 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
     extensions = YAML_EXTENSIONS
     format_name = "YAML"
 
-    @classmethod
-    def export_to_file(cls, filename: str, **kwargs: dict):
+    @staticmethod
+    def export_to_file(filename: Path | str, **kwargs: Any) -> None:
         """
         Write the DiffractionExperiment to a file.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
-        diffraction_exp : DiffractionExperiment, optional
-            The DiffractionExperiment instance to be exported. The default is the
-            DiffractionExperimentContext.
+        **kwargs : Any
+            The following keyword arguments are defined:
+
+            diffraction_exp : DiffractionExperiment, optional
+                The DiffractionExperiment instance to be exported.
+                The default is the DiffractionExperimentContext.
         """
-        _EXP = kwargs.get("diffraction_exp", EXP)
-        cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = _EXP.get_param_values_as_dict()
+        _exp = kwargs.get("diffraction_exp", EXP)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        _tmp_params = _exp.get_param_values_as_dict()
         # need to convert all float values to generic python "float" to
         # allow using the yaml.save_dump function
-        for _key, _val in tmp_params.items():
+        for _key, _val in _tmp_params.items():
             if isinstance(_val, Real) and not isinstance(_val, Integral):
-                tmp_params[_key] = float(_val)
-        tmp_params["detector_mask_file"] = str(tmp_params["detector_mask_file"])
-        del tmp_params["xray_energy"]
+                _tmp_params[_key] = float(_val)
+        _tmp_params["detector_mask_file"] = str(_tmp_params["detector_mask_file"])
+        del _tmp_params["xray_energy"]
         with open(filename, "w") as stream:
-            yaml.safe_dump(tmp_params, stream)
+            yaml.safe_dump(_tmp_params, stream)
 
     @classmethod
-    def import_from_file(
-        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
-    ):
+    def import_from_file(  # type: ignore[override]
+        cls,
+        filename: Path | str,
+        diffraction_exp: DiffractionExperiment | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
-        Restore the DiffractionExperimentContext from a YAML file.
+        Restore a DiffractionExperiment from a YAML file.
+
+        If a diffraction experiment is given as argument, this instance
+        is updated. If none is given, the generic DiffractionExperimentContext
+        is updated.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
-        diffraction_exp : Union[DiffractionExperiment, None], optional
+        diffraction_exp : DiffractionExperiment or None, optional
             The DiffractionExperiment instance to be updated.
         """
         with open(filename, "r") as stream:
             try:
-                cls.imported_params = yaml.safe_load(stream)
-            except yaml.YAMLError as yerr:
-                cls.imported_params = {}
-                raise yaml.YAMLError from yerr
-        if not isinstance(cls.imported_params, dict):
+                _imported_params = yaml.safe_load(stream)
+            except (yaml.YAMLError, UnicodeDecodeError):
+                _imported_params = None
+        if not isinstance(_imported_params, dict):
             raise UserConfigError(
                 f"Cannot interpret the selected file {filename} as a saved instance of "
                 "DiffractionExperimentContext."
             )
-        cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
+        _imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / _imported_params.get(
             "xray_wavelength", np.nan
         )
-        cls._verify_all_entries_present()
-        cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
+        cls.verify_all_entries_present(_imported_params)
+        cls.update_diffraction_exp(_imported_params, diffraction_exp=diffraction_exp)

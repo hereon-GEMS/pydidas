@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ the integration region for a plugin by selecting theROI graphically in a plot.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -288,10 +288,11 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
 
     @QtCore.Slot()
     def _process_exp_update(self) -> None:
-        """
-        Process updates of the DiffractionExperiment.
-        """
-        self._config["beamcenter"] = self._config["exp"].beamcenter
+        """Process updates of the DiffractionExperiment."""
+        try:
+            self._config["beamcenter"] = self._config["exp"].beamcenter
+        except UserConfigError:
+            return
         self._config["det_dist"] = self._config["exp"].get_param_value("detector_dist")
         if self._config["roi_plotted"]:
             self.show_plot_items("roi")

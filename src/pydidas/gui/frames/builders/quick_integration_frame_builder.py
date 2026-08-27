@@ -85,11 +85,11 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
         "create_empty_widget",
         ("tab_plot",),
         {
-            "layout_kwargs": dict(
-                contentsMargins=(10, 10, 10, 10),
-                columnStretch=(1, 1),
-                rowStretch=(0, 1),
-            ),
+            "layout_kwargs": {
+                "contentsMargins": (10, 10, 10, 10),
+                "columnStretch": (1, 1),
+                "rowStretch": (0, 1),
+            },
             "parent_widget": None,
         },
     ],

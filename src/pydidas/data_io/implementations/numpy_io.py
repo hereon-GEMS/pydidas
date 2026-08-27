@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the NumpyIo class for importing and exporting numpy data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -28,46 +28,49 @@ __all__ = []
 
 
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.core.constants import NUMPY_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors
+from pydidas.core.utils import (
+    CatchFileErrors,
+    verify_is_new_file_or_replace_set,
+)
 from pydidas.data_io.implementations.io_base import IoBase
 
 
 class NumpyIo(IoBase):
     """The IObase implementation for numpy files."""
 
-    extensions_export = NUMPY_EXTENSIONS
-    extensions_import = NUMPY_EXTENSIONS
-    format_name = "Numpy"
-    dimensions = [1, 2, 3, 4, 5, 6]
+    extensions_export: ClassVar[list[str]] = NUMPY_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = NUMPY_EXTENSIONS
+    format_name: ClassVar[str] = "Numpy"
+    dimensions: ClassVar[list[int]] = [1, 2, 3, 4, 5, 6]
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: Any):
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read data from a numpy file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file with the data to be imported.
         **kwargs : Any
             Any keyword arguments. These will be passed to the implemented
             importer. Supported arguments are:
 
-            roi : Union[tuple, None], optional
+            roi : tuple or None, optional
                 A region of interest for cropping. Acceptable are both 4-tuples
                 of integers in the format (y_low, y_high, x_low, x_high) and
                 2-tuples of integers or slice objects. If None, the full image
                 will be returned. The default is None.
-            returnType : Union[datatype, 'auto'], optional
+            astype : type or 'auto', optional
                 If 'auto', the image will be returned in its native data type.
-                If a specific datatype has been selected, the image is converted
-                to this type. The default is 'auto'.
+                If a specific datatype has been selected, the image is
+                converted to this type. The default is 'auto'.
             binning : int, optional
                 The rebinning factor to be applied to the image. The default
                 is 1.
@@ -75,21 +78,21 @@ class NumpyIo(IoBase):
         Returns
         -------
         data : pydidas.core.Dataset
-            The data in the form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded
+            metadata)
         """
         with CatchFileErrors(filename, EOFError):
-            _data = np.squeeze(np.load(filename))
-        cls._data = Dataset(_data)
-        return cls.return_data(**kwargs)
+            _data = Dataset(np.squeeze(np.load(filename)))
+        return NumpyIo.return_data(_data, **kwargs)
 
-    @classmethod
-    def export_to_file(cls, filename: Path | str, data: np.ndarray, **kwargs: Any):
+    @staticmethod
+    def export_to_file(filename: Path | str, data: np.ndarray, **kwargs: Any) -> None:
         """
         Export data to a numpy file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
@@ -97,7 +100,8 @@ class NumpyIo(IoBase):
             Supported keyword arguments are:
 
             overwrite : bool, optional
-                Flag to allow overwriting of existing files. The default is False.
+                Flag to allow overwriting of existing files. The default
+                is False.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         np.save(filename, data)

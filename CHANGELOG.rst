@@ -13,8 +13,14 @@ Improvements
 - Added a dedicated plugin to import NeXus NXdata with full metadata
   and in the shape of the Scan. This allows for conveniently restarting
   workflows from stored intermediate data.
+- Reworked the way NeXus files are structured for stronger compliance
+  with NeXus format.
+- Added an option to reference savers for ProcessingResults by their
+  *name* instead of the suffix (e.g. "NeXus (HDF5)" instead of only
+  ".nxs".
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
+- Added lazy imports of pyFAI to improve startup time.
 
 Programmatic changes
 --------------------
@@ -24,6 +30,23 @@ Programmatic changes
   architecture.
 - Reworked ReadOnlyTextWidget to allow appending and prepending text 
   to the widget text in a generic way.
+- Reworked the Scan importer/exporter classes and made the imported
+  params not a class variable but a local variable to preempt issues
+  with multiple parallel importers.
+- Reworked the DiffractionExperiment importer/exporter classes and
+  made the imported params not a class variable but a local variable
+  to preempt issues with multiple parallel importers.
+- Improved test coverage for DiffractionExp.
+- Added a dataclass for PluginResultInfos.
+- Modified the saver for ProcessingResults to be instance-based instead
+  of class-based
+- Added a ProcessingResultSaver class to handle export of results.
+- Added an option to export all Parameter values as export types in
+  the ParameterCollection
+- Updated the way pydidas handles font scaling on silx colorbars
+- When importing data, the return datatype in `import_data` calls must
+  be specified with `astype` instead of `datatype`.
+
 
 Bugfixes
 --------
@@ -47,6 +70,29 @@ Bugfixes
   to None (not supported in range)
 - Fixed an issue where the filename parameter was exported in the data
   browsing frame even though it was not intended.
+- Fixed an issue in Parameter which raised an Exception when trying to set
+  a number-tuple with a ndarray.
+- Fixed an issue which prevented saving results to a corrupted HDF5 file.
+- Fixed an issue in the ViewResultsFrame which did not properly count
+  the file number and frame number in loaded files in the
+  ShowInformationForResult popup window.
+- Fixed an issue with the ChangeCanvasAction which was incompatible with the
+  latest silx update to 3.1.0
+- Fixed an issue in RawIo class which did not clearly separate input and
+  output datatype assignments.
+- Fixed an issue with selecting binary and HDF5 files in the
+  SelectDataFrameWidget which did not correctly reset the parameter
+  widgets.
+- Fixed an issue in the FileDialog which displayed a text field by default
+  even if empty.
+- Fixed an issue in the DefineDiffractionExperiment frame which did not update
+  the displayed beamcenter after importing Fit2d parameters.
+- Fixed an issue which did not update the derived beamcenter in the
+  DefineDiffractionExperimentFrame on startup with value import.
+- Fixed an issue in the SelectDataFrameWidget which did not allow
+  to open binary images when no other image format was selected beforehand.
+- Fixed an issue which did not allow the QuickIntegrationFrame to be opened
+  when the experimental settings were not fully configured.
 
 
 v26.05.19

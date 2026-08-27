@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ plugins. It also keeps a registry of all the class objects for the user to acces
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -34,7 +34,7 @@ import importlib
 import inspect
 import warnings
 from pathlib import Path
-from typing import Any, Literal, Type
+from typing import Any, Literal
 
 from qtpy import QtCore
 
@@ -147,7 +147,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.find_and_register_plugins(*self._get_user_plugin_paths())
         self._config["initialized"] = True
         if self._config["must_emit_signal"]:
-            self.sig_updated_plugins.emit()  # noqa E0602
+            self.sig_updated_plugins.emit()
 
     def _get_user_plugin_paths(self) -> list[Path]:
         """
@@ -218,7 +218,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             if _path != Path() and _path.is_dir():
                 self._find_and_register_plugins_in_path(_path, reload)
         if self._config["initialized"]:
-            self.sig_updated_plugins.emit()  # noqa E0602
+            self.sig_updated_plugins.emit()
         else:
             self._config["must_emit_signal"] = True
 
@@ -291,7 +291,7 @@ class PluginRegistry(ObjectWithParameterCollection):
     @staticmethod
     def __get_classes_in_module(
         modname: str, filepath: Path
-    ) -> list[tuple[str, Type[type]]]:
+    ) -> list[tuple[str, type[type]]]:
         """
         Import a module from a file and get all class members of the module.
 
@@ -299,7 +299,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         ----------
         modname : str
             The registration name of the module
-        filepath : str
+        filepath : Path
             The full file path of the module.
 
         Returns
@@ -308,33 +308,34 @@ class PluginRegistry(ObjectWithParameterCollection):
             A list with class members with entries for each class in the
             form of (name, class).
         """
-        spec = importlib.util.spec_from_file_location(modname, filepath)  # noqa E0602
-        tmp_module = importlib.util.module_from_spec(spec)  # noqa E0602
+        spec = importlib.util.spec_from_file_location(modname, filepath)
+        tmp_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(tmp_module)
         cls_members = inspect.getmembers(tmp_module, inspect.isclass)
         del spec, tmp_module
         return cls_members
 
     def check_and_register_class(
-        self, class_: Type[BasePlugin] | Type[type], reload: bool = False
+        self, class_: type[type], reload: bool = False
     ) -> None:
         """
         Check whether a class is a valid plugin and register it.
 
         Parameters
         ----------
-        class_ : Type[BasePlugin] | Type[type]
-            The type of the class to be checked.
+        class_ : type[type]
+            The type of the class to be checked. Only classes of
+            type[BasePlugin] will be registered.
         reload : bool
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
         _class_bases = [
-            ".".join([_cls.__module__, _cls.__name__])
-            for _cls in inspect.getmro(class_)
+            f"{_cls.__module__}.{_cls.__name__}" for _cls in inspect.getmro(class_)
         ]
         if "pydidas.plugins.base_plugin.BasePlugin" not in _class_bases:
             return
+        assert issubclass(class_, BasePlugin)
         if class_.is_basic_plugin():
             self._plugin_basic_types[class_.__name__] = class_
             return
@@ -344,7 +345,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             self.remove_plugin_from_collection(class_)
             self.__add_new_class(class_)
 
-    def __add_new_class(self, class_: Type[BasePlugin]) -> None:
+    def __add_new_class(self, class_: type[BasePlugin]) -> None:
         """
         Add a new class to the collection.
 
@@ -369,7 +370,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         )
         self._plugin_names[class_.plugin_name] = class_.__name__
 
-    def remove_plugin_from_collection(self, class_: Type[BasePlugin]) -> None:
+    def remove_plugin_from_collection(self, class_: type[BasePlugin]) -> None:
         """
         Remove a Plugin from the PluginCollection.
 
@@ -395,7 +396,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         self.verify_is_initialized()
         return list(self.plugins.keys())
 
-    def get_plugin_by_plugin_name(self, plugin_name: str) -> Type[BasePlugin]:
+    def get_plugin_by_plugin_name(self, plugin_name: str) -> type[BasePlugin]:
         """
         Get a plugin by its plugin name.
 
@@ -470,7 +471,7 @@ class PluginRegistry(ObjectWithParameterCollection):
 
     def get_all_plugins_of_type(
         self, plugin_type: Literal["base", "input", "proc", "output"]
-    ) -> list[Type[BasePlugin]]:
+    ) -> list[type[BasePlugin]]:
         """
         Get all Plugins of a specific type (base, input, proc, or output).
 
@@ -525,7 +526,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             path = Path(path)
         if path not in self._plugin_paths:
             raise UserConfigError(
-                f"The given path `{str(path)}` is not registered with the "
+                f"The given path `{path!s}` is not registered with the "
                 "PluginCollection."
             )
         self._plugin_paths.remove(path)
@@ -569,6 +570,6 @@ class PluginRegistry(ObjectWithParameterCollection):
             self._plugin_names = {}
             self._plugin_paths = []
             self._config["initialized"] = False
-            self.sig_updated_plugins.emit()  # noqa E0602
+            self.sig_updated_plugins.emit()
             return
         print("No confirmation was given: The PluginCollection has not been reset.")

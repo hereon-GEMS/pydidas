@@ -71,6 +71,9 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             An optional factor to modify the width of text elements in the
             widget based on the font metrics. If None, the default width
             for the used Parameter widgets is applied. The default is None.
+        show_binary_checkbox : bool, optional
+            Flag whether to show the checkbox for binary decoding. The default
+            is True.
     """
 
     sig_new_selection = QtCore.Signal(str, dict)
@@ -81,6 +84,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         "ndim",
         "import_hdf5_metadata",
         "font_metric_width_factor",
+        "show_binary_checkbox",
     ]
     default_params = get_generic_param_collection(
         "filename",
@@ -131,7 +135,8 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         self.add_any_widget(
             "binary_decoder",
             ConfigureBinaryDecodingWidget(
-                params=ParameterCollection(self.get_param("filename"))
+                params=ParameterCollection(self.get_param("filename")),
+                show_checkbox=kwargs.get("show_binary_checkbox", True),
             ),
         )
 
@@ -167,10 +172,11 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if self.hdf5_file:
             self._process_new_hdf5_filename()
         elif self.binary_file:
+            self._toggle_file_selection(False, emit_signal=False)
             self._widgets["binary_decoder"].set_new_filename(_fname)
         else:
-            self._toggle_file_selection(True)
             self._selected_new_frame()
+            self._toggle_file_selection(True)
 
     def _toggle_file_selection(self, selected: bool, emit_signal: bool = True) -> None:
         """
@@ -239,7 +245,7 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
             self.set_param_and_widget_value_and_choices(
                 "slicing_axis", _curr_ax, _choices, emit_signal=False
             )
-            self._selected_new_slicing_axis(_curr_ax, emit_signal=False)
+            self._selected_new_slicing_axis(_curr_ax, emit_signal=False)  # type: ignore[call-arg]
         self._widgets["index_selector"].setVisible(self._selection.ndim > self.__ndim)
         self.toggle_param_widget_visibility(
             "slicing_axis", self._selection.ndim > self.__ndim
@@ -272,7 +278,6 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if emit_signal:
             self._selected_new_frame()
 
-    @QtCore.Slot(dict)
     def _selected_new_frame(self, config: dict | None = None) -> None:
         """
         Open a new file / frame based on the input Parameters.
@@ -290,12 +295,10 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
         if self.hdf5_file:
             config["dataset"] = self.get_param_value("hdf5_key_str", dtype=str)
             config["import_metadata"] = self.__import_hdf5_metadata
-        self.sig_new_selection.emit(  # type: ignore[attr-defined]
-            self.current_filename, config
-        )
+        self.sig_new_selection.emit(self.current_filename, config)
 
     @QtCore.Slot(int, str)
-    def _new_frame_index(self, ax_index: int, frame_slice_str: str) -> None:  # noqa ARG001
+    def _new_frame_index(self, ax_index: int, frame_slice_str: str) -> None:
         """
         Process a new frame index from the axis selector.
 
@@ -330,4 +333,4 @@ class SelectDataFrameWidget(WidgetWithParameterCollection, AssociatedFileMixin):
     def _process_binary_decoding_invalid(self) -> None:
         """Process invalid binary decoding settings."""
         self.__file_valid = False
-        self.sig_file_valid.emit(False)  # type: ignore[attr-defined]
+        self.sig_file_valid.emit(False)

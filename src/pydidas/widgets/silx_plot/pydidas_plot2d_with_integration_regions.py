@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
-# ruff: noqa: C901
 
 """
 Module with the PydidasPlot2DwithIntegrationRegions class which extends the
@@ -23,7 +22,7 @@ PydidasPlot2D with functionality to draw integration regions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -158,9 +157,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             The azimuthal integration region. Use None for the full detector or a tuple
             with (azi_start, azi_end) in radians for a region.
         """
-        if isinstance(azimuthal, tuple):
-            if np.mod(azimuthal, 2 * np.pi).std() < 1e-6:
-                azimuthal = None
+        if isinstance(azimuthal, tuple) and np.mod(azimuthal, 2 * np.pi).std() < 1e-6:
+            azimuthal = None
         if radial is None and azimuthal is None:
             _points = self._config["diffraction_exp"].det_corners
         elif radial is not None:
@@ -246,7 +244,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             if azimuthal[0] < _chi_det < azimuthal[1]:
                 _points.extend(self._config["diffraction_exp"].det_corners)
             else:
-                self.remove_plot_items("roi")  # noqa E1101
+                self.remove_plot_items("roi")
         elif len(_intersects0) == 2 and len(_intersects1) == 2:
             _points = self._get_outline(_intersects1[0], _intersects0[0])
             _points2 = self._get_outline(_intersects0[1], _intersects1[1])

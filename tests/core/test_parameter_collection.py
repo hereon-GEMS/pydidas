@@ -242,7 +242,7 @@ class TestParameterCollection(unittest.TestCase):
     def test_set_item__correct(self):
         obj = ParameterCollection(*self._params)
         obj["Test5"] = Parameter("Test5", float, default=-1)
-        self.assertTrue("Test5" in obj.keys())
+        self.assertTrue("Test5" in obj)
 
     def test_set_item__wrong_type(self):
         obj = ParameterCollection(*self._params)

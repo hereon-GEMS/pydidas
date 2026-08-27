@@ -126,7 +126,7 @@ class ToggleOptionsButton(PydidasPushButton):
         return self._linked_widget_visible
 
     @linked_widget_visible.setter
-    def linked_widget_visible(self, value: bool | int | float) -> None:
+    def linked_widget_visible(self, value: bool | float) -> None:
         """
         Set the advanced visibility status.
 

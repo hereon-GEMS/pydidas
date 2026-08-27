@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["SubtractBackgroundImage"]
 
 
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -77,7 +77,7 @@ class SubtractBackgroundImage(ProcPlugin):
         "roi_yhigh",
         "binning",
     )
-    advanced_parameters = [
+    advanced_parameters: ClassVar[list[str]] = [
         "hdf5_slicing_axis",
         "use_roi",
         "roi_xlow",

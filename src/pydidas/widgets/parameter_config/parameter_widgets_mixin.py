@@ -27,7 +27,8 @@ __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
 
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from qtpy import QtCore
 

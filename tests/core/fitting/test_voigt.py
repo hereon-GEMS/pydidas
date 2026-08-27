@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -55,14 +55,14 @@ class TestVoigt(unittest.TestCase):
         pass
 
     def test_guess_peak_start_params__narrow_peak(self):
-        _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
+        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
         _params = Voigt.guess_fit_start_params(self._x, _data)
         self.assertTrue(_params[1] > 0)
 
     def test_guess_peak_start_params__normal_peak(self):
-        _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
+        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
         _params = Voigt.guess_fit_start_params(self._x, self._data)
@@ -75,7 +75,7 @@ class TestVoigt(unittest.TestCase):
         )
         _bounds[0][3] = self._x[42]
         _bounds[1][3] = self._x[50]
-        _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
+        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
         _params = Voigt.guess_fit_start_params(self._x, self._data, bounds=_bounds)
@@ -89,7 +89,7 @@ class TestVoigt(unittest.TestCase):
         )
         _bounds[0][3] = self._x[35]
         _bounds[1][3] = self._x[38]
-        _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
+        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
         _params = Voigt.guess_fit_start_params(self._x, self._data, bounds=_bounds)

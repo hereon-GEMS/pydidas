@@ -28,8 +28,6 @@ __status__ = "Production"
 __all__ = ["PydidasQsettings"]
 
 
-from typing import Optional, Union
-
 from pydidas.core.pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
@@ -44,7 +42,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         The default is None.
     """
 
-    def __init__(self, version: Optional[str] = None):
+    def __init__(self, version: str | None = None):
         PydidasQsettingsMixin.__init__(self, version=version)
 
     def show_all_stored_q_settings(self):
@@ -70,7 +68,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
             _key.removeprefix(_prefix): self.q_settings.value(_key)
             for _key in _keys
             if (
-                (_key.startswith(_prefix) or _key.startswith("font/"))
+                _key.startswith((_prefix, "font/"))
                 and not (_key.startswith(f"{_prefix}dialogues"))
             )
         }
@@ -88,7 +86,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         """
         self.q_settings.setValue(f"{self.q_settings_version}/{key}", val)
 
-    def value(self, key: str, dtype: Union[None, type] = None) -> object:
+    def value(self, key: str, dtype: None | type = None) -> object:
         """
         Get the value from a QSetting key.
 

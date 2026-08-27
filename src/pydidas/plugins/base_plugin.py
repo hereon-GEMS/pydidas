@@ -31,7 +31,7 @@ __all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
-from typing import Any, NoReturn, Self
+from typing import Any, ClassVar, NoReturn, Self
 
 from qtpy import QtCore
 
@@ -51,6 +51,7 @@ from pydidas.core.utils import (
     strip_param_description_from_docstring,
 )
 from pydidas.managers import ImageMetadataManager
+from pydidas.plugins.plugin_result_info import PluginResultInfo
 
 
 ptype = {
@@ -153,8 +154,8 @@ class BasePlugin(ObjectWithParameterCollection):
     output_data_unit = ""
     new_dataset = False
     has_unique_parameter_config_widget = False
-    advanced_parameters = []
-    base_classes = []
+    advanced_parameters: ClassVar[list[str]] = []
+    base_classes: ClassVar[list[type["BasePlugin"]]] = []
 
     @classmethod
     def register_as_base_class(cls) -> None:
@@ -241,9 +242,7 @@ class BasePlugin(ObjectWithParameterCollection):
 
         _description.append(["header", "Parameters"])
         _param_docstrings = get_param_description_from_docstring(_doc)
-        _param_doc_keys = {
-            _k.split(":")[0].strip(): _k for _k in _param_docstrings.keys()
-        }
+        _param_doc_keys = {_k.split(":")[0].strip(): _k for _k in _param_docstrings}
         for _param in list(cls.generic_params.values()) + list(
             cls.default_params.values()
         ):
@@ -316,12 +315,32 @@ class BasePlugin(ObjectWithParameterCollection):
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
         for _kw, _item in kwargs.items():
-            if _kw in self.params.keys():
+            if _kw in self.params:
                 self.set_param_value(_kw, _item)
         self._config["test_mode"]: bool = False
         self._config["input_data"]: int | Dataset | None = None
         self.node_id = None
         self.advanced_params_visible = False
+
+    @property
+    def plugin_result_info(self) -> PluginResultInfo:
+        """
+        Get the initial plugin result info.
+
+        Note that the initial info is still missing information about the
+        full result shape (which includes the Scan shape as well as
+        metadata which might be passed on through the ProcessingTree.
+
+        Returns
+        -------
+        PluginResultInfo
+            The initial plugin result info.
+        """
+        return PluginResultInfo(
+            label=self.get_param_value("label"),
+            plugin_name=self.plugin_name,
+            result_title=self.result_title,
+        )
 
     def __copy__(self) -> Self:
         """
@@ -555,7 +574,7 @@ class BasePlugin(ObjectWithParameterCollection):
             dimensionality) which define the image ROI or None if the Plugin
             does not define a ROI.
         """
-        if "use_roi" not in self.params.keys() or not self.get_param_value("use_roi"):
+        if "use_roi" not in self.params or not self.get_param_value("use_roi"):
             return None
         _roi_data_dim = getattr(self, "base_output_data_dim", self.output_data_dim)
         if _roi_data_dim == 1:
@@ -591,7 +610,7 @@ class BasePlugin(ObjectWithParameterCollection):
             "is invalid:\n" + error_str
         )
 
-    def raise_UserConfigError(self, error_str: str) -> NoReturn:  # noqa
+    def raise_UserConfigError(self, error_str: str) -> NoReturn:
         """
         Raise a UserConfigError with the given error string.
 

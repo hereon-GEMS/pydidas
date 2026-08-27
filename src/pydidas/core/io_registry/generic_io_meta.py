@@ -27,7 +27,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["GenericIoMeta"]
 
-from typing import Any
+
+from pathlib import Path
+from typing import Any, ClassVar
 
 from pydidas.core.exceptions import UserConfigError
 from pydidas.core.utils.file_utils import get_extension
@@ -39,9 +41,11 @@ class GenericIoMeta(type):
     different file extension.
     """
 
-    registry = {}
+    registry: ClassVar[dict[str, type["GenericIoMeta"]]] = {}
 
-    def __new__(cls, clsname, bases, attrs):
+    def __new__(
+        cls, clsname: str, bases: tuple[type], attrs: dict[str, Any]
+    ) -> "GenericIoMeta":
         """
         Call the class' (i.e. the WorkflowTree exporter) __new__ method
         and register the class with the registry.
@@ -52,29 +56,27 @@ class GenericIoMeta(type):
             The new class.
         clsname : str
             The name of the new class
-        bases : list
-            The list of class bases.
-        attrs : dict
-            The class attributes.
+        bases : tuple[type]
+            The tuple of class bases.
+        attrs : dict[str, Any]
+            The class attributes dict.
 
         Returns
         -------
         type
             The new class.
         """
-        _new_class = super(GenericIoMeta, cls).__new__(cls, clsname, bases, attrs)
-        cls.register_class(_new_class)
-        return _new_class
+        _new_class = super().__new__(cls, clsname, bases, attrs)  # type: ignore[misc]
+        cls.register_class(_new_class)  # type: ignore[misc]
+        return _new_class  # type: ignore[return-value]
 
     @classmethod
-    def clear_registry(cls):
-        """
-        Clear the registry and remove all items.
-        """
+    def clear_registry(cls) -> None:
+        """Clear the registry and remove all items."""
         cls.registry = {}
 
     @classmethod
-    def register_class(cls, new_class, update_registry=False):
+    def register_class(cls, new_class: type, update_registry: bool = False) -> None:
         """
         Register a class as object for its native extensions.
 
@@ -82,7 +84,7 @@ class GenericIoMeta(type):
         ----------
         new_class : type
             The class to be registered.
-        update_registry : bool, optional
+        update_registry : bool
             Keyword to allow updating / overwriting of registered extensions.
             The default is False.
 
@@ -92,17 +94,18 @@ class GenericIoMeta(type):
             If an extension associated with new_class has already been
             registered and update_registry is False.
         """
-        for _ext in new_class.extensions:
+        for _ext in new_class.extensions:  # type: ignore[attr-defined]
             if not _ext.startswith("."):
                 _ext = "." + _ext
             if _ext.lower() in cls.registry and not update_registry:
                 raise KeyError(
-                    f"A class has already been registered for the extension `{_ext.lower()}`."
+                    "A class has already been registered for the extension "
+                    f"`{_ext.lower()}`."
                 )
             cls.registry[_ext.lower()] = new_class
 
     @classmethod
-    def verify_extension_is_registered(cls, ext):
+    def verify_extension_is_registered(cls, ext: str) -> None:
         """
         Verify the extension is registered with the MetaClass.
 
@@ -123,7 +126,7 @@ class GenericIoMeta(type):
             )
 
     @classmethod
-    def is_extension_registered(cls, extension):
+    def is_extension_registered(cls, extension: str) -> bool:
         """
         Check if the extension of filename corresponds to a registered
         class.
@@ -139,13 +142,11 @@ class GenericIoMeta(type):
             Flag whether the extension is registered or not.
         """
         if not extension.startswith("."):
-            extension = "." + extension
-        if extension.lower() in cls.registry:
-            return True
-        return False
+            extension = f".{extension}"
+        return extension.lower() in cls.registry
 
     @classmethod
-    def get_string_of_formats(cls):
+    def get_string_of_formats(cls) -> str:
         """
         Get a list of strings with the different formats and extensions.
 
@@ -159,58 +160,61 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = [f"*{_key}" for _key in cls.registry.keys()]
+        _extensions = [f"*{_key}" for _key in cls.registry]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
             f"{name} (*{' *'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)
 
     @classmethod
-    def get_registered_formats(cls):
+    def get_registered_formats(cls) -> dict[str, list[str]]:
         """
         Get the names of all registered formats and the corresponding
         file extensions.
 
         Returns
         -------
-        dict
+        dict[str, list[str]]
             A dictionary with <format name> : <extensions> entries.
         """
-        _formats = {_cls.format_name: _cls.extensions for _cls in cls.registry.values()}
+        _formats = {
+            _cls.format_name: _cls.extensions  # type: ignore[attr-defined]
+            for _cls in cls.registry.values()
+        }
         return _formats
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs: Any):
+    def export_to_file(cls, filename: Path | str, **kwargs: Any) -> None:
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The full filename and path.
-        tree : pydidas.workflow.WorkflowTree
-            The instance of the WorkflowTree
-        kwargs : Any
+        **kwargs : Any, optional
             Any kwargs which should be passed to the underlying exporter.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
-        _io_class.export_to_file(filename, **kwargs)
+        _io_class.export_to_file(filename, **kwargs)  # type: ignore[attr-defined]
 
     @classmethod
-    def import_from_file(cls, filename):
+    def import_from_file(cls, filename: Path | str, **kwargs: Any) -> None:
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The full filename and path.
+        **kwargs : Any, optional
+            Keyword arguments to be passed to the underlying importer.
         """
         _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
-        _io_class.import_from_file(filename)
+        _io_class.import_from_file(filename, **kwargs)  # type: ignore[attr-defined]

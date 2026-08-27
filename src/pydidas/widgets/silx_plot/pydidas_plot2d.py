@@ -29,25 +29,19 @@ __all__ = ["PydidasPlot2D"]
 
 
 from contextlib import nullcontext
-from functools import partial
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui import qt
-from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
-from silx.gui.plot.items import Scatter
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, PydidasQsettingsMixin
+from pydidas.core.lazy_imports.silx import BackendMatplotlib, Colormap, Scatter
 from pydidas.widgets.silx_plot._coordinate_transform_button import (
     CoordinateTransformButton,
-)
-from pydidas.widgets.silx_plot._silx_tickbar import (
-    tickbar_paintEvent,
-    tickbar_paintTick,
 )
 from pydidas.widgets.silx_plot.pydidas_position_info import PydidasPositionInfo
 from pydidas.widgets.silx_plot.silx_actions import (
@@ -73,7 +67,7 @@ _IMAGE_LEGEND = "pydidas image"
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
-    A customized silx.gui.plot.Plot2D with an additional features.
+    A customized silx Plot2D with an additional features.
 
     Additional features are implemented through additional SilxActions which
     are added to the toolbar.
@@ -82,13 +76,19 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     sig_get_more_info_for_data = QtCore.Signal(float, float)
     sig_new_data_size = QtCore.Signal(int, int)
     sig_data_linearity = QtCore.Signal(bool)
-    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
+    init_kwargs: ClassVar[list[str]] = [
+        "cs_transform",
+        "use_data_info_action",
+        "diffraction_exp",
+    ]
 
     def __init__(self, **kwargs: Any) -> None:
         PydidasQsettingsMixin.__init__(self)
         Plot2D.__init__(
             self, parent=kwargs.get("parent", None), backend=kwargs.get("backend", None)
         )
+        if not isinstance(self.getBackend(), BackendMatplotlib):
+            raise TypeError("PydidasPlot2D only supports the matplotlib backend.")
         self._default_unit: str = "no unit"
         self.__plotted_data_shape: tuple[int, int] = (0, 0)
         self._qtapp = PydidasQApplication.instance()
@@ -295,7 +295,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _scale: list[float] = []
         _xlimit = self.getGraphXLimits() if self._actions["lock_zoom"].locked else None
         _ylimit = self.getGraphYLimits() if self._actions["lock_zoom"].locked else None
-        # calling axis #1 [with x values]  first because silx expects (x, y) values.
+        # calling axis #1 [with x values] first because silx expects (x, y) values.
         for _dim in (1, 0):
             _ax = data.get_axis_range(_dim)
             _delta = (_ax.max() - _ax.min()) / _ax.size
@@ -393,9 +393,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "cs_transform_valid": False,
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "diffraction_exp": (
-                DiffractionExperimentContext()
-                if kwargs.get("diffraction_exp", None) is None
-                else kwargs.get("diffraction_exp")
+                kwargs.get("diffraction_exp") or DiffractionExperimentContext()
             ),
         }
 
@@ -410,7 +408,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             diffraction_exp=self._config["diffraction_exp"],
         )
         _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
-        # _layout = self.findChild(self._positionWidget.__class__).parent().layout()
         _layout = self._positionWidget.parent().layout()
         _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self._positionWidget = _new_position_widget
@@ -425,18 +422,15 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         """Create the custom actions"""
         self._actions: dict[str, QtGui.QAction | QtWidgets.QToolButton] = {}
         # The LockZoomAction can be used to disable automatic zooming
-        # noinspection PyTypeChecker
         self._actions["lock_zoom"] = LockZoomAction(self, parent=self)
 
         # The ChangeCanvasAction will toggle between expanding the canvas
         # and setting a tight canvas fitting to the data
-        # noinspection PyTypeChecker
-        self._actions["canvas"] = ChangeCanvasAction(self, parent=self)  # type: ignore[arg-type]
+        self._actions["canvas"] = ChangeCanvasAction(self, parent=self)
 
         # The CropHistogramOutliersAction is used to crop the histogram
         # to ignore low and high outliers in the scaling
-        # noinspection PyTypeChecker
-        self._actions["outliers"] = CropHistogramOutliersAction(self, parent=self)  # type: ignore[arg-type]
+        self._actions["outliers"] = CropHistogramOutliersAction(self, parent=self)
 
         # The AutoscaleToMinMaxAction is used to reset the colormap to
         # autoscaling to min / max of the image.
@@ -444,7 +438,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         # The AutoscaleToMeanAndThreeSigmaAction resets the automatic histogram
         # mode to the data mean and 3 sigma ranges
-        # noinspection PyTypeChecker
         self._actions["autoscale_mean_3sigma"] = AutoscaleToMeanAndThreeSigmaAction(
             self, parent=self
         )  # type: ignore[arg-type]
@@ -460,7 +453,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             # allow to transform the coordinate system and to display image
             # coordinates in polar coordinates
             # (with r / mm, 2theta / deg or q / nm^-1) scaling.
-            # noinspection PyTypeChecker
             self._actions["cs_transform"] = CoordinateTransformButton(
                 parent=self,
                 plot=self,
@@ -477,7 +469,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             "autoscale_mean_3sigma": self.keepDataAspectRatioAction,
             "data_info": None,
         }
-        for _key in self._actions.keys():
+        for _key in self._actions:
             if _key == "cs_transform":
                 continue
             self.group.addAction(self._actions[_key])
@@ -518,9 +510,6 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             )
             _cmap.setNaNColor(self.q_settings_get("user/cmap_nan_color"))
             self.setDefaultColormap(_cmap)
-        _tb = self.getColorBarWidget().getColorScaleBar().getTickBar()
-        _tb.paintEvent = partial(tickbar_paintEvent, _tb)
-        _tb._paintTick = partial(tickbar_paintTick, _tb)
 
     # -----------------------------------------#
     # private update methods                   #

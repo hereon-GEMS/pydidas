@@ -29,7 +29,7 @@ __all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
-from typing import Any, Optional, Self, Type
+from typing import Any, Self
 
 from qtpy import QtCore
 
@@ -72,14 +72,14 @@ class PydidasQsettingsMixin:
         An optional version string. The default is the pydidas version number.
     """
 
-    def __init__(self, version: Optional[str] = None):
+    def __init__(self, version: str | None = None):
         self.q_settings = _CopyablePydidasQSettings()
         self.q_settings_version = version if version is not None else VERSION
 
     def q_settings_get(
         self,
         key: str,
-        dtype: type[Integral] | type[Real] | Type | None = None,
+        dtype: type[Integral] | type[Real] | type | None = None,
         default: Any | None = None,
     ) -> Any:
         """

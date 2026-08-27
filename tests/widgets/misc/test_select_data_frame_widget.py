@@ -25,8 +25,8 @@ __status__ = "Production"
 
 
 import warnings
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 from unittest.mock import patch
 
 import h5py
@@ -258,9 +258,7 @@ def test__select_binary_file(qtbot, widget, path_w_data_files) -> None:
     ):
         widget._widgets["binary_decoder"].set_param_and_widget_value("raw_n_x", 6)
     qtbot.wait(5)  # ensure signal processing
-    # noinspection PyUnresolvedReferences
     _emitted_fname, _emitted_kwargs = widget.spy_sig_new_selection.results[0]
-    # noinspection PyUnresolvedReferences
     assert widget.spy_sig_file_valid.n == 2
     # noinspection PyUnresolvedReferences
     assert widget.spy_sig_file_valid.results[1] == [True]

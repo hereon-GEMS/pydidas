@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,15 +20,15 @@ Tests for the SinSquareChiGrouping class / plugin.
 """
 
 __author__ = "Gudrun Lotze"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Gudrun Lotze"
 __status__ = "Development"
 
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from numbers import Real
-from typing import Callable
 
 import numpy as np
 import numpy.testing as npt
@@ -39,7 +39,6 @@ from pydidas_plugins.residual_stress_plugins.sin_square_chi_grouping import (
     LABELS_POSITION,
     LABELS_SIN2CHI,
     NPT_AZIM_LIMIT,
-    PARAMETER_KEEP_RESULTS,
     S2C_TOLERANCE,
     UNITS_DEGREE,
 )
@@ -66,6 +65,7 @@ ALTERNATE_FIT_DATA_LABEL = (
 UNITS_ANGSTROM = "A"
 UNITS_NANOMETER = "nm"
 OUTPUT_LABEL = "d-spacing"
+X_DEFAULT = np.arange(0, 5)
 
 
 @pytest.fixture
@@ -174,8 +174,8 @@ def test_plugin_initialization(plugin):
     assert plugin.new_dataset
 
     # check plugin is initialised with autosave option (True or 1)
-    assert plugin.params.get_value(PARAMETER_KEEP_RESULTS)
-    assert plugin.generic_params[PARAMETER_KEEP_RESULTS].value == 1
+    assert plugin.params.get_value("keep_results")
+    assert plugin.generic_params["keep_results"].value == 1
 
 
 def test_plugin_inheritance():
@@ -274,7 +274,7 @@ def generate_spatial_fit_res(
     return result_array
 
 
-def generate_result_array_spatial(x=np.arange(0, 5), fit_labels=None):
+def generate_result_array_spatial(x=X_DEFAULT, fit_labels=None):
     y = np.arange(2, 8)  # y-range is always given
 
     if fit_labels is None:
@@ -631,7 +631,6 @@ def base_dataset_one_fit_parameter_factory():
 def test__extract_and_verify_units_validation(
     plugin, base_dataset_one_fit_parameter_factory, unit, expected_unit
 ):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(unit)
 
     plugin._extract_and_verify_units(test_ds)
@@ -645,7 +644,6 @@ def test__extract_and_verify_units_validation(
 def test__extract_and_verify_units_chi_missing(
     plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_label(0, "delta")
 
@@ -661,7 +659,6 @@ def test__extract_and_verify_units_chi_missing(
 def test__extract_and_verify_units_chi_unit_wrong(
     plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.update_axis_unit(0, "rad")
 
@@ -677,7 +674,6 @@ def test__extract_and_verify_units_chi_unit_wrong(
 def test__extract_and_verify_units_position_missing(
     plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label = f"length / {UNITS_ANGSTROM}"
 
@@ -691,7 +687,6 @@ def test__extract_and_verify_units_position_missing(
 def test__extract_and_verify_units_position_unit_wrong(
     plugin, base_dataset_one_fit_parameter_factory
 ):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
     test_ds.data_label = f"{LABELS_POSITION} / m"  # Set an invalid unit for position
 
@@ -703,7 +698,6 @@ def test__extract_and_verify_units_position_unit_wrong(
 
 
 def test__ds_slicing_1d_validation(plugin, base_dataset_one_fit_parameter_factory):
-    plugin = plugin
     test_ds = base_dataset_one_fit_parameter_factory(UNITS_ANGSTROM)
 
     chi, ds = plugin._ds_slicing_1d(test_ds)
@@ -774,7 +768,6 @@ def test__chi_pos_verification_success(
     fit_label_input,
     expected_chi_pos_values,
 ):
-    plugin = plugin
     test_ds = base_dataset_with_fit_labels_factory(fit_label_input)
 
     (chi_pos_res, (pos_idx_res, pos_key_res)) = plugin._chi_pos_verification(test_ds)
@@ -945,7 +938,7 @@ def test__ds_slicing_beyond_bounds_v2(plugin):
     )
     ds2.update_axis_label(3, fit_labels)
 
-    chi_key, (pos_key, pos_idx) = plugin._chi_pos_verification(ds2)
+    _, (_, pos_idx) = plugin._chi_pos_verification(ds2)
     # Position has a key of 5
     assert pos_idx == 5
 
@@ -1027,10 +1020,9 @@ def test__idx_s2c_grouping_basic(plugin):
 
 def test__idx_s2c_grouping_tolerance_effectiveness(plugin):
     chi = np.array([0, 0.001, 0.002, 0.003])
-    n_components, labels = plugin._idx_s2c_grouping(chi, tolerance=0.00001)
-    assert (
-        n_components == 1
-    )  # All should be in one group due to small variation and tight tolerance
+    n_components, _ = plugin._idx_s2c_grouping(chi, tolerance=0.00001)
+    # All should be in one group due to small variation and tight tolerance
+    assert n_components == 1
 
 
 def test__idx_s2c_grouping_type_error(plugin):
@@ -1047,7 +1039,7 @@ def test__idx_s2c_grouping_empty_array(plugin):
 
 def test__idx_s2c_grouping_extreme_values(plugin):
     chi = np.array([-360, 360])
-    n_components, labels = plugin._idx_s2c_grouping(chi)
+    n_components, _ = plugin._idx_s2c_grouping(chi)
     assert n_components == 1  # Extreme but equivalent values should be grouped together
 
 
@@ -1229,8 +1221,7 @@ def test__group_d_spacing_by_chi_second_validation_method(plugin, case):
 
             current_max = max(len_d_pos, len_d_neg)
 
-            if current_max > max_len:
-                max_len = current_max
+            max_len = max(max_len, current_max)
 
         # array creation with initialization
         data_pos = np.full(
@@ -1500,7 +1491,7 @@ def test_combine_sort_d_spacing_pos_neg_with_nan(plugin):
         expected_d_spacing_combined,
         err_msg=(
             "d_spacing values are not correctly sorted according to sorted sin2chi "
-            "values, especially with NaN values.",
+            "values, especially with NaN values."
         ),
     )
 
@@ -1553,7 +1544,6 @@ def d_spacing_combined_fixture():
 def test__create_final_result_sin2chi_method_valid_input(
     plugin, d_spacing_combined_fixture
 ):
-    plugin = plugin
     # Calculation
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
 
@@ -1579,7 +1569,6 @@ def test__create_final_result_sin2chi_method_valid_input(
 def test__create_final_result_sin2chi_method_accuracy(
     plugin, d_spacing_combined_fixture
 ):
-    plugin = plugin
     result = plugin._create_final_result_sin2chi_method(d_spacing_combined_fixture)
 
     expected_avg = np.vstack(
@@ -1676,7 +1665,6 @@ def results_sin2chi_method_fixture():
 def test__create_final_result_sin2chi_method_validation(
     plugin, results_sin2chi_method_fixture
 ):
-    plugin = plugin
     plugin._config["input_shape"] = (
         4,
         5,
@@ -1689,18 +1677,14 @@ def test__create_final_result_sin2chi_method_validation(
     assert np.array_equal(result.array, d_spacing_result.array)
     # Compare each key-value pair in the axis_ranges
     for key, value in result.axis_ranges.items():
-        assert key in d_spacing_result.axis_ranges.keys()
+        assert key in d_spacing_result.axis_ranges
         assert np.array_equal(value, d_spacing_result.axis_ranges[key])
     assert result.axis_labels == d_spacing_result.axis_labels
     assert result.data_label == d_spacing_result.data_label
     assert result.data_unit == d_spacing_result.data_unit
 
 
-def test__create_final_result_sin2chi_method_type_error(
-    plugin, results_sin2chi_method_fixture
-):
-    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
-
+def test__create_final_result_sin2chi_method_type_error(plugin):
     with pytest.raises(TypeError, match="Input must be an instance of Dataset"):
         plugin._create_final_result_sin2chi_method([])
 
@@ -1722,7 +1706,7 @@ def test__create_final_result_sin2chi_method_shape(plugin):
 def test__create_final_result_sin2chi_method_label_1(
     plugin, results_sin2chi_method_fixture
 ):
-    d_spacing_combined, d_spacing_result = results_sin2chi_method_fixture
+    d_spacing_combined, _ = results_sin2chi_method_fixture
     d_spacing_combined.update_axis_label(0, "blub")
 
     with pytest.raises(
@@ -1734,7 +1718,7 @@ def test__create_final_result_sin2chi_method_label_1(
 def test__create_final_result_sin2chi_method_label_2(
     plugin, results_sin2chi_method_fixture
 ):
-    d_spacing_combined, d_spacing_avg = results_sin2chi_method_fixture
+    d_spacing_combined, _ = results_sin2chi_method_fixture
     d_spacing_combined.update_axis_label(1, "blub")
 
     with pytest.raises(
@@ -2166,7 +2150,7 @@ ds_case10_exe = Ds2cTestConfig(
     d_unit=UNITS_NANOMETER,
     description=(
         "A more realistic case with chi ranging from 0 to 360 and noise added; "
-        "noise with scale 0.03",
+        "noise with scale 0.03"
     ),
 )
 
@@ -2474,7 +2458,6 @@ def test_execute_with_various_cases_1d(plugin, case):
     ],
 )
 def test_execute_with_invalid_input(plugin, invalid_input):
-    plugin = plugin
     with pytest.raises((AttributeError, UserConfigError)):
         plugin.execute(invalid_input)
 
@@ -2531,7 +2514,6 @@ def test_execute_with_missing_field(
     expected_error_message,
 ):
     """Test the execute function with missing axis labels."""
-    plugin = plugin
     test_ds = base_execute_dataset
 
     # Modify axis_labels by removing or adjusting the necessary field
@@ -2594,7 +2576,6 @@ def test_execute_with_missing_field(
 def test__extract_units_validation(
     plugin, base_execute_dataset, fit_label, data_label, expected_units_dict
 ):
-    plugin = plugin
     test_ds = base_execute_dataset
 
     # overwrite the axis_labels and data_label
@@ -2639,7 +2620,6 @@ def test__extract_units_validation(
 def test__chi_pos_unit_verification_error_position_unit(
     plugin, base_execute_dataset, fit_label, data_label, expected_error_message
 ):
-    plugin = plugin
     test_ds = base_execute_dataset
     # overwrite the axis_labels and data_label
     test_ds.update_axis_label(1, fit_label)
@@ -2659,22 +2639,20 @@ def test__chi_pos_unit_verification_error_position_unit(
 def test__chi_pos_unit_verification_valid_position_unit(
     plugin, base_execute_dataset, fit_label, data_label
 ):
-    plugin = plugin
     test_ds = base_execute_dataset
     test_ds.update_axis_label(1, fit_label)
     test_ds.data_label = data_label
     try:
         plugin._chi_pos_unit_verification(test_ds)
-    except Exception as e:
+    except UserConfigError as e:
         pytest.fail(f"Function raised an unexpected exception: {e}")
 
 
 def test__chi_pos_unit_verification_valid_chi_unit(plugin, base_execute_dataset):
-    plugin = plugin
     test_ds = base_execute_dataset
     try:
         plugin._chi_pos_unit_verification(test_ds)
-    except Exception as e:
+    except UserConfigError as e:
         pytest.fail(f"Function raised an unexpected exception: {e}")
 
 
@@ -2689,7 +2667,6 @@ def test__chi_pos_unit_verification_valid_chi_unit(plugin, base_execute_dataset)
 def test__chi_pos_unit_verification_error_chi_unit(
     plugin, base_execute_dataset, chi_unit, expected_error_message
 ):
-    plugin = plugin
     test_ds = base_execute_dataset
     test_ds.update_axis_unit(0, chi_unit)
 
@@ -2754,7 +2731,6 @@ def base_dataset():
 def test__create_final_result_sin2chi_method(
     plugin, base_dataset, modifications, expected_array
 ):
-    plugin = plugin
     plugin._config["input_shape"] = (
         4,
         5,

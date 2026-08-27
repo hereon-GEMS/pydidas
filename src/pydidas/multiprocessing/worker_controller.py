@@ -30,10 +30,11 @@ __all__ = ["WorkerController"]
 
 import multiprocessing as mp
 import time
+from collections.abc import Callable, Sequence
 from contextlib import contextmanager
 from numbers import Integral
 from queue import Empty
-from typing import Any, Callable, Sequence
+from typing import Any
 
 from qtpy import QtCore
 
@@ -166,7 +167,7 @@ class WorkerController(QtCore.QThread):
             If number is not of type Integral.
         """
         if not isinstance(number, Integral):
-            raise ValueError("The number of workers must be an integer number.")
+            raise TypeError("The number of workers must be an integer number.")
         self._n_workers = number
 
     @property
@@ -397,7 +398,7 @@ class WorkerController(QtCore.QThread):
         ]
         for _i, _worker in enumerate(self._workers):
             _worker.start()
-            logger.debug("WorkerController: Started worker %i" % _i)
+            logger.debug(f"WorkerController: Started worker {_i}")
 
     def _put_next_task_in_queue(self) -> None:
         """

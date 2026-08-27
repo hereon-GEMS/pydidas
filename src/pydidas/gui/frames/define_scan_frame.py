@@ -161,7 +161,7 @@ class DefineScanFrame(BaseFrame):
             self._widgets[f"button_down_{i}"].setVisible(i < _dim - 1)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
-            if i in DIM_LABELS[_dim].keys():
+            if i in DIM_LABELS[_dim]:
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
         self._widgets["main"].font_metric_width_factor = (
             FONT_METRIC_WIDE_CONFIG_WIDTH
@@ -210,7 +210,7 @@ class DefineScanFrame(BaseFrame):
         if len(_fnames) > 0:
             _return = ScanIo.check_multiple_files(_fnames, scan=SCAN)
             if _return[0] == "::no_error::":
-                _return = ScanIo.import_from_multiple_files(_fnames, scan=SCAN)
+                _return = ScanIo.import_from_file_sequence(_fnames, scan=SCAN)
             elif _return[0] == "::multiple_motors::":
                 _choice = ItemInListSelectionWidget(
                     _return[1:],
@@ -226,7 +226,7 @@ class DefineScanFrame(BaseFrame):
                         "No motor selected for scan dimension 0. Aborting import of "
                         "Scan from beamline files."
                     )
-                ScanIo.import_from_multiple_files(
+                ScanIo.import_from_file_sequence(
                     _fnames, scan=SCAN, scan_dim0_motor=_choice
                 )
             else:

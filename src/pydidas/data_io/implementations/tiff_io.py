@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,44 +29,43 @@ __all__ = []
 
 import warnings
 from pathlib import Path
-from typing import Union
+from typing import Any, ClassVar
 
 import numpy as np
-from skimage.io import imread, imsave
-from tifffile import TiffFileError
 
 from pydidas.core import Dataset
 from pydidas.core.constants import TIFF_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors
+from pydidas.core.lazy_imports.skimage import TiffFileError, imread, imsave
+from pydidas.core.utils import CatchFileErrors, verify_is_new_file_or_replace_set
 from pydidas.data_io.implementations.io_base import IoBase
 
 
 class TiffIo(IoBase):
     """IObase implementation for tiff files."""
 
-    extensions_export = TIFF_EXTENSIONS
-    extensions_import = TIFF_EXTENSIONS
-    format_name = "Tiff"
-    dimensions = [2]
+    extensions_export: ClassVar[list[str]] = TIFF_EXTENSIONS
+    extensions_import: ClassVar[list[str]] = TIFF_EXTENSIONS
+    format_name: ClassVar[str] = "Tiff"
+    dimensions: ClassVar[list[int]] = [2]
 
-    @classmethod
-    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read data from a tiff file.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename of the file with the data to be imported.
-        **kwargs : dict
+        **kwargs : Any
             Supported arguments are:
 
-            roi : Union[tuple, None], optional
+            roi : tuple or None, optional
                 A region of interest for cropping. Acceptable are both 4-tuples
                 of integers in the format (y_low, y_high, x_low, x_high) and
                 2-tuples of integers or slice objects. If None, the full image
                 will be returned. The default is None.
-            returnType : Union[datatype, 'auto'], optional
+            astype : type or 'auto', optional
                 If 'auto', the image will be returned in its native data type.
                 If a specific datatype has been selected, the image is converted
                 to this type. The default is 'auto'.
@@ -76,21 +75,19 @@ class TiffIo(IoBase):
 
         Returns
         -------
-        data : pydidas.core.Dataset
+        data : Dataset
             The data in the form of a pydidas Dataset (with embedded metadata)
         """
-        with CatchFileErrors(filename, TiffFileError):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", UserWarning)
-                _data = imread(filename)
+        with (
+            CatchFileErrors(filename, TiffFileError),
+            warnings.catch_warnings(action="ignore", category=UserWarning),
+        ):
+            _data = imread(filename)
+            _data = Dataset(_data)
+        return TiffIo.return_data(_data, **kwargs)
 
-        cls._data = Dataset(_data)
-        return cls.return_data(**kwargs)
-
-    @classmethod
-    def export_to_file(
-        cls, filename: Union[Path, str], data: np.ndarray, **kwargs: dict
-    ):
+    @staticmethod
+    def export_to_file(filename: Path | str, data: np.ndarray, **kwargs: Any) -> None:
         """
         Export data to a tiff file.
 
@@ -103,20 +100,19 @@ class TiffIo(IoBase):
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Path or str
             The filename
         data : np.ndarray
             The data to be written to file.
-        **kwargs : dict
+        **kwargs : Any
             Supported arguments are:
 
             overwrite : bool, optional
-                Flag to allow overwriting of existing files. The default is False.
-
+                Flag to allow overwriting of existing files. The default is
+                False.
         """
-        cls.check_for_existing_file(filename, **kwargs)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", UserWarning)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        with warnings.catch_warnings(action="ignore", category=UserWarning):
             if data.dtype.type in [np.float64, np.longdouble]:
                 imsave(filename, data.astype(np.float32))
             else:

@@ -75,7 +75,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self._config["plot_update_time"] = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
-        self._config["source_hash"] = self._RESULTS.source_hash
+        self._config["source_hash"] = self.proc_results.source_hash
         self._app = ExecuteWorkflowApp()
         self.add_params(self._app.params)
 
@@ -110,9 +110,9 @@ class WorkflowRunFrame(ViewResultsFrame):
         Workflow (either the global contexts or local instances) and must be
         checked to detect any changes.
         """
-        _hash = self._RESULTS.source_hash
+        _hash = self.proc_results.source_hash
         if _hash != self._config["source_hash"]:
-            self._config["source_hash"] = self._RESULTS.source_hash
+            self._config["source_hash"] = self.proc_results.source_hash
             self._clear_results()
             self.update_choices_of_selected_results()
 

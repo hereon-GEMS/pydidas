@@ -28,19 +28,17 @@ __status__ = "Production"
 __all__ = ["DiffractionExperimentIoPoni"]
 
 
-from typing import Union
-
-import pyFAI
-from pyFAI.io.ponifile import PoniFile
+from pathlib import Path
+from typing import Any
 
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
-from pydidas.core.constants import LAMBDA_IN_M_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import LAMBDA_IN_M_TO_E
 from pydidas.core.constants.file_extensions import PONI_EXTENSIONS
-
-
-EXP = DiffractionExperimentContext()
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
+from pydidas.core.lazy_imports.pyFAI import Detector, Geometry, PoniFile
+from pydidas.core.utils import verify_is_new_file_or_replace_set
 
 
 class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
@@ -51,122 +49,136 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
     extensions = PONI_EXTENSIONS
     format_name = "PONI"
 
-    @classmethod
-    def export_to_file(cls, filename: str, **kwargs: dict):
+    @staticmethod
+    def export_to_file(  # type: ignore[override]
+        filename: Path | str, **kwargs: Any
+    ) -> None:
         """
         Write the DiffractionExperiment to a pyFAI style poni file.
 
         Parameters
         ----------
-        filename : str
+        filename : Path or str
             The filename of the file to be written.
-        diffraction_exp : DiffractionExperiment, optional
-            The DiffractionExperiment instance to be exported. The default is the
-            DiffractionExperimentContext.
+        **kwargs : Any, optional
+            The following keyword arguments are defined:
+
+            diffraction_exp : DiffractionExperiment, optional
+                The DiffractionExperiment instance to be exported.
+                The default is the DiffractionExperimentContext.
         """
-        _EXP = kwargs.get("diffraction_exp", EXP)
-        cls.check_for_existing_file(filename, **kwargs)
-        _pdata = {}
-        for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]:
-            _pdata[key] = _EXP.get_param_value(f"detector_{key}")
-        _det = _EXP.get_param_value("detector_name")
+        _exp: DiffractionExperiment = kwargs.get(
+            "diffraction_exp", DiffractionExperimentContext()
+        )
+        verify_is_new_file_or_replace_set(filename, **kwargs)
+        _det = _exp.get_param_value("detector_name")
+        _pdata = {
+            key: _exp.get_param_value(f"detector_{key}")
+            for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]
+        }
         _pdata["detector"] = _det if _det in PYFAI_DETECTOR_NAMES else "Detector"
-        _pdata["distance"] = _EXP.get_param_value("detector_dist")
-        if (
-            _pdata["detector"] in pyFAI.detectors.Detector.registry
-            and _pdata["detector"] != "detector"
-        ):
-            _pdata["detector_config"] = {}
-        else:
-            _pdata["detector_config"] = dict(
-                pixel1=(1e-6 * _EXP.get_param_value("detector_pxsizey")),
-                pixel2=(1e-6 * _EXP.get_param_value("detector_pxsizex")),
-                max_shape=(
-                    _EXP.get_param_value("detector_npixy"),
-                    _EXP.get_param_value("detector_npixx"),
-                ),
-            )
-        _pdata["wavelength"] = _EXP.get_param_value("xray_wavelength") * 1e-10
-        pfile = pyFAI.io.ponifile.PoniFile(data=_pdata)
-        with open(filename, "w") as stream:
-            pfile.write(stream)
-            stream.write("\n# This file was created by pydidas.")
-            stream.write(f"\n# pydidas_det_name = {_det}")
+        _pdata["distance"] = _exp.get_param_value("detector_dist")
+        _pdata["detector_config"] = {
+            "pixel1": (1e-6 * _exp.get_param_value("detector_pxsizey")),
+            "pixel2": (1e-6 * _exp.get_param_value("detector_pxsizex")),
+            "max_shape": _exp.det_shape,
+        }
+        _pdata["wavelength"] = _exp.get_param_value("xray_wavelength") * 1e-10
+        pfile = PoniFile(data=_pdata)
+        with open(filename, "w") as _file:
+            pfile.write(_file)
+            _file.write("\n# This file was created by pydidas.")
+            _file.write(f"\n# pydidas_det_name = {_det}")
 
     @classmethod
     def import_from_file(
-        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
-    ):
+        cls,
+        filename: str | Path,
+        diffraction_exp: DiffractionExperiment | None = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Restore the DiffractionExperimentContext from a YAML file.
 
         Parameters
         ----------
-        filename : str
+        filename : str or Path
             The filename of the file to be written.
-        diffraction_exp : Union[DiffractionExperiment, None], optional
+        diffraction_exp : DiffractionExperiment or None, optional
             The DiffractionExperiment instance to be updated.
+            The default is None.
+        **kwargs : Any, optional
+            Additional keyword arguments. Not used in this implementation.
         """
-        geo = pyFAI.geometry.Geometry().load(PoniFile(data=filename))
-        with open(filename, "r") as stream:
-            _content = stream.read()
-        cls.imported_params = {}
-        cls._update_detector_from_pyFAI(geo.detector)
-        cls._update_geometry_from_pyFAI(geo)
-        if "pydidas_det_name = " in _content:
-            _det_name = _content.split("pydidas_det_name = ")[1].split("\n")[0].strip()
-            cls.imported_params["detector_name"] = _det_name
-        cls._verify_all_entries_present(exclude_det_mask=True)
-        cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
+        geo = Geometry().load(PoniFile(data=filename))  # type: ignore[arg-type]
+        with open(filename, "r") as _file:
+            _content = _file.readlines()
+        _imported_params = cls._update_detector_from_pyfai(geo.detector)
+        _imported_params.update(cls._update_geometry_from_pyfai(geo))
+        for _line in _content:
+            if "pydidas_det_name" in _line:
+                _det_name = _line.split("pydidas_det_name = ")[1].strip()
+                _imported_params["detector_name"] = _det_name
+        cls.verify_all_entries_present(_imported_params, exclude_det_mask=True)
+        cls.update_diffraction_exp(_imported_params, diffraction_exp=diffraction_exp)
 
-    @classmethod
-    def _update_detector_from_pyFAI(cls, det: pyFAI.detectors.Detector):
+    @staticmethod
+    def _update_detector_from_pyfai(
+        det: Detector,
+    ) -> dict[str, Any]:
         """
         Update the detector information from a pyFAI Detector instance.
 
         Parameters
         ----------
-        det : pyfai.detectors.Detector
+        det : Detector
             The pyFAI Detector instance.
-        """
-        if not isinstance(det, pyFAI.detectors.Detector):
-            raise TypeError(
-                f"Object '{det} (type {type(det)}' is not a "
-                "pyFAI.detectors.Detector instance."
-            )
-        for key, value in [
-            ["detector_name", det.name],
-            ["detector_npixx", det.shape[1]],
-            ["detector_npixy", det.shape[0]],
-            ["detector_pxsizex", 1e6 * det.pixel2],
-            ["detector_pxsizey", 1e6 * det.pixel1],
-        ]:
-            cls.imported_params[key] = value
 
-    @classmethod
-    def _update_geometry_from_pyFAI(cls, geo: pyFAI.geometry.Geometry):
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the detector parameters.
+        """
+        if not isinstance(det, Detector):
+            raise TypeError(
+                f"Object '{det} (type {type(det)}' is not a Detector instance."
+            )
+        return {
+            "detector_name": det.name,
+            "detector_npixx": det.shape[1],
+            "detector_npixy": det.shape[0],
+            "detector_pxsizex": 1e6 * det.pixel2,
+            "detector_pxsizey": 1e6 * det.pixel1,
+        }
+
+    @staticmethod
+    def _update_geometry_from_pyfai(geo: Geometry) -> dict[str, Any]:
         """
         Update the geometry information from a pyFAI Geometry instance.
 
         Parameters
         ----------
-        geo : pyfai.geometry.Geometry
+        geo : pyFAI.geometry.Geometry
             The geometry instance.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the geometry parameters.
         """
-        if not isinstance(geo, pyFAI.geometry.Geometry):
+        if not isinstance(geo, Geometry):
             raise TypeError(
                 f"Object '{geo} (type {type(geo)}' is not a "
                 "pyFAI.geometry.Geometry instance."
             )
-        cls.imported_params["xray_wavelength"] = geo.wavelength * 1e10
-        cls.imported_params["xray_energy"] = LAMBDA_IN_M_TO_E / geo.wavelength
-        _geodict = geo.getPyFAI()
-        for key in [
-            "detector_dist",
-            "detector_poni1",
-            "detector_poni2",
-            "detector_rot1",
-            "detector_rot2",
-            "detector_rot3",
-        ]:
-            cls.imported_params[key] = _geodict[key.split("_")[1]]
+        _geo_dict = geo.getPyFAI()
+        return {
+            "xray_wavelength": geo.wavelength * 1e10,
+            "xray_energy": LAMBDA_IN_M_TO_E / geo.wavelength,
+            "detector_dist": _geo_dict["dist"],
+            "detector_poni1": _geo_dict["poni1"],
+            "detector_poni2": _geo_dict["poni2"],
+            "detector_rot1": _geo_dict["rot1"],
+            "detector_rot2": _geo_dict["rot2"],
+            "detector_rot3": _geo_dict["rot3"],
+        }

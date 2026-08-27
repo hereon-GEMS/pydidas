@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,14 +20,12 @@ Module with QuestionBox class which shows a dialog with a yes/no reply.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["QuestionBox"]
 
-
-from typing import Union
 
 from qtpy import QtWidgets
 
@@ -59,7 +57,7 @@ class QuestionBox(QtWidgets.QMessageBox):
         title: str,
         question: str,
         explanation: str = "",
-        parent: Union[None, QtWidgets.QWidget] = None,
+        parent: None | QtWidgets.QWidget = None,
         default: QtWidgets.QMessageBox.StandardButton = QtWidgets.QMessageBox.No,
         tooltip: str = "",
     ):

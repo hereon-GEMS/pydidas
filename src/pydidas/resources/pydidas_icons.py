@@ -40,10 +40,16 @@ from pathlib import Path
 from qtpy import QtCore, QtGui
 
 from pydidas.core import UserConfigError
+from pydidas.core.utils import get_extension
+from pydidas_qtcore import PydidasQApplication
 
 
 ICON_PATH = Path(__file__).parent / "_icons"
 MDI_ICON_PATH = Path(__file__).parent / "_mdi_icons"
+
+
+_app = PydidasQApplication.instance()
+APP_IN_DARK_MODE = _app.is_dark_mode if _app else False
 
 
 def pydidas_icon() -> QtGui.QIcon:
@@ -91,6 +97,8 @@ def create_pydidas_icon(icon_name: str) -> QtGui.QIcon:
     _filename = _filenames[0]
     if _filename.suffix == ".svg":
         return _create_icon_from_svg(_filename)
+    if APP_IN_DARK_MODE and (_filename.parent / "dark" / _filename.name).is_file():
+        return QtGui.QIcon(str(_filename.parent / "dark" / _filename.name))
     return QtGui.QIcon(str(_filename))
 
 
@@ -123,6 +131,15 @@ def create_mdi_icon(icon_name: str) -> QtGui.QIcon:
 
 def _create_icon_from_svg(path: Path | str) -> QtGui.QIcon:
     """Create a QIcon from a svg image at the given path."""
+    path = Path(path)
+
+    if (
+        APP_IN_DARK_MODE
+        and path.parent.name in ["_icons", "_mdi_icons"]
+        and get_extension(path) == ".svg"
+    ):
+        path = path.parent / "dark" / path.name
+
     icon = QtGui.QIcon()
     icon.addFile(str(path), QtCore.QSize(128, 128))
     return icon

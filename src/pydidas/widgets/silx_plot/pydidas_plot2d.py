@@ -34,6 +34,7 @@ from typing import Any, ClassVar
 import numpy as np
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 from qtpy import QtCore, QtGui, QtWidgets
+from silx.gui import qt
 from silx.gui.plot import Plot2D
 
 from pydidas.contexts import DiffractionExperimentContext
@@ -220,6 +221,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._actions["canvas"].set_canvas_mode(
                 data.shape != self._config["diffraction_exp"].det_shape
             )
+        if self._qtapp.is_dark_mode:
+            self.invert_plot2d_icons()
 
     # display_data is a generic alias used in all custom silx plots to have a
     # uniform interface call to display data in DataViewer-like classes
@@ -563,3 +566,28 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if _image is None:
             return
         self.setBackend("matplotlib")  # type: ignore[arg-type]
+
+    def invert_plot2d_icons(self):
+        """
+        Inverts some buttons in the toolbar for darkmode
+        """
+        _icons_to_invert = [
+            "Pan mode",
+            "Save as...",
+            "Print...",
+            "Orient Y-axis upward",
+            "Orient Y-axis downward",
+        ]
+        for _action in self.findChildren(qt.QAction):
+            if _action.property("_is_inverted"):
+                continue
+            _text = _action.text() if callable(_action.text) else _action.text
+            if _text in _icons_to_invert:
+                _icon = _action.icon()
+                if not _icon.isNull():
+                    _pixmap = _icon.pixmap(32, 32)
+                    _image = _pixmap.toImage()
+                    _image.invertPixels()
+                    _new_icon = qt.QIcon(qt.QPixmap.fromImage(_image))
+                    _action.setIcon(_new_icon)
+                    _ = _action.setProperty("_is_inverted", True)

@@ -473,3 +473,16 @@ class PydidasQApplication(QApplication):
         for _ref in self.__worker_threads:
             _thread = _ref()
             _thread.requestInterruption()
+
+    @property
+    def is_dark_mode(self) -> bool:
+        """
+        Check if the current application color palette is in dark mode.
+
+        Returns
+        -------
+        bool
+            True if the window text color lightness indicates a dark theme.
+        """
+        text_color = self.palette().color(QtGui.QPalette.ColorRole.WindowText)
+        return text_color.lightness() > 128

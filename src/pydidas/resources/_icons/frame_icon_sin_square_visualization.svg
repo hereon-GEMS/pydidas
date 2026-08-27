@@ -95,7 +95,12 @@
        fy="-3.4617412"
        r="18"
        gradientTransform="matrix(-1.6143275,-0.01580401,0.01215066,-1.0053293,49.50629,0.1806378)"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse" >
+      <stop style="stop-color:#f93246;stop-opacity:1;" offset="0" id="stop782" />
+      <stop style="stop-color:#cc977a;stop-opacity:1;" offset="0.4" id="stop784" />
+      <stop style="stop-color:#505050;stop-opacity:1;" offset="0.75" id="stop785" />
+      <stop style="stop-color:#323246;stop-opacity:0;" offset="1" id="stop783" />
+    </radialGradient>
   </defs>
   <metadata
      id="metadata1">

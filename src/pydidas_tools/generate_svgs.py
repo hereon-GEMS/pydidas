@@ -65,10 +65,7 @@ def generate_dark_icon(path: Path):
         if "stroke" in elem.attrib and elem.attrib["stroke"] != "none":
             elem.set("stroke", _color)
         if "style" in elem.attrib and elem.attrib["style"] != "none":
-            try:
-                elem.attrib["style"] = convert_style_tag(elem.attrib["style"])
-            except Exception:
-                pass
+            elem.attrib["style"] = convert_style_tag(elem.attrib["style"])
     _svg_string = ElementTree.tostring(_root, encoding="unicode")
 
     (path.parent / "dark" / path.name).write_text(_svg_string, encoding="utf-8")

@@ -46,7 +46,7 @@ from pydidas.core.utils import (
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.data_io import IoManager
-from pydidas.gui.frames.builders import (
+from pydidas.gui.frames.builders.composite_creator_frame_builder import (
     COMPOSITE_CREATOR_FRAME_BUILD_CONFIG,
     KEYS_TO_INSERT_LINES_AFTER,
     ccf_param_widget_config,

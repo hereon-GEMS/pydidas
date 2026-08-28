@@ -37,7 +37,7 @@ from pydidas.apps import ExecuteWorkflowApp
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import UserConfigError
 from pydidas.core.utils import ShowBusyMouse, pydidas_logger
-from pydidas.gui.frames.builders import (
+from pydidas.gui.frames.builders.workflow_run_frame_builder import (
     WORKFLOW_RUN_FRAME_BUILD_CONFIG,
 )
 from pydidas.gui.frames.view_results_frame import ViewResultsFrame

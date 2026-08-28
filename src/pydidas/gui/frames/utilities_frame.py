@@ -33,7 +33,7 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.gui.frames.builders import UtilitiesFrameBuilder
+from pydidas.gui.frames.builders.utilities_frame_builder import UtilitiesFrameBuilder
 from pydidas.gui.frames.composite_creator_frame import CompositeCreatorFrame
 from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import (

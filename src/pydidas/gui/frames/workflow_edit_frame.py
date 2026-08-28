@@ -33,7 +33,9 @@ from typing import Any
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core.utils.file_utils import get_extension
-from pydidas.gui.frames.builders import WorkflowEditFrameBuilder
+from pydidas.gui.frames.builders.workflow_edit_frame_builder import (
+    WorkflowEditFrameBuilder,
+)
 from pydidas.gui.managers import WorkflowTreeEditManager
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog

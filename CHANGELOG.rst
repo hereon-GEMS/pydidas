@@ -21,6 +21,7 @@ Improvements
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
 - Added lazy imports of pyFAI to improve startup time.
+- Added a fast viewer based on PyQtGraph for 2D images.
 
 Programmatic changes
 --------------------

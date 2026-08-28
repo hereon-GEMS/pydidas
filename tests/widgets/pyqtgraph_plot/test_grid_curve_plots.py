@@ -33,7 +33,7 @@ import pytest
 
 from pydidas.contexts import Scan
 from pydidas.core import Dataset, UserConfigError
-from pydidas.widgets.plotting import GridCurvePlot
+from pydidas.widgets.pyqtgraph_plot import GridCurvePlot
 
 
 _DATASETS = {

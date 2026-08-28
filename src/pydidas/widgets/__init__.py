@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from types import ModuleType
 
 from . import (
@@ -49,8 +50,8 @@ from .widget_with_parameter_collection import *
 
 
 def __getattr__(name: str) -> ModuleType:
-    """Lazy-load the silx_plot module on demand."""
-    if name in ("silx_plot",):
+    """Lazy-load the silx_plot and pyqtgraph_plot modules on demand."""
+    if name in ("silx_plot", "pyqtgraph_plot"):
         import importlib
 
         module = importlib.import_module(f".{name}", __name__)
@@ -71,6 +72,7 @@ __all__ = (
         "plugin_config_widgets",
         "selection",
         "silx_plot",
+        "pyqtgraph_plot",
         "windows",
         "workflow_edit",
         "CreateWidgetsMixIn",

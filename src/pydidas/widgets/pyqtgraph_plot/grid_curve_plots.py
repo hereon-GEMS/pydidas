@@ -33,6 +33,7 @@ from numbers import Integral, Real
 from typing import Any, ClassVar
 
 import numpy as np
+import pyqtgraph as pg
 from qtpy import QtCore
 
 from pydidas.contexts import Scan
@@ -551,7 +552,6 @@ class GridCurvePlot(WidgetWithParameterCollection):
 
     def __create_plots_in_grid_if_needed(self):
         """Create the required plot widgets in the grid if they do not exist yet."""
-        import pyqtgraph as pg
 
         pg.setConfigOption("background", (255, 255, 255, 0))
 

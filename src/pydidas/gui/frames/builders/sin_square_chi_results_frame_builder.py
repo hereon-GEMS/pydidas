@@ -33,7 +33,7 @@ from pydidas.core.constants import (
     POLICY_FIX_EXP,
 )
 from pydidas.widgets import ScrollArea
-from pydidas.widgets.plotting import GridCurvePlot
+from pydidas.widgets.pyqtgraph_plot import GridCurvePlot
 
 
 def __create_param_widget(

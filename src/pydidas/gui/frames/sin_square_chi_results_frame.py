@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SinSquareChiResultsFrame"]
 
+
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -54,7 +55,6 @@ from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.dialogues import WarningBox
 from pydidas.widgets.factory import EmptyWidget
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.plotting import GridCurvePlot
 from pydidas.workflow import ProcessingResults, WorkflowResults
 from pydidas_qtcore import PydidasQApplication
 
@@ -199,10 +199,8 @@ class SinSquareChiResultsFrame(BaseFrame):
         )
 
     def finalize_ui(self) -> None:
-        """
-        Finalize the UI initialization.
-        """
-        self._plots: GridCurvePlot = self._widgets["visualization"]
+        """Finalize the UI initialization."""
+        self._plots = self._widgets["visualization"]
         self.reset_selection()
 
     def restore_state(self, state: dict) -> None:

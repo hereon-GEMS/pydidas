@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from pydidas.core import UserConfigError
-from pydidas.core.constants import OUTPUT_PLUGIN
+from pydidas.core.constants import INPUT_PLUGIN, OUTPUT_PLUGIN
 from pydidas.plugins import BasePlugin, PluginCollection
 from pydidas.workflow.generic_tree import GenericTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
@@ -97,6 +97,8 @@ class ProcessingTree(GenericTree):
         value: WorkflowNode | None,  # type: ignore[override]
     ) -> None:
         """Set the root node of the tree."""
+        if value is not None and value.plugin.plugin_type != INPUT_PLUGIN:
+            raise UserConfigError("Root node has to be an input plugin")
         super(ProcessingTree, self.__class__).root.fset(self, value)  # type: ignore[arg]
 
     def create_and_add_node(
@@ -155,6 +157,8 @@ class ProcessingTree(GenericTree):
         node : WorkflowNode
             The node to become the new root node
         """
+        if node.plugin.plugin_type != INPUT_PLUGIN:
+            raise UserConfigError("Root node has to be an input plugin")
         GenericTree.set_root(self, node)
         self.root.plugin.node_id = 0
 

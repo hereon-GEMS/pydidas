@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Module with the pydidas excepthook for the GUI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -70,7 +70,11 @@ def gui_excepthook(exc_type, exception, trace):
             "Configuration Error" if exc_type is UserConfigError else "File read error"
         )
         _app.sig_gui_exception_occurred.emit()
-        _ = PydidasExceptionMessageBox(text=_exc_repr, title=_title).exec_()
+        _box = PydidasExceptionMessageBox(text=_exc_repr, title=_title)
+        if hasattr(_box, "exec"):
+            _box.exec()
+        else:
+            _box.exec_()
         return
     with StringIO() as _tmpfile:
         traceback.print_tb(trace, None, _tmpfile)

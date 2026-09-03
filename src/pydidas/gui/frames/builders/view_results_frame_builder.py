@@ -35,7 +35,7 @@ from qtpy import QtCore
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.widgets import ScrollArea
 from pydidas.widgets.data_viewer import TableWithNodeLabels
-from pydidas.widgets.misc import ReadOnlyTextWidget
+from pydidas.widgets.misc import ReadOnlyTextEdit
 
 
 VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = [
@@ -135,7 +135,7 @@ VIEW_RESULTS_MIXIN_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] =
     ],
     [
         "create_any_widget",
-        ("result_info", ReadOnlyTextWidget),
+        ("result_info", ReadOnlyTextEdit),
         {
             "alignment": QtCore.Qt.AlignTop,
             "font_metric_height_factor": 25,

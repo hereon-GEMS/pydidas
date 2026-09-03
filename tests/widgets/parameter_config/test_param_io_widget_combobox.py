@@ -31,8 +31,8 @@ import pytest
 from pydidas.core import Parameter
 from pydidas.core.constants import ASCII_TO_UNI
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_combobox import (
-    ParamIoWidgetComboBox,
+from pydidas.widgets.param_io._param_io_combobox import (
+    _ParamIoComboBox,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -52,7 +52,7 @@ def _cleanup():
     yield
     app = PydidasQApplication.instance()
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetComboBox)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoComboBox)
     ]:
         widget.deleteLater()
     app.processEvents()
@@ -60,7 +60,7 @@ def _cleanup():
 
 @pytest.fixture
 def widget(qtbot, param):
-    widget = ParamIoWidgetComboBox(param)
+    widget = _ParamIoComboBox(param)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
@@ -71,7 +71,7 @@ def widget(qtbot, param):
 
 @pytest.mark.gui
 def test__creation(widget, param):
-    assert isinstance(widget, ParamIoWidgetComboBox)
+    assert isinstance(widget, _ParamIoComboBox)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert [widget.itemText(i) for i in range(widget.count())] == _UNICODE_CHOICES
@@ -84,7 +84,7 @@ def test__creation(widget, param):
 @pytest.mark.gui
 def test__creation__w_value_selected():
     param = Parameter("test", str, "B", choices=["A", "B", "C"])
-    widget = ParamIoWidgetComboBox(param)
+    widget = _ParamIoComboBox(param)
     assert widget.current_text == "B"
     assert widget.current_choices == param.choices
 

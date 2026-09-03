@@ -52,7 +52,7 @@ from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.dialogs import WarningBox
 from pydidas.widgets.factory import EmptyWidget
 from pydidas.widgets.framework import BaseFrame
 from pydidas.workflow import ProcessingResults, WorkflowResults

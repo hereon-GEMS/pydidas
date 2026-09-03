@@ -1,0 +1,81 @@
+# This file is part of pydidas.
+#
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Module with the WidgetWithParameters class which provides a QWidget
+with full access to Pydidas' ParameterCollection and widget creation methods.
+"""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+__all__ = ["WidgetWithParameters"]
+
+
+from typing import Any, ClassVar, NoReturn
+
+from qtpy import QtWidgets
+
+from pydidas.core import (
+    ParameterCollection,
+    ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
+    UserConfigError,
+)
+from pydidas.core.utils import apply_qt_properties
+from pydidas.widgets.base_classes.parameter_widget_mixin import ParameterWidgetMixIn
+from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
+
+
+class WidgetWithParameters(
+    PydidasQsettingsMixin,
+    WidgetFactoryMixIn,
+    ParameterCollectionMixIn,
+    ParameterWidgetMixIn,
+    QtWidgets.QWidget,
+):
+    """
+    A widget which has full access to Pydidas's ParameterCollection
+    and widget creation methods.
+    """
+
+    init_kwargs: ClassVar[list[str]] = ["parent"]
+
+    def __init__(self, **kwargs: Any) -> None:
+        self.params = ParameterCollection()
+        self._config: dict[str, Any] = {}
+        QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
+        PydidasQsettingsMixin.__init__(self)
+        ParameterCollectionMixIn.__init__(self)
+        ParameterWidgetMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
+        self.setLayout(QtWidgets.QGridLayout())
+        apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
+        apply_qt_properties(self, **kwargs)
+
+    def raise_UserConfigError(self, error_str: str) -> NoReturn:
+        """
+        Raise a UserConfigError with the given error string.
+
+        Parameters
+        ----------
+        error_str : str
+            The error string to raise.
+        """
+        raise UserConfigError(error_str)

@@ -34,9 +34,9 @@ import pytest
 
 from pydidas.core import Hdf5key, NXdataKey, Parameter, get_generic_parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
-    ParamIoWidgetHdf5Key,
-    ParamIoWidgetNXdata,
+from pydidas.widgets.param_io._param_io_hdf5 import (
+    _ParamIoHdf5Key,
+    _ParamIoNXdata,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -54,9 +54,9 @@ _PARAMS = [get_generic_parameter("hdf5_key"), get_generic_parameter("nxdata_key"
 def widget_instance(qtbot, param: Parameter = _PARAMS[0], qref: str | None = None):
     param.restore_default()
     if param.dtype == Hdf5key:
-        _widget_class = ParamIoWidgetHdf5Key
+        _widget_class = _ParamIoHdf5Key
     elif param.dtype == NXdataKey:
-        _widget_class = ParamIoWidgetNXdata
+        _widget_class = _ParamIoNXdata
     widget = _widget_class(param, persistent_qsettings_ref=qref)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
@@ -81,7 +81,7 @@ def _cleanup():
     yield
     app = PydidasQApplication.instance()
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetHdf5Key)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoHdf5Key)
     ]:
         widget.deleteLater()
     app.processEvents()
@@ -93,9 +93,9 @@ def _cleanup():
 def test__creation(qtbot, param, test_dir, qref):
     widget = widget_instance(qtbot, param, qref=qref)
     if param.dtype == Hdf5key:
-        assert isinstance(widget, ParamIoWidgetHdf5Key)
+        assert isinstance(widget, _ParamIoHdf5Key)
     if param.dtype == NXdataKey:
-        assert isinstance(widget, ParamIoWidgetNXdata)
+        assert isinstance(widget, _ParamIoNXdata)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     if qref is None:
@@ -118,7 +118,7 @@ def test_button_function(qtbot, test_dir, fname, selected_dset):
             return_value=fname,
         ),
         patch(
-            "pydidas.widgets.dialogues.Hdf5DatasetSelectionPopup.get_dset",
+            "pydidas.widgets.dialogs.Hdf5DatasetSelectionPopup.get_dset",
             return_value=selected_dset,
         ),
     ):

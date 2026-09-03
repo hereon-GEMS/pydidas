@@ -42,7 +42,7 @@ from pydidas.gui.frames.builders.view_results_frame_builder import (
 from pydidas.plugins import InputPlugin
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.data_viewer import DataViewer
-from pydidas.widgets.dialogues import critical_warning
+from pydidas.widgets.dialogs import critical_warning
 from pydidas.widgets.framework import BaseFrameWithApp
 from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import (

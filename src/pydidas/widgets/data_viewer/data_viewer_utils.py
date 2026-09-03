@@ -45,11 +45,11 @@ from pydidas.core.constants import (
     QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
     QT_REG_EXP_POS_INT_RANGE_VALIDATOR,
 )
-from pydidas.widgets.data_viewer.silx_subclasses import (
-    PydidasArrayTableWidget,
-    PydidasHdf5TableView,
+from pydidas.widgets.base_reimplementations import SquareButton
+from pydidas.widgets.data_viewer._silx_subclasses import (
+    _PydidasArrayTableWidget,
+    _PydidasHdf5TableView,
 )
-from pydidas.widgets.factory import SquareButton
 from pydidas.widgets.silx_plot import PydidasPlot1D, PydidasPlot2D
 
 
@@ -70,7 +70,7 @@ DATA_VIEW_CONFIG = {
         id=0,
         title="Hdf5",
         ref="view-h5",
-        widget=PydidasHdf5TableView,
+        widget=_PydidasHdf5TableView,
         use_axes_selector=False,
         additional_choices=None,
         min_dims=1,
@@ -106,7 +106,7 @@ DATA_VIEW_CONFIG = {
         id=4,
         title="Table",
         ref="view-table",
-        widget=PydidasArrayTableWidget,
+        widget=_PydidasArrayTableWidget,
         use_axes_selector=True,
         additional_choices="use as table x;;use as table y",
         min_dims=0,

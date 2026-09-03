@@ -36,7 +36,7 @@ from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import DEFAULT_FRAMES
 from pydidas.resources import icons
-from pydidas.widgets.dialogues import PydidasExceptionMessageBox
+from pydidas.widgets.dialogs import PydidasExceptionMessageBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 

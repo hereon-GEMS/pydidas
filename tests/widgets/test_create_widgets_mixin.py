@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Unit tests for the CreateWidgetsMixIn class."""
+"""Unit tests for the WidgetFactoryMixIn class."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
@@ -32,19 +32,19 @@ from typing import Any
 from qtpy import QtWidgets
 
 from pydidas.core import PydidasGuiError
-from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
+from pydidas.widgets.factory.create_widgets_mixin import WidgetFactoryMixIn
 from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 
 
-class _TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
+class _TestWidget(QtWidgets.QWidget, WidgetFactoryMixIn):
     def __init__(self, *args: object, parent: object = None, **kwargs: Any) -> None:
         super().__init__(parent)
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         self.hash = hash(self)
         self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 
 
-class TestCreateWidgetsMixIn(unittest.TestCase):
+class TestWidgetFactoryMixIn(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.widgets = []
@@ -161,7 +161,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_init(self) -> None:
         obj = _TestWidget()
-        self.assertIsInstance(obj, CreateWidgetsMixIn)
+        self.assertIsInstance(obj, WidgetFactoryMixIn)
         self.assertTrue(hasattr(obj, "_widgets"))
 
     def test_create_label(self) -> None:

@@ -35,7 +35,7 @@ from qtpy import QtCore, QtGui
 
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
+from pydidas.widgets.param_io._param_io_file import _ParamIoFile
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -47,7 +47,7 @@ param_pattern = Parameter("file_pattern", Path, "test_##.nxs", name="File patter
 
 def widget_from_param(qtbot, param, qref=None):
     param.restore_default()
-    widget = ParamIoWidgetFile(param, persistent_qsettings_ref=qref)
+    widget = _ParamIoFile(param, persistent_qsettings_ref=qref)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.show()
@@ -70,9 +70,7 @@ def _drag_drop_args(widget, mime_data):
 def _cleanup():
     yield
     app = PydidasQApplication.instance()
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetFile)
-    ]:
+    for widget in [_w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoFile)]:
         widget.deleteLater()
     app.processEvents()
 
@@ -90,7 +88,7 @@ def test_dir(temp_path):
 @pytest.mark.parametrize("qref", [None, "test_ref_file"])
 def test__creation(qtbot, param, test_dir, qref):
     widget = widget_from_param(qtbot, param, qref=qref)
-    assert isinstance(widget, ParamIoWidgetFile)
+    assert isinstance(widget, _ParamIoFile)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     if qref is None:

@@ -35,8 +35,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from pydidas.core import get_generic_parameter
 from pydidas.core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
 from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets.factory import CreateWidgetsMixIn
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
+from pydidas.widgets.base_classes import ParameterWidgetMixIn, WidgetFactoryMixIn
 
 
 class _TableWithXYPositions(QtWidgets.QTableWidget):
@@ -81,7 +80,9 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
     def remove_selected_points(self) -> None:
         """Remove all the manually selected points."""
         _points_to_remove = self._get_selected_points()
-        _rows_to_remove = self.get_rows_of_selected_points()
+        _rows_to_remove = sorted(
+            [_item.row() for _item in self.selectedIndexes()], reverse=True
+        )
         _new_row_count = self.rowCount() - len(_rows_to_remove)
         with QtCore.QSignalBlocker(self.selectionModel()):
             for _row in _rows_to_remove:
@@ -133,22 +134,9 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             _points.append(_pos)
         return _points
 
-    def get_rows_of_selected_points(self) -> list[int]:
-        """
-        Get the row numbers of the selected points, sorted in inverse order.
-
-        Returns
-        -------
-        list
-            The list with the row numbers of the selection.
-        """
-        _rows = [_item.row() for _item in self.selectedIndexes()]
-        _rows.sort(reverse=True)
-        return _rows
-
 
 class PointsForBeamcenterWidget(
-    QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidgetsMixIn
+    QtWidgets.QWidget, WidgetFactoryMixIn, ParameterWidgetMixIn
 ):
     """A widget to display a list of points in an associated plot."""
 
@@ -158,8 +146,8 @@ class PointsForBeamcenterWidget(
 
     def __init__(self, plot: Any, parent: Any = None, **kwargs: Any) -> None:
         QtWidgets.QWidget.__init__(self, parent)
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
+        ParameterWidgetMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self._qtapp = QtWidgets.QApplication.instance()
@@ -190,19 +178,15 @@ class PointsForBeamcenterWidget(
         self.create_button(
             "but_delete_selected_points",
             "Delete selected points",
+            clicked=self._widgets["table"].remove_selected_points,
         )
         self.create_button(
             "but_delete_all_points",
             "Delete all points",
+            clicked=self._widgets["table"].remove_all_points,
         )
 
         self.process_new_font_metrics(*self._qtapp.font_metrics)
-        self._widgets["but_delete_selected_points"].clicked.connect(
-            self._widgets["table"].remove_selected_points
-        )
-        self._widgets["but_delete_all_points"].clicked.connect(
-            self._widgets["table"].remove_all_points
-        )
         self._widgets["table"].sig_new_selection.connect(self.sig_new_selection)
         self._widgets["table"].sig_remove_points.connect(self.sig_remove_points)
         self._widgets["two_click_selection"].sig_new_check_state.connect(

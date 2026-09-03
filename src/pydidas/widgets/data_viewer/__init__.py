@@ -29,15 +29,6 @@ __status__ = "Production"
 from .axes_selector import AxesSelector
 from .data_axis_selector import DataAxisSelector
 from .data_viewer import DataViewer
-from .table_with_node_labels import TableWithNodeLabels
 
 
-__all__ = ["AxesSelector", "DataAxisSelector", "DataViewer", "TableWithNodeLabels"]
-
-# Clean up the namespace:
-del (
-    axes_selector,
-    data_axis_selector,
-    data_viewer,
-    table_with_node_labels,
-)
+__all__ = ["AxesSelector", "DataAxisSelector", "DataViewer"]

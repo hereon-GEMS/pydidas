@@ -37,26 +37,24 @@ from numpy import ndarray
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
+from pydidas.widgets.base_classes import WidgetWithParameters
+from pydidas.widgets.base_classes.pydidas_widget_mixin import PydidasWidgetMixIn
 from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_AXIS_SELECTOR_BUILD_CONFIG,
     DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG,
     invalid_range_str,
-)
-from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
-from pydidas.widgets.widget_with_parameter_collection import (
-    WidgetWithParameterCollection,
 )
 
 
 GENERIC_AXIS_SELECTOR_CHOICES = ["slice at index", "slice at data value"]
 
 
-class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
+class DataAxisSelector(WidgetWithParameters, PydidasWidgetMixIn):
     """
     A widget to select a data point on a specific axis.
     """
 
-    init_kwargs = WidgetWithParameterCollection.init_kwargs + [
+    init_kwargs = WidgetWithParameters.init_kwargs + [
         "multiline",
         "allow_axis_use_modification",
     ]
@@ -67,8 +65,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     def __init__(
         self, index: int, parent: QtWidgets.QWidget | None = None, **kwargs: Any
     ):
-        WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
-        PydidasWidgetMixin.__init__(self, **kwargs)
+        WidgetWithParameters.__init__(self, parent=parent, **kwargs)
+        PydidasWidgetMixIn.__init__(self, **kwargs)
         self._axis_index = index
         self._current_slice = slice(0, 1)
         self._npoints = 0

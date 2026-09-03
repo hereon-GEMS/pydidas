@@ -36,8 +36,8 @@ from qtpy import QtCore, QtGui
 from pydidas.core import Parameter
 from pydidas.core.constants import QT_REG_EXP_FLOAT_VALIDATOR, QT_REG_EXP_INT_VALIDATOR
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
-    ParamIoWidgetLineEdit,
+from pydidas.widgets.param_io._param_io_lineedit import (
+    _ParamIoLineEdit,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -63,7 +63,7 @@ _PARAM_TEST_VALUES = {
 
 
 def widget_instance(qtbot, param, **kwargs: Any):
-    widget = ParamIoWidgetLineEdit(param, **kwargs)
+    widget = _ParamIoLineEdit(param, **kwargs)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     qtbot.add_widget(widget)
@@ -83,7 +83,7 @@ def _cleanup():
         _param.restore_default()
     app = PydidasQApplication.instance()
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetLineEdit)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoLineEdit)
     ]:
         widget.deleteLater()
     app.processEvents()
@@ -94,7 +94,7 @@ def _cleanup():
 @pytest.mark.parametrize("precision", [None, 4])
 def test__creation(qtbot, param, precision):
     widget = widget_instance(qtbot, param, precision=precision)
-    assert isinstance(widget, ParamIoWidgetLineEdit)
+    assert isinstance(widget, _ParamIoLineEdit)
     if param.dtype == Real and precision is not None:
         assert widget._precision == precision
     else:

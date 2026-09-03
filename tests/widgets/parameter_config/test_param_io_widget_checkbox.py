@@ -30,8 +30,8 @@ import pytest
 
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
-    ParamIoWidgetCheckBox,
+from pydidas.widgets.param_io._param_io_checkbox import (
+    _ParamIoCheckBox,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -46,7 +46,7 @@ def _cleanup():
     yield
     app = PydidasQApplication.instance()
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetCheckBox)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoCheckBox)
     ]:
         widget.deleteLater()
     app.processEvents()
@@ -58,7 +58,7 @@ def widget(qtbot, param):
 
 
 def widget_with_param(qtbot, param):
-    widget = ParamIoWidgetCheckBox(param)
+    widget = _ParamIoCheckBox(param)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.show()
@@ -69,7 +69,7 @@ def widget_with_param(qtbot, param):
 
 @pytest.mark.gui
 def test__creation(widget, param):
-    assert isinstance(widget, ParamIoWidgetCheckBox)
+    assert isinstance(widget, _ParamIoCheckBox)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert widget.isEnabled()
@@ -87,7 +87,7 @@ def test__creation(widget, param):
 )
 def test__creation__w_one_choice_entry(qtbot, local_param):
     widget = widget_with_param(qtbot, local_param)
-    assert isinstance(widget, ParamIoWidgetCheckBox)
+    assert isinstance(widget, _ParamIoCheckBox)
     assert not widget.isEnabled()
     assert widget.text() == local_param.name
     assert widget.isChecked() == local_param.value

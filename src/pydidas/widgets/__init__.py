@@ -30,28 +30,24 @@ __status__ = "Production"
 from types import ModuleType
 
 from . import (
+    base_classes,
+    base_reimplementations,
     controllers,
-    data_viewer,
-    dialogues,
-    factory,
-    framework,
+    dialogs,
+    extended_widgets,
     misc,
-    parameter_config,
+    param_io,
     plugin_config_widgets,
-    selection,
     windows,
     workflow_edit,
 )
-from .factory import CreateWidgetsMixIn
-from .file_dialog import *
-from .scroll_area import *
+from .file_dialog import PydidasFileDialog
 from .utilities import *
-from .widget_with_parameter_collection import *
 
 
 def __getattr__(name: str) -> ModuleType:
-    """Lazy-load the silx_plot and pyqtgraph_plot modules on demand."""
-    if name in ("silx_plot", "pyqtgraph_plot"):
+    """Lazy-load sub-packages on demand."""
+    if name in ("data_viewer", "silx_plot", "pyqtgraph_plot"):
         import importlib
 
         module = importlib.import_module(f".{name}", __name__)
@@ -60,28 +56,20 @@ def __getattr__(name: str) -> ModuleType:
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__all__ = (
-    [
-        "controllers",
-        "data_viewer",
-        "dialogues",
-        "factory",
-        "framework",
-        "misc",
-        "parameter_config",
-        "plugin_config_widgets",
-        "selection",
-        "silx_plot",
-        "pyqtgraph_plot",
-        "windows",
-        "workflow_edit",
-        "CreateWidgetsMixIn",
-    ]
-    + file_dialog.__all__
-    + scroll_area.__all__
-    + utilities.__all__
-    + widget_with_parameter_collection.__all__
-)
-
-# Clean up the namespace:
-del file_dialog, scroll_area, utilities, widget_with_parameter_collection
+__all__ = [
+    "base_classes",
+    "base_reimplementations",
+    "controllers",
+    "data_viewer",
+    "dialogs",
+    "extended_widgets",
+    "file_browser",
+    "misc",
+    "param_io",
+    "plugin_config_widgets",
+    "pyqtgraph_plot",
+    "silx_plot",
+    "windows",
+    "workflow_edit",
+    "PydidasFileDialog",
+] + utilities.__all__

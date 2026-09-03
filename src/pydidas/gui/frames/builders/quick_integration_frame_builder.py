@@ -36,8 +36,8 @@ from pydidas.core import constants
 from pydidas.widgets import ScrollArea
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.misc import (
+    IntegrationRoiParamContainer,
     PointsForBeamcenterWidget,
-    ShowIntegrationRoiParamsWidget,
 )
 from pydidas.widgets.selection import SelectDataFrameWidget, ToggleOptionsButton
 from pydidas.widgets.silx_plot import (
@@ -261,7 +261,7 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("roi_selector", ShowIntegrationRoiParamsWidget),
+        ("roi_selector", IntegrationRoiParamContainer),
         {
             "show_reset_button": False,
             "add_bottom_spacer": False,

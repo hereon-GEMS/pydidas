@@ -36,16 +36,16 @@ from numpy import nan
 from pydidas.core import Hdf5key, Parameter, UserConfigError
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.parameter_config.base_param_io_widget import BaseParamIoWidget
+from pydidas.widgets.param_io.base_param_io_widget import BaseParamIo
 from pydidas_qtcore import PydidasQApplication
 
 
-class _TestBaseParamWidget(BaseParamIoWidget):
+class _TestBaseParamWidget(BaseParamIo):
     """
-    A test subclass of BaseParamIoWidget with minimal implementation.
+    A test subclass of BaseParamIo with minimal implementation.
 
     The implemented methods are only for testing purposes but are required to
-    fully test the other methods of BaseParamIoWidget.
+    fully test the other methods of BaseParamIo.
     """
 
     def __init__(self, param, **kwargs: Any):
@@ -64,9 +64,7 @@ class _TestBaseParamWidget(BaseParamIoWidget):
 def _cleanup():
     yield
     app = PydidasQApplication.instance()
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, BaseParamIoWidget)
-    ]:
+    for widget in [_w for _w in app.topLevelWidgets() if isinstance(_w, BaseParamIo)]:
         widget.deleteLater()
     app.processEvents()
 
@@ -93,7 +91,7 @@ def widget_with_param(qtbot, param):
 
 @pytest.mark.gui
 def test__creation(widget):
-    assert isinstance(widget, BaseParamIoWidget)
+    assert isinstance(widget, BaseParamIo)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert isinstance(widget._linked_param, Parameter)
@@ -102,7 +100,7 @@ def test__creation(widget):
 @pytest.mark.gui
 @pytest.mark.parametrize(
     "input_str, expected",
-    [(_k, _v) for _k, _v in BaseParamIoWidget._SUPPORTED_TYPE_STRINGS.items()],
+    [(_k, _v) for _k, _v in BaseParamIo._SUPPORTED_TYPE_STRINGS.items()],
 )
 @pytest.mark.parametrize("case", ["lower", "upper", "mixed"])
 def test_is_special_type_string__valid(widget, input_str, expected, case):
@@ -262,21 +260,21 @@ def test_emit_signal(widget):
 
 @pytest.mark.gui
 def test_current_text_property():
-    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    widget = BaseParamIo(Parameter("test", str, "entry"))
     with pytest.raises(NotImplementedError):
         _ = widget.current_text
 
 
 @pytest.mark.gui
 def test_update_display_value():
-    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    widget = BaseParamIo(Parameter("test", str, "entry"))
     with pytest.raises(NotImplementedError):
         widget.update_display_value("default")
 
 
 @pytest.mark.gui
 def test_update_choices():
-    widget = BaseParamIoWidget(Parameter("test", str, "entry"))
+    widget = BaseParamIo(Parameter("test", str, "entry"))
     with pytest.raises(NotImplementedError):
         widget.update_choices(["a", "b", "c"])
 

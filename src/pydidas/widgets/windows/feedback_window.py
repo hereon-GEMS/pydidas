@@ -40,7 +40,7 @@ from pydidas.core.utils import (
     apply_qt_properties,
     copy_text_to_system_clipbord,
 )
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 
 
 INFO_TEXT = (

@@ -51,8 +51,8 @@ from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
 from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget import (
-    BaseParamIoWidget,
+from pydidas.widgets.param_io.base_param_io_widget import (
+    BaseParamIo,
 )
 
 
@@ -291,7 +291,7 @@ class QuickIntegrationFrame(BaseFrame):
             )
 
     @QtCore.Slot()
-    def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
+    def _update_xray_param(self, param_key: str, widget: BaseParamIo) -> None:
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -299,7 +299,7 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         param_key : str
             The reference key.
-        widget : pydidas.widgets.parameter_config.BaseParamIoWidget
+        widget : pydidas.widgets.param_io.BaseParamIo
             The Parameter editing widget.
         """
         self._EXP.set_param_value(param_key, widget.get_value())

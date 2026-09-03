@@ -43,14 +43,12 @@ from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
 from pydidas.plugins import pyFAIintegrationBase
+from pydidas.widgets.base_classes import PydidasScrollArea, PydidasWindow
 from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
-from pydidas.widgets.dialogues import QuestionBox
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
-from pydidas.widgets.scroll_area import ScrollArea
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets.dialogs import QuestionBox
+from pydidas.widgets.misc import IntegrationRoiParamContainer, SelectDataFrameWidget
 from pydidas.widgets.silx_plot import (
     PydidasPlot2DwithIntegrationRegions,
 )
@@ -85,9 +83,9 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         **kwargs : Any
             Additional keyword arguments.
         """
-        PydidasWindow.__init__(
-            self, title="Select integration region", activate_frame=False
-        )
+        kwargs["title"] = "Select integration region"
+        kwargs["activate_frame"] = False
+        super().__init__(**kwargs)
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
         self._plugin = plugin
@@ -127,7 +125,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         )
         self.create_any_widget(
             "scroll_area",
-            ScrollArea,
+            PydidasScrollArea,
             gridPos=(1, 0, 1, 1),
             resize_to_widget_width=True,
             widget=self._widgets["left_container"],
@@ -170,7 +168,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.create_line(None, parent_widget=self._widgets["left_container"])
         self.add_any_widget(
             "roi_selector",
-            ShowIntegrationRoiParamsWidget(
+            IntegrationRoiParamContainer(
                 forced_edit_disable=self._config["only_show_roi"],
                 plugin=self._plugin,
             ),

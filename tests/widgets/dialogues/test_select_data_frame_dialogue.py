@@ -34,7 +34,7 @@ import pytest
 from qtpy import QtWidgets
 
 from pydidas.core import Dataset, FileReadError
-from pydidas.widgets.dialogues.select_data_frame_dialog import SelectDataFrameDialog
+from pydidas.widgets.dialogs.select_data_frame_dialog import SelectDataFrameDialog
 from pydidas.widgets.selection import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2D
 from pydidas_qtcore import PydidasQApplication
@@ -102,7 +102,7 @@ def test__selected_frame__initially_none(dialog) -> None:
 def test__creation__with_filename(qtbot, path_w_data_files) -> None:
     _fname = path_w_data_files / "data_2d.npy"
     with patch(
-        "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+        "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
         return_value=Dataset(_DATA_2D),
     ):
         _dialog = SelectDataFrameDialog(filename=_fname)
@@ -138,7 +138,7 @@ def test__process_file_validity__false_clears_selected_frame(dialog) -> None:
 def test__load_and_display__stores_dataset(dialog) -> None:
     _data = Dataset(_DATA_2D)
     with patch(
-        "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+        "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
         return_value=_data,
     ):
         dialog._load_and_display("some_file.npy", {})
@@ -150,7 +150,7 @@ def test__load_and_display__calls_plot(dialog) -> None:
     _data = Dataset(_DATA_2D)
     with (
         patch(
-            "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+            "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
             return_value=_data,
         ),
         patch.object(dialog._widgets["plot"], "plot_pydidas_dataset") as mock_plot,
@@ -164,7 +164,7 @@ def test__load_and_display__passes_config_to_import(dialog) -> None:
     _data = Dataset(_DATA_2D)
     _config = {"dataset": "/entry/data/2d", "indices": (0,)}
     with patch(
-        "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+        "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
         return_value=_data,
     ) as mock_import:
         dialog._load_and_display("file.h5", _config)
@@ -176,7 +176,7 @@ def test__load_and_display__on_file_read_error__clears_frame(dialog) -> None:
     dialog._selected_frame = Dataset(_DATA_2D)
     with (
         patch(
-            "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+            "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
             side_effect=FileReadError("read error"),
         ),
         pytest.raises(FileReadError),
@@ -189,7 +189,7 @@ def test__load_and_display__on_file_read_error__clears_frame(dialog) -> None:
 def test__load_and_display__on_file_read_error__clears_plot(dialog) -> None:
     with (
         patch(
-            "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+            "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
             side_effect=FileReadError("read error"),
         ),
         patch.object(dialog._widgets["plot"], "clear") as mock_clear,
@@ -229,7 +229,7 @@ def test__abort__selected_frame_remains_none(qtbot, dialog) -> None:
 def test__selected_frame__returns_last_loaded_after_confirm(qtbot, dialog) -> None:
     _data = Dataset(_DATA_2D)
     with patch(
-        "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+        "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
         return_value=_data,
     ):
         dialog._load_and_display("file.npy", {})
@@ -242,7 +242,7 @@ def test__selected_frame__returns_last_loaded_after_confirm(qtbot, dialog) -> No
 def test__sig_new_selection__triggers_load_and_display(dialog) -> None:
     _data = Dataset(_DATA_2D)
     with patch(
-        "pydidas.widgets.dialogues.select_data_frame_dialog.import_data",
+        "pydidas.widgets.dialogs.select_data_frame_dialog.import_data",
         return_value=_data,
     ):
         dialog._widgets["selector"].sig_new_selection.emit("file.npy", {})

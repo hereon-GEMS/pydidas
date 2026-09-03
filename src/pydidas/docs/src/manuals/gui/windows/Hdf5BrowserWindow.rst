@@ -1,7 +1,7 @@
 ..
     This file is licensed under the
     Creative Commons Attribution 4.0 International Public License (CC-BY-4.0)
-    Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+    Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _hdf5_browser_window:
@@ -26,6 +26,6 @@ items recursively from the currently selected item.
     The Hdf5 browser window does not allow to plot or explore datasets but only to
     visualize the tree structure of the HDF5 file.
 
-Acknowledgements go to the ESRF silx team. THe Hdf5 browser window is based on parts of
+Acknowledgements go to the ESRF silx team. The Hdf5 browser window is based on parts of
 the ``silx.app.view.Viewer.Viewer`` class from the
 `silx package <https://github.com/silx-kit/silx>`_.

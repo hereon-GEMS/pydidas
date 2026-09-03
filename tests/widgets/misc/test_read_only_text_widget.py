@@ -17,7 +17,7 @@
 #
 # Parts of this file have been created using the AI-tool Claude Haiku 4.5.
 
-"""Unit tests for the ReadOnlyTextWidget."""
+"""Unit tests for the ReadOnlyTextEdit."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
@@ -31,7 +31,7 @@ from collections.abc import Generator
 import pytest
 
 from pydidas.core.exceptions import UserConfigError
-from pydidas.widgets.misc.read_only_text_widget import ReadOnlyTextWidget
+from pydidas.widgets.misc.read_only_text_edit import ReadOnlyTextEdit
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -40,16 +40,16 @@ def _cleanup() -> Generator[None, None, None]:
     app = PydidasQApplication.instance()
     yield
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ReadOnlyTextWidget)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, ReadOnlyTextEdit)
     ]:
         widget.deleteLater()
     app.processEvents()
 
 
 @pytest.fixture
-def widget(qtbot) -> ReadOnlyTextWidget:
-    """Create a ReadOnlyTextWidget for testing."""
-    w = ReadOnlyTextWidget()
+def widget(qtbot) -> ReadOnlyTextEdit:
+    """Create a ReadOnlyTextEdit for testing."""
+    w = ReadOnlyTextEdit()
     qtbot.add_widget(w)
     w.show()
     qtbot.wait_until(lambda: w.isVisible(), timeout=500)
@@ -58,7 +58,7 @@ def widget(qtbot) -> ReadOnlyTextWidget:
 
 @pytest.mark.gui
 def test_creation__defaults(qtbot) -> None:
-    w = ReadOnlyTextWidget()
+    w = ReadOnlyTextEdit()
     qtbot.add_widget(w)
     w.show()
     qtbot.wait_until(lambda: w.isVisible(), timeout=500)
@@ -71,7 +71,7 @@ def test_creation__defaults(qtbot) -> None:
 @pytest.mark.gui
 @pytest.mark.parametrize("line_wrap_width", [40, 80, 120])
 def test_creation__with_line_wrap_width(qtbot, line_wrap_width) -> None:
-    w = ReadOnlyTextWidget(line_wrap_width=line_wrap_width)
+    w = ReadOnlyTextEdit(line_wrap_width=line_wrap_width)
     qtbot.add_widget(w)
     assert w.lineWrapColumnOrWidth() == line_wrap_width
 
@@ -86,7 +86,7 @@ def test_creation__with_size_kwargs(qtbot, width, height) -> None:
         kwargs["minimumWidth"] = width
     if height is not None:
         kwargs["minimumHeight"] = height
-    w = ReadOnlyTextWidget(**kwargs)
+    w = ReadOnlyTextEdit(**kwargs)
     qtbot.add_widget(w)
     if width is not None:
         assert w.minimumWidth() == width
@@ -96,7 +96,7 @@ def test_creation__with_size_kwargs(qtbot, width, height) -> None:
 
 @pytest.mark.gui
 def test_creation__with_fixed_size(qtbot) -> None:
-    w = ReadOnlyTextWidget(fixedWidth=500, minimumWidth=300)
+    w = ReadOnlyTextEdit(fixedWidth=500, minimumWidth=300)
     qtbot.add_widget(w)
     assert w.width() <= 500
 
@@ -380,7 +380,7 @@ def test__integration__complex_workflow(widget) -> None:
 
 @pytest.mark.gui
 def test__font_size_connection(qtbot) -> None:
-    w = ReadOnlyTextWidget()
+    w = ReadOnlyTextEdit()
     qtbot.add_widget(w)
     w.show()
     w.set_text("Test content")

@@ -46,14 +46,14 @@ from pydidas.core.constants import (
     QT_REG_EXP_POS_INT_VALIDATOR,
 )
 from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets import WidgetWithParameterCollection, delete_all_items_in_layout
+from pydidas.widgets import WidgetWithParameters, delete_all_items_in_layout
 
 
 _BUTTON_WIDTH = 25
 _LINE_PEN = {"color": COLOR_BLUE, "width": 2}
 
 
-class GridCurvePlot(WidgetWithParameterCollection):
+class GridCurvePlot(WidgetWithParameters):
     """
     A widget to display curve plots in a grid layout.
     """
@@ -92,7 +92,7 @@ class GridCurvePlot(WidgetWithParameterCollection):
         return min_, max_
 
     def __init__(self, **kwargs: Any):
-        WidgetWithParameterCollection.__init__(self, **kwargs)
+        WidgetWithParameters.__init__(self, **kwargs)
         self._config: dict[str, Any] = {
             "n_hor": kwargs.pop("n_hor", 2),
             "n_vert": kwargs.pop("n_vert", 2),

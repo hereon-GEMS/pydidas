@@ -35,9 +35,10 @@ from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.data_io import import_data
-from pydidas.widgets import parameter_config, silx_plot
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets import silx_plot
+from pydidas.widgets.base_classes import PydidasWindow
+from pydidas.widgets.extended_widgets import ParameterEditCanvas
+from pydidas.widgets.misc import SelectDataFrameWidget
 
 
 class MaskEditorWindow(PydidasWindow):
@@ -60,7 +61,7 @@ class MaskEditorWindow(PydidasWindow):
         """Build the frame and create all widgets."""
         self.create_any_widget(
             "param_frame",
-            parameter_config.ParameterEditCanvas,
+            ParameterEditCanvas,
             font_metric_width_factor=0.8 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(0, 0, 1, 1),
         )

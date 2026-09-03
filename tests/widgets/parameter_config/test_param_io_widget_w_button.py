@@ -32,8 +32,8 @@ from qtpy import QtCore, QtGui
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets import get_pyqt_icon_from_str
-from pydidas.widgets.parameter_config.param_io_widget_with_button import (
-    ParamIoWidgetWithButton,
+from pydidas.widgets.param_io._param_io_w_button import (
+    _ParamIoWithButton,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -46,7 +46,7 @@ def _cleanup():
     yield
     app = PydidasQApplication.instance()
     for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ParamIoWidgetWithButton)
+        _w for _w in app.topLevelWidgets() if isinstance(_w, _ParamIoWithButton)
     ]:
         widget.deleteLater()
     app.processEvents()
@@ -54,14 +54,14 @@ def _cleanup():
 
 @pytest.fixture
 def widget(qtbot):
-    _standard_button_func = ParamIoWidgetWithButton.button_function
+    _standard_button_func = _ParamIoWithButton.button_function
 
     def dummy_button_function(widget):
         widget.button_clicked = True
 
-    ParamIoWidgetWithButton.button_function = dummy_button_function
+    _ParamIoWithButton.button_function = dummy_button_function
     param.restore_default()
-    widget = ParamIoWidgetWithButton(param)
+    widget = _ParamIoWithButton(param)
     widget.button_clicked = False
     widget.spy_new_value = SignalSpy(widget.sig_new_value)
     widget.spy_value_changed = SignalSpy(widget.sig_value_changed)
@@ -69,13 +69,13 @@ def widget(qtbot):
     qtbot.add_widget(widget)
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
     yield widget
-    ParamIoWidgetWithButton.button_function = _standard_button_func
+    _ParamIoWithButton.button_function = _standard_button_func
     widget.deleteLater()
 
 
 @pytest.mark.gui
 def test__creation(widget):
-    assert isinstance(widget, ParamIoWidgetWithButton)
+    assert isinstance(widget, _ParamIoWithButton)
     assert hasattr(widget, "sig_new_value")
     assert hasattr(widget, "sig_value_changed")
     assert widget._io_lineedit.text() == param.value
@@ -87,14 +87,14 @@ def test__creation(widget):
     [None, get_pyqt_icon_from_str("pydidas::generic_copy"), "pydidas::generic_copy"],
 )
 def test__creation__w_icon(icon):
-    widget = ParamIoWidgetWithButton(param, button_icon=icon)
-    assert isinstance(widget, ParamIoWidgetWithButton)
+    widget = _ParamIoWithButton(param, button_icon=icon)
+    assert isinstance(widget, _ParamIoWithButton)
     assert isinstance(widget._button.icon(), QtGui.QIcon)
 
 
 @pytest.mark.gui
 def test_button_function():
-    widget = ParamIoWidgetWithButton(param)
+    widget = _ParamIoWithButton(param)
     with pytest.raises(NotImplementedError):
         widget.button_function()
 

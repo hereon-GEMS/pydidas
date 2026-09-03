@@ -36,14 +36,13 @@ from pydidas.core import UserConfigError
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
 from pydidas.plugins import InputPlugin
+from pydidas.widgets.base_classes import PydidasWindow, WidgetFactoryMixIn
+from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
 from pydidas.widgets.data_viewer import DataViewer
-from pydidas.widgets.factory import CreateWidgetsMixIn
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import ReadOnlyTextWidget
 from pydidas_qtcore import PydidasQApplication
 
 
-class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
+class ShowInformationForResult(PydidasWindow, WidgetFactoryMixIn):
     """Window to display detailed information about a result datapoint."""
 
     show_frame = False
@@ -52,7 +51,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
 
     def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, **kwargs)
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
 
         self.setWindowTitle("Information for data point")
         self._ordinal = None
@@ -79,7 +78,7 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         )
         self.create_any_widget(
             "info_field",
-            ReadOnlyTextWidget,
+            ReadOnlyTextEdit,
             font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             minimumHeight=300,
         )

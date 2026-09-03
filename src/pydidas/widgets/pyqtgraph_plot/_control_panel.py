@@ -34,14 +34,14 @@ from qtpy.QtWidgets import QWidget
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea, WidgetWithParameterCollection
+from pydidas.widgets import ScrollArea, WidgetWithParameters
 from pydidas.widgets.data_viewer import DataAxisSelector
 
 
 _SPACER_HEIGHT = 20
 
 
-class _ControlPanel(WidgetWithParameterCollection):
+class _ControlPanel(WidgetWithParameters):
     """
     The _ControlPanel allows to control the image display parameters
     and to set the ROI and zoom.
@@ -87,7 +87,7 @@ class _ControlPanel(WidgetWithParameterCollection):
     sig_use_scale = QtCore.Signal(str)
 
     def __init__(self, **kwargs: Any) -> None:
-        WidgetWithParameterCollection.__init__(self, **kwargs)
+        WidgetWithParameters.__init__(self, **kwargs)
         self.layout().setHorizontalSpacing(5)  # type: ignore[attr-defined]
         self.layout().setVerticalSpacing(5)  # type: ignore[attr-defined]
         self.set_default_params()

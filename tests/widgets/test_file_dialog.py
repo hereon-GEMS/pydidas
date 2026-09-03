@@ -85,16 +85,16 @@ def test_get_stored_entries__with_qref(
     file_dialog, qref, stored_entry, reference, stored_dir
 ) -> None:
     """Test getting stored entries with various qref and reference settings."""
-    file_dialog.q_settings_set("dialogues/Test__import", "entry_import")
-    file_dialog.q_settings_set("dialogues/Test__export", "entry_export")
+    file_dialog.q_settings_set("dialogs/Test__import", "entry_import")
+    file_dialog.q_settings_set("dialogs/Test__export", "entry_export")
     file_dialog._stored_selections = {}
     file_dialog._calling_kwargs = {}
     file_dialog._stored_dirs = {}
     if qref is not None:
         file_dialog._calling_kwargs["qsettings_ref"] = qref
     if stored_entry is not None:
-        file_dialog._stored_selections["dialogues/Test__import"] = stored_entry
-        file_dialog._stored_selections["dialogues/Test__export"] = stored_entry
+        file_dialog._stored_selections["dialogs/Test__import"] = stored_entry
+        file_dialog._stored_selections["dialogs/Test__export"] = stored_entry
         file_dialog._stored_selections["ref"] = stored_entry
     if reference is not None:
         file_dialog._calling_kwargs["reference"] = reference
@@ -162,15 +162,13 @@ def test_store_current_directory(file_dialog, temp_path, use_dir, qref, ref) -> 
     file_dialog.selectFile("file_dialog_test" if use_dir else "test_file.txt")
     file_dialog._store_current_directory()
     # Normalize paths for comparison on Windows
-    _stored_dir = Path(file_dialog.q_settings_get("dialogues/current")).resolve()
+    _stored_dir = Path(file_dialog.q_settings_get("dialogs/current")).resolve()
     _expected_dir = _test_dir.resolve()
     assert _stored_dir == _expected_dir
     if qref is not None:
-        _stored_qref_dir = Path(
-            file_dialog.q_settings_get(f"dialogues/{qref}")
-        ).resolve()
+        _stored_qref_dir = Path(file_dialog.q_settings_get(f"dialogs/{qref}")).resolve()
         assert _stored_qref_dir == _expected_dir
-        assert file_dialog._stored_selections[f"dialogues/{qref}"] == (
+        assert file_dialog._stored_selections[f"dialogs/{qref}"] == (
             "file_dialog_test" if use_dir else "test_file.txt"
         )
     if ref is not None:

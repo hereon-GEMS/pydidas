@@ -35,7 +35,7 @@ from qtpy import QtCore, QtGui
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import Parameter, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 
 
 _FIT2D_PARAM_KEYS = [

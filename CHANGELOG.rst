@@ -45,7 +45,8 @@ Programmatic changes
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
 - Updated the way pydidas handles font scaling on silx colorbars
-
+- Renamed the `dialogues` subpackage to `dialogs` for consistency with
+  development standards and Qt.
 
 Bugfixes
 --------

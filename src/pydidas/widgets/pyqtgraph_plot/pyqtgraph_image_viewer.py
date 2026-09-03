@@ -37,12 +37,12 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core.constants import POLICY_EXP_EXP, POLICY_EXP_FIX, POLICY_FIX_EXP
 from pydidas.resources.pydidas_icons import create_pydidas_icon
-from pydidas.widgets import WidgetWithParameterCollection
+from pydidas.widgets import WidgetWithParameters
 from pydidas.widgets.pyqtgraph_plot._control_panel import _ControlPanel
 from pydidas.widgets.pyqtgraph_plot._image_view import _ImageView
 
 
-class PyQtGraphImageViewer(WidgetWithParameterCollection):
+class PyQtGraphImageViewer(WidgetWithParameters):
     """
     The PyQtGraphImageViewer is a widget to display images from the camera and
     allows to control the image display and processing parameters.
@@ -53,7 +53,7 @@ class PyQtGraphImageViewer(WidgetWithParameterCollection):
 
     def __init__(self, **kwargs: Any) -> None:
         pyqtgraph.setConfigOptions(imageAxisOrder="row-major")
-        WidgetWithParameterCollection.__init__(self, **kwargs)
+        WidgetWithParameters.__init__(self, **kwargs)
         self._config_visible = True
         self.create_any_widget(
             "imageview",

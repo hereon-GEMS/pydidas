@@ -41,20 +41,20 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import get_random_string
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.parameter_config import ParameterWidget
-from pydidas.widgets.parameter_config.param_io_widget_checkbox import (
-    ParamIoWidgetCheckBox,
+from pydidas.widgets.param_io import ParameterWidget
+from pydidas.widgets.param_io._param_io_checkbox import (
+    _ParamIoCheckBox,
 )
-from pydidas.widgets.parameter_config.param_io_widget_combobox import (
-    ParamIoWidgetComboBox,
+from pydidas.widgets.param_io._param_io_combobox import (
+    _ParamIoComboBox,
 )
-from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
-from pydidas.widgets.parameter_config.param_io_widget_hdf5 import (
-    ParamIoWidgetHdf5Key,
-    ParamIoWidgetNXdata,
+from pydidas.widgets.param_io._param_io_file import _ParamIoFile
+from pydidas.widgets.param_io._param_io_hdf5 import (
+    _ParamIoHdf5Key,
+    _ParamIoNXdata,
 )
-from pydidas.widgets.parameter_config.param_io_widget_lineedit import (
-    ParamIoWidgetLineEdit,
+from pydidas.widgets.param_io._param_io_lineedit import (
+    _ParamIoLineEdit,
 )
 from pydidas_qtcore import PydidasQApplication
 
@@ -135,7 +135,7 @@ def test__creation__w__bool_choices(
     widget = widget_instance(
         qtbot, param, **(kwargs | {"font_metric_width_factor": width})
     )
-    assert isinstance(widget.io_widget, ParamIoWidgetCheckBox)
+    assert isinstance(widget.io_widget, _ParamIoCheckBox)
     assert widget.param == param
     assert widget.height() == _expected_height
     assert abs(_expected_width - widget.width()) < 3
@@ -185,17 +185,17 @@ def test__creation__check_choices_behaviour(
     assert widget.param == param
     assert widget.io_widget.current_text == str(default)
     if use_choices:
-        assert isinstance(widget.io_widget, ParamIoWidgetComboBox)
+        assert isinstance(widget.io_widget, _ParamIoComboBox)
         assert widget.io_widget.current_choices == [str(_item) for _item in choices]
     else:
         if dtype is Path:
-            assert isinstance(widget.io_widget, ParamIoWidgetFile)
+            assert isinstance(widget.io_widget, _ParamIoFile)
         elif dtype is Hdf5key:
-            assert isinstance(widget.io_widget, ParamIoWidgetHdf5Key)
+            assert isinstance(widget.io_widget, _ParamIoHdf5Key)
         elif dtype is NXdataKey:
-            assert isinstance(widget.io_widget, ParamIoWidgetNXdata)
+            assert isinstance(widget.io_widget, _ParamIoNXdata)
         else:
-            assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
+            assert isinstance(widget.io_widget, _ParamIoLineEdit)
 
 
 @pytest.mark.gui
@@ -260,7 +260,7 @@ def test__creation__check_layout(qtbot, qapp, kwargs, width, unit) -> None:
     _expected_row_offset = _expected_subwidget_height + LAYOUT_VERTICAL_SPACING
 
     assert widget.param == param
-    assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
+    assert isinstance(widget.io_widget, _ParamIoLineEdit)
     assert _expected_global_height == widget.height()
     assert _expected_global_width == widget.width()
 
@@ -468,7 +468,7 @@ def test_update_choices_from_param__no_previous_choices(qtbot, selection) -> Non
     param.set_value_and_choices(selection, choices=["A", "B", "C"])
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
-    assert isinstance(widget.io_widget, ParamIoWidgetComboBox)
+    assert isinstance(widget.io_widget, _ParamIoComboBox)
     assert widget.io_widget.current_choices == ["A", "B", "C"]
     assert widget.display_value == selection
     assert widget.spy_new_value.n == 0  # type: ignore[attr-defined]
@@ -483,7 +483,7 @@ def test_update_choices_from_param__choices_removed(qtbot, selection) -> None:
     param.set_value_and_choices(selection, None)
     widget.update_choices_from_param()
     qtbot.wait(5)  # wait for signal processing
-    assert isinstance(widget.io_widget, ParamIoWidgetLineEdit)
+    assert isinstance(widget.io_widget, _ParamIoLineEdit)
     assert widget.io_widget.current_choices is None
     assert widget.display_value == selection
     assert widget.spy_new_value.n == 0  # type: ignore[attr-defined]

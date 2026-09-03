@@ -53,7 +53,7 @@ from pydidas.gui.frames.builders.composite_creator_frame_builder import (
 )
 from pydidas.gui.mixins import SilxPlotWindowMixIn
 from pydidas.multiprocessing import AppRunner
-from pydidas.widgets import dialogues
+from pydidas.widgets import dialogs
 from pydidas.widgets.framework import BaseFrameWithApp
 from pydidas_qtcore import PydidasQApplication
 
@@ -443,7 +443,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         if self.get_param_value("live_processing") or Path(fname).is_file():
             return True
         if fname not in ["", "."]:
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "File does not exist",
                 f'The selected file\n\n"{fname}"\n\ndoes not exist.',
             )
@@ -490,7 +490,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             The filename to the hdf5 data file.
         """
         _fname = Path(fname)
-        dset = dialogues.Hdf5DatasetSelectionPopup(self, _fname).get_dset()
+        dset = dialogs.Hdf5DatasetSelectionPopup(self, _fname).get_dset()
         if dset is not None:
             self.set_param_and_widget_value("hdf5_key", dset)
             self.__selected_hdf5_key()
@@ -529,7 +529,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["bg_hdf5_images"] = hdf5_flag
         self._config["bg_configured"] = not hdf5_flag
         if hdf5_flag:
-            dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
+            dset = dialogs.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
                 self.set_param_and_widget_value("bg_hdf5_key", dset)
                 self._config["bg_configured"] = True
@@ -566,7 +566,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             _flag = True
         else:
             self.__clear_entries("bg_hdf5_key", hide=False)
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "Dataset key error",
                 (
                     f'The selected file\n\n"{_fname}"\n\ndoes not have the '
@@ -760,10 +760,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self._filelist.update()
         except UserConfigError as _error:
             self.__clear_entries("last_file", hide=False)
-            dialogues.critical_warning("Could not create filelist.", str(_error))
+            dialogs.critical_warning("Could not create filelist.", str(_error))
             return
         if not self._filelist.n_files > 0:
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "File list is empty.",
                 "The list of files is empty. Please verify the selection.",
             )

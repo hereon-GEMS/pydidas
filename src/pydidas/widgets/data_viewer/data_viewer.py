@@ -37,14 +37,12 @@ from qtpy.QtWidgets import QWidget
 from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
+from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.data_viewer import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import GENERIC_AXIS_SELECTOR_CHOICES
 from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,
     DataViewConfig,
-)
-from pydidas.widgets.widget_with_parameter_collection import (
-    WidgetWithParameterCollection,
 )
 
 
@@ -54,7 +52,7 @@ _DATASET_TOO_LARGE_ERROR = (
 )
 
 
-class DataViewer(WidgetWithParameterCollection):
+class DataViewer(WidgetWithParameters):
     """
     The DataViewer allows to display data in multiple display modes.
     """
@@ -67,7 +65,7 @@ class DataViewer(WidgetWithParameterCollection):
     sig_plot2d_get_more_info_for_data = QtCore.Signal(float, float)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
-        WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
+        WidgetWithParameters.__init__(self, parent=parent, **kwargs)
 
         self._data = None
         self._h5node = None

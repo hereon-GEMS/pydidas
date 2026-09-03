@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AboutWindow"]
 
+from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
@@ -38,7 +39,7 @@ from pydidas.core.constants import (
 )
 from pydidas.resources import logos
 from pydidas.version import VERSION
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 
 
 PYDIDAS_INFO = (
@@ -65,10 +66,10 @@ class AboutWindow(PydidasWindow):
 
     show_frame = False
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="About pydidas", **kwargs)
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """
         Build the frame and create all widgets.
         """
@@ -110,7 +111,7 @@ class AboutWindow(PydidasWindow):
         )
         self.resize(QtCore.QSize(_font_height * 35, _font_height * 20))
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """
         Build the frame and create all widgets.
         """
@@ -120,7 +121,7 @@ class AboutWindow(PydidasWindow):
         )
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Adjust the window based on the new font metrics.
 

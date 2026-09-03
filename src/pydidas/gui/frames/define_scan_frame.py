@@ -46,8 +46,8 @@ from pydidas.gui.frames.builders.define_scan_frame_builder import (
     DEFINE_SCAN_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.dialogues import ItemInListSelectionWidget
-from pydidas.widgets.dialogues.question_box import QuestionBox
+from pydidas.widgets.dialogs import SelectItemInListDialog
+from pydidas.widgets.dialogs.question_box import QuestionBox
 from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication
 
@@ -212,7 +212,7 @@ class DefineScanFrame(BaseFrame):
             if _return[0] == "::no_error::":
                 _return = ScanIo.import_from_file_sequence(_fnames, scan=SCAN)
             elif _return[0] == "::multiple_motors::":
-                _choice = ItemInListSelectionWidget(
+                _choice = SelectItemInListDialog(
                     _return[1:],
                     title="Select motor",
                     label=(
@@ -309,7 +309,7 @@ class DefineScanFrame(BaseFrame):
         basedir : str
             The new base directory
         """
-        self.q_settings_set("dialogues/DefineScanFrame__scan_name_pattern", basedir)
+        self.q_settings_set("dialogs/DefineScanFrame__scan_name_pattern", basedir)
 
     @QtCore.Slot()
     def _show_scan_dim_doc(self) -> None:

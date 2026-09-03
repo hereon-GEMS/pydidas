@@ -42,7 +42,7 @@ from pydidas.gui.frames.builders.workflow_run_frame_builder import (
 )
 from pydidas.gui.frames.view_results_frame import ViewResultsFrame
 from pydidas.multiprocessing import AppRunner
-from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.dialogs import WarningBox
 from pydidas.workflow import WorkflowResults, WorkflowTree
 
 

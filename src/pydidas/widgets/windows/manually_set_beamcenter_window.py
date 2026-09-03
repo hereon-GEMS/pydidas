@@ -39,13 +39,12 @@ from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
 from pydidas.data_io import import_data
+from pydidas.widgets.base_classes import PydidasWindow
 from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
 )
-from pydidas.widgets.dialogues import QuestionBox
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import PointsForBeamcenterWidget
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets.dialogs import QuestionBox
+from pydidas.widgets.misc import PointsForBeamcenterWidget, SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2D
 
 

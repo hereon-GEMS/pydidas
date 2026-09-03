@@ -55,8 +55,8 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     create_splitter,
 )
 from pydidas.widgets.framework import BaseFrame, PydidasWindow
-from pydidas.widgets.misc import ReadOnlyTextWidget
-from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
+from pydidas.widgets.misc import ReadOnlyTextEdit
+from pydidas.widgets.param_io._param_io_file import _ParamIoFile
 from pydidas.widgets.windows import Hdf5BrowserWindow
 
 
@@ -127,7 +127,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         # creation do not accept direct args
         self.add_any_widget(
             "filename",
-            ParamIoWidgetFile(get_generic_parameter("filename")),
+            _ParamIoFile(get_generic_parameter("filename")),
             gridPos=(0, 1, 1, 2),
             parent_widget="plot_header",
         )
@@ -400,7 +400,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.__metadata_window = PydidasWindow()
         self.__metadata_window.create_any_widget(
             "text_box",
-            ReadOnlyTextWidget,
+            ReadOnlyTextEdit,
             font_metric_width_factor=120,
             line_wrap_width=120,
             gridPos=(0, 0, 1, 2),

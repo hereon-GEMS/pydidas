@@ -38,13 +38,12 @@ from pydidas.core import Dataset
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.plugins import BasePlugin
+from pydidas.widgets.base_classes import PydidasScrollArea, PydidasWindow
 from pydidas.widgets.data_viewer import DataViewer
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.parameter_config import ParameterEditCanvas
+from pydidas.widgets.extended_widgets import ParameterEditCanvas
 from pydidas.widgets.plugin_config_widgets import (
     EditPluginParametersWidget,
 )
-from pydidas.widgets.scroll_area import ScrollArea
 from pydidas.widgets.windows.show_detailed_plugin_results_window import (
     ShowDetailedPluginResultsWindow,
 )
@@ -90,7 +89,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         )
         self.create_any_widget(
             "config_scroll_area",
-            ScrollArea,
+            PydidasScrollArea,
             minimumHeight=750,
             resize_to_widget_width=True,
             widget=self._widgets["config_area"],
@@ -227,7 +226,6 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["detailed_results"].setVisible(False)
         self.sig_closed.emit()
 
-    @QtCore.Slot()
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         """
         Handle the close event and discard any possible changes.

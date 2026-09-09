@@ -34,6 +34,8 @@ from typing import Any
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
+from pydidas.core import UserConfigError
+from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.singleton import QtSingleton
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.workflow_edit import PluginInWorkflowBox
@@ -452,7 +454,10 @@ class WorkflowTreeEditManager(QtCore.QObject, metaclass=QtSingleton):
             if self.root.n_children == 0:
                 self.root = None
             elif self.root.n_children == 1:
-                self.root = self.root.get_children()[0]
+                if TREE.nodes[self.root.get_children()[0].node_id].plugin.plugin_type == INPUT_PLUGIN:
+                    self.root = self.root.get_children()[0]
+                else:
+                    raise UserConfigError("Root node has to be an input plugin")
         self._nodes[node_id].connect_parent_to_children()
         self.__delete_references(node_id)
         TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)

@@ -173,6 +173,8 @@ class ProcessingTree(GenericTree):
         new_plugin : pydidas.plugins.BasePlugin
             The instance of the new Plugin.
         """
+        if node_id == 0 and new_plugin.plugin_type != INPUT_PLUGIN:
+            raise UserConfigError("Root node has to be an input plugin")
         new_plugin.node_id = node_id
         self.nodes[node_id].plugin = new_plugin
         self._config["tree_changed"] = True

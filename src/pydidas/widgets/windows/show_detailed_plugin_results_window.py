@@ -36,7 +36,7 @@ from pydidas.core import UserConfigError
 from pydidas.core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
 from pydidas.core.utils import update_size_policy
 from pydidas.widgets.base_classes import PydidasWindow
-from pydidas.widgets.silx_plot import PydidasPlotStack
+from pydidas.widgets.lazy_widgets import PydidasPlotStack
 from pydidas_qtcore import PydidasQApplication
 
 

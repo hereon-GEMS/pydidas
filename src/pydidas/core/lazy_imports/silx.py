@@ -28,13 +28,18 @@ __status__ = "Production"
 __all__ = [
     "BackendMatplotlib",
     "Colormap",
+    "ColormapNameComboBox",
+    "Hdf5TreeModel",
+    "Hdf5TreeView",
     "ImageToolBar",
+    "NexusSortFilterProxyModel",
     "Plot1D",
     "Plot2D",
     "PlotAction",
     "PlotToolButton",
     "Scatter",
     "plot_items",
+    "silx_icons",
 ]
 
 
@@ -44,7 +49,9 @@ from pydidas.core.lazy_imports.lazy_objects import LazyObject
 
 
 if TYPE_CHECKING:
+    from silx.gui import icons as silx_icons
     from silx.gui.colors import Colormap
+    from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
     from silx.gui.plot import Plot1D, Plot2D
     from silx.gui.plot import items as plot_items
     from silx.gui.plot.actions import PlotAction
@@ -52,15 +59,23 @@ if TYPE_CHECKING:
     from silx.gui.plot.items import Scatter
     from silx.gui.plot.PlotToolButtons import PlotToolButton
     from silx.gui.plot.tools import ImageToolBar
+    from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 else:
     BackendMatplotlib = LazyObject(
         "silx.gui.plot.backends.BackendMatplotlib", "BackendMatplotlib"
     )
     Colormap = LazyObject("silx.gui.colors", "Colormap")
+    ColormapNameComboBox = LazyObject(
+        "silx.gui.widgets.ColormapNameComboBox", "ColormapNameComboBox"
+    )
+    Hdf5TreeModel = LazyObject("silx.gui.hdf5", "Hdf5TreeModel")
+    Hdf5TreeView = LazyObject("silx.gui.hdf5", "Hdf5TreeView")
     ImageToolBar = LazyObject("silx.gui.plot.tools", "ImageToolBar")
+    NexusSortFilterProxyModel = LazyObject("silx.gui.hdf5", "NexusSortFilterProxyModel")
     Plot1D = LazyObject("silx.gui.plot", "Plot1D")
     Plot2D = LazyObject("silx.gui.plot", "Plot2D")
     PlotAction = LazyObject("silx.gui.plot.actions", "PlotAction")
     PlotToolButton = LazyObject("silx.gui.plot.PlotToolButtons", "PlotToolButton")
     Scatter = LazyObject("silx.gui.plot.items", "Scatter")
+    silx_icons = LazyObject("silx.gui", "icons")
     plot_items = LazyObject("silx.gui.plot", "items")

@@ -138,7 +138,7 @@ def invalid_range_str(input_range: str) -> str:
 
 def DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
     axis_index: int, multiline: bool
-) -> list[str, list[Any], dict[str, Any]]:
+) -> list[str | list[Any] | dict[str, Any]]:
     """
     Get the arguments required to create all necessary widgets in the header.
 
@@ -186,7 +186,7 @@ def DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
 
 def DATA_AXIS_SELECTOR_BUILD_CONFIG(
     multiline: bool,
-) -> list[str, tuple[Any], dict[str, Any]]:
+) -> list[str | list[Any] | dict[str, Any]]:
     """
     Get the arguments required to create all necessary widgets in the axis selector.
     """

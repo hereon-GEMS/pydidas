@@ -27,9 +27,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["AboutWindow"]
 
-from typing import Any
 
 import sys
+from typing import Any
 
 from qtpy import API_NAME, QtCore, QtWidgets
 

@@ -38,7 +38,7 @@ from pydidas.core.utils import ShowBusyMouse, get_fixed_length_str
 from pydidas.plugins import InputPlugin
 from pydidas.widgets.base_classes import PydidasWindow, WidgetFactoryMixIn
 from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
-from pydidas.widgets.data_viewer import DataViewer
+from pydidas.widgets.lazy_widgets import DataViewer
 from pydidas_qtcore import PydidasQApplication
 
 

@@ -29,7 +29,7 @@ __all__ = ["ManuallySetIntegrationRoiController"]
 
 
 from functools import partial
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from qtpy import QtCore
@@ -40,7 +40,10 @@ from pydidas.core.math import Point
 from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import pyFAIintegrationBase
 from pydidas.widgets.misc import IntegrationRoiParamContainer
-from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
 class ManuallySetIntegrationRoiController(QtCore.QObject):
@@ -58,7 +61,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
     ----------
     editor : pydidas.widgets.misc.IntegrationRoiParamContainer
         The IntegrationRoiParamContainer instance to display parameter values.
-    plot : pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions
+    plot : PydidasPlot2DwithIntegrationRegions
         The plot to display the ROI.
     **kwargs : Any
         Supported keyword arguments are:
@@ -78,7 +81,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
     def __init__(
         self,
         editor: IntegrationRoiParamContainer,
-        plot: PydidasPlot2DwithIntegrationRegions,
+        plot: "PydidasPlot2DwithIntegrationRegions",
         **kwargs: Any,
     ):
         QtCore.QObject.__init__(self)

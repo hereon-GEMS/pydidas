@@ -34,9 +34,13 @@ from typing import Any
 
 import h5py
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui import icons as silx_icons
-from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
 
+from pydidas.core.lazy_imports.silx import (
+    Hdf5TreeModel,
+    Hdf5TreeView,
+    NexusSortFilterProxyModel,
+    silx_icons,
+)
 from pydidas.resources.pydidas_icons import pydidas_icon_with_bg
 from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication

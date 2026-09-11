@@ -44,8 +44,8 @@ from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
 )
 from pydidas.widgets.dialogs import QuestionBox
+from pydidas.widgets.lazy_widgets import PydidasPlot2D
 from pydidas.widgets.misc import PointsForBeamcenterWidget, SelectDataFrameWidget
-from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 class ManuallySetBeamcenterWindow(PydidasWindow):

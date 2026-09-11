@@ -45,8 +45,8 @@ class FabioIo(IoBase):
     format_name: ClassVar[str] = "FabIO reader"
     dimensions: ClassVar[list[int]] = [2]
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: Any):
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
         Read an image from a FabIO-supported file format.
 
@@ -63,7 +63,7 @@ class FabioIo(IoBase):
                 4-tuples of integers in the format (y_low, y_high, x_low,
                 x_high) and 2-tuples of integers or slice objects.
                 If None, the full image will be returned. The default is None.
-            returnType : datatype or 'auto', optional
+            astype : datatype or 'auto', optional
                 If 'auto', the image will be returned in its native data
                 type. If a specific datatype has been selected, the image
                 is converted to this type. The default is 'auto'.
@@ -80,5 +80,5 @@ class FabioIo(IoBase):
             _data = _file.data
             _header = _file.header
 
-        cls._data = Dataset(_data, metadata=_header)
-        return cls.return_data(**kwargs)
+        _data = Dataset(_data, metadata=_header)
+        return FabioIo.return_data(_data, **kwargs)

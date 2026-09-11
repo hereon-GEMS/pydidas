@@ -282,15 +282,23 @@ class PluginInWorkflowBox(WidgetFactoryMixIn, QFrame):
         event : QtGui.QMouseEvent
             The mouse move event.
         """
-        if event.buttons() == QtCore.Qt.LeftButton:
-            _drag = QtGui.QDrag(self)
-            _mime = QtCore.QMimeData()
-            _drag.setMimeData(_mime)
+        if not (event.buttons() & QtCore.Qt.LeftButton):
+            return super().mouseMoveEvent(event)
 
-            _pixmap = QtGui.QPixmap(self.size())
-            self.render(_pixmap)
-            _drag.setPixmap(_pixmap)
-            _drag.exec_(QtCore.Qt.MoveAction)
+        drag = QtGui.QDrag(self.window())
+
+        mime = QtCore.QMimeData()
+        mime.setData(
+            "application/x-pydidas-plugin-id",
+            QtCore.QByteArray(str(self.widget_id).encode("utf-8")),
+        )
+        drag.setMimeData(mime)
+
+        pixmap = self.grab()
+        drag.setPixmap(pixmap)
+        drag.setHotSpot(pixmap.rect().center())
+
+        (getattr(drag, "exec", None) or drag.exec_)(QtCore.Qt.MoveAction)
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         """
@@ -312,11 +320,18 @@ class PluginInWorkflowBox(WidgetFactoryMixIn, QFrame):
         event : QtGui.QDropEvent
             The drop event.
         """
-        _source_widget = event.source()
-        if not isinstance(_source_widget, PluginInWorkflowBox):
-            return
-        event.accept()
-        self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)
+        source_id = None
+        if event.mimeData().hasFormat("application/x-pydidas-plugin-id"):
+            raw_id = bytes(
+                event.mimeData().data("application/x-pydidas-plugin-id")
+            ).decode("utf-8")
+            source_id = int(raw_id) if raw_id.isdigit() else raw_id
+        elif hasattr(event.source(), "widget_id"):
+            source_id = event.source().widget_id
+
+        if source_id is not None:
+            self.sig_new_node_parent_request.emit(source_id, self.widget_id)
+            event.acceptProposedAction()
 
     @QtCore.Slot(QtCore.QPoint)
     def _open_context_menu(self, point: QtCore.QPoint) -> None:

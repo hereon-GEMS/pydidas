@@ -29,7 +29,9 @@ __all__ = ["AboutWindow"]
 
 from typing import Any
 
-from qtpy import QtCore, QtWidgets
+import sys
+
+from qtpy import API_NAME, QtCore, QtWidgets
 
 from pydidas.core.constants import (
     ALIGN_BOTTOM_RIGHT,
@@ -44,6 +46,8 @@ from pydidas.widgets.base_classes import PydidasWindow
 
 PYDIDAS_INFO = (
     f"Version {VERSION}<br><br>"
+    f"Python version: {sys.version}<br>"
+    f"Qt binding: {API_NAME}<br><br>"
     "pydidas is developed by Helmholtz-Zentrum Hereon<br>"
     "and is made available under the "
     "<a href='http://www.gnu.org/licenses/gpl-3.0.txt'>GNU General Public License 3.0"

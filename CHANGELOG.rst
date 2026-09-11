@@ -44,9 +44,13 @@ Programmatic changes
 - Added a ProcessingResultSaver class to handle export of results.
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
+- Added information about python version and Qt binding to AboutWindow.
 - Updated the way pydidas handles font scaling on silx colorbars
 - Renamed the `dialogues` subpackage to `dialogs` for consistency with
   development standards and Qt.
+- When importing data, the return datatype in `import_data` calls must
+  be specified with `astype` instead of `datatype`.
+
 
 Bugfixes
 --------
@@ -76,22 +80,27 @@ Bugfixes
 - Fixed an issue in the ViewResultsFrame which did not properly count
   the file number and frame number in loaded files in the
   ShowInformationForResult popup window.
+- Fixed an issue on Unix where the main window was always maximized even
+  when reduced in size. According to the Qt documentation, the maximized
+  flag should only be used on Windows.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
-- Fixed an issue with selecting binary and HDF5 files in the 
-  SelectDataFrameWidget which did not correctly reset the parameter 
+- Fixed an issue in RawIo class which did not clearly separate input and
+  output datatype assignments.
+- Fixed an issue with selecting binary and HDF5 files in the
+  SelectDataFrameWidget which did not correctly reset the parameter
   widgets.
 - Fixed an issue in the FileDialog which displayed a text field by default
   even if empty.
 - Fixed an issue in the DefineDiffractionExperiment frame which did not update
   the displayed beamcenter after importing Fit2d parameters.
-- Fixed an issue which did not update the derived beamcenter in the 
+- Fixed an issue which did not update the derived beamcenter in the
   DefineDiffractionExperimentFrame on startup with value import.
 - Fixed an issue in the SelectDataFrameWidget which did not allow
   to open binary images when no other image format was selected beforehand.
 - Fixed an issue which did not allow the QuickIntegrationFrame to be opened
   when the experimental settings were not fully configured.
-- Fixed an issue which allowed PydidasQApplication font change signals to be 
+- Fixed an issue which allowed PydidasQApplication font change signals to be
   passed to already deleted QWidgets.
 
 

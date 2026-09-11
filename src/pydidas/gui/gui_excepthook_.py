@@ -70,7 +70,11 @@ def gui_excepthook(exc_type, exception, trace):
             "Configuration Error" if exc_type is UserConfigError else "File read error"
         )
         _app.sig_gui_exception_occurred.emit()
-        _ = PydidasExceptionMessageBox(text=_exc_repr, title=_title).exec_()
+        _box = PydidasExceptionMessageBox(text=_exc_repr, title=_title)
+        if hasattr(_box, "exec"):
+            _box.exec()
+        else:
+            _box.exec_()
         return
     with StringIO() as _tmpfile:
         traceback.print_tb(trace, None, _tmpfile)

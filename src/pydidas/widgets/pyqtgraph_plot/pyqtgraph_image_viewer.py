@@ -37,7 +37,7 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core.constants import POLICY_EXP_EXP, POLICY_EXP_FIX, POLICY_FIX_EXP
 from pydidas.resources.pydidas_icons import create_pydidas_icon
-from pydidas.widgets import WidgetWithParameters
+from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.pyqtgraph_plot._control_panel import _ControlPanel
 from pydidas.widgets.pyqtgraph_plot._image_view import _ImageView
 

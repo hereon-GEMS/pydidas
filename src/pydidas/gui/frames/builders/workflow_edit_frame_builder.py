@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ WorkflowEditFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -33,8 +33,7 @@ from qtpy.QtWidgets import QAbstractScrollArea
 from pydidas.core import constants
 from pydidas.core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
 from pydidas.core.utils import update_size_policy
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame, PydidasScrollArea
 from pydidas.widgets.plugin_config_widgets import EditPluginParametersWidget
 from pydidas.widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
 
@@ -66,7 +65,7 @@ class WorkflowEditFrameBuilder:
         )
         frame.create_any_widget(
             "workflow_area",
-            ScrollArea,
+            PydidasScrollArea,
             alignment=constants.ALIGN_TOP_CENTER,
             gridPos=(1, 0, 3, 2),
             minimumHeight=450,
@@ -88,7 +87,7 @@ class WorkflowEditFrameBuilder:
         frame._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
         frame.create_any_widget(
             "plugin_edit_area",
-            ScrollArea,
+            PydidasScrollArea,
             gridPos=(1, 2, 5, 1),
             minimumHeight=450,
             resize_to_widget_width=True,

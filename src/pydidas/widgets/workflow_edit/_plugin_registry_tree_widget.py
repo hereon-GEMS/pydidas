@@ -115,7 +115,8 @@ class _PluginRegistryTreeWidget(QtWidgets.QTreeView):
 
         for _plugin in self.collection.get_all_plugin_classes():
             _type = _plugin.plugin_subtype
-            plugin_items[_type].appendRow(QtGui.QStandardItem(_plugin.plugin_name))
+            if _type in plugin_items:
+                plugin_items[_type].appendRow(QtGui.QStandardItem(_plugin.plugin_name))
 
         _source = self.__model.sourceModel()
         _source.clear()  # type: ignore[attr-defined]

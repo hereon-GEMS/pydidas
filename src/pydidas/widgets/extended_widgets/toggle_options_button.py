@@ -95,8 +95,9 @@ class ToggleOptionsButton(PydidasPushButton):
             True: kwargs.pop("toggle_text_shown", "Hide advanced options"),
             False: kwargs.pop("toggle_text_hidden", "Show advanced options"),
         }
-        self.linked_widget = kwargs.pop("linked_widget", None)
+        _linked_widget = kwargs.pop("linked_widget", None)
         PydidasPushButton.__init__(self, *args, **kwargs)
+        self.linked_widget = _linked_widget
         self.clicked.connect(self.toggle_state)
 
     @property

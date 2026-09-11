@@ -144,7 +144,7 @@ class BasePlugin(ObjectWithParameterCollection):
     """
 
     plugin_type = BASE_PLUGIN
-    plugin_subtypee = plugin_type
+    plugin_subtype = plugin_type
     plugin_name = "Base plugin"
     default_params = ParameterCollection()
     generic_params = get_generic_param_collection("keep_results", "label")

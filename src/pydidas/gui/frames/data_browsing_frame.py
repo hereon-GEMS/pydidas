@@ -54,8 +54,8 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     DATA_BROWSING_FRAME_BUILD_CONFIG,
     create_splitter,
 )
-from pydidas.widgets.framework import BaseFrame, PydidasWindow
-from pydidas.widgets.misc import ReadOnlyTextEdit
+from pydidas.widgets.base_classes import BaseFrame, PydidasWindow
+from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
 from pydidas.widgets.param_io._param_io_file import _ParamIoFile
 from pydidas.widgets.windows import Hdf5BrowserWindow
 

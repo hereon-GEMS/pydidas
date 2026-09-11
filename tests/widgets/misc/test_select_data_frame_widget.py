@@ -37,14 +37,14 @@ from skimage.io import imsave
 
 from pydidas.core import UserConfigError
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.selection.select_data_frame_widget import SelectDataFrameWidget
+from pydidas.widgets.misc.select_data_frame_widget import SelectDataFrameWidget
 from pydidas_qtcore import PydidasQApplication
 
 
 _VALID_FILENAMES = ["hdf5_file.h5", "tif_file.tiff", "npy_file.npy"]
 _FILENAMES = _VALID_FILENAMES + ["invalid.tif"]
 _USER_CONFIG_ERROR_METHOD = (
-    "pydidas.widgets.selection.select_data_frame_widget."
+    "pydidas.widgets.misc.select_data_frame_widget."
     "SelectDataFrameWidget.raise_UserConfigError"
 )
 _VALID_KEYS = sorted(

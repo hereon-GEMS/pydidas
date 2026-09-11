@@ -29,16 +29,27 @@ __all__ = ["SelectDataFrameDialog"]
 
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Dataset, FileReadError
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
 from pydidas.resources.pydidas_icons import pydidas_icon
 from pydidas.widgets.base_classes import WidgetFactoryMixIn
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.misc import SelectDataFrameWidget
+    from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
+else:
+    SelectDataFrameWidget = LazyObject("pydidas.widgets.misc", "SelectDataFrameWidget")
+    PydidasPlot2D = LazyObject(
+        "pydidas.widgets.silx_plot.pydidas_plot2d", "PydidasPlot2D"
+    )
 
 
 class SelectDataFrameDialog(QtWidgets.QDialog, WidgetFactoryMixIn):
@@ -87,9 +98,6 @@ class SelectDataFrameDialog(QtWidgets.QDialog, WidgetFactoryMixIn):
 
     def _create_widgets(self) -> None:
         """Create and arrange all child widgets."""
-        # need to import here to keep clean import order
-        from pydidas.widgets.selection import SelectDataFrameWidget
-        from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
         self.create_empty_widget(
             "left_container", font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH

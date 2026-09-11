@@ -27,13 +27,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION"]
 
-from typing import Any
 
-from pydidas.core.constants import (
-    POLICY_FIX_EXP,
-)
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.pyqtgraph_plot import GridCurvePlot
+from typing import TYPE_CHECKING, Any
+
+from pydidas.core.constants import POLICY_FIX_EXP
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import PydidasScrollArea
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.pyqtgraph_plot import GridCurvePlot
+else:
+    GridCurvePlot = LazyObject("pydidas.widgets.pyqtgraph_plot", "GridCurvePlot")
 
 
 def __create_param_widget(
@@ -52,7 +57,7 @@ SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION: list[list[str, tuple, dict]] = [
     ],
     [
         "create_any_widget",
-        ("config_area", ScrollArea),
+        ("config_area", PydidasScrollArea),
         {
             "gridPos": (1, 0, 1, 1),
             "layout_kwargs": {"alignment": None},

@@ -32,7 +32,11 @@ from typing import TYPE_CHECKING, Any
 
 from qtpy import QtCore
 
-from pydidas.core import Parameter, ParameterCollection, PydidasGuiError
+from pydidas.core import (
+    Parameter,
+    ParameterCollectionMixIn,
+    PydidasGuiError,
+)
 from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.widgets.utilities import get_widget_layout_args
 
@@ -48,7 +52,7 @@ else:
     )
 
 
-class ParameterWidgetMixIn:
+class ParameterWidgetMixIn(ParameterCollectionMixIn):
     """
     The ParameterWidgetMixIn class includes methods which can be added to other
     classes to add functionality to create Parameter widgets and to have access to
@@ -56,13 +60,11 @@ class ParameterWidgetMixIn:
     """
 
     def __init__(self, **kwargs: Any) -> None:
+        super().__init__()
         self.param_widgets: dict[str, BaseParamIo] = {}
         self.param_composite_widgets: dict[str, ParameterWidget] = {}
         if not hasattr(self, "_widgets"):
             self._widgets = {}
-        if not hasattr(self, "params"):
-            self.params = ParameterCollection()
-        super().__init__(**kwargs)
 
     def create_param_widget(self, param: Parameter | str, **kwargs: Any) -> None:
         """

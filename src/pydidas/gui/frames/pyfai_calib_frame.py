@@ -55,7 +55,7 @@ from pydidas.core.lazy_imports.pyFAI import (
 )
 from pydidas.gui.utils.pyfai_calib_frame_utils import create_calib_tasks, populate_menu
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 
 
 EXP = DiffractionExperimentContext()

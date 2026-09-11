@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from numbers import Number
 from pathlib import Path
 from typing import Any

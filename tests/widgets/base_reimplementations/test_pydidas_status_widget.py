@@ -28,7 +28,7 @@ import unittest
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.widgets.framework import PydidasStatusWidget
+from pydidas.widgets.base_reimplementations import PydidasStatusWidget
 
 
 class TestPydidasStatusWidget(unittest.TestCase):

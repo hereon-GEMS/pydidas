@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from unittest.mock import MagicMock, patch
 
 import numpy as np

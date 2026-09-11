@@ -31,7 +31,8 @@ import numpy as np
 import pytest
 from qtpy import QtWidgets
 
-from pydidas.widgets.framework import BaseFrame, PydidasFrameStack
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.base_reimplementations import PydidasFrameStack
 
 
 class _TestWidget(BaseFrame):

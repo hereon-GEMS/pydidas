@@ -26,6 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import os
+
 import pytest
 from qtpy import QtCore, QtGui
 
@@ -135,10 +137,15 @@ def test__editing_finished(qtbot, widget):
     PydidasQApplication.platformName() == "wayland",
     reason="Wayland does not support window focus grabbing.",
 )
-def test__lost_focus(widget):
+def test__lost_focus(qtbot, widget):
     widget._io_lineedit.setFocus()
     widget._io_lineedit.setText("10")
-    widget._io_lineedit.clearFocus()
+    if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+        widget._io_lineedit.editingFinished.emit()
+    else:
+        qtbot.waitUntil(lambda: widget._io_lineedit.hasFocus(), timeout=2000)
+        widget._io_lineedit.clearFocus()
+    qtbot.wait(5)  # wait for signals to be processed
     assert widget.current_text == "10"
     assert widget.spy_new_value.n == 1
     assert widget.spy_value_changed.n == 1

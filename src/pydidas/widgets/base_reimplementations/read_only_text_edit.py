@@ -257,8 +257,9 @@ class ReadOnlyTextEdit(PydidasWidgetMixIn, QtWidgets.QTextEdit):
                 _block_format = self._BLOCK_FORMAT_STANDARD
                 _char_format = self._CHAR_FORMAT_NORMAL
             else:
+                self.clear()
                 raise UserConfigError(
-                    f"Unsupported formatter type: {_format} in ReadOnlyTextEdit. "
+                    f"Unsupported formatter type: `{_format}` in ReadOnlyTextEdit. "
                     "Supported types are `plain`, `header`, `section`, and "
                     "`subsection`."
                 )

@@ -32,7 +32,7 @@ from typing import Any
 from qtpy import QtWidgets
 
 from pydidas.core import PydidasGuiError
-from pydidas.widgets.factory.create_widgets_mixin import WidgetFactoryMixIn
+from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
 from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 
 

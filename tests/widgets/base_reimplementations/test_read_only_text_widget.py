@@ -31,29 +31,20 @@ from collections.abc import Generator
 import pytest
 
 from pydidas.core.exceptions import UserConfigError
-from pydidas.widgets.misc.read_only_text_edit import ReadOnlyTextEdit
+from pydidas.widgets.base_reimplementations.read_only_text_edit import ReadOnlyTextEdit
 from pydidas_qtcore import PydidasQApplication
 
 
-@pytest.fixture(autouse=True)
-def _cleanup() -> Generator[None, None, None]:
-    app = PydidasQApplication.instance()
-    yield
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, ReadOnlyTextEdit)
-    ]:
-        widget.deleteLater()
-    app.processEvents()
-
-
 @pytest.fixture
-def widget(qtbot) -> ReadOnlyTextEdit:
+def widget(qapp, qtbot) -> ReadOnlyTextEdit:
     """Create a ReadOnlyTextEdit for testing."""
     w = ReadOnlyTextEdit()
     qtbot.add_widget(w)
     w.show()
     qtbot.wait_until(lambda: w.isVisible(), timeout=500)
-    return w
+    yield w
+    w.deleteLater()
+    qapp.processEvents()
 
 
 @pytest.mark.gui

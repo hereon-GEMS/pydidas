@@ -32,7 +32,7 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 
 
 class SignalTestClass(QtCore.QObject):

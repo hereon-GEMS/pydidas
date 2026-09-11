@@ -48,7 +48,7 @@ from pydidas.gui.frames.builders.image_math_frame_builder import (
     IMAGE_MATH_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.workflow import WorkflowTree
 
 

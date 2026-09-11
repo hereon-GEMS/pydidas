@@ -29,8 +29,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.selection import ToggleOptionsButton
-from pydidas_qtcore import PydidasQApplication  # noqa: F401
+from pydidas.widgets.extended_widgets import ToggleOptionsButton
 
 
 @pytest.fixture

@@ -46,8 +46,8 @@ from pydidas.core.utils import apply_qt_properties, formatted_str_repr_of_dict
 from pydidas.gui.frames.builders.workflow_test_frame_builder import (
     get_WorkflowTestFrame_build_config,
 )
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.dialogs import WarningBox
-from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,

@@ -26,15 +26,22 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["get_WorkflowTestFrame_build_config"]
 
-from typing import Any
+
+from typing import TYPE_CHECKING, Any
 
 from qtpy import QtCore
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.data_viewer import DataViewer, TableWithNodeLabels
-from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.misc import ReadOnlyTextEdit
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import BaseFrame, PydidasScrollArea
+from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
+from pydidas.widgets.extended_widgets import TableWithNodeLabels
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.data_viewer import DataViewer
+else:
+    DataViewer = LazyObject("pydidas.widgets.data_viewer", "DataViewer")
 
 
 def __param_widget_config(param_key: str) -> dict:
@@ -114,7 +121,7 @@ def get_WorkflowTestFrame_build_config(
             ],
             [
                 "create_any_widget",
-                ("config_area", ScrollArea),
+                ("config_area", PydidasScrollArea),
                 {
                     "resize_to_widget_width": True,
                 },

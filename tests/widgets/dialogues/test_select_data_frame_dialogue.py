@@ -35,7 +35,7 @@ from qtpy import QtWidgets
 
 from pydidas.core import Dataset, FileReadError
 from pydidas.widgets.dialogs.select_data_frame_dialog import SelectDataFrameDialog
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets.misc import SelectDataFrameWidget
 from pydidas.widgets.silx_plot import PydidasPlot2D
 from pydidas_qtcore import PydidasQApplication
 

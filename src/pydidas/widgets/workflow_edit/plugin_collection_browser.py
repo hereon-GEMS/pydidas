@@ -82,8 +82,8 @@ class PluginCollectionBrowser(WidgetFactoryMixIn, EmptyWidget):
     sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, collection: PluginRegistry | None = None, **kwargs: Any) -> None:
-        EmptyWidget.__init__(self, **kwargs)
         WidgetFactoryMixIn.__init__(self)
+        EmptyWidget.__init__(self, **kwargs)
         self.collection = collection or PluginCollection()
 
         self.add_any_widget(

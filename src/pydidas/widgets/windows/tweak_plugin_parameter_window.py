@@ -29,17 +29,17 @@ __all__ = ["TweakPluginParameterWindow"]
 
 
 import copy
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.plugins import BasePlugin
 from pydidas.widgets.base_classes import PydidasScrollArea, PydidasWindow
-from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.extended_widgets import ParameterEditCanvas
 from pydidas.widgets.plugin_config_widgets import (
     EditPluginParametersWidget,
@@ -47,6 +47,12 @@ from pydidas.widgets.plugin_config_widgets import (
 from pydidas.widgets.windows.show_detailed_plugin_results_window import (
     ShowDetailedPluginResultsWindow,
 )
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.data_viewer import DataViewer
+else:
+    DataViewer = LazyObject("pydidas.widgets.data_viewer", "DataViewer")
 
 
 class TweakPluginParameterWindow(PydidasWindow):

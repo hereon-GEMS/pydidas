@@ -46,11 +46,11 @@ from pydidas.gui.frames.builders.quick_integration_frame_builder import (
 )
 from pydidas.plugins import PluginCollection, pyFAIintegrationBase
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
     ManuallySetIntegrationRoiController,
 )
-from pydidas.widgets.framework import BaseFrame
 from pydidas.widgets.param_io.base_param_io_widget import (
     BaseParamIo,
 )

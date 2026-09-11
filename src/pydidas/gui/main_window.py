@@ -43,7 +43,8 @@ from pydidas.gui.frames import (
 )
 from pydidas.gui.main_menu import MainMenu
 from pydidas.resources import icons
-from pydidas.widgets.framework import BaseFrame, FontScalingToolbar
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.base_reimplementations import FontScalingToolbar
 
 
 class MainWindow(MainMenu):

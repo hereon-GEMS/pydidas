@@ -28,21 +28,28 @@ __status__ = "Production"
 __all__ = ["QUICK_INTEGRATION_FRAME_BUILD_CONFIG"]
 
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qtpy import QtWidgets
 
 from pydidas.core import constants
-from pydidas.widgets import ScrollArea
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import PydidasScrollArea
 from pydidas.widgets.data_viewer import DataViewer
+from pydidas.widgets.extended_widgets import ToggleOptionsButton
 from pydidas.widgets.misc import (
     IntegrationRoiParamContainer,
     PointsForBeamcenterWidget,
+    SelectDataFrameWidget,
 )
-from pydidas.widgets.selection import SelectDataFrameWidget, ToggleOptionsButton
-from pydidas.widgets.silx_plot import (
-    PydidasPlot2DwithIntegrationRegions,
-)
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
+else:
+    PydidasPlot2DwithIntegrationRegions = LazyObject(
+        "pydidas.widgets.silx_plot", "PydidasPlot2DwithIntegrationRegions"
+    )
 
 
 def _label_header(
@@ -132,7 +139,7 @@ QUICK_INTEGRATION_FRAME_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("config_area", ScrollArea),
+        ("config_area", PydidasScrollArea),
         {
             "gridPos": (1, 0, 1, 1),
             "layout_kwargs": {"alignment": None},

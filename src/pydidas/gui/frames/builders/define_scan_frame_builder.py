@@ -37,8 +37,8 @@ from pydidas.core.constants import (
     FONT_METRIC_WIDE_CONFIG_WIDTH,
     POLICY_EXP_EXP,
 )
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.factory import SquareButton
+from pydidas.widgets.base_classes import PydidasScrollArea
+from pydidas.widgets.base_reimplementations import SquareButton
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
@@ -83,7 +83,7 @@ DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = 
         ],
         [
             "create_any_widget",
-            ("config_area", ScrollArea),
+            ("config_area", PydidasScrollArea),
             {
                 "layout_kwargs": {"alignment": None},
                 "resize_to_widget_width": True,

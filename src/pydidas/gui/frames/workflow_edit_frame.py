@@ -39,7 +39,7 @@ from pydidas.gui.frames.builders.workflow_edit_frame_builder import (
 from pydidas.gui.managers import WorkflowTreeEditManager
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.workflow import WorkflowTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 from pydidas_qtcore import PydidasQApplication

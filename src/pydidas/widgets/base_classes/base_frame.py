@@ -34,7 +34,6 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import (
     ParameterCollection,
-    ParameterCollectionMixIn,
     PydidasQsettingsMixin,
     UserConfigError,
 )
@@ -45,7 +44,6 @@ from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
 
 
 class BaseFrame(
-    ParameterCollectionMixIn,
     PydidasQsettingsMixin,
     WidgetFactoryMixIn,
     ParameterWidgetMixIn,
@@ -100,7 +98,6 @@ class BaseFrame(
         WidgetFactoryMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetMixIn.__init__(self)
-        ParameterCollectionMixIn.__init__(self)
 
         _layout = QtWidgets.QGridLayout()
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)

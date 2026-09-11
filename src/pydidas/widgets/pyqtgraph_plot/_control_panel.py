@@ -34,7 +34,7 @@ from qtpy.QtWidgets import QWidget
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import POLICY_FIX_EXP
-from pydidas.widgets import ScrollArea, WidgetWithParameters
+from pydidas.widgets.base_classes import PydidasScrollArea, WidgetWithParameters
 from pydidas.widgets.data_viewer import DataAxisSelector
 
 
@@ -99,7 +99,9 @@ class _ControlPanel(WidgetWithParameters):
         )
         self.add_any_widget(
             "scroll_area",
-            ScrollArea(resize_to_widget_width=True, widget=self._widgets["config"]),
+            PydidasScrollArea(
+                resize_to_widget_width=True, widget=self._widgets["config"]
+            ),
             gridPos=(0, 1, 1, 1),
             sizePolicy=POLICY_FIX_EXP,
             stretch=(1, 0),

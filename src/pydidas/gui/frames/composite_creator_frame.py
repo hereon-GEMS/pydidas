@@ -54,7 +54,7 @@ from pydidas.gui.frames.builders.composite_creator_frame_builder import (
 from pydidas.gui.mixins import SilxPlotWindowMixIn
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets import dialogs
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 from pydidas_qtcore import PydidasQApplication
 
 

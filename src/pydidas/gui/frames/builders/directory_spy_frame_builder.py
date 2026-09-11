@@ -28,14 +28,22 @@ __status__ = "Production"
 __all__ = ["DirectorySpyFrameBuilder"]
 
 
+from typing import TYPE_CHECKING
+
 from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     POLICY_EXP_EXP,
     POLICY_FIX_EXP,
 )
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrameWithApp
-from pydidas.widgets.silx_plot import PydidasPlot2D
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import PydidasScrollArea
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasPlot2D
+else:
+    PydidasPlot2D = LazyObject("pydidas.widgets.silx_plot", "PydidasPlot2D")
 
 
 class DirectorySpyFrameBuilder:
@@ -97,7 +105,7 @@ class DirectorySpyFrameBuilder:
         frame.create_spacer("spacer1", parent_widget=frame._widgets["config"])
         frame.create_any_widget(
             "config_area",
-            ScrollArea,
+            PydidasScrollArea,
             layout_kwargs={"alignment": None},
             sizePolicy=POLICY_FIX_EXP,
             stretch=(1, 0),

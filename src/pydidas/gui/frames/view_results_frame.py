@@ -43,7 +43,7 @@ from pydidas.plugins import InputPlugin
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.dialogs import critical_warning
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import (
     ProcessingResults,

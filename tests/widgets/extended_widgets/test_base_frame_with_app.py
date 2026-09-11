@@ -30,7 +30,7 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import BaseApp, get_generic_parameter
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 
 
 class DummyRunner:

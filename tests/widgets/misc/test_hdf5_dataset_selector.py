@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import shutil
 from pathlib import Path
 
@@ -33,7 +34,7 @@ from qtpy import QtCore
 
 from pydidas.core import Parameter
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.selection import Hdf5DatasetSelector
+from pydidas.widgets.misc import Hdf5DatasetSelector
 
 
 @pytest.fixture

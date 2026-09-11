@@ -49,7 +49,7 @@ from pydidas.widgets.data_viewer.data_viewer_utils import (
 GENERIC_AXIS_SELECTOR_CHOICES = ["slice at index", "slice at data value"]
 
 
-class DataAxisSelector(WidgetWithParameters, PydidasWidgetMixIn):
+class DataAxisSelector(PydidasWidgetMixIn, WidgetWithParameters):
     """
     A widget to select a data point on a specific axis.
     """

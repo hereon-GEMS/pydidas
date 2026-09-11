@@ -46,9 +46,9 @@ from pydidas.gui.frames.builders.define_scan_frame_builder import (
     DEFINE_SCAN_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.dialogs import SelectItemInListDialog
 from pydidas.widgets.dialogs.question_box import QuestionBox
-from pydidas.widgets.framework import BaseFrame
 from pydidas_qtcore import PydidasQApplication
 
 

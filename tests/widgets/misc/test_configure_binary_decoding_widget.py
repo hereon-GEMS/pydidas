@@ -44,7 +44,7 @@ from pydidas.core.constants import (
 from pydidas.core.generic_parameters import get_generic_parameter
 from pydidas.data_io import import_data
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.selection import ConfigureBinaryDecodingWidget
+from pydidas.widgets.misc import ConfigureBinaryDecodingWidget
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -179,7 +179,7 @@ def test_set_new_filename__binary(qtbot, widget, path_w_data_files, filename) ->
     assert widget.spy_sig_new_binary_image.n == 0  # type: ignore[attr-defined]
     assert widget.spy_sig_new_binary_config.n == 0  # type: ignore[attr-defined]
     _dtype_bytes = int(re.sub(r"[a-z_]", "", filename.removesuffix(".bin"))) // 8
-    assert widget._config["filesize"] == (_dtype_bytes * 625)
+    assert widget._config["file_size"] == (_dtype_bytes * 625)
 
 
 @pytest.mark.gui

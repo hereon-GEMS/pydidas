@@ -34,7 +34,6 @@ from qtpy import QtWidgets
 
 from pydidas.core import (
     ParameterCollection,
-    ParameterCollectionMixIn,
     PydidasQsettingsMixin,
     UserConfigError,
 )
@@ -46,7 +45,6 @@ from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
 class WidgetWithParameters(
     PydidasQsettingsMixin,
     WidgetFactoryMixIn,
-    ParameterCollectionMixIn,
     ParameterWidgetMixIn,
     QtWidgets.QWidget,
 ):
@@ -62,9 +60,8 @@ class WidgetWithParameters(
         self._config: dict[str, Any] = {}
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
-        ParameterCollectionMixIn.__init__(self)
-        ParameterWidgetMixIn.__init__(self)
         WidgetFactoryMixIn.__init__(self)
+        ParameterWidgetMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         apply_qt_properties(self, **kwargs)

@@ -31,16 +31,19 @@ __all__ = ["_ParamIoWithButton"]
 from functools import partial
 from typing import Any
 
-from qtpy import QtGui, QtWidgets
+from qtpy import QtGui
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Parameter
-from pydidas.widgets.base_classes import ParameterWidgetMixIn, PydidasWidgetMixIn
+from pydidas.widgets.base_classes import (
+    EmptyWidget,
+)
 from pydidas.widgets.base_reimplementations import PydidasLineEdit, SquareButton
+from pydidas.widgets.param_io.base_param_io_widget import BaseParamIoMixIn
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 
 
-class _ParamIoWithButton(ParameterWidgetMixIn, PydidasWidgetMixIn, QtWidgets.QWidget):
+class _ParamIoWithButton(BaseParamIoMixIn, EmptyWidget):
     """
     Widgets for Parameter I/O which includes a freely programmable button.
 
@@ -56,9 +59,8 @@ class _ParamIoWithButton(ParameterWidgetMixIn, PydidasWidgetMixIn, QtWidgets.QWi
     """
 
     def __init__(self, param: Parameter, **kwargs: Any) -> None:
-        QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
-        ParameterWidgetMixIn.__init__(self, param)
-        PydidasWidgetMixIn.__init__(self, **kwargs)
+        EmptyWidget.__init__(self, **kwargs)
+        BaseParamIoMixIn.__init__(self, param)
         _icon = kwargs.get("button_icon", None)
         if isinstance(_icon, str):
             _icon = get_pyqt_icon_from_str(_icon)
@@ -70,12 +72,13 @@ class _ParamIoWithButton(ParameterWidgetMixIn, PydidasWidgetMixIn, QtWidgets.QWi
         self._io_lineedit = PydidasLineEdit()
         self._button = SquareButton(_icon, "", font_metric_height_factor=1)
 
-        _layout = QtWidgets.QHBoxLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.setSpacing(2)
-        _layout.addWidget(self._io_lineedit)
-        _layout.addWidget(self._button)
-        self.setLayout(_layout)
+        # NOTE: EmptyWidget already installed a QGridLayout in its __init__.
+        # Qt silently ignores a second call to setLayout, so the existing
+        # layout must be reused (and reconfigured) rather than replaced.
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(2)
+        self.layout().addWidget(self._io_lineedit, 0, 0)
+        self.layout().addWidget(self._button, 0, 1)
         self.setFocusProxy(self._io_lineedit)
 
         self._io_lineedit.setText(f"{param.value}")

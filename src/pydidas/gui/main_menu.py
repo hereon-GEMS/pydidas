@@ -49,8 +49,11 @@ from pydidas.gui.gui_excepthook_ import gui_excepthook
 from pydidas.resources import icons
 from pydidas.version import VERSION
 from pydidas.widgets import PydidasFileDialog, get_pyqt_icon_from_str
+from pydidas.widgets.base_reimplementations import (
+    PydidasFrameStack,
+    PydidasStatusWidget,
+)
 from pydidas.widgets.dialogs import AcknowledgeBox, QuestionBox
-from pydidas.widgets.framework import PydidasFrameStack, PydidasStatusWidget
 from pydidas.widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,

@@ -28,15 +28,21 @@ __status__ = "Production"
 __all__ = ["IMAGE_BUFFER_SIZE", "IMAGE_MATH_FRAME_BUILD_CONFIG"]
 
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import constants
 from pydidas.core.constants import FONT_METRIC_CONSOLE_WIDTH
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.selection import SelectDataFrameWidget
-from pydidas.widgets.silx_plot import PydidasPlot2D
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import PydidasScrollArea
+from pydidas.widgets.misc import SelectDataFrameWidget
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasPlot2D
+else:
+    PydidasPlot2D = LazyObject("pydidas.widgets.silx_plot", "PydidasPlot2D")
 
 
 UFUNCS = ["absolute", "exp", "fmax", "fmin", "log", "log2", "log10", "power", "sqrt"]
@@ -86,7 +92,7 @@ IMAGE_MATH_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]
     ],
     [
         "create_any_widget",
-        ("left_scroll_area", ScrollArea),
+        ("left_scroll_area", PydidasScrollArea),
         {
             "layout_kwargs": {"alignment": None},
             "sizePolicy": constants.POLICY_FIX_EXP,

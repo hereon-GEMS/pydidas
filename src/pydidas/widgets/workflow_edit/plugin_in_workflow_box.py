@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ to display plugin processing steps in the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -280,20 +280,28 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             self.flags["inconsistent"] = False
             self.__update_style()
 
-    def mouseMoveEvent(self, event: QtCore.QEvent):
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
         """
         Implement a mouse move event to drag the plugins to a new position in the
         WorkflowTree.
         """
-        if event.buttons() == QtCore.Qt.LeftButton:
-            _drag = QtGui.QDrag(self)
-            _mime = QtCore.QMimeData()
-            _drag.setMimeData(_mime)
+        if not (event.buttons() & QtCore.Qt.LeftButton):
+            return super().mouseMoveEvent(event)
 
-            _pixmap = QtGui.QPixmap(self.size())
-            self.render(_pixmap)
-            _drag.setPixmap(_pixmap)
-            _drag.exec_(QtCore.Qt.MoveAction)
+        drag = QtGui.QDrag(self.window())
+
+        mime = QtCore.QMimeData()
+        mime.setData(
+            "application/x-pydidas-plugin-id",
+            QtCore.QByteArray(str(self.widget_id).encode("utf-8")),
+        )
+        drag.setMimeData(mime)
+
+        pixmap = self.grab()
+        drag.setPixmap(pixmap)
+        drag.setHotSpot(pixmap.rect().center())
+
+        (getattr(drag, "exec", None) or drag.exec_)(QtCore.Qt.MoveAction)
 
     def dragEnterEvent(self, event: QtCore.QEvent):
         """
@@ -312,12 +320,21 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
 
         Parameters
         ----------
-        event : QtCore.QEvent
+        event : QtGui.QDropEvent
             The drop event.
         """
-        _source_widget = event.source()
-        event.accept()
-        self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)
+        source_id = None
+        if event.mimeData().hasFormat("application/x-pydidas-plugin-id"):
+            raw_id = bytes(
+                event.mimeData().data("application/x-pydidas-plugin-id")
+            ).decode("utf-8")
+            source_id = int(raw_id) if raw_id.isdigit() else raw_id
+        elif hasattr(event.source(), "widget_id"):
+            source_id = event.source().widget_id
+
+        if source_id is not None:
+            self.sig_new_node_parent_request.emit(source_id, self.widget_id)
+            event.acceptProposedAction()
 
     @QtCore.Slot(QtCore.QPoint)
     def _open_context_menu(self, point: QtCore.QPoint):

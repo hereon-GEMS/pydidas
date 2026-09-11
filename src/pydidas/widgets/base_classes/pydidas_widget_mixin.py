@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasWidgetMixIn"]
 
-
+from functools import partial
 from numbers import Real
 from typing import Any, ClassVar
 
@@ -40,7 +40,11 @@ from pydidas.core.constants import (
     GENERIC_STANDARD_WIDGET_WIDTH,
     MINIMUM_WIDGET_DIMENSIONS,
 )
-from pydidas.core.utils import apply_qt_properties, update_qwidget_font
+from pydidas.core.utils import (
+    apply_qt_properties,
+    safe_connection_disconnect,
+    update_qwidget_font,
+)
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -119,7 +123,7 @@ class PydidasWidgetMixIn:
         self._font_metric_width_factor = kwargs.get("font_metric_width_factor", None)
         self._font_metric_height_factor = kwargs.get("font_metric_height_factor", None)
 
-        apply_qt_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)  # type: ignore[arg-type]
         if self.layout() is not None:  # type: ignore[attr-defined]
             apply_qt_properties(
                 self.layout(),  # type: ignore[attr-defined]
@@ -138,12 +142,17 @@ class PydidasWidgetMixIn:
         self.update_fontsize(self._qtapp.font_size)
         self.update_font_family(self._qtapp.font_family)
         if not all(_val == 0 for _val in self.__font_config.values()):
-            update_qwidget_font(self, **self.__font_config)
-        self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
-        self._qtapp.sig_new_font_family.connect(self.update_font_family)
-        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
+            update_qwidget_font(self, **self.__font_config)  # type: ignore[attr-defined]
+
+        _connections = [
+            self._qtapp.sig_new_fontsize.connect(self.update_fontsize),
+            self._qtapp.sig_new_font_family.connect(self.update_font_family),
+            self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics),
+        ]
+        self.destroyed.connect(  # type: ignore[attr-defined]
+            partial(safe_connection_disconnect, *_connections)
+        )
         self.process_new_font_metrics(*self._qtapp.font_metrics)
-        super().__init__(**kwargs)
 
     def sizeHint(self) -> QSize:
         """
@@ -174,7 +183,8 @@ class PydidasWidgetMixIn:
             The new font size.
         """
         update_qwidget_font(
-            self, pointSizeF=new_fontsize + self.__font_config["size_offset"]
+            self,  # type: ignore[arg-type]
+            pointSizeF=new_fontsize + self.__font_config["size_offset"],
         )
 
     @Slot(str)
@@ -187,7 +197,7 @@ class PydidasWidgetMixIn:
         new_family : str
             The name of the new font family.
         """
-        update_qwidget_font(self, family=new_family)
+        update_qwidget_font(self, family=new_family)  # type: ignore[attr-defined]
 
     @Slot(float, float)
     def process_new_font_metrics(self, font_width: float, font_height: float) -> None:
@@ -209,8 +219,8 @@ class PydidasWidgetMixIn:
             self._size_hint[0] = _width
             self.setFixedWidth(_width)  # type: ignore[attr-defined]
         if isinstance(self.font_metric_height_factor, Real):
-            # NOTE: Qt applies the layout spacing in addition to the contents margins
-            # when adding widgets to a layout.
+            # NOTE: Qt applies the layout spacing in addition to the
+            # contents margins when adding widgets to a layout.
             _height = (
                 2 * self.LAYOUT_TOP_BOTTOM_MARGIN
                 + 2 * self.LAYOUT_VERTICAL_SPACING

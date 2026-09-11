@@ -91,6 +91,9 @@ Bugfixes
   to open binary images when no other image format was selected beforehand.
 - Fixed an issue which did not allow the QuickIntegrationFrame to be opened
   when the experimental settings were not fully configured.
+- Fixed an issue which allowed PydidasQApplication font change signals to be 
+  passed to already deleted QWidgets.
+
 
 
 v26.05.19

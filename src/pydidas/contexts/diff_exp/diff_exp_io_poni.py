@@ -31,16 +31,13 @@ __all__ = ["DiffractionExperimentIoPoni"]
 from pathlib import Path
 from typing import Any
 
-import pyFAI
-from pyFAI.detectors import Detector
-from pyFAI.geometry import Geometry
-from pyFAI.io.ponifile import PoniFile
-
 from pydidas.contexts.diff_exp.diff_exp import DiffractionExperiment
 from pydidas.contexts.diff_exp.diff_exp_context import DiffractionExperimentContext
 from pydidas.contexts.diff_exp.diff_exp_io_base import DiffractionExperimentIoBase
-from pydidas.core.constants import LAMBDA_IN_M_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import LAMBDA_IN_M_TO_E
 from pydidas.core.constants.file_extensions import PONI_EXTENSIONS
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
+from pydidas.core.lazy_imports.pyFAI import Detector, Geometry, PoniFile
 from pydidas.core.utils import verify_is_new_file_or_replace_set
 
 
@@ -87,7 +84,7 @@ class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
             "max_shape": _exp.det_shape,
         }
         _pdata["wavelength"] = _exp.get_param_value("xray_wavelength") * 1e-10
-        pfile = pyFAI.io.ponifile.PoniFile(data=_pdata)
+        pfile = PoniFile(data=_pdata)
         with open(filename, "w") as _file:
             pfile.write(_file)
             _file.write("\n# This file was created by pydidas.")

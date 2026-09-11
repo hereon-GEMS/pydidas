@@ -28,22 +28,26 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
-from numbers import Real
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pyFAI
-from pyFAI.detectors import Detector
-from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
 from pydidas.core import (
     ObjectWithParameterCollection,
+    Parameter,
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
+from pydidas.core.constants import LAMBDA_IN_A_TO_E
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_NAMES
+from pydidas.core.lazy_imports.pyFAI import (
+    Detector,
+    Geometry,
+    convert_from_Fit2d,
+    convert_to_Fit2d,
+)
 from pydidas.core.math import Point, PointList
 from pydidas.core.utils import NoPrint
 
@@ -78,14 +82,22 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, filename: str | Path | None = None, *args: Any, **kwargs: Any):
+    def __init__(
+        self, *args: Parameter, filename: str | Path | None = None, **kwargs: Any
+    ):
         """
         Initialize the DiffractionExperiment instance.
 
         Parameters
         ----------
+        *args : Parameter
+            Any Parameter instances to add to the DiffractionExperiment.
         filename : str or Path, optional
             File to load DiffractionExperiment configuration from.
+        **kwargs : Any
+            Any additional keyword arguments to set Parameter values. The
+            keys must correspond to the Parameter keys and the values to
+            the new Parameter values.
         """
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
@@ -250,7 +262,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         _name = self.get_param_value("detector_name")
         if _name in PYFAI_DETECTOR_NAMES:
-            _det = pyFAI.detector_factory(_name)
+            _det = Detector.factory(_name)
         else:
             _det = Detector()
         for key, value in [
@@ -304,7 +316,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             If the specified detector name is unknown by pyFAI.
         """
         if det_name in PYFAI_DETECTOR_NAMES:
-            _det = pyFAI.detector_factory(det_name)
+            _det = Detector.factory(det_name)
         else:
             raise UserConfigError(
                 f"The detector name '{det_name}' is unknown to pyFAI."
@@ -336,7 +348,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 self.set_param_value(_key, _val)
         self.sig_params_changed.emit()  # type: ignore[attr-defined]
 
-    def update_from_pyfai_geometry(self, geometry: Geometry):
+    def update_from_pyfai_geometry(self, geometry: "Geometry"):
         """
         Update this DiffractionExperiment from a pyFAI geometry.
 
@@ -402,7 +414,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         )
 
     def set_beamcenter_from_fit2d_params(
-        self, center_x: Real, center_y: Real, det_dist: Real, **kwargs: Any
+        self, center_x: float, center_y: float, det_dist: float, **kwargs: Any
     ):
         """
         Set the beamcenter in detector pixel coordinates.
@@ -419,20 +431,20 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        center_x : Real
+        center_x : float
             The position of the x beam center in pixels.
-        center_y : Real
+        center_y : float
             The position of the y beam center in pixels.
-        det_dist : Real
+        det_dist : float
             The distance between sample and detector beam center in meters.
         **kwargs : Any
             Supported keyword arguments are:
 
-            tilt : Real, optional
+            tilt : float, optional
                 The tilt of the detector, given in rotation unit. The default is 0.
-            tilt_plane: Real, optional
-                The rotation of the tilt plane of the detector, given in rot unit. The
-                default is 0.
+            tilt_plane: float, optional
+                The rotation of the tilt plane of the detector, given in the
+                selected rotation unit (can be degree or rad). The default is 0.
             rot_unit : str, optional
                 The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.
                 The default is degree.
@@ -452,7 +464,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             _tilt = -_tilt
             _tilt_plane = 180 - _tilt_plane
         with NoPrint():
-            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(
+            _geo = convert_from_Fit2d(
                 {
                     "directDist": det_dist * 1e3,
                     "centerX": center_x,
@@ -477,15 +489,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             The geometry in Fit2D nomenclature with center_x, center_y, det_dist,
             tilt and tilt_plane keys and float values.
         """
-        if (
-            self.get_param_value("detector_pxsizex") == 0
-            or self.get_param_value("detector_pxsizey") == 0
-        ):
+        if not self.detector_is_valid:
             raise UserConfigError(
-                "The detector pixel size of 0 is invalid for a fit2d geometry."
+                "The detector is invalid for a fit2d geometry: "
+                "Please check the detector pixel sizes and numbers of pixels."
             )
         _geo = self.as_pyfai_geometry()
-        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
+        _f2d_geo = convert_to_Fit2d(_geo)
         return {
             "center_x": _f2d_geo.centerX,
             "center_y": _f2d_geo.centerY,

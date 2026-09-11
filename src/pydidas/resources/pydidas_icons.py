@@ -30,6 +30,7 @@ __all__ = [
     "create_pydidas_icon",
     "pydidas_error_icon",
     "pydidas_error_icon_with_bg",
+    "pydidas_icon",
     "pydidas_icon_with_bg",
 ]
 

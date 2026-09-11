@@ -25,13 +25,19 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
+import silx.gui.plot.ColorBar as _silx_colorbar
+
 from . import silx_actions as actions
+from ._tickbar import _PydidasTickBar
 from .pydidas_masktools_widget import *
 from .pydidas_plot1d import *
 from .pydidas_plot2d import *
 from .pydidas_plot2d_with_integration_regions import *
 from .pydidas_plot_stack import *
 
+
+_silx_colorbar._TickBar = _PydidasTickBar
 
 __all__ = (
     ["actions", "utilities"]
@@ -49,6 +55,4 @@ del (
     pydidas_plot2d,
     pydidas_plot_stack,
     pydidas_plot2d_with_integration_regions,
-    pydidas_position_info,
-    silx_actions,
 )

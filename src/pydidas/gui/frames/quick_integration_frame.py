@@ -38,7 +38,7 @@ from qtpy import QtCore
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import get_generic_param_collection
-from pydidas.core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
+from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_MODELS_OF_SHAPES
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.data_io import import_data
 from pydidas.gui.frames.builders.quick_integration_frame_builder import (
@@ -116,8 +116,10 @@ class QuickIntegrationFrame(BaseFrame):
         Build the frame and create all widgets.
         """
         for _method, _args, _kwargs in QUICK_INTEGRATION_FRAME_BUILD_CONFIG:
-            if "input_plot" in _args or "res_plot" in _args:
+            if "input_plot" in _args:
                 _kwargs["diffraction_exp"] = self._EXP
+            if "res_plot" in _args:
+                _kwargs["plot2d_diffraction_exp"] = self._EXP
             if "input_beamcenter_points" in _args:
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:

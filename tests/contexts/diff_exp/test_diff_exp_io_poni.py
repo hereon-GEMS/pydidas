@@ -27,8 +27,9 @@ __status__ = "Production"
 import logging
 from pathlib import Path
 
-import pyFAI
 import pytest
+from pyFAI.detectors import Detector
+from pyFAI.geometry import Geometry
 from pyFAI.io.ponifile import PoniFile
 
 from pydidas.contexts import DiffractionExperimentContext
@@ -62,7 +63,7 @@ _custom_det_params = {
 
 @pytest.fixture(scope="module")
 def eiger9m_poni_file(temp_path):
-    geo = pyFAI.geometry.Geometry(detector="Eiger 9M", **_pyfai_geo_params)
+    geo = Geometry(detector="Eiger 9M", **_pyfai_geo_params)
     geo.save(temp_path / "eiger9m.poni")
     return temp_path / "eiger9m.poni"
 
@@ -74,8 +75,8 @@ def exp():
 
 @pytest.fixture(scope="module")
 def custom_det_poni_file(temp_path):
-    det = pyFAI.detectors.Detector(**_custom_det_params)
-    geo = pyFAI.geometry.Geometry(detector=det, **_pyfai_geo_params)
+    det = Detector(**_custom_det_params)
+    geo = Geometry(detector=det, **_pyfai_geo_params)
     geo.save(temp_path / "custom_detector.poni")
     with open(temp_path / "custom_detector.poni", "a") as f:
         f.write("\n# This file was created by pydidas.")
@@ -106,7 +107,7 @@ def verify_imported_geo_params(exp: DiffractionExperiment):
 
 
 def check_imported_geo_params(exp: DiffractionExperiment, _fname: str):
-    geo = pyFAI.geometry.Geometry().load(PoniFile(_fname))
+    geo = Geometry().load(PoniFile(_fname))
     for param, val in [
         ("detector_dist", geo.dist),
         ("detector_poni1", geo.poni1),
@@ -130,7 +131,7 @@ def check_imported_geo_params(exp: DiffractionExperiment, _fname: str):
 
 def test_import_from_file__standard_det(eiger9m_poni_file, exp):
     EXP_IO_PONI.import_from_file(eiger9m_poni_file, diffraction_exp=exp)
-    det = pyFAI.detector_factory("Eiger 9M")
+    det = Detector.factory("Eiger 9M")
     verify_imported_geo_params(exp)
     assert exp.get_param_value("detector_name") == "Eiger 9M"
     assert exp.get_param_value("detector_npixx") == det.max_shape[1]

@@ -26,6 +26,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+from types import ModuleType
 
 from . import (
     controllers,
@@ -37,7 +38,6 @@ from . import (
     parameter_config,
     plugin_config_widgets,
     selection,
-    silx_plot,
     windows,
     workflow_edit,
 )
@@ -46,6 +46,17 @@ from .file_dialog import *
 from .scroll_area import *
 from .utilities import *
 from .widget_with_parameter_collection import *
+
+
+def __getattr__(name: str) -> ModuleType:
+    """Lazy-load the silx_plot module on demand."""
+    if name in ("silx_plot",):
+        import importlib
+
+        module = importlib.import_module(f".{name}", __name__)
+        globals()[name] = module  # Cache in module globals
+        return module
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = (

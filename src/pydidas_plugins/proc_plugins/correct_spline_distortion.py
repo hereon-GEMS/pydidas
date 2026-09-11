@@ -30,13 +30,13 @@ __all__ = ["CorrectSplineDistortion"]
 
 import warnings
 from pathlib import Path
+from typing import Any
 
 import numpy as np
-import pyFAI
-from pyFAI.distortion import Distortion
 
 from pydidas.core import Dataset, Parameter, ParameterCollection, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
+from pydidas.core.lazy_imports.pyFAI import Detector, Distortion
 from pydidas.plugins import ProcPlugin
 
 
@@ -108,7 +108,7 @@ class CorrectSplineDistortion(ProcPlugin):
         _spline = self.get_param_value("spline_file")
         if not _spline.is_file():
             raise UserConfigError(f"The given path `{_spline}` is not a valid file.")
-        self._detector = pyFAI.detector_factory("FReLoN", {"splineFile": str(_spline)})
+        self._detector = Detector.factory("FReLoN", {"splineFile": str(_spline)})
         if self.get_param_value("geometry") == "Fit2D":
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
@@ -119,8 +119,8 @@ class CorrectSplineDistortion(ProcPlugin):
             _dummy = self._correction.correct(np.ones(self._detector.max_shape))
             self._nan_mask = np.where(_dummy < 0.8, 1, 0)
 
-    def execute(
-        self, data: Dataset | np.ndarray, **kwargs: dict
+    def execute(  # type: ignore[override]
+        self, data: Dataset | np.ndarray, **kwargs: Any
     ) -> tuple[Dataset, dict]:
         """
         Apply a distortion correction to an image (2d data-array).
@@ -129,7 +129,7 @@ class CorrectSplineDistortion(ProcPlugin):
         ----------
         data : pydidas.core.Dataset or np.ndarray
             The image / frame data.
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns

@@ -20,6 +20,7 @@ Improvements
   ".nxs".
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
+- Added lazy imports of pyFAI to improve startup time.
 
 Programmatic changes
 --------------------
@@ -43,6 +44,9 @@ Programmatic changes
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
 - Added information about python version and Qt binding to AboutWindow.
+- Updated the way pydidas handles font scaling on silx colorbars
+- When importing data, the return datatype in `import_data` calls must
+  be specified with `astype` instead of `datatype`.
 
 
 Bugfixes
@@ -78,6 +82,21 @@ Bugfixes
   flag should only be used on Windows.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
+- Fixed an issue in RawIo class which did not clearly separate input and
+  output datatype assignments.
+- Fixed an issue with selecting binary and HDF5 files in the
+  SelectDataFrameWidget which did not correctly reset the parameter
+  widgets.
+- Fixed an issue in the FileDialog which displayed a text field by default
+  even if empty.
+- Fixed an issue in the DefineDiffractionExperiment frame which did not update
+  the displayed beamcenter after importing Fit2d parameters.
+- Fixed an issue which did not update the derived beamcenter in the
+  DefineDiffractionExperimentFrame on startup with value import.
+- Fixed an issue in the SelectDataFrameWidget which did not allow
+  to open binary images when no other image format was selected beforehand.
+- Fixed an issue which did not allow the QuickIntegrationFrame to be opened
+  when the experimental settings were not fully configured.
 
 
 v26.05.19

@@ -205,6 +205,7 @@ class _PydidasFileDialog(
             "",
             parent_widget=self._widgets["fileview_frame"],
             margin=15,
+            visible=False,
         )
         self.add_any_widget(
             "fileview", _fileview, parent_widget=self._widgets["fileview_frame"]

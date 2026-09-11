@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the TiffIo class for importing and exporting tiff data.
+Module with the AsciiIo class for importing and exporting ASCII data.
 """
 
 __author__ = "Malte Storm"
@@ -25,6 +25,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
+
 
 import datetime
 import time
@@ -35,8 +36,16 @@ from typing import Any, ClassVar
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.core.constants import ASCII_EXPORT_EXTENSIONS, ASCII_IMPORT_EXTENSIONS
-from pydidas.core.utils import CatchFileErrors, convert_str_to_number, get_extension
+from pydidas.core.constants import (
+    ASCII_EXPORT_EXTENSIONS,
+    ASCII_IMPORT_EXTENSIONS,
+)
+from pydidas.core.utils import (
+    CatchFileErrors,
+    convert_str_to_number,
+    get_extension,
+    verify_is_new_file_or_replace_set,
+)
 from pydidas.core.utils.ascii_header_decoders import (
     decode_chi_header,
     decode_specfile_header,
@@ -54,8 +63,8 @@ class AsciiIo(IoBase):
     dimensions: ClassVar[list[int]] = [1, 2]
     allows_metadata_import: ClassVar[bool] = True
 
-    @classmethod
-    def export_to_file(cls, filename: str | Path, data: np.ndarray, **kwargs: Any):
+    @staticmethod
+    def export_to_file(filename: str | Path, data: np.ndarray, **kwargs: Any) -> None:
         """
         Export data to file in ASCII format.
 
@@ -68,7 +77,7 @@ class AsciiIo(IoBase):
 
         Parameters
         ----------
-        filename : str | Path
+        filename : str or Path
             The filename
         data : np.ndarray
             The data to be written to file.
@@ -76,16 +85,17 @@ class AsciiIo(IoBase):
             Supported arguments are:
 
             overwrite : bool, optional
-                Flag to allow overwriting of existing files. The default is False.
+                Flag to allow overwriting of existing files. The default
+                is False.
             x_column : bool, optional
                 A flag which indicates whether the x-axis should be written as
-                a first column. If False, only the data array will be written. The
-                default is True.
+                a first column. If False, only the data array will be
+                written. The default is True.
             write_header : bool, optional
                 A flag which indicates whether a metadata header should be
                 written. The default is True.
         """
-        cls.check_for_existing_file(filename, **kwargs)
+        verify_is_new_file_or_replace_set(filename, **kwargs)
         if data.ndim > 2:
             raise UserConfigError("Only 1-d and 2-d data can be saved as ASCII")
         if not isinstance(filename, Path):
@@ -99,14 +109,14 @@ class AsciiIo(IoBase):
         if _ext == ".chi":
             if not _write_x_column:
                 raise UserConfigError("CHI files always need an x-column.")
-            _header = cls.__create_chi_header(filename, data)
+            _header = AsciiIo.__create_chi_header(filename, data)
             _comment_prefix = ""
         elif _ext in [".txt", ".csv"]:
-            _header = cls.__create_txt_header(data, _write_x_column)
+            _header = AsciiIo.__create_txt_header(data, _write_x_column)
             if _ext == ".csv":
                 _delimiter = ","
         elif _ext == ".dat":
-            _header = cls.__create_specfile_header(filename, data, _write_x_column)
+            _header = AsciiIo.__create_specfile_header(filename, data, _write_x_column)
         else:
             raise UserConfigError(f"File extension '{_ext}' not supported for export.")
         if _write_x_column:
@@ -123,8 +133,8 @@ class AsciiIo(IoBase):
                 comments=_comment_prefix,
             )
 
-    @classmethod
-    def __create_chi_header(cls, filename: Path, data: Dataset):
+    @staticmethod
+    def __create_chi_header(filename: Path, data: Dataset) -> str:
         """
         Export data to a chi file.
 
@@ -144,7 +154,7 @@ class AsciiIo(IoBase):
         return _header
 
     @staticmethod
-    def __create_txt_header(data: Dataset, write_x_column: bool):
+    def __create_txt_header(data: Dataset, write_x_column: bool) -> str:
         """
         Export data to a text file.
 
@@ -170,7 +180,9 @@ class AsciiIo(IoBase):
         return _header
 
     @staticmethod
-    def __create_specfile_header(filename: Path, data: Dataset, write_x_column: bool):
+    def __create_specfile_header(
+        filename: Path, data: Dataset, write_x_column: bool
+    ) -> str:
         """
         Export data to a SpecFile (.dat) file.
 
@@ -181,11 +193,12 @@ class AsciiIo(IoBase):
         data : Dataset
             The data to be written to the SpecFile.
         write_x_column : bool
-            A flag which indicates whether a column with the x-axis will be written
-            (as first column).
+            A flag which indicates whether a column with the x-axis will
+            be written (as first column).
         """
-        _header = ""
-        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")  # noqa: DTZ005
+        _time = datetime.datetime.now().strftime(  # noqa: DTZ005
+            "%a %b %d %H:%M:%S %Y"
+        )
         _ncols = (data.shape[1] if data.ndim > 1 else 1) + write_x_column
         _header = (
             f"F {Path(filename).name}\nE {time.time()}\nD {_time}\n\n"
@@ -200,38 +213,38 @@ class AsciiIo(IoBase):
             _header += f"L {data.get_data_description('(')}\n"
         return _header
 
-    @classmethod
-    def import_from_file(cls, filename: Path | str, **kwargs: Any) -> Dataset:
+    @staticmethod
+    def import_from_file(filename: Path | str, **kwargs: Any) -> Dataset:
         """
-        Read data from an Ascii file.
+        Read data from an ASCII file.
 
         The decoder is based on the extensions.
 
         Parameters
         ----------
-        filename : str | Path
+        filename : str or Path
             The filename of the file with the data to be imported.
         **kwargs : Any
             Supported arguments are:
 
-            roi : Union[tuple, None], optional
+            roi : tuple or None, optional
                 A region of interest for cropping. Acceptable are both 4-tuples
                 of integers in the format (y_low, y_high, x_low, x_high) and
                 2-tuples of integers or slice objects. If None, the full image
                 will be returned. The default is None.
-            returnType : Union[datatype, 'auto'], optional
+            astype : type or 'auto', optional
                 If 'auto', the image will be returned in its native data type.
-                If a specific datatype has been selected, the image is converted
-                to this type. The default is 'auto'.
+                If a specific datatype has been selected, the image is
+                converted to this type. The default is 'auto'.
             binning : int, optional
                 The rebinning factor to be applied to the image. The default
                 is 1.
             x_column : bool, optional
                 A flag which indicates whether the first column of the data
                 should be treated as x-axis. This flag is only used for
-                importing .dat and .csv files or .txt files without a metadata
-                header. The default is True for .dat and False for .csv and .txt
-                files.
+                importing .dat and .csv files or .txt files without a
+                metadata header. The default is True for .dat and False
+                for .csv and .txt files.
             x_column_index : int, optional
                 The column number to be used as x-column. This is only used if
                 x_column is True. The default is 0.
@@ -239,38 +252,41 @@ class AsciiIo(IoBase):
         Returns
         -------
         data : Dataset
-            The data in the form of a pydidas Dataset (with embedded metadata)
+            The data in the form of a pydidas Dataset (with embedded
+            metadata)
         """
         _ext = get_extension(filename)
         _x_column = kwargs.get("x_column", _ext in [".dat"])
         _col_no = kwargs.get("x_column_index", 0)
-        with CatchFileErrors(filename), warnings.catch_warnings():
-            warnings.simplefilter("ignore", UserWarning)
+        with (
+            CatchFileErrors(filename),
+            warnings.catch_warnings(action="ignore", category=UserWarning),
+        ):
             if _ext == ".chi":
-                cls._data = cls.__import_chi(filename)
+                _data = AsciiIo.__import_chi(filename)
             elif _ext == ".dat":
-                cls._data = cls.__import_specfile(
+                _data = AsciiIo.__import_specfile(
                     filename, _x_column, x_column_index=_col_no
                 )
             elif _ext in [".txt", ".csv"]:
                 _delimiter = "," if _ext == ".csv" else None
-                cls._data = cls.__import_txt(
+                _data = AsciiIo.__import_txt(
                     filename,
                     delimiter=_delimiter,
                     x_column=_x_column,
                     x_column_index=_col_no,
                 )
             elif _ext == ".fio":
-                cls._data = cls.__import_fio(
+                _data = AsciiIo.__import_fio(
                     filename, x_column=_x_column, x_column_index=_col_no
                 )
             elif _ext == ".asc":
-                cls._data = cls.__import_asc(filename)
+                _data = AsciiIo.__import_asc(filename)
             else:
                 raise UserConfigError(
                     f"File extension '{_ext}' not supported for import."
                 )
-        return cls.return_data(**kwargs)
+        return AsciiIo.return_data(_data, **kwargs)
 
     @staticmethod
     def __import_chi(filename: Path | str) -> Dataset:
@@ -279,7 +295,7 @@ class AsciiIo(IoBase):
 
         Parameters
         ----------
-        filename : Path |  str
+        filename : Path or str
             The filename of the chi file to be imported.
 
         Returns
@@ -298,19 +314,19 @@ class AsciiIo(IoBase):
             data_unit=_data_unit,
         )
 
-    @classmethod
+    @staticmethod
     def __import_specfile(
-        cls, filename: Path | str, x_column: bool, x_column_index: int = 0
+        filename: Path | str, x_column: bool, x_column_index: int = 0
     ) -> Dataset:
         """
         Import a SpecFile (.dat) file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the SpecFile to be imported.
         x_column : bool
-            A flag which indicates whether the to read the x-axis from the data.
+            A flag which indicates whether to read the x-axis from the data.
         x_column_index : int, optional
             The column number to be used as x-column. This is only used if
             x_column is True. The default is 0.
@@ -329,7 +345,8 @@ class AsciiIo(IoBase):
         if x_column:
             if _imported_data.ndim == 1:
                 raise UserConfigError(
-                    "Cannot read x-column from 1d SPEC file. Please check the file "
+                    "Cannot read x-column from 1d SPEC file. Please check "
+                    "the file "
                     "and assure it has two columns"
                 )
             _ax_ranges: list[Any] = [_imported_data[:, x_column_index]]
@@ -338,6 +355,9 @@ class AsciiIo(IoBase):
                 _ax_ranges.append(np.arange(_imported_data.shape[1]))
         else:
             _ax_ranges = [np.arange(n) for n in _imported_data.shape]
+        _raw_x_column_metadata = (
+            {"raw_data_x_column": x_column_index} if x_column else {}
+        )
         return Dataset(
             _imported_data,
             axis_units=_units,
@@ -345,12 +365,11 @@ class AsciiIo(IoBase):
             axis_ranges=_ax_ranges,
             data_label=_data_label,
             data_unit=_data_unit,
-            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
+            metadata=_raw_x_column_metadata,
         )
 
-    @classmethod
+    @staticmethod
     def __import_txt(
-        cls,
         filename: Path | str,
         delimiter: str | None = None,
         x_column: bool = True,
@@ -361,13 +380,13 @@ class AsciiIo(IoBase):
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the text file to be imported.
         delimiter : str, optional
             The delimiter used in the text file. The default is None which
             resolves to any whitespace.
         x_column : bool, optional
-            A flag which indicates whether the to read the x-axis from the data.
+            A flag which indicates whether to read the x-axis from the data.
         x_column_index : int, optional
             The column number (0-indexed) to be used as x-column if x_column
             is True. The default is 0.
@@ -380,7 +399,8 @@ class AsciiIo(IoBase):
         _data = np.loadtxt(filename, comments="#", delimiter=delimiter)
         if _data.ndim == 1 and x_column:
             raise UserConfigError(
-                "Cannot read x-column from 1d text file. Please check the file "
+                "Cannot read x-column from 1d text file. Please check the "
+                "file "
                 "and assure it has two columns"
             )
         _metadata = decode_txt_header(filename)
@@ -398,6 +418,9 @@ class AsciiIo(IoBase):
             _axes.append(None)
             _labels.append("")
             _units.append("")
+        _raw_x_column_metadata = (
+            {"raw_data_x_column": x_column_index} if x_column else {}
+        )
         return Dataset(
             _data,
             axis_ranges=_axes,
@@ -405,22 +428,22 @@ class AsciiIo(IoBase):
             axis_units=_units,
             data_label=_metadata.get("data_label", ""),
             data_unit=_metadata.get("data_unit", ""),
-            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
+            metadata=_raw_x_column_metadata,
         )
 
-    @classmethod
+    @staticmethod
     def __import_fio(
-        cls, filename: Path | str, x_column: bool = True, x_column_index: int = 0
+        filename: Path | str, x_column: bool = True, x_column_index: int = 0
     ) -> Dataset:
         """
         Import a .fio file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the .fio file to be imported.
         x_column : bool, optional
-            A flag which indicates whether the to read the x-axis from the data.
+            A flag which indicates whether to read the x-axis from the data.
         x_column_index : int, optional
             The column number (0-indexed) to be used as x-column if
             x_column is True. The default is 0.
@@ -451,7 +474,8 @@ class AsciiIo(IoBase):
             raise ValueError("No data found in .fio file.")
         if _data.ndim == 1 and x_column:
             raise UserConfigError(
-                "Cannot read x-column from 1d .fio file. Please check the file "
+                "Cannot read x-column from 1d .fio file. Please check the "
+                "file "
                 "and assure it has two columns or disable x_column reading."
             )
         if x_column:
@@ -471,16 +495,19 @@ class AsciiIo(IoBase):
             _ax_labels.append(
                 "; ".join(f"{i}: {k}" for i, k in enumerate(_col_keys.values()))
             )
+        _raw_x_column_metadata = (
+            {"raw_data_x_column": x_column_index} if x_column else {}
+        )
         return Dataset(
             _data,
             axis_ranges=_axes,
             axis_labels=_ax_labels,
             data_label=_data_label,
-            metadata=({"raw_data_x_column": x_column_index} if x_column else {}),
+            metadata=_raw_x_column_metadata,
         )
 
-    @classmethod
-    def __import_asc(cls, filename: Path | str) -> Dataset:
+    @staticmethod
+    def __import_asc(filename: Path | str) -> Dataset:
         """
         Import an .asc file.
 
@@ -527,16 +554,14 @@ class AsciiIo(IoBase):
             data_unit=_metadata.get("YUNIT", ""),
         )
 
-    @classmethod
-    def read_metadata_from_file(
-        cls, filename: Path | str, **kwargs: Any
-    ) -> dict[str, Any]:
+    @staticmethod
+    def read_metadata_from_file(filename: Path | str, **kwargs: Any) -> dict[str, Any]:
         """
         Read only the metadata from an ASCII file.
 
         Parameters
         ----------
-        filename : Path | str
+        filename : Path or str
             The filename of the file with the data to be imported.
         **kwargs : Any
             Currently not used but included for consistency.
@@ -547,29 +572,27 @@ class AsciiIo(IoBase):
             A dictionary with any found metadata keys.
         """
         _ext = get_extension(filename)
-        if _ext not in cls.extensions_import:
+        if _ext not in AsciiIo.extensions_import:
             raise UserConfigError(
                 f"File extension '{_ext}' not supported for import: Cannot read "
                 "the metadata from the file."
             )
-        with (
-            CatchFileErrors(filename),
-            warnings.catch_warnings(),
-            open(filename, "r") as f,
-        ):
+        _lines: list[str] = []
+        with CatchFileErrors(filename), warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            _lines = f.readlines()
+            with open(filename, "r") as f:
+                _lines = f.readlines()
         if _ext == ".chi":
-            _metadata = cls.__read_chi_metadata(_lines)
-        elif _ext == ".dat":
-            _metadata = cls.__read_specfile_metadata(_lines)
-        elif _ext in [".txt", ".csv"]:
-            _metadata = cls.__read_txt_metadata(_lines)
-        elif _ext == ".fio":
-            _metadata = cls.__read_fio_metadata(_lines)
-        elif _ext == ".asc":
-            _metadata = cls.__read_asc_metadata(_lines)
-        return _metadata
+            return AsciiIo.__read_chi_metadata(_lines)
+        if _ext == ".dat":
+            return AsciiIo.__read_specfile_metadata(_lines)
+        if _ext in [".txt", ".csv"]:
+            return AsciiIo.__read_txt_metadata(_lines)
+        if _ext == ".fio":
+            return AsciiIo.__read_fio_metadata(_lines)
+        if _ext == ".asc":
+            return AsciiIo.__read_asc_metadata(_lines)
+        return {}
 
     @staticmethod
     def __read_chi_metadata(lines: list[str]) -> dict[str, Any]:
@@ -698,8 +721,8 @@ class AsciiIo(IoBase):
                         _line = lines.pop(0).strip()
                         _i = int(_line.removeprefix("Col").split()[0])
                         _line += (
-                            "    [note: in Python indexing, this column is indexed "
-                            f"as #{_i - 1}]"
+                            "    [note: in Python indexing, this column is "
+                            f"indexed as #{_i - 1}]"
                         )
                         _metadata["data_columns"].append(_line)
         except (IndexError, ValueError) as error:

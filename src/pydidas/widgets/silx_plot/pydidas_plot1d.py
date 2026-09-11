@@ -46,9 +46,7 @@ from pydidas.widgets.silx_plot.utilities import (
 
 
 class PydidasPlot1D(Plot1D):
-    """
-    A customized silx.gui.plot.Plot1D with support for pydidas Datasets.
-    """
+    """A customized silx Plot1D with support for pydidas Datasets."""
 
     def __init__(self, **kwargs: Any) -> None:
         Plot1D.__init__(

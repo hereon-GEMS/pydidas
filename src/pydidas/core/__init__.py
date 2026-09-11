@@ -28,7 +28,7 @@ __status__ = "Production"
 
 
 # import sub-packages:
-from . import constants, generic_params, io_registry, utils
+from . import constants, generic_params, io_registry, lazy_imports, utils
 
 # import items from modules:
 from .base_app import *
@@ -48,7 +48,7 @@ from .singleton import *
 
 
 __all__: list[str] = (
-    ["constants", "generic_params", "io_registry", "utils"]
+    ["constants", "generic_params", "io_registry", "utils", "lazy_imports"]
     + base_app.__all__
     + dataset.__all__
     + exceptions.__all__

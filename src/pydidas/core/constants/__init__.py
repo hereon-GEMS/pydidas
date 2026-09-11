@@ -45,7 +45,7 @@ from .unicode_letters import *
 
 
 __all__: list[str] = (
-    ["image_ops"]
+    ["image_ops", "pyfai_names"]
     + colors.__all__
     + constants.__all__
     + file_extensions.__all__

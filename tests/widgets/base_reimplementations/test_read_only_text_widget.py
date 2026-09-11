@@ -26,13 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from collections.abc import Generator
-
 import pytest
 
 from pydidas.core.exceptions import UserConfigError
 from pydidas.widgets.base_reimplementations.read_only_text_edit import ReadOnlyTextEdit
-from pydidas_qtcore import PydidasQApplication
 
 
 @pytest.fixture

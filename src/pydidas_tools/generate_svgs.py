@@ -80,22 +80,23 @@ def generate_dark_mdi(path: Path):
     (path.parent / "dark" / path.name).write_text(_svg_string, encoding="utf-8")
 
 
-_app = PydidasQApplication.instance()
-_dark = _app.is_dark_mode if _app else False
-_color = "#ffffff" if _dark else "#000000"
-_bg_color = "#000000" if _dark else "#ffffff"
+if __name__ == "__main__":
+    _app = PydidasQApplication.instance()
+    _dark = _app.is_dark_mode if _app else False
+    _color = "#ffffff" if _dark else "#000000"
+    _bg_color = "#000000" if _dark else "#ffffff"
 
-(ICON_PATH / "dark").mkdir(exist_ok=True)
-(MDI_ICON_PATH / "dark").mkdir(exist_ok=True)
+    (ICON_PATH / "dark").mkdir(exist_ok=True)
+    (MDI_ICON_PATH / "dark").mkdir(exist_ok=True)
 
-for path in ICON_PATH.iterdir():
-    if path.is_file() and get_extension(path) == ".svg":
-        _name = path.name
-        if not (path.parent / "dark" / path.name).is_file():
-            generate_dark_icon(path)
+    for path in ICON_PATH.iterdir():
+        if path.is_file() and get_extension(path) == ".svg":
+            _name = path.name
+            if not (path.parent / "dark" / path.name).is_file():
+                generate_dark_icon(path)
 
-for path in MDI_ICON_PATH.iterdir():
-    if path.is_file():
-        _name = path.name
-        if not (path.parent / "dark" / path.name).is_file():
-            generate_dark_mdi(path)
+    for path in MDI_ICON_PATH.iterdir():
+        if path.is_file():
+            _name = path.name
+            if not (path.parent / "dark" / path.name).is_file():
+                generate_dark_mdi(path)

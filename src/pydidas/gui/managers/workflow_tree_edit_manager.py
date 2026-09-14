@@ -454,11 +454,17 @@ class WorkflowTreeEditManager(QtCore.QObject, metaclass=QtSingleton):
             if self.root.n_children == 0:
                 self.root = None
             elif self.root.n_children == 1:
-                if TREE.nodes[self.root.get_children()[0].node_id].plugin.plugin_type == INPUT_PLUGIN:
+                if (
+                    TREE.nodes[self.root.get_children()[0].node_id].plugin.plugin_type
+                    == INPUT_PLUGIN
+                ):
                     self.root = self.root.get_children()[0]
                 else:
-                    raise UserConfigError("Root node has to be an input plugin")
+                    raise UserConfigError(
+                        "Cannot delete root node because its child is not an input plugin"
+                    )
         self._nodes[node_id].connect_parent_to_children()
+        self._node_widgets[node_id].deleteLater()
         self.__delete_references(node_id)
         TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
         if len(TREE.node_ids) > 0:

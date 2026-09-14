@@ -166,7 +166,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         _scroll_width = max(
             50, min(120, self._widgets["label"].font_metric_width_factor)
         )
-        self._widgets["scroll_area"].setFixedWidth(_scroll_width * _font_width)
+        self._widgets["scroll_area"].setFixedWidth(int(_scroll_width * _font_width))
         self._widgets["scroll_area"].setFixedHeight(
             self.__qtapp.font_height * (_n_lines + 4)
         )

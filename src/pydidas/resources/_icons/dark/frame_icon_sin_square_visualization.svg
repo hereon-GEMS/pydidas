@@ -1,0 +1,55 @@
+<ns0:svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns1="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns2="http://www.inkscape.org/namespaces/inkscape" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns5="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" width="40" height="40" viewBox="0 0 40 40" version="1.1" id="svg1" ns1:docname="frame_icon_sin_square_visualization.svg" ns2:version="1.4 (86a8ad7, 2024-10-11)">
+  <ns1:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" ns2:showpageshadow="2" ns2:pageopacity="0.0" ns2:pagecheckerboard="0" ns2:deskcolor="#d1d1d1" showgrid="false" ns2:zoom="20.62984" ns2:cx="12.966654" ns2:cy="18.686524" ns2:window-width="2124" ns2:window-height="1275" ns2:window-x="3216" ns2:window-y="8" ns2:window-maximized="0" ns2:current-layer="svg1" />
+  <ns0:title id="title1">Pydidas frame icon: Quick intergration</ns0:title>
+  <ns0:defs id="defs1">
+    <ns0:linearGradient id="linearGradient782" ns2:collect="always">
+      <ns0:stop style="stop-color:#f93246;stop-opacity:1" offset="0.12529002" id="stop782" />
+      <ns0:stop style="stop-color:#cc977a;stop-opacity:1" offset="0.39675173" id="stop784" />
+      <ns0:stop style="stop-color:#505050;stop-opacity:1" offset="0.60556847" id="stop785" />
+      <ns0:stop style="stop-color:#323246;stop-opacity:0" offset="1" id="stop783" />
+    </ns0:linearGradient>
+    <ns0:radialGradient ns3:href="#linearGradient5488" id="radialGradient5490" cx="26.458332" cy="54.70821" fx="26.458332" fy="54.70821" r="6.6662598" gradientTransform="matrix(1.46259,0,0,1.46259,-28.197696,-69.515677)" gradientUnits="userSpaceOnUse" />
+    <ns0:linearGradient id="linearGradient5488">
+      <ns0:stop style="stop-color:#ffffff;stop-opacity:1" offset="0" id="stop5484" />
+      <ns0:stop style="stop-color:#c8c8c8;stop-opacity:0.80769229" offset="0.33333334" id="stop6286" />
+      <ns0:stop style="stop-color:#000000;stop-opacity:0" offset="1" id="stop5486" />
+    </ns0:linearGradient>
+    <ns0:radialGradient ns2:collect="always" ns3:href="#linearGradient782" id="radialGradient783" cx="18.228113" cy="-3.4617412" fx="18.228113" fy="-3.4617412" r="18" gradientTransform="matrix(-1.6143275,-0.01580401,0.01215066,-1.0053293,49.50629,0.1806378)" gradientUnits="userSpaceOnUse">
+      <ns0:stop style="stop-color:#f93246;stop-opacity:1" offset="0" id="stop782" />
+      <ns0:stop style="stop-color:#cc977a;stop-opacity:1" offset="0.4" id="stop784" />
+      <ns0:stop style="stop-color:#505050;stop-opacity:1" offset="0.75" id="stop785" />
+      <ns0:stop style="stop-color:#323246;stop-opacity:0" offset="1" id="stop783" />
+    </ns0:radialGradient>
+  </ns0:defs>
+  <ns0:metadata id="metadata1">
+    <rdf:RDF>
+      <ns5:Work rdf:about="">
+        <dc:title>Pydidas frame icon: Quick intergration</dc:title>
+        <dc:creator>
+          <ns5:Agent>
+            <dc:title>Malte Storm</dc:title>
+          </ns5:Agent>
+        </dc:creator>
+        <dc:rights>
+          <ns5:Agent>
+            <dc:title>Helmholtz-Zentrum Hereon GmbH</dc:title>
+          </ns5:Agent>
+        </dc:rights>
+        <ns5:license rdf:resource="http://creativecommons.org/licenses/by-nc-nd/4.0/" />
+      </ns5:Work>
+      <ns5:License rdf:about="http://creativecommons.org/licenses/by-nc-nd/4.0/">
+        <ns5:permits rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <ns5:permits rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <ns5:requires rdf:resource="http://creativecommons.org/ns#Notice" />
+        <ns5:requires rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <ns5:prohibits rdf:resource="http://creativecommons.org/ns#CommercialUse" />
+      </ns5:License>
+    </rdf:RDF>
+  </ns0:metadata>
+  <ns0:rect style="fill:#323246;stroke:none;stroke-width:1.40319;stroke-dasharray:none;paint-order:markers stroke fill" id="rect1" width="40" height="12" x="0" y="2" ry="0" />
+  <ns0:rect style="fill:url(#radialGradient783);stroke:none;stroke-width:1.40319;stroke-dasharray:none;paint-order:markers stroke fill" id="rect1-1" width="40" height="12" x="0" y="2" ry="0" />
+  <ns0:path style="fill:#323246;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 12,0 8,6 8,-6 z" id="path1" ns1:nodetypes="cccc" />
+  <ns0:path style="fill:none;stroke:#00aae6;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 2.3752002,20.55275 37.179153,32.380278" id="path785" />
+  <ns0:path style="fill:none;stroke:#e60046;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 37.07977,32.309292 C 31.747688,22.953912 10.809585,16.577928 2.666041,20.455805 6.6893392,31.507757 33.928994,36.090223 37.07977,32.309292 Z" id="path786" ns1:nodetypes="ccc" />
+  <ns0:path style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.993127px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 1.4794521,38.485574 H 37.534075 v 1.5 l 2.465925,-2 -2.465925,-2.25 v 1.75 H 2.4657535 V 18.161525 h 1.4794521 l -1.9726028,-2.5 L 0,18.161525 h 1.4794521 z" id="path1-8" ns1:nodetypes="ccccccccccccc" />
+</ns0:svg>

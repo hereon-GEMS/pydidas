@@ -21,6 +21,8 @@ Improvements
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
 - Added lazy imports of pyFAI to improve startup time.
+- Adjust svgs and background colors of nodes in workflow tree for better
+  readability when system wide dark mode is enabled.
 - Added checks to prevent non-input plugins from being used as workflow roots.
 
 Programmatic changes
@@ -44,6 +46,7 @@ Programmatic changes
 - Added a ProcessingResultSaver class to handle export of results.
 - Added an option to export all Parameter values as export types in
   the ParameterCollection
+- Added information about python version and Qt binding to AboutWindow.
 - Updated the way pydidas handles font scaling on silx colorbars
 - When importing data, the return datatype in `import_data` calls must
   be specified with `astype` instead of `datatype`.
@@ -77,6 +80,9 @@ Bugfixes
 - Fixed an issue in the ViewResultsFrame which did not properly count
   the file number and frame number in loaded files in the
   ShowInformationForResult popup window.
+- Fixed an issue on Unix where the main window was always maximized even
+  when reduced in size. According to the Qt documentation, the maximized
+  flag should only be used on Windows.
 - Fixed an issue with the ChangeCanvasAction which was incompatible with the
   latest silx update to 3.1.0
 - Fixed an issue in RawIo class which did not clearly separate input and

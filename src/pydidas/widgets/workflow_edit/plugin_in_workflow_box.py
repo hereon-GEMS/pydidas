@@ -40,6 +40,7 @@ from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 from pydidas.workflow import WorkflowTree
+from pydidas_qtcore import PydidasQApplication
 
 
 TREE = WorkflowTree()
@@ -201,19 +202,34 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
 
     def __update_style(self):
         """
-        Update the widget's style based on the stored flags.
+        Update the widget's style based on the stored flags and application theme.
         """
+        _app = PydidasQApplication.instance()
+        _dark = _app.is_dark_mode if _app else False
+
         _border = 3 if self.flags["active"] else 1
-        if self.flags["inconsistent"]:
-            _bg_color = "rgb(255, 225, 225)"
-        elif self.flags["active"]:
-            _bg_color = "rgb(225, 225, 255)"
+
+        if _dark:
+            _border_color = "rgb(180, 180, 180)"
+            if self.flags["inconsistent"]:
+                _bg_color = "rgb(90, 40, 40)"
+            elif self.flags["active"]:
+                _bg_color = "rgb(40, 60, 100)"
+            else:
+                _bg_color = "rgb(45, 45, 50)"
         else:
-            _bg_color = "rgb(200, 200, 200)"
+            _border_color = "rgb(60, 60, 60)"
+            if self.flags["inconsistent"]:
+                _bg_color = "rgb(255, 225, 225)"
+            elif self.flags["active"]:
+                _bg_color = "rgb(225, 225, 255)"
+            else:
+                _bg_color = "rgb(200, 200, 200)"
+
         self.setStyleSheet(
             "QFrame#PluginInWorkflowBox{ border-radius: 4px; "
             "border-style: solid;"
-            "border-color: rgb(60, 60, 60);"
+            f"border-color: {_border_color};"
             f"border-width: {_border}px;"
             f"background: {_bg_color};"
             "}"

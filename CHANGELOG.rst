@@ -21,6 +21,8 @@ Improvements
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
 - Added lazy imports of pyFAI to improve startup time.
+- Adjust svgs and background colors of nodes in workflow tree for better
+  readability when system wide dark mode is enabled.
 
 Programmatic changes
 --------------------

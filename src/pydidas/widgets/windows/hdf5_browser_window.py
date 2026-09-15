@@ -35,12 +35,7 @@ from typing import Any
 import h5py
 from qtpy import QtCore, QtGui, QtWidgets
 
-from pydidas.core.lazy_imports.silx import (
-    Hdf5TreeModel,
-    Hdf5TreeView,
-    NexusSortFilterProxyModel,
-    silx_icons,
-)
+from pydidas.core.lazy_imports.silx import silx_hdf5, silx_icons
 from pydidas.resources.pydidas_icons import pydidas_icon_with_bg
 from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
@@ -77,11 +72,11 @@ class Hdf5BrowserWindow(PydidasWindow):
 
     def _create_treeview(self) -> None:
         """Create the tree view for the browser."""
-        self._h5_treeview = Hdf5TreeView(self)
+        self._h5_treeview = silx_hdf5.Hdf5TreeView(self)
         self._h5_treeview.setExpandsOnDoubleClick(True)
 
-        _tree_model = Hdf5TreeModel(self._h5_treeview, ownFiles=False)
-        self._tree_model_sorted = NexusSortFilterProxyModel(self._h5_treeview)
+        _tree_model = silx_hdf5.Hdf5TreeModel(self._h5_treeview, ownFiles=False)
+        self._tree_model_sorted = silx_hdf5.NexusSortFilterProxyModel(self._h5_treeview)
         self._tree_model_sorted.setSourceModel(_tree_model)
         self._tree_model_sorted.sort(0, QtCore.Qt.AscendingOrder)
         self._tree_model_sorted.setSortCaseSensitivity(QtCore.Qt.CaseInsensitive)

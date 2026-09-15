@@ -48,8 +48,8 @@ from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
 from pydidas.widgets.dialogs import QuestionBox
-from pydidas.widgets.lazy_widgets import PydidasPlot2DwithIntegrationRegions
 from pydidas.widgets.misc import IntegrationRoiParamContainer, SelectDataFrameWidget
+from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
 class SelectIntegrationRegionWindow(PydidasWindow):

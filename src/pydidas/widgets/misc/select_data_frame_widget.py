@@ -41,7 +41,7 @@ from pydidas.core.utils.hdf5 import (
     get_hdf5_populated_dataset_keys,
 )
 from pydidas.widgets.base_classes import WidgetWithParameters
-from pydidas.widgets.lazy_widgets import DataAxisSelector
+from pydidas.widgets.data_viewer import DataAxisSelector
 from pydidas.widgets.misc.configure_binary_decoding_widget import (
     ConfigureBinaryDecodingWidget,
 )

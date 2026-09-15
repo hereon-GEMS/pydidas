@@ -149,7 +149,7 @@ class BaseFrame(
         """Connect all the required signals for the frame."""
 
     def finalize_ui(self) -> None:
-        """finalize the UI initialization."""
+        """Finalize the UI initialization."""
 
     def set_status(self, text: str) -> None:
         """

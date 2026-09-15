@@ -27,33 +27,23 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from types import ModuleType
-
 from . import (
     base_classes,
     base_reimplementations,
     controllers,
+    data_viewer,
     dialogs,
     extended_widgets,
     misc,
     param_io,
     plugin_config_widgets,
+    pyqtgraph_plot,
+    silx_plot,
     windows,
     workflow_edit,
 )
 from .file_dialog import PydidasFileDialog
 from .utilities import *
-
-
-def __getattr__(name: str) -> ModuleType:
-    """Lazy-load sub-packages on demand."""
-    if name in ("data_viewer", "silx_plot", "pyqtgraph_plot"):
-        import importlib
-
-        module = importlib.import_module(f".{name}", __name__)
-        globals()[name] = module  # Cache in module globals
-        return module
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = [

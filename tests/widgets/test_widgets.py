@@ -36,8 +36,8 @@ def test_widgets_import__does_not_eagerly_load_heavy_deps():
         "import sys; "
         "import pydidas; "
         "import pydidas.widgets; "
-        "heavy = ['silx', 'fabio', 'skimage', 'matplotlib.pyplot', 'pyqtgraph']; "
-        "loaded = [m for m in heavy if m in sys.modules]; "
+        "heavy = ('silx', 'fabio', 'skimage', 'matplotlib.pyplot', 'pyqtgraph'); "
+        "loaded = {m for m in sys.modules if m.startswith(heavy)}; "
         "print(loaded)"
     )
     result = subprocess.run(
@@ -48,7 +48,7 @@ def test_widgets_import__does_not_eagerly_load_heavy_deps():
         check=False,
     )
     assert result.returncode == 0, result.stderr
-    assert result.stdout.strip() == "[]", (
+    assert result.stdout.strip() == "set()", (
         f"Unexpected eager imports after 'import pydidas': {result.stdout.strip()}"
     )
 

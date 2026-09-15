@@ -50,6 +50,8 @@ Programmatic changes
   development standards and Qt.
 - When importing data, the return datatype in `import_data` calls must
   be specified with `astype` instead of `datatype`.
+- Modified the default_frames to lazily load the frames and only
+  import and return them on request.
 
 
 Bugfixes

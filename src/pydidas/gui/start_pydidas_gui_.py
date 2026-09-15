@@ -34,7 +34,7 @@ from qtpy.QtWidgets import QApplication
 
 from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
-from pydidas.gui.frames import DEFAULT_FRAMES
+from pydidas.gui.default_frames import get_default_frames
 from pydidas.resources import icons
 from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.dialogs import PydidasExceptionMessageBox
@@ -81,7 +81,7 @@ def start_pydidas_gui(
     restore_state = "None" if restore_state is None else restore_state
     _prepare_interpreter()
     if use_default_frames:
-        frames = DEFAULT_FRAMES + frames
+        frames = get_default_frames() + frames
     _check_frames(frames)
     _splash = (
         PydidasSplashScreen.instance(custom_splash_image=custom_splash_image)

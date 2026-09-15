@@ -187,6 +187,43 @@ class LazyObject:
         return f"<lazy proxy for {self._module_path}.{self._attr_name}>"
 
 
+class LazyModule:
+    """
+    A proxy that defers importing a module until first use.
+
+    The real module is resolved and cached the first time an attribute is
+    accessed on the proxy.
+
+    Parameters
+    ----------
+    module_path : str
+        Dotted import path of the module.
+    """
+
+    def __init__(self, module_path: str) -> None:
+        self._module_path = module_path
+        self._module = None
+
+    def _resolve(self) -> object:
+        """Return the real module, importing it if necessary."""
+        if self._module is None:
+            self._module = importlib.import_module(self._module_path)
+        return self._module
+
+    def resolve(self) -> object:
+        """Return the real underlying module, importing it if necessary."""
+        return self._resolve()
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._resolve(), name)
+
+    def __dir__(self) -> list[str]:
+        return dir(self._resolve())
+
+    def __repr__(self) -> str:
+        return f"<lazy module proxy for {self._module_path}>"
+
+
 class LazySet(set):
     """
     A set subclass that populates itself with entries on the first access.

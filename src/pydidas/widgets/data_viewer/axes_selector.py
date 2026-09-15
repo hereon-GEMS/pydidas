@@ -44,7 +44,7 @@ from pydidas.widgets.data_viewer.data_axis_selector import (
 
 class AxesSelector(WidgetWithParameters):
     """
-    The AxesSelector is a widget to select multi-dimensional slicing for
+    The AxesSelector is a widget to select multidimensional slicing for
     a given Dataset.
 
     The AxesSelector allows to select slicing for a dataset based on

@@ -38,7 +38,7 @@ from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.widgets.base_classes import WidgetWithParameters
-from pydidas.widgets.data_viewer import AxesSelector
+from pydidas.widgets.data_viewer.axes_selector import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import GENERIC_AXIS_SELECTOR_CHOICES
 from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,

@@ -26,8 +26,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .grid_curve_plots import GridCurvePlot
-from .pyqtgraph_image_viewer import PyQtGraphImageViewer
+from typing import TYPE_CHECKING
 
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+
+
+if TYPE_CHECKING:
+    from .grid_curve_plots import GridCurvePlot
+    from .pyqtgraph_image_viewer import PyQtGraphImageViewer
+else:
+    GridCurvePlot = LazyObject(
+        "pydidas.widgets.pyqtgraph_plot.grid_curve_plots", "GridCurvePlot"
+    )
+    PyQtGraphImageViewer = LazyObject(
+        "pydidas.widgets.pyqtgraph_plot.pyqtgraph_image_viewer", "PyQtGraphImageViewer"
+    )
 
 __all__ = ["GridCurvePlot", "PyQtGraphImageViewer"]

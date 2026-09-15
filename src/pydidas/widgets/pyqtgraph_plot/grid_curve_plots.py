@@ -46,8 +46,8 @@ from pydidas.core.constants import (
     QT_REG_EXP_POS_INT_VALIDATOR,
 )
 from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets import delete_all_items_in_layout
 from pydidas.widgets.base_classes import WidgetWithParameters
+from pydidas.widgets.utilities import delete_all_items_in_layout
 
 
 _BUTTON_WIDTH = 25

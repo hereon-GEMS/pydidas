@@ -399,10 +399,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        force_check : bool, optional
+        force_check : bool
             Flag to force a check even when the user disabled checking for
             updates. The default is False.
-        auto_check : bool, optional
+        auto_check : bool
             Flag to signalize an automatic update check. This will only display
             a notice when the local and remote versions differ. The default is False.
         """

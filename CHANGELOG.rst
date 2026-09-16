@@ -22,6 +22,8 @@ Improvements
   at calling time with an argument. Use '-restore_state None | exit | saved'
 - Added lazy imports of pyFAI to improve startup time.
 - Added a fast viewer based on PyQtGraph for 2D images.
+- Adjust svgs and background colors of nodes in workflow tree for better
+  readability when system wide dark mode is enabled.
 
 Programmatic changes
 --------------------

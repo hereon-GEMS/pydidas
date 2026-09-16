@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the UtilitiesFrameBuilder class which is used to populate
+Module with the UTILITIES_FRAME_BUILD_CONFIG which is used to populate
 the UtilitiesFrame with widgets.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["UtilitiesFrameBuilder"]
+__all__ = ["UTILITIES_FRAME_BUILD_CONFIG"]
 
 from typing import Any
 

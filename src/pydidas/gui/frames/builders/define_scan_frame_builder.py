@@ -76,224 +76,218 @@ def __param_widget_config(
     return ["create_param_widget", (name,), _kws]
 
 
-DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = (
+DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = [
     [
-        [
-            "create_empty_widget",
-            ("main",),
-            {"layout_kwargs": {"horizontalSpacing": 0}},
-        ],
-        [
-            "create_any_widget",
-            ("config_area", PydidasScrollArea),
-            {
-                "layout_kwargs": {"alignment": None},
-                "resize_to_widget_width": True,
-                "widget": "main",
-            },
-        ],
-        [
-            "create_label",
-            ("label_title", "Scan settings\n"),
-            {
-                "fontsize_offset": 4,
-                "bold": True,
-                "parent_widget": "main",
-                "gridPos": (0, 0, 1, 1),
-            },
-        ],
-        [
-            "create_empty_widget",
-            ("config_explanation",),
-            {
-                "font_metric_width_factor": int(1.5 * FONT_METRIC_CONFIG_WIDTH)
-                + _WIDTH_FACTOR_SPACER,
-                "gridPos": (1, 2, 1, 3),
-                "parent_widget": "main",
-            },
-        ],
-        [
-            "create_empty_widget",
-            ("config_global",),
-            {
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
-                "gridPos": (1, 0, 3, 1),
-                "parent_widget": "main",
-            },
-        ],
-        [
-            "create_empty_widget",
-            ("config_A",),
-            {
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                "gridPos": (3, 2, 1, 1),
-                "parent_widget": "main",
-            },
-        ],
-        [
-            "create_empty_widget",
-            ("config_B",),
-            {
-                "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
-                # width of 2 columns to extend over the config_explanation widget
-                "gridPos": (3, 4, 1, 2),
-                "parent_widget": "main",
-            },
-        ],
-        [
-            "create_label",
-            ("dimension_hint_title", "Scan dimension explanation"),
-            {
-                "bold": True,
-                "fontsize_offset": 1,
-                "parent_widget": "config_explanation",
-            },
-        ],
-        [
-            "create_label",
-            ("dimension_hint_text", _SCAN_DIMENSION_EXPLANATION_TEXT),
-            {
-                "font_metric_height_factor": 6,
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
-                "parent_widget": "config_explanation",
-                "wordWrap": True,
-            },
-        ],
-        [
-            "create_button",
-            ("but_more_scan_dim_info", "More information about scan dimensions"),
-            {
-                "icon": "qt-std::SP_MessageBoxInformation",
-                "parent_widget": "config_explanation",
-            },
-        ],
-        [
-            "create_button",
-            ("but_import_from_pydidas", "Import scan settings from pydidas file"),
-            {
-                "icon": "qt-std::SP_DialogOpenButton",
-                "parent_widget": "config_global",
-            },
-        ],
-        [
-            "create_button",
-            (
-                "but_import_bl_metadata",
-                "Import scan settings from beamline scan metadata",
-            ),
-            {"parent_widget": "config_global"},
-        ],
-        [
-            "create_button",
-            ("but_reset", "Reset all scan settings"),
-            {"icon": "qt-std::SP_BrowserReload", "parent_widget": "config_global"},
-        ],
-        [
-            "create_empty_widget",
-            (None,),
-            {"font_metric_height_factor": 1, "parent_widget": "config_global"},
-        ],
-        [
-            "create_label",
-            ("scan_global", "\nGlobal scan parameters:"),
-            {"bold": True, "fontsize_offset": 1, "parent_widget": "config_global"},
-        ],
-        __param_widget_config("scan_dim", **_WIDE_PARAM_KWARGS),
-        __param_widget_config("scan_title", linebreak=True, **_WIDE_PARAM_KWARGS),
-        __param_widget_config(
-            "scan_base_directory", linebreak=True, **_WIDE_PARAM_KWARGS
+        "create_empty_widget",
+        ("main",),
+        {"layout_kwargs": {"horizontalSpacing": 0}},
+    ],
+    [
+        "create_any_widget",
+        ("config_area", PydidasScrollArea),
+        {
+            "layout_kwargs": {"alignment": None},
+            "resize_to_widget_width": True,
+            "widget": "main",
+        },
+    ],
+    [
+        "create_label",
+        ("label_title", "Scan settings\n"),
+        {
+            "fontsize_offset": 4,
+            "bold": True,
+            "parent_widget": "main",
+            "gridPos": (0, 0, 1, 1),
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("config_explanation",),
+        {
+            "font_metric_width_factor": int(1.5 * FONT_METRIC_CONFIG_WIDTH)
+            + _WIDTH_FACTOR_SPACER,
+            "gridPos": (1, 2, 1, 3),
+            "parent_widget": "main",
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("config_global",),
+        {
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
+            "gridPos": (1, 0, 3, 1),
+            "parent_widget": "main",
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("config_A",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            "gridPos": (3, 2, 1, 1),
+            "parent_widget": "main",
+        },
+    ],
+    [
+        "create_empty_widget",
+        ("config_B",),
+        {
+            "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH,
+            # width of 2 columns to extend over the config_explanation widget
+            "gridPos": (3, 4, 1, 2),
+            "parent_widget": "main",
+        },
+    ],
+    [
+        "create_label",
+        ("dimension_hint_title", "Scan dimension explanation"),
+        {
+            "bold": True,
+            "fontsize_offset": 1,
+            "parent_widget": "config_explanation",
+        },
+    ],
+    [
+        "create_label",
+        ("dimension_hint_text", _SCAN_DIMENSION_EXPLANATION_TEXT),
+        {
+            "font_metric_height_factor": 6,
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
+            "parent_widget": "config_explanation",
+            "wordWrap": True,
+        },
+    ],
+    [
+        "create_button",
+        ("but_more_scan_dim_info", "More information about scan dimensions"),
+        {
+            "icon": "qt-std::SP_MessageBoxInformation",
+            "parent_widget": "config_explanation",
+        },
+    ],
+    [
+        "create_button",
+        ("but_import_from_pydidas", "Import scan settings from pydidas file"),
+        {
+            "icon": "qt-std::SP_DialogOpenButton",
+            "parent_widget": "config_global",
+        },
+    ],
+    [
+        "create_button",
+        (
+            "but_import_bl_metadata",
+            "Import scan settings from beamline scan metadata",
         ),
-        ["create_line", ("file_line",), {"parent_widget": "config_global"}],
-        [
-            "create_empty_widget",
-            ("_file_header",),
-            {
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
-                "gridPos": (-1, 0, 1, 1),
-                "parent_widget": "config_global",
-                "layout_kwargs": {"spacing": 0},
-            },
-        ],
-        [
-            "create_label",
-            ("file_label", "File naming:"),
-            {
-                "parent_widget": "_file_header",
-                "underline": True,
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
-            },
-        ],
-        [
-            "create_button",
-            ("but_file_naming_help", "information about file naming"),
-            {
-                "icon": "qt-std::SP_MessageBoxInformation",
-                "parent_widget": "_file_header",
-                "font_metric_width_factor": 2 * FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
-                "gridPos": (0, -1, 1, 1),
-            },
-        ],
-        __param_widget_config(
-            "scan_name_pattern", linebreak=True, **_WIDE_PARAM_KWARGS
-        ),
-        __param_widget_config("pattern_number_offset", **_WIDE_PARAM_KWARGS),
-        __param_widget_config("pattern_number_delta", **_WIDE_PARAM_KWARGS),
-        ["create_line", (None,), {"parent_widget": "config_global"}],
-        [
-            "create_empty_widget",
-            ("_multi_frame_header",),
-            {
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
-                "gridPos": (-1, 0, 1, 1),
-                "parent_widget": "config_global",
-                "layout_kwargs": {"spacing": 0},
-            },
-        ],
-        [
-            "create_label",
-            ("scan_multi_frame_handling", "Multi-frame handling:"),
-            {
-                "parent_widget": "_multi_frame_header",
-                "underline": True,
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
-            },
-        ],
-        [
-            "create_button",
-            ("but_multi_frame_help", "information on multi-frame handling"),
-            {
-                "icon": "qt-std::SP_MessageBoxInformation",
-                "parent_widget": "_multi_frame_header",
-                "font_metric_width_factor": 2 * FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
-                "gridPos": (0, -1, 1, 1),
-            },
-        ],
-        __param_widget_config("frame_indices_per_scan_point", **_WIDE_PARAM_KWARGS),
-        __param_widget_config("scan_frames_per_point", **_WIDE_PARAM_KWARGS),
-        __param_widget_config("scan_multi_frame_handling", **_WIDE_PARAM_KWARGS),
-        [
-            "create_spacer",
-            ("derived_n",),
-            {"fixedHeight": 10, "parent_widget": "config_global"},
-        ],
-        __param_widget_config("derived_n_frames", **_WIDE_PARAM_KWARGS),
-        [
-            "create_button",
-            ("but_save", "Export scan settings"),
-            {
-                "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
-                "gridPos": (-1, 0, 1, 1),
-                "icon": "qt-std::SP_DialogSaveButton",
-                "parent_widget": "main",
-            },
-        ],
-        [
-            "create_spacer",
-            ("final_spacer",),
-            {"gridPos": (-1, 0, 1, 1), "sizePolicy": POLICY_EXP_EXP},
-        ],
-    ]
-)
+        {"parent_widget": "config_global"},
+    ],
+    [
+        "create_button",
+        ("but_reset", "Reset all scan settings"),
+        {"icon": "qt-std::SP_BrowserReload", "parent_widget": "config_global"},
+    ],
+    [
+        "create_empty_widget",
+        (None,),
+        {"font_metric_height_factor": 1, "parent_widget": "config_global"},
+    ],
+    [
+        "create_label",
+        ("scan_global", "\nGlobal scan parameters:"),
+        {"bold": True, "fontsize_offset": 1, "parent_widget": "config_global"},
+    ],
+    __param_widget_config("scan_dim", **_WIDE_PARAM_KWARGS),
+    __param_widget_config("scan_title", linebreak=True, **_WIDE_PARAM_KWARGS),
+    __param_widget_config("scan_base_directory", linebreak=True, **_WIDE_PARAM_KWARGS),
+    ["create_line", ("file_line",), {"parent_widget": "config_global"}],
+    [
+        "create_empty_widget",
+        ("_file_header",),
+        {
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
+            "gridPos": (-1, 0, 1, 1),
+            "parent_widget": "config_global",
+            "layout_kwargs": {"spacing": 0},
+        },
+    ],
+    [
+        "create_label",
+        ("file_label", "File naming:"),
+        {
+            "parent_widget": "_file_header",
+            "underline": True,
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
+        },
+    ],
+    [
+        "create_button",
+        ("but_file_naming_help", "information about file naming"),
+        {
+            "icon": "qt-std::SP_MessageBoxInformation",
+            "parent_widget": "_file_header",
+            "font_metric_width_factor": 2 * FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
+            "gridPos": (0, -1, 1, 1),
+        },
+    ],
+    __param_widget_config("scan_name_pattern", linebreak=True, **_WIDE_PARAM_KWARGS),
+    __param_widget_config("pattern_number_offset", **_WIDE_PARAM_KWARGS),
+    __param_widget_config("pattern_number_delta", **_WIDE_PARAM_KWARGS),
+    ["create_line", (None,), {"parent_widget": "config_global"}],
+    [
+        "create_empty_widget",
+        ("_multi_frame_header",),
+        {
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
+            "gridPos": (-1, 0, 1, 1),
+            "parent_widget": "config_global",
+            "layout_kwargs": {"spacing": 0},
+        },
+    ],
+    [
+        "create_label",
+        ("scan_multi_frame_handling", "Multi-frame handling:"),
+        {
+            "parent_widget": "_multi_frame_header",
+            "underline": True,
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
+        },
+    ],
+    [
+        "create_button",
+        ("but_multi_frame_help", "information on multi-frame handling"),
+        {
+            "icon": "qt-std::SP_MessageBoxInformation",
+            "parent_widget": "_multi_frame_header",
+            "font_metric_width_factor": 2 * FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
+            "gridPos": (0, -1, 1, 1),
+        },
+    ],
+    __param_widget_config("frame_indices_per_scan_point", **_WIDE_PARAM_KWARGS),
+    __param_widget_config("scan_frames_per_point", **_WIDE_PARAM_KWARGS),
+    __param_widget_config("scan_multi_frame_handling", **_WIDE_PARAM_KWARGS),
+    [
+        "create_spacer",
+        ("derived_n",),
+        {"fixedHeight": 10, "parent_widget": "config_global"},
+    ],
+    __param_widget_config("derived_n_frames", **_WIDE_PARAM_KWARGS),
+    [
+        "create_button",
+        ("but_save", "Export scan settings"),
+        {
+            "font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH,
+            "gridPos": (-1, 0, 1, 1),
+            "icon": "qt-std::SP_DialogSaveButton",
+            "parent_widget": "main",
+        },
+    ],
+    [
+        "create_spacer",
+        ("final_spacer",),
+        {"gridPos": (-1, 0, 1, 1), "sizePolicy": POLICY_EXP_EXP},
+    ],
+]
 
 for _gridPos in [(1, 1, 1, 1), (2, 2, 1, 1), (3, 3, 1, 1)]:
     DEFINE_SCAN_FRAME_BUILD_CONFIG.append(

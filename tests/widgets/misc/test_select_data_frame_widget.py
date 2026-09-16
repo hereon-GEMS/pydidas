@@ -79,8 +79,8 @@ def _cleanup() -> Generator[None, None, None]:
         _w for _w in app.topLevelWidgets() if isinstance(_w, SelectDataFrameWidget)
     ]:
         widget.deleteLater()
-    app.processEvents()
-    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+        app.processEvents()
+        app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
 
 
 @pytest.fixture(scope="module")

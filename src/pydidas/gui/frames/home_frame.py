@@ -239,3 +239,4 @@ class HomeFrame(BaseFrame):
             gridPos=(0, 2, 1, 1),
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )
+        super().build_frame()

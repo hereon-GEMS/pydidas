@@ -102,6 +102,7 @@ class DefineScanFrame(BaseFrame):
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
         self.param_composite_widgets["derived_n_frames"].io_widget.setEnabled(False)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect all required signals and slots."""
@@ -142,6 +143,7 @@ class DefineScanFrame(BaseFrame):
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
         self._update_derived_n_frames()
+        super().finalize_ui()
 
     @QtCore.Slot()
     def update_dim_visibility(self) -> None:

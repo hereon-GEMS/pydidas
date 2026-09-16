@@ -33,11 +33,15 @@ from typing import Any, ClassVar
 
 import h5py
 from qtpy import QtCore
-from silx.gui.hdf5 import H5Node
-from silx.gui.hdf5.Hdf5Item import Hdf5Item
-from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
+from pydidas.core.lazy_imports.silx import silx_hdf5
+
+
+H5Node = silx_hdf5.H5Node
+Hdf5Item = silx_hdf5.Hdf5Item.Hdf5Item
+Hdf5Node = silx_hdf5.Hdf5Node.Hdf5Node
+
+from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
 )
@@ -56,7 +60,6 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
 )
 from pydidas.widgets.base_classes import BaseFrame, PydidasWindow
 from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
-from pydidas.widgets.param_io._param_io_file import _ParamIoFile
 from pydidas.widgets.windows import Hdf5BrowserWindow
 
 
@@ -124,13 +127,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             _widget_creation_method = getattr(self, _method)
             _widget_creation_method(*_args, **_kwargs)
         # explicitly add the widget here to because the generic widget
-        # creation do not accept direct args
-        self.add_any_widget(
-            "filename",
-            _ParamIoFile(get_generic_parameter("filename")),
-            gridPos=(0, 1, 1, 2),
-            parent_widget="plot_header",
-        )
+        # creation does not accept direct args
         self.add_any_widget(
             "splitter",
             create_splitter(
@@ -141,6 +138,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         _viewer_layout = self._widgets["viewer_and_filename"].layout()
         _viewer_layout.setRowStretch(_viewer_layout.rowCount() - 1, 1)
+        super().build_frame()
 
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""

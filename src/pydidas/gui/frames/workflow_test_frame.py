@@ -206,8 +206,8 @@ class WorkflowTestFrame(BaseFrame):
             _method = getattr(self, _method)
             _method(*_args, **_kwargs)
         self._widgets["config_area"].setWidget(self._widgets["config"])
-
         apply_qt_properties(self.layout(), columnStretch=(1, 10))
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """
@@ -232,6 +232,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)  # type: ignore[attr-defined]
         self.__details_window.sig_minimized.connect(self.__details_hidden)  # type: ignore[attr-defined]
+        super().build_frame()
 
     def __check_tree_uptodate(self) -> None:
         """

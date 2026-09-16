@@ -117,6 +117,7 @@ class ViewResultsFrame(BaseFrameWithApp):
         self._widgets["import_container"].setVisible(self._config["enable_import"])
         self._widgets["export_container"].setVisible(self._config["enable_export"])
         self._widgets["run_app_container"].setVisible(self._config["enable_app"])
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect signals."""

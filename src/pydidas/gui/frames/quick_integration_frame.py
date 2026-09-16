@@ -124,7 +124,8 @@ class QuickIntegrationFrame(BaseFrame):
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:
                 _kwargs["plugin"] = self._plugins["generic"]
-            getattr(self, _method)(*_args, **_kwargs)
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         self._widgets["tabs"].addTab(self._widgets["tab_plot"], "Input image")
         self._widgets["tabs"].addTab(self._widgets["res_plot"], "Integration results")
         self._widgets["but_toggle_exp_section"].linked_widget = self._widgets[
@@ -135,6 +136,7 @@ class QuickIntegrationFrame(BaseFrame):
         ]
         _n = self._widgets["config"].layout().rowCount()
         self._widgets["config"].layout().setRowStretch(_n - 1, 1)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """

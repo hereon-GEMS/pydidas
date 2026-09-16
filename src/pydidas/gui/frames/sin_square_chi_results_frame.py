@@ -46,19 +46,18 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.base_classes import BaseFrame, EmptyWidget
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.dialogs import WarningBox
 from pydidas.workflow import ProcessingResults, WorkflowResults
 from pydidas_qtcore import PydidasQApplication
 
 
-_DEFAULT_PARAMS = get_generic_param_collection(
+_SIN_SQUARE_CHI_FRAME_DEFAULT_PARAMS = get_generic_param_collection(
     "selected_data_source",
     "selected_sin_square_chi_node",
     "selected_sin_2chi_node",
@@ -76,7 +75,7 @@ _DEFAULT_PARAMS = get_generic_param_collection(
     "num_vertical_plots",
 )
 
-_PARAMS_NOT_TO_RESTORE = [
+_SIN_SQUARE_CHI_FRAME_PARAMS_NOT_TO_RESTORE = [
     "selected_data_source",
     "selected_sin_square_chi_node",
     "selected_sin_2chi_node",
@@ -101,8 +100,8 @@ class SinSquareChiResultsFrame(BaseFrame):
     menu_icon = "pydidas::frame_icon_sin_square_visualization"
     menu_title = "Sin square chi results visualization"
     menu_entry = "Analysis tools/Sin square chi results visualization"
-    default_params = _DEFAULT_PARAMS
-    params_not_to_restore = _PARAMS_NOT_TO_RESTORE
+    default_params = _SIN_SQUARE_CHI_FRAME_DEFAULT_PARAMS
+    params_not_to_restore = _SIN_SQUARE_CHI_FRAME_PARAMS_NOT_TO_RESTORE
 
     @staticmethod
     def _get_data_min_and_max(data: np.ndarray) -> tuple[float, float]:
@@ -132,24 +131,15 @@ class SinSquareChiResultsFrame(BaseFrame):
         self._sin_2chi_data = None
 
     def build_frame(self) -> None:
-        """
-        Build the frame and populate it with widgets.
-        """
-        self._widgets["config"] = EmptyWidget(
-            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH
-        )
+        """Build the frame and populate it with widgets."""
         for _name, _args, _kwargs in SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION:
             _method = getattr(self, _name)
-            if "widget" in _kwargs:
-                _kwargs["widget"] = self._widgets[_kwargs["widget"]]
             _method(*_args, **_kwargs)
         apply_qt_properties(self.layout(), columnStretch=(1, 1))
+        super().build_frame()
 
     def connect_signals(self) -> None:
-        """
-        Connect all required signals and slots between widgets and class
-        methods.
-        """
+        """Connect all required signals and slots."""
         self._widgets["button_load_workflow_results"].clicked.connect(
             self._import_workflow_results
         )
@@ -201,6 +191,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         """Finalize the UI initialization."""
         self._plots = self._widgets["visualization"]
         self.reset_selection()
+        super().finalize_ui()
 
     def restore_state(self, state: dict) -> None:
         """Restore the frame's state from stored information."""
@@ -226,9 +217,7 @@ class SinSquareChiResultsFrame(BaseFrame):
 
     @QtCore.Slot()
     def _import_workflow_results(self):
-        """
-        Import workflow results from a file dialog.
-        """
+        """Import workflow results from a file dialog."""
         self.__current_results.update_from_processing_results(_RESULTS)
         self.update_selected_data_source("Workflow results")
         self.reset_selection()
@@ -236,9 +225,7 @@ class SinSquareChiResultsFrame(BaseFrame):
 
     @QtCore.Slot()
     def _import_from_directory(self):
-        """
-        Open a file dialog to import data from a directory.
-        """
+        """Open a file dialog to import data from a directory."""
         _dir = self.__import_dialog.get_existing_directory(
             caption="Import data from directory",
             qsettings_ref="SinSquareChiResultsFrame__import_dir",
@@ -308,9 +295,7 @@ class SinSquareChiResultsFrame(BaseFrame):
 
     @QtCore.Slot()
     def _update_plotted_data(self) -> None:
-        """
-        Update the data used in the plots.
-        """
+        """Update the data used in the plots."""
         for _key in ["square_chi", "2chi"]:
             _node_str = self.get_param_value(f"selected_sin_{_key}_node")
             _node_id = getattr(self, f"_sin_{_key}_node_keys")[_node_str]
@@ -369,9 +354,7 @@ class SinSquareChiResultsFrame(BaseFrame):
 
     @QtCore.Slot()
     def _update_sin_square_chi_limits_from_data(self) -> None:
-        """
-        Update the sin^2(chi) limits from the selected data.
-        """
+        """Update the sin^2(chi) limits from the selected data."""
         _min, _max = self._get_data_min_and_max(self._sin_square_chi_data)
         self.set_param_and_widget_value("sin_square_chi_limit_low", _min)
         self.set_param_and_widget_value("sin_square_chi_limit_high", _max)
@@ -379,9 +362,7 @@ class SinSquareChiResultsFrame(BaseFrame):
 
     @QtCore.Slot()
     def _update_sin_2chi_limits_from_data(self) -> None:
-        """
-        Update the sin(2*chi) limits from the selected data.
-        """
+        """Update the sin(2*chi) limits from the selected data."""
         _min, _max = self._get_data_min_and_max(self._sin_2chi_data)
         self.set_param_and_widget_value("sin_2chi_limit_low", _min)
         self.set_param_and_widget_value("sin_2chi_limit_high", _max)

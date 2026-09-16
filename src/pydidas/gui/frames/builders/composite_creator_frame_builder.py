@@ -32,7 +32,7 @@ __all__ = [
 ]
 
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from qtpy import QtWidgets
 
@@ -40,14 +40,8 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     POLICY_FIX_EXP,
 )
-from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.widgets.base_classes import PydidasScrollArea
-
-
-if TYPE_CHECKING:
-    from pydidas.widgets.silx_plot import PydidasPlot2D
-else:
-    PydidasPlot2D = LazyObject("pydidas.widgets.silx_plot", "PydidasPlot2D")
+from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 KEYS_TO_INSERT_LINES_AFTER = [

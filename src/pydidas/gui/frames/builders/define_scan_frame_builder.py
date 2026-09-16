@@ -53,7 +53,9 @@ _WIDTH_FACTOR_SPACER = 5
 _WIDE_PARAM_KWARGS = {"font_metric_width_factor": FONT_METRIC_WIDE_CONFIG_WIDTH}
 
 
-def __param_widget_config(name: str, **kwargs: Any) -> list[Any]:
+def __param_widget_config(
+    name: str, **kwargs: Any
+) -> list[str | tuple[Any, ...] | dict[str, Any]]:
     """
     Get the configuration for a parameter widget.
 
@@ -66,7 +68,7 @@ def __param_widget_config(name: str, **kwargs: Any) -> list[Any]:
 
     Returns
     -------
-    list[Any]
+    list[str | tuple[Any, ...] | dict[str, Any]]
         A list with the widget creation configuration including the widget
         type, parameter tuple, and keyword arguments dictionary.
     """
@@ -74,7 +76,7 @@ def __param_widget_config(name: str, **kwargs: Any) -> list[Any]:
     return ["create_param_widget", (name,), _kws]
 
 
-DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = (
+DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = (
     [
         [
             "create_empty_widget",
@@ -100,21 +102,6 @@ DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = 
                 "gridPos": (0, 0, 1, 1),
             },
         ],
-    ]
-    + [
-        [
-            "create_empty_widget",
-            (None,),
-            {
-                "font_metric_width_factor": _WIDTH_FACTOR_SPACER,
-                "font_metric_height_factor": 1.5,
-                "parent_widget": "main",
-                "gridPos": _gridPos,
-            },
-        ]
-        for _gridPos in [(1, 1, 1, 1), (2, 2, 1, 1), (3, 3, 1, 1)]
-    ]
-    + [
         [
             "create_empty_widget",
             ("config_explanation",),
@@ -307,6 +294,21 @@ DEFINE_SCAN_FRAME_BUILD_CONFIG: list[list[str | tuple[Any] | dict[str, Any]]] = 
         ],
     ]
 )
+
+for _gridPos in [(1, 1, 1, 1), (2, 2, 1, 1), (3, 3, 1, 1)]:
+    DEFINE_SCAN_FRAME_BUILD_CONFIG.append(
+        [
+            "create_empty_widget",
+            (None,),
+            {
+                "font_metric_width_factor": _WIDTH_FACTOR_SPACER,
+                "font_metric_height_factor": 1.5,
+                "parent_widget": "main",
+                "gridPos": _gridPos,
+            },
+        ]
+    )
+
 for i_dim in range(4):
     _parent = "config_A" if i_dim in [0, 1] else "config_B"
     DEFINE_SCAN_FRAME_BUILD_CONFIG.extend(
@@ -353,5 +355,5 @@ for i_dim in range(4):
             )
             for basename in ["label", "n_points", "delta", "unit", "offset"]
         ]
-        + [["create_spacer", ("scan_dim_spacer",), {"parent_widget": _parent}]]
+        + [["create_spacer", ("scan_dim_spacer",), {"parent_widget": _parent}]],
     )

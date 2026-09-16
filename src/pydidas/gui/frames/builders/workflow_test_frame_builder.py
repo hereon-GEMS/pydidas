@@ -27,21 +27,15 @@ __status__ = "Production"
 __all__ = ["get_WorkflowTestFrame_build_config"]
 
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from qtpy import QtCore
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
-from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.widgets.base_classes import BaseFrame, PydidasScrollArea
 from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
+from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.extended_widgets import TableWithNodeLabels
-
-
-if TYPE_CHECKING:
-    from pydidas.widgets.data_viewer import DataViewer
-else:
-    DataViewer = LazyObject("pydidas.widgets.data_viewer", "DataViewer")
 
 
 def __param_widget_config(param_key: str) -> dict:
@@ -74,7 +68,7 @@ def __param_widget_config(param_key: str) -> dict:
 
 def get_WorkflowTestFrame_build_config(
     frame: BaseFrame,
-) -> list[list[str | tuple[str] | dict[str, Any]]]:
+) -> list[list[str | tuple[Any, ...] | dict[str, Any]]]:
     """
     Return the build configuration for the WorkflowTestFrame.
 
@@ -85,7 +79,7 @@ def get_WorkflowTestFrame_build_config(
 
     Returns
     -------
-    list[list[str, tuple[str], dict]]
+    list[list[str, tuple[Any, ...], dict]]
         The build configuration in form of a list. Each list entry consists of the
         widget creation method name, the method arguments and the method
     """
@@ -100,11 +94,6 @@ def get_WorkflowTestFrame_build_config(
                     "gridPos": (0, 0, 1, 2),
                 },
             ],
-            # [
-            #     "create_spacer",
-            #     ("title_spacer",),
-            #     {"fixedHeight": 20},
-            # ],
             [
                 "create_empty_widget",
                 ("config",),

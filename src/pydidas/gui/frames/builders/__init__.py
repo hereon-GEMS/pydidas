@@ -19,7 +19,7 @@
 The builders sub-package includes build configs and builders for all GUI frame classes.
 
 The builders to create and arrange the widgets have been separated simply for
-improved code organisation. They will create the user interface "shells"
+improved code organization. They will create the user interface "shells"
 without any connections and functionality.
 """
 

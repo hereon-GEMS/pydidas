@@ -51,7 +51,7 @@ from pydidas.gui.frames.builders.composite_creator_frame_builder import (
     KEYS_TO_INSERT_LINES_AFTER,
     ccf_param_widget_config,
 )
-from pydidas.gui.mixins import SilxPlotWindowMixIn
+from pydidas.gui.mixins.silx_plotwindow_mixin import SilxPlotWindowMixIn
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets import dialogs
 from pydidas.widgets.extended_widgets import BaseFrameWithApp
@@ -119,8 +119,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.layout().setContentsMargins(10, 0, 0, 0)
         self.setMinimumHeight(800)
         for _method, _args, _kwargs in COMPOSITE_CREATOR_FRAME_BUILD_CONFIG:
-            getattr(self, _method)(*_args, **_kwargs)
-
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         for _key in self.params:
             self.create_param_widget(_key, **ccf_param_widget_config(_key))
             # add spacers between groups:
@@ -131,6 +131,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                     f"CompositeCreatorFrame__{_key}"
                 )
         self.setVisible(_vis)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect the required signals between widgets and methods."""

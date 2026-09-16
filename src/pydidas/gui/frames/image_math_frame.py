@@ -104,6 +104,7 @@ class ImageMathFrame(BaseFrame):
             _method(*_args, **_kwargs)
         self._toggle_features_enabled(False)
         self._widgets["combo_display_image"].setEnabled(False)
+        super().build_frame()
 
     @property
     def active_index(self) -> int:

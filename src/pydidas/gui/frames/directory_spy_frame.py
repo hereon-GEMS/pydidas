@@ -40,7 +40,7 @@ from pydidas.core import ParameterCollection
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import get_extension, pydidas_logger
 from pydidas.gui.frames.builders.directory_spy_frame_builder import (
-    DirectorySpyFrameBuilder,
+    DIRECTORY_SPY_FRAME_BUILD_CONFIG,
 )
 from pydidas.multiprocessing import AppRunner
 from pydidas.widgets.extended_widgets import BaseFrameWithApp
@@ -112,7 +112,9 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         Populate the frame with widgets.
         """
-        DirectorySpyFrameBuilder.build_frame(self)
+        for _name, _args, _kwargs in DIRECTORY_SPY_FRAME_BUILD_CONFIG:
+            getattr(self, _name)(*_args, **_kwargs)
+        super().build_frame()
 
     @QtCore.Slot()
     def __update_file_widget_visibility(self) -> None:

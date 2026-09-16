@@ -530,6 +530,23 @@ class TestProcessingTree(unittest.TestCase):
         for _val in _res.values():
             self.assertIsInstance(_val, Dataset)
 
+    def test_create_and_add_node__invalid_root_plugin(self):
+        with self.assertRaises(UserConfigError):
+            self._curr_tree.create_and_add_node(self.get_dummy_proc_plugin())
+
+    def test_replace_node_plugin__invalid_root_plugin(self):
+        self._curr_tree.create_and_add_node(self.get_dummy_loader_plugin())
+
+        with self.assertRaises(UserConfigError):
+            self._curr_tree.replace_node_plugin(0, self.get_dummy_proc_plugin())
+
+    def test_set_root__invalid_root_plugin(self):
+        tree = ProcessingTree()
+        invalid_root_node = WorkflowNode(plugin=self.get_dummy_proc_plugin())
+
+        with self.assertRaises(UserConfigError):
+            tree.set_root(invalid_root_node)
+
 
 if __name__ == "__main__":
     unittest.main()

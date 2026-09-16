@@ -23,6 +23,7 @@ Improvements
 - Added lazy imports of pyFAI to improve startup time.
 - Adjust svgs and background colors of nodes in workflow tree for better
   readability when system wide dark mode is enabled.
+- Added checks to prevent non-input plugins from being used as workflow roots.
 
 Programmatic changes
 --------------------
@@ -99,7 +100,8 @@ Bugfixes
   to open binary images when no other image format was selected beforehand.
 - Fixed an issue which did not allow the QuickIntegrationFrame to be opened
   when the experimental settings were not fully configured.
-
+- Fixed an issue which caused nodes to be deleted from the UI but not from the
+  workflow when trying to delete root nodes with multiple children.
 
 v26.05.19
 =========

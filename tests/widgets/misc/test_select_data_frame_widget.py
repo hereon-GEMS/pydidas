@@ -80,6 +80,7 @@ def _cleanup() -> Generator[None, None, None]:
     ]:
         widget.deleteLater()
     app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
 
 
 @pytest.fixture(scope="module")

@@ -89,6 +89,10 @@ def widget(qtbot, hdf5_test_file: Path) -> Hdf5DatasetSelector:
     widget.spy_sig_new_dataset_selected = SignalSpy(widget.sig_new_dataset_selected)
     widget.spy_sig_request_hdf5_browser = SignalSpy(widget.sig_request_hdf5_browser)
     widget.new_filename(hdf5_test_file)
+    # register with qtbot so it is closed and deleted deterministically at
+    # teardown, instead of leaking as an orphaned top-level widget that only
+    # the cyclic garbage collector could eventually free.
+    qtbot.add_widget(widget)
     widget.show()
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
     return widget

@@ -45,19 +45,13 @@ class _TestWidget(QtWidgets.QWidget, WidgetFactoryMixIn):
 
 
 class TestWidgetFactoryMixIn(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.widgets = []
+    def setUp(self) -> None:
+        self.widgets = []
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        while cls.widgets:
-            w = cls.widgets.pop()
+    def tearDown(self) -> None:
+        while self.widgets:
+            w = self.widgets.pop()
             w.deleteLater()
-
-    def setUp(self) -> None: ...
-
-    def tearDown(self) -> None: ...
 
     def get_widget(
         self, layout: type[QtWidgets.QLayout] | None = QtWidgets.QGridLayout

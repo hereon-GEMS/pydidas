@@ -33,6 +33,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.widgets.base_classes import BaseFrame
+from pydidas_qtcore import PydidasQApplication
 
 
 class SignalTestClass(QtCore.QObject):
@@ -55,10 +56,25 @@ class TestBaseFrame(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.tester = SignalTestClass()
 
-    @staticmethod
-    def get_base_frame(**kwargs: Any) -> BaseFrame:
+    def setUp(self) -> None:
+        self._frames: list[BaseFrame] = []
+
+    def tearDown(self) -> None:
+        # ensure all frames created during the test are deleted and that the
+        # deferred deletion is processed immediately; otherwise these widgets
+        # would leak as orphaned top-level widgets that only the cyclic
+        # garbage collector could eventually free, which is unsafe for
+        # PyQt5/PySide QObjects.
+        for _frame in self._frames:
+            _frame.deleteLater()
+        PydidasQApplication.instance().processEvents()
+        PydidasQApplication.instance().sendPostedEvents(
+            None, QtCore.QEvent.DeferredDelete
+        )
+
+    def get_base_frame(self, **kwargs: Any) -> BaseFrame:
         _frame = BaseFrame(**kwargs)
-        # self.widgets.append(_frame)
+        self._frames.append(_frame)
         _frame.add_param(Parameter("test_int", int, 24))
         _frame.add_param(Parameter("test_str", str, get_random_string(30)))
         _frame.create_param_widget(_frame.get_param("test_int"))
@@ -97,7 +113,6 @@ class TestBaseFrame(unittest.TestCase):
         self.assertEqual(obj.frame_index, _state["frame_index"])
         self.assertEqual(obj.menu_entry, _state["menu_entry"])
         self.assertEqual(obj.__class__.__name__, _state["class"])
-        obj.deleteLater()
 
     def test_inject_frame_state(self) -> None:
         _n = 10
@@ -113,7 +128,6 @@ class TestBaseFrame(unittest.TestCase):
         obj.show()
         obj.inject_frame_state(_state)
         self.assertEqual(obj._config["state"], _state)
-        obj.deleteLater()
 
     def test_restore_state(self) -> None:
         _n = 10
@@ -131,7 +145,6 @@ class TestBaseFrame(unittest.TestCase):
         obj.restore_state(_state)
         _, _state = obj.export_state()
         self.assertEqual(_params, _state["params"])
-        obj.deleteLater()
 
 
 if __name__ == "__main__":

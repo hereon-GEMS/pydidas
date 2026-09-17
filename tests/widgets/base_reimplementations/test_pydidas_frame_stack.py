@@ -67,9 +67,10 @@ def frames():
 
 
 @pytest.fixture
-def stack_with_frames(frames):
+def stack_with_frames(frames, qtbot):
     """Create a PydidasFrameStack with 4 registered frames."""
     stack = PydidasFrameStack()
+    qtbot.addWidget(stack)
     for i in range(4):
         w = _TestWidget()
         stack.register_frame(w)
@@ -77,27 +78,30 @@ def stack_with_frames(frames):
     return stack, frames
 
 
-def test_init() -> None:
+def test_init(qtbot) -> None:
     """Test PydidasFrameStack initialization."""
     obj = PydidasFrameStack()
+    qtbot.addWidget(obj)
     assert isinstance(obj, QtWidgets.QStackedWidget)
     assert hasattr(obj, "frame_indices")
     assert hasattr(obj, "current_frames")
     assert hasattr(obj, "frame_names")
 
 
-def test_register_frame(frames) -> None:
+def test_register_frame(qtbot, frames) -> None:
     """Test registering a single frame."""
     stack = PydidasFrameStack()
+    qtbot.addWidget(stack)
     w = _TestWidget()
     stack.register_frame(w)
     frames.append(w)
     assert stack.widget(0) == w
 
 
-def test_register_frame_duplicate(frames) -> None:
+def test_register_frame_duplicate(qtbot, frames) -> None:
     """Test registering a duplicate frame raises KeyError."""
     stack = PydidasFrameStack()
+    qtbot.addWidget(stack)
     w = _TestWidget()
     stack.register_frame(w)
     frames.append(w)

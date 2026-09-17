@@ -50,6 +50,10 @@ def widget(qtbot):
     _linked_widget = QtWidgets.QLineEdit("Dummy")
     button = ToggleOptionsButton(linked_widget=_linked_widget)
     button.spy_sig_visibility_changed = SignalSpy(button.sig_visibility_changed)
+    # `linked_widget` is stored by reference only (not reparented), so it must
+    # be registered with qtbot separately to ensure it is properly closed and
+    # deleted; otherwise it would leak as an orphaned top-level widget.
+    qtbot.addWidget(_linked_widget)
     qtbot.addWidget(button)
     _linked_widget.show()
     button.show()

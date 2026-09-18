@@ -35,6 +35,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import qtpy
 
 from pydidas import unittest_objects
 from pydidas.contexts import Scan
@@ -45,48 +46,96 @@ from pydidas.workflow import ProcessingTree
 from pydidas_qtcore import PydidasQApplication
 
 
-@pytest.fixture(scope="session", autouse=True)
-def _disable_cyclic_gc_for_qt_safety():
-    """
-    Disable Python's cyclic garbage collector for the test session.
+if qtpy.API_NAME in ("PyQt5", "PyQt6"):
 
-    PyQt5/PySide QObjects (widgets, signals, ...) must only ever be destroyed
-    via explicit `deleteLater()`/`close()` or plain refcounting, never via
-    Python's cyclic garbage collector. Across the (large) GUI test suite, some
-    widget fixtures leave widgets in reference cycles (e.g. via
-    ``signal.connect(self.some_method)`` self-connections, or signal spies
-    holding references), so plain refcounting never frees them. Python's
-    cyclic collector eventually frees a whole batch of such long-lived
-    QObjects together, at an unpredictable point during an unrelated test's
-    setup or teardown. Finalizing multiple QObjects that way is not safe with
-    PyQt5/sip and reliably causes a segmentation fault when running the full
-    GUI test suite (though not when running individual test files in
-    isolation, since not enough cyclic garbage accumulates to trigger an
-    automatic collection).
+    @pytest.fixture(scope="session", autouse=True)
+    def _disable_cyclic_gc_for_qt_safety():
+        """
+        Guard against unsafe cyclic-garbage-collector-triggered Qt destruction.
 
-    A generic, autouse per-test "safety net" fixture that explicitly closes,
-    disconnects and `deleteLater()`s every leftover top-level widget was
-    evaluated as a more targeted alternative to disabling the collector, but
-    was found empirically to be unsafe in this codebase: Qt itself creates
-    and manages ephemeral top-level widgets internally (e.g. combo-box
-    popups, tooltips), and force-deleting/disconnecting arbitrary top-level
-    widgets after every test corrupts Qt's internal bookkeeping, causing
-    segfaults elsewhere (e.g. in `QApplication.setFont()` when propagating a
-    font change to a stale widget pointer). Reliably distinguishing
-    "leaked" widgets from intentionally long-lived or Qt-internal ones would
-    require much deeper, more fragile introspection than is practical here.
+        PyQt5/PySide QObjects (widgets, signals, ...) must only ever be destroyed
+        via explicit `deleteLater()`/`close()` or plain refcounting, never via
+        Python's cyclic garbage collector. Across the (large) GUI test suite, some
+        widget fixtures leave widgets in reference cycles (e.g. via
+        ``signal.connect(self.some_method)`` self-connections, or signal spies
+        holding references), so plain refcounting never frees them. Left to
+        accumulate, a cyclic collection pass eventually frees a whole batch of
+        such long-lived QObjects together, at an unpredictable point during an
+        unrelated test's setup or teardown. Finalizing multiple QObjects that way
+        is not safe with either binding and reliably causes a segmentation fault
+        when running the full GUI test suite (though not when running individual
+        test files in isolation, since not enough cyclic garbage accumulates to
+        trigger a collection).
 
-    Disabling the cyclic collector for the test session avoids this failure
-    mode entirely; all objects are still freed normally via refcounting when
-    they go out of scope, and any true reference cycles created by test code
-    are just never reclaimed within the (short-lived) test process. Fixing
-    the individual leaking fixtures (as already done for several files) is
-    still the preferred long-term remedy; this fixture remains as a backstop
-    for leaks not yet found.
-    """
-    gc.disable()
-    yield
-    gc.enable()
+
+
+        The two supported Qt bindings differ in a critical way that requires two
+        different mitigation strategies:
+
+        - With **PyQt5** (sip), simply disabling the cyclic collector for the
+          whole session (``gc.disable()``) is sufficient and safe: nothing in
+          PyQt5/sip forces an explicit collection, so with automatic collection
+          disabled, cyclic garbage is just never reclaimed within the
+          (short-lived) test process, and all QObjects are still freed normally
+          via refcounting when possible.
+        - With **PySide6** (shiboken), ``gc.disable()`` alone does *not* help:
+          shiboken's binding manager explicitly forces a Python garbage
+          collection pass (bypassing the ``gc.enabled`` flag, which only gates
+          *automatic* triggering) at its own, internal, wrapper-object-count
+          based thresholds, in order to resolve reference cycles between Python
+          QObject wrappers and their C++ parent/child hierarchy. This was
+          confirmed empirically: with ``gc.disable()`` active for the whole
+          session, the full GUI suite still crashed with "Garbage-collecting"
+          showing in the fault handler's traceback. Since these forced passes
+          cannot be prevented, the mitigation instead keeps each pass small and
+          safe by proactively running ``gc.collect()`` after *every* test (once
+          that test's own widgets have already been explicitly closed and
+          deleted via the normal Qt-safe path), so there is essentially always
+          only a small, test-local amount of cyclic garbage for any collection
+          pass (ours or shiboken's own forced one) to reclaim, rather than a
+          large, cross-test backlog accumulated over the whole session. Note
+          that proactively calling ``gc.collect()`` after every test is *not*
+          safe to do for PyQt5 (verified empirically to reintroduce the
+          segfault), since PyQt5/sip's unsafety is not about batch size, but
+          about cyclic-GC-triggered destruction happening at all.
+
+        Fixing the individual leaking fixtures (as already done for several
+        files) is still the preferred long-term remedy to reduce how much cyclic
+        garbage accumulates in the first place; this fixture remains as a
+        backstop for leaks not yet found.
+        """
+        gc.disable()
+        yield
+        gc.enable()
+
+
+if qtpy.API_NAME in ("PySide6", "PySide2"):
+
+    @pytest.fixture(autouse=True)
+    def _collect_garbage_after_each_test_for_shiboken_safety(request):
+        """
+        Proactively run a small, isolated garbage collection after each test.
+
+        See the docstring of ``_disable_cyclic_gc_for_qt_safety`` for the full
+        rationale. This fixture only takes effect for shiboken-based bindings
+        (PySide2/PySide6), where an explicit, frequent, small ``gc.collect()``
+        after each test avoids letting cyclic garbage accumulate into a large
+        backlog that shiboken's own forced (and otherwise uncontrollable)
+        internal collection passes would later reclaim all at once, which was
+        observed to segfault. For PyQt5/sip, this fixture deliberately does
+        nothing, since calling `gc.collect()` there is unsafe regardless of
+        batch size.
+
+        The collection is additionally restricted to tests marked with
+        ``@pytest.mark.gui``, since only those tests are expected to create
+        QObject-related cyclic garbage in the first place; this keeps the
+        (comparatively slow) explicit collection restricted to GUI-related
+        tests, avoiding a large runtime cost across the full, mostly-non-GUI
+        default test suite.
+        """
+        yield
+        if request.node.get_closest_marker("gui"):
+            gc.collect()
 
 
 @pytest.fixture(scope="session", autouse=True)

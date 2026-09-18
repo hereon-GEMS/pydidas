@@ -94,7 +94,18 @@ def _cleanup() -> Generator[None, None, None]:
         app.processEvents()
     while __widgets:
         _w = __widgets.pop()
+        # Explicitly break the Python-level reference cycle formed by
+        # attaching a SignalSpy to the widget as an attribute (the spy holds
+        # a live connection back to the widget's signal, and the widget
+        # holds the spy), so refcounting alone can free both without ever
+        # relying on the cyclic GC to do so (which is unsafe to trigger a
+        # QObject's C++ destructor with PyQt5/PySide6).
+        for _attr in ("spy_new_value", "spy_value_changed"):
+            if hasattr(_w, _attr):
+                delattr(_w, _attr)
         _w.deleteLater()
+    app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
 
 
 @pytest.mark.gui

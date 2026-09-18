@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = []
 
 
+import gc
 import random
 import shutil
 import tempfile
@@ -42,6 +43,50 @@ from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
 from pydidas.workflow import ProcessingTree
 from pydidas_qtcore import PydidasQApplication
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _disable_cyclic_gc_for_qt_safety():
+    """
+    Disable Python's cyclic garbage collector for the test session.
+
+    PyQt5/PySide QObjects (widgets, signals, ...) must only ever be destroyed
+    via explicit `deleteLater()`/`close()` or plain refcounting, never via
+    Python's cyclic garbage collector. Across the (large) GUI test suite, some
+    widget fixtures leave widgets in reference cycles (e.g. via
+    ``signal.connect(self.some_method)`` self-connections, or signal spies
+    holding references), so plain refcounting never frees them. Python's
+    cyclic collector eventually frees a whole batch of such long-lived
+    QObjects together, at an unpredictable point during an unrelated test's
+    setup or teardown. Finalizing multiple QObjects that way is not safe with
+    PyQt5/sip and reliably causes a segmentation fault when running the full
+    GUI test suite (though not when running individual test files in
+    isolation, since not enough cyclic garbage accumulates to trigger an
+    automatic collection).
+
+    A generic, autouse per-test "safety net" fixture that explicitly closes,
+    disconnects and `deleteLater()`s every leftover top-level widget was
+    evaluated as a more targeted alternative to disabling the collector, but
+    was found empirically to be unsafe in this codebase: Qt itself creates
+    and manages ephemeral top-level widgets internally (e.g. combo-box
+    popups, tooltips), and force-deleting/disconnecting arbitrary top-level
+    widgets after every test corrupts Qt's internal bookkeeping, causing
+    segfaults elsewhere (e.g. in `QApplication.setFont()` when propagating a
+    font change to a stale widget pointer). Reliably distinguishing
+    "leaked" widgets from intentionally long-lived or Qt-internal ones would
+    require much deeper, more fragile introspection than is practical here.
+
+    Disabling the cyclic collector for the test session avoids this failure
+    mode entirely; all objects are still freed normally via refcounting when
+    they go out of scope, and any true reference cycles created by test code
+    are just never reclaimed within the (short-lived) test process. Fixing
+    the individual leaking fixtures (as already done for several files) is
+    still the preferred long-term remedy; this fixture remains as a backstop
+    for leaks not yet found.
+    """
+    gc.disable()
+    yield
+    gc.enable()
 
 
 @pytest.fixture(scope="session", autouse=True)

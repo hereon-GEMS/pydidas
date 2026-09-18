@@ -624,7 +624,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if state_upper == "EXIT":
             _path = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
             if _path and not _path.is_file():
-                _exit_states = utils.get_available_exit_states()
+                _exit_states = utils.get_available_exit_states(self.EXIT_STATE_FILENAME)
                 if not _exit_states:
                     return None
                 _path = utils.get_standard_state_full_filename(_exit_states[-1])

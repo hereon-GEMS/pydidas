@@ -78,16 +78,25 @@ def get_standard_state_full_filename(filename: str) -> Path:
     return PYDIDAS_STANDARD_CONFIG_PATH.joinpath(filename)
 
 
-def get_available_exit_states() -> list[str]:
+def get_available_exit_states(exit_state_filename: str | Path) -> list[str]:
     """
     Get the available states from the standard config path.
+
+    Parameters
+    ----------
+    exit_state_filename : str | Path
+        The filename of the unavailable exit state.
 
     Returns
     -------
     list[str]
         The available state filenames.
     """
-    _regex = r"^pydidas_gui_exit_state_[0-9]{2}\.[0-9]{2}\.[0-9]{2}.yaml$"
+    # The suffix is given as version YY.MM.DD.yaml:
+    exit_state_filename = str(exit_state_filename)
+    _fname_prefix = exit_state_filename.removesuffix(f"{VERSION}.yaml")
+
+    _regex = f"^{_fname_prefix}" + r"[0-9]{2}\.[0-9]{2}\.[0-9]{2}.yaml$"
     filenames = []
     for _path in PYDIDAS_CONFIG_PATHS:
         if not _path.exists():
@@ -96,7 +105,7 @@ def get_available_exit_states() -> list[str]:
             _f for _f in _path.iterdir() if _f.is_file() and os.access(_f, os.R_OK)
         ]
         for _f in _files:
-            if re.search(_regex, _f.name):
+            if re.search(_regex, _f.name) and _f.name != exit_state_filename:
                 filenames.append(_f.name)
     return sorted(filenames)
 

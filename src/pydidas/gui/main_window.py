@@ -270,7 +270,7 @@ class MainWindow(MainMenu):
             is None.
         """
         try:
-            MainMenu.restore_gui_state(self, state, filename)
+            super().restore_gui_state(state, filename)
         except UserConfigError as exc:
             raise UserConfigError(exc)
         self.select_item(self._frame_stack.currentWidget().menu_entry)

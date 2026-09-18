@@ -46,9 +46,9 @@ from pydidas.gui.frames.builders.define_scan_frame_builder import (
     DEFINE_SCAN_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.dialogues import ItemInListSelectionWidget
-from pydidas.widgets.dialogues.question_box import QuestionBox
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.dialogs import SelectItemInListDialog
+from pydidas.widgets.dialogs.question_box import QuestionBox
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -102,6 +102,7 @@ class DefineScanFrame(BaseFrame):
         for _name in ["scan_base_directory", "scan_name_pattern"]:
             self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
         self.param_composite_widgets["derived_n_frames"].io_widget.setEnabled(False)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect all required signals and slots."""
@@ -142,6 +143,7 @@ class DefineScanFrame(BaseFrame):
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
         self._update_derived_n_frames()
+        super().finalize_ui()
 
     @QtCore.Slot()
     def update_dim_visibility(self) -> None:
@@ -212,7 +214,7 @@ class DefineScanFrame(BaseFrame):
             if _return[0] == "::no_error::":
                 _return = ScanIo.import_from_file_sequence(_fnames, scan=SCAN)
             elif _return[0] == "::multiple_motors::":
-                _choice = ItemInListSelectionWidget(
+                _choice = SelectItemInListDialog(
                     _return[1:],
                     title="Select motor",
                     label=(
@@ -309,7 +311,7 @@ class DefineScanFrame(BaseFrame):
         basedir : str
             The new base directory
         """
-        self.q_settings_set("dialogues/DefineScanFrame__scan_name_pattern", basedir)
+        self.q_settings_set("dialogs/DefineScanFrame__scan_name_pattern", basedir)
 
     @QtCore.Slot()
     def _show_scan_dim_doc(self) -> None:

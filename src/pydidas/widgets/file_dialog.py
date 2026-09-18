@@ -44,7 +44,7 @@ from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_child_qobject
 from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
-from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.base_classes import WidgetFactoryMixIn
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -80,7 +80,7 @@ class SelectionModel(QtCore.QIdentityProxyModel):
 
 
 class _PydidasFileDialog(
-    QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
+    QtWidgets.QFileDialog, WidgetFactoryMixIn, PydidasQsettingsMixin
 ):
     """
     pydidas's subclassed QFileDialog with additional functionality.
@@ -118,7 +118,7 @@ class _PydidasFileDialog(
                 the FileDialog widget. The default is None.
         """
         QtWidgets.QFileDialog.__init__(self)  # type: ignore[type]
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._files_unselectable_model = SelectionModel(self)
         self._config = {
@@ -221,7 +221,7 @@ class _PydidasFileDialog(
     @QtCore.Slot()
     def goto_latest_location(self) -> None:
         """Open the latest location from any dialogue."""
-        self.setDirectory(self.q_settings_get("dialogues/current"))
+        self.setDirectory(self.q_settings_get("dialogs/current"))
 
     @QtCore.Slot()
     def goto_scan_base_dir(self) -> None:
@@ -257,7 +257,7 @@ class _PydidasFileDialog(
         _scan_base = SCAN.get_param_value("scan_base_directory")
         _scan_base_valid = _scan_base.is_dir() and _scan_base != Path()
         self._widgets["but_scan_home"].setEnabled(_scan_base_valid)
-        _latest = self.q_settings_get("dialogues/current")
+        _latest = self.q_settings_get("dialogs/current")
         if _latest is not None:
             self._widgets["but_latest_location"].setEnabled(Path(_latest).is_dir())
         _stored_selection, _stored_dir = self._get_stored_entries()
@@ -472,7 +472,7 @@ class _PydidasFileDialog(
             The stored directory, if existing or None.
         """
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
+            _key = "dialogs/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             return self._stored_selections.get(_key, ""), self.q_settings_get(_key)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")
@@ -485,10 +485,10 @@ class _PydidasFileDialog(
         if not _selection.is_dir():
             _selection = _selection.parent
         _curr_dir = str(_selection)
-        self.q_settings_set("dialogues/current", _curr_dir)
+        self.q_settings_set("dialogs/current", _curr_dir)
         _key = None
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
+            _key = "dialogs/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             self.q_settings_set(_key, _curr_dir)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")

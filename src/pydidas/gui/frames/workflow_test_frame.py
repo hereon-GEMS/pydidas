@@ -43,9 +43,11 @@ from pydidas.core import (
     utils,
 )
 from pydidas.core.utils import apply_qt_properties, formatted_str_repr_of_dict
-from pydidas.gui.frames.builders import get_WorkflowTestFrame_build_config
-from pydidas.widgets.dialogues import WarningBox
-from pydidas.widgets.framework import BaseFrame
+from pydidas.gui.frames.builders.workflow_test_frame_builder import (
+    get_WorkflowTestFrame_build_config,
+)
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.dialogs import WarningBox
 from pydidas.widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,
@@ -204,8 +206,8 @@ class WorkflowTestFrame(BaseFrame):
             _method = getattr(self, _method)
             _method(*_args, **_kwargs)
         self._widgets["config_area"].setWidget(self._widgets["config"])
-
         apply_qt_properties(self.layout(), columnStretch=(1, 10))
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """
@@ -230,6 +232,7 @@ class WorkflowTestFrame(BaseFrame):
         self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)  # type: ignore[attr-defined]
         self.__details_window.sig_minimized.connect(self.__details_hidden)  # type: ignore[attr-defined]
+        super().build_frame()
 
     def __check_tree_uptodate(self) -> None:
         """

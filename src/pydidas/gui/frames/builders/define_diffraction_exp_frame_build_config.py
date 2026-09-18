@@ -29,7 +29,8 @@ __all__ = ["DIFFRACTION_EXP_FRAME_BUILD_CONFIG"]
 
 
 from pydidas.core import constants
-from pydidas.widgets import ScrollArea, get_pyqt_icon_from_str
+from pydidas.widgets import get_pyqt_icon_from_str
+from pydidas.widgets.base_classes import PydidasScrollArea
 
 
 _STD_WIDTH = constants.FONT_METRIC_CONFIG_WIDTH
@@ -52,7 +53,7 @@ DIFFRACTION_EXP_FRAME_BUILD_CONFIG = [
     ],
     [
         "create_any_widget",
-        ("config_area", ScrollArea),
+        ("config_area", PydidasScrollArea),
         {
             "layout_kwargs": {"alignment": None},
             "sizePolicy": constants.POLICY_FIX_EXP,

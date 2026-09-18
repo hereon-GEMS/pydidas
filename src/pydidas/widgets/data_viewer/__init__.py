@@ -24,20 +24,23 @@ __copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
+__all__ = ["AxesSelector", "DataAxisSelector", "DataViewer"]
 
 
-from .axes_selector import AxesSelector
-from .data_axis_selector import DataAxisSelector
-from .data_viewer import DataViewer
-from .table_with_node_labels import TableWithNodeLabels
+from typing import TYPE_CHECKING
+
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 
 
-__all__ = ["AxesSelector", "DataAxisSelector", "DataViewer", "TableWithNodeLabels"]
-
-# Clean up the namespace:
-del (
-    axes_selector,
-    data_axis_selector,
-    data_viewer,
-    table_with_node_labels,
-)
+if TYPE_CHECKING:
+    from .axes_selector import AxesSelector
+    from .data_axis_selector import DataAxisSelector
+    from .data_viewer import DataViewer
+else:
+    AxesSelector = LazyObject(
+        "pydidas.widgets.data_viewer.axes_selector", "AxesSelector"
+    )
+    DataAxisSelector = LazyObject(
+        "pydidas.widgets.data_viewer.data_axis_selector", "DataAxisSelector"
+    )
+    DataViewer = LazyObject("pydidas.widgets.data_viewer.data_viewer", "DataViewer")

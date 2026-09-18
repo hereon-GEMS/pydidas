@@ -49,8 +49,11 @@ from pydidas.gui.gui_excepthook_ import gui_excepthook
 from pydidas.resources import icons
 from pydidas.version import VERSION
 from pydidas.widgets import PydidasFileDialog, get_pyqt_icon_from_str
-from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox
-from pydidas.widgets.framework import PydidasFrameStack, PydidasStatusWidget
+from pydidas.widgets.base_reimplementations import (
+    PydidasFrameStack,
+    PydidasStatusWidget,
+)
+from pydidas.widgets.dialogs import AcknowledgeBox, QuestionBox
 from pydidas.widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,
@@ -396,10 +399,10 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        force_check : bool, optional
+        force_check : bool
             Flag to force a check even when the user disabled checking for
             updates. The default is False.
-        auto_check : bool, optional
+        auto_check : bool
             Flag to signalize an automatic update check. This will only display
             a notice when the local and remote versions differ. The default is False.
         """
@@ -621,7 +624,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         if state_upper == "EXIT":
             _path = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
             if _path and not _path.is_file():
-                _exit_states = utils.get_available_exit_states()
+                _exit_states = utils.get_available_exit_states(self.EXIT_STATE_FILENAME)
                 if not _exit_states:
                     return None
                 _path = utils.get_standard_state_full_filename(_exit_states[-1])

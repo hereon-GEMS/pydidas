@@ -1,0 +1,151 @@
+# This file is part of pydidas.
+#
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""Unit tests for the BaseFrame widget."""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
+__maintainer__ = "Malte Storm"
+__status__ = "Production"
+
+
+import unittest
+from typing import Any
+
+import pytest
+from qtpy import QtCore, QtWidgets
+
+from pydidas.core import Parameter
+from pydidas.core.utils import get_random_string
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas_qtcore import PydidasQApplication
+
+
+class SignalTestClass(QtCore.QObject):
+    signal = QtCore.Signal(int)
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.received_signals: list = []
+
+    def get_signal(self, obj: object) -> None:
+        self.received_signals.append(obj)
+
+    def send_signal(self, sig: int) -> None:
+        self.signal.emit(sig)  # type: ignore[attr-defined]
+
+
+@pytest.mark.gui
+class TestBaseFrame(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.tester = SignalTestClass()
+
+    def setUp(self) -> None:
+        self._frames: list[BaseFrame] = []
+
+    def tearDown(self) -> None:
+        # ensure all frames created during the test are deleted and that the
+        # deferred deletion is processed immediately; otherwise these widgets
+        # would leak as orphaned top-level widgets that only the cyclic
+        # garbage collector could eventually free, which is unsafe for
+        # PyQt5/PySide QObjects.
+        for _frame in self._frames:
+            _frame.deleteLater()
+        PydidasQApplication.instance().processEvents()
+        PydidasQApplication.instance().sendPostedEvents(
+            None, QtCore.QEvent.DeferredDelete
+        )
+
+    def get_base_frame(self, **kwargs: Any) -> BaseFrame:
+        _frame = BaseFrame(**kwargs)
+        self._frames.append(_frame)
+        _frame.add_param(Parameter("test_int", int, 24))
+        _frame.add_param(Parameter("test_str", str, get_random_string(30)))
+        _frame.create_param_widget(_frame.get_param("test_int"))
+        return _frame
+
+    @staticmethod
+    def create_widgets_in_frame(frame: BaseFrame, n: int = 6) -> None:
+        for _index in range(n):
+            frame.create_label(f"label_{_index}", get_random_string(120))
+
+    def test_init(self) -> None:
+        obj = self.get_base_frame()
+        self.assertIsInstance(obj, BaseFrame)
+        self.assertEqual(obj.frame_index, -1)
+        self.assertIsInstance(obj.layout(), QtWidgets.QGridLayout)
+
+    def test_frame_activated(self) -> None:
+        obj = self.get_base_frame()
+        self.tester.signal.connect(obj.frame_activated)  # type: ignore[attr-defined]
+        self.tester.send_signal(1)
+
+    def test_set_status(self) -> None:
+        _test = "This is the test status."
+        obj = self.get_base_frame()
+        obj.status_msg.connect(self.tester.get_signal)
+        obj.set_status(_test)
+        self.assertEqual(self.tester.received_signals.pop(), _test)
+
+    def test_export_state(self) -> None:
+        _n = 10
+        obj = self.get_base_frame()
+        self.create_widgets_in_frame(obj, _n)
+        obj.show()
+        _, _state = obj.export_state()
+        self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
+        self.assertEqual(obj.frame_index, _state["frame_index"])
+        self.assertEqual(obj.menu_entry, _state["menu_entry"])
+        self.assertEqual(obj.__class__.__name__, _state["class"])
+
+    def test_inject_frame_state(self) -> None:
+        _n = 10
+        obj = self.get_base_frame()
+        obj._config["built"] = False
+        self.create_widgets_in_frame(obj, _n)
+        _params = {"test_int": 42, "test_str": get_random_string(10)}
+        _state = {
+            "params": _params,
+            "frame_index": 0,
+            "menu_entry": obj.menu_entry,
+        }
+        obj.show()
+        obj.inject_frame_state(_state)
+        self.assertEqual(obj._config["state"], _state)
+
+    def test_restore_state(self) -> None:
+        _n = 10
+        obj = self.get_base_frame()
+        self.create_widgets_in_frame(obj, _n)
+        obj.frame_activated(obj.frame_index)
+        _params = {"test_int": 42, "test_str": get_random_string(10)}
+        _state = {
+            "params": _params,
+            "frame_index": obj.frame_index,
+            "menu_entry": obj.menu_entry,
+        }
+        obj.show()
+        obj.inject_frame_state(_state)
+        obj.restore_state(_state)
+        _, _state = obj.export_state()
+        self.assertEqual(_params, _state["params"])
+
+
+if __name__ == "__main__":
+    unittest.main()

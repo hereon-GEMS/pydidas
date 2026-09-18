@@ -27,17 +27,27 @@ __status__ = "Production"
 __all__ = ["MaskEditorWindow"]
 
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.core.utils import update_size_policy
 from pydidas.data_io import import_data
-from pydidas.widgets import parameter_config, silx_plot
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.selection import SelectDataFrameWidget
+from pydidas.widgets.base_classes import PydidasWindow
+from pydidas.widgets.extended_widgets import ParameterEditCanvas
+from pydidas.widgets.misc import SelectDataFrameWidget
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasMaskToolsWidget, PydidasPlot2D
+else:
+    PydidasMaskToolsWidget = LazyObject(
+        "pydidas.widgets.silx_plot", "PydidasMaskToolsWidget"
+    )
+    PydidasPlot2D = LazyObject("pydidas.widgets.silx_plot", "PydidasPlot2D")
 
 
 class MaskEditorWindow(PydidasWindow):
@@ -60,7 +70,7 @@ class MaskEditorWindow(PydidasWindow):
         """Build the frame and create all widgets."""
         self.create_any_widget(
             "param_frame",
-            parameter_config.ParameterEditCanvas,
+            ParameterEditCanvas,
             font_metric_width_factor=0.8 * FONT_METRIC_CONFIG_WIDTH,
             gridPos=(0, 0, 1, 1),
         )
@@ -88,10 +98,10 @@ class MaskEditorWindow(PydidasWindow):
             parent_widget=self._widgets["param_frame"],
         )
 
-        self.create_any_widget("plot_2d", silx_plot.PydidasPlot2D, gridPos=(0, 1, 2, 1))
+        self.create_any_widget("plot_2d", PydidasPlot2D, gridPos=(0, 1, 2, 1))
         update_size_policy(self._widgets["plot_2d"], horizontalStretch=1)
 
-        self._widgets["mask_tools"] = silx_plot.PydidasMaskToolsWidget(
+        self._widgets["mask_tools"] = PydidasMaskToolsWidget(
             self, plot=self._widgets["plot_2d"]
         )
         self._widgets["mask_tools"].setDirection(QtWidgets.QBoxLayout.TopToBottom)

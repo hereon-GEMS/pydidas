@@ -39,8 +39,8 @@ from pydidas.core.utils.dectris_utils import (
     store_eiger_pixel_mask_from_master_file,
 )
 from pydidas.data_io import IoManager
-from pydidas.widgets.dialogues import critical_warning
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
+from pydidas.widgets.dialogs import critical_warning
 
 
 class ExportEigerPixelmaskWindow(PydidasWindow):

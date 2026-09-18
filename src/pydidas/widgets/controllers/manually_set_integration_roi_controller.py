@@ -13,11 +13,11 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with pydidas If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the ManuallySetIntegrationRoiController class which manages manually setting
-the integration region for a plugin by selecting theROI graphically in a plot.
+the integration region for a plugin by selecting the ROI graphically in a plot.
 """
 
 __author__ = "Malte Storm"
@@ -29,7 +29,7 @@ __all__ = ["ManuallySetIntegrationRoiController"]
 
 
 from functools import partial
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from qtpy import QtCore
@@ -39,8 +39,11 @@ from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.math import Point
 from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import pyFAIintegrationBase
-from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
-from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
+from pydidas.widgets.misc import IntegrationRoiParamContainer
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
 class ManuallySetIntegrationRoiController(QtCore.QObject):
@@ -56,9 +59,9 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
 
     Parameters
     ----------
-    editor : pydidas.widgets.misc.ShowIntegrationRoiParamsWidget
-        The ShowIntegrationRoiParamsWidget instance to display parameter values.
-    plot : pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions
+    editor : pydidas.widgets.misc.IntegrationRoiParamContainer
+        The IntegrationRoiParamContainer instance to display parameter values.
+    plot : PydidasPlot2DwithIntegrationRegions
         The plot to display the ROI.
     **kwargs : Any
         Supported keyword arguments are:
@@ -66,25 +69,26 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         plugin : pydidas.plugins.BasePlugin
             The plugin to be edited.
         forced_edit_disable : bool
-            Flag to force
+            Flag to force disabling the edit mode, irrespective of the
+            requested enabled state.
     """
 
     default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_enable = QtCore.Signal(bool)
     sig_toggle_selection_mode = QtCore.Signal(bool)
-    widget_width = 320
 
     def __init__(
         self,
-        editor: ShowIntegrationRoiParamsWidget,
-        plot: PydidasPlot2DwithIntegrationRegions,
+        editor: IntegrationRoiParamContainer,
+        plot: "PydidasPlot2DwithIntegrationRegions",
         **kwargs: Any,
     ):
         QtCore.QObject.__init__(self)
         self._plot = plot
         self._plugin = kwargs.get("plugin", None)
         self._editor = editor
+        self._original_plugin_param_values: dict[str, Any] = {}
         self._config: dict[str, Any] = {
             "roi_plotted": False,
             "forced_edit_disable": kwargs.get("forced_edit_disable", False),

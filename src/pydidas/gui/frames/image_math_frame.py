@@ -48,7 +48,7 @@ from pydidas.gui.frames.builders.image_math_frame_builder import (
     IMAGE_MATH_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.workflow import WorkflowTree
 
 
@@ -104,6 +104,7 @@ class ImageMathFrame(BaseFrame):
             _method(*_args, **_kwargs)
         self._toggle_features_enabled(False)
         self._widgets["combo_display_image"].setEnabled(False)
+        super().build_frame()
 
     @property
     def active_index(self) -> int:

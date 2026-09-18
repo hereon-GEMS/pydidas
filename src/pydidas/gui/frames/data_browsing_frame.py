@@ -33,11 +33,15 @@ from typing import Any, ClassVar
 
 import h5py
 from qtpy import QtCore
-from silx.gui.hdf5 import H5Node
-from silx.gui.hdf5.Hdf5Item import Hdf5Item
-from silx.gui.hdf5.Hdf5Node import Hdf5Node
 
-from pydidas.core import Dataset, Parameter, ParameterCollection, get_generic_parameter
+from pydidas.core.lazy_imports.silx import silx_hdf5
+
+
+H5Node = silx_hdf5.H5Node
+Hdf5Item = silx_hdf5.Hdf5Item.Hdf5Item
+Hdf5Node = silx_hdf5.Hdf5Node.Hdf5Node
+
+from pydidas.core import Dataset, Parameter, ParameterCollection
 from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
 )
@@ -54,9 +58,8 @@ from pydidas.gui.frames.builders.data_browsing_frame_builder import (
     DATA_BROWSING_FRAME_BUILD_CONFIG,
     create_splitter,
 )
-from pydidas.widgets.framework import BaseFrame, PydidasWindow
-from pydidas.widgets.misc import ReadOnlyTextWidget
-from pydidas.widgets.parameter_config.param_io_widget_file import ParamIoWidgetFile
+from pydidas.widgets.base_classes import BaseFrame, PydidasWindow
+from pydidas.widgets.base_reimplementations import ReadOnlyTextEdit
 from pydidas.widgets.windows import Hdf5BrowserWindow
 
 
@@ -124,13 +127,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
             _widget_creation_method = getattr(self, _method)
             _widget_creation_method(*_args, **_kwargs)
         # explicitly add the widget here to because the generic widget
-        # creation do not accept direct args
-        self.add_any_widget(
-            "filename",
-            ParamIoWidgetFile(get_generic_parameter("filename")),
-            gridPos=(0, 1, 1, 2),
-            parent_widget="plot_header",
-        )
+        # creation does not accept direct args
         self.add_any_widget(
             "splitter",
             create_splitter(
@@ -141,6 +138,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         )
         _viewer_layout = self._widgets["viewer_and_filename"].layout()
         _viewer_layout.setRowStretch(_viewer_layout.rowCount() - 1, 1)
+        super().build_frame()
 
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""
@@ -400,7 +398,7 @@ class DataBrowsingFrame(BaseFrame, AssociatedFileMixin):
         self.__metadata_window = PydidasWindow()
         self.__metadata_window.create_any_widget(
             "text_box",
-            ReadOnlyTextWidget,
+            ReadOnlyTextEdit,
             font_metric_width_factor=120,
             line_wrap_width=120,
             gridPos=(0, 0, 1, 2),

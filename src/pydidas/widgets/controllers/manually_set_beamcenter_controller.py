@@ -44,7 +44,7 @@ from pydidas.core.math.ellipse import (
     fit_detector_center_and_tilt_from_points,
 )
 from pydidas.data_io import import_data
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.misc import PointsForBeamcenterWidget
 
 

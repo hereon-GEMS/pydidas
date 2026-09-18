@@ -31,16 +31,16 @@ __status__ = "Production"
 from . import frames, managers, mixins
 
 # import items from modules:
-from .gui_excepthook_ import *
-from .main_window import *
-from .start_pydidas_gui_ import *
+from .gui_excepthook_ import gui_excepthook
+from .main_window import MainWindow
+from .start_pydidas_gui_ import start_pydidas_gui
 
 
-__all__ = (
-    ["frames", "managers", "mixins"]
-    + gui_excepthook_.__all__
-    + main_window.__all__
-    + start_pydidas_gui_.__all__
-)
-
-del gui_excepthook_, main_window, start_pydidas_gui_
+__all__ = [
+    "MainWindow",
+    "frames",
+    "gui_excepthook",
+    "managers",
+    "mixins",
+    "start_pydidas_gui",
+]

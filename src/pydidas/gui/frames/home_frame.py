@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ opening pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -37,8 +37,7 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import DOC_HOME_ADDRESS
 from pydidas.resources import logos
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame, PydidasScrollArea
 
 
 _GENERIC_INTRO = (
@@ -116,7 +115,7 @@ class HomeFrame(BaseFrame):
         }
         self.create_any_widget(
             "scroll_area",
-            ScrollArea,
+            PydidasScrollArea,
             layout_kwargs={"alignment": None},
             resize_to_widget_width=True,
             sizePolicy=POLICY_FIX_EXP,
@@ -240,3 +239,4 @@ class HomeFrame(BaseFrame):
             gridPos=(0, 2, 1, 1),
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )
+        super().build_frame()

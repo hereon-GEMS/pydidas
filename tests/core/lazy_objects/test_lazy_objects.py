@@ -26,7 +26,12 @@ __status__ = "Production"
 
 import pytest
 
-from pydidas.core.lazy_imports.lazy_objects import LazyDict, LazyObject, LazySet
+from pydidas.core.lazy_imports.lazy_objects import (
+    LazyDict,
+    LazyModule,
+    LazyObject,
+    LazySet,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -126,6 +131,11 @@ def test_lazy_object__getattr_forwards_to_real_class():
     assert proxy.home() == Path.home()
 
 
+def test_lazy_object__hasattr_forwards_to_real_class():
+    proxy = LazyObject("numpy", "ndarray")
+    assert hasattr(proxy, "data")
+
+
 def test_lazy_object__isinstance_true_for_instance_of_real_class():
     from pathlib import Path
 
@@ -218,6 +228,64 @@ def test_lazy_object__ror_with_real_type():
     proxy = LazyObject("pathlib", "Path")
     union = int | proxy
     assert isinstance(union, types.UnionType)
+
+
+# ---------------------------------------------------------------------------
+# LazyModule
+# ---------------------------------------------------------------------------
+
+
+def test_lazy_module__module_none_before_use():
+    proxy = LazyModule("pathlib")
+    assert proxy._module is None
+
+
+def test_lazy_module__repr_before_resolution():
+    proxy = LazyModule("pathlib")
+    assert repr(proxy) == "<lazy module proxy for pathlib>"
+
+
+def test_lazy_module__resolve_returns_module():
+    import pathlib
+
+    proxy = LazyModule("pathlib")
+    assert proxy.resolve() is pathlib
+
+
+def test_lazy_module__getattr_forwards_to_module():
+    import pathlib
+
+    proxy = LazyModule("pathlib")
+    assert proxy.Path is pathlib.Path
+
+
+def test_lazy_module__real_module_cached_after_resolution():
+    proxy = LazyModule("pathlib")
+    _ = proxy.Path
+    assert proxy._module is not None
+
+
+def test_lazy_module__resolve_imports_once(monkeypatch):
+    import importlib
+
+    call_count = {"n": 0}
+    _original = importlib.import_module
+
+    def counting_import(name, *args, **kwargs):
+        call_count["n"] += 1
+        return _original(name, *args, **kwargs)
+
+    proxy = LazyModule("pathlib")
+    monkeypatch.setattr(importlib, "import_module", counting_import)
+    _ = proxy.Path
+    _ = proxy.PurePath
+    assert call_count["n"] == 1
+
+
+def test_lazy_module__invalid_module_raises_on_resolve():
+    proxy = LazyModule("no.such.module")
+    with pytest.raises(ModuleNotFoundError):
+        proxy.resolve()
 
 
 # ---------------------------------------------------------------------------

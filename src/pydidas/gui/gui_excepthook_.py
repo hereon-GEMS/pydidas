@@ -35,7 +35,7 @@ from io import StringIO
 
 from pydidas.core import FileReadError, UserConfigError
 from pydidas.core.utils import get_logging_dir
-from pydidas.widgets.dialogues import ErrorMessageBox, PydidasExceptionMessageBox
+from pydidas.widgets.dialogs import ErrorMessageBox, PydidasExceptionMessageBox
 from pydidas_qtcore import PydidasQApplication
 
 

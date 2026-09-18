@@ -391,7 +391,7 @@ class PydidasFrameStack(QtWidgets.QStackedWidget):
                 _missing_frames.append(_frame_name)
             try:
                 self.get_widget_by_name(_frame_name).inject_frame_state(_state)
-            except UserConfigError as exc:
+            except (KeyError, UserConfigError) as exc:
                 _errors += f"Frame '{_frame_name}':\n{exc!s}\n"
             _unrestored_frames.remove(_frame_name)
         if _errors:

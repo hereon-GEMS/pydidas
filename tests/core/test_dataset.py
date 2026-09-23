@@ -25,11 +25,13 @@ __status__ = "Production"
 
 
 import copy
-import unittest
+import pickle
 import warnings
 from numbers import Real
+from typing import Any
 
 import numpy as np
+import pytest
 
 from pydidas.core import Dataset, PydidasConfigError, UserConfigError
 from pydidas.core.utils import rebin2d
@@ -43,1428 +45,1380 @@ _AXIS_SLICES = [0, 3, -1, -3, (0,), (2,), (0, 1), (1, 3), (2, 0), (1, 2, 3), (0,
 _IMPLEMENTED_METHODS = ["mean", "sum", "max", "min"]
 _METHOD_REQUIRES_INITIAL = ["max", "min"]
 _METHOD_TAKES_NO_DTYPE = ["max", "min"]
-
-
-class TestDataset(unittest.TestCase):
-    def setUp(self):
-        self._axis_labels = ["axis0", "axis1"]
-        self._axis_ranges = [1, [5, 10]]
-        self._axis_units = {0: "m", 1: "rad"}
-        self._3x10_axis_ranges = [np.arange(10), 10 - np.arange(10), 3 * np.arange(10)]
-
-    def tearDown(self): ...
-
-    def create_simple_dataset(self):
-        obj = Dataset(
-            [[10, 10]],
-            axis_labels=self._axis_labels,
-            axis_ranges=self._axis_ranges,
-            axis_units=self._axis_units,
-            metadata={},
-        )
-        return obj
-
-    def create_large_dataset(self):
-        self._dset = {
-            "shape": (10, 12, 14, 16),
-            "labels": ["a", "b", "c", "d"],
-            "ranges": [np.arange(10), np.arange(12), np.arange(14), np.arange(16)],
-            "units": ["ua", "ub", "uc", "ud"],
-            "data_label": "data label",
-            "data_unit": "data unit",
-        }
-        obj = Dataset(
-            np.random.random(self._dset["shape"]),
-            axis_labels=self._dset["labels"],
-            axis_ranges=self._dset["ranges"],
-            axis_units=self._dset["units"],
-            data_label=self._dset["data_label"],
-            data_unit=self._dset["data_unit"],
-            metadata={},
-        )
-        return obj
-
-    def get_dset_prop(self, key: str, indices: tuple[int]):
-        key = key.removeprefix("axis_")
-        return [item for i, item in enumerate(self._dset[key]) if i in indices]
-
-    def get_random_dataset(self, ndim: int, shape=None):
-        if shape is None:
-            shape = np.arange(ndim) + 6
-        return Dataset(
-            _np_random_generator.random(shape),
-            axis_labels=[str(i) for i in range(ndim)],
-            axis_units=[chr(97 + i) for i in range(ndim)],
-            axis_ranges=[
-                _np_random_generator.integers(-10, 10)
-                + (0.1 + _np_random_generator.random()) * np.arange(shape[_dim])
-                for _dim in range(ndim)
-            ],
-        )
-
-    def ax_tuple(self, obj: Dataset, axes: tuple[int]) -> tuple[int]:
-        return tuple(
-            np.mod(_x, obj.ndim)
-            for _x in (axes if isinstance(axes, tuple) else (axes,))
-        )
-
-    def get_dict(self, key):
-        if isinstance(getattr(self, key), dict):
-            return getattr(self, key)
-        return dict(enumerate(getattr(self, key)))
-
-    def test_array_finalize__simple_indexing(self):
-        obj = self.create_large_dataset()
-        for _ds_slice, _key_slices, _range_slices in [
-            [0, (1, 2, 3), {}],
-            [(slice(None, None), 0), (0, 2, 3), {}],
-            [(slice(None, None), 7, 6), (0, 3), {}],
-            [(slice(1, 4)), (0, 1, 2, 3), {0: slice(1, 4)}],
-            [np.arange(1, 4), (0, 1, 2, 3), {0: slice(1, 4)}],
-        ]:
-            with self.subTest(slice=_ds_slice):
-                _new = obj[_ds_slice]
-                for _key in ["axis_labels", "axis_units"]:
-                    self.assertEqual(
-                        list(getattr(_new, _key).values()),
-                        self.get_dset_prop(f"{_key}", _key_slices),
-                    )
-                for _new_dim, _original_dim in enumerate(_key_slices):
-                    _new_range = _new.axis_ranges[_new_dim]
-                    _original_range = self._dset["ranges"][_original_dim]
-                    if _original_dim in _range_slices:
-                        _original_range = _original_range[_range_slices[_original_dim]]
-                    self.assertTrue(np.allclose(_new_range, _original_range))
-
-    def test_array_finalize__add_dimension(self):
-        obj = self.create_large_dataset()
-        _new = obj[None, :]
-        self.assertEqual(list(_new.axis_labels.values()), [""] + self._dset["labels"])
-        self.assertEqual(list(_new.axis_units.values()), [""] + self._dset["units"])
-        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
-            if _dim == 0:
-                self.assertTrue(np.allclose(_new_range, np.arange(_new.shape[0])))
-            else:
-                self.assertTrue(np.allclose(_new_range, self._dset["ranges"][_dim - 1]))
-
-    def test_array_finalize__add_dimension_in_middle(self):
-        obj = self.create_large_dataset()
-        _new = obj[:, None, :]
-        self.assertEqual(
-            list(_new.axis_labels.values()),
-            [self._dset["labels"][0]] + [""] + self._dset["labels"][1:],
-        )
-        self.assertEqual(
-            list(_new.axis_units.values()),
-            [self._dset["units"][0]] + [""] + self._dset["units"][1:],
-        )
-
-    def test_array_finalize__with_array_mask(self):
-        obj = self.create_large_dataset()
-        _mask = np.zeros(obj.shape)
-        obj[_mask == 0] = 1
-        self.assertTrue((obj == 1).all())
-
-    def test_array_finalize__get_full_masked(self):
-        obj = self.create_large_dataset()
-        _mask = np.zeros(obj.shape)
-        _new = obj[_mask == 0]
-        self.assertTrue(np.allclose(obj.flatten(), _new))
-
-    def test_array_finalize__get_masked(self):
-        obj = self.create_large_dataset()
-        _mask = np.zeros(obj.shape)
-        _mask[1, 1, 1, 1] = 1
-        _mask[2, 2, 2, 2] = 1
-        _new = obj[_mask == 1]
-        _ref = [obj[1, 1, 1, 1], obj[2, 2, 2, 2]]
-        self.assertTrue(np.allclose(_ref, _new))
-        self.assertEqual(_new.axis_ranges[0].size, 2)
-
-    def test_array_finalize__get_masked_1d(self):
-        _slice = slice(12, 18)
-        obj = create_dataset(1, float, shape=(42,))
-        _mask = np.zeros(obj.shape)
-        _mask[_slice] = 1
-        _new = obj[_mask == 1]
-        self.assertTrue(np.allclose(obj[_slice], _new))
-        self.assertEqual(_new.axis_ranges[0].size, 6)
-
-    def test_new__from_array(self):
-        _ndarray = np.random.random((10, 12))
-        obj = Dataset(_ndarray)
-        self.assertNotEqual(id(_ndarray), id(obj))
-        self.assertNotEqual(id(_ndarray), id(obj.base))
-
-    def test_new__assure_memory_not_shared(self):
-        _ndarray = np.random.random((10, 12))
-        obj = Dataset(_ndarray)
-        _ndarray[0, 0] = 42
-        self.assertTrue(obj[0, 0] <= 1)
-
-    def test_view__assure_memory_shared_in_view(self):
-        obj = Dataset(np.random.random((10, 12)))
-        _view = obj[0]
-        _view[0] = 42
-        self.assertEqual(obj[0, 0], 42)
-
-    def test_new__from_iterable(self):
-        for _base in [[1, 4, 42], (0.5, 7, 1.2)]:
-            with self.subTest(base=_base):
-                obj = Dataset(_base)
-                for _index, _item in enumerate(_base):
-                    self.assertEqual(obj[_index], _item)
-
-    def test_new__from_scalar(self):
-        _val = 42.0
-        obj = Dataset(_val)
-        self.assertEqual(obj.shape, ())
-        self.assertEqual(obj[()], _val)
-
-    def test_get_rebinned_copy__bin2(self):
-        obj = self.create_large_dataset()
-        _new = obj.get_rebinned_copy(2)
-        self.assertIsInstance(_new, Dataset)
-        self.assertNotEqual(id(obj), id(_new))
-        self.assertEqual(tuple(_s // 2 for _s in self._dset["shape"]), _new.shape)
-
-    def test_get_rebinned_copy__bin1(self):
-        obj = self.create_large_dataset()
-        _new = obj.get_rebinned_copy(1)
-        self.assertIsInstance(_new, Dataset)
-        self.assertNotEqual(id(obj), id(_new))
-        self.assertEqual(obj.shape, _new.shape)
-
-    def test_T(self):
-        obj = self.create_large_dataset()
-        _new = obj.T
-        self.assertEqual(_new.shape, tuple(reversed(obj.shape)))
-        for _dim, _new_range in _new.axis_ranges.items():
-            self.assertTrue(
-                np.allclose(_new_range, obj.axis_ranges[obj.ndim - 1 - _dim])
-            )
-
-    def test_property_dict(self):
-        obj = self.create_large_dataset()
-        _obj_props = obj.property_dict
-        _copy = obj.property_dict
-        _copy["data_unit"] = "42 space"
-        self.assertEqual(_obj_props["data_unit"], obj.data_unit)
-        self.assertNotEqual(_copy["data_unit"], obj.data_unit)
-
-    def test_flatten(self):
-        obj = self.create_large_dataset()
-        _new = obj.flatten()
-        self.assertEqual(_new.shape, (obj.size,))
-        self.assertEqual(_new.axis_labels, {0: "Flattened"})
-        self.assertEqual(_new.axis_units, {0: ""})
-        self.assertTrue(np.equal(_new.axis_ranges[0], np.arange(_new.size)).all())
-
-    def test_flatten_dims__simple(self):
-        _dims = (1, 2)
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims)
-        self.assertEqual(obj.ndim, len(self._dset["shape"]) - 1)
-        for key, preset in zip(
-            ["axis_labels", "axis_units"],
-            ["Flattened", ""],
-        ):
-            self.assertEqual(getattr(obj, key)[_dims[0]], preset)
-        self.assertTrue(np.allclose(obj.axis_ranges[_dims[0]], np.arange(obj.shape[1])))
-
-    def test_flatten_dims__1dim_only(self):
-        obj = self.create_large_dataset()
-        obj2 = copy.copy(obj)
-        obj2.flatten_dims(1)
-        self.assertTrue(np.equal(obj, obj2).all())
-
-    def test_flatten_dims__distributed_dims(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
-            obj.flatten_dims(1, 3)
-
-    def test_flatten_dims__new_label(self):
-        _dims = (1, 2)
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims)
-        _new_label = "new label"
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims, new_dim_label=_new_label)
-        _labels = [
-            self._dset["labels"][i]
-            for i in range(len(self._dset["labels"]))
-            if i not in _dims
-        ]
-        _labels.insert(_dims[0], _new_label)
-        self.assertEqual(list(obj.axis_labels.values()), _labels)
-
-    def test_flatten_dims__new_unit(self):
-        _dims = (1, 2)
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims)
-        _new_unit = "new unit"
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims, new_dim_unit=_new_unit)
-        _units = [
-            self._dset["units"][i]
-            for i in range(len(self._dset["units"]))
-            if i not in _dims
-        ]
-        _units.insert(_dims[0], _new_unit)
-        self.assertEqual(list(obj.axis_units.values()), _units)
-
-    def test_flatten_dims__new_range(self):
-        _dims = (1, 2)
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims)
-        _new_range = np.arange(
-            self._dset["shape"][_dims[0]] * self._dset["shape"][_dims[1]]
-        )
-        obj = self.create_large_dataset()
-        obj.flatten_dims(*_dims, new_dim_range=_new_range)
-        _range = [
-            self._dset["ranges"][i]
-            for i in range(len(self._dset["ranges"]))
-            if i not in _dims
-        ]
-        _range.insert(_dims[0], _new_range)
-        self.assertTrue(np.equal(obj.axis_ranges[_dims[0]], _new_range).all())
-
-    def test__comparison_with_allclose(self):
-        obj = self.create_large_dataset()
-        _new = np.zeros(obj.shape)
-        self.assertFalse(np.allclose(obj, _new))
-
-    def test_array_finalize__multiple_ops(self):
-        obj = self.create_large_dataset()
-        _ = obj[0, 0]
-        _ = obj[0]
-        self.assertEqual(obj._meta["_get_item_key"], ())
-
-    def test_array_finalize__multiple_slicing(self):
-        obj = self.create_large_dataset()
-        _new = obj[:, 3:7, 5:10]
-        self.assertEqual(list(_new.axis_labels.values()), self._dset["labels"])
-        self.assertEqual(list(_new.axis_units.values()), self._dset["units"])
-        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
-            if _dim == 1:
-                self.assertTrue(np.allclose(_new_range, self._dset["ranges"][1][3:7]))
-            elif _dim == 2:
-                self.assertTrue(np.allclose(_new_range, self._dset["ranges"][2][5:10]))
-            else:
-                self.assertTrue(np.allclose(_new_range, self._dset["ranges"][_dim]))
-
-    def test_array_finalize__reordering(self):
-        obj = self.get_random_dataset(1)
-        _slicer = np.arange(obj.shape[0] - 1, -1, -1)
-        _new = obj[_slicer]
-        self.assertEqual(_new.axis_labels, obj.axis_labels)
-        self.assertEqual(_new.axis_units, obj.axis_units)
-        self.assertTrue(np.allclose(_new.axis_ranges[0], obj.axis_ranges[0][_slicer]))
-        self.assertEqual(obj.shape, _new.shape)
-
-    def test_array_finalize__insert_data_simple(self):
-        obj = self.create_large_dataset()
-        _new = np.random.random((12, 14, 16))
-        obj[2] = _new
-        for _key in ["labels", "units"]:
-            self.assertEqual(
-                getattr(obj, f"axis_{_key}"),
-                {i: k for i, k in enumerate(self._dset.get(_key))},
-            )
-
-    def test_array_finalize__insert_data(self):
-        obj = self.create_large_dataset()
-        _new = np.random.random((14, 16))
-        obj[2, 3] = _new
-        for _key in ["labels", "units"]:
-            self.assertEqual(
-                getattr(obj, f"axis_{_key}"),
-                {i: k for i, k in enumerate(self._dset.get(_key))},
-            )
-
-    def test_array_finalize__1d_array_w_array_mask(self):
-        obj = self.get_random_dataset(1)
-        indices = np.ones((obj.size), dtype=bool)
-        indices[1] = False
-        _new = obj[indices]
-        self.assertTrue(isinstance(_new, Dataset))
-        self.assertTrue(np.allclose(_new, np.append(obj[0], obj[2:])))
-        self.assertEqual(_new.axis_ranges[0].size, _new.size)
-
-    def test_array_finalize__get_single_value(self):
-        obj = self.create_simple_dataset()[0]
-        _val = obj[0]
-        self.assertIsInstance(_val, Real)
-        self.assertEqual(obj._meta["_get_item_key"], ())
-
-    def test__with_rebin2d(self):
-        obj = Dataset(np.random.random((11, 11)), axis_labels=["0", "1"])
-        _new = rebin2d(obj, 2)
-        self.assertEqual(_new.shape, (5, 5))
-
-    def test_transpose__1d(self):
-        obj = Dataset(np.random.random(12), axis_labels=["0"], axis_units=["a"])
-        _new = obj.transpose()
-        self.assertEqual(obj.axis_labels[0], _new.axis_labels[0])
-        self.assertEqual(obj.axis_units[0], _new.axis_units[0])
-        self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
-
-    def test_transpose__2d(self):
-        obj = self.get_random_dataset(2)
-        _new = obj.transpose()
-        for _i1, _i2 in [[0, 1], [1, 0]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0], _new[:, 0]))
-        self.assertTrue(np.allclose(obj[:, 0], _new[0]))
-
-    def test_transpose__3d(self):
-        obj = self.get_random_dataset(3)
-        _new = obj.transpose()
-        for _i1, _i2 in [[0, 2], [2, 0], [1, 1]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0], _new[:, 0, 0]))
-        self.assertTrue(np.allclose(obj[:, 0, 0], _new[0, 0]))
-        self.assertTrue(np.allclose(obj[0, :, 0], _new[0, :, 0]))
-
-    def test_transpose__4d(self):
-        obj = self.get_random_dataset(4)
-        _new = obj.transpose()
-        for _i1, _i2 in [[0, 3], [3, 0], [1, 2], [2, 1]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, 0], _new[:, 0, 0, 0]))
-        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, 0]))
-        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, 0, :, 0]))
-
-    def test_transpose__4d_with_axes(self):
-        obj = self.get_random_dataset(4)
-        _new = obj.transpose(2, 1, 0, 3)
-        for _i1, _i2 in [[0, 2], [2, 0]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, :, 0], _new[:, 0, 0, 0]))
-        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
-        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
-
-    def test_transpose__4d_with_axtuple(self):
-        obj = self.get_random_dataset(4)
-        _new = obj.transpose((2, 1, 0, 3))
-        for _i1, _i2 in [[0, 2], [2, 0]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, :, 0], _new[:, 0, 0, 0]))
-        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
-        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
-
-    def test_squeeze__single_dim(self):
-        obj = self.get_random_dataset(4)
-        obj = obj[:, :, 0:1]
-        _new = np.squeeze(obj)
-        for _i1, _i2 in [[0, 0], [1, 1], [3, 2]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, 0], _new[0, 0]))
-        self.assertEqual(obj.metadata, _new.metadata)
-        self.assertEqual(obj.data_unit, _new.data_unit)
-
-    def test_squeeze__multi_dim(self):
-        obj = self.get_random_dataset(5, (6, 1, 7, 1, 9))
-        _new = np.squeeze(obj)
-        for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
-
-    def test_squeeze__multi_dims_of_len_1(self):
-        obj = self.get_random_dataset(5, (1, 1, 7, 1, 1))
-        _new = np.squeeze(obj)
-        self.assertEqual(obj.axis_labels[2], _new.axis_labels[0])
-        self.assertEqual(obj.axis_units[2], _new.axis_units[0])
-        self.assertTrue(np.allclose(obj.axis_ranges[2], _new.axis_ranges[0]))
-        self.assertTrue(np.allclose(obj[0, 0, :, 0, 0], _new))
-
-    def test_squeeze__multi_dim_size_1(self):
-        obj = Dataset([[[[42]]]])
-        _new = np.squeeze(obj)
-        self.assertEqual(42, _new[0])
-
-    def test_squeeze__multi_dim_with_None_range(self):
-        obj = self.get_random_dataset(5, (6, 1, 7, 1, 9))
-        obj.update_axis_range(4, None)
-        _new = obj.squeeze()
-        for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
-
-    def test_squeeze__no_dim(self):
-        obj = self.get_random_dataset(5, (6, 4, 7, 2, 9))
-        _new = np.squeeze(obj)
-        for _i1, _i2 in [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj, _new))
-
-    def test_squeeze__with_slicing(self):
-        obj = self.get_random_dataset(5, (6, 4, 7, 1, 9))
-        _new = np.squeeze(obj[0:3])
-        self.assertTrue(np.allclose(obj.axis_ranges[0][:3], _new.axis_ranges[0]))
-        for _i1, _i2 in [[1, 1], [2, 2], [4, 3]]:
-            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
-            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
-            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
-        self.assertTrue(np.allclose(obj[:3, :, :, 0], _new))
-
-    def test_take__full_dim_from_3d(self):
-        obj = self.get_random_dataset(3, (6, 4, 7))
-        _dim = 1
-        _slice = 1
-        _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[:, 1], _new))
-        self.assertEqual(obj.axis_labels[0], _new.axis_labels[0])
-        self.assertEqual(obj.axis_labels[2], _new.axis_labels[1])
-        self.assertEqual(obj.axis_units[0], _new.axis_units[0])
-        self.assertEqual(obj.axis_units[2], _new.axis_units[1])
-        self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
-        self.assertTrue(np.allclose(obj.axis_ranges[2], _new.axis_ranges[1]))
-
-    def test_take__dim_subset_from_3d(self):
-        obj = self.get_random_dataset(3, (6, 5, 7))
-        _dim = 1
-        _slice = (1, 2, 3)
-        _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[:, slice(1, 4)], _new))
-        for _dim in range(3):
-            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
-            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
-            _slice = slice(1, 4) if _dim == 1 else slice(None, None)
-            self.assertTrue(
-                np.allclose(obj.axis_ranges[_dim][_slice], _new.axis_ranges[_dim])
-            )
-
-    def test_take__full_dim_from_2d(self):
-        obj = self.get_random_dataset(2)
-        _dim = 0
-        _slice = 1
-        _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[_slice], _new))
-        self.assertEqual(obj.axis_labels[1], _new.axis_labels[0])
-        self.assertEqual(obj.axis_units[1], _new.axis_units[0])
-        self.assertTrue(np.allclose(obj.axis_ranges[1], _new.axis_ranges[0]))
-
-    def test_take__dim_subset_from_2d(self):
-        obj = self.get_random_dataset(2)
-        _dim = 1
-        _slice = (1, 2, 3)
-        _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[:, slice(1, 4)], _new))
-        for _dim in range(2):
-            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
-            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
-        self.assertTrue(
-            np.allclose(obj.axis_ranges[1][slice(1, 4)], _new.axis_ranges[1])
-        )
-        self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
-
-    def test_take__with_single_iterable_value(self):
-        obj = self.get_random_dataset(2)
-        _dim = 0
-        _slice = [2]
-        _new = np.take(obj, _slice, _dim)
-        self.assertTrue(np.allclose(obj[2], _new[0]))
-        for _dim in range(2):
-            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
-            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
-        self.assertTrue(np.allclose(obj.axis_ranges[0][_slice[0]], _new.axis_ranges[0]))
-        self.assertTrue(np.allclose(obj.axis_ranges[1], _new.axis_ranges[1]))
-
-    def test_take__single_number(self):
-        obj = self.get_random_dataset(1)
-        _new = np.take(obj, 2, 0)
-        self.assertFalse(isinstance(_new, Dataset))
-        self.assertEqual(_new, obj[2])
-
-    def test_take__1d_array_wo_axis(self):
-        obj = self.get_random_dataset(1)
-        indices = [i for i in range(obj.size) if i != 1]
-        _new = np.take(obj, indices)
-        self.assertTrue(isinstance(_new, Dataset))
-        self.assertTrue(np.allclose(_new, np.append(obj[0], obj[2:])))
-        self.assertEqual(_new.axis_ranges[0].size, _new.size)
-
-    def test_take__2d_array_wo_axis(self):
-        obj = self.get_random_dataset(2)
-        indices = [i for i in range(obj.size) if i != 1]
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            _new = np.take(obj, indices)
-            self.assertTrue(isinstance(_new, Dataset))
-            self.assertEqual(_new.size, obj.size - 1)
-            self.assertEqual(_new.ndim, 1)
-            self.assertEqual(_new.axis_ranges[0].size, _new.size)
-
-    def test_getitem__simple(self):
-        obj = self.create_large_dataset()
-        _new = obj.__getitem__((0, 0))
-        self.assertIsInstance(_new, Dataset)
-
-    def test_slice__w_tuple(self):
-        obj = self.create_large_dataset()
-        _new = obj[:, (1, 2, 3)]
-        _new_shape = (obj.shape[0], 3) + (obj.shape[2:])
-        self.assertEqual(_new.shape, _new_shape)
-
-    def test__new__kwargs(self):
-        obj = self.create_simple_dataset()
-        self.assertIsInstance(obj.axis_labels, dict)
-        self.assertIsInstance(obj.axis_ranges, dict)
-        self.assertIsInstance(obj.axis_units, dict)
-
-    def test_data_label_property(self):
-        obj = self.create_simple_dataset()
-        _label = obj.data_label
-        self.assertIsInstance(_label, str)
-
-    def test_data_label_property__modify(self):
-        obj = self.create_simple_dataset()
-        _new = "new value"
-        obj.data_label = _new
-        self.assertEqual(obj.data_label, _new)
-
-    def test_data_unit_property(self):
-        obj = self.create_simple_dataset()
-        _label = obj.data_unit
-        self.assertIsInstance(_label, str)
-
-    def test_data_unit_property__modify(self):
-        obj = self.create_simple_dataset()
-        _new = "new value"
-        obj.data_unit = _new
-        self.assertEqual(obj.data_unit, _new)
-
-    def test_axis_str_property(self):
-        obj = self.create_simple_dataset()
-        for _method_name in ["axis_labels", "axis_units"]:
-            with self.subTest(method=_method_name):
-                self.assertEqual(
-                    getattr(obj, _method_name), self.get_dict(f"_{_method_name}")
-                )
-
-    def test_axis_str_property__not_str_types(self):
-        obj = self.create_simple_dataset()
-        _entries = [["a", "b"], "c", "d"]
-        for _method_name in ["axis_labels", "axis_units"]:
-            with (
-                self.subTest(method=_method_name),
-                self.assertRaises(PydidasConfigError),
-            ):
-                setattr(obj, _method_name, _entries)
-
-    def test_axis_str_property__modify_copy(self):
-        obj = self.create_simple_dataset()
-        _entries = [["a", "b"], "c", "d"]
-        for _method_name in ["axis_labels", "axis_units"]:
-            with self.subTest(method=_method_name):
-                _item = getattr(obj, _method_name)
-                _item[0] = "new value"
-                self.assertEqual(
-                    getattr(obj, _method_name), self.get_dict(f"_{_method_name}")
-                )
-
-    def test_axis_ranges_property(self):
-        obj = self.create_simple_dataset()
-        _ranges_ref = self.get_dict("_axis_ranges")
-        for _dim in range(obj.ndim):
-            self.assertTrue(np.allclose(_ranges_ref[_dim], obj.axis_ranges[_dim]))
-
-    def test_axis_ranges_property__modify_copy(self):
-        obj = self.create_simple_dataset()
-        _ranges = obj.axis_ranges
-        _ranges[0] = 2 * _ranges[0] - 5
-        _ranges_ref = self.get_dict("_axis_ranges")
-        for _dim in range(obj.ndim):
-            self.assertTrue(np.allclose(_ranges_ref[_dim], obj.axis_ranges[_dim]))
-
-    def test_set_axis_str_property(self):
-        obj = self.create_simple_dataset()
-        for _method_name in ["axis_labels", "axis_units"]:
-            with self.subTest(method=_method_name):
-                _newkeys = ["123", "456"]
-                setattr(obj, _method_name, _newkeys)
-                self.assertEqual(getattr(obj, _method_name), dict(enumerate(_newkeys)))
-
-    def test_set_axis_ranges_property__w_single_key(self):
-        obj = self.create_simple_dataset()
-        _newkeys = [123, [234, 456]]
-        obj.axis_ranges = _newkeys
-        for _dim, _val in obj.axis_ranges.items():
-            self.assertTrue(np.allclose(_val, np.asarray(_newkeys[_dim])))
-
-    def test_set_axis_ranges_property__w_none(self):
-        obj = Dataset(np.random.random((20, 20)), axis_ranges=[None, np.arange(20)])
-        self.assertFalse(None in obj.axis_ranges)
-
-    def test_set_axis_ranges_property__ndarrays_of_correct_len(self):
-        obj = self.create_simple_dataset()
-        _newkeys = [np.arange(_len) for _len in obj.shape]
-        obj.axis_ranges = _newkeys
-        self.assertEqual(obj.axis_ranges, dict(enumerate(_newkeys)))
-
-    def test_set_axis_ranges_property__lists_of_correct_len(self):
-        obj = self.create_simple_dataset()
-        _newkeys = [list(np.arange(_len)) for _len in obj.shape]
-        obj.axis_ranges = _newkeys
-        for _key, _range in obj.axis_ranges.items():
-            self.assertTrue(np.allclose(_range, np.asarray(_newkeys[_key])))
-
-    def test_set_axis_ranges_property__ndarrays_of_incorrect_len(self):
-        obj = self.create_simple_dataset()
-        _newkeys = [np.arange(_len + 2) for _len in obj.shape]
-        with self.assertRaises(ValueError):
-            obj.axis_ranges = _newkeys
-
-    def test_set_axis_ranges_property__lists_of_incorrect_len(self):
-        obj = self.create_simple_dataset()
-        _newkeys = [list(np.arange(_len + 2)) for _len in obj.shape]
-        with self.assertRaises(ValueError):
-            obj.axis_ranges = _newkeys
-
-    def test_metadata_property(self):
-        obj = self.create_simple_dataset()
-        self.assertEqual(obj.metadata, {})
-
-    def test_set_metadata_property(self):
-        obj = self.create_simple_dataset()
-        obj.metadata = None
-
-    def test_set_metadata_property_w_dict(self):
-        obj = self.create_simple_dataset()
-        _meta = {"key0": 123, "key1": -1, 0: "test"}
-        obj.metadata = _meta
-        self.assertEqual(obj.metadata, _meta)
-
-    def test_set_metadata_property_w_list(self):
-        obj = self.create_simple_dataset()
-        _meta = [1, 2, 4]
-        with self.assertRaises(TypeError):
-            obj.metadata = _meta
-
-    def test_array_property(self):
-        obj = self.create_simple_dataset()
-        self.assertIsInstance(obj.array, np.ndarray)
-
-    def test_update_axis_range__single_val(self):
-        _val = 12
-        obj = Dataset(np.random.random((10, 1, 10)))
-        obj.update_axis_range(1, _val)
-        self.assertEqual(obj.axis_ranges[1], _val)
-
-    def test_update_axis_range__correct_ndarray(self):
-        obj = self.create_large_dataset()
-        _val = np.arange(obj.shape[1])
-        obj.update_axis_range(1, _val)
-        self.assertTrue(np.allclose(obj.axis_ranges[1], _val))
-
-    def test_update_axis_range__incorrect_ndarray(self):
-        obj = self.create_large_dataset()
-        _val = np.arange(obj.shape[1] + 5)
-        with self.assertRaises(ValueError):
-            obj.update_axis_range(1, _val)
-
-    def test_update_axis_label__single_val(self):
-        _val = "a new label"
-        obj = self.create_large_dataset()
-        obj.update_axis_label(1, _val)
-        self.assertEqual(obj.axis_labels[1], _val)
-
-    def test_update_axis_label__w_none(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(TypeError):
-            obj.update_axis_label(1, None)
-
-    def test_update_axis_unit__single_val(self):
-        _val = "a new unit"
-        obj = self.create_large_dataset()
-        obj.update_axis_unit(1, _val)
-        self.assertEqual(obj.axis_units[1], _val)
-
-    def test_get_description_of_point__wrong_arg_len(self):
-        obj = self.create_large_dataset()
-        with self.assertRaises(ValueError):
-            obj.get_description_of_point((1, 2, 3, 4, 5, 6))
-
-    def test_get_description_of_point__simple(self):
-        obj = self.create_large_dataset()
-        _str = obj.get_description_of_point((1, 2, 3, 4))
-        self.assertEqual(_str, "a: 1.0000 ua; b: 2.0000 ub; c: 3.0000 uc; d: 4.0000 ud")
-
-    def test_get_description_of_point__wNone(self):
-        obj = self.create_large_dataset()
-        _str = obj.get_description_of_point((None, 2, None, 4))
-        self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
-
-    def test_dataset_creation(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        self.assertIsInstance(obj, Dataset)
-        self.assertTrue((obj.array == _array).all())
-
-    def test_dataset_creation_with_kwargs(self):
-        _array = np.random.random((10, 10))
-        obj = Dataset(
-            _array,
-            axis_labels=self._axis_labels,
-            axis_ranges=[np.arange(10), 10 - np.arange(10)],
-            axis_units=self._axis_units,
-            metadata={},
-        )
-        self.assertIsInstance(obj, Dataset)
-        self.assertIsInstance(obj.axis_labels, dict)
-        self.assertIsInstance(obj.axis_ranges, dict)
-        self.assertIsInstance(obj.axis_units, dict)
-        self.assertIsInstance(obj.metadata, dict)
-
-    def test_dataset_creation__with_axis_ranges_property_single_values(self):
-        _array = np.random.random((10, 10))
-        with self.assertRaises(PydidasConfigError):
-            Dataset(
-                _array,
-                axis_labels=self._axis_labels,
-                axis_ranges=[np.arange(10)],
-                axis_units=self._axis_units,
-                metadata={},
-            )
-
-    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_correct_len(self):
-        _array = np.random.random((10, 10))
-        obj = Dataset(
-            _array,
-            axis_labels=self._axis_labels,
-            axis_ranges=[np.arange(10), 10 - np.arange(10)],
-            axis_units=self._axis_units,
-            metadata={},
-        )
-        self.assertIsInstance(obj, Dataset)
-
-    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_incorrect_len(
-        self,
-    ):
-        _array = np.random.random((10, 10))
-        with self.assertRaises(ValueError):
-            Dataset(
-                _array,
-                axis_labels=self._axis_labels,
-                axis_ranges=[np.arange(12), 10 - np.arange(10)],
-                axis_units=self._axis_units,
-                metadata={},
-            )
-
-    def test_repr__dataset(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        self.assertIsInstance(obj.__repr__(), str)
-
-    def test_repr__empty_dataset(self):
-        obj = Dataset((10, 10, 10))
-        self.assertIsInstance(obj.__repr__(), str)
-
-    def test_str__(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        self.assertIsInstance(str(obj), str)
-
-    def test_reduce(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        _array_reduce = _array.__reduce__()
-        _obj_reduce = obj.__reduce__()
-        self.assertEqual(_array_reduce[0], _obj_reduce[0])
-        self.assertIsInstance(_obj_reduce[2][-1], dict)
-        for index, item in enumerate(_array_reduce[2]):
-            self.assertEqual(_obj_reduce[2][index], item)
-
-    def test_setstate(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        _obj_state = obj.__reduce__()[2]
-        new_obj = Dataset(1)
-        new_obj.__setstate__(_obj_state)
-        for key in obj.__dict__:
-            self.assertEqual(obj.__dict__[key], new_obj.__dict__[key])
-        self.assertTrue((new_obj.array == obj.array).all())
-
-    def test_np_amax__simple(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        _max = np.amax(obj)
-        self.assertIsInstance(_max, Real)
-
-    def test_np_amax__with_metadata(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        obj.metadata = {"test": "something"}
-        _max = np.amax(obj)
-        self.assertIsInstance(_max, Real)
-
-    def test_np_amax__with_axis_with_metadata(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array)
-        obj.metadata = {"test": "something"}
-        _max = np.amax(obj, axis=0)
-        self.assertIsInstance(_max, Dataset)
-        self.assertEqual(_max.shape, obj.shape[1:])
-
-    def test_np_array__with_ndmin(self):
-        obj = self.create_large_dataset()
-        _new = np.array(obj, copy=None, subok=True, ndmin=obj.ndim + 2)
-        for _dim in range(obj.ndim):
-            self.assertEqual(_new.shape[2 + _dim], obj.shape[_dim])
-            self.assertEqual(_new.axis_labels[2 + _dim], obj.axis_labels[_dim])
-            self.assertEqual(_new.axis_units[2 + _dim], obj.axis_units[_dim])
-            self.assertTrue(
-                np.allclose(_new.axis_ranges[2 + _dim], obj.axis_ranges[_dim])
-            )
-
-    def test_copy_dataset(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(_array, axis_ranges=self._3x10_axis_ranges)
-        obj.metadata = {"test": "something"}
-        obj2 = copy.copy(obj)
-        for _key, _item in obj2.__dict__.items():
-            _target = getattr(obj, _key)
-            if isinstance(_item, dict):
-                for _local_key, _local_item in _item.items():
-                    self.assertEqual(_local_item, _target[_local_key])
-            else:
-                self.assertEqual(_item, _target)
-
-    def test_copy_dataset__update_ax_label(self):
-        _array = np.random.random((10, 10, 10))
-        obj = Dataset(
-            _array, axis_ranges=self._3x10_axis_ranges, axis_labels=["a", "b", "c"]
-        )
-        obj2 = obj.copy()
-        obj2.update_axis_label(2, "new")
-        self.assertEqual(obj.axis_labels[2], "c")
-
-    def test_hash(self):
-        _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
-        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
-        obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
-        self.assertIsInstance(hash(obj), int)
-        self.assertNotEqual(hash(obj), hash(obj2))
-
-    def test_data_description__no_data_unit(self):
-        _test_label = "Spam, eggs, sausage and spam"
-        obj = self.create_simple_dataset()
-        obj.data_label = _test_label
-        self.assertEqual(obj.data_description, _test_label)
-
-    def test_data_description__w_data_unit(self):
-        _test_label = "Spam, eggs, sausage and spam"
-        _test_unit = "more spam"
-        obj = self.create_simple_dataset()
-        obj.data_label = _test_label
-        obj.data_unit = _test_unit
-        self.assertEqual(obj.data_description, f"{_test_label} / {_test_unit}")
-
-    def test_get_data_description__no_unit(self):
-        obj = self.create_simple_dataset()
-        for _char in ["/", "_", "(", "["]:
-            with self.subTest(sep=_char):
-                _str = obj.get_data_description(sep=_char)
-                self.assertEqual(_str, obj.data_label)
-
-    def test_get_data_description__w_unit(self):
-        obj = self.create_simple_dataset()
-        obj.data_unit = "Tm"
-        for _char in ["/", "_", "(", "["]:
-            with self.subTest(sep=_char):
-                _str = obj.get_data_description(sep=_char)
-                _label, _unit = _str.split(_char, 1)
-                _unit = _unit.strip(" )]")
-                self.assertEqual(_label.strip(), obj.data_label)
-                self.assertEqual(_unit.strip(), obj.data_unit)
-
-    def test_get_axis_description__no_unit(self):
-        obj = self.create_simple_dataset()
-        for index in range(2):
-            for _char in ["/", "_", "(", "["]:
-                with self.subTest(index=index, sep=_char):
-                    obj.update_axis_unit(index, "")
-                    _ax_str = obj.get_axis_description(index, sep=_char)
-                    self.assertEqual(_ax_str, self._axis_labels[index])
-
-    def test_get_axis_description__w_unit(self):
-        obj = self.create_simple_dataset()
-        for index in range(2):
-            for _char in ["/", "_", "(", "["]:
-                with self.subTest(index=index, sep=_char):
-                    _ax_str = obj.get_axis_description(index, sep=_char)
-                    _label, _unit = _ax_str.split(_char, 1)
-                    _unit = _unit.strip(" )]")
-                    self.assertEqual(_label.strip(), self._axis_labels[index])
-                    self.assertEqual(_unit.strip(), self._axis_units[index])
-
-    def test_np_reimplementation__invalid_kwargs(self):
-        for _method_name in _IMPLEMENTED_METHODS:
-            with self.subTest(method=_method_name):
-                obj = self.create_large_dataset()
-                _method = getattr(obj, _method_name)
-                with self.assertRaises(TypeError):
-                    _method(wrong_key=True)
-
-    def test_np_reimplementation__full(self):
-        for _method_name in _IMPLEMENTED_METHODS:
-            with self.subTest(method=_method_name):
-                obj = self.create_large_dataset()
-                _method = getattr(obj, _method_name)
-                _val = _method()
-                _ref = getattr(obj.array, _method_name)()
-                self.assertEqual(_val, _ref)
-
-    def test_np_reimplementation__none_axis(self):
-        for _method_name in _IMPLEMENTED_METHODS:
-            with self.subTest(method=_method_name):
-                obj = self.create_large_dataset()
-                _method = getattr(obj, _method_name)
-                _val = _method(axis=None)
-                _ref = getattr(obj.array, _method_name)(axis=None)
-                self.assertEqual(_val, _ref)
-
-    def test_np_reimplementation__all_axes(self):
-        for _method_name in _IMPLEMENTED_METHODS:
-            with self.subTest(method=_method_name):
-                obj = self.create_large_dataset()
-                _method = getattr(obj, _method_name)
-                _val = _method(axis=(0, 1, 2, 3))
-                _ref = getattr(obj.array, _method_name)(axis=(0, 1, 2, 3))
-                self.assertEqual(_val, _ref)
-
-    def test_mean__simple(self):
-        obj = self.create_large_dataset()
-        for _ax in _AXIS_SLICES:
-            for _method, _mean in [
-                ("Dataset.mean", obj.mean(axis=_ax)),
-                ("np.mean(Dataset)", np.mean(obj, axis=_ax)),
-            ]:
-                with self.subTest(axis=_ax, method=_method):
-                    _ax_tuple = self.ax_tuple(obj, _ax)
-                    self.assertTrue(np.allclose(_mean, obj.array.mean(axis=_ax)))
-                    self.__assert_new_metadata_correct(_mean, _ax_tuple, "mean")
-
-    def test_sum__simple(self):
-        obj = self.create_large_dataset()
-        for _ax in _AXIS_SLICES:
-            for _method, _sum in [
-                ("Dataset.sum", obj.sum(axis=_ax)),
-                ("np.sum(Dataset)", np.sum(obj, axis=_ax)),
-            ]:
-                with self.subTest(axis=_ax, method=_method):
-                    _ax_tuple = self.ax_tuple(obj, _ax)
-                    self.assertTrue(np.allclose(_sum, obj.array.sum(axis=_ax)))
-                    self.__assert_new_metadata_correct(_sum, _ax_tuple, "sum")
-
-    def test_np_reimplementation__w_out_ndarray(self):
-        obj = self.create_large_dataset()
-        for _method_name in ["max", "mean", "sum"]:
-            for _ax in _AXIS_SLICES:
-                _ax_tuple = self.ax_tuple(obj, _ax)
-                _new_shape = tuple(
-                    n for i, n in enumerate(obj.shape) if i not in _ax_tuple
-                )
-                _out = np.zeros(_new_shape)
-                with self.subTest(method=_method_name, axis=_ax):
-                    _method = getattr(obj, _method_name)
-                    _ = _method(axis=_ax, out=_out)
-                    _ref = getattr(obj.array, _method_name)(axis=_ax)
-                    self.assertTrue(np.allclose(_out, _ref))
-
-    def test_np_reimplementation__w_out_dataset(self):
-        obj = self.create_large_dataset()
-        for _method_name in _IMPLEMENTED_METHODS:
-            for _ax in _AXIS_SLICES:
-                _ax_tuple = self.ax_tuple(obj, _ax)
-                _new_shape = tuple(
-                    n for i, n in enumerate(obj.shape) if i not in _ax_tuple
-                )
-                with self.subTest(method=_method_name, axis=_ax):
-                    _out = Dataset(np.zeros(_new_shape))
-                    _method = getattr(obj, _method_name)
-                    _ = _method(axis=_ax, out=_out)
-                    _ref = getattr(obj.array, _method_name)(axis=_ax)
-                    self.assertTrue(np.allclose(_out, _ref))
-                    self.__assert_new_metadata_correct(_out, _ax_tuple, _method_name)
-
-    def test_np_reimplementation__all_w_dtype(self):
-        obj = self.create_large_dataset()
-        for _method_name in _IMPLEMENTED_METHODS:
-            if _method_name in _METHOD_TAKES_NO_DTYPE:
-                continue
-            with self.subTest(method=_method_name):
-                _method = getattr(obj, _method_name)
-                _result = _method(dtype=np.float32)
-                _ref = getattr(obj.array, _method_name)(dtype=np.float32)
-                self.assertEqual(_result, _ref)
-                self.assertEqual(_result.dtype, np.float32)
-
-    def test_np_reimplementation__w_axis_w_dtype(self):
-        obj = self.create_large_dataset()
-        for _method_name in _IMPLEMENTED_METHODS:
-            if _method_name in _METHOD_TAKES_NO_DTYPE:
-                continue
-            for _ax in _AXIS_SLICES:
-                _ax_tuple = self.ax_tuple(obj, _ax)
-                with self.subTest(method=_method_name, axis=_ax):
-                    _method = getattr(obj, _method_name)
-                    _result = _method(axis=_ax, dtype=np.float32)
-                    _ref = getattr(obj.array, _method_name)(axis=_ax, dtype=np.float32)
-                    self.assertTrue(np.allclose(_result, _ref))
-                    self.__assert_new_metadata_correct(_result, _ax_tuple, _method_name)
-                    self.assertEqual(_result.dtype, np.float32)
-
-    def test_np_reimplementation__w_keepdims(self):
-        obj = self.create_large_dataset()
-        for _ax in _AXIS_SLICES:
-            _ax_tuple = self.ax_tuple(obj, _ax)
-            for _method_name in _IMPLEMENTED_METHODS:
-                with self.subTest(method=_method_name, axis=_ax):
-                    _method = getattr(obj, _method_name)
-                    _result = _method(axis=_ax, keepdims=True)
-                    _ref = getattr(obj.array, _method_name)(axis=_ax, keepdims=True)
-                    self.assertEqual(
-                        list(_result.shape),
-                        [1 if i in _ax_tuple else n for i, n in enumerate(obj.shape)],
-                    )
-                    self.assertTrue(np.allclose(_result, _ref))
-                    self.__assert_new_metadata_correct(_result, [], _method_name)
-
-    def test_np_reimplementation__w_where(self):
-        obj = self.create_large_dataset()
-        _mask = np.ones(obj.shape, dtype=bool)
-        _mask[obj.shape[0] // 2 :] = False
-        for _ax in _AXIS_SLICES:
-            _ax_tuple = self.ax_tuple(obj, _ax)
-            for _method_name in _IMPLEMENTED_METHODS:
-                with self.subTest(method=_method_name, axis=_ax):
-                    _method = getattr(obj, _method_name)
-                    if _method_name in _METHOD_REQUIRES_INITIAL:
-                        _result = _method(axis=_ax, where=_mask, initial=0)
-                        _ref = getattr(obj.array, _method_name)(
-                            axis=_ax, where=_mask, initial=0
-                        )
-                    else:
-                        _result = _method(axis=_ax, where=_mask)
-                        _ref = getattr(obj.array, _method_name)(axis=_ax, where=_mask)
-                    self.assertTrue(
-                        np.allclose(
-                            _result[~np.isnan(_result)], _ref[~np.isnan(_result)]
-                        )
-                    )
-                    self.__assert_new_metadata_correct(_result, _ax_tuple, _method_name)
-
-    def __assert_new_metadata_correct(self, new_array, slicing_axes, function_name):
-        self.assertEqual(
-            new_array.data_label,
-            f"{function_name.capitalize()} of " + self._dset["data_label"],
-        )
-        self.assertEqual(new_array.data_unit, self._dset["data_unit"])
-        for _key in ["axis_labels", "axis_units"]:
-            _ref = [
-                _item
-                for _i, _item in enumerate(self._dset[_key[5:]])
-                if _i not in slicing_axes
-            ]
-            self.assertEqual(_ref, list(getattr(new_array, _key).values()))
-        _ref_ranges = [
-            _range
-            for _i, _range in enumerate(self._dset["ranges"])
+_METHODS_WITH_DTYPE = [
+    _method for _method in _IMPLEMENTED_METHODS if _method not in _METHOD_TAKES_NO_DTYPE
+]
+_SEPARATORS = ["/", "_", "(", "["]
+
+_SIMPLE_DSET = {
+    "labels": ["axis0", "axis1"],
+    "ranges": [1, [5, 10]],
+    "units": {0: "m", 1: "rad"},
+}
+_LARGE_DSET = {
+    "shape": (10, 12, 14, 16),
+    "labels": ["a", "b", "c", "d"],
+    "ranges": [np.arange(10), np.arange(12), np.arange(14), np.arange(16)],
+    "units": ["ua", "ub", "uc", "ud"],
+    "data_label": "data label",
+    "data_unit": "data unit",
+}
+_3X10_AXIS_RANGES = [np.arange(10), 10 - np.arange(10), 3 * np.arange(10)]
+
+
+def create_simple_dataset() -> Dataset:
+    """Create a 1x2 Dataset with simple metadata."""
+    return Dataset(
+        [[10, 10]],
+        axis_labels=_SIMPLE_DSET["labels"],
+        axis_ranges=_SIMPLE_DSET["ranges"],
+        axis_units=_SIMPLE_DSET["units"],
+        metadata={},
+    )
+
+
+def create_large_dataset() -> Dataset:
+    """Create a 4-dimensional Dataset with full metadata."""
+    return Dataset(
+        np.random.random(_LARGE_DSET["shape"]),
+        axis_labels=_LARGE_DSET["labels"],
+        axis_ranges=_LARGE_DSET["ranges"],
+        axis_units=_LARGE_DSET["units"],
+        data_label=_LARGE_DSET["data_label"],
+        data_unit=_LARGE_DSET["data_unit"],
+        metadata={},
+    )
+
+
+def get_random_dataset(ndim: int, shape: tuple[int, ...] | None = None) -> Dataset:
+    """Create a Dataset with random data and random axis ranges."""
+    if shape is None:
+        shape = np.arange(ndim) + 6
+    return Dataset(
+        _np_random_generator.random(shape),
+        axis_labels=[str(i) for i in range(ndim)],
+        axis_units=[chr(97 + i) for i in range(ndim)],
+        axis_ranges=[
+            _np_random_generator.integers(-10, 10)
+            + (0.1 + _np_random_generator.random()) * np.arange(shape[_dim])
+            for _dim in range(ndim)
+        ],
+    )
+
+
+def get_large_dset_prop(key: str, indices: tuple[int, ...]) -> list[Any]:
+    """Get the selected entries of the large dataset reference property."""
+    key = key.removeprefix("axis_")
+    return [item for i, item in enumerate(_LARGE_DSET[key]) if i in indices]
+
+
+def ax_tuple(obj: Dataset, axes: int | tuple[int, ...]) -> tuple[int, ...]:
+    """Get the positive axis indices for the given axes."""
+    return tuple(
+        np.mod(_x, obj.ndim) for _x in (axes if isinstance(axes, tuple) else (axes,))
+    )
+
+
+def as_dict(item: dict | list) -> dict:
+    """Convert an iterable of properties to a dict with the dimensions as keys."""
+    if isinstance(item, dict):
+        return item
+    return dict(enumerate(item))
+
+
+def assert_new_metadata_correct(
+    new_array: Dataset, slicing_axes: tuple[int, ...] | list, function_name: str
+):
+    """Assert that the metadata of a reduced large dataset is correct."""
+    assert new_array.data_label == (
+        f"{function_name.capitalize()} of " + _LARGE_DSET["data_label"]
+    )
+    assert new_array.data_unit == _LARGE_DSET["data_unit"]
+    for _key in ["axis_labels", "axis_units"]:
+        _ref = [
+            _item
+            for _i, _item in enumerate(_LARGE_DSET[_key[5:]])
             if _i not in slicing_axes
         ]
-        _new_ranges = list(new_array.axis_ranges.values())
-        for _ref, _new in zip(_ref_ranges, _new_ranges):
-            self.assertTrue(np.allclose(_ref, _new))
+        assert _ref == list(getattr(new_array, _key).values())
+    _ref_ranges = [
+        _range
+        for _i, _range in enumerate(_LARGE_DSET["ranges"])
+        if _i not in slicing_axes
+    ]
+    for _ref, _new in zip(_ref_ranges, list(new_array.axis_ranges.values())):
+        assert np.allclose(_ref, _new)
 
-    def test_nanmean(self):
-        obj = self.create_large_dataset()
-        obj[0, 0, :, 0] = np.nan
-        for _ax in _AXIS_SLICES:
-            _ax_tuple = self.ax_tuple(obj, _ax)
-            with self.subTest(axis=_ax):
-                _result = np.nanmean(obj, axis=_ax)
-                self.__assert_new_metadata_correct(_result, _ax_tuple, "sum")
 
-    def test_reshape__syntax(self):
-        obj = self.create_large_dataset()
-        _shape = (5, 2, 6, 2, 14, 16)
-        for _type in ("tuple", "ints"):
-            with self.subTest(type=_type):
-                if _type == "ints":
-                    new = obj.reshape(*_shape)
-                elif _type == "tuple":
-                    new = obj.reshape(_shape)
-                self.assertEqual(new.shape, _shape)
+def assert_reshape_metadata_correct(obj: Dataset):
+    """Assert that the metadata of a reshaped large dataset is correct."""
+    _dim_matches = get_corresponding_dims(_LARGE_DSET["shape"], obj.shape)
+    for _index, _len in enumerate(obj.shape):
+        if _index in _dim_matches:
+            _original_index = _dim_matches[_index]
+            assert obj.axis_labels[_index] == _LARGE_DSET["labels"][_original_index]
+            assert obj.axis_units[_index] == _LARGE_DSET["units"][_original_index]
+            assert np.allclose(
+                obj.axis_ranges[_index], _LARGE_DSET["ranges"][_original_index]
+            )
+        else:
+            assert obj.axis_labels[_index] == ""
+            assert obj.axis_units[_index] == ""
+            assert np.allclose(obj.axis_ranges[_index], np.arange(_len))
 
-    def test_shape__setter(self):
-        obj = self.create_large_dataset()
-        _shape = (5, 2, 6, 2, 14, 16)
-        obj.shape = _shape
-        self.assertEqual(obj.shape, _shape)
 
-    def test_reshape__syntax_flat(self):
-        obj = self.create_large_dataset()
-        new = obj.reshape(obj.size)
-        self.assertEqual(new.shape, (obj.size,))
+@pytest.fixture
+def simple_dataset() -> Dataset:
+    return create_simple_dataset()
 
-    def test_reshape__simple(self):
-        for i0, i1 in [(0, 1), (1, 2), (2, 3)]:
-            with self.subTest(axes=(i0, i1)):
-                obj = self.create_large_dataset()
-                _new_shape = tuple(
-                    (n if i not in [i0, i1] else n * obj.shape[i1])
-                    for i, n in enumerate(obj.shape)
-                    if i != i1
-                )
-                obj.shape = _new_shape
-                self.assertEqual(obj.shape, _new_shape)
-                self.__check_reshape_metadata(obj)
 
-    def test_reshape__shape_inversion(self):
-        obj = self.create_large_dataset()
-        _new_shape = obj.shape[::-1]
-        obj.shape = _new_shape
-        self.assertEqual(obj.shape, _new_shape)
-        self.__check_reshape_metadata(obj)
+@pytest.fixture
+def large_dataset() -> Dataset:
+    return create_large_dataset()
 
-    def test_reshape_0d(self):
-        obj = Dataset(0)
-        new = obj.reshape(1)
-        self.assertEqual(new.shape, (1,))
 
-    def test_reshape__complex(self):
-        for _new_shape in [
-            (5, 2, 6, 2, 14, 16),
-            (5, 2, 6, 2, 14, 16),
-            (2, 5, 6, 2, 7, 2, 4, 4),
-            (10, 7, 12, 2, 16),
-            (10, 12, 7, 16, 2),
-        ]:
-            with self.subTest(shape=_new_shape):
-                obj = self.create_large_dataset()
-                obj.shape = _new_shape
-                self.assertEqual(obj.shape, _new_shape)
-                self.__check_reshape_metadata(obj)
+@pytest.mark.parametrize(
+    "ds_slice, key_slices, range_slices",
+    [
+        (0, (1, 2, 3), {}),
+        ((slice(None, None), 0), (0, 2, 3), {}),
+        ((slice(None, None), 7, 6), (0, 3), {}),
+        (slice(1, 4), (0, 1, 2, 3), {0: slice(1, 4)}),
+        (np.arange(1, 4), (0, 1, 2, 3), {0: slice(1, 4)}),
+    ],
+)
+def test_array_finalize__simple_indexing(
+    large_dataset, ds_slice, key_slices, range_slices
+):
+    _new = large_dataset[ds_slice]
+    for _key in ["axis_labels", "axis_units"]:
+        assert list(getattr(_new, _key).values()) == get_large_dset_prop(
+            _key, key_slices
+        )
+    for _new_dim, _original_dim in enumerate(key_slices):
+        _new_range = _new.axis_ranges[_new_dim]
+        _original_range = _LARGE_DSET["ranges"][_original_dim]
+        if _original_dim in range_slices:
+            _original_range = _original_range[range_slices[_original_dim]]
+        assert np.allclose(_new_range, _original_range)
 
-    def test_reshape_w_neg_index(self):
-        obj = self.create_large_dataset()
-        for _dim in range(len(obj.shape)):
-            _new_shape = list(obj.shape)
-            _new_shape[_dim] = -1
-            obj.shape = _new_shape
-            self.assertEqual(obj.shape, self._dset["shape"])
-            self.__check_reshape_metadata(obj)
 
-    def test_reshape_w_neg_index__and_reshape(self):
-        for _new_shape in [
-            (5, 2, 6, 2, 14, -1),
-            (5, 2, 6, -1, 14, 16),
-            (2, 5, 6, 2, -1, 2, 4, 4),
-            (10, 7, -1, 2, 16),
-            (-1, 12, 7, 16, 2),
-        ]:
-            with self.subTest(shape=_new_shape):
-                obj = self.create_large_dataset()
-                obj.shape = _new_shape
-                _new_dim = obj.size // np.cumprod([n for n in obj.shape if n != -1])
-                _new_final_shape = tuple(
-                    (n if n != -1 else _new_dim) for n in obj.shape
-                )
-                self.assertEqual(obj.shape, _new_final_shape)
-                self.__check_reshape_metadata(obj)
+def test_array_finalize__add_dimension(large_dataset):
+    _new = large_dataset[None, :]
+    assert list(_new.axis_labels.values()) == [""] + _LARGE_DSET["labels"]
+    assert list(_new.axis_units.values()) == [""] + _LARGE_DSET["units"]
+    for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+        if _dim == 0:
+            assert np.allclose(_new_range, np.arange(_new.shape[0]))
+        else:
+            assert np.allclose(_new_range, _LARGE_DSET["ranges"][_dim - 1])
 
-    def test_reshape__insert_dim(self):
-        obj = self.create_large_dataset()
-        _new_shape = (obj.shape[0], 1, 1, *obj.shape[1:])
-        obj.shape = _new_shape
-        self.assertEqual(obj.shape, _new_shape)
-        self.__check_reshape_metadata(obj)
 
-    def __check_reshape_metadata(self, obj):
-        _dim_matches = get_corresponding_dims(self._dset["shape"], obj.shape)
-        for _index, _len in enumerate(obj.shape):
-            if _index in _dim_matches:
-                _original_index = _dim_matches[_index]
-                self.assertEqual(
-                    obj.axis_labels[_index], self._dset["labels"][_original_index]
-                )
-                self.assertEqual(
-                    obj.axis_units[_index], self._dset["units"][_original_index]
-                )
-                self.assertTrue(
-                    np.allclose(
-                        obj.axis_ranges[_index], self._dset["ranges"][_original_index]
-                    )
-                )
-            else:
-                self.assertEqual(obj.axis_labels[_index], "")
-                self.assertEqual(obj.axis_units[_index], "")
-                self.assertTrue(np.allclose(obj.axis_ranges[_index], np.arange(_len)))
+def test_array_finalize__add_dimension_in_middle(large_dataset):
+    _new = large_dataset[:, None, :]
+    assert list(_new.axis_labels.values()) == (
+        [_LARGE_DSET["labels"][0]] + [""] + _LARGE_DSET["labels"][1:]
+    )
+    assert list(_new.axis_units.values()) == (
+        [_LARGE_DSET["units"][0]] + [""] + _LARGE_DSET["units"][1:]
+    )
 
-    def test_reshape__1d_insert_dim(self):
-        obj = self.get_random_dataset(1)
-        _new = obj.reshape(-1, obj.size)
-        self.assertEqual(_new.shape, (1, obj.size))
 
-    def test_reshape_1d(self):
-        obj = self.get_random_dataset(1)
-        _axlabel = obj.axis_labels[0]
-        _axunit = obj.axis_units[0]
-        _axrange = obj.axis_ranges[0]
-        _new_shape = (1, obj.size)
-        obj.shape = _new_shape
-        self.assertEqual(obj.shape, _new_shape)
-        self.assertEqual(obj.axis_labels, {0: "", 1: _axlabel})
-        self.assertEqual(obj.axis_units, {0: "", 1: _axunit})
-        self.assertTrue(np.allclose(obj.axis_ranges[0], np.arange(1)))
-        self.assertTrue(np.allclose(obj.axis_ranges[1], _axrange))
+def test_array_finalize__with_array_mask(large_dataset):
+    _mask = np.zeros(large_dataset.shape)
+    large_dataset[_mask == 0] = 1
+    assert (large_dataset == 1).all()
 
-    def test_repeat(self):
-        obj = self.get_random_dataset(4)
-        for _ax in range(obj.ndim):
-            with self.subTest(axis=_ax):
-                _new = obj.repeat(repeats=3, axis=_ax)
-                for _dim in range(obj.ndim):
-                    if _dim == _ax:
-                        self.assertEqual(_new.shape[_dim], obj.shape[_dim] * 3)
-                    else:
-                        self.assertEqual(_new.shape[_dim], obj.shape[_dim])
-                self.assertEqual(_new.axis_labels, obj.axis_labels)
-                self.assertEqual(_new.axis_units, obj.axis_units)
 
-    def test_repeat__axis_None(self):
-        obj = self.get_random_dataset(4)
-        _new = obj.repeat(repeats=3, axis=None)
-        self.assertEqual(_new.shape, (obj.size * 3,))
-        for _iter in [0, 1, 2]:
-            self.assertTrue(np.allclose(obj.flatten(), _new.reshape(-1, 3)[:, _iter]))
+def test_array_finalize__get_full_masked(large_dataset):
+    _mask = np.zeros(large_dataset.shape)
+    _new = large_dataset[_mask == 0]
+    assert np.allclose(large_dataset.flatten(), _new)
 
-    def test_np_array__simple(self):
-        obj = self.get_random_dataset(1)
-        _new = np.array(obj)
-        self.assertTrue(np.allclose(obj, _new))
-        self.assertIsInstance(_new, np.ndarray)
 
-    def test_np_array__w_subok(self):
-        obj = self.get_random_dataset(3)
-        _new = np.array(obj, subok=True)
-        self.assertTrue(np.allclose(obj, _new))
-        self.assertIsInstance(_new, Dataset)
+def test_array_finalize__get_masked(large_dataset):
+    _mask = np.zeros(large_dataset.shape)
+    _mask[1, 1, 1, 1] = 1
+    _mask[2, 2, 2, 2] = 1
+    _new = large_dataset[_mask == 1]
+    _ref = [large_dataset[1, 1, 1, 1], large_dataset[2, 2, 2, 2]]
+    assert np.allclose(_ref, _new)
+    assert _new.axis_ranges[0].size == 2
 
-    def test_np_array__w_subok_ndmin(self):
-        obj = self.get_random_dataset(1)
-        _new = np.array(obj, subok=True, ndmin=4)
-        self.assertTrue(np.allclose(obj, _new))
-        self.assertIsInstance(_new, Dataset)
 
-    def test_np_tile(self):
-        obj = self.get_random_dataset(2)
-        _new = np.tile(obj, (1, 2, 3))
-        self.assertIsInstance(_new, Dataset)
+def test_array_finalize__get_masked_1d():
+    _slice = slice(12, 18)
+    obj = create_dataset(1, float, shape=(42,))
+    _mask = np.zeros(obj.shape)
+    _mask[_slice] = 1
+    _new = obj[_mask == 1]
+    assert np.allclose(obj[_slice], _new)
+    assert _new.axis_ranges[0].size == 6
 
-    def test_argsort(self):
-        for _dim in range(1, 6):
-            with self.subTest(dim=_dim):
-                obj = self.get_random_dataset(_dim)
-                _indices = obj.argsort()
-                self.assertIsInstance(_indices, np.ndarray)
-                self.assertNotIsInstance(_indices, Dataset)
-                self.assertEqual(_indices.shape, obj.shape)
 
-    def test_sort__1d_np_sort(self):
-        obj = self.get_random_dataset(1, shape=(50,))
-        _indices = obj.argsort()
-        _range = obj.axis_ranges[0]
-        _new = np.sort(obj)
-        self.assertTrue(np.allclose(obj[_indices], _new))
-        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
+def test_new__from_array():
+    _ndarray = np.random.random((10, 12))
+    obj = Dataset(_ndarray)
+    assert id(_ndarray) != id(obj)
+    assert id(_ndarray) != id(obj.base)
 
-    def test_sort__1d_None_ax(self):
-        obj = self.get_random_dataset(1, shape=(50,))
-        _indices = obj.argsort()
-        _range = obj.axis_ranges[0]
-        _new = np.sort(obj, axis=None)
-        self.assertTrue(np.allclose(obj[_indices], _new))
-        self.assertTrue(np.allclose(_new.axis_ranges[0], _range[_indices]))
 
-    def test_sort__1d_self_sort(self):
-        obj = self.get_random_dataset(1, shape=(50,))
-        _range = obj.axis_ranges[0]
-        _indices = obj.argsort()
+def test_new__assure_memory_not_shared():
+    _ndarray = np.random.random((10, 12))
+    obj = Dataset(_ndarray)
+    _ndarray[0, 0] = 42
+    assert obj[0, 0] <= 1
+
+
+def test_view__assure_memory_shared_in_view():
+    obj = Dataset(np.random.random((10, 12)))
+    _view = obj[0]
+    _view[0] = 42
+    assert obj[0, 0] == 42
+
+
+@pytest.mark.parametrize("base", [[1, 4, 42], (0.5, 7, 1.2)])
+def test_new__from_iterable(base):
+    obj = Dataset(base)
+    for _index, _item in enumerate(base):
+        assert obj[_index] == _item
+
+
+def test_new__from_scalar():
+    _val = 42.0
+    obj = Dataset(_val)
+    assert obj.shape == ()
+    assert obj[()] == _val
+
+
+def test_get_rebinned_copy__bin2(large_dataset):
+    _new = large_dataset.get_rebinned_copy(2)
+    assert isinstance(_new, Dataset)
+    assert id(large_dataset) != id(_new)
+    assert tuple(_s // 2 for _s in _LARGE_DSET["shape"]) == _new.shape
+
+
+def test_get_rebinned_copy__bin1(large_dataset):
+    _new = large_dataset.get_rebinned_copy(1)
+    assert isinstance(_new, Dataset)
+    assert id(large_dataset) != id(_new)
+    assert large_dataset.shape == _new.shape
+
+
+def test_T(large_dataset):
+    _new = large_dataset.T
+    assert _new.shape == tuple(reversed(large_dataset.shape))
+    for _dim, _new_range in _new.axis_ranges.items():
+        assert np.allclose(
+            _new_range, large_dataset.axis_ranges[large_dataset.ndim - 1 - _dim]
+        )
+
+
+def test_property_dict(large_dataset):
+    _obj_props = large_dataset.property_dict
+    _copy = large_dataset.property_dict
+    _copy["data_unit"] = "42 space"
+    assert _obj_props["data_unit"] == large_dataset.data_unit
+    assert _copy["data_unit"] != large_dataset.data_unit
+
+
+def test_flatten(large_dataset):
+    _new = large_dataset.flatten()
+    assert _new.shape == (large_dataset.size,)
+    assert _new.axis_labels == {0: "Flattened"}
+    assert _new.axis_units == {0: ""}
+    assert np.equal(_new.axis_ranges[0], np.arange(_new.size)).all()
+
+
+def test_flatten_dims__simple(large_dataset):
+    _dims = (1, 2)
+    large_dataset.flatten_dims(*_dims)
+    assert large_dataset.ndim == len(_LARGE_DSET["shape"]) - 1
+    assert large_dataset.axis_labels[_dims[0]] == "Flattened"
+    assert large_dataset.axis_units[_dims[0]] == ""
+    assert np.allclose(
+        large_dataset.axis_ranges[_dims[0]], np.arange(large_dataset.shape[1])
+    )
+
+
+def test_flatten_dims__1dim_only(large_dataset):
+    obj2 = copy.copy(large_dataset)
+    obj2.flatten_dims(1)
+    assert np.equal(large_dataset, obj2).all()
+
+
+def test_flatten_dims__distributed_dims(large_dataset):
+    with pytest.raises(ValueError):
+        large_dataset.flatten_dims(1, 3)
+
+
+def test_flatten_dims__new_label(large_dataset):
+    _dims = (1, 2)
+    _new_label = "new label"
+    large_dataset.flatten_dims(*_dims, new_dim_label=_new_label)
+    _labels = [
+        _label for _i, _label in enumerate(_LARGE_DSET["labels"]) if _i not in _dims
+    ]
+    _labels.insert(_dims[0], _new_label)
+    assert list(large_dataset.axis_labels.values()) == _labels
+
+
+def test_flatten_dims__new_unit(large_dataset):
+    _dims = (1, 2)
+    _new_unit = "new unit"
+    large_dataset.flatten_dims(*_dims, new_dim_unit=_new_unit)
+    _units = [_unit for _i, _unit in enumerate(_LARGE_DSET["units"]) if _i not in _dims]
+    _units.insert(_dims[0], _new_unit)
+    assert list(large_dataset.axis_units.values()) == _units
+
+
+def test_flatten_dims__new_range(large_dataset):
+    _dims = (1, 2)
+    _new_range = np.arange(
+        _LARGE_DSET["shape"][_dims[0]] * _LARGE_DSET["shape"][_dims[1]]
+    )
+    large_dataset.flatten_dims(*_dims, new_dim_range=_new_range)
+    assert np.equal(large_dataset.axis_ranges[_dims[0]], _new_range).all()
+
+
+def test__comparison_with_allclose(large_dataset):
+    _new = np.zeros(large_dataset.shape)
+    assert not np.allclose(large_dataset, _new)
+
+
+def test_array_finalize__multiple_ops(large_dataset):
+    _ = large_dataset[0, 0]
+    _ = large_dataset[0]
+    _new = large_dataset[:, 2]
+    assert list(_new.axis_labels.values()) == get_large_dset_prop(
+        "axis_labels", (0, 2, 3)
+    )
+    assert list(_new.axis_units.values()) == get_large_dset_prop(
+        "axis_units", (0, 2, 3)
+    )
+    for _new_dim, _original_dim in enumerate((0, 2, 3)):
+        assert np.allclose(
+            _new.axis_ranges[_new_dim], _LARGE_DSET["ranges"][_original_dim]
+        )
+
+
+def test_array_finalize__multiple_slicing(large_dataset):
+    _new = large_dataset[:, 3:7, 5:10]
+    assert list(_new.axis_labels.values()) == _LARGE_DSET["labels"]
+    assert list(_new.axis_units.values()) == _LARGE_DSET["units"]
+    for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+        if _dim == 1:
+            assert np.allclose(_new_range, _LARGE_DSET["ranges"][1][3:7])
+        elif _dim == 2:
+            assert np.allclose(_new_range, _LARGE_DSET["ranges"][2][5:10])
+        else:
+            assert np.allclose(_new_range, _LARGE_DSET["ranges"][_dim])
+
+
+def test_array_finalize__reordering():
+    obj = get_random_dataset(1)
+    _slicer = np.arange(obj.shape[0] - 1, -1, -1)
+    _new = obj[_slicer]
+    assert _new.axis_labels == obj.axis_labels
+    assert _new.axis_units == obj.axis_units
+    assert np.allclose(_new.axis_ranges[0], obj.axis_ranges[0][_slicer])
+    assert obj.shape == _new.shape
+
+
+@pytest.mark.parametrize("index", [(2,), (2, 3)])
+def test_array_finalize__insert_data(large_dataset, index):
+    _new = np.random.random(_LARGE_DSET["shape"][len(index) :])
+    large_dataset[index] = _new
+    for _key in ["labels", "units"]:
+        assert getattr(large_dataset, f"axis_{_key}") == dict(
+            enumerate(_LARGE_DSET[_key])
+        )
+
+
+def test_array_finalize__1d_array_w_array_mask():
+    obj = get_random_dataset(1)
+    indices = np.ones((obj.size), dtype=bool)
+    indices[1] = False
+    _new = obj[indices]
+    assert isinstance(_new, Dataset)
+    assert np.allclose(_new, np.append(obj[0], obj[2:]))
+    assert _new.axis_ranges[0].size == _new.size
+
+
+def test_array_finalize__get_single_value(simple_dataset):
+    obj = simple_dataset[0]
+    _val = obj[0]
+    assert isinstance(_val, Real)
+    _new = obj[0:2]
+    assert _new.axis_labels[0] == obj.axis_labels[0]
+    assert np.allclose(_new.axis_ranges[0], obj.axis_ranges[0])
+
+
+def test__with_rebin2d():
+    obj = Dataset(np.random.random((11, 11)), axis_labels=["0", "1"])
+    _new = rebin2d(obj, 2)
+    assert _new.shape == (5, 5)
+
+
+def test_transpose__1d():
+    obj = Dataset(np.random.random(12), axis_labels=["0"], axis_units=["a"])
+    _new = obj.transpose()
+    assert obj.axis_labels[0] == _new.axis_labels[0]
+    assert obj.axis_units[0] == _new.axis_units[0]
+    assert np.allclose(obj.axis_ranges[0], _new.axis_ranges[0])
+
+
+def test_transpose__2d():
+    obj = get_random_dataset(2)
+    _new = obj.transpose()
+    for _i1, _i2 in [[0, 1], [1, 0]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0], _new[:, 0])
+    assert np.allclose(obj[:, 0], _new[0])
+
+
+def test_transpose__3d():
+    obj = get_random_dataset(3)
+    _new = obj.transpose()
+    for _i1, _i2 in [[0, 2], [2, 0], [1, 1]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0], _new[:, 0, 0])
+    assert np.allclose(obj[:, 0, 0], _new[0, 0])
+    assert np.allclose(obj[0, :, 0], _new[0, :, 0])
+
+
+def test_transpose__4d():
+    obj = get_random_dataset(4)
+    _new = obj.transpose()
+    for _i1, _i2 in [[0, 3], [3, 0], [1, 2], [2, 1]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0, 0], _new[:, 0, 0, 0])
+    assert np.allclose(obj[:, 0, 0, 0], _new[0, 0, 0])
+    assert np.allclose(obj[0, :, 0, 0], _new[0, 0, :, 0])
+
+
+@pytest.mark.parametrize("axes_as_tuple", [True, False])
+def test_transpose__4d_with_axes(axes_as_tuple):
+    obj = get_random_dataset(4)
+    _new = obj.transpose((2, 1, 0, 3)) if axes_as_tuple else obj.transpose(2, 1, 0, 3)
+    for _i1, _i2 in [[0, 2], [2, 0]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0, :, 0], _new[:, 0, 0, 0])
+    assert np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0])
+    assert np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0])
+
+
+def test_squeeze__single_dim():
+    obj = get_random_dataset(4)
+    obj = obj[:, :, 0:1]
+    _new = np.squeeze(obj)
+    for _i1, _i2 in [[0, 0], [1, 1], [3, 2]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0, 0], _new[0, 0])
+    assert obj.metadata == _new.metadata
+    assert obj.data_unit == _new.data_unit
+
+
+def test_squeeze__multi_dim():
+    obj = get_random_dataset(5, (6, 1, 7, 1, 9))
+    _new = np.squeeze(obj)
+    for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0, 0, 0], _new[0, 0])
+
+
+def test_squeeze__multi_dims_of_len_1():
+    obj = get_random_dataset(5, (1, 1, 7, 1, 1))
+    _new = np.squeeze(obj)
+    assert obj.axis_labels[2] == _new.axis_labels[0]
+    assert obj.axis_units[2] == _new.axis_units[0]
+    assert np.allclose(obj.axis_ranges[2], _new.axis_ranges[0])
+    assert np.allclose(obj[0, 0, :, 0, 0], _new)
+
+
+def test_squeeze__multi_dim_size_1():
+    obj = Dataset([[[[42]]]])
+    _new = np.squeeze(obj)
+    assert _new[0] == 42
+
+
+def test_squeeze__multi_dim_with_None_range():
+    obj = get_random_dataset(5, (6, 1, 7, 1, 9))
+    obj.update_axis_range(4, None)
+    _new = obj.squeeze()
+    for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[0, 0, 0, 0], _new[0, 0])
+
+
+def test_squeeze__no_dim():
+    obj = get_random_dataset(5, (6, 4, 7, 2, 9))
+    _new = np.squeeze(obj)
+    for _dim in range(5):
+        assert obj.axis_labels[_dim] == _new.axis_labels[_dim]
+        assert obj.axis_units[_dim] == _new.axis_units[_dim]
+        assert np.allclose(obj.axis_ranges[_dim], _new.axis_ranges[_dim])
+    assert np.allclose(obj, _new)
+
+
+def test_squeeze__with_slicing():
+    obj = get_random_dataset(5, (6, 4, 7, 1, 9))
+    _new = np.squeeze(obj[0:3])
+    assert np.allclose(obj.axis_ranges[0][:3], _new.axis_ranges[0])
+    for _i1, _i2 in [[1, 1], [2, 2], [4, 3]]:
+        assert obj.axis_labels[_i1] == _new.axis_labels[_i2]
+        assert obj.axis_units[_i1] == _new.axis_units[_i2]
+        assert np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2])
+    assert np.allclose(obj[:3, :, :, 0], _new)
+
+
+def test_take__full_dim_from_3d():
+    obj = get_random_dataset(3, (6, 4, 7))
+    _new = np.take(obj, 1, 1)
+    assert np.allclose(obj[:, 1], _new)
+    assert obj.axis_labels[0] == _new.axis_labels[0]
+    assert obj.axis_labels[2] == _new.axis_labels[1]
+    assert obj.axis_units[0] == _new.axis_units[0]
+    assert obj.axis_units[2] == _new.axis_units[1]
+    assert np.allclose(obj.axis_ranges[0], _new.axis_ranges[0])
+    assert np.allclose(obj.axis_ranges[2], _new.axis_ranges[1])
+
+
+def test_take__dim_subset_from_3d():
+    obj = get_random_dataset(3, (6, 5, 7))
+    _new = np.take(obj, (1, 2, 3), 1)
+    assert np.allclose(obj[:, slice(1, 4)], _new)
+    for _dim in range(3):
+        assert obj.axis_labels[_dim] == _new.axis_labels[_dim]
+        assert obj.axis_units[_dim] == _new.axis_units[_dim]
+        _slice = slice(1, 4) if _dim == 1 else slice(None, None)
+        assert np.allclose(obj.axis_ranges[_dim][_slice], _new.axis_ranges[_dim])
+
+
+def test_take__full_dim_from_2d():
+    obj = get_random_dataset(2)
+    _new = np.take(obj, 1, 0)
+    assert np.allclose(obj[1], _new)
+    assert obj.axis_labels[1] == _new.axis_labels[0]
+    assert obj.axis_units[1] == _new.axis_units[0]
+    assert np.allclose(obj.axis_ranges[1], _new.axis_ranges[0])
+
+
+def test_take__dim_subset_from_2d():
+    obj = get_random_dataset(2)
+    _new = np.take(obj, (1, 2, 3), 1)
+    assert np.allclose(obj[:, slice(1, 4)], _new)
+    for _dim in range(2):
+        assert obj.axis_labels[_dim] == _new.axis_labels[_dim]
+        assert obj.axis_units[_dim] == _new.axis_units[_dim]
+    assert np.allclose(obj.axis_ranges[1][slice(1, 4)], _new.axis_ranges[1])
+    assert np.allclose(obj.axis_ranges[0], _new.axis_ranges[0])
+
+
+def test_take__with_single_iterable_value():
+    obj = get_random_dataset(2)
+    _new = np.take(obj, [2], 0)
+    assert np.allclose(obj[2], _new[0])
+    for _dim in range(2):
+        assert obj.axis_labels[_dim] == _new.axis_labels[_dim]
+        assert obj.axis_units[_dim] == _new.axis_units[_dim]
+    assert np.allclose(obj.axis_ranges[0][2], _new.axis_ranges[0])
+    assert np.allclose(obj.axis_ranges[1], _new.axis_ranges[1])
+
+
+def test_take__single_number():
+    obj = get_random_dataset(1)
+    _new = np.take(obj, 2, 0)
+    assert not isinstance(_new, Dataset)
+    assert _new == obj[2]
+
+
+def test_take__1d_array_wo_axis():
+    obj = get_random_dataset(1)
+    indices = [i for i in range(obj.size) if i != 1]
+    _new = np.take(obj, indices)
+    assert isinstance(_new, Dataset)
+    assert np.allclose(_new, np.append(obj[0], obj[2:]))
+    assert _new.axis_ranges[0].size == _new.size
+
+
+def test_take__2d_array_wo_axis():
+    obj = get_random_dataset(2)
+    indices = [i for i in range(obj.size) if i != 1]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        _new = np.take(obj, indices)
+    assert isinstance(_new, Dataset)
+    assert _new.size == obj.size - 1
+    assert _new.ndim == 1
+    assert _new.axis_ranges[0].size == _new.size
+
+
+def test_getitem__simple(large_dataset):
+    _new = large_dataset[0, 0]
+    assert isinstance(_new, Dataset)
+
+
+def test_slice__w_tuple(large_dataset):
+    _new = large_dataset[:, (1, 2, 3)]
+    _new_shape = (large_dataset.shape[0], 3) + (large_dataset.shape[2:])
+    assert _new.shape == _new_shape
+
+
+def test__new__kwargs(simple_dataset):
+    assert isinstance(simple_dataset.axis_labels, dict)
+    assert isinstance(simple_dataset.axis_ranges, dict)
+    assert isinstance(simple_dataset.axis_units, dict)
+
+
+def test_data_label_property(simple_dataset):
+    assert isinstance(simple_dataset.data_label, str)
+
+
+def test_data_label_property__modify(simple_dataset):
+    _new = "new value"
+    simple_dataset.data_label = _new
+    assert simple_dataset.data_label == _new
+
+
+def test_data_unit_property(simple_dataset):
+    assert isinstance(simple_dataset.data_unit, str)
+
+
+def test_data_unit_property__modify(simple_dataset):
+    _new = "new value"
+    simple_dataset.data_unit = _new
+    assert simple_dataset.data_unit == _new
+
+
+@pytest.mark.parametrize("prop_name", ["axis_labels", "axis_units"])
+def test_axis_str_property(simple_dataset, prop_name):
+    assert getattr(simple_dataset, prop_name) == as_dict(
+        _SIMPLE_DSET[prop_name.removeprefix("axis_")]
+    )
+
+
+@pytest.mark.parametrize("prop_name", ["axis_labels", "axis_units"])
+def test_axis_str_property__not_str_types(simple_dataset, prop_name):
+    with pytest.raises(PydidasConfigError):
+        setattr(simple_dataset, prop_name, [["a", "b"], "c", "d"])
+
+
+@pytest.mark.parametrize("prop_name", ["axis_labels", "axis_units"])
+def test_axis_str_property__modify_copy(simple_dataset, prop_name):
+    _item = getattr(simple_dataset, prop_name)
+    _item[0] = "new value"
+    assert getattr(simple_dataset, prop_name) == as_dict(
+        _SIMPLE_DSET[prop_name.removeprefix("axis_")]
+    )
+
+
+def test_axis_ranges_property(simple_dataset):
+    _ranges_ref = as_dict(_SIMPLE_DSET["ranges"])
+    for _dim in range(simple_dataset.ndim):
+        assert np.allclose(_ranges_ref[_dim], simple_dataset.axis_ranges[_dim])
+
+
+def test_axis_ranges_property__modify_copy(simple_dataset):
+    _ranges = simple_dataset.axis_ranges
+    _ranges[0] = 2 * _ranges[0] - 5
+    _ranges_ref = as_dict(_SIMPLE_DSET["ranges"])
+    for _dim in range(simple_dataset.ndim):
+        assert np.allclose(_ranges_ref[_dim], simple_dataset.axis_ranges[_dim])
+
+
+@pytest.mark.parametrize("prop_name", ["axis_labels", "axis_units"])
+def test_set_axis_str_property(simple_dataset, prop_name):
+    _newkeys = ["123", "456"]
+    setattr(simple_dataset, prop_name, _newkeys)
+    assert getattr(simple_dataset, prop_name) == dict(enumerate(_newkeys))
+
+
+def test_set_axis_ranges_property__w_single_key(simple_dataset):
+    _newkeys = [123, [234, 456]]
+    simple_dataset.axis_ranges = _newkeys
+    for _dim, _val in simple_dataset.axis_ranges.items():
+        assert np.allclose(_val, np.asarray(_newkeys[_dim]))
+
+
+def test_set_axis_ranges_property__w_none():
+    obj = Dataset(np.random.random((20, 20)), axis_ranges=[None, np.arange(20)])
+    assert None not in obj.axis_ranges
+
+
+def test_set_axis_ranges_property__ndarrays_of_correct_len(simple_dataset):
+    _newkeys = [np.arange(_len) for _len in simple_dataset.shape]
+    simple_dataset.axis_ranges = _newkeys
+    assert simple_dataset.axis_ranges == dict(enumerate(_newkeys))
+
+
+def test_set_axis_ranges_property__lists_of_correct_len(simple_dataset):
+    _newkeys = [list(np.arange(_len)) for _len in simple_dataset.shape]
+    simple_dataset.axis_ranges = _newkeys
+    for _key, _range in simple_dataset.axis_ranges.items():
+        assert np.allclose(_range, np.asarray(_newkeys[_key]))
+
+
+@pytest.mark.parametrize("as_list", [True, False])
+def test_set_axis_ranges_property__entries_of_incorrect_len(simple_dataset, as_list):
+    _newkeys = [np.arange(_len + 2) for _len in simple_dataset.shape]
+    if as_list:
+        _newkeys = [list(_key) for _key in _newkeys]
+    with pytest.raises(ValueError):
+        simple_dataset.axis_ranges = _newkeys
+
+
+def test_metadata_property(simple_dataset):
+    assert simple_dataset.metadata == {}
+
+
+def test_set_metadata_property(simple_dataset):
+    simple_dataset.metadata = None
+    assert simple_dataset.property_dict["metadata"] is None
+
+
+def test_set_metadata_property_w_dict(simple_dataset):
+    _meta = {"key0": 123, "key1": -1, 0: "test"}
+    simple_dataset.metadata = _meta
+    assert simple_dataset.metadata == _meta
+
+
+def test_set_metadata_property_w_list(simple_dataset):
+    with pytest.raises(TypeError):
+        simple_dataset.metadata = [1, 2, 4]
+
+
+def test_array_property(simple_dataset):
+    assert isinstance(simple_dataset.array, np.ndarray)
+
+
+def test_update_axis_range__single_val():
+    _val = 12
+    obj = Dataset(np.random.random((10, 1, 10)))
+    obj.update_axis_range(1, _val)
+    assert obj.axis_ranges[1] == _val
+
+
+def test_update_axis_range__correct_ndarray(large_dataset):
+    _val = np.arange(large_dataset.shape[1])
+    large_dataset.update_axis_range(1, _val)
+    assert np.allclose(large_dataset.axis_ranges[1], _val)
+
+
+def test_update_axis_range__incorrect_ndarray(large_dataset):
+    _val = np.arange(large_dataset.shape[1] + 5)
+    with pytest.raises(ValueError):
+        large_dataset.update_axis_range(1, _val)
+
+
+def test_update_axis_label__single_val(large_dataset):
+    _val = "a new label"
+    large_dataset.update_axis_label(1, _val)
+    assert large_dataset.axis_labels[1] == _val
+
+
+def test_update_axis_label__w_none(large_dataset):
+    with pytest.raises(TypeError):
+        large_dataset.update_axis_label(1, None)
+
+
+def test_update_axis_unit__single_val(large_dataset):
+    _val = "a new unit"
+    large_dataset.update_axis_unit(1, _val)
+    assert large_dataset.axis_units[1] == _val
+
+
+def test_get_description_of_point__wrong_arg_len(large_dataset):
+    with pytest.raises(ValueError):
+        large_dataset.get_description_of_point((1, 2, 3, 4, 5, 6))
+
+
+def test_get_description_of_point__simple(large_dataset):
+    _str = large_dataset.get_description_of_point((1, 2, 3, 4))
+    assert _str == "a: 1.0000 ua; b: 2.0000 ub; c: 3.0000 uc; d: 4.0000 ud"
+
+
+def test_get_description_of_point__wNone(large_dataset):
+    _str = large_dataset.get_description_of_point((None, 2, None, 4))
+    assert _str == "b: 2.0000 ub; d: 4.0000 ud"
+
+
+def test_dataset_creation():
+    _array = np.random.random((10, 10, 10))
+    obj = Dataset(_array)
+    assert isinstance(obj, Dataset)
+    assert (obj.array == _array).all()
+
+
+def test_dataset_creation_with_kwargs():
+    _array = np.random.random((10, 10))
+    obj = Dataset(
+        _array,
+        axis_labels=_SIMPLE_DSET["labels"],
+        axis_ranges=[np.arange(10), 10 - np.arange(10)],
+        axis_units=_SIMPLE_DSET["units"],
+        metadata={},
+    )
+    assert isinstance(obj, Dataset)
+    assert isinstance(obj.axis_labels, dict)
+    assert isinstance(obj.axis_ranges, dict)
+    assert isinstance(obj.axis_units, dict)
+    assert isinstance(obj.metadata, dict)
+
+
+def test_dataset_creation__with_axis_ranges_property_single_values():
+    with pytest.raises(PydidasConfigError):
+        Dataset(
+            np.random.random((10, 10)),
+            axis_labels=_SIMPLE_DSET["labels"],
+            axis_ranges=[np.arange(10)],
+            axis_units=_SIMPLE_DSET["units"],
+            metadata={},
+        )
+
+
+def test_dataset_creation__with_axis_ranges_property_ndarrays_of_correct_len():
+    obj = Dataset(
+        np.random.random((10, 10)),
+        axis_labels=_SIMPLE_DSET["labels"],
+        axis_ranges=[np.arange(10), 10 - np.arange(10)],
+        axis_units=_SIMPLE_DSET["units"],
+        metadata={},
+    )
+    assert isinstance(obj, Dataset)
+
+
+def test_dataset_creation__with_axis_ranges_property_ndarrays_of_incorrect_len():
+    with pytest.raises(ValueError):
+        Dataset(
+            np.random.random((10, 10)),
+            axis_labels=_SIMPLE_DSET["labels"],
+            axis_ranges=[np.arange(12), 10 - np.arange(10)],
+            axis_units=_SIMPLE_DSET["units"],
+            metadata={},
+        )
+
+
+def test_repr__dataset():
+    obj = Dataset(np.random.random((10, 10, 10)))
+    assert isinstance(repr(obj), str)
+
+
+def test_repr__empty_dataset():
+    obj = Dataset((10, 10, 10))
+    assert isinstance(repr(obj), str)
+
+
+def test_str__():
+    obj = Dataset(np.random.random((10, 10, 10)))
+    assert isinstance(str(obj), str)
+
+
+def test_pickling(large_dataset):
+    large_dataset.metadata = {"test": "something"}
+    _new = pickle.loads(pickle.dumps(large_dataset))
+    assert isinstance(_new, Dataset)
+    assert np.allclose(_new.array, large_dataset.array)
+    assert _new.axis_labels == large_dataset.axis_labels
+    assert _new.axis_units == large_dataset.axis_units
+    assert _new.metadata == large_dataset.metadata
+    assert _new.data_label == large_dataset.data_label
+    assert _new.data_unit == large_dataset.data_unit
+    for _dim, _range in large_dataset.axis_ranges.items():
+        assert np.allclose(_new.axis_ranges[_dim], _range)
+
+
+def test_pickling__independent_copy(large_dataset):
+    _new = pickle.loads(pickle.dumps(large_dataset))
+    _new.update_axis_label(0, "new label")
+    _new[0, 0, 0, 0] = 42
+    assert large_dataset.axis_labels[0] == _LARGE_DSET["labels"][0]
+    assert large_dataset[0, 0, 0, 0] != 42
+
+
+def test_np_amax__simple():
+    obj = Dataset(np.random.random((10, 10, 10)))
+    assert isinstance(np.amax(obj), Real)
+
+
+def test_np_amax__with_metadata():
+    obj = Dataset(np.random.random((10, 10, 10)))
+    obj.metadata = {"test": "something"}
+    assert isinstance(np.amax(obj), Real)
+
+
+def test_np_amax__with_axis_with_metadata():
+    obj = Dataset(np.random.random((10, 10, 10)))
+    obj.metadata = {"test": "something"}
+    _max = np.amax(obj, axis=0)
+    assert isinstance(_max, Dataset)
+    assert _max.shape == obj.shape[1:]
+
+
+def test_np_array__with_ndmin(large_dataset):
+    _new = np.array(large_dataset, copy=None, subok=True, ndmin=large_dataset.ndim + 2)
+    for _dim in range(large_dataset.ndim):
+        assert _new.shape[2 + _dim] == large_dataset.shape[_dim]
+        assert _new.axis_labels[2 + _dim] == large_dataset.axis_labels[_dim]
+        assert _new.axis_units[2 + _dim] == large_dataset.axis_units[_dim]
+        assert np.allclose(_new.axis_ranges[2 + _dim], large_dataset.axis_ranges[_dim])
+
+
+def test_copy_dataset():
+    obj = Dataset(np.random.random((10, 10, 10)), axis_ranges=_3X10_AXIS_RANGES)
+    obj.metadata = {"test": "something"}
+    obj2 = copy.copy(obj)
+    assert np.allclose(obj2.array, obj.array)
+    assert obj2.axis_labels == obj.axis_labels
+    assert obj2.axis_units == obj.axis_units
+    assert obj2.metadata == obj.metadata
+    assert obj2.data_label == obj.data_label
+    assert obj2.data_unit == obj.data_unit
+    for _dim, _range in obj.axis_ranges.items():
+        assert np.allclose(obj2.axis_ranges[_dim], _range)
+
+
+def test_copy_dataset__update_ax_label():
+    obj = Dataset(
+        np.random.random((10, 10, 10)),
+        axis_ranges=_3X10_AXIS_RANGES,
+        axis_labels=["a", "b", "c"],
+    )
+    obj2 = obj.copy()
+    obj2.update_axis_label(2, "new")
+    assert obj.axis_labels[2] == "c"
+
+
+def test_hash():
+    _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
+    obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+    obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+    assert isinstance(hash(obj), int)
+    assert hash(obj) != hash(obj2)
+
+
+def test_data_description__no_data_unit(simple_dataset):
+    _test_label = "Spam, eggs, sausage and spam"
+    simple_dataset.data_label = _test_label
+    assert simple_dataset.data_description == _test_label
+
+
+def test_data_description__w_data_unit(simple_dataset):
+    _test_label = "Spam, eggs, sausage and spam"
+    _test_unit = "more spam"
+    simple_dataset.data_label = _test_label
+    simple_dataset.data_unit = _test_unit
+    assert simple_dataset.data_description == f"{_test_label} / {_test_unit}"
+
+
+@pytest.mark.parametrize("sep", _SEPARATORS)
+def test_get_data_description__no_unit(simple_dataset, sep):
+    assert simple_dataset.get_data_description(sep=sep) == simple_dataset.data_label
+
+
+@pytest.mark.parametrize("sep", _SEPARATORS)
+def test_get_data_description__w_unit(simple_dataset, sep):
+    simple_dataset.data_unit = "Tm"
+    _label, _unit = simple_dataset.get_data_description(sep=sep).split(sep, 1)
+    assert _label.strip() == simple_dataset.data_label
+    assert _unit.strip(" )]").strip() == simple_dataset.data_unit
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("sep", _SEPARATORS)
+def test_get_axis_description__no_unit(simple_dataset, index, sep):
+    simple_dataset.update_axis_unit(index, "")
+    _ax_str = simple_dataset.get_axis_description(index, sep=sep)
+    assert _ax_str == _SIMPLE_DSET["labels"][index]
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("sep", _SEPARATORS)
+def test_get_axis_description__w_unit(simple_dataset, index, sep):
+    _ax_str = simple_dataset.get_axis_description(index, sep=sep)
+    _label, _unit = _ax_str.split(sep, 1)
+    assert _label.strip() == _SIMPLE_DSET["labels"][index]
+    assert _unit.strip(" )]").strip() == _SIMPLE_DSET["units"][index]
+
+
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__invalid_kwargs(large_dataset, method_name):
+    with pytest.raises(TypeError):
+        getattr(large_dataset, method_name)(wrong_key=True)
+
+
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__full(large_dataset, method_name):
+    assert (
+        getattr(large_dataset, method_name)()
+        == getattr(large_dataset.array, method_name)()
+    )
+
+
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__none_axis(large_dataset, method_name):
+    assert getattr(large_dataset, method_name)(axis=None) == getattr(
+        large_dataset.array, method_name
+    )(axis=None)
+
+
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__all_axes(large_dataset, method_name):
+    assert getattr(large_dataset, method_name)(axis=(0, 1, 2, 3)) == getattr(
+        large_dataset.array, method_name
+    )(axis=(0, 1, 2, 3))
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("use_np_function", [True, False])
+def test_mean__simple(large_dataset, axis, use_np_function):
+    _mean = (
+        np.mean(large_dataset, axis=axis)
+        if use_np_function
+        else large_dataset.mean(axis=axis)
+    )
+    assert np.allclose(_mean, large_dataset.array.mean(axis=axis))
+    assert_new_metadata_correct(_mean, ax_tuple(large_dataset, axis), "mean")
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("use_np_function", [True, False])
+def test_sum__simple(large_dataset, axis, use_np_function):
+    _sum = (
+        np.sum(large_dataset, axis=axis)
+        if use_np_function
+        else large_dataset.sum(axis=axis)
+    )
+    assert np.allclose(_sum, large_dataset.array.sum(axis=axis))
+    assert_new_metadata_correct(_sum, ax_tuple(large_dataset, axis), "sum")
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("method_name", ["max", "mean", "sum"])
+def test_np_reimplementation__w_out_ndarray(large_dataset, axis, method_name):
+    _ax_tuple = ax_tuple(large_dataset, axis)
+    _new_shape = tuple(
+        n for i, n in enumerate(large_dataset.shape) if i not in _ax_tuple
+    )
+    _out = np.zeros(_new_shape)
+    getattr(large_dataset, method_name)(axis=axis, out=_out)
+    assert np.allclose(_out, getattr(large_dataset.array, method_name)(axis=axis))
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__w_out_dataset(large_dataset, axis, method_name):
+    _ax_tuple = ax_tuple(large_dataset, axis)
+    _new_shape = tuple(
+        n for i, n in enumerate(large_dataset.shape) if i not in _ax_tuple
+    )
+    _out = Dataset(np.zeros(_new_shape))
+    getattr(large_dataset, method_name)(axis=axis, out=_out)
+    assert np.allclose(_out, getattr(large_dataset.array, method_name)(axis=axis))
+    assert_new_metadata_correct(_out, _ax_tuple, method_name)
+
+
+@pytest.mark.parametrize("method_name", _METHODS_WITH_DTYPE)
+def test_np_reimplementation__all_w_dtype(large_dataset, method_name):
+    _result = getattr(large_dataset, method_name)(dtype=np.float32)
+    assert _result == getattr(large_dataset.array, method_name)(dtype=np.float32)
+    assert _result.dtype == np.float32
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("method_name", _METHODS_WITH_DTYPE)
+def test_np_reimplementation__w_axis_w_dtype(large_dataset, axis, method_name):
+    _result = getattr(large_dataset, method_name)(axis=axis, dtype=np.float32)
+    _ref = getattr(large_dataset.array, method_name)(axis=axis, dtype=np.float32)
+    assert np.allclose(_result, _ref)
+    assert_new_metadata_correct(_result, ax_tuple(large_dataset, axis), method_name)
+    assert _result.dtype == np.float32
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__w_keepdims(large_dataset, axis, method_name):
+    _ax_tuple = ax_tuple(large_dataset, axis)
+    _result = getattr(large_dataset, method_name)(axis=axis, keepdims=True)
+    _ref = getattr(large_dataset.array, method_name)(axis=axis, keepdims=True)
+    assert list(_result.shape) == [
+        1 if i in _ax_tuple else n for i, n in enumerate(large_dataset.shape)
+    ]
+    assert np.allclose(_result, _ref)
+    assert_new_metadata_correct(_result, [], method_name)
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+@pytest.mark.parametrize("method_name", _IMPLEMENTED_METHODS)
+def test_np_reimplementation__w_where(large_dataset, axis, method_name):
+    _mask = np.ones(large_dataset.shape, dtype=bool)
+    _mask[large_dataset.shape[0] // 2 :] = False
+    _kwargs = {"where": _mask} | (
+        {"initial": 0} if method_name in _METHOD_REQUIRES_INITIAL else {}
+    )
+    _result = getattr(large_dataset, method_name)(axis=axis, **_kwargs)
+    _ref = getattr(large_dataset.array, method_name)(axis=axis, **_kwargs)
+    assert np.allclose(_result[~np.isnan(_result)], _ref[~np.isnan(_result)])
+    assert_new_metadata_correct(_result, ax_tuple(large_dataset, axis), method_name)
+
+
+@pytest.mark.parametrize("axis", _AXIS_SLICES)
+def test_nanmean(large_dataset, axis):
+    large_dataset[0, 0, :, 0] = np.nan
+    _result = np.nanmean(large_dataset, axis=axis)
+    assert_new_metadata_correct(_result, ax_tuple(large_dataset, axis), "sum")
+
+
+@pytest.mark.parametrize("shape_as_tuple", [True, False])
+def test_reshape__syntax(large_dataset, shape_as_tuple):
+    _shape = (5, 2, 6, 2, 14, 16)
+    _new = (
+        large_dataset.reshape(_shape)
+        if shape_as_tuple
+        else large_dataset.reshape(*_shape)
+    )
+    assert _new.shape == _shape
+
+
+def test_shape__setter(large_dataset):
+    _shape = (5, 2, 6, 2, 14, 16)
+    large_dataset.shape = _shape
+    assert large_dataset.shape == _shape
+
+
+def test_reshape__syntax_flat(large_dataset):
+    _new = large_dataset.reshape(large_dataset.size)
+    assert _new.shape == (large_dataset.size,)
+
+
+@pytest.mark.parametrize("axes", [(0, 1), (1, 2), (2, 3)])
+def test_reshape__simple(large_dataset, axes):
+    i0, i1 = axes
+    _new_shape = tuple(
+        (n if i not in [i0, i1] else n * large_dataset.shape[i1])
+        for i, n in enumerate(large_dataset.shape)
+        if i != i1
+    )
+    large_dataset.shape = _new_shape
+    assert large_dataset.shape == _new_shape
+    assert_reshape_metadata_correct(large_dataset)
+
+
+def test_reshape__shape_inversion(large_dataset):
+    _new_shape = large_dataset.shape[::-1]
+    large_dataset.shape = _new_shape
+    assert large_dataset.shape == _new_shape
+    assert_reshape_metadata_correct(large_dataset)
+
+
+def test_reshape_0d():
+    obj = Dataset(0)
+    assert obj.reshape(1).shape == (1,)
+
+
+@pytest.mark.parametrize(
+    "new_shape",
+    [
+        (5, 2, 6, 2, 14, 16),
+        (2, 5, 6, 2, 7, 2, 4, 4),
+        (10, 7, 12, 2, 16),
+        (10, 12, 7, 16, 2),
+    ],
+)
+def test_reshape__complex(large_dataset, new_shape):
+    large_dataset.shape = new_shape
+    assert large_dataset.shape == new_shape
+    assert_reshape_metadata_correct(large_dataset)
+
+
+@pytest.mark.parametrize("dim", [0, 1, 2, 3])
+def test_reshape_w_neg_index(large_dataset, dim):
+    _new_shape = list(large_dataset.shape)
+    _new_shape[dim] = -1
+    large_dataset.shape = _new_shape
+    assert large_dataset.shape == _LARGE_DSET["shape"]
+    assert_reshape_metadata_correct(large_dataset)
+
+
+@pytest.mark.parametrize(
+    "new_shape",
+    [
+        (5, 2, 6, 2, 14, -1),
+        (5, 2, 6, -1, 14, 16),
+        (2, 5, 6, 2, -1, 2, 4, 4),
+        (10, 7, -1, 2, 16),
+        (-1, 12, 7, 16, 2),
+    ],
+)
+def test_reshape_w_neg_index__and_reshape(large_dataset, new_shape):
+    _size = large_dataset.size
+    large_dataset.shape = new_shape
+    _missing_dim = _size // np.prod([n for n in new_shape if n != -1])
+    assert large_dataset.shape == tuple(
+        (n if n != -1 else _missing_dim) for n in new_shape
+    )
+    assert_reshape_metadata_correct(large_dataset)
+
+
+def test_reshape__insert_dim(large_dataset):
+    _new_shape = (large_dataset.shape[0], 1, 1, *large_dataset.shape[1:])
+    large_dataset.shape = _new_shape
+    assert large_dataset.shape == _new_shape
+    assert_reshape_metadata_correct(large_dataset)
+
+
+def test_reshape__1d_insert_dim():
+    obj = get_random_dataset(1)
+    _new = obj.reshape(-1, obj.size)
+    assert _new.shape == (1, obj.size)
+
+
+def test_reshape_1d():
+    obj = get_random_dataset(1)
+    _axlabel = obj.axis_labels[0]
+    _axunit = obj.axis_units[0]
+    _axrange = obj.axis_ranges[0]
+    _new_shape = (1, obj.size)
+    obj.shape = _new_shape
+    assert obj.shape == _new_shape
+    assert obj.axis_labels == {0: "", 1: _axlabel}
+    assert obj.axis_units == {0: "", 1: _axunit}
+    assert np.allclose(obj.axis_ranges[0], np.arange(1))
+    assert np.allclose(obj.axis_ranges[1], _axrange)
+
+
+@pytest.mark.parametrize("axis", [0, 1, 2, 3])
+def test_repeat(axis):
+    obj = get_random_dataset(4)
+    _new = obj.repeat(repeats=3, axis=axis)
+    for _dim in range(obj.ndim):
+        _factor = 3 if _dim == axis else 1
+        assert _new.shape[_dim] == obj.shape[_dim] * _factor
+    assert _new.axis_labels == obj.axis_labels
+    assert _new.axis_units == obj.axis_units
+
+
+def test_repeat__axis_None():
+    obj = get_random_dataset(4)
+    _new = obj.repeat(repeats=3, axis=None)
+    assert _new.shape == (obj.size * 3,)
+    for _iter in [0, 1, 2]:
+        assert np.allclose(obj.flatten(), _new.reshape(-1, 3)[:, _iter])
+
+
+def test_np_array__simple():
+    obj = get_random_dataset(1)
+    _new = np.array(obj)
+    assert np.allclose(obj, _new)
+    assert isinstance(_new, np.ndarray)
+
+
+def test_np_array__w_subok():
+    obj = get_random_dataset(3)
+    _new = np.array(obj, subok=True)
+    assert np.allclose(obj, _new)
+    assert isinstance(_new, Dataset)
+
+
+def test_np_array__w_subok_ndmin():
+    obj = get_random_dataset(1)
+    _new = np.array(obj, subok=True, ndmin=4)
+    assert np.allclose(obj, _new)
+    assert isinstance(_new, Dataset)
+
+
+def test_np_tile():
+    obj = get_random_dataset(2)
+    assert isinstance(np.tile(obj, (1, 2, 3)), Dataset)
+
+
+@pytest.mark.parametrize("ndim", [1, 2, 3, 4, 5])
+def test_argsort(ndim):
+    obj = get_random_dataset(ndim)
+    _indices = obj.argsort()
+    assert isinstance(_indices, np.ndarray)
+    assert not isinstance(_indices, Dataset)
+    assert _indices.shape == obj.shape
+
+
+@pytest.mark.parametrize("axis_kwargs", [{}, {"axis": None}])
+def test_sort__1d_np_sort(axis_kwargs):
+    obj = get_random_dataset(1, shape=(50,))
+    _indices = obj.argsort()
+    _range = obj.axis_ranges[0]
+    _new = np.sort(obj, **axis_kwargs)
+    assert np.allclose(obj[_indices], _new)
+    assert np.allclose(_new.axis_ranges[0], _range[_indices])
+
+
+def test_sort__1d_self_sort():
+    obj = get_random_dataset(1, shape=(50,))
+    _range = obj.axis_ranges[0]
+    _indices = obj.argsort()
+    obj.sort()
+    assert np.all(np.diff(obj) >= 0)
+    assert np.allclose(obj.axis_ranges[0], _range[_indices])
+
+
+@pytest.mark.parametrize("ndim", [2, 3, 4])
+def test_sort__multidim(ndim):
+    obj = get_random_dataset(ndim)
+    with pytest.raises(UserConfigError):
         obj.sort()
-        self.assertTrue(np.all(np.diff(obj) >= 0))
-        self.assertTrue(np.allclose(obj.axis_ranges[0], _range[_indices]))
-
-    def test_sort__multidim(self):
-        for _dim in range(2, 5):
-            with self.subTest(dim=_dim):
-                obj = self.get_random_dataset(_dim)
-                with self.assertRaises(UserConfigError):
-                    obj.sort()
-
-    def test_sort__multidim_axis_None(self):
-        for _dim in range(2, 5):
-            with self.subTest(dim=_dim):
-                obj = self.get_random_dataset(_dim)
-                obj.sort(axis=None)
-                self.assertTrue(np.all(np.diff(obj) >= 0))
-                self.assertEqual(obj.shape, (obj.size,))
-
-    def test_is_axis_nonlinear__simple(self):
-        obj = self.create_large_dataset()
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__falling_numbers(self):
-        obj = self.create_large_dataset()
-        obj = obj[::-1, :, ::-1]
-        for _ax in range(obj.ndim):
-            self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__linear_w_jitter(self):
-        obj = self.create_large_dataset()
-        for _level in [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]:
-            with self.subTest(jitter_level=_level):
-                obj.update_axis_range(
-                    1, np.arange(obj.shape[1]) + _level * np.random.random(obj.shape[1])
-                )
-            self.assertEqual(obj.is_axis_nonlinear(1), _level > 1e-4)
-            for _ax in [0, 2, 3]:
-                self.assertFalse(obj.is_axis_nonlinear(_ax))
-
-    def test_is_axis_nonlinear__inverse_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, 1 / (1 + obj.axis_ranges[1]))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
-
-    def test_is_axis_nonlinear__sine_func(self):
-        obj = self.create_large_dataset()
-        obj.update_axis_range(1, np.sin(np.arange(obj.shape[1])))
-        for _ax in range(obj.ndim):
-            self.assertEqual(obj.is_axis_nonlinear(_ax), _ax == 1)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("ndim", [2, 3, 4])
+def test_sort__multidim_axis_None(ndim):
+    obj = get_random_dataset(ndim)
+    obj.sort(axis=None)
+    assert np.all(np.diff(obj) >= 0)
+    assert obj.shape == (obj.size,)
+
+
+def test_is_axis_nonlinear__simple(large_dataset):
+    for _ax in range(large_dataset.ndim):
+        assert not large_dataset.is_axis_nonlinear(_ax)
+
+
+def test_is_axis_nonlinear__falling_numbers(large_dataset):
+    obj = large_dataset[::-1, :, ::-1]
+    for _ax in range(obj.ndim):
+        assert not obj.is_axis_nonlinear(_ax)
+
+
+@pytest.mark.parametrize("level", [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+def test_is_axis_nonlinear__linear_w_jitter(large_dataset, level):
+    large_dataset.update_axis_range(
+        1,
+        np.arange(large_dataset.shape[1])
+        + level * np.random.random(large_dataset.shape[1]),
+    )
+    assert large_dataset.is_axis_nonlinear(1) == (level > 1e-4)
+    for _ax in [0, 2, 3]:
+        assert not large_dataset.is_axis_nonlinear(_ax)
+
+
+def test_is_axis_nonlinear__inverse_func(large_dataset):
+    large_dataset.update_axis_range(1, 1 / (1 + large_dataset.axis_ranges[1]))
+    for _ax in range(large_dataset.ndim):
+        assert large_dataset.is_axis_nonlinear(_ax) == (_ax == 1)
+
+
+def test_is_axis_nonlinear__sine_func(large_dataset):
+    large_dataset.update_axis_range(1, np.sin(np.arange(large_dataset.shape[1])))
+    for _ax in range(large_dataset.ndim):
+        assert large_dataset.is_axis_nonlinear(_ax) == (_ax == 1)

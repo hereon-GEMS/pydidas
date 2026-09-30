@@ -477,7 +477,7 @@ GPT-5.3-Codex.</p>
 </nav>
 <section id="parameterwidget-internal-widget-structure">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">ParameterWidget internal widget structure</a><a class="headerlink" href="#parameterwidget-internal-widget-structure" title="Link to this heading">#</a></h2>
-<p>The <a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code>
 is a composite widget designed to display and edit a single <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a>. It is composed of three main widgets:</p>
 <ol class="arabic simple">
 <li><p>A label widget (<code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasLabel</span></code>)
@@ -511,7 +511,7 @@ Parameter’s <code class="docutils literal notranslate"><span class="pre">unit<
 </section>
 <section id="parameterwidget-args-and-kwargs">
 <h2><a class="toc-backref" href="#id2" role="doc-backlink">ParameterWidget args and kwargs</a><a class="headerlink" href="#parameterwidget-args-and-kwargs" title="Link to this heading">#</a></h2>
-<p>The :<a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a> constructor takes a single argument: The associated
+<p>The :<code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code> constructor takes a single argument: The associated
 <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> instance. The widget behaviour will be determined by the keyword
 arguments. The following keyword arguments are supported:</p>
 <div class="pst-scrollable-table-container"><table class="tight-table table">
@@ -612,7 +612,7 @@ support both direct access to the new value and a generic change notification:</
 <p class="admonition-title">Note</p>
 <p>Note that programmatic updates to the <a class="reference internal" href="../../code/api/core/parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></a> value are not
 automatically reflected in the widget display. To synchronize the display
-with the current Parameter value, use the <a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget.update_from_param" title="pydidas.widgets.parameter_config.ParameterWidget.update_from_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_from_param</span></code></a>
+with the current Parameter value, use the <code class="xref py py-meth docutils literal notranslate"><span class="pre">update_from_param</span></code>
 method.</p>
 </div>
 <section id="signal-and-data-flow-user-edit">
@@ -735,7 +735,7 @@ underlying and linked Parameter.</p></td>
 <h2><a class="toc-backref" href="#id9" role="doc-backlink">I/O subclasses</a><a class="headerlink" href="#i-o-subclasses" title="Link to this heading">#</a></h2>
 <section id="widget-selection-rules">
 <h3><a class="toc-backref" href="#id10" role="doc-backlink">Widget Selection Rules</a><a class="headerlink" href="#widget-selection-rules" title="Link to this heading">#</a></h3>
-<p><a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget" title="pydidas.widgets.parameter_config.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a> chooses the I/O widget class from the Parameter metadata:</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code> chooses the I/O widget class from the Parameter metadata:</p>
 <ul class="simple">
 <li><p>bool-like choices -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetCheckBox</span></code></p></li>
 <li><p>list of choices -&gt; <code class="xref py py-class docutils literal notranslate"><span class="pre">ParamIoWidgetComboBox</span></code></p></li>
@@ -745,7 +745,7 @@ underlying and linked Parameter.</p></td>
 </ul>
 <p>The selection is dynamic and can be updated to accommodate for changes in the
 Parameter’s metadata (e.g. new choices list) through the
-<a class="reference internal" href="../../code/api/widgets/parameter_config.html#pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param" title="pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_choices_from_param</span></code></a>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">update_choices_from_param</span></code>
 method.</p>
 </section>
 <section id="subclass-behavior-matrix">

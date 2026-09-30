@@ -514,15 +514,15 @@ default values will be used. The default is None.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.gui.MainWindow.register_frame">
-<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.MainWindow.register_frame" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.gui.MainWindow.register_frame" title="Link to this definition">#</a></dt>
 <dd><p>Register a frame class with the MainWindow and add it to the
 PydidasFrameStack.</p>
-<p>This method takes a <a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a> and creates an instance which
+<p>This method takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code> and creates an instance which
 is registers with the PydidasFrameStack. It also stores the required
 metadata to create an actionbar link to open the frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
+<dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><em>BaseFrame</em><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
 If a string is passed, an empty frame class with the metadata
 given by title, menu_entry and icon is created.</p>
 </dd>
@@ -619,9 +619,9 @@ default values will be used. The default is None.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>force_check</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Flag to force a check even when the user disabled checking for
+<li><p><strong>force_check</strong> (<em>bool</em>) – Flag to force a check even when the user disabled checking for
 updates. The default is False.</p></li>
-<li><p><strong>auto_check</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Flag to signalize an automatic update check. This will only display
+<li><p><strong>auto_check</strong> (<em>bool</em>) – Flag to signalize an automatic update check. This will only display
 a notice when the local and remote versions differ. The default is False.</p></li>
 </ul>
 </dd>
@@ -752,15 +752,15 @@ referenced by param_key or dtype, if given.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
+<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Register a frame class with the MainWindow and add it to the
 PydidasFrameStack.</p>
-<p>This method takes a <a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code></a> and creates an instance which
+<p>This method takes a <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFrame</span></code> and creates an instance which
 is registers with the PydidasFrameStack. It also stores the required
 metadata to create an actionbar link to open the frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><a class="reference internal" href="../widgets/framework.html#pydidas.widgets.framework.BaseFrame" title="pydidas.widgets.framework.BaseFrame"><em>BaseFrame</em></a><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
+<dd class="field-odd"><p><strong>frame</strong> (<em>type</em><em>[</em><em>BaseFrame</em><em>]</em>) – The class of the Frame. This must be a subclass of BaseFrame.
 If a string is passed, an empty frame class with the metadata
 given by title, menu_entry and icon is created.</p>
 </dd>

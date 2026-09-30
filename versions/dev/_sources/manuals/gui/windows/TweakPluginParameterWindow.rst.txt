@@ -35,7 +35,7 @@ changes:
 
   - **Run plugin with current parameters**
 
-    This button allows to execute the selected plugin with the current paramter
+    This button allows to execute the selected plugin with the current parameter
     configuration. Results (and detailed results) will be updated directly.
 
   - **Confirm current parameters and close window**

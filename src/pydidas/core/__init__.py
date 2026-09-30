@@ -32,6 +32,7 @@ from . import constants, generic_params, io_registry, lazy_imports, utils
 
 # import items from modules:
 from .base_app import *
+from .config_dict import *
 from .dataset import *
 
 # import exceptions first to be used in other modules
@@ -50,6 +51,7 @@ from .singleton import *
 __all__: list[str] = (
     ["constants", "generic_params", "io_registry", "utils", "lazy_imports"]
     + base_app.__all__
+    + config_dict.__all__
     + dataset.__all__
     + exceptions.__all__
     + generic_parameters.__all__
@@ -66,6 +68,7 @@ __all__: list[str] = (
 # Clean up the namespace
 del (
     base_app,
+    config_dict,
     dataset,
     exceptions,
     generic_parameters,

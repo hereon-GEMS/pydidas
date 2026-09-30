@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DataAxisSelect class which allows to select a datapoint
+Module with the DataAxisSelector class which allows to select a datapoint
 on a specific axis.
 """
 
@@ -37,26 +37,25 @@ from numpy import ndarray
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
+from pydidas.widgets.base_classes import (
+    EmptyWidget,
+    WidgetFactoryMixIn,
+)
 from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_AXIS_SELECTOR_BUILD_CONFIG,
     DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG,
     invalid_range_str,
-)
-from pydidas.widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
-from pydidas.widgets.widget_with_parameter_collection import (
-    WidgetWithParameterCollection,
 )
 
 
 GENERIC_AXIS_SELECTOR_CHOICES = ["slice at index", "slice at data value"]
 
 
-class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
-    """
-    A widget to select a data point on a specific axis.
-    """
+class DataAxisSelector(WidgetFactoryMixIn, EmptyWidget):
+    """A widget to select a data point on a specific axis."""
 
-    init_kwargs = WidgetWithParameterCollection.init_kwargs + [
+    init_kwargs = EmptyWidget.init_kwargs + [
+        "parent",
         "multiline",
         "allow_axis_use_modification",
     ]
@@ -67,8 +66,8 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
     def __init__(
         self, index: int, parent: QtWidgets.QWidget | None = None, **kwargs: Any
     ):
-        WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
-        PydidasWidgetMixin.__init__(self, **kwargs)
+        EmptyWidget.__init__(self, parent=parent, **kwargs)
+        WidgetFactoryMixIn.__init__(self, **kwargs)
         self._axis_index = index
         self._current_slice = slice(0, 1)
         self._npoints = 0
@@ -677,7 +676,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         self._widgets[edit_name].setPalette(self._palette_base)
 
     @QtCore.Slot(str)
-    def _check_edit_range_input(self, edit_name: str, new_text: str) -> None:
+    def _check_edit_range_input(self, edit_name: str, _new_text: str) -> None:
         """
         Check the input of the range edit widget.
 
@@ -685,7 +684,7 @@ class DataAxisSelector(WidgetWithParameterCollection, PydidasWidgetMixin):
         ----------
         edit_name : str
             The name of the edit widget.
-        new_text : str
+        _new_text : str
             The new text in the edit widget. This input is ignored because
             the input is checked through the hasAcceptableInput() method.
         """

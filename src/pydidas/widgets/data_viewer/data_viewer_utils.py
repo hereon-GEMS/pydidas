@@ -45,11 +45,8 @@ from pydidas.core.constants import (
     QT_REG_EXP_FLOAT_RANGE_VALIDATOR,
     QT_REG_EXP_POS_INT_RANGE_VALIDATOR,
 )
-from pydidas.widgets.data_viewer.silx_subclasses import (
-    PydidasArrayTableWidget,
-    PydidasHdf5TableView,
-)
-from pydidas.widgets.factory import SquareButton
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_reimplementations import SquareButton
 from pydidas.widgets.silx_plot import PydidasPlot1D, PydidasPlot2D
 
 
@@ -58,7 +55,7 @@ class DataViewConfig:
     id: int
     title: str
     ref: str
-    widget: type[QWidget]
+    widget: type[QWidget] | LazyObject
     use_axes_selector: bool
     additional_choices: str | None
     min_dims: int
@@ -70,7 +67,9 @@ DATA_VIEW_CONFIG = {
         id=0,
         title="Hdf5",
         ref="view-h5",
-        widget=PydidasHdf5TableView,
+        widget=LazyObject(
+            "pydidas.widgets.data_viewer._silx_subclasses", "PydidasHdf5TableView"
+        ),
         use_axes_selector=False,
         additional_choices=None,
         min_dims=1,
@@ -106,7 +105,9 @@ DATA_VIEW_CONFIG = {
         id=4,
         title="Table",
         ref="view-table",
-        widget=PydidasArrayTableWidget,
+        widget=LazyObject(
+            "pydidas.widgets.data_viewer._silx_subclasses", "_PydidasArrayTableWidget"
+        ),
         use_axes_selector=True,
         additional_choices="use as table x;;use as table y",
         min_dims=0,
@@ -138,7 +139,7 @@ def invalid_range_str(input_range: str) -> str:
 
 def DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
     axis_index: int, multiline: bool
-) -> list[str, list[Any], dict[str, Any]]:
+) -> list[str | list[Any] | dict[str, Any]]:
     """
     Get the arguments required to create all necessary widgets in the header.
 
@@ -186,7 +187,7 @@ def DATA_AXIS_SELECTOR_HEADER_BUILD_CONFIG(
 
 def DATA_AXIS_SELECTOR_BUILD_CONFIG(
     multiline: bool,
-) -> list[str, tuple[Any], dict[str, Any]]:
+) -> list[str | list[Any] | dict[str, Any]]:
     """
     Get the arguments required to create all necessary widgets in the axis selector.
     """

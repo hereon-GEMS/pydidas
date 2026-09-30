@@ -39,17 +39,17 @@ from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from pydidas.core import get_generic_param_collection
+from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.lazy_imports.pyFAI import Detector
 from pydidas.core.utils import update_palette
 from pydidas.gui.frames.builders.define_diffraction_exp_frame_build_config import (
     DIFFRACTION_EXP_FRAME_BUILD_CONFIG,
 )
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.dialogues import critical_warning
-from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget import (
-    BaseParamIoWidget,
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.dialogs import critical_warning
+from pydidas.widgets.param_io.base_param_io_widget import (
+    BaseParamIo,
 )
 from pydidas.widgets.windows import (
     ConvertFit2dGeometryWindow,
@@ -92,13 +92,15 @@ class DefineDiffractionExpFrame(BaseFrame):
     def build_frame(self) -> None:
         """Build the frame and create all widgets."""
         for _method, _args, _kwargs in DIFFRACTION_EXP_FRAME_BUILD_CONFIG:
-            getattr(self, _method)(*_args, **_kwargs)
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         for _p in [self._bc_params["beamcenter_x"], self._bc_params["beamcenter_y"]]:
             self.create_param_widget(_p, parent_widget="config_right")
             update_palette(
                 self.param_widgets[_p.refkey], base=QtGui.QColor(235, 235, 235)
             )
             self.param_widgets[_p.refkey].setReadOnly(True)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect all signals and slots in the frame."""
@@ -125,7 +127,12 @@ class DefineDiffractionExpFrame(BaseFrame):
     def finalize_ui(self) -> None:
         """Finalize the UI and update the beamcenter display."""
         super().finalize_ui()
-        self._update_beamcenter()
+        try:
+            self._update_beamcenter()
+        except UserConfigError:
+            # Ignore if the beamcenter cannot be calculated because
+            # the geometry is not valid yet.
+            pass
 
     def set_param_and_widget_value(
         self, key: str, value: Any, emit_signal: bool = True
@@ -157,7 +164,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             )
 
     @QtCore.Slot()
-    def update_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
+    def update_param(self, param_key: str, widget: BaseParamIo) -> None:
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -165,7 +172,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         ----------
         param_key : str
             The reference key.
-        widget : pydidas.widgets.parameter_config.BaseParamIoWidget
+        widget : pydidas.widgets.param_io.BaseParamIo
             The Parameter editing widget.
         """
         EXP.set_param_value(param_key, widget.get_value())

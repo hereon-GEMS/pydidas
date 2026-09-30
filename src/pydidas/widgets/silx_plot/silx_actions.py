@@ -48,7 +48,7 @@ from pydidas.core.lazy_imports.silx import Colormap, plot_items
 from pydidas.core.utils import calculate_histogram_limits, has_extension
 from pydidas.data_io import IoManager, import_data
 from pydidas.resources import icons
-from pydidas.widgets.dialogues.select_data_frame_dialog import SelectDataFrameDialog
+from pydidas.widgets.dialogs.select_data_frame_dialog import SelectDataFrameDialog
 from pydidas.widgets.file_dialog import PydidasFileDialog
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 

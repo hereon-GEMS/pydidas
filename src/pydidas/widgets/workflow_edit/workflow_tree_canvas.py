@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,20 +22,22 @@ editing the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowTreeCanvas"]
 
 
+from typing import Any
+
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import constants
-from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.base_classes import WidgetFactoryMixIn
 
 
-class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
+class WorkflowTreeCanvas(WidgetFactoryMixIn, QtWidgets.QFrame):
     """
     The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
     the individual plugin widgets. It is also responsible to draw the lines
@@ -43,13 +45,13 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
 
     Parameters
     ----------
-    parent : QtWidget, optional
+    parent : QtWidgets.QWidget or None, optional
         The parent widget. The default is None.
     """
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any) -> None:
         QtWidgets.QFrame.__init__(self, parent=kwargs.get("parent", None))
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         self.setAcceptDrops(True)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
@@ -59,13 +61,13 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 
-    def paintEvent(self, event: QtCore.QEvent):
+    def paintEvent(self, event: QtGui.QPaintEvent) -> None:
         """
         Overload the paintEvent to also draw lines connecting parent and child plugins.
 
         Parameters
         ----------
-        event : QtCore.QEvent
+        event : QtGui.QPaintEvent
             The calling event.
         """
         self.painter.begin(self)
@@ -74,7 +76,7 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         self.painter.end()
         super().paintEvent(event)
 
-    def draw_connections(self):
+    def draw_connections(self) -> None:
         """
         Draw connections between plugins.
 
@@ -85,7 +87,9 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         for _x0, _y0, _x1, _y1 in self.widget_connections:
             self.painter.drawLine(_x0, _y0, _x1, _y1)
 
-    def update_widget_connections(self, widget_conns: list):
+    def update_widget_connections(
+        self, widget_conns: list[tuple[int, int, int, int]]
+    ) -> None:
         """
         Store updated widget connections.
 
@@ -94,7 +98,7 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
 
         Parameters
         ----------
-        widget_conns : list
+        widget_conns : list[tuple[int, int, int, int]]
             A list with coordinate pairs to draw connections.
         """
         self.widget_connections = widget_conns
@@ -104,8 +108,8 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         """
         Set the Qt sizeHint to be the widget's size.
 
-        Note that the sizeHint is arbitrary large because it limits the QScrollArea's
-        size.
+        Note that the sizeHint is arbitrary large because it limits
+        the QScrollArea's size.
 
         Returns
         -------

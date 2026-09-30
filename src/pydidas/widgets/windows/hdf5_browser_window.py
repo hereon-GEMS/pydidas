@@ -16,7 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with custom Pydidas DataViews to be used in silx widgets.
+Module with the Hdf5BrowserWindow class to browse and display the tree
+structure of HDF5 files.
 """
 
 __author__ = "Malte Storm"
@@ -29,14 +30,14 @@ __all__ = ["Hdf5BrowserWindow"]
 
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 import h5py
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui import icons as silx_icons
-from silx.gui.hdf5 import Hdf5TreeModel, Hdf5TreeView, NexusSortFilterProxyModel
 
+from pydidas.core.lazy_imports.silx import silx_hdf5, silx_icons
 from pydidas.resources.pydidas_icons import pydidas_icon_with_bg
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -48,47 +49,41 @@ class Hdf5BrowserWindow(PydidasWindow):
 
     Parameters
     ----------
-    **kwargs : dict
+    **kwargs : Any
         Any keyword arguments. Supported kwargs are:
 
         parent : QtWidgets.QWidget, optional
             The parent widget of the browser.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self.__qtapp = PydidasQApplication.instance()
-        PydidasWindow.__init__(self, title="Hdf5 structure browser", **kwargs)
+        super().__init__(title="Hdf5 structure browser", **kwargs)
         self.setWindowIcon(pydidas_icon_with_bg())
         self.__open_file = None
 
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
+    def build_frame(self) -> None:
+        """Build the frame and create all widgets."""
         self._create_treeview()
         self._create_toolbar()
         self.add_any_widget("toolbar", self.__toolbar, gridPos=(0, 0, 1, 1))
         self.add_any_widget("treeview", self._h5_treeview, gridPos=(1, 0, 1, 1))
         self._set_size_and_position()
 
-    def _create_treeview(self):
-        """
-        Create the tree view for the browser.
-        """
-        self._h5_treeview = Hdf5TreeView(self)
+    def _create_treeview(self) -> None:
+        """Create the tree view for the browser."""
+        self._h5_treeview = silx_hdf5.Hdf5TreeView(self)
         self._h5_treeview.setExpandsOnDoubleClick(True)
 
-        _tree_model = Hdf5TreeModel(self._h5_treeview, ownFiles=False)
-        self._tree_model_sorted = NexusSortFilterProxyModel(self._h5_treeview)
+        _tree_model = silx_hdf5.Hdf5TreeModel(self._h5_treeview, ownFiles=False)
+        self._tree_model_sorted = silx_hdf5.NexusSortFilterProxyModel(self._h5_treeview)
         self._tree_model_sorted.setSourceModel(_tree_model)
         self._tree_model_sorted.sort(0, QtCore.Qt.AscendingOrder)
         self._tree_model_sorted.setSortCaseSensitivity(QtCore.Qt.CaseInsensitive)
         self._h5_treeview.setModel(self._tree_model_sorted)
 
-    def _create_toolbar(self):
-        """
-        Create the toolbar for the tree view
-        """
+    def _create_toolbar(self) -> None:
+        """Create the toolbar for the tree view."""
         __default_height = int(1.5 * self.__qtapp.font_height)
         self.__toolbar = QtWidgets.QToolBar(self)
         self.__toolbar.setIconSize(QtCore.QSize(__default_height, __default_height))
@@ -113,27 +108,16 @@ class Hdf5BrowserWindow(PydidasWindow):
 
         self.__qtapp.sig_new_font_metrics.connect(self._update_toolbar_icons)
 
-    def _set_layout(self):
-        """
-        Set the layout of the browser.
-        """
-        _layout = QtWidgets.QVBoxLayout()
-        _layout.addWidget(self.__toolbar)
-        _layout.addWidget(self._h5_treeview)
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.setSpacing(0)
-        self.setLayout(_layout)
-
-    def _set_size_and_position(self):
-        """
-        Set the size and position of the window
-        """
+    def _set_size_and_position(self) -> None:
+        """Set the size and position of the window."""
         if self.parent() is None:
             _origin = (50, 50)
             _screen = QtGui.QGuiApplication.primaryScreen()
         else:
             _origin = (self.parent().x(), self.parent().y())
             _screen = QtGui.QGuiApplication.screenAt(self.parent().geometry().center())
+            if _screen is None:
+                _screen = QtGui.QGuiApplication.primaryScreen()
         _screen_size = _screen.size()
         _default_size = (
             min(
@@ -149,7 +133,7 @@ class Hdf5BrowserWindow(PydidasWindow):
         self.resize(*_default_size)
 
     @QtCore.Slot(float, float)
-    def _update_toolbar_icons(self, font_width: float, font_height: float):
+    def _update_toolbar_icons(self, font_width: float, font_height: float) -> None:
         """
         Update the toolbar icons based on the font width and height.
 
@@ -162,7 +146,7 @@ class Hdf5BrowserWindow(PydidasWindow):
         self.__toolbar.setIconSize(QtCore.QSize(_icon_size, _icon_size))
 
     @QtCore.Slot()
-    def __toggle_selection(self, expand: bool):
+    def __toggle_selection(self, expand: bool) -> None:
         """
         Expand or collapse all selected items in the tree view.
 
@@ -179,10 +163,8 @@ class Hdf5BrowserWindow(PydidasWindow):
         if expand:
             QtWidgets.QApplication.restoreOverrideCursor()
 
-    def open_file(self, filename: str | Path):
-        """
-        Open a file in the browser
-        """
+    def open_file(self, filename: str | Path) -> None:
+        """Open a file in the browser."""
         if self.__open_file is not None:
             self.__open_file.close()
             self.__open_file = None
@@ -199,10 +181,9 @@ class Hdf5BrowserWindow(PydidasWindow):
         self.raise_()
         self.setFocus()
 
-    def closeEvent(self, event):
-        """
-        Handle the close event of the widget and assure all files are closed.
-        """
-        self.__open_file.close()
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        """Handle the close event of the widget and assure all files are closed."""
+        if self.__open_file is not None:
+            self.__open_file.close()
         self._h5_treeview.findHdf5TreeModel().clear()
         super().closeEvent(event)

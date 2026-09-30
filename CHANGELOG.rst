@@ -21,9 +21,11 @@ Improvements
 - Added an options parser to the GUI starter script to set the state import
   at calling time with an argument. Use '-restore_state None | exit | saved'
 - Added lazy imports of pyFAI to improve startup time.
+- Added a fast viewer based on PyQtGraph for 2D images.
 - Adjust svgs and background colors of nodes in workflow tree for better
   readability when system wide dark mode is enabled.
 - Added checks to prevent non-input plugins from being used as workflow roots.
+
 
 Programmatic changes
 --------------------
@@ -48,8 +50,12 @@ Programmatic changes
   the ParameterCollection
 - Added information about python version and Qt binding to AboutWindow.
 - Updated the way pydidas handles font scaling on silx colorbars
+- Renamed the `dialogues` subpackage to `dialogs` for consistency with
+  development standards and Qt.
 - When importing data, the return datatype in `import_data` calls must
   be specified with `astype` instead of `datatype`.
+- Modified the default_frames to lazily load the frames and only
+  import and return them on request.
 
 
 Bugfixes
@@ -100,8 +106,13 @@ Bugfixes
   to open binary images when no other image format was selected beforehand.
 - Fixed an issue which did not allow the QuickIntegrationFrame to be opened
   when the experimental settings were not fully configured.
+- Fixed an issue which allowed PydidasQApplication font change signals to be
+  passed to already deleted QWidgets.
 - Fixed an issue which caused nodes to be deleted from the UI but not from the
   workflow when trying to delete root nodes with multiple children.
+- Fixed an issue when the GUI state import fell back to default exit state
+  states with custom names.
+
 
 v26.05.19
 =========

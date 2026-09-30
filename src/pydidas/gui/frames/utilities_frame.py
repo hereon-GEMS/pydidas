@@ -33,9 +33,11 @@ from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
-from pydidas.gui.frames.builders import UtilitiesFrameBuilder
+from pydidas.gui.frames.builders.utilities_frame_builder import (
+    UTILITIES_FRAME_BUILD_CONFIG,
+)
 from pydidas.gui.frames.composite_creator_frame import CompositeCreatorFrame
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.windows import (
     ExportEigerPixelmaskWindow,
     GlobalSettingsWindow,
@@ -54,16 +56,14 @@ class UtilitiesFrame(BaseFrame):
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         BaseFrame.__init__(self, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
         self._add_config_windows()
 
-    def _add_config_windows(self):
-        """
-        Create the required widgets and signals for the global configuration window.
-        """
+    def _add_config_windows(self) -> None:
+        """Create widgets and signals for the global configuration window."""
         _frame = GlobalSettingsWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["global_settings"] = _frame
@@ -71,25 +71,23 @@ class UtilitiesFrame(BaseFrame):
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
 
-    def build_frame(self):
-        """
-        Build the frame and populate it with widgets.
-        """
-        UtilitiesFrameBuilder.build_frame(self)
+    def build_frame(self) -> None:
+        """Build the frame and populate it with widgets."""
+        for _method, _args, _kwargs in UTILITIES_FRAME_BUILD_CONFIG:
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        super().build_frame()
 
-    def finalize_ui(self):
-        """
-        finalize the UI initialization.
-        """
+    def finalize_ui(self) -> None:
+        """finalize the UI initialization."""
         self.__app = QtWidgets.QApplication.instance()
         self.__app.sig_exit_pydidas.connect(
             self._child_windows["global_settings"].close
         )
+        super().finalize_ui()
 
-    def connect_signals(self):
-        """
-        Connect the required signals and slots to add functionality to widgets.
-        """
+    def connect_signals(self) -> None:
+        """Connect the required signals and slots to add functionality to widgets."""
         self._widgets["button_eiger_mask"].clicked.connect(
             partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
@@ -108,18 +106,15 @@ class UtilitiesFrame(BaseFrame):
         self._widgets["button_composite_creation"].clicked.connect(
             partial(self.create_and_show_frame, CompositeCreatorFrame)
         )
-        # self._widgets["button_directory_spy"].clicked.connect(
-        #     partial(self.create_and_show_frame, DirectorySpyFrame)
-        # )
 
     @QtCore.Slot(object)
-    def create_and_show_temp_window(self, window: type[QtWidgets.QWidget]):
+    def create_and_show_temp_window(self, window: type[QtWidgets.QWidget]) -> None:
         """
         Show the given temporary window.
 
         Parameters
         ----------
-        window : QtCore.QWidget
+        window : type[QtWidgets.QWidget]
             The window to be shown.
         """
         _name = f"temp_window_{self.__window_counter:03d}"
@@ -132,13 +127,13 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[_name].show()
 
     @QtCore.Slot(object)
-    def create_and_show_frame(self, frame: type[BaseFrame]):
+    def create_and_show_frame(self, frame: type[BaseFrame]) -> None:
         """
         Show the given frame.
 
         Parameters
         ----------
-        frame : pydidas.widgets.framework.BaseFrame
+        frame : type[pydidas.widgets.base_classes.BaseFrame]
             The frame to be shown.
         """
         if frame.menu_title in self._child_windows:
@@ -151,7 +146,7 @@ class UtilitiesFrame(BaseFrame):
         _frame.show()
 
     @QtCore.Slot(str)
-    def show_window(self, name: str):
+    def show_window(self, name: str) -> None:
         """
         Show a separate window.
 
@@ -166,7 +161,7 @@ class UtilitiesFrame(BaseFrame):
         self._child_windows[name].raise_()
 
     @QtCore.Slot(str)
-    def remove_window_from_children(self, name: str):
+    def remove_window_from_children(self, name: str) -> None:
         """
         Remove the specified window from the list of child window.
 

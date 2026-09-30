@@ -52,7 +52,7 @@ class TestPydidasQSettings(unittest.TestCase):
             self.q_settings.setValue(
                 f"{VERSION}/global/{key}", self._params.get_value(key)
             )
-        self.q_settings.setValue(f"{VERSION}/dialogues/test", "a test")
+        self.q_settings.setValue(f"{VERSION}/dialogs/test", "a test")
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
@@ -74,7 +74,7 @@ class TestPydidasQSettings(unittest.TestCase):
         for _key in self._params:
             _val = self._params.get_value(_key)
             self.assertIn(f"global/{_key}: {_val}", _text)
-        self.assertNotIn("dialogues/test", _text)
+        self.assertNotIn("dialogs/test", _text)
 
     def test_get_all_stored_q_settings(self):
         obj = PydidasQsettings(version="unittesting")

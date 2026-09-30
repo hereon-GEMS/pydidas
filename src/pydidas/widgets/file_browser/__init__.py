@@ -30,6 +30,4 @@ __status__ = "Production"
 from .directory_explorer import DirectoryExplorer
 
 
-__all__ = [
-    "DirectoryExplorer",
-]
+__all__ = ["DirectoryExplorer"]

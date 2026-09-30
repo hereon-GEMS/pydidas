@@ -33,7 +33,6 @@ from typing import Any
 
 from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import (
@@ -49,15 +48,16 @@ from pydidas.core.constants import (
 from pydidas.core.generic_params.generic_params_settings import (
     GENERIC_PARAMS_SETTINGS,
 )
+from pydidas.core.lazy_imports.silx import ColormapNameComboBox
 from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
-from pydidas.widgets.dialogues import (
+from pydidas.widgets.base_classes import PydidasWindow
+from pydidas.widgets.base_reimplementations import SquareButton
+from pydidas.widgets.dialogs import (
     PydidasExceptionMessageBox,
     QuestionBox,
 )
-from pydidas.widgets.factory import SquareButton
-from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -509,7 +509,7 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
         """
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
-            None,
+            self,
             "",
             "Are you sure to reset all the values?",
             _qm.Yes | _qm.No,

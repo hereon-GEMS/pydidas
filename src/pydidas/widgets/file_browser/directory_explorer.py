@@ -39,22 +39,20 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_directory, get_single_shot_timer
+from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.file_browser._directory_explorer_config import (
     DIRECTORY_EXPLORER_DEFAULT_PARAMS,
     DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG,
 )
-from pydidas.widgets.file_browser.directory_explorer_filter_model import (
-    DirectoryExplorerFilterModel,
-)
-from pydidas.widgets.widget_with_parameter_collection import (
-    WidgetWithParameterCollection,
+from pydidas.widgets.file_browser._directory_explorer_filter_model import (
+    _DirectoryExplorerFilterModel,
 )
 
 
 _DRIVE_LETTER_RE = re.compile(r"^[A-Za-z]:$")
 
 
-class DirectoryExplorer(WidgetWithParameterCollection):
+class DirectoryExplorer(WidgetWithParameters):
     """
     The DirectoryExplorer is an implementation of a QTreeView widget with a
     file system model to display the contents of directories.
@@ -76,7 +74,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
     default_params = DIRECTORY_EXPLORER_DEFAULT_PARAMS
 
     def __init__(self, **kwargs: Any) -> None:
-        WidgetWithParameterCollection.__init__(self, **kwargs)
+        WidgetWithParameters.__init__(self, **kwargs)
         self.__dir_to_load: Path | None = Path(
             kwargs.get(
                 "current_path",
@@ -134,7 +132,7 @@ class DirectoryExplorer(WidgetWithParameterCollection):
         did not change the edit for 500 ms to prevent multiple calls during
         editing.
         """
-        self._filter_model = DirectoryExplorerFilterModel()
+        self._filter_model = _DirectoryExplorerFilterModel()
         self._filter_model.setSourceModel(self._file_model)  # type: ignore[arg-type]
         self._widgets["tree_view"].setModel(self._filter_model)
         self.__pending_filter_text = ""

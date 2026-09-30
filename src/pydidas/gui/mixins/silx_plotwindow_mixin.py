@@ -29,29 +29,21 @@ __all__ = ["SilxPlotWindowMixIn"]
 
 import warnings
 
-import matplotlib
 import numpy as np
-from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
 
+from pydidas.core.lazy_imports.silx import BackendMatplotlibQt
 from pydidas.core.utils import LOGGING_LEVEL, pydidas_logger
 
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
-# TODO: Remove on next silx release. The lines below are a workaround for issue
-# silx #4472 [https://github.com/silx-kit/silx/issues/4472] which was solved
-# with PR #4481 [https://github.com/silx-kit/silx/pull/4481] but has not yet
-# been released.
-matplotlib.use("QtAgg", force=True)
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg  # noqa
-
 
 class SilxPlotWindowMixIn:
     """
-    MixIn class with Controls for Silx PlotWindow.
+    MixIn class with Controls for silx PlotWindow.
 
     NOTE: This class expects a PlotWindow widget with the reference
-    class._widgets['PlotWindow']. Due to the different layouts, this MixIn
+    class._widgets['plot_window']. Due to the different layouts, this MixIn
     does *not* create the PlotWindow instance.
     """
 

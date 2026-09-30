@@ -35,21 +35,20 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.core.constants import POLICY_EXP_FIX
+from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.data_viewer.data_axis_selector import (
     GENERIC_AXIS_SELECTOR_CHOICES,
     DataAxisSelector,
 )
-from pydidas.widgets.widget_with_parameter_collection import (
-    WidgetWithParameterCollection,
-)
 
 
-class AxesSelector(WidgetWithParameterCollection):
+class AxesSelector(WidgetWithParameters):
     """
-    The AxesSelector is a widget to select slicing for a given Dataset.
+    The AxesSelector is a widget to select multidimensional slicing for
+    a given Dataset.
 
-    The AxesSelector allows to select slicing for a dataset based on indexing
-    or on metadata.
+    The AxesSelector allows to select slicing for a dataset based on
+    indexing or on metadata.
 
     Supported signals:
 
@@ -63,7 +62,7 @@ class AxesSelector(WidgetWithParameterCollection):
     sig_new_slicing_str_repr = QtCore.Signal(str, str)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any):
-        WidgetWithParameterCollection.__init__(self, parent=parent, **kwargs)
+        WidgetWithParameters.__init__(self, parent=parent, **kwargs)
         self._axis_widgets = {}
         self._data_shape = ()
         self._data_ndim = 0

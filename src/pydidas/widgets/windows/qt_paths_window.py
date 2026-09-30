@@ -29,6 +29,7 @@ __all__ = ["QtPathsWindow"]
 
 from functools import partial
 from pathlib import Path
+from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
@@ -40,7 +41,7 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import get_logging_dir
 from pydidas.resources import logos
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 
 
 _FULL_WIDTH = FONT_METRIC_CONSOLE_WIDTH + FONT_METRIC_WIDE_BUTTON_WIDTH
@@ -51,7 +52,7 @@ class QtPathsWindow(PydidasWindow):
 
     show_frame = False
 
-    def __init__(self, **kwargs: dict):
+    def __init__(self, **kwargs: Any):
         self._log_path = get_logging_dir()
         self._config_path = Path(
             QtCore.QStandardPaths.standardLocations(
@@ -60,7 +61,7 @@ class QtPathsWindow(PydidasWindow):
         )
         PydidasWindow.__init__(self, title="pydidas paths", **kwargs)
 
-    def build_frame(self):
+    def build_frame(self) -> None:
         """Build the frame and create all widgets."""
         _font_width, _font_height = QtWidgets.QApplication.instance().font_metrics
 
@@ -122,7 +123,7 @@ class QtPathsWindow(PydidasWindow):
             gridPos=(1, 1, 1, 1),
         )
 
-    def connect_signals(self):
+    def connect_signals(self) -> None:
         """Connect all required signals."""
         self._widgets["but_okay"].clicked.connect(self.close)
         self._widgets["but_open_logdir"].clicked.connect(
@@ -135,24 +136,24 @@ class QtPathsWindow(PydidasWindow):
             self.process_new_font_metrics
         )
 
-    def finalize_ui(self):
+    def finalize_ui(self) -> None:
         """Finalize the user interface."""
         QtCore.QTimer.singleShot(0, self._widgets["but_okay"].setFocus)
 
     @QtCore.Slot()
-    def open_folder(self, folder):
+    def open_folder(self, folder: str | Path) -> None:
         """
         Open the selected folder in the system's standard file browser.
 
         Parameters
         ----------
-        folder : str
+        folder : str or Path
             The folder name.
         """
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(folder))
 
     @QtCore.Slot(float, float)
-    def process_new_font_metrics(self, char_width: float, char_height: float):
+    def process_new_font_metrics(self, char_width: float, char_height: float) -> None:
         """
         Process the user input of the new font size.
 

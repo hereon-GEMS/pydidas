@@ -36,7 +36,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, QSETTINGS_GLOBAL_KEYS
 from pydidas.core.singleton import QtSingleton
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 

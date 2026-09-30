@@ -46,15 +46,15 @@ from pydidas.core.utils import (
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.data_io import IoManager
-from pydidas.gui.frames.builders import (
+from pydidas.gui.frames.builders.composite_creator_frame_builder import (
     COMPOSITE_CREATOR_FRAME_BUILD_CONFIG,
     KEYS_TO_INSERT_LINES_AFTER,
     ccf_param_widget_config,
 )
-from pydidas.gui.mixins import SilxPlotWindowMixIn
+from pydidas.gui.mixins.silx_plotwindow_mixin import SilxPlotWindowMixIn
 from pydidas.multiprocessing import AppRunner
-from pydidas.widgets import dialogues
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets import dialogs
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -119,8 +119,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.layout().setContentsMargins(10, 0, 0, 0)
         self.setMinimumHeight(800)
         for _method, _args, _kwargs in COMPOSITE_CREATOR_FRAME_BUILD_CONFIG:
-            getattr(self, _method)(*_args, **_kwargs)
-
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         for _key in self.params:
             self.create_param_widget(_key, **ccf_param_widget_config(_key))
             # add spacers between groups:
@@ -131,6 +131,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                     f"CompositeCreatorFrame__{_key}"
                 )
         self.setVisible(_vis)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect the required signals between widgets and methods."""
@@ -443,7 +444,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         if self.get_param_value("live_processing") or Path(fname).is_file():
             return True
         if fname not in ["", "."]:
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "File does not exist",
                 f'The selected file\n\n"{fname}"\n\ndoes not exist.',
             )
@@ -490,7 +491,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             The filename to the hdf5 data file.
         """
         _fname = Path(fname)
-        dset = dialogues.Hdf5DatasetSelectionPopup(self, _fname).get_dset()
+        dset = dialogs.Hdf5DatasetSelectionPopup(self, _fname).get_dset()
         if dset is not None:
             self.set_param_and_widget_value("hdf5_key", dset)
             self.__selected_hdf5_key()
@@ -529,7 +530,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._config["bg_hdf5_images"] = hdf5_flag
         self._config["bg_configured"] = not hdf5_flag
         if hdf5_flag:
-            dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
+            dset = dialogs.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
                 self.set_param_and_widget_value("bg_hdf5_key", dset)
                 self._config["bg_configured"] = True
@@ -566,7 +567,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             _flag = True
         else:
             self.__clear_entries("bg_hdf5_key", hide=False)
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "Dataset key error",
                 (
                     f'The selected file\n\n"{_fname}"\n\ndoes not have the '
@@ -760,10 +761,10 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self._filelist.update()
         except UserConfigError as _error:
             self.__clear_entries("last_file", hide=False)
-            dialogues.critical_warning("Could not create filelist.", str(_error))
+            dialogs.critical_warning("Could not create filelist.", str(_error))
             return
         if not self._filelist.n_files > 0:
-            dialogues.critical_warning(
+            dialogs.critical_warning(
                 "File list is empty.",
                 "The list of files is empty. Please verify the selection.",
             )

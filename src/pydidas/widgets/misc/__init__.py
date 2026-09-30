@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,29 +20,24 @@ Package with miscellaneous individual QWidgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-from .line_edit_with_icon import *
-from .points_for_beamcenter_widget import *
-from .read_only_text_widget import *
-from .show_integration_roi_params_widget import *
+from .configure_binary_decoding_widget import ConfigureBinaryDecodingWidget
+from .hdf5_dataset_selector import Hdf5DatasetSelector
+from .integration_roi_param_container import IntegrationRoiParamContainer
+from .points_for_beamcenter_widget import PointsForBeamcenterWidget
+from .select_data_frame_widget import SelectDataFrameWidget
 
 
-__all__ = (
-    line_edit_with_icon.__all__
-    + points_for_beamcenter_widget.__all__
-    + show_integration_roi_params_widget.__all__
-    + read_only_text_widget.__all__
-)
-
-del (
-    line_edit_with_icon,
-    points_for_beamcenter_widget,
-    show_integration_roi_params_widget,
-    read_only_text_widget,
-)
+__all__ = [
+    "ConfigureBinaryDecodingWidget",
+    "Hdf5DatasetSelector",
+    "IntegrationRoiParamContainer",
+    "PointsForBeamcenterWidget",
+    "SelectDataFrameWidget",
+]

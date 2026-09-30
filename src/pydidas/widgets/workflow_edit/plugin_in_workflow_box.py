@@ -37,7 +37,7 @@ from qtpy.QtWidgets import QFrame
 
 from pydidas.core.constants import ALIGN_CENTER_LEFT, ALIGN_TOP_RIGHT
 from pydidas.core.utils import apply_qt_properties
-from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.base_classes import WidgetFactoryMixIn
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 from pydidas.workflow import WorkflowTree
 from pydidas_qtcore import PydidasQApplication
@@ -46,7 +46,7 @@ from pydidas_qtcore import PydidasQApplication
 TREE = WorkflowTree()
 
 
-class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
+class PluginInWorkflowBox(WidgetFactoryMixIn, QFrame):
     """
     Widget to represent a Plugin in the WorkflowTree.
 
@@ -59,10 +59,10 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         The name of the Plugin class.
     widget_id : int
         The widget ID. This is the same as the corresponding node ID.
-    **kwargs : dict
+    **kwargs : Any
         Additional supported keyword arguments are:
 
-        parent : Union[QtWidgets.QWidget, None], optional
+        parent : QtWidgets.QWidget or None, optional
             The widget's parent. The default is None.
         label : str, optional
             The node's label. The default is an empty string.
@@ -76,9 +76,9 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
     sig_new_node_parent_request = QtCore.Signal(int, int)
     sig_create_copy_request = QtCore.Signal(int, int)
 
-    def __init__(self, plugin_name: str, widget_id: int, **kwargs: Any):
+    def __init__(self, plugin_name: str, widget_id: int, **kwargs: Any) -> None:
         QtWidgets.QFrame.__init__(self, kwargs.get("parent", None))
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(
             self.layout(),
@@ -128,7 +128,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.__create_menus()
         self.__update_style()
 
-    def update_text(self, node_id: int, label: str = ""):
+    def update_text(self, node_id: int, label: str = "") -> None:
         """
         Update the text for the node label.
 
@@ -139,22 +139,22 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         label : str, optional
             The new label for the workflow node.
         """
-        _txt = f"node {node_id:d}" + (f": {label}" if len(label) > 0 else "")
+        _txt = f"node {node_id:d}" + (f": {label}" if label else "")
         self._widgets["node_label"].setText(_txt)
 
-    def update_plugin(self, plugin_name: str):
+    def update_plugin(self, plugin_name: str) -> None:
         """
-        Update the plugin.
+        Update the plugin class name.
 
         Parameters
         ----------
         plugin_name : str
-            The type of the new plugin.
+            The name of the new plugin class.
         """
         self._widgets["plugin_name"].setText(plugin_name)
         self.update_text(self.widget_id)
 
-    def __create_menus(self):
+    def __create_menus(self) -> None:
         """
         Create custom context menus.
 
@@ -172,12 +172,14 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self._menu_item_context.addMenu(self._menu_move)
         self._menu_item_context.addMenu(self._menu_append)
 
-        self._delete_node_context = QtWidgets.QMenu(self)
-
         self._del_actions = {
             "delete": QtWidgets.QAction("Delete this node", self),
             "delete_branch": QtWidgets.QAction("Delete this branch", self),
         }
+        self._delete_node_context = QtWidgets.QMenu(self)
+        self._delete_node_context.addAction(self._del_actions["delete"])
+        self._delete_node_context.addAction(self._del_actions["delete_branch"])
+
         self._del_actions["delete"].triggered.connect(
             partial(self.sig_widget_delete_request.emit, self.widget_id)
         )
@@ -185,10 +187,8 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
         )
         self._del_actions["delete_branch"].triggered.connect(self.deleteLater)
-        self._delete_node_context.addAction(self._del_actions["delete"])
-        self._delete_node_context.addAction(self._del_actions["delete_branch"])
 
-    def __show_deletion_context_menu(self, event: QtGui.QMouseEvent):
+    def __show_deletion_context_menu(self, event: QtGui.QMouseEvent) -> None:
         """
         Show the node deletion context menu.
 
@@ -199,10 +199,8 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         """
         self._delete_node_context.exec(event.globalPosition().toPoint())
 
-    def __update_style(self):
-        """
-        Update the widget's style based on the stored flags and application theme.
-        """
+    def __update_style(self) -> None:
+        """Update the widget's style based on the stored flags and application theme."""
         _app = PydidasQApplication.instance()
         _dark = _app.is_dark_mode if _app else False
 
@@ -234,47 +232,41 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             "}"
         )
 
-    def mousePressEvent(self, event: QtGui.QMouseEvent):
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         """
         Extend the generic mousePressEvent by an activation signal.
 
         Parameters
         ----------
-        event : QtCore.QEvent
+        event : QtGui.QMouseEvent
             The original event.
         """
         event.accept()
         if not self.flags["active"]:
             self.sig_widget_activated.emit(self.widget_id)
 
-    def delete(self):
-        """
-        Send the delete request to the WorkflowTreeEditManager.
-        """
-        self.sig_widget_delete_request.emit(self.widget_id)
-
     @QtCore.Slot(int)
-    def new_widget_selected(self, selection: bool):
+    def new_widget_selected(self, selection: int) -> None:
         """
         Select or deselect the widget.
 
         Parameters
         ----------
-        selection : bool
-            Flag whether the widget has been selected (True) or deselected
-            (False).
+        selection : int
+            The node ID of the currently selected widget, or -1 if no
+            widget is selected.
         """
         self.flags["active"] = self.widget_id == selection
         self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_inconsistent_signal(self, widget_ids: list[int]):
+    def receive_inconsistent_signal(self, widget_ids: list[int]) -> None:
         """
         Handle the node inconsistent signal set the stylesheets.
 
         Parameters
         ----------
-        *widget_ids : list[int]
+        widget_ids : list[int]
             The widget node IDs which are inconsistent.
         """
         if self.widget_id in widget_ids and not self.flags["inconsistent"]:
@@ -282,7 +274,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             self.__update_style()
 
     @QtCore.Slot(list)
-    def receive_consistent_signal(self, widget_ids: list[int]):
+    def receive_consistent_signal(self, widget_ids: list[int]) -> None:
         """
         Handle the node consistent signal set the stylesheets.
 
@@ -295,10 +287,15 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             self.flags["inconsistent"] = False
             self.__update_style()
 
-    def mouseMoveEvent(self, event: QtGui.QMouseEvent):
+    def mouseMoveEvent(self, event: QtGui.QMouseEvent) -> None:
         """
         Implement a mouse move event to drag the plugins to a new position in the
         WorkflowTree.
+
+        Parameters
+        ----------
+        event : QtGui.QMouseEvent
+            The mouse move event.
         """
         if not (event.buttons() & QtCore.Qt.LeftButton):
             return super().mouseMoveEvent(event)
@@ -318,18 +315,18 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
 
         (getattr(drag, "exec", None) or drag.exec_)(QtCore.Qt.MoveAction)
 
-    def dragEnterEvent(self, event: QtCore.QEvent):
+    def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         """
         Enable dragging of this widget.
 
         Parameters
         ----------
-        event : QtCore.QEvent
+        event : QtGui.QDragEnterEvent
             The drag event.
         """
         event.accept()
 
-    def dropEvent(self, event: QtCore.QEvent):
+    def dropEvent(self, event: QtGui.QDropEvent) -> None:
         """
         Allow dropping the widget on other WorkflowNode widgets.
 
@@ -352,7 +349,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             event.acceptProposedAction()
 
     @QtCore.Slot(QtCore.QPoint)
-    def _open_context_menu(self, point: QtCore.QPoint):
+    def _open_context_menu(self, point: QtCore.QPoint) -> None:
         """
         Open the context menu after updating the menu entries based on the
         current WorkflowTree.
@@ -360,7 +357,7 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         self.__update_menus()
         self._menu_item_context.exec(self.mapToGlobal(point))
 
-    def __update_menus(self):
+    def __update_menus(self) -> None:
         """
         Update the menus to move and to append a copy based on the nodes in the Tree.
         """
@@ -392,25 +389,25 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
             )
 
     @QtCore.Slot(int)
-    def _emit_new_parent_signal(self, new_parent_id: int):
+    def _emit_new_parent_signal(self, new_parent_id: int) -> None:
         """
         Emit the signal to move the node to a new parent.
 
         Parameters
         ----------
-        new_parent_id: int
+        new_parent_id : int
             The id of the new parent node.
         """
         self.sig_new_node_parent_request.emit(self.widget_id, new_parent_id)
 
     @QtCore.Slot(int)
-    def _emit_create_copy_signal(self, new_parent_id: int):
+    def _emit_create_copy_signal(self, new_parent_id: int) -> None:
         """
-        Emit the signal to move the node to a new parent.
+        Emit the signal to create a plugin copy and append it to a new parent.
 
         Parameters
         ----------
-        new_parent_id: int
+        new_parent_id : int
             The id of the new parent node.
         """
         self.sig_create_copy_request.emit(self.widget_id, new_parent_id)

@@ -47,8 +47,7 @@ from pydidas.core.lazy_imports.pyFAI import (
 )
 from pydidas.core.lazy_imports.silx import ImageToolBar
 from pydidas.widgets import PydidasFileDialog, icon_with_inverted_colors
-from pydidas.widgets.silx_plot import actions
-from pydidas.widgets.silx_plot.silx_actions import PydidasLoadImageAction
+from pydidas.widgets.silx_plot import silx_actions
 
 
 # ------------------------------------
@@ -147,7 +146,7 @@ def _replace_exp_task_button_actions(exp_task: ExperimentTask) -> None:
         _btn = getattr(exp_task, _item)
         while _btn.actions():
             _btn.removeAction(_btn.actions()[0])
-        _action = PydidasLoadImageAction(_btn)
+        _action = silx_actions.PydidasLoadImageAction(_btn)
         _btn.addAction(_action)
         _btn.setDefaultAction(_action)
 
@@ -196,13 +195,13 @@ def _update_toolbar_entries(
     for _task in tasks:
         _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
         _toolbar = _plot.findChildren(ImageToolBar.resolve())[0]  # type: ignore[attr-defined]
-        _histo_crop_action = actions.CropHistogramOutliersAction(
+        _histo_crop_action = silx_actions.CropHistogramOutliersAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
-        _autoscale_min_max_action = actions.AutoscaleToMinMaxAction(
+        _autoscale_min_max_action = silx_actions.AutoscaleToMinMaxAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
-        _autoscale_mean_3sigma_action = actions.AutoscaleToMeanAndThreeSigmaAction(
+        _autoscale_mean_3sigma_action = silx_actions.AutoscaleToMeanAndThreeSigmaAction(
             _plot, parent=_plot, forced_image_legend="image"
         )
         _widget_action = next(

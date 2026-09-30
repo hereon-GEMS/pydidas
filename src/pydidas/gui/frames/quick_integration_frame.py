@@ -46,13 +46,13 @@ from pydidas.gui.frames.builders.quick_integration_frame_builder import (
 )
 from pydidas.plugins import PluginCollection, pyFAIintegrationBase
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
     ManuallySetIntegrationRoiController,
 )
-from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget import (
-    BaseParamIoWidget,
+from pydidas.widgets.param_io.base_param_io_widget import (
+    BaseParamIo,
 )
 
 
@@ -124,7 +124,8 @@ class QuickIntegrationFrame(BaseFrame):
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:
                 _kwargs["plugin"] = self._plugins["generic"]
-            getattr(self, _method)(*_args, **_kwargs)
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         self._widgets["tabs"].addTab(self._widgets["tab_plot"], "Input image")
         self._widgets["tabs"].addTab(self._widgets["res_plot"], "Integration results")
         self._widgets["but_toggle_exp_section"].linked_widget = self._widgets[
@@ -135,6 +136,7 @@ class QuickIntegrationFrame(BaseFrame):
         ]
         _n = self._widgets["config"].layout().rowCount()
         self._widgets["config"].layout().setRowStretch(_n - 1, 1)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """
@@ -291,7 +293,7 @@ class QuickIntegrationFrame(BaseFrame):
             )
 
     @QtCore.Slot()
-    def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
+    def _update_xray_param(self, param_key: str, widget: BaseParamIo) -> None:
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -299,7 +301,7 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         param_key : str
             The reference key.
-        widget : pydidas.widgets.parameter_config.BaseParamIoWidget
+        widget : pydidas.widgets.param_io.BaseParamIo
             The Parameter editing widget.
         """
         self._EXP.set_param_value(param_key, widget.get_value())

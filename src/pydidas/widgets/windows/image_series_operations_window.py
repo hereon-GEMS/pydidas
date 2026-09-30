@@ -48,8 +48,8 @@ from pydidas.core.utils import ShowBusyMouse, has_extension
 from pydidas.core.utils.hdf5 import get_hdf5_metadata
 from pydidas.data_io import IoManager, export_data, import_data
 from pydidas.managers import FilelistManager
-from pydidas.widgets import dialogues
-from pydidas.widgets.framework import PydidasWindow
+from pydidas.widgets import dialogs
+from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -262,7 +262,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         fname : str or Path
             The filename to the hdf5 data file.
         """
-        dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
+        dset = dialogs.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
             self.set_param_and_widget_value("hdf5_key", dset)
 

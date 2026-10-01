@@ -49,7 +49,7 @@ through the toolbar menu on the left (circled in orange):
 
 For a tutorial on how to use the *pyFAI-calib2* tool, please refer directly to
 the `pyFAI calibration tutorial
-<https://pyfai.readthedocs.io/en/master/usage/cookbook/calib-gui/index.html#cookbook-calibration-gui>`_.
+<https://pyfai.readthedocs.io/en/v2023.1/usage/cookbook/calib-gui/index.html#cookbook-calibration-gui>`_.
 
 2. Define the experimental setup
 --------------------------------

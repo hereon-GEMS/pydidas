@@ -169,7 +169,7 @@ the detector.
 
     The pyFAI geometry is described in detail in this pyFAI document:
     `Default geometry in pyFAI
-    <https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai>`_.
+    <https://pyfai.readthedocs.io/en/v2023.1/geometry.html#default-geometry-in-pyfai>`_.
 
 The pyFAI coordinate system used the :math:`x_1` (up), :math:`x_2` and
 :math:`x_3` (along the beam direction) coordinates. The :math:`x_2` axis is

@@ -138,23 +138,57 @@ Sub-package descriptions
     pydidas-specific PyQt5 widgets which are used in the graphical user
     interface.
 
-  - *pydidas.widgets.dialogues*
+  - *pydidas.widgets.base_classes*
 
-        User dialogue widgets which show in their own windows.
+        Base classes and mix-ins for pydidas widgets, frames and windows.
 
-  - *pydidas.widgets.factory*
+  - *pydidas.widgets.base_reimplementations*
 
-        Convenience functions to create new widgets and set Qt properties
-        defined by the user.
+        Re-implementations of generic Qt widgets with pydidas-specific extensions.
 
-  - *pydidas.widgets.parameter_config*
+  - *pydidas.widgets.controllers*
 
-        Specific widgets to edit the values of Parameters and functionality to
-        create and manage parameter config widgets.
+        Widget-specific controllers which handle the interaction between different widgets.
 
-  - *pydidas.widgets.selection*
+  - *pydidas.widgets.data_viewer*
 
-        Widgets used to select a specific item.
+        Widgets to view and browse data.
+
+  - *pydidas.widgets.dialogs*
+
+        User dialog widgets which show in their own windows.
+
+  - *pydidas.widgets.extended_widgets*
+
+        Extended generic widgets used throughout pydidas.
+
+  - *pydidas.widgets.file_browser*
+
+        Widgets used to browse the file system.
+
+  - *pydidas.widgets.misc*
+
+        Miscellaneous widgets for specific jobs.
+
+  - *pydidas.widgets.param_io*
+
+        Widgets to edit the values of Parameters.
+
+  - *pydidas.widgets.plugin_config_widgets*
+
+        Widgets to configure the Parameters of plugins.
+
+  - *pydidas.widgets.pyqtgraph_plot*
+
+        Widgets for plotting based on pyqtgraph.
+
+  - *pydidas.widgets.silx_plot*
+
+        Widgets used to extend the silx plotting functionality.
+
+  - *pydidas.widgets.windows*
+
+        Windows offering specific and more complicated functionality.
 
   - *pydidas.widgets.workflow_edit*
 

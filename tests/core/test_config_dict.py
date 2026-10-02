@@ -25,9 +25,11 @@ __status__ = "Production"
 
 
 import copy
+import json
 import pickle
 
 import pytest
+import yaml
 
 from pydidas.core import ConfigDict
 
@@ -299,6 +301,57 @@ def test_check_key__error_message_contains_class_and_type_names():
         ConfigDict({1: 1})
     with pytest.raises(TypeError, match="_SubConfigDict keys must be of type"):
         _SubConfigDict({1: 1})
+
+
+def _nested_config() -> ConfigDict:
+    return ConfigDict(
+        text="a",
+        number=1,
+        real=1.5,
+        flag=True,
+        nothing=None,
+        sequence=[1, "b", None],
+        mapping={"x": 1, "y": [2, 3]},
+        nested=ConfigDict(inner="p", values=[1, 2]),
+    )
+
+
+@pytest.mark.parametrize("protocol", range(pickle.HIGHEST_PROTOCOL + 1))
+def test_pickle__all_protocols_and_nested_values(protocol):
+    cfg = _nested_config()
+    restored = pickle.loads(pickle.dumps(cfg, protocol=protocol))
+    assert type(restored) is ConfigDict
+    assert restored == cfg
+    assert type(restored.nested) is ConfigDict
+
+
+def test_pickle__empty_config():
+    restored = pickle.loads(pickle.dumps(ConfigDict()))
+    assert type(restored) is ConfigDict
+    assert restored == {}
+
+
+def test_json_dumps__roundtrip():
+    cfg = _nested_config()
+    restored = ConfigDict(json.loads(json.dumps(cfg)))
+    assert type(restored) is ConfigDict
+    assert restored == cfg
+
+
+@pytest.mark.parametrize("config_class", [ConfigDict, _SubConfigDict])
+def test_yaml_safe_dump__roundtrip(config_class):
+    cfg = config_class(_nested_config())
+    text = yaml.safe_dump(cfg)
+    restored = config_class(yaml.safe_load(text))
+    assert type(restored) is config_class
+    assert restored == cfg
+
+
+def test_yaml_safe_dump__nested_config_dict_is_a_plain_mapping():
+    cfg = _SubConfigDict(a=1, b=ConfigDict(c=2))
+    assert yaml.safe_load(yaml.safe_dump({"outer": cfg})) == {
+        "outer": {"a": 1, "b": {"c": 2}}
+    }
 
 
 if __name__ == "__main__":

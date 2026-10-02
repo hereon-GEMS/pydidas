@@ -32,6 +32,8 @@ import warnings
 from collections.abc import Iterable
 from typing import Any, ClassVar, Self
 
+import yaml
+
 
 class ConfigDict(dict):
     """
@@ -39,6 +41,11 @@ class ConfigDict(dict):
 
     Keys which clash with attributes of dict (e.g. "items" or "keys") can only
     be accessed through item access (``cfg["items"]``).
+
+    The mapping can be pickled and exported with json.dumps and yaml.safe_dump
+    (the latter through a representer registered for the yaml.SafeDumper). Loading
+    JSON or YAML data gives plain dicts which can be converted with
+    ``ConfigDict(data)``.
 
     Parameters
     ----------
@@ -160,6 +167,10 @@ class ConfigDict(dict):
         _dict_repr = dict.__repr__(self).strip("{}")
         return f"{type(self).__name__}({_dict_repr})"
 
+    def __copy__(self) -> Self:
+        """Return a shallow copy of the mapping."""
+        return type(self)(self)
+
     def __hash__(self) -> int:
         """Return a hash of the mapping."""
         return ConfigDict.__hash_dict(self)
@@ -212,3 +223,11 @@ class ConfigDict(dict):
     def fromkeys(cls, iterable: Iterable[str], value: Any = None) -> Self:
         """Create a new mapping from an iterable of string keys."""
         return cls(dict.fromkeys(iterable, value))
+
+
+def _represent_config_dict(dumper: yaml.SafeDumper, data: ConfigDict) -> yaml.Node:
+    """Represent a ConfigDict (or subclass) as a plain YAML mapping."""
+    return dumper.represent_dict(dict(data))
+
+
+yaml.SafeDumper.add_multi_representer(ConfigDict, _represent_config_dict)

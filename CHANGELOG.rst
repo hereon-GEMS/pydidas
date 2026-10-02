@@ -59,6 +59,10 @@ Programmatic changes
 - Added a new dictionary subclass ConfigDict which enforces string
   keys and exposes a public read-only property ``config`` to access
   the dictionary.
+- The BaseApp (and subclasses) now use a ``default_config`` class attribute
+  to define the default configuration for the app. This allows a more
+  generic way to reset the configuration to default values and to handle
+  the state import.
 
 
 Bugfixes

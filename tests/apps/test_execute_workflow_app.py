@@ -192,11 +192,11 @@ def test_multiprocessing_pre_run(app) -> None:
 def test_prepare_run__stores_context(
     app, random_scan, dummy_tree, random_diff_exp
 ) -> None:
-    assert app.config["tree_str_rep"] == "[]"
+    assert app.config["tree_str_repr"] == "[]"
     assert app.config["scan_context_repr"] == {}
     assert app.config["exp_context_repr"] == {}
     app.prepare_run()
-    assert app.config["tree_str_rep"] == dummy_tree.export_to_string()
+    assert app.config["tree_str_repr"] == dummy_tree.export_to_string()
     assert app.config["scan_context_repr"] == random_scan.param_export_values
     assert app.config["exp_context_repr"] == random_diff_exp.param_export_values
 
@@ -208,9 +208,9 @@ def test_prepare_run__recreates_context_if_clone(
     TREE.clear()
     SCAN.restore_all_defaults(True)
     EXP.restore_all_defaults(True)
-    app_clone.config["tree_str_rep"] = dummy_tree.export_to_string()
-    app_clone.config["scan_context"] = random_scan.param_export_values
-    app_clone.config["exp_context"] = random_diff_exp.param_export_values
+    app_clone.config["tree_str_repr"] = dummy_tree.export_to_string()
+    app_clone.config["scan_context_repr"] = random_scan.param_export_values
+    app_clone.config["exp_context_repr"] = random_diff_exp.param_export_values
     app_clone.prepare_run()
     for _id, _node in TREE.nodes.items():
         assert hash(_node) == hash(dummy_tree.nodes[_id])

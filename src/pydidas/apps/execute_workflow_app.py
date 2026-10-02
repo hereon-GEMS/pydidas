@@ -132,7 +132,7 @@ class ExecuteWorkflowApp(BaseApp):
     default_config: ClassVar[dict[str, Any]] = {
         "result_metadata_set": False,
         "shared_memory": {},
-        "tree_str_rep": "[]",
+        "tree_str_repr": "[]",
         "run_prepared": False,
         "latest_results": None,
         "scan_context_repr": {},
@@ -442,13 +442,13 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _recreate_context(self) -> None:
         """Recreate the required context from the config for app clones."""
-        TREE.restore_from_string(self.config["tree_str_rep"])
+        TREE.restore_from_string(self.config["tree_str_repr"])
         SCAN.update_param_values_from_kwargs(**self.config["scan_context_repr"])
         EXP.update_param_values_from_kwargs(**self.config["exp_context_repr"])
 
     def _store_context(self) -> None:
         """Store the current context for app clone instances."""
-        self.config["tree_str_rep"] = TREE.export_to_string()
+        self.config["tree_str_repr"] = TREE.export_to_string()
         self.config["scan_context_repr"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )

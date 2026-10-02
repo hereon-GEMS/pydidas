@@ -161,7 +161,7 @@ class AppRunner(WorkerController):
             self._mp_kwargs,
             self.__app.__class__,
             self.__app.params.copy(),
-            self.__app.get_config(),
+            self.__app.config.copy(),
         )
         self._processor["kwargs"] = {
             "use_tasks": self._use_app_tasks,

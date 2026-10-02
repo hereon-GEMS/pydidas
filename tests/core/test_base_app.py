@@ -134,17 +134,6 @@ def test_multiprocessing_carryon(base_app):
     assert result is True
 
 
-def test_get_config(base_app):
-    config = base_app.get_config()
-    assert config == {"run_prepared": False}
-
-
-def test_get_config__verify_returns_copy(base_app):
-    config = base_app.get_config()
-    config["new_key"] = "modified"
-    assert "new_key" not in base_app.config
-
-
 def test_copy(base_app):
     _mgr = mp.Manager()
     _items = {

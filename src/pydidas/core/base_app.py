@@ -251,17 +251,6 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
-    def get_config(self) -> dict:
-        """
-        Get the App configuration.
-
-        Returns
-        -------
-        dict
-            The App configuration stored in the config dictionary.
-        """
-        return dict(self.config)
-
     def export_state(self) -> dict:
         """
         Get the sanitized app Parameters and configuration for export.
@@ -271,18 +260,16 @@ class BaseApp(ObjectWithParameterCollection):
         dict
             The state dictionary.
         """
-        _cfg = self.get_config()
-        _new_cfg = {}
+        _cfg = {_k: deepcopy(_v) for _k, _v in self.config.items()}
         for _key, _item in self.config.items():
             if isinstance(_item, range):
-                _new_cfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
+                _cfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, slice):
-                _new_cfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
+                _cfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, Path):
-                _new_cfg[_key] = f"::path::{_item}"
-            if _key in ["scan_context", "exp_context"]:
-                _new_cfg[_key] = "::None::"
-        _cfg.update(_new_cfg)
+                _cfg[_key] = f"::path::{_item}"
+            if _key in ["scan_context_repr", "exp_context_repr"]:
+                _cfg[_key] = "::None::"
         return {
             "params": self.get_param_values_as_dict(filter_types_for_export=True),
             "config": _cfg,

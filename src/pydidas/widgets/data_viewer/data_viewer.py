@@ -97,7 +97,7 @@ class DataViewer(WidgetWithParameters):
         )
         self.add_any_widget(
             "axes_selector",
-            AxesSelector(multiline_layout=self.config.range_slice["multiline_layout"]),
+            AxesSelector(multiline_layout=self.config["multiline_layout"]),
             gridPos=(1, 0, 1, 1),
             parent_widget="view_container",
             visible=False,

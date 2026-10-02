@@ -64,7 +64,7 @@ class IntegrationRoiParamContainer(WidgetWithParameters):
         self.set_default_params()
         self._plugin = kwargs.get("plugin", None)
         self.config.update(
-            force_edit_disable=kwargs.get("forced_edit_disable", False),
+            forced_edit_disable=kwargs.get("forced_edit_disable", False),
             roi_active=False,
         )
         self.create_param_widget(self.get_param("overlay_color"))

@@ -254,9 +254,9 @@ def create_singleton_metaclass(  # noqa: C901
                 )
             return _base_class
 
-    _name = name or _SingletonMeta.__name_
-    _SingletonMeta.__name_ = _name
-    _SingletonMeta.__qualname_ = _name
+    _name = name or _SingletonMeta.__name__
+    _SingletonMeta.__name__ = _name
+    _SingletonMeta.__qualname__ = _name
     return _SingletonMeta
 
 

@@ -232,6 +232,8 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
         enabled : bool
             Flag whether the editing mode is active.
         """
+        print("Controller: toggle_enable", enabled)
+        print("Config:", self.config)
         enabled = enabled if not self.config["forced_edit_disable"] else False
         self.config["enabled"] = enabled
         self._editor.toggle_enable(enabled)

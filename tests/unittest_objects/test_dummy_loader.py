@@ -49,12 +49,12 @@ class TestDummyLoader(unittest.TestCase):
 
     def test_input_available__true(self):
         plugin = DummyLoader()
-        plugin._config["input_available"] = 7
+        plugin.config["input_available"] = 7
         self.assertTrue(plugin.input_available(6))
 
     def test_input_available__false(self):
         plugin = DummyLoader()
-        plugin._config["input_available"] = 7
+        plugin.config["input_available"] = 7
         self.assertFalse(plugin.input_available(8))
 
     def test_pre_execute(self):

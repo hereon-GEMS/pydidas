@@ -76,7 +76,7 @@ class TestFilelistManager(unittest.TestCase):
     def test_n_files(self):
         _n = 123
         fm = FilelistManager()
-        fm._config["n_files"] = _n
+        fm.config["n_files"] = _n
         self.assertEqual(fm.n_files, _n)
 
     def test_get_config(self):
@@ -144,8 +144,8 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm._create_one_file_list()
-        self.assertEqual(fm._config["n_files"], 1)
-        self.assertEqual(fm._config["file_list"], [self._fname(0)])
+        self.assertEqual(fm.config["n_files"], 1)
+        self.assertEqual(fm.config["file_list"], [self._fname(0)])
 
     def test_create_filelist_with_live(self):
         fm = FilelistManager()
@@ -153,9 +153,9 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value("last_file", self._fname(49))
         fm.set_param_value("live_processing", True)
         fm._create_filelist()
-        self.assertEqual(fm._config["n_files"], 50)
+        self.assertEqual(fm.config["n_files"], 50)
         self.assertListEqual(
-            fm._config["file_list"], [self._fname(i) for i in range(50)]
+            fm.config["file_list"], [self._fname(i) for i in range(50)]
         )
 
     def test_create_filelist_static(self):
@@ -163,9 +163,9 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", self._fname(49))
         fm._create_filelist_static()
-        self.assertEqual(fm._config["n_files"], 50)
+        self.assertEqual(fm.config["n_files"], 50)
         self.assertListEqual(
-            fm._config["file_list"], [self._fname(i) for i in range(50)]
+            fm.config["file_list"], [self._fname(i) for i in range(50)]
         )
 
     def test_create_filelist_static__metadata_files(self):
@@ -177,9 +177,9 @@ class TestFilelistManager(unittest.TestCase):
             _len = int(np.random.random() * 1e3)
             np.savetxt(_fname, np.arange(_len))
         fm._create_filelist_static()
-        self.assertEqual(fm._config["n_files"], 50)
+        self.assertEqual(fm.config["n_files"], 50)
         self.assertListEqual(
-            fm._config["file_list"], [self._fname(i) for i in range(50)]
+            fm.config["file_list"], [self._fname(i) for i in range(50)]
         )
 
     def test_create_filelist_static_stepping(self):
@@ -189,21 +189,21 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value("last_file", self._fname(49))
         fm.set_param_value("file_stepping", _stepping)
         fm._create_filelist_static()
-        self.assertEqual(fm._config["n_files"], int(np.ceil(50 / _stepping)))
+        self.assertEqual(fm.config["n_files"], int(np.ceil(50 / _stepping)))
         self.assertListEqual(
-            fm._config["file_list"], [self._fname(i) for i in range(0, 50, _stepping)]
+            fm.config["file_list"], [self._fname(i) for i in range(0, 50, _stepping)]
         )
 
     def test_update_params(self):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(49))
-        self.assertEqual(fm._config["n_files"], 50)
+        self.assertEqual(fm.config["n_files"], 50)
 
     def test_get_filename(self):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(49))
-        self.assertEqual(fm._config["n_files"], 50)
-        self.assertEqual(len(fm._config["file_list"]), 50)
+        self.assertEqual(fm.config["n_files"], 50)
+        self.assertEqual(len(fm.config["file_list"]), 50)
         self.assertEqual(self._fname(10), fm.get_filename(10))
 
     def test_get_filename_empty_list(self):
@@ -232,8 +232,8 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(49))
         fm.reset()
-        self.assertEqual(fm._config["n_files"], 0)
-        self.assertEqual(len(fm._config["file_list"]), 0)
+        self.assertEqual(fm.config["n_files"], 0)
+        self.assertEqual(len(fm.config["file_list"]), 0)
 
 
 if __name__ == "__main__":

@@ -644,7 +644,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         }
         self.config.clear()
         self.config.update(
-            {_key: deepcopy(_val) for _key, _val in results._config.items()}
+            {_key: deepcopy(_val) for _key, _val in results.config.items()}
         )
         self._plugin_result_infos = deepcopy(results._plugin_result_infos)
 

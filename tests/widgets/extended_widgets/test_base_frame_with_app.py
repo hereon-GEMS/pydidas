@@ -94,10 +94,10 @@ class TestBaseFrameWithApp(unittest.TestCase):
         )
         app.set_param_value("binning", _bin)
         app.set_param_value("first_file", _fname)
-        app._config["test_key"] = True
+        app.config["test_key"] = True
         app.test_attr = [True, False]  # type: ignore[attr-defined]
         obj._set_app(app)
-        self.assertTrue(obj._app._config["test_key"])
+        self.assertTrue(obj._app.config["test_key"])
         self.assertEqual(obj._app.get_param_value("binning"), _bin)
         self.assertEqual(obj._app.get_param_value("first_file"), _fname)
         self.assertEqual(

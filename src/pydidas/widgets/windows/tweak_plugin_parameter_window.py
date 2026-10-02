@@ -199,10 +199,10 @@ class TweakPluginParameterWindow(PydidasWindow):
     def run_plugin(self) -> None:
         """Run the plugin with the current Parameters."""
         with ShowBusyMouse():
-            _arg = self.__plugin._config["input_data"]
+            _arg = self.__plugin.config["input_data"]
             if isinstance(_arg, np.ndarray):
-                _arg = self.__plugin._config["input_data"].copy()
-            _kwargs = self.__plugin._config["input_kwargs"].copy()
+                _arg = self.__plugin.config["input_data"].copy()
+            _kwargs = self.__plugin.config["input_kwargs"].copy()
             self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
             self._widgets["plot"].set_data(

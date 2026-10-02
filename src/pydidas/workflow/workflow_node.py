@@ -283,8 +283,8 @@ class WorkflowNode(GenericNode):
         """
         self.results = None
         self.result_kws = None
-        self.plugin._config["input_data"] = None
-        self.plugin._config["input_kwargs"] = {}
+        self.plugin.config["input_data"] = None
+        self.plugin.config["input_kwargs"] = {}
         if recursive:
             for _child in self._children:
                 _child.clear_data(recursive=True)

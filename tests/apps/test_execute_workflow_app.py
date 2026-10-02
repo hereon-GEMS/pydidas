@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 import threading
 import time
 from collections.abc import Iterator
@@ -161,7 +162,7 @@ def test_prepare_run__reset_shared_runtime_vars(app) -> None:
     app.mp_manager["shapes_dict"] = {1: (10, 10), 2: (10, 10)}
     app.mp_manager["metadata_dict"] = {1: {"axis_labels": ["x", "y"]}}
     app.prepare_run()
-    assert not app._config["result_metadata_set"]
+    assert not app.config["result_metadata_set"]
     assert app._shared_arrays == {}
     assert not app.mp_manager["shapes_available"].is_set()
     assert not app.mp_manager["shapes_set"].is_set()
@@ -172,32 +173,32 @@ def test_prepare_run__reset_shared_runtime_vars(app) -> None:
 def test_prepare_run__sets_basic_variables(app, random_scan) -> None:
     app._index = 42
     app._mp_tasks = None
-    assert not app._config["run_prepared"]
+    assert not app.config["run_prepared"]
     app.prepare_run()
     assert app._index == -1
     assert app._mp_tasks.size == random_scan.n_points
-    assert app._config["run_prepared"]
-    assert not app._config["export_files_prepared"]
+    assert app.config["run_prepared"]
+    assert not app.config["export_files_prepared"]
     assert TREE._pre_executed
 
 
 @pytest.mark.slow
 def test_multiprocessing_pre_run(app) -> None:
     app.multiprocessing_pre_run()
-    assert app._config["run_prepared"] is True
+    assert app.config["run_prepared"] is True
 
 
 @pytest.mark.slow
 def test_prepare_run__stores_context(
     app, random_scan, dummy_tree, random_diff_exp
 ) -> None:
-    assert app._config["tree_str_rep"] == "[]"
-    assert app._config["scan_context"] == {}
-    assert app._config["exp_context"] == {}
+    assert app.config["tree_str_rep"] == "[]"
+    assert app.config["scan_context_repr"] == {}
+    assert app.config["exp_context_repr"] == {}
     app.prepare_run()
-    assert app._config["tree_str_rep"] == dummy_tree.export_to_string()
-    assert app._config["scan_context"] == random_scan.param_export_values
-    assert app._config["exp_context"] == random_diff_exp.param_export_values
+    assert app.config["tree_str_rep"] == dummy_tree.export_to_string()
+    assert app.config["scan_context_repr"] == random_scan.param_export_values
+    assert app.config["exp_context_repr"] == random_diff_exp.param_export_values
 
 
 @pytest.mark.slow
@@ -207,9 +208,9 @@ def test_prepare_run__recreates_context_if_clone(
     TREE.clear()
     SCAN.restore_all_defaults(True)
     EXP.restore_all_defaults(True)
-    app_clone._config["tree_str_rep"] = dummy_tree.export_to_string()
-    app_clone._config["scan_context"] = random_scan.param_export_values
-    app_clone._config["exp_context"] = random_diff_exp.param_export_values
+    app_clone.config["tree_str_rep"] = dummy_tree.export_to_string()
+    app_clone.config["scan_context"] = random_scan.param_export_values
+    app_clone.config["exp_context"] = random_diff_exp.param_export_values
     app_clone.prepare_run()
     for _id, _node in TREE.nodes.items():
         assert hash(_node) == hash(dummy_tree.nodes[_id])
@@ -350,7 +351,7 @@ def test_multiprocessing_func__w_shapes_available_not_set(app, app_list, clone) 
         assert app.mp_manager["shapes_dict"][_id] == _res.shape
         assert _id in app.mp_manager["metadata_dict"]
         assert app.mp_manager["shapes_available"].is_set()
-    assert RESULTS._config["metadata_complete"] == (not clone)
+    assert RESULTS.config["metadata_complete"] == (not clone)
 
 
 @pytest.mark.slow
@@ -371,7 +372,7 @@ def test_multiprocessing_func__w_shapes_not_set(app, app_list, clone) -> None:
     if app.clone_mode:
         assert _ret_val is None
         for _id in TREE.get_current_results():
-            assert _id in app._config["latest_results"]
+            assert _id in app.config["latest_results"]
     else:  # main app:
         assert app.mp_manager["shapes_set"].is_set()
         assert "in_use_flag" in app._locals["shared_memory_buffers"]
@@ -502,11 +503,11 @@ def test_multiprocessing_store_results__check_metadata_set(app, metadata_set):
     app.prepare_run()
     _index = app.multiprocessing_func(0)
     if not metadata_set:
-        app._config["result_metadata_set"] = metadata_set
-        RESULTS._config["metadata_complete"] = metadata_set
+        app.config["result_metadata_set"] = metadata_set
+        RESULTS.config["metadata_complete"] = metadata_set
     app.multiprocessing_store_results(0, _index)
-    assert app._config["result_metadata_set"]
-    assert RESULTS._config["metadata_complete"]
+    assert app.config["result_metadata_set"]
+    assert RESULTS.config["metadata_complete"]
 
 
 @pytest.mark.slow
@@ -519,8 +520,8 @@ def test_multiprocessing_store_results__from_clone(app, app_list):
     app._create_shared_memory()  # simulates main app creating shared memory after signal
     _index = _clone.get_latest_results()  # clone writes results and returns buffer pos
     app.multiprocessing_store_results(0, _index)
-    assert app._config["result_metadata_set"]
-    assert RESULTS._config["metadata_complete"]
+    assert app.config["result_metadata_set"]
+    assert RESULTS.config["metadata_complete"]
 
 
 @pytest.mark.slow

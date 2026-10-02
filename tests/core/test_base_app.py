@@ -66,14 +66,17 @@ def test_app_with_mocks():
     app.multiprocessing_pre_cycle = Mock()
     app.multiprocessing_post_run = Mock()
     app.stored = []
-    app._config = {
-        "item1": 1,
-        "item2": slice(0, 5),
-        "item3": "dummy",
-        "item4": range(35),
-        "item5": range(3, 42, 7),
-        "carryon_counter": -1,
-    }
+    app.config.clear()
+    app.config.update(
+        {
+            "item1": 1,
+            "item2": slice(0, 5),
+            "item3": "dummy",
+            "item4": range(35),
+            "item5": range(3, 42, 7),
+            "carryon_counter": -1,
+        }
+    )
     return app
 
 
@@ -101,9 +104,9 @@ def test_creation_with_args(params):
 
 
 def test_multiprocessing_pre_run(base_app):
-    assert not base_app._config["run_prepared"]
+    assert not base_app.config["run_prepared"]
     base_app.multiprocessing_pre_run()
-    assert base_app._config["run_prepared"]
+    assert base_app.config["run_prepared"]
 
 
 def test_multiprocessing_pre_cycle(base_app):
@@ -139,7 +142,7 @@ def test_get_config(base_app):
 def test_get_config__verify_returns_copy(base_app):
     config = base_app.get_config()
     config["new_key"] = "modified"
-    assert "new_key" not in base_app._config
+    assert "new_key" not in base_app.config
 
 
 def test_copy(base_app):
@@ -180,10 +183,10 @@ def test_export_state(temp_dir, params):
     app.set_param_value("label", _label)
     app.set_param_value("composite_nx", _nx)
     app.set_param_value("composite_ny", _ny)
-    app._config["new_key"] = True
-    app._config["item1"] = "item1"
-    app._config["item2"] = slice(0, 5)
-    app._config["item4"] = range(35)
+    app.config["new_key"] = True
+    app.config["item1"] = "item1"
+    app.config["item2"] = slice(0, 5)
+    app.config["item4"] = range(35)
     _state = app.export_state()
     assert _state["params"]["label"] == _label
     assert _state["params"]["composite_nx"] == _nx
@@ -214,10 +217,10 @@ def test_import_state(params):
     for _key, _val in _state["params"].items():
         assert app.get_param_value(_key) == _val
     for _key in ["item1", "item3"]:
-        assert app._config[_key] == _state["config"][_key]
-    assert app._config["item2"] == slice(1, 7, 2)
-    assert app._config["item4"] == range(10)
-    assert app._config["item5"] is None
+        assert app.config[_key] == _state["config"][_key]
+    assert app.config["item2"] == slice(1, 7, 2)
+    assert app.config["item4"] == range(10)
+    assert app.config["item5"] is None
 
 
 @pytest.mark.parametrize(
@@ -237,7 +240,7 @@ def test_import_state__w_serialization_formats(item_str, expected):
         "config": {"test_item": item_str},
     }
     app.import_state(_state)
-    assert app._config["test_item"] == expected
+    assert app.config["test_item"] == expected
 
 
 def test_import_state__w_invalid_range():
@@ -258,7 +261,7 @@ def test_run(test_app_with_mocks):
 
     test_app_with_mocks.run()
 
-    assert test_app_with_mocks._config["run_prepared"] is True
+    assert test_app_with_mocks.config["run_prepared"] is True
     test_app_with_mocks.multiprocessing_get_tasks.assert_called_once()
     assert test_app_with_mocks.multiprocessing_pre_cycle.call_count == len(_tasks)
     assert test_app_with_mocks.multiprocessing_func.call_count == len(_tasks)
@@ -325,7 +328,7 @@ def test_get_latest_results(base_app):
 
 
 def test_get_latest_results__w_data(base_app):
-    base_app._config["latest_results"] = "some_data"
+    base_app.config["latest_results"] = "some_data"
     result = base_app.get_latest_results()
     assert result == "some_data"
 

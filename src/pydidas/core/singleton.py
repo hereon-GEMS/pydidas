@@ -33,6 +33,7 @@ from typing import Any, ClassVar
 
 from qtpy.QtCore import QObject
 
+from pydidas.core import ConfigDict
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
 from pydidas.core.parameter_collection import ParameterCollection
 
@@ -72,8 +73,10 @@ def _fallback_copy(obj: Any, base_class: type, copy_func: Callable) -> Any:
         _copy_instance.add_params(_param_copy)
 
     # Shallow copy _config
-    _config_copy: dict[str, Any] = copy_func(getattr(obj, "_config", {}))
-    if _config_copy:
+    if hasattr(obj, "_config") and isinstance(
+        getattr(obj, "_config", None), ConfigDict
+    ):
+        _config_copy: dict[str, Any] = copy_func(getattr(obj, "_config", {}))
         _copy_instance._config = _config_copy
     return _copy_instance
 

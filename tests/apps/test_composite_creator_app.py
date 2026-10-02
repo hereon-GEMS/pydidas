@@ -280,8 +280,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_multiprocessing_func(self):
         app = self.get_default_app()
-        app._config["current_fname"] = self._hdf5_fnames[0]
-        app._config["current_kwargs"] = {"dataset": "/entry/data/data", "indices": (0,)}
+        app.config["current_fname"] = self._hdf5_fnames[0]
+        app.config["current_kwargs"] = {"dataset": "/entry/data/data", "indices": (0,)}
         _image = app.multiprocessing_func(0)
         self.assertTrue((_image == self._data[0]).all())
 
@@ -310,7 +310,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = self.get_default_app()
         app.run()
         app.set_param_value("live_processing", True)
-        app._config["current_fname"] = _last_file
+        app.config["current_fname"] = _last_file
         self.assertTrue(app.multiprocessing_carryon())
 
     def test_multiprocessing_carryon__no_file(self):
@@ -318,7 +318,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = self.get_default_app()
         app.run()
         app.set_param_value("live_processing", True)
-        app._config["current_fname"] = _last_file
+        app.config["current_fname"] = _last_file
         self.assertFalse(app.multiprocessing_carryon())
 
     def test_multiprocessing_store_with_bg(self):
@@ -339,10 +339,10 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._image_metadata.update(filename=self._hdf5_fnames[0])
         _index = 3
         app._store_args_for_read_image(_index)
-        self.assertEqual(app._config["current_fname"], self._hdf5_fnames[0])
-        self.assertEqual(app._config["current_kwargs"]["indices"], (_index,))
-        self.assertEqual(app._config["current_kwargs"]["dataset"], "/entry/data/data")
-        self.assertEqual(app._config["current_kwargs"]["binning"], 1)
+        self.assertEqual(app.config["current_fname"], self._hdf5_fnames[0])
+        self.assertEqual(app.config["current_kwargs"]["indices"], (_index,))
+        self.assertEqual(app.config["current_kwargs"]["dataset"], "/entry/data/data")
+        self.assertEqual(app.config["current_kwargs"]["binning"], 1)
 
     def test_store_args_for_read_image__npy(self):
         app = self.get_default_app()
@@ -350,8 +350,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._image_metadata.update()
         _index = 7
         app._store_args_for_read_image(_index)
-        self.assertEqual(app._config["current_fname"], self._fname(_index))
-        self.assertEqual(app._config["current_kwargs"]["binning"], 1)
+        self.assertEqual(app.config["current_fname"], self._fname(_index))
+        self.assertEqual(app.config["current_kwargs"]["binning"], 1)
 
     def test_multiprocessing_pre_cycle__no_files(self):
         app = CompositeCreatorApp()
@@ -374,7 +374,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_get_tasks__tasks_defined(self):
         _tasks = [1, 2, 3, 4]
         app = CompositeCreatorApp()
-        app._config["mp_tasks"] = _tasks
+        app.config["mp_tasks"] = _tasks
         _newtasks = app.multiprocessing_get_tasks()
         self.assertEqual(_tasks, _newtasks)
 
@@ -564,8 +564,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_pre_run(self):
         app = self.get_default_app()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config["run_prepared"])
-        self.assertIsNotNone(app._config["mp_tasks"])
+        self.assertTrue(app.config["run_prepared"])
+        self.assertIsNotNone(app.config["mp_tasks"])
 
 
 if __name__ == "__main__":

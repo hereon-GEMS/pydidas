@@ -132,14 +132,14 @@ def test_set_name_filter(file_dialog, format1, format2) -> None:
     )
     file_dialog._calling_kwargs["formats"] = _format_str
     file_dialog._set_name_filter()
-    assert set(_all_formats) == set(file_dialog._config["valid_extensions"])
+    assert set(_all_formats) == set(file_dialog.config["valid_extensions"])
 
 
 def test_set_name_filter__no_formats(file_dialog) -> None:
     """Test setting name filter when no formats are provided."""
     file_dialog._calling_kwargs = {}
     file_dialog._set_name_filter()
-    assert file_dialog._config["valid_extensions"] is None
+    assert file_dialog.config["valid_extensions"] is None
 
 
 @pytest.mark.parametrize("use_dir", [True, False])

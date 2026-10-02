@@ -361,10 +361,10 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj2 = obj.copy()
         for _param in obj.params.values():
             self.assertNotIn(_param, obj2.params.values())
-        for (_key,) in obj._config:
-            self.assertIn(_key, obj2._config)
-            obj._config[_key] = 42
-            self.assertNotEqual(id(obj._config[_key]), id(obj2._config[_key]))
+        for (_key,) in obj.config:
+            self.assertIn(_key, obj2.config)
+            obj.config[_key] = 42
+            self.assertNotEqual(id(obj.config[_key]), id(obj2.config[_key]))
 
     def test_copy__w_subclass(self):
         class Subclass(ObjectWithParameterCollection):
@@ -397,30 +397,30 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj.config.update({"a": 123, "b": [1, 2, 3], "c": ("A", "C")})
         obj2 = obj.deepcopy()
-        obj2._config["a"] = 42
-        obj2._config["b"].append(42)
-        obj2._config["c"] = ("A", "a", "C")
+        obj2.config["a"] = 42
+        obj2.config["b"].append(42)
+        obj2.config["c"] = ("A", "a", "C")
         for _param in obj.params.values():
             self.assertNotIn(_param, obj2.params.values())
-        for _key, _val in obj._config.items():
-            self.assertIn(_key, obj2._config)
-            self.assertNotEqual(id(_val), id(obj2._config[_key]))
+        for _key, _val in obj.config.items():
+            self.assertIn(_key, obj2.config)
+            self.assertNotEqual(id(_val), id(obj2.config[_key]))
 
     def test_getstate(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["test"] = "Test"
+        obj.config["test"] = "Test"
         _state = obj.__getstate__()
         for _key, _param in _state["params"].items():
             self.assertEqual(_param.value, obj.get_param_value(_key))
         for _key, _value in _state["_config"].items():
-            self.assertEqual(_value, obj._config[_key])
+            self.assertEqual(_value, obj.config[_key])
 
     def test_getstate__with_shared_memory(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["test"] = "Test"
-        obj._config["shared_memory"] = {"test": mp.Value("I"), "test2": mp.Value("f")}
+        obj.config["test"] = "Test"
+        obj.config["shared_memory"] = {"test": mp.Value("I"), "test2": mp.Value("f")}
         _state = obj.__getstate__()
         for _key, _param in _state["params"].items():
             self.assertEqual(_param.value, obj.get_param_value(_key))
@@ -428,7 +428,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
             if _key == "shared_memory":
                 self.assertEqual(_value, {})
             else:
-                self.assertEqual(_value, obj._config[_key])
+                self.assertEqual(_value, obj.config[_key])
 
     def test_setstate(self):
         obj = ObjectWithParameterCollection()
@@ -441,12 +441,12 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         for _key, _param in _state["params"].items():
             self.assertEqual(_param.value, obj.get_param_value(_key))
         for _key, _value in _state["_config"].items():
-            self.assertEqual(_value, obj._config[_key])
+            self.assertEqual(_value, obj.config[_key])
 
     def test_pickle(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["shared_memory"] = {"test": mp.Value("I")}
+        obj.config["shared_memory"] = {"test": mp.Value("I")}
         new_obj = pickle.loads(pickle.dumps(obj))
         self.assertIsInstance(new_obj, ObjectWithParameterCollection)
         for _key, _param in obj.params.items():
@@ -465,18 +465,18 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_hash__complex_comparison(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["Test"] = [1, 2, 3, 4, 5]
+        obj.config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
-        obj2._config["Test"] = [1, 2, 3, 4, 5]
+        obj2.config["Test"] = [1, 2, 3, 4, 5]
         obj2.add_params(self._params.copy())
         self.assertEqual(hash(obj), hash(obj2))
 
     def test_hash__complex_comparison_w_difference(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["Test"] = [1, 2, 3, 4, 5]
+        obj.config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
-        obj2._config["Test"] = [1, 2, 3, 4, 5, 6]
+        obj2.config["Test"] = [1, 2, 3, 4, 5, 6]
         obj2.add_params(self._params.copy())
         obj2.set_param_value("Test0", 13)
         self.assertNotEqual(hash(obj), hash(obj2))
@@ -484,7 +484,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_hash__from_pickle(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config["Test"] = [1, 2, 3, 4, 5]
+        obj.config["Test"] = [1, 2, 3, 4, 5]
         obj2 = pickle.loads(pickle.dumps(obj))
         self.assertEqual(hash(obj), hash(obj2))
 

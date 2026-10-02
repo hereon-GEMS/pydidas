@@ -36,6 +36,7 @@ from typing import Any
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Hdf5key, NXdataKey, Parameter, UserConfigError
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import (
     ALIGN_CENTER_LEFT,
     FLOAT_DISPLAY_ACCURACY,
@@ -74,7 +75,7 @@ def _param_widget_class(param: Parameter) -> type[BaseParamIo]:
     return _ParamIoLineEdit
 
 
-class ParameterWidget(EmptyWidget):
+class ParameterWidget(ConfigDictMixin, EmptyWidget):
     """
     A composite widget to display and modify a Parameter with name, value and unit.
 
@@ -138,7 +139,8 @@ class ParameterWidget(EmptyWidget):
     def __init__(
         self, param: Parameter, parent: QtWidgets.QWidget | None = None, **kwargs: Any
     ) -> None:
-        EmptyWidget.__init__(self, parent, **kwargs)
+        kwargs["parent"] = parent
+        super().__init__(**kwargs)
         if not isinstance(self.font_metric_width_factor, Real):
             self.font_metric_width_factor = FONT_METRIC_CONFIG_WIDTH
         self.setSizePolicy(*POLICY_EXP_FIX)  # type: ignore[arg-type]
@@ -241,18 +243,28 @@ class ParameterWidget(EmptyWidget):
             if _linebreak
             else self.font_metric_width_factor - _unit_width - _text_width
         )
-        self._config: dict[str, Any] = {
-            "linebreak": bool(_linebreak),
-            "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
-            "width_unit": _unit_width,
-            "width_text": _text_width,
-            "width_io": _io_width,
-            "layout_text": (0, 0, 1, 1 + 2 * _linebreak, ALIGN_CENTER_LEFT),
-            "layout_io": (_linebreak, 1, 1, 2 - (_unit_width > 0), ALIGN_CENTER_LEFT),
-            "layout_unit": (_linebreak, 2, 1, 1, ALIGN_CENTER_LEFT),
-            "validator": kwargs.get("validator", None),
-            "precision": kwargs.get("precision", FLOAT_DISPLAY_ACCURACY),
-        }
+        self.config.update(
+            {
+                "linebreak": bool(_linebreak),
+                "persistent_qsettings_ref": kwargs.get(
+                    "persistent_qsettings_ref", None
+                ),
+                "width_unit": _unit_width,
+                "width_text": _text_width,
+                "width_io": _io_width,
+                "layout_text": (0, 0, 1, 1 + 2 * _linebreak, ALIGN_CENTER_LEFT),
+                "layout_io": (
+                    _linebreak,
+                    1,
+                    1,
+                    2 - (_unit_width > 0),
+                    ALIGN_CENTER_LEFT,
+                ),
+                "layout_unit": (_linebreak, 2, 1, 1, ALIGN_CENTER_LEFT),
+                "validator": kwargs.get("validator", None),
+                "precision": kwargs.get("precision", FLOAT_DISPLAY_ACCURACY),
+            }
+        )
 
     def __create_name_widget(self) -> None:
         """Create a widget with the Parameter's name."""
@@ -260,14 +272,14 @@ class ParameterWidget(EmptyWidget):
         self._widgets["label"] = PydidasLabel(  # type: ignore[assignment]
             _display_txt,
             font_metric_height_factor=1,
-            font_metric_width_factor=self._config["width_text"],
+            font_metric_width_factor=self.config["width_text"],
             margin=0,
         )
         self.layout().addWidget(  # type: ignore[arg-type]
-            self._widgets["label"], *self._config["layout_text"]
+            self._widgets["label"], *self.config["layout_text"]
         )
-        if not self._config["linebreak"]:
-            self.layout().setColumnStretch(0, int(self._config["width_text"] * 100))
+        if not self.config["linebreak"]:
+            self.layout().setColumnStretch(0, int(self.config["width_text"] * 100))
 
     def __create_param_io_widget(self) -> None:
         """
@@ -280,24 +292,24 @@ class ParameterWidget(EmptyWidget):
             self._widgets["io"].deleteLater()
             del self._widgets["io"]
         kwargs = {
-            "persistent_qsettings_ref": self._config["persistent_qsettings_ref"],
-            "linebreak": self._config["linebreak"],
+            "persistent_qsettings_ref": self.config["persistent_qsettings_ref"],
+            "linebreak": self.config["linebreak"],
             "font_metric_height_factor": 1,
-            "font_metric_width_factor": self._config["width_io"],
-            "precision": self._config["precision"],
+            "font_metric_width_factor": self.config["width_io"],
+            "precision": self.config["precision"],
         }
         self._widgets["io"] = _param_widget_class(self.param)(self.param, **kwargs)
-        if self._config["validator"] is not None and hasattr(
+        if self.config["validator"] is not None and hasattr(
             self._widgets["io"], "setValidator"
         ):
             self._widgets["io"].setValidator(  # type: ignore[attr-defined]
-                self._config["validator"]
+                self.config["validator"]
             )
         self._widgets["io"].set_value(self.param.value)
         self.layout().addWidget(  # type: ignore[arg-type]
-            self._widgets["io"], *self._config["layout_io"]
+            self._widgets["io"], *self.config["layout_io"]
         )
-        if self._config["linebreak"]:
+        if self.config["linebreak"]:
             self._widgets["io_spacer"] = EmptyWidget(
                 size_hint_width=20,
                 sizePolicy=POLICY_EXP_FIX,
@@ -313,18 +325,18 @@ class ParameterWidget(EmptyWidget):
 
     def __create_unit_widget_if_required(self) -> None:
         """Create a widget with the Parameter's unit text."""
-        if self._config["width_unit"] == 0:
+        if self.config["width_unit"] == 0:
             return
         self._widgets["unit"] = PydidasLabel(  # type: ignore[assignment]
             convert_special_chars_to_unicode(self.param.unit),
             font_metric_height_factor=1,
-            font_metric_width_factor=self._config["width_unit"],
+            font_metric_width_factor=self.config["width_unit"],
             minimum_width=0,
         )
         self.layout().addWidget(  # type: ignore[arg-type]
-            self._widgets["unit"], *self._config["layout_unit"]
+            self._widgets["unit"], *self.config["layout_unit"]
         )
-        self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
+        self.layout().setColumnStretch(2, int(self.config["width_unit"] * 100))
 
     def sizeHint(self) -> QtCore.QSize:
         """
@@ -343,7 +355,7 @@ class ParameterWidget(EmptyWidget):
             + 2 * self.LAYOUT_TOP_BOTTOM_MARGIN
             + 2 * self.LAYOUT_VERTICAL_SPACING
         )
-        if self._config.get("linebreak"):
+        if self.config.get("linebreak"):
             _height += self._widgets["label"].height() + self.LAYOUT_VERTICAL_SPACING
         return QtCore.QSize(_width, max(_height, MINIMUM_WIDGET_DIMENSIONS))
 

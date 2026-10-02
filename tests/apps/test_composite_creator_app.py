@@ -462,6 +462,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._CompositeCreatorApp__verify_number_of_images_fits_composite()
         self.assertEqual(app.get_param_value("composite_ny"), self._ny)
 
+    def test_verify_total_number_of_images_in_composite__both_default(self):
+        app = self.get_default_app()
+        app.set_param_value("composite_nx", -1)
+        app.set_param_value("composite_ny", -1)
+        with self.assertRaises(UserConfigError):
+            app._CompositeCreatorApp__verify_number_of_images_fits_composite()
+
     def test_verify_total_number_of_images_in_composite__too_small(self):
         app = self.get_default_app()
         app.set_param_value("composite_nx", 2)

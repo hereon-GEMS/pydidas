@@ -81,7 +81,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameters, AssociatedFileMixin):
             self.add_params(kwargs["params"])
         self.set_default_params()
         AssociatedFileMixin.__init__(self, filename_param=self.get_param("filename"))
-        self._config = {"decode_kwargs": {}, "file_size": 0}
+        self.config.update({"decode_kwargs": {}, "file_size": 0})
         self.__create_widgets()
         if not kwargs.get("show_checkbox", True):
             self._widgets["show_decoding_details"].setVisible(False)
@@ -113,7 +113,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameters, AssociatedFileMixin):
     @property
     def decoding_is_valid(self) -> bool:
         """Get the flag whether the current decoding settings are valid."""
-        return self._config.get("decoding_is_valid", False)
+        return self.config.get("decoding_is_valid", False)
 
     @property
     def datatype(self) -> type[np.dtype]:
@@ -136,7 +136,7 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameters, AssociatedFileMixin):
         self.current_filepath = filename
         self.setVisible(self.binary_file and self.current_filename_is_valid)
         if self.binary_file and self.current_filename_is_valid:
-            self._config["file_size"] = self.current_filepath.stat().st_size
+            self.config["file_size"] = self.current_filepath.stat().st_size
             self._check_decoding_params()
 
     @QtCore.Slot()
@@ -145,16 +145,16 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameters, AssociatedFileMixin):
         _n = self.get_param_value("raw_n_y") * self.get_param_value("raw_n_x")
         _dtype_bytesize = np.dtype(self.datatype).itemsize
         _expected_size = _n * _dtype_bytesize + self.get_param_value("raw_header_size")
-        _decoding_was_valid = self._config.get("decoding_is_valid", True)
-        self._config["decoding_is_valid"] = _expected_size == self._config["file_size"]
-        _color = COLOR_GREEN if self._config["decoding_is_valid"] else COLOR_RED
+        _decoding_was_valid = self.config.get("decoding_is_valid", True)
+        self.config["decoding_is_valid"] = _expected_size == self.config["file_size"]
+        _color = COLOR_GREEN if self.config["decoding_is_valid"] else COLOR_RED
         self._widgets["decode_info"].setStyleSheet("QLabel {color: " + _color + ";}")
-        if self._config["decoding_is_valid"]:
+        if self.config["decoding_is_valid"]:
             self._widgets["decode_info"].setText("Decoding parameters are valid.")
             self._emit_new_image_settings()
         else:
             self._widgets["decode_info"].setText(
-                f"File size: {self._config['file_size']:,} bytes\n"
+                f"File size: {self.config['file_size']:,} bytes\n"
                 f"decoder settings: {_expected_size:,} bytes."
             )
             if _decoding_was_valid:
@@ -163,16 +163,16 @@ class ConfigureBinaryDecodingWidget(WidgetWithParameters, AssociatedFileMixin):
     @QtCore.Slot()
     def _emit_new_image_settings(self) -> None:
         """Confirm the decoder settings and emit the signal."""
-        self._config["decode_kwargs"] = {
+        self.config["decode_kwargs"] = {
             "datatype": self.datatype,
             "offset": self.get_param_value("raw_header_size"),
             "shape": (self.get_param_value("raw_n_y"), self.get_param_value("raw_n_x")),
         }
         self.sig_new_binary_image.emit(  # type: ignore[attr-defined]
-            self.current_filepath, self._config["decode_kwargs"]
+            self.current_filepath, self.config["decode_kwargs"]
         )
         self.sig_new_binary_config.emit(  # type: ignore[attr-defined]
-            self._config["decode_kwargs"]
+            self.config["decode_kwargs"]
         )
 
     @QtCore.Slot(bool)

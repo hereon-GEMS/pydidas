@@ -332,7 +332,7 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
 
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""
-        self._config["cmap_nan_palette"] = QtGui.QPalette()
+        self.config["cmap_nan_palette"] = QtGui.QPalette()
         _initial_cmap_nan_color = self.q_settings_get("user/cmap_nan_color")
         self._update_cmap_nan_current_color(_initial_cmap_nan_color)
         _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
@@ -390,22 +390,22 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
         """
         if isinstance(new_color, str):
             new_color = QtGui.QColor(new_color)
-        self._config["cmap_nan_palette"].setColor(QtGui.QPalette.Window, new_color)
+        self.config["cmap_nan_palette"].setColor(QtGui.QPalette.Window, new_color)
         self._widgets["cmap_nan_display_current"].setPalette(
-            self._config["cmap_nan_palette"]
+            self.config["cmap_nan_palette"]
         )
 
     @QtCore.Slot()
     def select_new_nan_color(self) -> None:
         """Select a new NaN color using a QColorDialog."""
-        if self._config.get("nan_colordialog") is None:
-            self._config["nan_colordialog"] = QtWidgets.QColorDialog(self)
-            self._config["nan_colordialog"].colorSelected.connect(
+        if self.config.get("nan_colordialog") is None:
+            self.config["nan_colordialog"] = QtWidgets.QColorDialog(self)
+            self.config["nan_colordialog"].colorSelected.connect(
                 self._update_cmap_nan_value
             )
         _current = QtGui.QColor(self.q_settings_get("user/cmap_nan_color"))
-        self._config["nan_colordialog"].setCurrentColor(_current)
-        self._config["nan_colordialog"].show()
+        self.config["nan_colordialog"].setCurrentColor(_current)
+        self.config["nan_colordialog"].show()
 
     @QtCore.Slot()
     def update_plugin_collection(self) -> None:

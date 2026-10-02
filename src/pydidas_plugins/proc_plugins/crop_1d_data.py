@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the CropData Plugin which can be used to reduce the range of data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -92,14 +92,14 @@ class Crop1dData(ProcPlugin):
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
         self._data = None
-        self._config["slices"] = None
+        self.config["slices"] = None
 
     def pre_execute(self):
         """
         Reset the slicing configuration.
         """
         self._data = None
-        self._config["slices"] = None
+        self.config["slices"] = None
         if (
             self.get_param_value("crop_low") is None
             and self.get_param_value("crop_high") is None
@@ -143,8 +143,8 @@ class Crop1dData(ProcPlugin):
         tuple[slice, ...]
             The slices to select the range from the input data.
         """
-        if self._config["slices"] is not None:
-            return self._config["slices"]
+        if self.config["slices"] is not None:
+            return self.config["slices"]
         _n_dim_start = (
             self._data.ndim if self.get_param_value("process_data_dim") < 0 else 0
         )
@@ -183,5 +183,5 @@ class Crop1dData(ProcPlugin):
                 _slice = slice(_bounds[0], _bounds[0] + 1)
             else:
                 _slice = slice(_bounds[0], _bounds[-1] + 1)
-        self._config["slices"] = (slice(None, None),) * _i_dim + (_slice,)
-        return self._config["slices"]
+        self.config["slices"] = (slice(None, None),) * _i_dim + (_slice,)
+        return self.config["slices"]

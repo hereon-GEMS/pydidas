@@ -199,8 +199,8 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         """
         if self.get_param_value("output_export_images_flag"):
             OutputPlugin.pre_execute(self)
-        self._config["flag_conversion_set_up"] = False
-        self._config["flag_input_data_check"] = False
+        self.config["flag_conversion_set_up"] = False
+        self.config["flag_input_data_check"] = False
         self._converter = self._converter_identity
         self._details = {}
         self._figure = None
@@ -229,7 +229,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         tuple[Dataset, dict]
             The processed data and additional information.
         """
-        if not self._config["flag_input_data_check"]:
+        if not self.config["flag_input_data_check"]:
             self._check_input_data(data)
         _sin_square_chi_data, _sin_2chi_data = self._regroup_data_w_sin_chi(data)
         _fit_sin_square_res = self._fit_sin_square_chi_data(_sin_square_chi_data)
@@ -262,7 +262,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 _fit_sin_2chi_res,
             )
         if _flag_export:
-            self._config["global_index"] = kwargs.get("global_index", None)
+            self.config["global_index"] = kwargs.get("global_index", None)
             self._write_results()
         return _results, kwargs
 
@@ -271,11 +271,11 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         Regroup the data with sin^2(chi) and sin(2*chi).
         """
         _sin_square_chi_data, _ = self._plugin_group_in_sin_square_chi.execute(data)
-        if not self._config["flag_conversion_set_up"]:
+        if not self.config["flag_conversion_set_up"]:
             self._set_up_converter(_sin_square_chi_data)
         _sin_square_chi_data = self._converter(
             _sin_square_chi_data,
-            *self._config["converter_args"],
+            *self.config["converter_args"],
         )
         _sin_2chi_data, _ = self._plugin_group_in_sin_2_chi.execute(
             _sin_square_chi_data
@@ -306,7 +306,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
                 + ", ".join(f"`{_item}`" for _item in _VALID_DATA_AXIS_1_LABELS)
                 + "."
             )
-        self._config["flag_input_data_check"] = True
+        self.config["flag_input_data_check"] = True
 
     def _set_up_converter(self, input_data: Dataset) -> None:
         """
@@ -314,14 +314,14 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
         """
         if self.get_param_value("output_type") == "Same as input":
             self._converter = self._converter_identity
-            self._config["converter_args"] = ()
+            self.config["converter_args"] = ()
             self.output_data_label = f"fitted coefficients ({input_data.data_label})"
             self.output_data_unit = input_data.data_unit
         else:
             _input_type = input_data.data_label + " / " + input_data.data_unit
             _output = self.get_param_value("output_type")
             self._converter = convert_integration_result
-            self._config["converter_args"] = (
+            self.config["converter_args"] = (
                 _input_type,
                 _output,
                 self._EXP.xray_wavelength_in_m,
@@ -329,7 +329,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             )
             _data_label, self.output_data_unit = _output.split(" / ")
             self.output_data_label = f"fitted coefficients ({_data_label})"
-        self._config["flag_conversion_set_up"] = True
+        self.config["flag_conversion_set_up"] = True
 
     @staticmethod
     def _converter_identity(data: Dataset, *args: Any) -> Dataset:
@@ -576,9 +576,9 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             handlelength=5,
             handleheight=1.8,
         )
-        _indices = self._SCAN.get_indices_from_ordinal(self._config["global_index"])
+        _indices = self._SCAN.get_indices_from_ordinal(self.config["global_index"])
         self._figure.suptitle(
-            f"Sin^2(chi) analysis for scan point #{self._config['global_index']} "
+            f"Sin^2(chi) analysis for scan point #{self.config['global_index']} "
             + "\n(position in scan:"
             + " / ".join(str(i) for i in _indices)
             + ")"

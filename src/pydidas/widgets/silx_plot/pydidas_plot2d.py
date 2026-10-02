@@ -39,6 +39,7 @@ from silx.gui.plot import Plot2D
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import Dataset, PydidasQsettingsMixin
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.lazy_imports.silx import BackendMatplotlib, Colormap, Scatter
 from pydidas.widgets.silx_plot._coordinate_transform_button import (
     CoordinateTransformButton,
@@ -65,7 +66,7 @@ _SCATTER_LEGEND = "pydidas non-uniform image"
 _IMAGE_LEGEND = "pydidas image"
 
 
-class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
+class PydidasPlot2D(ConfigDictMixin, Plot2D, PydidasQsettingsMixin):
     """
     A customized silx Plot2D with an additional features.
 
@@ -204,7 +205,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _data_is_linear = not (data.is_axis_nonlinear(0) or data.is_axis_nonlinear(1))
         _data_has_same_shape = data.shape == self.__plotted_data_shape
         self.__plotted_data_shape = (int(data.shape[0]), int(data.shape[1]))
-        self._config["data_shape"] = data.shape
+        self.config["data_shape"] = data.shape
         self.profile.setEnabled(_data_is_linear)
         self.sig_data_linearity.emit(_data_is_linear)
         if _data_is_linear:
@@ -219,7 +220,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._update_colorbar(data)
         if not self._actions["lock_zoom"].locked and not _data_has_same_shape:
             self._actions["canvas"].set_canvas_mode(
-                data.shape != self._config["diffraction_exp"].det_shape
+                data.shape != self.config["diffraction_exp"].det_shape
             )
         if self._qtapp.is_dark_mode:
             self.invert_plot2d_icons()
@@ -388,14 +389,18 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._user_config_update(
             "cmap_nan_color", self.q_settings_get("user/cmap_nan_color")
         )
-        self._config = {
-            "cs_transform": kwargs.get("cs_transform", True),
-            "cs_transform_valid": False,
-            "use_data_info_action": kwargs.get("use_data_info_action", False),
-            "diffraction_exp": (
-                kwargs.get("diffraction_exp") or DiffractionExperimentContext()
-            ),
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "cs_transform": kwargs.get("cs_transform", True),
+                "cs_transform_valid": False,
+                "use_data_info_action": kwargs.get("use_data_info_action", False),
+                "diffraction_exp": (
+                    kwargs.get("diffraction_exp") or DiffractionExperimentContext()
+                ),
+            },
+            super_init=False,
+        )
 
     def _update_position_widget(self) -> None:
         """Update the position widget to be able to display units."""
@@ -405,7 +410,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         _new_position_widget = PydidasPositionInfo(
             plot=self,
             converters=_pos_widget_converters,
-            diffraction_exp=self._config["diffraction_exp"],
+            diffraction_exp=self.config["diffraction_exp"],
         )
         _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
         _layout = self._positionWidget.parent().layout()
@@ -444,11 +449,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         # The data info action is used to click on a point in the data and
         # request more information for the data point including all other
         # sliced dimensions.
-        if self._config["use_data_info_action"]:
+        if self.config["use_data_info_action"]:
             self._actions["data_info"] = self.group.addAction(
                 PydidasGetDataInfoAction(self, parent=self)  # type: ignore[arg-type]
             )
-        if self._config["cs_transform"]:
+        if self.config["cs_transform"]:
             # The coordinate transform actions (implemented as QToolButton)
             # allow to transform the coordinate system and to display image
             # coordinates in polar coordinates
@@ -456,7 +461,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self._actions["cs_transform"] = CoordinateTransformButton(
                 parent=self,
                 plot=self,
-                diffraction_exp=self._config["diffraction_exp"],
+                diffraction_exp=self.config["diffraction_exp"],
             )
 
     def _add_actions_to_toolbar(self) -> None:
@@ -476,12 +481,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.addAction(self._actions[_key])
             self._toolbar.insertAction(_insert_behind[_key], self._actions[_key])
 
-        if self._config["cs_transform"]:
+        if self.config["cs_transform"]:
             self._toolbar.addWidget(self._actions["cs_transform"])
 
     def _connect_action_signals(self) -> None:
         """Connect the signals of the custom actions to the plot."""
-        if self._config["cs_transform"]:
+        if self.config["cs_transform"]:
             self._actions["cs_transform"].sig_new_coordinate_system.connect(
                 self._positionWidget.new_coordinate_system
             )
@@ -491,7 +496,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.sig_data_linearity.connect(
                 self._actions["cs_transform"].set_data_linearity
             )  # type: ignore[attr-defined]
-        if self._config["use_data_info_action"]:
+        if self.config["use_data_info_action"]:
             self._actions["data_info"].sig_show_more_info_for_data.connect(
                 self.sig_get_more_info_for_data
             )

@@ -196,7 +196,7 @@ class WorkflowEditFrame(BaseFrame):
             information for both.
         """
         BaseFrame.restore_state(self, state)
-        if self._config["built"]:
+        if self.config["built"]:
             WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
@@ -226,5 +226,5 @@ class WorkflowEditFrame(BaseFrame):
             The calling event.
         """
         super().resizeEvent(event)
-        if self._config["built"]:
+        if self.config["built"]:
             WORKFLOW_EDIT_MANAGER.update_node_positions()

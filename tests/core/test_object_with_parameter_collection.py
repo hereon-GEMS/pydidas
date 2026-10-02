@@ -357,7 +357,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_copy__w_config(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config = {"a": "123", "b": [1, 2, 3], "c": ("A", "C")}
+        obj.config.update({"a": "123", "b": [1, 2, 3], "c": ("A", "C")})
         obj2 = obj.copy()
         for _param in obj.params.values():
             self.assertNotIn(_param, obj2.params.values())
@@ -395,7 +395,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_deepcopy(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        obj._config = {"a": 123, "b": [1, 2, 3], "c": ("A", "C")}
+        obj.config.update({"a": 123, "b": [1, 2, 3], "c": ("A", "C")})
         obj2 = obj.deepcopy()
         obj2._config["a"] = 42
         obj2._config["b"].append(42)

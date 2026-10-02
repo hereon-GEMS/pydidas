@@ -46,6 +46,7 @@ from pydidas.core import (
     ObjectWithParameterCollection,
     UserConfigError,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.workflow.processing_result_saver import ProcessingResultSaver
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -104,11 +105,16 @@ class ProcessingResults(ObjectWithParameterCollection):
         )
         self._tree = WorkflowTree() if processing_tree is None else processing_tree
         self._saver = ProcessingResultSaver()
-        self._config: dict[str, Any] = {
-            "frozen_scan": Scan(),
-            "frozen_exp": DiffractionExperiment(),
-            "frozen_tree": ProcessingTree(),
-        } | _STANDARD_CONFIG
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "frozen_scan": Scan(),
+                "frozen_exp": DiffractionExperiment(),
+                "frozen_tree": ProcessingTree(),
+            }
+            | _STANDARD_CONFIG,
+            super_init=False,
+        )
         self._composites: dict[int, Dataset] = {}
         self._plugin_result_infos: dict[int, PluginResultInfo] = {}
         self._source_hash: int = -1
@@ -173,7 +179,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         WorkflowTree
             The WorkflowTree at the time of processing.
         """
-        return self._config.get("frozen_tree", ProcessingTree())
+        return self.config.get("frozen_tree", ProcessingTree())
 
     @property
     def frozen_exp(self) -> DiffractionExperiment:
@@ -185,7 +191,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         DiffractionExperiment
             The DiffractionExperiment at the time of processing.
         """
-        return self._config.get("frozen_exp", DiffractionExperiment())
+        return self.config.get("frozen_exp", DiffractionExperiment())
 
     @property
     def frozen_scan(self) -> Scan:
@@ -197,7 +203,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         Scan
             The Scan at the time of processing.
         """
-        return self._config.get("frozen_scan", Scan())
+        return self.config.get("frozen_scan", Scan())
 
     @property
     def source_hash(self) -> int:
@@ -238,7 +244,7 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._saver.set_active_savers(None)
         self._plugin_result_infos = {}
         self._source_hash = -1
-        self._config.update(_STANDARD_CONFIG)
+        self.config.update(_STANDARD_CONFIG)
 
     def prepare_new_results(self) -> None:
         """Prepare the ProcessingResults for newly created results."""
@@ -247,10 +253,10 @@ class ProcessingResults(ObjectWithParameterCollection):
             _node_id: int = _node.node_id  # type: ignore[type]
             self._plugin_result_infos[_node_id] = _node.plugin.plugin_result_info
         self._source_hash = hash((hash(self._scan), hash(self._tree), hash(self._exp)))
-        self._config["frozen_scan"].update_from_scan(self._scan)
-        self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
-        self._config["frozen_tree"].update_from_tree(self._tree)
-        self._config["frozen_tree"].prepare_execution()
+        self.config["frozen_scan"].update_from_scan(self._scan)
+        self.config["frozen_exp"].update_from_diffraction_exp(self._exp)
+        self.config["frozen_tree"].update_from_tree(self._tree)
+        self.config["frozen_tree"].prepare_execution()
 
     def update_result_metadata(
         self, metadata: dict[int, Dataset] | dict[int, dict[str, Any]]
@@ -266,11 +272,11 @@ class ProcessingResults(ObjectWithParameterCollection):
             the associated data. Alternatively, the Datasets can also be used
             directly as dict values.
         """
-        _scan_shape = self._config["frozen_scan"].shape
+        _scan_shape = self.config["frozen_scan"].shape
         _scan_meta = {
-            "axis_labels": self._config["frozen_scan"].axis_labels,
-            "axis_units": self._config["frozen_scan"].axis_units,
-            "axis_ranges": self._config["frozen_scan"].axis_ranges,
+            "axis_labels": self.config["frozen_scan"].axis_labels,
+            "axis_units": self.config["frozen_scan"].axis_units,
+            "axis_ranges": self.config["frozen_scan"].axis_ranges,
         }
         for _node_id, _meta in metadata.items():
             if isinstance(_meta, Dataset):
@@ -281,8 +287,8 @@ class ProcessingResults(ObjectWithParameterCollection):
                 setattr(_info, _key, _val)
             _info.data_label = _meta.get("data_label", "")
             _info.data_unit = _meta.get("data_unit", "")
-            _info.scan_ndim = self._config["frozen_scan"].ndim
-        self._config["metadata_complete"] = True
+            _info.scan_ndim = self.config["frozen_scan"].ndim
+        self.config["metadata_complete"] = True
         self._update_composite_metadata()
 
     def store_scan_point_results(
@@ -302,12 +308,12 @@ class ProcessingResults(ObjectWithParameterCollection):
             Flag whether to export the new data directly to the savers.
             The default is False.
         """
-        if not self._config["metadata_complete"]:
+        if not self.config["metadata_complete"]:
             self.update_result_metadata(results)
-        if not self._config["saver_metadata_set"]:
+        if not self.config["saver_metadata_set"]:
             _info = {_id: _val.property_dict for _id, _val in self._composites.items()}
             self._saver.update_saver_metadata(_info)
-            self._config["saver_metadata_set"] = True
+            self.config["saver_metadata_set"] = True
         _scan_index = self._scan.get_indices_from_ordinal(index)
         for _key, _val in results.items():
             self._composites[_key][_scan_index] = _val
@@ -373,9 +379,9 @@ class ProcessingResults(ObjectWithParameterCollection):
             _data = _data.copy()
         if flatten_scan_dims:
             _data.flatten_dims(
-                *range(self._config["frozen_scan"].ndim),
+                *range(self.config["frozen_scan"].ndim),
                 new_dim_label="Chronological scan points",
-                new_dim_range=np.arange(self._config["frozen_scan"].n_points),
+                new_dim_range=np.arange(self.config["frozen_scan"].n_points),
             )
         if squeeze:
             return _data.squeeze()
@@ -456,7 +462,7 @@ class ProcessingResults(ObjectWithParameterCollection):
             selected. The default is None.
         """
         _save_path = Path(save_dir)
-        if not self._config["metadata_complete"]:
+        if not self.config["metadata_complete"]:
             raise UserConfigError(
                 "The metadata has not been set from the results yet. Cannot "
                 "save results."
@@ -477,9 +483,9 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._saver.prepare_active_savers(
             _save_path,
             self._export_result_info,
-            scan=self._config["frozen_scan"],
-            diffraction_exp=self._config["frozen_exp"],
-            processing_tree=self._config["frozen_tree"],
+            scan=self.config["frozen_scan"],
+            diffraction_exp=self.config["frozen_exp"],
+            processing_tree=self.config["frozen_tree"],
         )
 
     def save_results_to_disk(
@@ -611,10 +617,10 @@ class ProcessingResults(ObjectWithParameterCollection):
             self._scan.update_from_scan(_scan)
             self._exp.update_from_diffraction_exp(_exp)
             self._tree.update_from_tree(_tree)
-            self._config["frozen_scan"].update_from_scan(self._scan)
-            self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
-            self._config["frozen_tree"].update_from_tree(self._tree)
-            self._config["metadata_complete"] = True
+            self.config["frozen_scan"].update_from_scan(self._scan)
+            self.config["frozen_exp"].update_from_diffraction_exp(self._exp)
+            self.config["frozen_tree"].update_from_tree(self._tree)
+            self.config["metadata_complete"] = True
 
     def update_from_processing_results(self, results: "ProcessingResults"):
         """
@@ -630,13 +636,16 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._scan.update_from_scan(results.scan_instance)
         self._exp.update_from_diffraction_exp(results.diff_exp_instance)
         self._tree.update_from_tree(results.proc_tree_instance)
-        self._config["frozen_scan"].update_from_scan(self._scan)
-        self._config["frozen_exp"].update_from_diffraction_exp(self._exp)
-        self._config["frozen_tree"].update_from_tree(self._tree)
+        self.config["frozen_scan"].update_from_scan(self._scan)
+        self.config["frozen_exp"].update_from_diffraction_exp(self._exp)
+        self.config["frozen_tree"].update_from_tree(self._tree)
         self._composites = {
             _key: deepcopy(_val) for _key, _val in results._composites.items()
         }
-        self._config = {_key: deepcopy(_val) for _key, _val in results._config.items()}
+        self.config.clear()
+        self.config.update(
+            {_key: deepcopy(_val) for _key, _val in results._config.items()}
+        )
         self._plugin_result_infos = deepcopy(results._plugin_result_infos)
 
     # ------------------
@@ -645,7 +654,7 @@ class ProcessingResults(ObjectWithParameterCollection):
 
     def _create_composites(self) -> None:
         """Create the composite datasets for all node results."""
-        if not self._config["metadata_complete"]:
+        if not self.config["metadata_complete"]:
             raise UserConfigError(
                 "The shapes of the results have not been set. Please set the shapes "
                 "before storing results."
@@ -657,11 +666,11 @@ class ProcessingResults(ObjectWithParameterCollection):
             )
             for _node_id, _info in self._plugin_result_infos.items()
         }
-        self._config["composites_created"] = True
+        self.config["composites_created"] = True
 
     def _update_composite_metadata(self) -> None:
         """Update the metadata of the composite datasets with the stored metadata."""
-        if not self._config["composites_created"]:
+        if not self.config["composites_created"]:
             self._create_composites()
         for _node_id, _metadata in self._plugin_result_infos.items():
             _metadata = self._plugin_result_infos[_node_id].dataset_metadata

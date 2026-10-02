@@ -36,6 +36,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.core import UserConfigError
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.lazy_imports.pyFAI import Detector
 from pydidas.core.math.ellipse import (
@@ -52,7 +53,7 @@ if TYPE_CHECKING:
     from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
-class ManuallySetBeamcenterController(QtCore.QObject):
+class ManuallySetBeamcenterController(ConfigDictMixin, QtCore.QObject):
     """
     This class manages manually selecting and editing the beamcenter.
 
@@ -105,16 +106,20 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         **kwargs: Any,
     ) -> None:
         QtCore.QObject.__init__(self)
-        self._config = {
-            "selection_active": kwargs.get("selection_active", True),
-            "2click_selection": True,
-            "wait_for_2nd_click": False,
-            "overlay_color": kwargs.get("overlay_color", PYDIDAS_COLORS["orange"]),
-            "beamcenter_set": False,
-            "beamcenter_outline_points": None,
-            "selected_points": [],
-            "beamcenter_position": None,
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "selection_active": kwargs.get("selection_active", True),
+                "2click_selection": True,
+                "wait_for_2nd_click": False,
+                "overlay_color": kwargs.get("overlay_color", PYDIDAS_COLORS["orange"]),
+                "beamcenter_set": False,
+                "beamcenter_outline_points": None,
+                "selected_points": [],
+                "beamcenter_position": None,
+            },
+            super_init=False,
+        )
         self._points = []
         self._parent_frame = parent_frame
         self._plot = plot
@@ -162,7 +167,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         y_positions : np.ndarray
             The y values of the selected points.
         """
-        return self._get_points_as_arrays(self._config["selected_points"])
+        return self._get_points_as_arrays(self.config["selected_points"])
 
     @property
     def beamcenter_is_set(self) -> bool:
@@ -174,7 +179,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         bool :
             Flag whether the beamcenter has been set.
         """
-        return self._config["beamcenter_set"]
+        return self.config["beamcenter_set"]
 
     @property
     def selection_active(self) -> bool:
@@ -186,7 +191,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         bool
             Selection active flag.
         """
-        return self._config["selection_active"]
+        return self.config["selection_active"]
 
     @QtCore.Slot(str)
     def set_marker_color(self, color: str) -> None:
@@ -198,16 +203,16 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         color : str
             The new color name.
         """
-        self._config["overlay_color"] = PYDIDAS_COLORS[color]
+        self.config["overlay_color"] = PYDIDAS_COLORS[color]
         _marker_keys = [f"marker_{_point[0]}_{_point[1]}" for _point in self._points]
         _marker_keys.append("beamcenter")
         for _key in _marker_keys:
             _item = self._plot._getItem("marker", legend=_key)
             if _item is not None:
-                _item.setColor(self._config["overlay_color"])
+                _item.setColor(self.config["overlay_color"])
         _item = self._plot._getItem("item", legend="beamcenter_outline")
         if _item is not None:
-            _item.setColor(self._config["overlay_color"])
+            _item.setColor(self.config["overlay_color"])
 
     def remove_plot_items(
         self, *kind: Literal["all", "marker", "beamcenter", "beamcenter_outline"]
@@ -241,26 +246,26 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The kind of items to be removed.
         """
         kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
-        if "beamcenter" in kind and self._config["beamcenter_position"] is not None:
+        if "beamcenter" in kind and self.config["beamcenter_position"] is not None:
             self._plot.addMarker(
-                *self._config["beamcenter_position"],
+                *self.config["beamcenter_position"],
                 legend="beamcenter",
-                color=self._config["overlay_color"],
+                color=self.config["overlay_color"],
                 symbol="d",
             )
         if (
             "beamcenter_outline" in kind
-            and self._config["beamcenter_outline_points"] is not None
+            and self.config["beamcenter_outline_points"] is not None
         ):
-            self._plot_beamcenter_outline(*self._config["beamcenter_outline_points"])
+            self._plot_beamcenter_outline(*self.config["beamcenter_outline_points"])
         if "marker" in kind:
             for _point in self._points:
                 _label = f"marker_{_point[0]}_{_point[1]}"
-                _symbol = "o" if _point in self._config["selected_points"] else "x"
+                _symbol = "o" if _point in self.config["selected_points"] else "x"
                 self._plot.addMarker(
                     *_point,
                     legend=_label,
-                    color=self._config["overlay_color"],
+                    color=self.config["overlay_color"],
                     symbol=_symbol,
                 )
 
@@ -274,7 +279,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         active : bool
             The new activation state.
         """
-        self._config["selection_active"] = active
+        self.config["selection_active"] = active
         self._points_for_bc.setVisible(active)
 
     @QtCore.Slot(bool)
@@ -287,13 +292,13 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         use_2_clicks : bool
             Flag to activate/deactivate 2-point selection.
         """
-        self._config["2click_selection"] = use_2_clicks
-        if self._config["wait_for_2nd_click"]:
+        self.config["2click_selection"] = use_2_clicks
+        if self.config["wait_for_2nd_click"]:
             self._plot.resetZoom()
             self._plot.getImage().getColormap().setVRange(
-                *self._config["2click_cmap_limits"]
+                *self.config["2click_cmap_limits"]
             )
-        self._config["wait_for_2nd_click"] = False
+        self.config["wait_for_2nd_click"] = False
 
     @QtCore.Slot(dict)
     def _process_plot_signal(self, event_dict: dict[str, Any]) -> None:
@@ -308,19 +313,19 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         if not (
             event_dict["event"] == "mouseClicked"
             and event_dict.get("button", "None") == "left"
-            and self._config["selection_active"]
+            and self.config["selection_active"]
         ):
             return
         _x = np.round(event_dict["x"], decimals=3)
         _y = np.round(event_dict["y"], decimals=3)
-        if self._config["2click_selection"] and not self._config["wait_for_2nd_click"]:
+        if self.config["2click_selection"] and not self.config["wait_for_2nd_click"]:
             self.__process_click_one_of_two(_x, _y)
             return
-        if self._config["2click_selection"] and self._config["wait_for_2nd_click"]:
+        if self.config["2click_selection"] and self.config["wait_for_2nd_click"]:
             self.__process_click_two_of_two()
         if (_x, _y) in self._points:
             return
-        _color = self._config["overlay_color"]
+        _color = self.config["overlay_color"]
         self._plot.addMarker(
             _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
         )
@@ -339,9 +344,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The y-coordinate of the click.
         """
         _cmap = self._plot.getImage().getColormap()
-        self._config["2click_xlimits"] = self._plot.getGraphXLimits()
-        self._config["2click_ylimits"] = self._plot.getGraphYLimits()
-        self._config["2click_cmap_limits"] = _cmap.getVRange()
+        self.config["2click_xlimits"] = self._plot.getGraphXLimits()
+        self.config["2click_ylimits"] = self._plot.getGraphYLimits()
+        self.config["2click_cmap_limits"] = _cmap.getVRange()
 
         _delta = 50
 
@@ -357,18 +362,18 @@ class ManuallySetBeamcenterController(QtCore.QObject):
 
         self._plot.setLimits(_x0, _x1, _y0, _y1)
         _cmap.setVRange(np.amin(_data), np.amax(_data))
-        self._config["wait_for_2nd_click"] = True
+        self.config["wait_for_2nd_click"] = True
 
     def __process_click_two_of_two(self) -> None:
         """
         Process the second click in the two-click selection.
         """
         self._plot.setLimits(
-            *self._config["2click_xlimits"], *self._config["2click_ylimits"]
+            *self.config["2click_xlimits"], *self.config["2click_ylimits"]
         )
-        self._config["wait_for_2nd_click"] = False
+        self.config["wait_for_2nd_click"] = False
         self._plot.getImage().getColormap().setVRange(
-            *self._config["2click_cmap_limits"]
+            *self.config["2click_cmap_limits"]
         )
 
     @QtCore.Slot()
@@ -399,8 +404,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         position : tuple[float, float]
             The (x, y) position of the beamcenter.
         """
-        _color = self._config["overlay_color"]
-        self._config["beamcenter_position"] = position
+        _color = self.config["overlay_color"]
+        self.config["beamcenter_position"] = position
         self._plot.addMarker(*position, legend="beamcenter", color=_color, symbol="d")
         self._toggle_beamcenter_is_set(True)
 
@@ -493,7 +498,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         for _name in ["beamcenter_x", "beamcenter_y"]:
             self._parent_frame.param_composite_widgets[_name].setVisible(is_set)
-        self._config["beamcenter_set"] = is_set
+        self.config["beamcenter_set"] = is_set
 
     @QtCore.Slot(object)
     def __new_points_selected(self, points: Iterable[str]) -> None:
@@ -505,7 +510,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         points : Iterable[str]
             An iterable (tuple, list) with the string names of the points.
         """
-        self._config["selected_points"] = points
+        self.config["selected_points"] = points
         for _point in self._points:
             _label = f"marker_{_point[0]}_{_point[1]}"
             _marker = self._plot._getItem("marker", _label)
@@ -525,9 +530,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         for _point in points:
             self._points.remove(_point)
             self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
-            if _point in self._config["selected_points"]:
-                _index = self._config["selected_points"].index(_point)
-                self._config["selected_points"].pop(_index)
+            if _point in self.config["selected_points"]:
+                _index = self.config["selected_points"].index(_point)
+                self.config["selected_points"].pop(_index)
 
     @QtCore.Slot()
     def manual_beamcenter_update(self) -> None:
@@ -536,7 +541,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         _x = self._parent_frame.get_param_value("beamcenter_x")
         _y = self._parent_frame.get_param_value("beamcenter_y")
-        self._config["beamcenter_position"] = (_x, _y)
+        self.config["beamcenter_position"] = (_x, _y)
         if self.selection_active:
             self._set_beamcenter_marker((_x, _y))
             self.remove_plot_items("beamcenter_outline")
@@ -559,12 +564,12 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         xpoints = np.asarray(xpoints)
         ypoints = np.asarray(ypoints)
-        self._config["beamcenter_outline_points"] = (xpoints, ypoints)
+        self.config["beamcenter_outline_points"] = (xpoints, ypoints)
         self._plot.addShape(
             xpoints,
             ypoints,
             legend="beamcenter_outline",
-            color=self._config["overlay_color"],
+            color=self.config["overlay_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,

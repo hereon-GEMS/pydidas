@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["FilelistManager"]
 
 
-import copy
 import os
 from pathlib import Path
 
@@ -94,7 +93,7 @@ class FilelistManager(ObjectWithParameterCollection):
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
-        self._config = {"file_list": [], "file_size": None, "n_files": 0}
+        self.config.update({"file_list": [], "file_size": None, "n_files": 0})
 
     @property
     def n_files(self) -> int:
@@ -106,7 +105,7 @@ class FilelistManager(ObjectWithParameterCollection):
         n_files : int
             The number of files in the filelist.
         """
-        return self._config["n_files"]
+        return self.config.n_files
 
     @property
     def filesize(self) -> float:
@@ -118,7 +117,7 @@ class FilelistManager(ObjectWithParameterCollection):
         float
             The file size in bytes.
         """
-        return self._config["file_size"]
+        return self.config.file_size
 
     def get_config(self) -> dict:
         """
@@ -130,7 +129,7 @@ class FilelistManager(ObjectWithParameterCollection):
             The config dictionary with information about the file list, sizes
             and number of files.
         """
-        return copy.copy(self._config)
+        return dict(self.config)
 
     def update(
         self,
@@ -232,9 +231,9 @@ class FilelistManager(ObjectWithParameterCollection):
         Create a filelist with only one the first file.
         """
         _fullname = self.get_param_value("first_file")
-        self._config["file_list"] = [_fullname]
-        self._config["file_size"] = os.stat(_fullname).st_size
-        self._config["n_files"] = 1
+        self.config.file_list = [_fullname]
+        self.config.file_size = os.stat(_fullname).st_size
+        self.config.n_files = 1
 
     def _create_filelist_static(self):
         """
@@ -258,24 +257,24 @@ class FilelistManager(ObjectWithParameterCollection):
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
         if _file1.suffix[1:] not in HDF5_EXTENSIONS:
             verify_files_of_range_are_same_size(_list)
-        self._config["file_list"] = _list
-        self._config["n_files"] = len(_list)
-        self._config["file_size"] = os.stat(_file1).st_size
+        self.config.file_list = _list
+        self.config.n_files = len(_list)
+        self.config.file_size = os.stat(_file1).st_size
 
     def _create_filelist_live_processing(self):
         """
         Create the filelist for live processing.
 
         This method will filter the compare the names of the first and last
-        file and try to interprete the selected range.
+        file and try to interpret the selected range.
         """
         _fnames, _range = get_file_naming_scheme(
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
-        self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
+        self.config.file_size = os.stat(self.get_param_value("first_file")).st_size
         _path, _name = _fnames.parent, _fnames.name
-        self._config["file_list"] = [_path / _name.format(index=i) for i in _range]
-        self._config["n_files"] = len(_range)
+        self.config.file_list = [_path / _name.format(index=i) for i in _range]
+        self.config.n_files = len(_range)
 
     def get_filename(self, index: int) -> Path:
         """
@@ -297,16 +296,17 @@ class FilelistManager(ObjectWithParameterCollection):
         Path
             The filename (and path) of the image file indexed with index.
         """
-        _n = self._config["n_files"]
+        _n = self.config.n_files
         if not 0 <= index < _n:
             raise UserConfigError(
                 f'The selected number "{index}" is out of '
                 f"the range of the file list [0, {_n - 1}]"
             )
-        return self._config["file_list"][index]
+        return self.config.file_list[index]
 
     def reset(self):
         """
         Reset the filelist to the initial configuration.
         """
-        self._config = {"file_list": [], "file_size": None, "n_files": 0}
+        self.config.clear()
+        self.config.update(file_list=[], file_size=None, n_files=0)

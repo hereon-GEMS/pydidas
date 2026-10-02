@@ -84,7 +84,7 @@ class PydidasWindow(BaseFrame):
 
         This makes sure that any show calls will have a fully built window.
         """
-        if not self._config.get("built", False):
+        if not self.config.get("built", False):
             self.frame_activated(self.frame_index)
         if self._geometry is not None:
             self.setGeometry(self._geometry)

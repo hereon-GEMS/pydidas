@@ -44,6 +44,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from pydidas.core.config_dict import ConfigDict
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.core.utils import (
     get_formatted_blocks_from_docstring,
@@ -318,8 +319,8 @@ class BasePlugin(ObjectWithParameterCollection):
         for _kw, _item in kwargs.items():
             if _kw in self.params:
                 self.set_param_value(_kw, _item)
-        self._config["test_mode"]: bool = False
-        self._config["input_data"]: int | Dataset | None = None
+        self.config["test_mode"]: bool = False
+        self.config["input_data"]: int | Dataset | None = None
         self.node_id = None
         self.advanced_params_visible = False
 
@@ -410,6 +411,8 @@ class BasePlugin(ObjectWithParameterCollection):
             A state dictionary for restoring the object.
         """
         for key, val in state.items():
+            if key == "_config" and not isinstance(val, ConfigDict):
+                val = ConfigDict(val)
             setattr(self, key, val)
 
     def __reduce__(self) -> tuple:
@@ -489,7 +492,7 @@ class BasePlugin(ObjectWithParameterCollection):
         bool
             The test mode flag.
         """
-        return self._config["test_mode"]
+        return self.config["test_mode"]
 
     @test_mode.setter
     def test_mode(self, value: bool):
@@ -500,7 +503,7 @@ class BasePlugin(ObjectWithParameterCollection):
         value : bool
             The new test mode flag.
         """
-        self._config["test_mode"] = bool(value)
+        self.config["test_mode"] = bool(value)
 
     @property
     def input_data(self) -> int | Dataset | None:
@@ -512,7 +515,7 @@ class BasePlugin(ObjectWithParameterCollection):
         int or Dataset or None
             The input data passed to the plugin.
         """
-        return self._config["input_data"]
+        return self.config["input_data"]
 
     @property
     def result_data_label(self) -> str:
@@ -557,8 +560,8 @@ class BasePlugin(ObjectWithParameterCollection):
         **kwargs : Any
             The calling keyword arguments.
         """
-        self._config["input_data"] = copy.deepcopy(data)
-        self._config["input_kwargs"] = copy.deepcopy(kwargs)
+        self.config["input_data"] = copy.deepcopy(data)
+        self.config["input_kwargs"] = copy.deepcopy(kwargs)
 
     def _get_own_roi(self) -> slice | tuple[slice, slice] | None:
         """

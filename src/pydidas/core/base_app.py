@@ -27,10 +27,11 @@ __status__ = "Production"
 __all__ = ["BaseApp"]
 
 
-from copy import copy
+from collections.abc import Sequence
+from copy import copy, deepcopy
 from multiprocessing.managers import SyncManager
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Self
 
 import numpy as np
 from qtpy import QtCore
@@ -62,16 +63,18 @@ class BaseApp(ObjectWithParameterCollection):
         implementation of the app.
     """
 
-    default_params = ParameterCollection()
-    parse_func = staticmethod(lambda: {})  # noqa E731
+    default_params: ClassVar[ParameterCollection] = ParameterCollection()
+    parse_func: ClassVar[staticmethod] = staticmethod(lambda: {})  # noqa E731
     attributes_not_to_copy_to_app_clone: ClassVar[list[str]] = ["_mp_manager_instance"]
+    default_config: ClassVar[dict[str, Any]] = {}
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.clone_mode = kwargs.pop("clone_mode", False)
         ObjectWithParameterCollection.__init__(self)
         self.update_params_from_init_args_and_kwargs(*args, **kwargs)
         self.parse_args_and_set_params()
-        self._config["run_prepared"] = False
+        self.config.update({k: deepcopy(v) for k, v in self.default_config.items()})
+        self.config["run_prepared"] = False
         self.mp_manager = {}
         self._mp_manager_instance = None
 
@@ -134,7 +137,7 @@ class BaseApp(ObjectWithParameterCollection):
         object or None
             The latest results or None.
         """
-        return self._config.get("latest_results", None)
+        return self.config.get("latest_results", None)
 
     def run(self) -> None:
         """Run the app serially without multiprocessing support."""
@@ -154,10 +157,10 @@ class BaseApp(ObjectWithParameterCollection):
         """
         Perform operations prior to running main parallel processing function.
 
-        The generic method simple performs no operation and subclasses only
-        need to re-implement it when they explicitly need it.
+        The generic method simply sets the "run_prepared" flag and subclasses
+        only need to re-implement it when they explicitly need it.
         """
-        self._config["run_prepared"] = True
+        self.config["run_prepared"] = True
 
     def prepare_run(self) -> None:
         """Prepare running the app. This is a wrapper for multiprocessing_pre_run."""
@@ -168,16 +171,21 @@ class BaseApp(ObjectWithParameterCollection):
         """
         Perform operations after running main parallel processing function.
 
-        The generic method simple performs no operation and subclasses only
+        The generic method simply performs no operation and subclasses only
         need to re-implement it when they explicitly need it.
         """
         return
 
-    def multiprocessing_get_tasks(self) -> np.ndarray:
+    def multiprocessing_get_tasks(self) -> Sequence[int] | np.ndarray:
         """
         Return all tasks required in multiprocessing.
 
         This method must be implemented by the BaseApp subclasses.
+
+        Returns
+        -------
+        Sequence[int] or np.ndarray
+            The tasks to be processed.
         """
         raise NotImplementedError
 
@@ -185,7 +193,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         Perform operations in the pre-cycle of every task.
 
-        The generic method simple performs no operation and subclasses only
+        The generic method simply performs no operation and subclasses only
         need to re-implement it when they explicitly need it.
 
         Parameters
@@ -205,6 +213,11 @@ class BaseApp(ObjectWithParameterCollection):
         ----------
         index : int
             The index to be processed.
+
+        Returns
+        -------
+        Any or None
+            The result of the processing. The specific type depends on the app.
         """
         raise NotImplementedError
 
@@ -214,8 +227,7 @@ class BaseApp(ObjectWithParameterCollection):
 
         This method is called in the parallel multiprocessing process
         prior to the actual calculation. Apps can specify wait conditions
-        that need to be fulfilled before carrying on. The method returns
-        a boolean flag whether a timeout was encountered.
+        that need to be fulfilled before carrying on.
 
         Returns
         -------
@@ -246,9 +258,9 @@ class BaseApp(ObjectWithParameterCollection):
         Returns
         -------
         dict
-            The App configuration stored in the _config dictionary.
+            The App configuration stored in the config dictionary.
         """
-        return copy(self._config)
+        return dict(self.config)
 
     def export_state(self) -> dict:
         """
@@ -261,13 +273,13 @@ class BaseApp(ObjectWithParameterCollection):
         """
         _cfg = self.get_config()
         _new_cfg = {}
-        for _key, _item in self._config.items():
+        for _key, _item in self.config.items():
             if isinstance(_item, range):
                 _new_cfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, slice):
                 _new_cfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
             if isinstance(_item, Path):
-                _new_cfg[_key] = str(_item)
+                _new_cfg[_key] = f"::path::{_item}"
             if _key in ["scan_context", "exp_context"]:
                 _new_cfg[_key] = "::None::"
         _cfg.update(_new_cfg)
@@ -301,11 +313,16 @@ class BaseApp(ObjectWithParameterCollection):
                 _stop = None if _stop == "None" else int(_stop)
                 _step = None if _step == "None" else int(_step)
                 _new_cfg[_key] = slice(_start, _stop, _step)
+            elif _item.startswith("::path::"):
+                _new_cfg[_key] = Path(_item.removeprefix("::path::"))
             elif _item == "::None::":
                 _new_cfg[_key] = None
-        self._config = state["config"] | _new_cfg
+        self.config.clear()
+        self.config.update({k: deepcopy(v) for k, v in self.default_config.items()})
+        self.config["run_prepared"] = False
+        self.config.update(state["config"] | _new_cfg)
 
-    def copy(self, clone_mode: bool = False) -> "BaseApp":
+    def copy(self, clone_mode: bool = False) -> Self:
         """
         Get a copy of the App.
 
@@ -313,7 +330,8 @@ class BaseApp(ObjectWithParameterCollection):
         ----------
         clone_mode : bool, optional
             Keyword to toggle creation of an app clone which does not include
-            attributes marked in the classes' clone_mode attribute.
+            attributes listed in the class' attributes_not_to_copy_to_app_clone.
+            The default is False.
 
         Returns
         -------
@@ -322,7 +340,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return self.__copy__(clone_mode)
 
-    def __copy__(self, clone_mode: bool = False) -> "BaseApp":
+    def __copy__(self, clone_mode: bool = False) -> Self:
         """
         Reimplement the generic copy method.
 

@@ -70,13 +70,13 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             title="Define beamcenter through selected points",
             **kwargs,
         )
-        self._config = self._config | {
-            "beamcenter_set": False,
-            "diffraction_exp": kwargs.get(
+        self.config.update(
+            beamcenter_set=False,
+            diffraction_exp=kwargs.get(
                 "diffraction_exp", DiffractionExperimentContext()
             ),
-            "select_mode_active": False,
-        }
+            select_mode_active=False,
+        )
         self._markers = {}
         self._image = Dataset(np.zeros((5, 5)))
         self.frame_activated(self.frame_index)
@@ -101,7 +101,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             "plot",
             PydidasPlot2D(
                 cs_transform=False,
-                diffraction_exp=self._config["diffraction_exp"],
+                diffraction_exp=self.config["diffraction_exp"],
             ),
             gridPos=(1, 3, 2, 1),
             minimumHeight=700,
@@ -251,7 +251,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
 
     def _update_image_if_required(self) -> None:
         """Check the image dimensions against the Detector size."""
-        _shape = self._config["diffraction_exp"].det_shape
+        _shape = self.config["diffraction_exp"].det_shape
         if _shape == self._image.shape:
             return
         self._image = Dataset(np.zeros(_shape))

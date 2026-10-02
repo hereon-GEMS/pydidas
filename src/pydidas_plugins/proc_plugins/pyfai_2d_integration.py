@@ -71,7 +71,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
             "azimuth_range": self.get_azimuthal_range_in_deg(),
-            "method": self._config["method"],
+            "method": self.config["method"],
         }
 
         self.__range_factor = (

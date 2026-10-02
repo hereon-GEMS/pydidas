@@ -56,6 +56,9 @@ Programmatic changes
   be specified with `astype` instead of `datatype`.
 - Modified the default_frames to lazily load the frames and only
   import and return them on request.
+- Added a new dictionary subclass ConfigDict which enforces string
+  keys and exposes a public read-only property ``config`` to access
+  the dictionary.
 
 
 Bugfixes

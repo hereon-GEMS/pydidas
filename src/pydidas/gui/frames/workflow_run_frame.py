@@ -70,12 +70,12 @@ class WorkflowRunFrame(ViewResultsFrame):
         kwargs["processing_tree"] = WorkflowTree()
         kwargs["workflow_results"] = WorkflowResults()
         ViewResultsFrame.__init__(self, **kwargs)
-        self._config["data_use_timeline"] = False
-        self._config["plot_last_update"] = 0
-        self._config["plot_update_time"] = self.q_settings_get(
+        self.config["data_use_timeline"] = False
+        self.config["plot_last_update"] = 0
+        self.config["plot_update_time"] = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
-        self._config["source_hash"] = self.proc_results.source_hash
+        self.config["source_hash"] = self.proc_results.source_hash
         self._app = ExecuteWorkflowApp()
         self.add_params(self._app.params)
 
@@ -107,8 +107,8 @@ class WorkflowRunFrame(ViewResultsFrame):
         checked to detect any changes.
         """
         _hash = self.proc_results.source_hash
-        if _hash != self._config["source_hash"]:
-            self._config["source_hash"] = self.proc_results.source_hash
+        if _hash != self.config["source_hash"]:
+            self.config["source_hash"] = self.proc_results.source_hash
             self._clear_results()
             self.update_choices_of_selected_results()
 
@@ -171,7 +171,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
-        self._config["plot_last_update"] = time.time()
+        self.config["plot_last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
         logger.debug("WorkflowRunFrame: Starting AppRunner")
         self._runner = AppRunner(self._app)
@@ -184,7 +184,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         QtWidgets.QApplication.instance().aboutToQuit.connect(
             self._runner.send_stop_signal
         )
-        self._config["update_node_information_connected"] = True
+        self.config["update_node_information_connected"] = True
         logger.debug("WorkflowRunFrame: Running AppRunner")
         self._runner.start()
 
@@ -240,16 +240,16 @@ class WorkflowRunFrame(ViewResultsFrame):
         has sent the first results.
         """
         self.update_choices_of_selected_results()
-        if self._config["update_node_information_connected"]:
+        if self.config["update_node_information_connected"]:
             self._runner.sig_results.disconnect(self.__update_result_node_information)
-            self._config["update_node_information_connected"] = False
+            self.config["update_node_information_connected"] = False
 
     @QtCore.Slot()
     def __check_for_plot_update(self) -> None:
         """Check whether the plot is due for an update and update it if so."""
-        _dt = time.time() - self._config["plot_last_update"]
-        if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
-            self._config["plot_last_update"] = time.time()
+        _dt = time.time() - self.config["plot_last_update"]
+        if _dt > self.config["plot_update_time"] and self.config["frame_active"]:
+            self.config["plot_last_update"] = time.time()
             self.update_displayed_data()
 
     @QtCore.Slot(str)
@@ -290,7 +290,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
-        self._config["export_available"] = not running
+        self.config["export_available"] = not running
         for _key in [
             "saving_format",
             "squeeze_empty_dims",

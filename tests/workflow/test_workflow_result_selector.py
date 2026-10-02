@@ -102,7 +102,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.prepare_execution()
 
     def populate_WorkflowResults(self):
-        RES._config["frozen_tree"].update_from_tree(TREE)
+        RES.config["frozen_tree"].update_from_tree(TREE)
         RES.prepare_new_results()
         _results = {
             1: Dataset(
@@ -151,7 +151,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertIsInstance(obj, WorkflowResultsSelector)
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
-        self.assertTrue("active_node" in obj._config)
+        self.assertTrue("active_node" in obj.config)
         self.assertEqual(obj._SCAN, RES.frozen_scan)
         self.assertEqual(obj._RESULTS, RES)
 
@@ -173,17 +173,17 @@ class TestWorkflowResultSelector(unittest.TestCase):
 
     def test_reset(self):
         obj = WorkflowResultsSelector()
-        obj._config["active_node"] = 12
+        obj.config["active_node"] = 12
         obj._selection = [1, 2, 3]
         obj.reset()
         self.assertIsNone(obj._selection)
-        self.assertEqual(obj._config["active_node"], -1)
+        self.assertEqual(obj.config["active_node"], -1)
 
     def test_check_and_create_params_for_slice_selection(self):
         self.populate_WorkflowResults()
         _ndim = len(self._scan_n) + len(self._result2_shape)
         obj = WorkflowResultsSelector()
-        obj._config["active_node"] = 2
+        obj.config["active_node"] = 2
         obj._check_and_create_params_for_slice_selection()
         for _dim in range(_ndim):
             self.assertIn(f"data_slice_{_dim}", obj.params)
@@ -192,27 +192,27 @@ class TestWorkflowResultSelector(unittest.TestCase):
     def test_calc_and_store_ndim_of_results__no_timeline(self):
         self.populate_WorkflowResults()
         obj = WorkflowResultsSelector()
-        obj._config["active_node"] = 2
+        obj.config["active_node"] = 2
         obj._calc_and_store_ndim_of_results()
         self.assertEqual(
-            obj._config["result_ndim"], len(self._scan_n) + len(self._result2_shape)
+            obj.config["result_ndim"], len(self._scan_n) + len(self._result2_shape)
         )
 
     def test_calc_and_store_ndim_of_results__with_timeline(self):
         self.populate_WorkflowResults()
         obj = WorkflowResultsSelector()
-        obj._config["active_node"] = 2
+        obj.config["active_node"] = 2
         obj.set_param_value("use_scan_timeline", True)
         obj._calc_and_store_ndim_of_results()
-        self.assertEqual(obj._config["result_ndim"], 1 + len(self._result2_shape))
+        self.assertEqual(obj.config["result_ndim"], 1 + len(self._result2_shape))
 
     def test_select_active_node(self):
         _node = 2
         self.populate_WorkflowResults()
         obj = WorkflowResultsSelector()
         obj.select_active_node(_node)
-        self.assertEqual(obj._config["active_node"], _node)
-        self.assertIsNotNone(obj._config.get("result_ndim", None))
+        self.assertEqual(obj.config["active_node"], _node)
+        self.assertIsNotNone(obj.config.get("result_ndim", None))
 
     def test_check_for_selection_dim__no_check(self):
         _selection = (np.r_[0], np.r_[0], np.r_[1, 2, 3], np.r_[1, 2, 3], np.r_[2])
@@ -268,7 +268,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _index = 4
         obj = WorkflowResultsSelector()
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, RES.shapes[_node][_index])
@@ -279,7 +279,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _index = 4
         obj = WorkflowResultsSelector()
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", ":")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, RES.shapes[_node][_index])
@@ -291,7 +291,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "1:-1")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, RES.shapes[_node][_index] - 2)
@@ -303,7 +303,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "1, 3, 5, 6, 7")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 5)
@@ -315,7 +315,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "1, 3, 5, 1, 5")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 3)
@@ -327,7 +327,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "0:2, 4:6")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 4)
@@ -340,7 +340,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj.set_param_value("use_data_range", True)
         obj.set_param_value("use_scan_timeline", True)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "0:2, 4:6")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 6)
@@ -352,7 +352,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "1:4, 3, 4, 6:8")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 6)
@@ -364,7 +364,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "1:")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, RES.shapes[_node][_index] - 1)
@@ -376,7 +376,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", ":-1")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, RES.shapes[_node][_index] - 1)
@@ -388,7 +388,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "0:12:2")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 6)
@@ -401,7 +401,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", False)
         obj.select_active_node(_node)
-        obj._npoints = list(RES.shapes[obj._config["active_node"]])
+        obj._npoints = list(RES.shapes[obj.config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "::2")
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, _arrsize // 2 + _arrsize % 2)
@@ -490,9 +490,9 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _start = _data[_target_range[0]]
         _stop = _data[_target_range[-1]]
         obj = WorkflowResultsSelector()
-        obj._config["active_index"] = 0
-        obj._config["active_ranges"] = {0: _data}
-        obj._config["index_defaults"] = [0, _data.size, 1]
+        obj.config["active_index"] = 0
+        obj.config["active_ranges"] = {0: _data}
+        obj.config["index_defaults"] = [0, _data.size, 1]
         _str = [f"{_start}:{_stop}"]
         _res = obj._convert_values_to_indices(_str)
         self.assertEqual(_res[0], [_target_range[0], _target_range[-1]])

@@ -1665,7 +1665,7 @@ def results_sin2chi_method_fixture():
 def test__create_final_result_sin2chi_method_validation(
     plugin, results_sin2chi_method_fixture
 ):
-    plugin._config["input_shape"] = (
+    plugin.config["input_shape"] = (
         4,
         5,
     )  # chose 5 in position 0 to avoid padding as above
@@ -2731,7 +2731,7 @@ def base_dataset():
 def test__create_final_result_sin2chi_method(
     plugin, base_dataset, modifications, expected_array
 ):
-    plugin._config["input_shape"] = (
+    plugin.config["input_shape"] = (
         4,
         5,
     )  # chose 5 in position 0 to avoid padding as above

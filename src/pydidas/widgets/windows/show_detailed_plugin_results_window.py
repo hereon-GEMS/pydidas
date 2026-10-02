@@ -61,7 +61,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             Keyword arguments passed to the PydidasWindow constructor.
         """
         PydidasWindow.__init__(self, title="Detailed plugin results", **kwargs)
-        self._config["n_plots"] = 0
+        self.config["n_plots"] = 0
         self._results = results
         if results is not None:
             self.update_results(results)
@@ -135,16 +135,16 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             An optional title to be used for the window. The default is None.
         """
         self._results = results
-        self._config["result_keys"] = list(results.keys())
+        self.config["result_keys"] = list(results.keys())
         self._widgets["label_title"].setText(
             "Detailed plugin results" + (f": {title}" if title else "")
         )
-        if len(self._config["result_keys"]) > 0:
-            _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)
-            self._config["n_plots"] = _n_plots
+        if len(self.config["result_keys"]) > 0:
+            _n_plots = results[self.config["result_keys"][0]].get("n_plots", 0)
+            self.config["n_plots"] = _n_plots
             self.__prepare_widgets()
             self.__update_metadata()
-            self.__plot_results(self._config["result_keys"][0])
+            self.__plot_results(self.config["result_keys"][0])
 
     def __prepare_widgets(self) -> None:
         """Prepare all widgets."""
@@ -152,13 +152,13 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         for _index in range(4):
             if f"plot_{_index}" in self._widgets:
                 self._widgets[f"plot_{_index}"].setVisible(
-                    _index < self._config["n_plots"]
+                    _index < self.config["n_plots"]
                 )
                 self._widgets[f"plot_{_index}"].clear_plots()
 
     def __create_necessary_plots(self) -> None:
         """Create all required plots."""
-        for _index in range(self._config["n_plots"]):
+        for _index in range(self.config["n_plots"]):
             if f"plot_{_index}" not in self._widgets:
                 self.create_any_widget(
                     f"plot_{_index}",
@@ -179,7 +179,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 self._widgets["selector"].addItems(list(self._results.keys()))
             self._widgets["selector"].setCurrentIndex(0)
             self._widgets["selector"].setVisible(True)
-            self.__select_point(self._config["result_keys"][0])
+            self.__select_point(self.config["result_keys"][0])
 
     @QtCore.Slot(str)
     def __select_point(self, key: str | None) -> None:
@@ -231,12 +231,12 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 ylabel=_plot_ylabels.get(_i_plot, ""),
                 **_plot_kwargs,
             )
-        for _i_plot in range(self._config["n_plots"]):
+        for _i_plot in range(self.config["n_plots"]):
             self._widgets[f"plot_{_i_plot}"].resetZoom()
 
     def __clear_plots(self) -> None:
         """Clear all items from all plots."""
-        for _index in range(self._config["n_plots"]):
+        for _index in range(self.config["n_plots"]):
             self._widgets[f"plot_{_index}"].clear_plot()
         # for some reason, the plots do not update properly without this call
         # to the event loop:

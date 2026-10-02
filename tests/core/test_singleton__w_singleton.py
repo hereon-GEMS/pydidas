@@ -24,21 +24,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 import copy
-from typing import Any
 
 import numpy as np
 import pytest
 
-from pydidas.core import Parameter, PydidasQsettingsMixin
+from pydidas.core import ConfigDictMixin, Parameter, PydidasQsettingsMixin
 from pydidas.core.parameter_collection import ParameterCollection
 from pydidas.core.singleton import Singleton
 
 
-class _NonContextClass:
+class _NonContextClass(ConfigDictMixin):
     """Testing class to test Singleton."""
 
     def __init__(self):
-        self._config: dict[str, Any] = {"valueA": 1}
+        super().__init__(config={"valueA": 1})
         self.is_copy: bool = False
         self.valueA: int = 1
 
@@ -58,29 +57,29 @@ class _NonContextClassWithCustomCopy(_NonContextClass):
 
     def __copy__(self) -> "_NonContextClassWithCustomCopy":
         _copy = self.__class__()
-        _copy._config = copy.copy(self._config)
+        _copy._config = copy.copy(self.config)
         _copy.valueA = copy.copy(self.valueA)
         _copy.is_copy = True
         return _copy
 
     def __deepcopy__(self, memo) -> "_NonContextClassWithCustomCopy":
         _copy = self.__class__()
-        _copy._config = copy.deepcopy(self._config)
+        _copy._config = copy.deepcopy(self.config)
         _copy.valueA = copy.deepcopy(self.valueA)
         _copy.is_copy = True
         return _copy
 
 
-class _NonContextClassFromDict(ParameterCollection):
+class _NonContextClassFromDict(ParameterCollection, ConfigDictMixin):
     """Testing class to test Singleton."""
 
     def __init__(self):
         ParameterCollection.__init__(self)
+        ConfigDictMixin.__init__(self)
         self.add_params(
             Parameter("test1", int, 1),
             Parameter("test2", int, 2),
         )
-        self._config: dict[str, Any] = {}
 
 
 class _ContextClass(_NonContextClass, metaclass=Singleton): ...

@@ -195,8 +195,8 @@ def test_reset_instance__on_empty_stack(singleton_class):
 @pytest.mark.parametrize("copy_module", [True, False])
 def test_copy(singleton_class, copy_module):
     obj = singleton_class()
-    obj._config["test_key"] = 42
-    obj._config["is_false"] = False
+    obj.config["test_key"] = 42
+    obj.config["is_false"] = False
     obj.add_param(Parameter("test3", int, 21))
     if copy_module:
         obj_copy = copy.copy(obj)
@@ -208,15 +208,15 @@ def test_copy(singleton_class, copy_module):
         assert not isinstance(obj_copy, _context_class)
     assert obj_copy.get_param_value("test3") == obj.get_param_value("test3")
     assert obj_copy.get_param("test3") is not obj.get_param("test3")
-    for _key, _val in obj._config.items():
-        assert obj_copy._config[_key] == _val
+    for _key, _val in obj.config.items():
+        assert obj_copy.config[_key] == _val
 
 
 @pytest.mark.parametrize("copy_module", [True, False])
 def test_copy__w_custom_copy(copy_module):
     obj = _ContextClassWithCustomCopy()
-    obj._config["test_key"] = 42
-    obj._config["is_false"] = False
+    obj.config["test_key"] = 42
+    obj.config["is_false"] = False
     if copy_module:
         obj_copy = copy.copy(obj)
     else:
@@ -224,7 +224,7 @@ def test_copy__w_custom_copy(copy_module):
     assert id(obj) != id(obj_copy)
     assert isinstance(obj_copy, _NonContextClassWithCustomCopy)
     assert getattr(obj_copy, "is_copy", False)
-    assert obj_copy._config == {}
+    assert obj_copy.config == {}
     assert not isinstance(obj_copy, _ContextClassWithCustomCopy)
 
 
@@ -233,8 +233,8 @@ def test_copy__w_ndarray(singleton_class):
     obj = singleton_class()
     _ref_w_obj = np.array([[1, 2, 3], [2, 3]], dtype=object)
     _ref = np.array([1, 2, 3])
-    obj._config["obj_arr"] = copy.deepcopy(_ref_w_obj)
-    obj._config["arr"] = copy.copy(_ref)
+    obj.config["obj_arr"] = copy.deepcopy(_ref_w_obj)
+    obj.config["arr"] = copy.copy(_ref)
     copyA = obj.copy()
     copyB = copy.copy(obj)
     deepcopyA = obj.deepcopy()
@@ -243,18 +243,18 @@ def test_copy__w_ndarray(singleton_class):
         assert id(obj) != id(_item)
         assert isinstance(_item, _NonContextClass)
         assert not isinstance(_item, singleton_class)
-    obj._config["obj_arr"][0][0] = 42
-    obj._config["arr"][0] = 7
+    obj.config["obj_arr"][0][0] = 42
+    obj.config["arr"][0] = 7
     for _item in [copyA, copyB]:
-        assert id(obj._config["arr"]) == id(_item._config["arr"])
-        assert np.allclose(obj._config["arr"], _item._config["arr"])
+        assert id(obj.config["arr"]) == id(_item.config["arr"])
+        assert np.allclose(obj.config["arr"], _item.config["arr"])
     for _item in [deepcopyA, deepcopyB]:
-        assert id(obj._config["arr"]) != id(_item._config["arr"])
-        assert not np.allclose(obj._config["arr"], _item._config["arr"])
-    assert copyA._config["obj_arr"][0][0] == 42
-    assert copyB._config["obj_arr"][0][0] == 42
-    assert deepcopyA._config["obj_arr"][0][0] == 1
-    assert deepcopyB._config["obj_arr"][0][0] == 1
+        assert id(obj.config["arr"]) != id(_item.config["arr"])
+        assert not np.allclose(obj.config["arr"], _item.config["arr"])
+    assert copyA.config["obj_arr"][0][0] == 42
+    assert copyB.config["obj_arr"][0][0] == 42
+    assert deepcopyA.config["obj_arr"][0][0] == 1
+    assert deepcopyB.config["obj_arr"][0][0] == 1
 
 
 if __name__ == "__main__":

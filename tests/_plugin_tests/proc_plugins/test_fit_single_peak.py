@@ -84,7 +84,7 @@ class TestFitSinglePeak(unittest.TestCase):
             plugin._data,
             bg_order=plugin.get_param_value("fit_bg_order"),
         )
-        plugin._fit_params = dict(zip(plugin._config["param_labels"], _startguess))
+        plugin._fit_params = dict(zip(plugin.config["param_labels"], _startguess))
         self._dummy_metadata = {"test_meta": 123}
         plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
         return plugin

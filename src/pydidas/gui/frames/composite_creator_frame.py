@@ -78,11 +78,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
         self._image_metadata = self._app._image_metadata
-        self._app._config.update(self._config)
-        self._config = self._app._config
-        self._config["input_configured"] = False
-        self._config["bg_configured"] = False
-        self._config["frame_active"] = False
+        self._app.config.update(self.config)
+        # must use direct reference to app config to circumvent
+        # rule of replacing the config dict:
+        self._config = self._app.config
+        self.config["input_configured"] = False
+        self.config["bg_configured"] = False
+        self.config["frame_active"] = False
         self._create_param_collection()
 
     def _create_param_collection(self) -> None:
@@ -199,11 +201,11 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     def __received_composite_update(self) -> None:
         """Slot to be called on an update signal from the Composite."""
         if (
-            time.time() - self._config["last_update"] >= 2
-            and self._config["frame_active"]
+            time.time() - self.config["last_update"] >= 2
+            and self.config["frame_active"]
         ):
             self.__show_composite()
-            self._config["last_update"] = time.time()
+            self.config["last_update"] = time.time()
 
     @QtCore.Slot()
     def __show_composite(self) -> None:
@@ -232,8 +234,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             respective information for all.
         """
         BaseFrameWithApp.restore_state(self, state)
-        self._config["bg_configured"] = state["config"]["bg_configured"]
-        self._config["input_configured"] = state["config"]["input_configured"]
+        self.config["bg_configured"] = state["config"]["bg_configured"]
+        self.config["input_configured"] = state["config"]["input_configured"]
         BaseFrameWithApp.frame_activated(self, self.frame_index)
         if self.get_param_value("first_file") != Path():
             self._filelist.update()
@@ -262,8 +264,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         _index, _state = BaseFrameWithApp.export_state(self)
         _state["config"] = {
-            "bg_configured": self._config["bg_configured"],
-            "input_configured": self._config["input_configured"],
+            "bg_configured": self.config["bg_configured"],
+            "input_configured": self.config["input_configured"],
         }
         return _index, _state
 
@@ -278,7 +280,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             The frame index.
         """
         BaseFrameWithApp.frame_activated(self, index)
-        self._config["frame_active"] = index == self.frame_index
+        self.config["frame_active"] = index == self.frame_index
 
     def _run_app_serial(self) -> None:
         """Serial implementation of the execution method."""
@@ -296,9 +298,9 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         This method sets the required attributes both for serial and
         parallel running of the app.
         """
-        self._config["plot_scale"] = None
-        self._config["plot_origin"] = None
-        self._config["plot_aspect"] = None
+        self.config["plot_scale"] = None
+        self.config["plot_origin"] = None
+        self.config["plot_aspect"] = None
         self._image_metadata.update()
         self.set_status("Started composite image creation.")
 
@@ -332,7 +334,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                     "detector mask size does not match the image data size."
                 )
         self._prepare_plot_params()
-        self._config["last_update"] = time.time()
+        self.config["last_update"] = time.time()
         self._widgets["but_exec"].setEnabled(False)
         self._widgets["but_abort"].setVisible(True)
         self._widgets["progress"].setVisible(True)
@@ -411,7 +413,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self.get_param_value("first_file")
         )
         if self.__check_if_hdf5_file():
-            self._config["input_configured"] = False
+            self.config["input_configured"] = False
             self.__popup_select_hdf5_key(fname)
         else:
             self._image_metadata.update()
@@ -421,8 +423,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             )
             self.set_param_and_widget_value("raw_image_shape", _shape)
             self.set_param_and_widget_value("images_per_file", 1)
-            self._config["input_configured"] = True
-        _finalize_flag = self._config["input_configured"]
+            self.config["input_configured"] = True
+        _finalize_flag = self.config["input_configured"]
         self.__update_n_total()
         self.__finalize_selection(_finalize_flag)
         self.__check_exec_enable()
@@ -496,7 +498,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self.set_param_and_widget_value("hdf5_key", dset)
             self.__selected_hdf5_key()
         else:
-            self._config["input_configured"] = False
+            self.config["input_configured"] = False
             self.__finalize_selection(False)
             self.set_param_and_widget_value("hdf5_key", "")
             self.__clear_entries(
@@ -527,13 +529,13 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         self.__clear_entries("bg_hdf5_key", "bg_hdf5_frame")
         hdf5_flag = get_extension(fname) in HDF5_EXTENSIONS
-        self._config["bg_hdf5_images"] = hdf5_flag
-        self._config["bg_configured"] = not hdf5_flag
+        self.config["bg_hdf5_images"] = hdf5_flag
+        self.config["bg_configured"] = not hdf5_flag
         if hdf5_flag:
             dset = dialogs.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
                 self.set_param_and_widget_value("bg_hdf5_key", dset)
-                self._config["bg_configured"] = True
+                self.config["bg_configured"] = True
         self.toggle_param_widget_visibility("bg_hdf5_key", hdf5_flag)
         self.toggle_param_widget_visibility("bg_hdf5_frame", hdf5_flag)
         self.__check_exec_enable()
@@ -549,12 +551,12 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             self.set_param_and_widget_value(
                 "images_per_file", self._image_metadata.images_per_file
             )
-            self._config["input_configured"] = True
+            self.config["input_configured"] = True
         except UserConfigError:
             self.__clear_entries(
                 "hdf5_key", "hdf5_dataset_shape", "images_per_file", hide=False
             )
-            self._config["input_configured"] = False
+            self.config["input_configured"] = False
             raise
         self.__update_n_image()
 
@@ -575,7 +577,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
                 ),
             )
             _flag = False
-        self._config["bg_configured"] = _flag
+        self.config["bg_configured"] = _flag
         self.__check_exec_enable()
 
     def __reset_params(self, *keys: str) -> None:
@@ -594,7 +596,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         for _key in keys:
             self.set_param_and_widget_value(_key, self.params[_key].default)
         if "first_file" in keys:
-            self._config["input_configured"] = False
+            self.config["input_configured"] = False
 
     def __check_exec_enable(self) -> None:
         """Check whether the exec button should be enabled and enable/disable it."""
@@ -603,12 +605,12 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
                 assert Path(self.get_param_value("bg_file")).is_file()
-                assert self._config["bg_configured"]
+                assert self.config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):
             pass
         finally:
-            _flag = _enable and self._config["input_configured"]
+            _flag = _enable and self.config["input_configured"]
             self._widgets["but_exec"].setEnabled(_flag)
 
     @QtCore.Slot(str)
@@ -747,7 +749,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         Update the number of images in the composite based on input parameters.
         """
-        if not self._config["input_configured"]:
+        if not self.config["input_configured"]:
             return
         self._image_metadata.update_input_data()
         _n_per_file = self._image_metadata.images_per_file
@@ -774,7 +776,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def __update_n_total(self) -> None:
         """Update the total number of selected images."""
-        if not self._config["input_configured"]:
+        if not self.config["input_configured"]:
             return
         _n_total = self._image_metadata.images_per_file * self._filelist.n_files
         self.set_param_and_widget_value("n_total", _n_total)

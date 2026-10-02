@@ -117,7 +117,7 @@ def test__class_attributes():
 def test_init():
     _saver = H5SAVER()
     assert isinstance(_saver, H5SAVER)
-    assert _saver._config["metadata_written"] is False
+    assert _saver.config["metadata_written"] is False
 
 
 @pytest.mark.slow
@@ -136,7 +136,7 @@ def test_prepare_files_and_directories(
         diffraction_exp=random_diff_exp,
         processing_tree=test_tree,
     )
-    assert saver._config["metadata_written"] is False
+    assert saver.config["metadata_written"] is False
     for _id, _name in [(0, "node_00.nxs"), (1, "node_01_result_node.nxs")]:
         assert (empty_temp_path / _name).is_file()
         with h5py.File(empty_temp_path / _name, "r") as _h5file:
@@ -208,7 +208,7 @@ def test_export_full_data_to_file(
         for _id, _info in node_info.items()
     }
     saver.export_full_data_to_file(_results, squeeze=squeeze)
-    assert saver._config.get("metadata_written", False) is True
+    assert saver.config.get("metadata_written", False) is True
     for _id in node_info:
         _name = saver.get_filenames(node_info)[_id]
         _data_ref = _results[_id].squeeze() if squeeze else _results[_id]

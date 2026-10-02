@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the CenterOfMass1dData Plugin which can be used to sum over 1D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -54,13 +54,13 @@ class CenterOfMass1dData(ProcPlugin):
 
     def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
-        self._config["slicer"] = None
+        self.config["slicer"] = None
 
     def pre_execute(self):
         """
         Pre-execute method to set up the plugin before execution.
         """
-        self._config["slicer"] = None
+        self.config["slicer"] = None
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -81,9 +81,9 @@ class CenterOfMass1dData(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         _dim = np.mod(self.get_param_value("process_data_dim"), data.ndim)
-        if self._config["slicer"] is None:
+        if self.config["slicer"] is None:
             self._calculate_slicer(data)
-        _x = data.axis_ranges[_dim][*self._config["slicer"]]
+        _x = data.axis_ranges[_dim][*self.config["slicer"]]
         center_of_mass = np.sum(_x * data, axis=_dim) / np.sum(data, axis=_dim)
         center_of_mass.data_label = "Center of mass of " + data.axis_labels[_dim]
         center_of_mass.data_unit = data.axis_units[_dim]
@@ -99,7 +99,7 @@ class CenterOfMass1dData(ProcPlugin):
             The input Dataset.
         """
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
-        self._config["slicer"] = (
+        self.config["slicer"] = (
             [np.newaxis] * _dim_to_process
             + [slice(None)]
             + max((data.ndim - _dim_to_process - 1), 0) * [np.newaxis]

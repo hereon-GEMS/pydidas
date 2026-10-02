@@ -102,7 +102,7 @@ class GeneralAsciiSaver(OutputPlugin):
             raise UserConfigError("Only 1-d data can be saved as ASCII")
         if kwargs.get("test", False):
             return data, kwargs
-        self._config["global_index"] = kwargs.get("global_index", None)
+        self.config["global_index"] = kwargs.get("global_index", None)
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:

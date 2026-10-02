@@ -63,7 +63,7 @@ class DummyLoader(InputPlugin):
     def __init__(self, *args: tuple, **kwargs: dict):
         InputPlugin.__init__(self, *args, **kwargs)
         self._pre_executed = False
-        self._config["input_available"] = 12
+        self.config["input_available"] = 12
 
     def __reduce__(self):
         """
@@ -119,7 +119,7 @@ class DummyLoader(InputPlugin):
         """
         if index is None:
             return False
-        return index <= self._config["input_available"]
+        return index <= self.config["input_available"]
 
     def pre_execute(self):
         """

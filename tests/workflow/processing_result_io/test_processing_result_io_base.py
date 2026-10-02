@@ -100,11 +100,11 @@ class SharedTestProcessingResultIo:
 
     def test_prepare_files_and_directories__sets_save_dir(self, saver, tmp_path):
         saver.prepare_files_and_directories(tmp_path, {})
-        assert saver._config["save_dir"] == Path(tmp_path)
+        assert saver.config["save_dir"] == Path(tmp_path)
 
     def test_prepare_files_and_directories__sets_filenames(self, saver, tmp_path):
         saver.prepare_files_and_directories(tmp_path, self.node_info())
-        _fnames = saver._config["filenames"]
+        _fnames = saver.config["filenames"]
         assert _fnames[5] == tmp_path / (
             "node_05_pretty_ugly_name" + saver.default_suffix
         )
@@ -117,9 +117,9 @@ class SharedTestProcessingResultIo:
         saver.prepare_files_and_directories(
             tmp_path, {}, scan=_scan, diffraction_exp=_exp, processing_tree=_tree
         )
-        assert saver._config["scan"] is _scan
-        assert saver._config["diffraction_exp"] is _exp
-        assert saver._config["processing_tree"] is _tree
+        assert saver.config["scan"] is _scan
+        assert saver.config["diffraction_exp"] is _exp
+        assert saver.config["processing_tree"] is _tree
 
     def test_prepare_files_and_directories__uses_defaults(self, saver, tmp_path):
         _scan_mock = MagicMock()
@@ -140,9 +140,9 @@ class SharedTestProcessingResultIo:
             ),
         ):
             saver.prepare_files_and_directories(tmp_path, {})
-        assert saver._config["scan"] is _scan_mock
-        assert saver._config["diffraction_exp"] is _exp_mock
-        assert saver._config["processing_tree"] is _tree_mock
+        assert saver.config["scan"] is _scan_mock
+        assert saver.config["diffraction_exp"] is _exp_mock
+        assert saver.config["processing_tree"] is _tree_mock
 
 
 def test_export_frame_to_file__raises(saver):

@@ -106,10 +106,10 @@ def test_widget_creation() -> None:
     assert isinstance(widget.get_param("dataset"), Parameter)
     assert isinstance(widget.get_param("min_datadim"), Parameter)
     assert not widget.isVisible()
-    assert widget._config["current_dataset"] == ""
-    assert widget._config["current_filename"] == ""
-    assert widget._config["min_datadim"] == 1
-    assert widget._config["display_details"] is False
+    assert widget.config["current_dataset"] == ""
+    assert widget.config["current_filename"] == ""
+    assert widget.config["min_datadim"] == 1
+    assert widget.config["display_details"] is False
     assert hasattr(widget, "sig_new_dataset_selected")
     assert hasattr(widget, "sig_request_hdf5_browser")
 
@@ -121,7 +121,7 @@ def test_new_filename(hdf5_test_file: Path) -> None:
     widget.new_filename(str(hdf5_test_file))
     _choices = widget.get_param("dataset").choices
     assert widget.isVisible()
-    assert widget._config["current_filename"] == str(hdf5_test_file)
+    assert widget.config["current_filename"] == str(hdf5_test_file)
     assert len(_choices) > 0
     assert _choices[0] == "/entry/data/data"
 
@@ -209,12 +209,12 @@ def test__click_button_toggle_details(widget: Hdf5DatasetSelector, qtbot) -> Non
             widget._widgets["button_toggle_details"], QtCore.Qt.MouseButton.LeftButton
         )
     assert widget._widgets["filter_container"].isVisible()
-    assert widget._config["display_details"] is True
+    assert widget.config["display_details"] is True
     with qtbot.waitSignal(widget._widgets["button_toggle_details"].clicked):
         qtbot.mouseClick(
             widget._widgets["button_toggle_details"], QtCore.Qt.MouseButton.LeftButton
         )
-    assert widget._config["display_details"] is False
+    assert widget.config["display_details"] is False
     assert not widget._widgets["filter_container"].isVisible()
 
 
@@ -233,11 +233,11 @@ def test_display_dataset_signal_not_emitted_on_same_dataset(
 def test_clear(widget: Hdf5DatasetSelector, hdf5_test_file: Path) -> None:
     """Test that clear() resets the widget state."""
     assert widget.isVisible()
-    assert widget._config["current_filename"] != ""
+    assert widget.config["current_filename"] != ""
     widget.clear()
     assert not widget.isVisible()
-    assert widget._config["current_dataset"] == ""
-    assert widget._config["current_filename"] == ""
+    assert widget.config["current_dataset"] == ""
+    assert widget.config["current_filename"] == ""
 
 
 @pytest.mark.gui
@@ -245,7 +245,7 @@ def test_clear_on_empty_widget(widget: Hdf5DatasetSelector) -> None:
     """Test that clear() works on uninitialized widget."""
     widget.clear()
     assert not widget.isVisible()
-    assert widget._config["current_dataset"] == ""
+    assert widget.config["current_dataset"] == ""
 
 
 @pytest.mark.gui

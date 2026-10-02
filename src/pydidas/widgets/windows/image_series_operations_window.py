@@ -90,7 +90,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
     def __init__(self, **kwargs: Any) -> None:
         PydidasWindow.__init__(self, title="Image series operations", **kwargs)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
-        self._config["num_frames_per_file"] = 1
+        self.config["num_frames_per_file"] = 1
 
     def build_frame(self) -> None:
         """Build the frame and create all widgets."""
@@ -278,7 +278,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         self._filelist.update()
         if has_extension(self.get_param_value("first_file"), HDF5_EXTENSIONS):
             self._calculate_hdf5_frame_limits()
-        _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
+        _n_frames = self._filelist.n_files * self.config["num_frames_per_file"]
         _hdf5_dset = self.get_param_value("hdf5_key")
         _base_indices = (None,) * self.get_param_value("hdf5_slicing_axis")
         self._data = None
@@ -315,8 +315,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             _fname = self._filelist.get_filename(0)
             _slice_axis = self.get_param_value("hdf5_slicing_axis")
             _max_index = get_hdf5_metadata(_fname, "shape", dset=_key)[_slice_axis]
-        self._config["hdf5_frames"] = [_start_index, _max_index]
-        self._config["num_frames_per_file"] = _max_index - _start_index
+        self.config["hdf5_frames"] = [_start_index, _max_index]
+        self.config["num_frames_per_file"] = _max_index - _start_index
 
     def _get_fname_and_frame_number(self, index: int) -> tuple[Path, int]:
         """
@@ -332,8 +332,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         tuple[Path, int]
             The filename and frame number for the selected index.
         """
-        _i_file = index // self._config["num_frames_per_file"]
-        _frame = index % self._config["num_frames_per_file"]
+        _i_file = index // self.config["num_frames_per_file"]
+        _frame = index % self.config["num_frames_per_file"]
         _fname = self._filelist.get_filename(_i_file)
         return _fname, _frame
 
@@ -360,7 +360,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         _op = self.get_param_value("operation")
         if _op == "mean":
-            _n_frames = self._filelist.n_files * self._config["num_frames_per_file"]
+            _n_frames = self._filelist.n_files * self.config["num_frames_per_file"]
             self._data = self._data / _n_frames
 
     def _reduce_integer_dtype(self) -> None:

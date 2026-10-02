@@ -84,13 +84,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         Update local Parameters from the global QSetting values.
         """
-        self._config["border_width"] = self.q_settings_get(
+        self.config["border_width"] = self.q_settings_get(
             "user/mosaic_border_width", int
         )
-        self._config["border_value"] = self.q_settings_get(
+        self.config["border_value"] = self.q_settings_get(
             "user/mosaic_border_value", float
         )
-        self._config["max_image_size"] = self.q_settings_get(
+        self.config["max_image_size"] = self.q_settings_get(
             "user/max_image_size", float
         )
 
@@ -137,7 +137,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         self.__check_max_size(_shape)
         self.__image = (
             np.zeros(_shape, dtype=self.get_param_value("datatype"))
-            + self._config["border_value"]
+            + self.config["border_value"]
         )
 
     def __get_composite_shape(self) -> tuple[int, int]:
@@ -150,7 +150,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             The new shape.
         """
         _shape = self.get_param_value("image_shape")
-        _border_width = self._config["border_width"]
+        _border_width = self.config["border_width"]
         _nx = (
             self.get_param_value("composite_nx") * (_shape[1] + _border_width)
             - _border_width
@@ -296,8 +296,8 @@ class CompositeImageManager(ObjectWithParameterCollection):
             _ix = self.get_param_value("composite_nx") - _ix - 1
         if self.get_param_value("composite_ydir_orientation") == "bottom-to-top":
             _iy = self.get_param_value("composite_ny") - _iy - 1
-        _start_y = _iy * (_image_size[0] + self._config["border_width"])
-        _start_x = _ix * (_image_size[1] + self._config["border_width"])
+        _start_y = _iy * (_image_size[0] + self.config["border_width"])
+        _start_x = _ix * (_image_size[1] + self.config["border_width"])
         _yslice = slice(_start_y, _start_y + _image_size[0])
         _xslice = slice(_start_x, _start_x + _image_size[1])
         return _yslice, _xslice
@@ -385,6 +385,6 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         obj = self.__class__()
         obj.params = self.params.copy()
-        obj._config = copy(self._config)
+        obj._config = copy(self.config)
         obj.__image = self.__image.copy()
         return obj

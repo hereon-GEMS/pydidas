@@ -86,12 +86,12 @@ class PluginRegistry(ObjectWithParameterCollection):
         self._plugin_names = {}
         self._plugin_basic_types = {}
         self._plugin_paths = []
-        self._config = {
-            "initial_plugin_path": self.__get_plugin_path_from_kwargs(**kwargs),
-            "initialized": False,
-            "must_emit_signal": False,
-            "use_generic_plugins": kwargs.get("use_generic_plugins", True),
-        }
+        self.config.update(
+            initial_plugin_path=self.__get_plugin_path_from_kwargs(**kwargs),
+            initialized=False,
+            must_emit_signal=False,
+            use_generic_plugins=kwargs.get("use_generic_plugins", True),
+        )
         if kwargs.get("force_initialization", False):
             self.verify_is_initialized()
 
@@ -138,15 +138,15 @@ class PluginRegistry(ObjectWithParameterCollection):
         that the PluginCollection is always initialized before any user
         interaction occurs.
         """
-        if self._config["initialized"]:
+        if self.config["initialized"]:
             return
-        if self._config["use_generic_plugins"]:
+        if self.config["use_generic_plugins"]:
             self.find_and_register_plugins(GENERIC_PLUGIN_PATH)
             for _cls in BasePlugin.base_classes:
                 self.check_and_register_class(_cls)
         self.find_and_register_plugins(*self._get_user_plugin_paths())
-        self._config["initialized"] = True
-        if self._config["must_emit_signal"]:
+        self.config["initialized"] = True
+        if self.config["must_emit_signal"]:
             self.sig_updated_plugins.emit()
 
     def _get_user_plugin_paths(self) -> list[Path]:
@@ -161,8 +161,8 @@ class PluginRegistry(ObjectWithParameterCollection):
         plugin_paths : list[Path]
             A list of plugin paths.
         """
-        if self._config["initial_plugin_path"]:
-            _paths = self._config["initial_plugin_path"]
+        if self.config["initial_plugin_path"]:
+            _paths = self.config["initial_plugin_path"]
         else:
             _paths = self.get_q_settings_plugin_paths()
         for _path_to_check in [Path(), GENERIC_PLUGIN_PATH]:
@@ -217,10 +217,10 @@ class PluginRegistry(ObjectWithParameterCollection):
                 )
             if _path != Path() and _path.is_dir():
                 self._find_and_register_plugins_in_path(_path, reload)
-        if self._config["initialized"]:
+        if self.config["initialized"]:
             self.sig_updated_plugins.emit()
         else:
-            self._config["must_emit_signal"] = True
+            self.config["must_emit_signal"] = True
 
     def _find_and_register_plugins_in_path(
         self, path: Path, reload: bool = True
@@ -530,7 +530,7 @@ class PluginRegistry(ObjectWithParameterCollection):
                 "PluginCollection."
             )
         self._plugin_paths.remove(path)
-        self._config["initial_plugin_path"] = list(self._plugin_paths)
+        self.config["initial_plugin_path"] = list(self._plugin_paths)
         self.q_settings_set(
             "user/plugin_path", ";;".join(str(_path) for _path in self._plugin_paths)
         )
@@ -550,7 +550,7 @@ class PluginRegistry(ObjectWithParameterCollection):
         if not confirmation:
             print("Confirmation for unregistering all paths was not given. Aborting...")
             return
-        self._config["initial_plugin_path"] = []
+        self.config["initial_plugin_path"] = []
         self.q_settings_set("user/plugin_path", None)
         self.clear_collection(True)
 
@@ -569,7 +569,7 @@ class PluginRegistry(ObjectWithParameterCollection):
             self._plugin_types = {}
             self._plugin_names = {}
             self._plugin_paths = []
-            self._config["initialized"] = False
+            self.config["initialized"] = False
             self.sig_updated_plugins.emit()
             return
         print("No confirmation was given: The PluginCollection has not been reset.")

@@ -73,13 +73,13 @@ class TweakPluginParameterWindow(PydidasWindow):
         PydidasWindow.__init__(self, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
         self.__qtapp = QtWidgets.QApplication.instance()
-        self._config: dict[str, Any] = self._config | {
-            "initial_results": None,
-            "detailed_results": None,
-            "current_results": None,
-            "parent": kwargs.get("parent", None),
-            "accept_changes": False,
-        }
+        self.config.update(
+            initial_results=None,
+            detailed_results=None,
+            current_results=None,
+            parent=kwargs.get("parent", None),
+            accept_changes=False,
+        )
 
     def build_frame(self) -> None:
         """Populate the window and create all widgets."""
@@ -162,10 +162,10 @@ class TweakPluginParameterWindow(PydidasWindow):
             The results obtained with the current plugin parameters.
         """
         self._widgets["config_scroll_area"].adjustSize()
-        self._config["accept_changes"] = False
+        self.config["accept_changes"] = False
         self.__plugin = plugin
         self.__original_plugin_params = copy.deepcopy(plugin.params)
-        self._config["initial_results"] = results
+        self.config["initial_results"] = results
         self._widgets["plugin_param_edit"].configure_plugin(
             plugin.node_id, plugin, allow_restore_defaults=False
         )
@@ -180,7 +180,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         """
         if hasattr(self.__plugin, "detailed_results"):
             _details = self.__plugin.detailed_results
-            self._config["detailed_results"] = _details
+            self.config["detailed_results"] = _details
             self._widgets["detailed_results"].update_results(
                 _details,
                 (
@@ -191,7 +191,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             self._widgets["detailed_results"].setVisible(True)
             self._widgets["detailed_results"].raise_()
         else:
-            self._config["detailed_results"] = None
+            self.config["detailed_results"] = None
             self._widgets["detailed_results"].update_results({}, "")
             self._widgets["detailed_results"].setVisible(False)
 
@@ -199,10 +199,10 @@ class TweakPluginParameterWindow(PydidasWindow):
     def run_plugin(self) -> None:
         """Run the plugin with the current Parameters."""
         with ShowBusyMouse():
-            _arg = self.__plugin._config["input_data"]
+            _arg = self.__plugin.config["input_data"]
             if isinstance(_arg, np.ndarray):
-                _arg = self.__plugin._config["input_data"].copy()
-            _kwargs = self.__plugin._config["input_kwargs"].copy()
+                _arg = self.__plugin.config["input_data"].copy()
+            _kwargs = self.__plugin.config["input_kwargs"].copy()
             self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
             self._widgets["plot"].set_data(
@@ -213,7 +213,7 @@ class TweakPluginParameterWindow(PydidasWindow):
     @QtCore.Slot()
     def confirm_parameters(self) -> None:
         """Confirm the selected Parameters and hide the TweakPluginParameterWindow."""
-        self._config["accept_changes"] = True
+        self.config["accept_changes"] = True
         self.setVisible(False)
         self.sig_new_params.emit(self.__plugin.node_id)
         self._widgets["detailed_results"].setVisible(False)
@@ -225,7 +225,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         Discard the made changes to the Plugin Parameters and reset them
         to the original values.
         """
-        self._config["accept_changes"] = False
+        self.config["accept_changes"] = False
         self.setVisible(False)
         if self.__plugin is not None:
             self.__plugin.params = copy.deepcopy(self.__original_plugin_params)
@@ -241,7 +241,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         event : QtGui.QCloseEvent
             The closing event.
         """
-        if not self._config["accept_changes"]:
+        if not self.config["accept_changes"]:
             self.discard_parameter_changes()
         self._widgets["detailed_results"].close()
         QtWidgets.QWidget.closeEvent(self, event)

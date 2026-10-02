@@ -52,7 +52,7 @@ class ProcessingResultSaver(ObjectWithParameterCollection):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self._active_savers: dict[str, ProcessingResultIoBase] = {}
-        self._config["savers_ready"] = False
+        self.config["savers_ready"] = False
 
     @property
     def current_formats(self) -> list[str]:
@@ -79,7 +79,7 @@ class ProcessingResultSaver(ObjectWithParameterCollection):
             Multiple savers can also be given as a single string if they are
             separated by a semicolon `;`.
         """
-        self._config["savers_ready"] = False
+        self.config["savers_ready"] = False
         self._active_savers = ProcessingResultIoMeta.get_savers(formats)
 
     def expected_export_filenames(
@@ -136,16 +136,16 @@ class ProcessingResultSaver(ObjectWithParameterCollection):
             Only specify this, if you explicitly require a different context.
             The default is None.
         """
-        self._config["save_dir"] = Path(save_dir)
+        self.config["save_dir"] = Path(save_dir)
         for _saver in self._active_savers.values():
             _saver.prepare_files_and_directories(
-                self._config["save_dir"],
+                self.config["save_dir"],
                 node_information,
                 scan=scan,
                 diffraction_exp=diffraction_exp,
                 processing_tree=processing_tree,
             )
-        self._config["savers_ready"] = True
+        self.config["savers_ready"] = True
 
     def update_saver_metadata(
         self,

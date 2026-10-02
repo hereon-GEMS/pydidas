@@ -77,7 +77,7 @@ def node_info():
 def test_init(saver):
     assert isinstance(saver, ProcessingResultSaver)
     assert saver._active_savers == {}
-    assert saver._config["savers_ready"] is False
+    assert saver.config["savers_ready"] is False
 
 
 def test_current_formats__empty(saver):
@@ -89,21 +89,21 @@ def test_current_formats__empty(saver):
 def test_set_active_savers__with_none(saver, io_meta):
     saver.set_active_savers(None)
     assert saver._active_savers == {}
-    assert saver._config["savers_ready"] is False
+    assert saver.config["savers_ready"] is False
 
 
 def test_set_active_savers__with_single_format(saver, io_meta):
     create_mock_saver_class("SAVER_TEST", ".test")
     saver.set_active_savers(".test")
     assert ".test" in saver._active_savers
-    assert saver._config["savers_ready"] is False
+    assert saver.config["savers_ready"] is False
 
 
 def test_set_active_savers__with_format_name(saver, io_meta):
     create_mock_saver_class("SAVER_TEST", ".test")
     saver.set_active_savers(".test Saver")
     assert ".test" in saver._active_savers
-    assert saver._config["savers_ready"] is False
+    assert saver.config["savers_ready"] is False
 
 
 @pytest.mark.parametrize("save_formats", [[".test", ".hdf5"], ".test;hdf5"])
@@ -118,9 +118,9 @@ def test_set_active_savers__with_list(saver, io_meta, save_formats):
 
 def test_set_active_savers__clears_ready_flag(saver, io_meta):
     create_mock_saver_class("SAVER_TEST", ".test")
-    saver._config["savers_ready"] = True
+    saver.config["savers_ready"] = True
     saver.set_active_savers(".test")
-    assert saver._config["savers_ready"] is False
+    assert saver.config["savers_ready"] is False
 
 
 def test_expected_export_filenames(saver, io_meta, node_info):
@@ -150,8 +150,8 @@ def test_prepare_active_savers(saver, io_meta, node_info, tmp_path, str_path):
     saver.set_active_savers(".test")
     _path = str(tmp_path) if str_path else tmp_path
     saver.prepare_active_savers(_path, node_info)
-    assert saver._config["save_dir"] == Path(tmp_path)
-    assert saver._config["savers_ready"] is True
+    assert saver.config["save_dir"] == Path(tmp_path)
+    assert saver.config["savers_ready"] is True
 
 
 def test_prepare_active_savers__with_contexts(saver, io_meta, node_info, tmp_path):

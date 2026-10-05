@@ -506,12 +506,13 @@ implementation of the app.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.core.BaseApp.copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle creation of an app clone which does not include
-attributes marked in the classes’ clone_mode attribute.</p>
+attributes listed in the class’ attributes_not_to_copy_to_app_clone.
+The default is False.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the App instance.</p>
@@ -536,20 +537,6 @@ attributes marked in the classes’ clone_mode attribute.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The state dictionary.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.core.BaseApp.get_config">
-<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.get_config" title="Link to this definition">#</a></dt>
-<dd><p>Get the App configuration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The App configuration stored in the _config dictionary.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
@@ -591,8 +578,7 @@ exported state information to be restored.</p>
 <dd><p>Wait for specific tasks to give the clear signal.</p>
 <p>This method is called in the parallel multiprocessing process
 prior to the actual calculation. Apps can specify wait conditions
-that need to be fulfilled before carrying on. The method returns
-a boolean flag whether a timeout was encountered.</p>
+that need to be fulfilled before carrying on.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Flag whether processing can continue or should wait.</p>
@@ -612,21 +598,35 @@ a boolean flag whether a timeout was encountered.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index to be processed.</p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the processing. The specific type depends on the app.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any or None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.multiprocessing_get_tasks">
-<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
 <dd><p>Return all tasks required in multiprocessing.</p>
 <p>This method must be implemented by the BaseApp subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The tasks to be processed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sequence[int] or np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.multiprocessing_post_run">
 <span class="sig-name descname"><span class="pre">multiprocessing_post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.multiprocessing_post_run" title="Link to this definition">#</a></dt>
 <dd><p>Perform operations after running main parallel processing function.</p>
-<p>The generic method simple performs no operation and subclasses only
+<p>The generic method simply performs no operation and subclasses only
 need to re-implement it when they explicitly need it.</p>
 </dd></dl>
 
@@ -634,7 +634,7 @@ need to re-implement it when they explicitly need it.</p>
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.multiprocessing_pre_cycle">
 <span class="sig-name descname"><span class="pre">multiprocessing_pre_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.multiprocessing_pre_cycle" title="Link to this definition">#</a></dt>
 <dd><p>Perform operations in the pre-cycle of every task.</p>
-<p>The generic method simple performs no operation and subclasses only
+<p>The generic method simply performs no operation and subclasses only
 need to re-implement it when they explicitly need it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -647,8 +647,8 @@ need to re-implement it when they explicitly need it.</p>
 <dt class="sig sig-object py" id="pydidas.core.BaseApp.multiprocessing_pre_run">
 <span class="sig-name descname"><span class="pre">multiprocessing_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.core.BaseApp.multiprocessing_pre_run" title="Link to this definition">#</a></dt>
 <dd><p>Perform operations prior to running main parallel processing function.</p>
-<p>The generic method simple performs no operation and subclasses only
-need to re-implement it when they explicitly need it.</p>
+<p>The generic method simply sets the “run_prepared” flag and subclasses
+only need to re-implement it when they explicitly need it.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -765,14 +765,21 @@ subclasses full control over args and kwargs.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="others.html#pydidas.core.ConfigDict" title="pydidas.core.config_dict.ConfigDict"><span class="pre">ConfigDict</span></a></span></dt>
+<dd><p>Return this object’s mutable configuration mapping.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><a class="reference internal" href="parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle creation of an app clone which does not include
-attributes marked in the classes’ clone_mode attribute.</p>
+attributes listed in the class’ attributes_not_to_copy_to_app_clone.
+The default is False.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the App instance.</p>
@@ -811,20 +818,6 @@ attributes marked in the classes’ clone_mode attribute.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The state dictionary.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span></dt>
-<dd><p>Get the App configuration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The App configuration stored in the _config dictionary.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
@@ -944,8 +937,7 @@ exported state information to be restored.</p>
 <dd><p>Wait for specific tasks to give the clear signal.</p>
 <p>This method is called in the parallel multiprocessing process
 prior to the actual calculation. Apps can specify wait conditions
-that need to be fulfilled before carrying on. The method returns
-a boolean flag whether a timeout was encountered.</p>
+that need to be fulfilled before carrying on.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Flag whether processing can continue or should wait.</p>
@@ -965,21 +957,35 @@ a boolean flag whether a timeout was encountered.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index to be processed.</p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the processing. The specific type depends on the app.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any or None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span></dt>
 <dd><p>Return all tasks required in multiprocessing.</p>
 <p>This method must be implemented by the BaseApp subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The tasks to be processed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sequence[int] or np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">multiprocessing_post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Perform operations after running main parallel processing function.</p>
-<p>The generic method simple performs no operation and subclasses only
+<p>The generic method simply performs no operation and subclasses only
 need to re-implement it when they explicitly need it.</p>
 </dd></dl>
 
@@ -987,7 +993,7 @@ need to re-implement it when they explicitly need it.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">multiprocessing_pre_cycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Perform operations in the pre-cycle of every task.</p>
-<p>The generic method simple performs no operation and subclasses only
+<p>The generic method simply performs no operation and subclasses only
 need to re-implement it when they explicitly need it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1000,8 +1006,8 @@ need to re-implement it when they explicitly need it.</p>
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">multiprocessing_pre_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span></dt>
 <dd><p>Perform operations prior to running main parallel processing function.</p>
-<p>The generic method simple performs no operation and subclasses only
-need to re-implement it when they explicitly need it.</p>
+<p>The generic method simply sets the “run_prepared” flag and subclasses
+only need to re-implement it when they explicitly need it.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1322,7 +1328,6 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.copy"><code class="docutils literal notranslate"><span class="pre">BaseApp.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.deleteLater"><code class="docutils literal notranslate"><span class="pre">BaseApp.deleteLater</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.export_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.export_state</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.get_config"><code class="docutils literal notranslate"><span class="pre">BaseApp.get_config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.get_latest_results"><code class="docutils literal notranslate"><span class="pre">BaseApp.get_latest_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.import_state"><code class="docutils literal notranslate"><span class="pre">BaseApp.import_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.BaseApp.multiprocessing_carryon"><code class="docutils literal notranslate"><span class="pre">BaseApp.multiprocessing_carryon</span></code></a></li>

@@ -1167,16 +1167,23 @@ output_data_label and output_data_unit.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.plugins.</span></span><span class="sig-name descname"><span class="pre">Input1dXRangeMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core/parameter.html#pydidas.core.Parameter" title="pydidas.core.parameter.Parameter"><span class="pre">Parameter</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin" title="Link to this definition">#</a></dt>
 <dd><p>A mixin class for input plugins that provides functionality for handling
 x-range calculations and custom x-scale settings.</p>
+<p>Initialization arguments are passed to the parent class’s constructor.
+The mixin only adds parameters for custom x-scale settings.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.Input1dXRangeMixin.calculate_xrange">
-<span class="sig-name descname"><span class="pre">calculate_xrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.calculate_xrange" title="Link to this definition">#</a></dt>
-<dd><p>Calculate the x-range for the data.</p>
+<span class="sig-name descname"><span class="pre">calculate_xrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.calculate_xrange" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the x-range for the data and store it in the config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n_points</strong> (<em>int</em>) – The number of points in the data.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.Input1dXRangeMixin.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ordinal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.execute" title="Link to this definition">#</a></dt>
-<dd><p>Import the data and pass it on after (optionally) handling image multiplicity.</p>
+<dd><p>Import the data and (optionally) apply the custom x-scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1186,8 +1193,8 @@ x-range calculations and custom x-scale settings.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><em>Dataset</em> – The image data frame.</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>) – The updated kwargs.</p></li>
+<li><p><em>Dataset</em> – The 1D data with the (optional) custom x-axis.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – The updated kwargs.</p></li>
 </ul>
 </p>
 </dd>
@@ -1196,13 +1203,21 @@ x-range calculations and custom x-scale settings.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.Input1dXRangeMixin.get_parameter_config_widget">
-<span class="sig-name descname"><span class="pre">get_parameter_config_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.get_parameter_config_widget" title="Link to this definition">#</a></dt>
-<dd><p>Get the parameter config widget for the plugin.</p>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_parameter_config_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">type</span><span class="p"><span class="pre">[</span></span><span class="pre">GenericPluginConfigWidget</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.get_parameter_config_widget" title="Link to this definition">#</a></dt>
+<dd><p>Get the parameter config widget class for the plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The config widget class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>type[GenericPluginConfigWidget]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.plugins.Input1dXRangeMixin.pre_execute">
-<span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.pre_execute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">pre_execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.plugins.Input1dXRangeMixin.pre_execute" title="Link to this definition">#</a></dt>
 <dd><p>Run generic pre-execution routines.</p>
 </dd></dl>
 

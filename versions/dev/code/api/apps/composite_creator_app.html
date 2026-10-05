@@ -552,14 +552,21 @@ been created, this property returns None.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.config">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../core/others.html#pydidas.core.ConfigDict" title="pydidas.core.config_dict.ConfigDict"><span class="pre">ConfigDict</span></a></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.config" title="Link to this definition">#</a></dt>
+<dd><p>Return this object’s mutable configuration mapping.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle creation of an app clone which does not include
-attributes marked in the classes’ clone_mode attribute.</p>
+attributes listed in the class’ attributes_not_to_copy_to_app_clone.
+The default is False.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the App instance.</p>
@@ -620,20 +627,6 @@ for 2-dimensional data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The state dictionary.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.get_config">
-<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.get_config" title="Link to this definition">#</a></dt>
-<dd><p>Get the App configuration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The App configuration stored in the _config dictionary.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
@@ -780,7 +773,7 @@ exported state information to be restored.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.CompositeCreatorApp.multiprocessing_get_tasks">
-<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.apps.CompositeCreatorApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
 <dd><p>Return all tasks required in multiprocessing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1173,12 +1166,12 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.add_params"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.add_params</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.apply_thresholds"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.apply_thresholds</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.composite"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.composite</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.config"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.copy"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.deepcopy"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.deepcopy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.deleteLater"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.deleteLater</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.export_image"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.export_image</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.export_state"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.export_state</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_config"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_latest_results"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_latest_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.CompositeCreatorApp.get_param_value"><code class="docutils literal notranslate"><span class="pre">CompositeCreatorApp.get_param_value</span></code></a></li>

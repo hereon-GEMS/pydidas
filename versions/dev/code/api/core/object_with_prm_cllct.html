@@ -464,7 +464,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.core.ObjectWithParameterCollection">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.core.</span></span><span class="sig-name descname"><span class="pre">ObjectWithParameterCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.core.ObjectWithParameterCollection" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="others.html#pydidas.core.ParameterCollectionMixIn" title="pydidas.core.parameter_collection_mixin.ParameterCollectionMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a>, <a class="reference internal" href="others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="others.html#pydidas.core.ConfigDictMixin" title="pydidas.core.config_dict_mixin.ConfigDictMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDictMixin</span></code></a>, <a class="reference internal" href="others.html#pydidas.core.ParameterCollectionMixIn" title="pydidas.core.parameter_collection_mixin.ParameterCollectionMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollectionMixIn</span></code></a>, <a class="reference internal" href="others.html#pydidas.core.PydidasQsettingsMixin" title="pydidas.core.pydidas_q_settings_mixin.PydidasQsettingsMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasQsettingsMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
 <p>An object with a ParameterCollection.</p>
 <p>This class can be inherited by any class which requires a
 ParameterCollection and access methods defined for it in the
@@ -500,6 +500,12 @@ subclasses full control over args and kwargs.</p>
 <dd class="field-odd"><p><strong>*params</strong> (<a class="reference internal" href="parameter.html#pydidas.core.Parameter" title="pydidas.core.Parameter"><em>Parameter</em></a><em> | </em><a class="reference internal" href="parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><em>ParameterCollection</em></a>) – Any Parameter or ParameterCollection.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.core.ObjectWithParameterCollection.config">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="others.html#pydidas.core.ConfigDict" title="pydidas.core.config_dict.ConfigDict"><span class="pre">ConfigDict</span></a></span><a class="headerlink" href="#pydidas.core.ObjectWithParameterCollection.config" title="Link to this definition">#</a></dt>
+<dd><p>Return this object’s mutable configuration mapping.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -861,6 +867,7 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.add_param"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.add_param</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.add_params"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.add_params</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.config"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.copy"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.deepcopy"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.deepcopy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.core.ObjectWithParameterCollection.get_param"><code class="docutils literal notranslate"><span class="pre">ObjectWithParameterCollection.get_param</span></code></a></li>

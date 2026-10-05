@@ -484,12 +484,12 @@ is an empty Path().</p>
 <dt>hdf5_key<span class="classifier">Hdf5key, optional</span></dt><dd><p>Used only for hdf5 files: The dataset key. The default is
 entry/data/data.</p>
 </dd>
-<dt>use_det_mask<span class="classifier">bool, optional</span></dt><dd><p>Keyword to enable or disable using the global detector mask as
+<dt>use_detector_mask<span class="classifier">bool, optional</span></dt><dd><p>Keyword to enable or disable using the global detector mask as
 defined by the global mask file and mask value. The default is True.</p>
 </dd>
 <dt>detector_mask_file<span class="classifier">Path or str, optional</span></dt><dd><p>The full path to the detector mask file.</p>
 </dd>
-<dt>det_mask_val<span class="classifier">float, optional</span></dt><dd><p>The display value for masked pixels. The default is 0.</p>
+<dt>detector_mask_val<span class="classifier">float, optional</span></dt><dd><p>The display value for masked pixels. The default is 0.</p>
 </dd>
 <dt>use_bg_file<span class="classifier">bool, optional</span></dt><dd><p>Keyword to toggle usage of background subtraction. The default is
 False.</p>
@@ -560,14 +560,21 @@ subclasses full control over args and kwargs.</p>
 <dd><p>Cleanup the DirectorySpyApp.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.config">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">config</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../core/others.html#pydidas.core.ConfigDict" title="pydidas.core.config_dict.ConfigDict"><span class="pre">ConfigDict</span></a></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.config" title="Link to this definition">#</a></dt>
+<dd><p>Return this object’s mutable configuration mapping.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../core/base_app.html#pydidas.core.BaseApp" title="pydidas.core.base_app.BaseApp"><span class="pre">BaseApp</span></a></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.copy" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clone_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.copy" title="Link to this definition">#</a></dt>
 <dd><p>Get a copy of the App.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>clone_mode</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – Keyword to toggle creation of an app clone which does not include
-attributes marked in the classes’ clone_mode attribute.</p>
+attributes listed in the class’ attributes_not_to_copy_to_app_clone.
+The default is False.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the App instance.</p>
@@ -645,20 +652,6 @@ attributes marked in the classes’ clone_mode attribute.</p>
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.generic_file">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">generic_file</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.generic_file" title="Link to this definition">#</a></dt>
 <dd><p>Flag whether the selected file is a generic file.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.get_config">
-<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.get_config" title="Link to this definition">#</a></dt>
-<dd><p>Get the App configuration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The App configuration stored in the _config dictionary.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -778,14 +771,14 @@ keys.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.image">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">image</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.image" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">image</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.image" title="Link to this definition">#</a></dt>
 <dd><p>Get the currently stored image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The image data</p>
+<dd class="field-odd"><p>The image data. None, if no image has been stored yet.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>np.ndarray</p>
+<dd class="field-even"><p>np.ndarray or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -828,7 +821,6 @@ the result shapes.</p>
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_carryon">
 <span class="sig-name descname"><span class="pre">multiprocessing_carryon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_carryon" title="Link to this definition">#</a></dt>
 <dd><p>Wait for specific tasks to give the clear signal.</p>
-<p>This method will be re-implemented by the prepare_run method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Flag whether processing can continue or should wait.</p>
@@ -845,23 +837,27 @@ the result shapes.</p>
 <dd><p>Read the latest image. If the latest image cannot be read (e.g. the
 file is currently being written), the 2nd latest file will be read.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>index</strong> (<em>int or None</em>) – The input index. As this parameter is not used for this app and
-only implemented for compatibility, this will generally be None
-for the DirectorySpyApp. The default is None.</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The task index. It is not used by this app and only kept for
+compatibility. The default is -1.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>index</strong> (<em>int or None</em>) – The input index.</p></li>
 <li><p><strong>filename</strong> (<em>Path</em>) – The full filename of the file being read.</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../core/others.html#pydidas.core.FileReadError" title="pydidas.core.FileReadError"><strong>FileReadError</strong></a> – If neither of the last two files can be read.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_get_tasks">
-<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
-<dd><p>The DirectorySpyApp does not use tasks and will always return an empty
-list.</p>
+<span class="sig-name descname"><span class="pre">multiprocessing_get_tasks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_get_tasks" title="Link to this definition">#</a></dt>
+<dd><p>The DirectorySpyApp does not use tasks and will return an empty list.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -889,7 +885,7 @@ list.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.multiprocessing_store_results">
-<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">multiprocessing_store_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.multiprocessing_store_results" title="Link to this definition">#</a></dt>
 <dd><p>Store the multiprocessing results for other pydidas apps and processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -992,20 +988,19 @@ and entered values or - if missing - the default values.</p>
 <dt class="sig sig-object py" id="pydidas.apps.DirectorySpyApp.prepare_run">
 <span class="sig-name descname"><span class="pre">prepare_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.apps.DirectorySpyApp.prepare_run" title="Link to this definition">#</a></dt>
 <dd><p>Prepare running the directory spy app.</p>
-<p>For the main App (i.e. running not in clone_mode), this involves the
-following steps:</p>
+<p>This method performs the following steps:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Get the shape of all results from the WorkflowTree and store
-them for internal reference.</p></li>
-<li><p>Get all multiprocessing tasks from the ScanContext.</p></li>
-<li><p>Calculate the required buffer size and verify that the memory
-requirements are okay.</p></li>
-<li><p>Initialize the shared memory arrays.</p></li>
+<li><p>Load the detector mask, if used.</p></li>
+<li><p>Define the directory path and the filename pattern.</p></li>
+<li><p>Reset the runtime variables and load the background image,
+if used.</p></li>
+<li><p>For the main App (i.e. not in clone_mode), initialize the
+shared memory.</p></li>
+<li><p>Initialize the local numpy array from the shared memory.</p></li>
+<li><p>If scanning for a filename pattern, find the current index.</p></li>
 </ol>
 </div></blockquote>
-<p>Both the cloned and the main applications then initialize local numpy
-arrays from the shared memory.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1247,6 +1242,7 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.ascii_file"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.ascii_file</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.binary_file"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.binary_file</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.cleanup"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.cleanup</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.config"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.copy"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.copy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.current_filename"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.current_filename</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.current_filename_is_valid"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.current_filename_is_valid</span></code></a></li>
@@ -1256,7 +1252,6 @@ for the Parameter will be disabled.</p></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.deleteLater"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.deleteLater</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.export_state"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.export_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.generic_file"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.generic_file</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.get_config"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.get_config</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.get_image"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.get_image</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.get_latest_results"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.get_latest_results</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.apps.DirectorySpyApp.get_param"><code class="docutils literal notranslate"><span class="pre">DirectorySpyApp.get_param</span></code></a></li>

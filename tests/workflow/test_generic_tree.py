@@ -59,8 +59,8 @@ class TestGenericTree(unittest.TestCase):
         _val1 = 12
         _val2 = "something"
         tree = GenericTree(test1=_val1, test2=_val2)
-        self.assertEqual(tree._config["test1"], _val1)
-        self.assertEqual(tree._config["test2"], _val2)
+        self.assertEqual(tree.config["test1"], _val1)
+        self.assertEqual(tree.config["test2"], _val2)
 
     def test_clear(self):
         tree = GenericTree()
@@ -104,7 +104,7 @@ class TestGenericTree(unittest.TestCase):
 
     def test_active_node_setter__none(self):
         tree = GenericTree()
-        tree._config["active_node"] = 1
+        tree.config["active_node"] = 1
         tree.active_node_id = None
         self.assertIsNone(tree.active_node_id)
 

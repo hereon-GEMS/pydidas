@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ from full azimuthal integration data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -80,17 +80,17 @@ class ExtractAzimuthalSectors(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
-        self._config = self._config | {
-            "settings_updated_from_data": False,
-            "x_pos_hash": -1,
-        }
+        self.config.update(
+            settings_updated_from_data=False,
+            x_pos_hash=-1,
+        )
         self._factors = {}
 
     def pre_execute(self):
         """
         Set up the required functions and fit variable labels.
         """
-        self._config["centers"] = tuple(np.round(self._get_sector_values(), 10))
+        self.config["centers"] = tuple(np.round(self._get_sector_values(), 10))
 
     def _get_sector_values(self) -> list[float, ...]:
         """
@@ -146,7 +146,7 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         self._data = data
         self._update_settings_from_data()
-        _res = np.zeros((len(self._config["centers"]), self._data.shape[1]))
+        _res = np.zeros((len(self.config["centers"]), self._data.shape[1]))
         for _index, _factors in self._factors.items():
             _f = np.broadcast_to(_factors, data.shape[::-1]).T
             _res[_index] = np.sum(data * _f, axis=0) / np.sum(_factors)
@@ -154,7 +154,7 @@ class ExtractAzimuthalSectors(ProcPlugin):
             _res,
             axis_labels=data.axis_labels,
             axis_units=data.axis_units,
-            axis_ranges=[self._config["centers"], data.axis_ranges[1]],
+            axis_ranges=[self.config["centers"], data.axis_ranges[1]],
             data_label=data.data_label,
             data_unit=data.data_unit,
             metadata=data.metadata,
@@ -167,12 +167,12 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         _xhash = hash(self._data.axis_ranges[0].tobytes())
         if (
-            self._config["settings_updated_from_data"]
-            and _xhash == self._config["x_pos_hash"]
+            self.config["settings_updated_from_data"]
+            and _xhash == self.config["x_pos_hash"]
         ):
             return
         _factor = 1 if self._data.axis_units[0] == "deg" else np.pi / 180
-        self._config["x_pos_hash"] = _xhash
+        self.config["x_pos_hash"] = _xhash
         _x = self._data.axis_ranges[0]
         if _x.size < 3:
             raise UserConfigError(
@@ -194,8 +194,8 @@ class ExtractAzimuthalSectors(ProcPlugin):
         )
         _delta = self.get_param_value("width") / 2
         _data_width = np.diff(self._data.axis_ranges[0]).mean()
-        self._config["factors"] = {}
-        for _index, _center in enumerate(self._config["centers"]):
+        self.config["factors"] = {}
+        for _index, _center in enumerate(self.config["centers"]):
             _indices = np.where(abs(_center - _data_centers) <= _delta)[0]
             _factors = np.zeros(_x.size)
             for _ii in _indices:
@@ -210,4 +210,4 @@ class ExtractAzimuthalSectors(ProcPlugin):
                     "fits into the selected sector width."
                 )
             self._factors[_index] = _factors
-        self._config["settings_updated_from_data"] = True
+        self.config["settings_updated_from_data"] = True

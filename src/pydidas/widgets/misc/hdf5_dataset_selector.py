@@ -117,12 +117,12 @@ class Hdf5DatasetSelector(WidgetWithParameters):
         WidgetWithParameters.__init__(self, **kwargs)
         self.add_params(DATA_DIMENSION_PARAM.copy(), DATASET_PARAM.copy())
 
-        self._config = {
-            "current_dataset": "",
-            "current_filename": "",
-            "min_datadim": 1,
-            "display_details": False,
-        }
+        self.config.update(
+            current_dataset="",
+            current_filename="",
+            min_datadim=1,
+            display_details=False,
+        )
         self.__create_widgets()
         self.__connect_slots()
         self.setVisible(kwargs.get("visible", False))
@@ -237,7 +237,7 @@ class Hdf5DatasetSelector(WidgetWithParameters):
         value : str
             The new value of the minimum dataset dimension parameter.
         """
-        self._config["min_datadim"] = 0 if value == "any" else int(value.split("=")[1])
+        self.config["min_datadim"] = 0 if value == "any" else int(value.split("=")[1])
         self.__populate_dataset_list()
 
     @QtCore.Slot()
@@ -251,8 +251,8 @@ class Hdf5DatasetSelector(WidgetWithParameters):
         """
         with ShowBusyMouse():
             _datasets = get_hdf5_populated_dataset_keys(
-                self._config["current_filename"],
-                min_dim=self._config["min_datadim"],
+                self.config["current_filename"],
+                min_dim=self.config["min_datadim"],
                 ignore_keys=self.active_filters,
                 nxdata_signal_only=self._widgets["check_nxsignal"].isChecked(),
                 ignore_key_exceptions=self.dset_filter_exceptions,
@@ -284,9 +284,9 @@ class Hdf5DatasetSelector(WidgetWithParameters):
         accepted frame range for the sliders.
         """
         _dset = self.get_param_value("dataset")
-        if _dset == self._config["current_dataset"]:
+        if _dset == self.config["current_dataset"]:
             return
-        self._config["current_dataset"] = _dset
+        self.config["current_dataset"] = _dset
         self.sig_new_dataset_selected.emit(_dset)  # type: ignore[attr-defined]
 
     @QtCore.Slot(str)
@@ -307,24 +307,24 @@ class Hdf5DatasetSelector(WidgetWithParameters):
         self.setVisible(_is_hdf5)
         if not _is_hdf5:
             return
-        _is_current = _filename == self._config["current_filename"]
-        self._config["current_filename"] = filename
+        _is_current = _filename == self.config["current_filename"]
+        self.config["current_filename"] = filename
         if _filename.is_file() and not _is_current:
-            self._config["current_dataset"] = ""
+            self.config["current_dataset"] = ""
             self.__populate_dataset_list()
         self.display_dataset()
 
     def clear(self) -> None:
         """Clear all entries for the widget."""
         self.setVisible(False)
-        self._config["current_dataset"] = ""
-        self._config["current_filename"] = ""
+        self.config["current_dataset"] = ""
+        self.config["current_filename"] = ""
 
     def _toggle_details(self) -> None:
         """Toggle the visibility of the detailed dataset selection options."""
-        _is_visible = not self._config["display_details"]
+        _is_visible = not self.config["display_details"]
         self._widgets["filter_container"].setVisible(_is_visible)
-        self._config["display_details"] = _is_visible
+        self.config["display_details"] = _is_visible
         self._widgets["button_toggle_details"].setText(
             ("Hide" if _is_visible else "Show") + " detailed dataset selection options"
         )

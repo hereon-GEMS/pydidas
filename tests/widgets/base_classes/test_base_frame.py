@@ -117,7 +117,7 @@ class TestBaseFrame(unittest.TestCase):
     def test_inject_frame_state(self) -> None:
         _n = 10
         obj = self.get_base_frame()
-        obj._config["built"] = False
+        obj.config["built"] = False
         self.create_widgets_in_frame(obj, _n)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
         _state = {
@@ -127,7 +127,7 @@ class TestBaseFrame(unittest.TestCase):
         }
         obj.show()
         obj.inject_frame_state(_state)
-        self.assertEqual(obj._config["state"], _state)
+        self.assertEqual(obj.config["state"], _state)
 
     def test_restore_state(self) -> None:
         _n = 10

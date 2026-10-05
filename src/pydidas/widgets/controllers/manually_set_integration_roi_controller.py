@@ -35,6 +35,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.math import Point
 from pydidas.core.utils.scattering_geometry import convert_integration_result
@@ -46,7 +47,7 @@ if TYPE_CHECKING:
     from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
-class ManuallySetIntegrationRoiController(QtCore.QObject):
+class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
     """
     A controller to handle manually setting the integration region.
 
@@ -89,12 +90,16 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._plugin = kwargs.get("plugin", None)
         self._editor = editor
         self._original_plugin_param_values: dict[str, Any] = {}
-        self._config: dict[str, Any] = {
-            "roi_plotted": False,
-            "forced_edit_disable": kwargs.get("forced_edit_disable", False),
-            "enabled": True,
-            "exp": None,
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "roi_plotted": False,
+                "forced_edit_disable": kwargs.get("forced_edit_disable", False),
+                "enabled": True,
+                "exp": None,
+            },
+            super_init=False,
+        )
         self._editor.param_widgets["overlay_color"].sig_new_value.connect(
             self.set_new_marker_color
         )
@@ -114,7 +119,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         bool
             The enabled status.
         """
-        return self._config["enabled"]
+        return self.config["enabled"]
 
     def set_new_plugin(self, plugin: pyFAIintegrationBase) -> None:
         """
@@ -125,26 +130,26 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         plugin : pydidas.plugins.pyFAIintegrationBase
             The plugin to be edited
         """
-        if self._config["exp"] is not None:
-            self._config["exp"].sig_params_changed.disconnect(self._process_exp_update)
+        if self.config["exp"] is not None:
+            self.config["exp"].sig_params_changed.disconnect(self._process_exp_update)
 
         self._plugin = plugin
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
-        self._config["exp"] = plugin._EXP
-        self._config["exp"].sig_params_changed.connect(self._process_exp_update)
+        self.config["exp"] = plugin._EXP
+        self.config["exp"].sig_params_changed.connect(self._process_exp_update)
         self._process_exp_update()
 
         self._editor.clear_plugin_widgets()
         if "rad_use_range" in plugin.params:
             self._editor.create_widgets_for_axis(plugin, "rad")
             self._connect_axis_widgets("rad")
-            self._config["rad_unit"] = plugin.get_param_value("rad_unit")
+            self.config["rad_unit"] = plugin.get_param_value("rad_unit")
         if "azi_use_range" in plugin.params:
             self._editor.create_widgets_for_axis(plugin, "azi")
             self._connect_axis_widgets("azi")
         if self._plot.getActiveImage() is None:
-            _nx = self._config["exp"].get_param_value("detector_npixx")
-            _ny = self._config["exp"].get_param_value("detector_npixy")
+            _nx = self.config["exp"].get_param_value("detector_npixx")
+            _ny = self.config["exp"].get_param_value("detector_npixy")
             self._plot.addImage(np.zeros((_ny, _nx)))
         self.reset_selection_mode()
 
@@ -182,7 +187,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         color : str
             The name of the new color.
         """
-        self._config["color"] = PYDIDAS_COLORS[color]
+        self.config["color"] = PYDIDAS_COLORS[color]
         self._plot.set_marker_color(color)
         for _key in [
             "roi",
@@ -193,7 +198,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ]:
             _item = self._plot._getItem("item", legend=_key)
             if _item is not None:
-                _item.setColor(self._config["color"])
+                _item.setColor(self.config["color"])
 
     @QtCore.Slot()
     def reset_plugin(self) -> None:
@@ -212,8 +217,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         Reset the selection mode and restore button functionality.
         """
-        self._config["radial_n"] = 0
-        self._config["azimuthal_n"] = 0
+        self.config["radial_n"] = 0
+        self.config["azimuthal_n"] = 0
         self.toggle_enable(True)
         self.update_input_widgets()
         self.sig_toggle_selection_mode.emit(False)
@@ -227,8 +232,10 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         enabled : bool
             Flag whether the editing mode is active.
         """
-        enabled = enabled if not self._config["forced_edit_disable"] else False
-        self._config["enabled"] = enabled
+        print("Controller: toggle_enable", enabled)
+        print("Config:", self.config)
+        enabled = enabled if not self.config["forced_edit_disable"] else False
+        self.config["enabled"] = enabled
         self._editor.toggle_enable(enabled)
         self.sig_toggle_enable.emit(enabled)
 
@@ -257,7 +264,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         kind = ["azimuthal", "radial", "roi"] if "all" in kind else kind
         if "radial" in kind:
-            _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
+            _pxsize = self.config["exp"].get_param_value("detector_pxsizex") * 1e-6
             _range = self._plugin.get_radial_range_in_units("r / mm")
             if _range is not None:
                 self._plot.draw_circle(_range[0] * 1e-3 / _pxsize, "radial_lower")
@@ -288,17 +295,17 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
                 self._plot.remove(legend=f"{_kind}_upper", kind="item")
             self._plot.remove(legend=_kind, kind="item")
         if "roi" in kind:
-            self._config["roi_plotted"] = False
+            self.config["roi_plotted"] = False
 
     @QtCore.Slot()
     def _process_exp_update(self) -> None:
         """Process updates of the DiffractionExperiment."""
         try:
-            self._config["beamcenter"] = self._config["exp"].beamcenter
+            self.config["beamcenter"] = self.config["exp"].beamcenter
         except UserConfigError:
             return
-        self._config["det_dist"] = self._config["exp"].get_param_value("detector_dist")
-        if self._config["roi_plotted"]:
+        self.config["det_dist"] = self.config["exp"].get_param_value("detector_dist")
+        if self.config["roi_plotted"]:
             self.show_plot_items("roi")
 
     @QtCore.Slot()
@@ -318,8 +325,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self.set_param_and_widget_value(
             f"{type_[:3]}_use_range", f"Specify {type_} range"
         )
-        self._config[f"{type_}_active"] = True
-        self._config[f"{type_}_n"] = 0
+        self.config[f"{type_}_active"] = True
+        self.config[f"{type_}_n"] = 0
         self.remove_plot_items("all")
         self.show_plot_items(_other_type)
         self.toggle_enable(False)
@@ -344,7 +351,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         """
         Show the integration region in the plot.
         """
-        _pxsize = self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
+        _pxsize = self.config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _rad_range = self._plugin.get_radial_range_in_units("r / mm")
         if _rad_range is not None:
             _rad_range = (
@@ -352,7 +359,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
                 _rad_range[1] * 1e-3 / _pxsize,
             )
         _azi_range = self._plugin.get_azimuthal_range_in_rad()
-        self._config["roi_plotted"] = True
+        self.config["roi_plotted"] = True
         self._plot.draw_integration_region(_rad_range, _azi_range)
 
     def update_input_widgets(self) -> None:
@@ -385,23 +392,23 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ypos : float
             The y position in detector pixels.
         """
-        _r_px = (Point(xpos, ypos) - self._config["beamcenter"]).r
-        _r = _r_px * self._config["exp"].get_param_value("detector_pxsizex") * 1e-6
+        _r_px = (Point(xpos, ypos) - self.config["beamcenter"]).r
+        _r = _r_px * self.config["exp"].get_param_value("detector_pxsizex") * 1e-6
         _r_in_mm = _r * 1e3
         _val = convert_integration_result(
             _r_in_mm,
             "r / mm",
             self._plugin.get_param_value("rad_unit"),
-            self._config["exp"].xray_wavelength_in_m,
-            self._config["exp"].det_dist_in_m,
+            self.config["exp"].xray_wavelength_in_m,
+            self.config["exp"].det_dist_in_m,
         )
-        _bounds = "lower" if self._config["radial_n"] == 0 else "upper"
+        _bounds = "lower" if self.config["radial_n"] == 0 else "upper"
         self._editor.toggle_param_widget_visibility(f"rad_range_{_bounds}", True)
         self.set_param_and_widget_value(f"rad_range_{_bounds}", np.round(_val, 5))
-        if self._config["radial_n"] == 0:
+        if self.config["radial_n"] == 0:
             self._plot.draw_circle(_r_px, f"radial_{_bounds}")
-        self._config["radial_n"] += 1
-        if self._config["radial_n"] > 1:
+        self.config["radial_n"] += 1
+        if self.config["radial_n"] > 1:
             self._plot.sig_new_point_selected.disconnect(self._new_radial_point)
             self.reset_selection_mode()
             self.remove_plot_items("all")
@@ -419,20 +426,20 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         ypos : float
             The y position in detector pixels.
         """
-        _chi = (Point(xpos, ypos) - self._config["beamcenter"]).chi
+        _chi = (Point(xpos, ypos) - self.config["beamcenter"]).chi
         _factor = (
             180 / np.pi if "deg" in self._plugin.get_param_value("azi_unit") else 1
         )
-        _bounds = "lower" if self._config["azimuthal_n"] == 0 else "upper"
+        _bounds = "lower" if self.config["azimuthal_n"] == 0 else "upper"
         self._editor.toggle_param_widget_visibility(f"azi_range_{_bounds}", True)
         self.set_param_and_widget_value(
             f"azi_range_{_bounds}", np.round(_factor * _chi, 5)
         )
-        if self._config["azimuthal_n"] == 0:
+        if self.config["azimuthal_n"] == 0:
             self._plot.draw_line_from_beamcenter(_chi, f"azimuthal_{_bounds}")
-        self._config["azimuthal_n"] += 1
+        self.config["azimuthal_n"] += 1
 
-        if self._config["azimuthal_n"] > 1:
+        if self.config["azimuthal_n"] > 1:
             self._plot.sig_new_point_selected.disconnect(self._new_azimuthal_point)
             self.reset_selection_mode()
             self.remove_plot_items("all")
@@ -477,8 +484,8 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         new_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
             The new unit for the radial selection.
         """
-        self._plugin.convert_radial_range_values(self._config["rad_unit"], new_unit)
-        self._config["rad_unit"] = new_unit
+        self._plugin.convert_radial_range_values(self.config["rad_unit"], new_unit)
+        self.config["rad_unit"] = new_unit
         self._editor.update_param_widget_value(
             "rad_range_lower", self._plugin.get_param_value("rad_range_lower")
         )

@@ -36,6 +36,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import get_extension
 from pydidas.core.utils.hdf5 import get_hdf5_metadata, verify_hdf5_dset_exists_in_file
@@ -102,17 +103,21 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
-        self._config = {
-            "raw_img_shape_x": None,
-            "raw_img_shape_y": None,
-            "datatype": None,
-            "numbers": None,
-            "final_shape": None,
-            "roi": None,
-            "images_per_file": -1,
-            "hdf5_dset_shape": None,
-            "filename": "",
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "raw_img_shape_x": None,
+                "raw_img_shape_y": None,
+                "datatype": None,
+                "numbers": None,
+                "final_shape": None,
+                "roi": None,
+                "images_per_file": -1,
+                "hdf5_dset_shape": None,
+                "filename": "",
+            },
+            super_init=False,
+        )
 
     @property
     def raw_size_x(self) -> int:
@@ -124,7 +129,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         int
             The number of pixels in x-direction.
         """
-        return self._config["raw_img_shape_x"]
+        return self.config["raw_img_shape_x"]
 
     @property
     def raw_size_y(self) -> int:
@@ -136,7 +141,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         int
             The number of pixels in y-direction.
         """
-        return self._config["raw_img_shape_y"]
+        return self.config["raw_img_shape_y"]
 
     @property
     def datatype(self) -> type:
@@ -148,7 +153,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         type
             The datatype class.
         """
-        return self._config["datatype"]
+        return self.config["datatype"]
 
     @property
     def numbers(self) -> range | int:
@@ -160,7 +165,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         range or int
             The selected frame numbers.
         """
-        return self._config["numbers"]
+        return self.config["numbers"]
 
     @property
     def final_shape(self) -> tuple[float, float]:
@@ -172,7 +177,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         tuple[float, float]
             The final shape of the image.
         """
-        return self._config["final_shape"]
+        return self.config["final_shape"]
 
     @property
     def roi(self) -> None | tuple[slice, slice]:
@@ -185,7 +190,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             Either None, if no ROI has been defined or a tuple with the
             slice objects for y and x dimensions.
         """
-        return self._config["roi"]
+        return self.config["roi"]
 
     @property
     def images_per_file(self) -> int:
@@ -197,7 +202,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         int
             The number of images per file.
         """
-        return self._config["images_per_file"]
+        return self.config["images_per_file"]
 
     @property
     def hdf5_dset_shape(self) -> tuple[int, ...]:
@@ -209,7 +214,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         tuple[int, ...]
             The shape (number of datapoints) of the dataset.
         """
-        return self._config["hdf5_dset_shape"]
+        return self.config["hdf5_dset_shape"]
 
     @property
     def filename(self) -> Path:
@@ -221,7 +226,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         Path
             The filename.
         """
-        return self._config["filename"]
+        return self.config["filename"]
 
     @filename.setter
     def filename(self, filename: Path | str) -> None:
@@ -244,7 +249,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
                 f"Cannot find the file *{filename!s}* specified for the "
                 "ImageMetadataManager."
             )
-        self._config["filename"] = filename
+        self.config["filename"] = filename
 
     def update(self, filename: str | Path | None = None) -> None:
         """
@@ -266,7 +271,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     def update_input_data(self) -> None:
         """Update the image metadata from new input."""
-        _filename = self._config["filename"]
+        _filename = self.config["filename"]
         if get_extension(_filename) in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
@@ -276,7 +281,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from hdf5 file.
         """
-        _filename = self._config["filename"]
+        _filename = self.config["filename"]
         _key = self.get_param_value("hdf5_key")
         _slice_ax = self.get_param_value("hdf5_slicing_axis")
         verify_hdf5_dset_exists_in_file(_filename, _key)
@@ -289,8 +294,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         )
         _step = self.get_param_value("hdf5_stepping")
         _n_per_file = (_n1 - _n0 - 1) // _step + 1
-        self._config["numbers"] = range(_n0, _n1, _step)
-        self._config["hdf5_dset_shape"] = _meta["shape"]
+        self.config["numbers"] = range(_n0, _n1, _step)
+        self.config["hdf5_dset_shape"] = _meta["shape"]
         _img_shape = list(_meta["shape"][:])
         _img_shape.pop(_slice_ax)
         self.store_image_data(_img_shape, _meta["dtype"], _n_per_file)
@@ -319,9 +324,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     def _store_image_data_from_single_image(self) -> None:
         """Store config metadata from file range."""
-        _test_image = import_data(self._config["filename"])
-        self._config["numbers"] = [0]
-        self._config["hdf5_dset_shape"] = (0, 0, 0)
+        _test_image = import_data(self.config["filename"])
+        self.config["numbers"] = [0]
+        self.config["hdf5_dset_shape"] = (0, 0, 0)
         self.store_image_data(_test_image.shape, _test_image.dtype, 1)
 
     def store_image_data(
@@ -339,10 +344,10 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         n_image : int
             The number of images per file.
         """
-        self._config["images_per_file"] = n_image
-        self._config["datatype"] = img_dtype
-        self._config["raw_img_shape_x"] = img_shape[1]
-        self._config["raw_img_shape_y"] = img_shape[0]
+        self.config["images_per_file"] = n_image
+        self.config["datatype"] = img_dtype
+        self.config["raw_img_shape_x"] = img_shape[1]
+        self.config["raw_img_shape_y"] = img_shape[0]
 
     def _calculate_final_image_shape(self) -> None:
         """Process the ROI inputs and store the ROI."""
@@ -355,8 +360,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         else:
             _final_shape = (self.raw_size_y // _binning, self.raw_size_x // _binning)
             _roi = None
-        self._config["roi"] = _roi
-        self._config["final_shape"] = _final_shape
+        self.config["roi"] = _roi
+        self.config["final_shape"] = _final_shape
 
     def __check_roi_for_consistency(self) -> None:
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -49,12 +49,12 @@ class TestDummyLoader(unittest.TestCase):
 
     def test_input_available__true(self):
         plugin = DummyLoader()
-        plugin._config["input_available"] = 7
+        plugin.config["input_available"] = 7
         self.assertTrue(plugin.input_available(6))
 
     def test_input_available__false(self):
         plugin = DummyLoader()
-        plugin._config["input_available"] = 7
+        plugin.config["input_available"] = 7
         self.assertFalse(plugin.input_available(8))
 
     def test_pre_execute(self):

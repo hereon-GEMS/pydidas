@@ -307,9 +307,9 @@ check. These methods will also print some info for demonstration:
 
         def __init__(self, *args, **kwargs):
             pydidas.core.BaseApp.__init__(self, *args, **kwargs)
-            self._config["buffer_n"] = 20
-            self._config["shared_memory"] = {}
-            self._config["carryon_counter"] = 0
+            self.config["buffer_n"] = 20
+            self.config["shared_memory"] = {}
+            self.config["carryon_counter"] = 0
             self.shared_array = None
             self.shared_index_in_use = None
             self.results = None
@@ -325,22 +325,22 @@ check. These methods will also print some info for demonstration:
                 self.initialize_shared_memory()
             # create the shared arrays:
             self.shared_index_in_use = np.frombuffer(
-                self._config["shared_memory"]["flag"].get_obj(), dtype=np.int32
+                self.config["shared_memory"]["flag"].get_obj(), dtype=np.int32
             )
             self.shared_array = np.frombuffer(
-                self._config["shared_memory"]["data"].get_obj(), dtype=np.float32
-            ).reshape((self._config["buffer_n"],) + self.get_param_value("image_shape"))
+                self.config["shared_memory"]["data"].get_obj(), dtype=np.float32
+            ).reshape((self.config["buffer_n"],) + self.get_param_value("image_shape"))
             self.results = np.zeros(
                 (self._tasks.size,) + self.get_param_value("image_shape")
             )
 
         def initialize_shared_memory(self):
-            _n = self._config["buffer_n"]
+            _n = self.config["buffer_n"]
             _num = int(
-                self._config["buffer_n"] * np.prod(self.get_param_value("image_shape"))
+                self.config["buffer_n"] * np.prod(self.get_param_value("image_shape"))
             )
-            self._config["shared_memory"]["flag"] = mp.Array("I", _n, lock=mp.Lock())
-            self._config["shared_memory"]["data"] = mp.Array("f", _num, lock=mp.Lock())
+            self.config["shared_memory"]["flag"] = mp.Array("I", _n, lock=mp.Lock())
+            self.config["shared_memory"]["data"] = mp.Array("f", _num, lock=mp.Lock())
 
         def multiprocessing_get_tasks(self):
             return self._tasks
@@ -359,8 +359,8 @@ check. These methods will also print some info for demonstration:
             """
             Count up and carry on only for every second call.
             """
-            self._config["carryon_counter"] += 1
-            _carryon = self._config["carryon_counter"] % 2 == 0
+            self.config["carryon_counter"] += 1
+            _carryon = self.config["carryon_counter"] % 2 == 0
             print("Carry on check: ", _carryon)
             return _carryon
 
@@ -371,7 +371,7 @@ check. These methods will also print some info for demonstration:
             _shape = self.get_param_value("image_shape")
             # now, acquire the lock for the shared array and find the first empty
             # buffer position and write the image to it:
-            _index_lock = self._config["shared_memory"]["flag"]
+            _index_lock = self.config["shared_memory"]["flag"]
             while True:
                 _index_lock.acquire()
                 _zeros = np.where(self.shared_index_in_use == 0)[0]
@@ -386,7 +386,7 @@ check. These methods will also print some info for demonstration:
             return _buffer_pos
 
         def multiprocessing_store_results(self, task_index, buffer_index):
-            _index_lock = self._config["shared_memory"]["flag"]
+            _index_lock = self.config["shared_memory"]["flag"]
             _index_lock.acquire()
             self.results[task_index] = self.shared_array[buffer_index]
             self.shared_index_in_use[buffer_index] = 0

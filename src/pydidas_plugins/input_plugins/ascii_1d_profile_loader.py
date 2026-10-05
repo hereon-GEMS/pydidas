@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ MCA spectral data
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -88,7 +88,7 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
 
     def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._config.update({"header_lines": 0})
+        self.config.update({"header_lines": 0})
         self.__xscale_valid = False
         self.__yslice = None
         self._standard_kwargs = {}
@@ -150,8 +150,8 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
             if not self.__xscale_valid:
                 self.__create_x_scale(_dataset.size)
             _dataset.update_axis_label(0, self.get_param_value("x_label"))
-            _dataset.update_axis_unit(0, self._config["axis_unit"])
-            _dataset.update_axis_range(0, self._config["axis_range"])
+            _dataset.update_axis_unit(0, self.config["axis_unit"])
+            _dataset.update_axis_range(0, self.config["axis_range"])
         return _dataset, kwargs
 
     def __create_x_scale(self, n_points: int) -> None:
@@ -166,6 +166,6 @@ class ASCII1dProfileLoader(Input1dXRangeMixin, InputPlugin):
         _unit = self.get_param_value("x_unit")
         _scale = np.arange(n_points) * self.get_param_value("x_delta")
         _scale += self.get_param_value("x0_offset")
-        self._config["axis_unit"] = _unit
-        self._config["axis_range"] = _scale
+        self.config["axis_unit"] = _unit
+        self.config["axis_range"] = _scale
         self.__xscale_valid = True

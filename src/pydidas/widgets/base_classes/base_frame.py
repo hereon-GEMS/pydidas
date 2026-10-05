@@ -37,6 +37,7 @@ from pydidas.core import (
     PydidasQsettingsMixin,
     UserConfigError,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.utils import ShowBusyMouse
 from pydidas.resources import icons
 from pydidas.widgets.base_classes.parameter_widget_mixin import ParameterWidgetMixIn
@@ -44,6 +45,7 @@ from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
 
 
 class BaseFrame(
+    ConfigDictMixin,
     PydidasQsettingsMixin,
     WidgetFactoryMixIn,
     ParameterWidgetMixIn,
@@ -106,7 +108,7 @@ class BaseFrame(
         self.menu_entry = kwargs.get("menu_entry", self.menu_entry)
         self.menu_title = kwargs.get("title", self.menu_title)
         self.icon = kwargs.get("icon", self.menu_icon)
-        self._config: dict[str, Any] = {"built": False}
+        ConfigDictMixin.__init__(self, config={"built": False}, super_init=False)
 
     @QtCore.Slot(int)
     def frame_activated(self, index: int) -> None:
@@ -123,22 +125,22 @@ class BaseFrame(
         index : int
             The index of the activated frame.
         """
-        if index == self.frame_index and not self._config["built"]:
+        if index == self.frame_index and not self.config["built"]:
             with ShowBusyMouse():
                 self.build_frame()
                 self.setUpdatesEnabled(True)
                 self.connect_signals()
                 self.finalize_ui()
-                self._config["built"] = True
+                self.config["built"] = True
                 try:
-                    _state = self._config.pop("state", None)
+                    _state = self.config.pop("state", None)
                     if _state:
                         self.restore_state(_state)
                 except UserConfigError as exc:
                     raise UserConfigError(
                         f"- Error restoring state for frame {self.menu_title}: {exc}\n"
                     )
-        self._config["frame_active"] = index == self.frame_index
+        self.config["frame_active"] = index == self.frame_index
         if index == self.frame_index:
             self.sig_this_frame_activated.emit()  # type: ignore[attr-defined]
 
@@ -197,7 +199,7 @@ class BaseFrame(
             A dictionary with the frame state information. The exact contents
             may vary for each BaseFrame implementation.
         """
-        self._config["state"] = state  # type: ignore[arg-type]
+        self.config["state"] = state  # type: ignore[arg-type]
         self.frame_index = state["frame_index"]
         for _key, _val in state["params"].items():
             if _key in self.params and _key not in self.params_not_to_restore:

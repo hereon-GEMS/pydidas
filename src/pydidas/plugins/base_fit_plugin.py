@@ -78,11 +78,11 @@ class BaseFitPlugin(ProcPlugin):
         self._details = {}
         self._fit_params = {}
         self._fit_presets = {}
-        self._config = self._config | {
-            "range_slice": None,
-            "settings_updated_from_data": False,
-            "data_x_hash": -1,
-        }
+        self.config.update(
+            range_slice=None,
+            settings_updated_from_data=False,
+            data_x_hash=-1,
+        )
 
     @property
     def detailed_results(self) -> dict:
@@ -113,24 +113,24 @@ class BaseFitPlugin(ProcPlugin):
         Set up the required functions and fit variable labels.
         """
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
-        self._config["range_slice"] = None
-        self._config["settings_updated_from_data"] = False
-        self._config["min_peak_height"] = self.get_param_value("fit_min_peak_height")
-        self._config["sigma_threshold"] = self.get_param_value("fit_sigma_threshold")
-        self._config["result_shape"] = (self.num_peaks, len(self.fit_outputs))
+        self.config.range_slice = None
+        self.config.settings_updated_from_data = False
+        self.config["min_peak_height"] = self.get_param_value("fit_min_peak_height")
+        self.config["sigma_threshold"] = self.get_param_value("fit_sigma_threshold")
+        self.config["result_shape"] = (self.num_peaks, len(self.fit_outputs))
         for _key in ["param_bounds_low", "param_bounds_high", "param_labels"]:
-            self._config[_key] = getattr(self._fitter, _key).copy()
+            self.config[_key] = getattr(self._fitter, _key).copy()
         _bg_order = self.get_param_value("fit_bg_order")
         self.output_data_label = self.get_param_value("fit_output")
         self.output_data_unit = ""
         if _bg_order in [0, 1]:
-            self._config["param_labels"].append("background_p0")
-            self._config["param_bounds_low"].append(-np.inf)
-            self._config["param_bounds_high"].append(np.inf)
+            self.config["param_labels"].append("background_p0")
+            self.config.param_bounds_low.append(-np.inf)
+            self.config.param_bounds_high.append(np.inf)
         if _bg_order == 1:
-            self._config["param_labels"].append("background_p1")
-            self._config["param_bounds_low"].append(-np.inf)
-            self._config["param_bounds_high"].append(np.inf)
+            self.config["param_labels"].append("background_p1")
+            self.config.param_bounds_low.append(-np.inf)
+            self.config.param_bounds_high.append(np.inf)
         self.update_fit_param_bounds()
         self.create_fit_start_param_dict()
 
@@ -166,8 +166,8 @@ class BaseFitPlugin(ProcPlugin):
             self._data,
             bg_order=self.get_param_value("fit_bg_order"),
             bounds=(
-                self._config["param_bounds_low"],
-                self._config["param_bounds_high"],
+                self.config.param_bounds_low,
+                self.config.param_bounds_high,
             ),
             **self._fit_presets,
         )
@@ -176,12 +176,12 @@ class BaseFitPlugin(ProcPlugin):
             _startguess,
             args=(self._data_x, self._data.array),
             bounds=(
-                self._config["param_bounds_low"],
-                self._config["param_bounds_high"],
+                self.config.param_bounds_low,
+                self.config.param_bounds_high,
             ),
         )
         _res_c = self._fitter.sort_fitted_peaks_by_position(tuple(_res.x))
-        self._fit_params = dict(zip(self._config["param_labels"], _res_c))
+        self._fit_params = dict(zip(self.config["param_labels"], _res_c))
         kwargs = kwargs | {
             "fit_params": self._fit_params,
             "fit_func": self._fitter.name,
@@ -211,12 +211,12 @@ class BaseFitPlugin(ProcPlugin):
         new_data : pydidas.core.Dataset
             The new dataset.
         """
-        _new_data = np.full(self._config["result_shape"], np.nan)
+        _new_data = np.full(self.config["result_shape"], np.nan)
         if valid and self.check_center_positions():
             _fit_pvals = tuple(self._fit_params.values())
             _datafit = self._fitter.profile(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
-            if _residual <= self._config["sigma_threshold"]:
+            if _residual <= self.config["sigma_threshold"]:
                 _new_data = self._write_valid_results(_new_data)
         else:  # results not valid
             _residual = np.nan
@@ -298,10 +298,10 @@ class BaseFitPlugin(ProcPlugin):
         self._data = data
         self._data_x = data.axis_ranges[0]
         self._crop_data_to_selected_range()
-        if not self._config["settings_updated_from_data"]:
+        if not self.config.settings_updated_from_data:
             self._update_node_output_labels()
             self._update_peak_bounds_from_data()
-            self._config["settings_updated_from_data"] = True
+            self.config.settings_updated_from_data = True
 
     def _crop_data_to_selected_range(self):
         """
@@ -322,12 +322,12 @@ class BaseFitPlugin(ProcPlugin):
             The slice object to crop the data to the given range.
         """
         if (
-            hash(self._data_x.tobytes()) != self._config["data_x_hash"]
-            or self._config["range_slice"] is None
+            hash(self._data_x.tobytes()) != self.config["data_x_hash"]
+            or self.config.range_slice is None
         ):
             _xlow = self.get_param_value("fit_lower_limit")
             _xhigh = self.get_param_value("fit_upper_limit")
-            self._config["data_x_hash"] = hash(self._data_x.tobytes())
+            self.config["data_x_hash"] = hash(self._data_x.tobytes())
             _range_low = (
                 np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
@@ -346,8 +346,8 @@ class BaseFitPlugin(ProcPlugin):
                     "FitSinglePeak plugin. The input data range is "
                     f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
                 )
-            self._config["range_slice"] = slice(_range[0], _range[-1] + 1)
-        return self._config["range_slice"]
+            self.config.range_slice = slice(_range[0], _range[-1] + 1)
+        return self.config.range_slice
 
     def _update_node_output_labels(self):
         """
@@ -371,16 +371,16 @@ class BaseFitPlugin(ProcPlugin):
         """
         for _key in ["", "1", "2", "3"]:
             _label = f"center{_key}"
-            if _label not in self._config["param_labels"]:
+            if _label not in self.config["param_labels"]:
                 continue
-            _index = self._config["param_labels"].index(_label)
+            _index = self.config["param_labels"].index(_label)
             _xlow = np.amin(self._data_x)
-            self._config["param_bounds_low"][_index] = max(
-                self._config["param_bounds_low"][_index], _xlow
+            self.config.param_bounds_low[_index] = max(
+                self.config.param_bounds_low[_index], _xlow
             )
             _xhigh = np.amax(self._data_x)
-            self._config["param_bounds_high"][_index] = min(
-                self._config["param_bounds_high"][_index], _xhigh
+            self.config.param_bounds_high[_index] = min(
+                self.config.param_bounds_high[_index], _xhigh
             )
 
     def update_fit_param_bounds(self):
@@ -390,10 +390,10 @@ class BaseFitPlugin(ProcPlugin):
                 _suffix = "low" if _key.endswith("_xlow") else "high"
                 _index = _key[8 : -(len(_suffix) + 2)]
                 _label = f"center{_index}"
-                _index = self._config["param_labels"].index(_label)
+                _index = self.config["param_labels"].index(_label)
                 _value = self.get_param_value(_key)
                 if _value is not None:
-                    self._config[f"param_bounds_{_suffix}"][_index] = _value
+                    self.config[f"param_bounds_{_suffix}"][_index] = _value
 
     def create_fit_start_param_dict(self):
         """
@@ -421,7 +421,7 @@ class BaseFitPlugin(ProcPlugin):
         bool
             Flag whether the input data has a sufficiently large peak.
         """
-        _min_peak = self._config["min_peak_height"]
+        _min_peak = self.config["min_peak_height"]
         if _min_peak is not None:
             _tmp_y, bg_params = self._fitter.estimate_background_params(
                 self._data_x, self._data, self.get_param_value("fit_bg_order")

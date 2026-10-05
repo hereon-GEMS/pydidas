@@ -58,10 +58,10 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     def __init__(self, **kwargs: Any) -> None:
         PydidasPlot2D.__init__(self, **kwargs)
-        self._config["marker_color"] = kwargs.get(
+        self.config["marker_color"] = kwargs.get(
             "marker_color", PYDIDAS_COLORS["orange"]
         )
-        self._config["roi_active"] = False
+        self.config["roi_active"] = False
         self.sigPlotSignal.connect(self._process_plot_signal)
 
     def set_marker_color(self, color: str) -> None:
@@ -77,7 +77,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             raise UserConfigError(
                 f"The selected color `{color}` is not a valid color name."
             )
-        self._config["marker_color"] = PYDIDAS_COLORS[color]
+        self.config["marker_color"] = PYDIDAS_COLORS[color]
 
     def draw_circle(
         self,
@@ -99,13 +99,13 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             DiffractionExperiment beamcenter. The default is None.
         """
         _center = (
-            self._config["diffraction_exp"].beamcenter if center is None else center
+            self.config["diffraction_exp"].beamcenter if center is None else center
         )
         self.addShape(
             radius * _COS_PHI_ARR + _center.x,
             radius * _SIN_PHI_ARR + _center.y,
             legend=legend,
-            color=self._config["marker_color"],
+            color=self.config["marker_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
@@ -122,8 +122,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         legend : str
             The reference legend entry for this line.
         """
-        _shape = self._config["diffraction_exp"].det_shape
-        _center = self._config["diffraction_exp"].beamcenter
+        _shape = self.config["diffraction_exp"].det_shape
+        _center = self.config["diffraction_exp"].beamcenter
         _intersects: PointList = ray_intersects_with_detector(_center, chi, _shape)
         if len(_intersects) == 0:
             return
@@ -134,7 +134,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _intersects.yarr,
             legend=legend,
             shape="polylines",
-            color=self._config["marker_color"],
+            color=self.config["marker_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
@@ -160,7 +160,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         if isinstance(azimuthal, tuple) and np.mod(azimuthal, 2 * np.pi).std() < 1e-6:
             azimuthal = None
         if radial is None and azimuthal is None:
-            _points = self._config["diffraction_exp"].det_corners
+            _points = self.config["diffraction_exp"].det_corners
         elif radial is not None:
             _points = self._calculate_points_for_radial_region(radial, azimuthal)
         else:  # radial is None and azimuthal is not None:
@@ -169,10 +169,10 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _points.xarr,
             _points.yarr,
             legend="roi",
-            color=self._config["marker_color"],
+            color=self.config["marker_color"],
             linewidth=2.0,
         )
-        self._config["roi_active"] = True
+        self.config["roi_active"] = True
 
     def _calculate_points_for_radial_region(
         self, radial: tuple[float, float], azimuthal: None | tuple[float, float]
@@ -193,7 +193,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         points : PointList
             The coordinates of the radial integration region.
         """
-        _center = self._config["diffraction_exp"].beamcenter
+        _center = self.config["diffraction_exp"].beamcenter
         _phi = (
             np.linspace(0, 2 * np.pi, num=145)
             if azimuthal is None
@@ -224,8 +224,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             A list of Point objects representing the corners of the azimuthal
             integration region on the detector.
         """
-        _ny, _nx = self._config["diffraction_exp"].det_shape
-        _center = self._config["diffraction_exp"].beamcenter
+        _ny, _nx = self.config["diffraction_exp"].det_shape
+        _center = self.config["diffraction_exp"].beamcenter
         _center_on_det = 0 <= _center.x <= _nx and 0 <= _center.y <= _ny
 
         _intersects0 = ray_intersects_with_detector(_center, azimuthal[0], (_ny, _nx))
@@ -242,7 +242,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             # detector in roi
             _chi_det = (Point(_nx / 2, _ny / 2) - _center).chi
             if azimuthal[0] < _chi_det < azimuthal[1]:
-                _points.extend(self._config["diffraction_exp"].det_corners)
+                _points.extend(self.config["diffraction_exp"].det_corners)
             else:
                 self.remove_plot_items("roi")
         elif len(_intersects0) == 2 and len(_intersects1) == 2:
@@ -275,7 +275,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         PointList
             A list of Point objects representing the corner points between the start
         """
-        _ny, _nx = self._config["diffraction_exp"].det_shape
+        _ny, _nx = self.config["diffraction_exp"].det_shape
         _points = PointList([startpoint])
         while True:
             if _points[-1].y == 0:

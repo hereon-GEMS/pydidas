@@ -94,17 +94,17 @@ class GridCurvePlot(WidgetWithParameters):
 
     def __init__(self, **kwargs: Any):
         WidgetWithParameters.__init__(self, **kwargs)
-        self._config: dict[str, Any] = {
-            "n_hor": kwargs.pop("n_hor", 2),
-            "n_vert": kwargs.pop("n_vert", 2),
-            "max_index": -1,
-            "num_dataset_plots": 0,
-            "num_plots_in_grid": 0,
-            "num_grid_spaces": 0,
-            "active_plot_indices": [],
-            "active_plot_keys": [],
-            "plot_visibility_changed": True,
-        }
+        self.config.update(
+            n_hor=kwargs.pop("n_hor", 2),
+            n_vert=kwargs.pop("n_vert", 2),
+            max_index=-1,
+            num_dataset_plots=0,
+            num_plots_in_grid=0,
+            num_grid_spaces=0,
+            active_plot_indices=[],
+            active_plot_keys=[],
+            plot_visibility_changed=True,
+        )
         self.set_default_params()
         self._datasets = {}
         self._yscaling = {}
@@ -226,32 +226,32 @@ class GridCurvePlot(WidgetWithParameters):
     @property
     def n_plots(self) -> int:
         """Get the total number of plots in the grid."""
-        return self._config["n_hor"] * self._config["n_vert"]
+        return self.config["n_hor"] * self.config["n_vert"]
 
     @property
     def n_plots_hor(self) -> int:
         """Get the total number of plots in the horizontal grid."""
-        return self._config["n_hor"]
+        return self.config["n_hor"]
 
     @n_plots_hor.setter
     def n_plots_hor(self, n_plots_hor: int) -> None:
         """Set the total number of plots in the horizontal grid."""
         if not isinstance(n_plots_hor, Integral):
             raise UserConfigError("The value of n_plots_hor must be an integer.")
-        self._config["n_hor"] = int(n_plots_hor)
+        self.config["n_hor"] = int(n_plots_hor)
         self.__updated_n_plot_numbers()
 
     @property
     def n_plots_vert(self) -> int:
         """Get the total number of plots in the vertical grid."""
-        return self._config["n_vert"]
+        return self.config["n_vert"]
 
     @n_plots_vert.setter
     def n_plots_vert(self, n_plots_vert: int) -> None:
         """Set the total number of plots in the vertical grid."""
         if not isinstance(n_plots_vert, Integral):
             raise UserConfigError("The value of n_plots_vert must be an integer.")
-        self._config["n_vert"] = int(n_plots_vert)
+        self.config["n_vert"] = int(n_plots_vert)
         self.__updated_n_plot_numbers()
 
     def set_plot_numbers(self, n_vert: int, n_hor: int) -> None:
@@ -269,20 +269,20 @@ class GridCurvePlot(WidgetWithParameters):
             raise UserConfigError(
                 "The values for n_plots_vert and n_plots_hor must be integers."
             )
-        self._config["n_vert"] = int(n_vert)
-        self._config["n_hor"] = int(n_hor)
+        self.config["n_vert"] = int(n_vert)
+        self.config["n_hor"] = int(n_hor)
         self.__updated_n_plot_numbers()
 
     def __updated_n_plot_numbers(self) -> None:
         """Run housekeeping after changing the number of plots."""
         _indices = list(
-            product(range(self._config["n_vert"]), range(self._config["n_hor"]))
+            product(range(self.config["n_vert"]), range(self.config["n_hor"]))
         )
-        self._config["active_plot_indices"] = _indices
-        self._config["active_plot_keys"] = [f"plot_{_i}_{_j}" for _i, _j in _indices]
-        self._config["plot_visibility_changed"] = True
+        self.config["active_plot_indices"] = _indices
+        self.config["active_plot_keys"] = [f"plot_{_i}_{_j}" for _i, _j in _indices]
+        self.config["plot_visibility_changed"] = True
         self._current_index = min(
-            self._config["max_index"] - (self.n_plots - 1), self._current_index
+            self.config["max_index"] - (self.n_plots - 1), self._current_index
         )
         self._current_index = max(0, self._current_index)
         if self._datasets:
@@ -291,7 +291,7 @@ class GridCurvePlot(WidgetWithParameters):
 
     def _update_navigation_widgets(self) -> None:
         """Update the edit indices in the bottom configuration."""
-        _max = self._config["max_index"] - (self.n_plots - 1)
+        _max = self.config["max_index"] - (self.n_plots - 1)
         for _key in ["button_forward", "button_forward_page", "button_end"]:
             self._widgets[_key].setEnabled(self._current_index < _max)
         for _key in ["button_backward", "button_back_page", "button_start"]:
@@ -310,7 +310,7 @@ class GridCurvePlot(WidgetWithParameters):
         self._yscaling = {}
         self._xscaling = {}
         self._plot_titles = {}
-        self._config["max_index"] = None
+        self.config["max_index"] = None
         self._update_plot()
 
     def set_scan(self, scan: Scan):
@@ -351,8 +351,8 @@ class GridCurvePlot(WidgetWithParameters):
             raise UserConfigError(
                 "All datasets must be 2- or 3-dimensional (i.e. have 2 or 3 axes)."
             )
-        self._config["max_index"] = min(_sizes) - 1 if _sizes else 0
-        self._config["plot_visibility_changed"] = True
+        self.config["max_index"] = min(_sizes) - 1 if _sizes else 0
+        self.config["plot_visibility_changed"] = True
         self._datasets = datasets
         for _key in self._datasets:
             if _key not in self._yscaling:
@@ -480,7 +480,7 @@ class GridCurvePlot(WidgetWithParameters):
         """
         _start_index = self._current_index
         # The n_plots - 1 is done because the starting index is inclusive
-        _max = self._config["max_index"] - (self.n_plots - 1)
+        _max = self.config["max_index"] - (self.n_plots - 1)
         match value:
             case "::start::":
                 self._current_index = 0
@@ -511,11 +511,11 @@ class GridCurvePlot(WidgetWithParameters):
         self._widgets["config_bottom"].setVisible(_should_be_visible)
         if not _should_be_visible:
             return
-        if self.n_plots != self._config["num_grid_spaces"]:
+        if self.n_plots != self.config["num_grid_spaces"]:
             self.__update_grid_for_plots()
         if (
-            len(self._datasets) != self._config["num_dataset_plots"]
-            or self.n_plots != self._config["num_plots_in_grid"]
+            len(self._datasets) != self.config["num_dataset_plots"]
+            or self.n_plots != self.config["num_plots_in_grid"]
         ):
             self.__create_plots_in_grid_if_needed()
         self.__update_plot_visibility()
@@ -530,12 +530,12 @@ class GridCurvePlot(WidgetWithParameters):
         for _key in [_key for _key in self._widgets if _key.startswith("plot_")]:
             _comparator = _key.removesuffix("_title")
             self._widgets[_key].setVisible(
-                _comparator in self._config["active_plot_keys"]
+                _comparator in self.config["active_plot_keys"]
             )
-        for _index, _key in enumerate(self._config["active_plot_keys"]):
+        for _index, _key in enumerate(self.config["active_plot_keys"]):
             if _key in self._widgets:
                 continue
-            _y, _x = self._config["active_plot_indices"][_index]
+            _y, _x = self.config["active_plot_indices"][_index]
             self.create_label(
                 f"{_key}_title",
                 f"Plot {_x + 1}, {_y + 1}",
@@ -549,7 +549,7 @@ class GridCurvePlot(WidgetWithParameters):
                 parent_widget=self._widgets["grid"],
                 gridPos=(2 * _y + 1, _x, 1, 1),
             )
-        self._config["num_grid_spaces"] = self.n_plots
+        self.config["num_grid_spaces"] = self.n_plots
 
     def __create_plots_in_grid_if_needed(self):
         """Create the required plot widgets in the grid if they do not exist yet."""
@@ -562,7 +562,7 @@ class GridCurvePlot(WidgetWithParameters):
             for _key in self._widgets
             if _key.startswith("plot_") and not _key.endswith("_title")
         ]
-        for _plot_key in self._config["active_plot_keys"]:
+        for _plot_key in self.config["active_plot_keys"]:
             _widget = self._widgets[_plot_key]
             if _widget.layout().count() != _n_data:
                 for _sub_key in [
@@ -579,16 +579,16 @@ class GridCurvePlot(WidgetWithParameters):
                         gridPos=(0, -1, 1, 1),
                         parent_widget=_plot_key,
                     )
-        self._config["num_dataset_plots"] = _n_data
-        self._config["num_plots_in_grid"] = len(_plot_keys)
+        self.config["num_dataset_plots"] = _n_data
+        self.config["num_plots_in_grid"] = len(_plot_keys)
 
     def __update_plot_visibility(self):
         """Update the visibility of the plot widgets based on the datasets."""
-        if self._config["plot_visibility_changed"]:
+        if self.config["plot_visibility_changed"]:
             for _idata, _data in enumerate(self._datasets.values()):
-                for _key in self._config["active_plot_keys"]:
+                for _key in self.config["active_plot_keys"]:
                     self._widgets[f"sub{_key}_{_idata}"].setVisible(_data is not None)
-            self._config["plot_visibility_changed"] = False
+            self.config["plot_visibility_changed"] = False
 
     def __plot_datasets(self):
         """Plot the datasets in the grid layout."""
@@ -600,7 +600,7 @@ class GridCurvePlot(WidgetWithParameters):
             for _i_plot in range(self.n_plots):
                 if self._current_index + _i_plot >= _data.shape[0]:
                     continue
-                _key = f"sub{self._config['active_plot_keys'][_i_plot]}_{_idata}"
+                _key = f"sub{self.config['active_plot_keys'][_i_plot]}_{_idata}"
                 self.__prepare_plot_for_new_data(
                     _data_key, _key, (_xmin, _xmax), (_ymin, _ymax)
                 )
@@ -676,7 +676,7 @@ class GridCurvePlot(WidgetWithParameters):
         for _iplot in range(self.n_plots):
             if self._current_index + _iplot >= self._local_scan.shape[0]:
                 continue
-            _key = self._config["active_plot_keys"][_iplot] + "_title"
+            _key = self.config["active_plot_keys"][_iplot] + "_title"
             _scan_index = _iplot + self._current_index
             _indices = self._local_scan.get_indices_from_ordinal(_scan_index)
             _indices_str = " / ".join(str(_i) for _i in _indices)
@@ -698,7 +698,7 @@ class GridCurvePlot(WidgetWithParameters):
         if source == "high":
             _low -= self.n_plots - 1
         self._current_index = max(
-            0, min(_low, self._config["max_index"] - (self.n_plots - 1))
+            0, min(_low, self.config["max_index"] - (self.n_plots - 1))
         )
         self._update_navigation_widgets()
         if self._current_index != _start_index:

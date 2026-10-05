@@ -60,7 +60,7 @@ def test_init(grid_plot: GridCurvePlot) -> None:
     assert grid_plot._datasets == {}
     assert grid_plot._yscaling == {}
     assert grid_plot._xscaling == {}
-    assert isinstance(grid_plot._config, dict)
+    assert isinstance(grid_plot.config, dict)
 
 
 @pytest.mark.slow
@@ -71,8 +71,8 @@ def test_set_n_plots(
 ) -> None:
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
-    assert grid_plot._config["n_hor"] == n_plots_hor
-    assert grid_plot._config["n_vert"] == n_plots_vert
+    assert grid_plot.config["n_hor"] == n_plots_hor
+    assert grid_plot.config["n_vert"] == n_plots_vert
     assert grid_plot.n_plots == n_plots_hor * n_plots_vert
 
 
@@ -85,8 +85,8 @@ def test_set_n_plots__w_data(
     grid_plot.n_plots_vert = n_plots_vert
     grid_plot.n_plots_hor = n_plots_hor
     grid_plot.set_datasets(**datasets)
-    assert grid_plot._config["n_hor"] == n_plots_hor
-    assert grid_plot._config["n_vert"] == n_plots_vert
+    assert grid_plot.config["n_hor"] == n_plots_hor
+    assert grid_plot.config["n_vert"] == n_plots_vert
     assert grid_plot.n_plots == n_plots_hor * n_plots_vert
     for _i_hor in range(n_plots_hor):
         for _i_vert in range(n_plots_vert):
@@ -109,11 +109,11 @@ def test_clear(grid_plot: GridCurvePlot) -> None:
     grid_plot._datasets = {"test1": None, "test2": [1, 2]}
     grid_plot._yscaling = {"test1": 1, "test2": 2}
     grid_plot._xscaling = {"test1": 1, "test2": 2}
-    grid_plot._config["max_index"] = 42
+    grid_plot.config["max_index"] = 42
     grid_plot.clear()
     for _key in ["_datasets", "_yscaling", "_xscaling"]:
         assert getattr(grid_plot, _key) == {}
-    assert grid_plot._config["max_index"] is None
+    assert grid_plot.config["max_index"] is None
 
 
 @pytest.mark.slow
@@ -122,7 +122,7 @@ def test_set_datasets(grid_plot: GridCurvePlot, datasets: dict) -> None:
     assert grid_plot._datasets == datasets
     assert grid_plot._yscaling == {k: (None, None) for k in datasets}
     assert grid_plot._xscaling == {k: (None, None) for k in datasets}
-    assert grid_plot._config["max_index"] == datasets["test1"].shape[0] - 1
+    assert grid_plot.config["max_index"] == datasets["test1"].shape[0] - 1
 
 
 def test_set_datasets__no_datasets(grid_plot: GridCurvePlot) -> None:

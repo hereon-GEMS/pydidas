@@ -65,15 +65,18 @@ class DataViewer(WidgetWithParameters):
     sig_plot2d_get_more_info_for_data = QtCore.Signal(float, float)
 
     def __init__(self, parent: QtWidgets.QWidget | None = None, **kwargs: Any) -> None:
-        WidgetWithParameters.__init__(self, parent=parent, **kwargs)
+        kwargs["parent"] = parent
+        _config = kwargs.get("config", {})
+        _config["multiline_layout"] = kwargs.get("multiline_layout", False)
+        _config["plot_title"] = None
+        kwargs["config"] = _config
+        WidgetWithParameters.__init__(self, **kwargs)
 
         self._data = None
         self._h5node = None
         self._active_view = None
         self._button_group = QtWidgets.QButtonGroup()
         self._view_config = DATA_VIEW_CONFIG["view-table"]
-        self._config["multiline_layout"] = kwargs.get("multiline_layout", False)
-        self._config["plot_title"] = None
         self._plot2d_config = {
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
@@ -94,7 +97,7 @@ class DataViewer(WidgetWithParameters):
         )
         self.add_any_widget(
             "axes_selector",
-            AxesSelector(multiline_layout=self._config["multiline_layout"]),
+            AxesSelector(multiline_layout=self.config["multiline_layout"]),
             gridPos=(1, 0, 1, 1),
             parent_widget="view_container",
             visible=False,
@@ -253,7 +256,7 @@ class DataViewer(WidgetWithParameters):
             _data = self._data
         if not isinstance(_data, Dataset):
             _data = Dataset(_data)
-        _view.display_data(_data, title=self._config["plot_title"])
+        _view.display_data(_data, title=self.config["plot_title"])
 
     def set_data(
         self,
@@ -292,7 +295,7 @@ class DataViewer(WidgetWithParameters):
             h5node = data
         self._h5node = h5node
         if title is not None:
-            self._config["plot_title"] = title
+            self.config["plot_title"] = title
         self._import_data(data)
         self._update_widgets_from_data()
         self._set_new_view()
@@ -379,7 +382,7 @@ class DataViewer(WidgetWithParameters):
             The title of the data. If None, the title will not be updated.
         """
         if title is not None:
-            self._config["plot_title"] = title
+            self.config["plot_title"] = title
         if not (isinstance(data, np.ndarray) and isinstance(self._data, np.ndarray)):
             raise UserConfigError(
                 "Can only update data if both the stored data and the new data "

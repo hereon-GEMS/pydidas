@@ -63,10 +63,10 @@ class IntegrationRoiParamContainer(WidgetWithParameters):
         self.setSizePolicy(*POLICY_MIN_MIN)
         self.set_default_params()
         self._plugin = kwargs.get("plugin", None)
-        self._config = self._config | {
-            "forced_edit_disable": kwargs.get("forced_edit_disable", False),
-            "roi_active": False,
-        }
+        self.config.update(
+            forced_edit_disable=kwargs.get("forced_edit_disable", False),
+            roi_active=False,
+        )
         self.create_param_widget(self.get_param("overlay_color"))
         self.create_empty_widget(
             "plugin_container",
@@ -153,7 +153,7 @@ class IntegrationRoiParamContainer(WidgetWithParameters):
         enabled : bool
             Editing enabled flag.
         """
-        if self._config["forced_edit_disable"]:
+        if self.config["forced_edit_disable"]:
             enabled = False
         for _type in ["rad", "azi"]:
             _type_long = "radial" if _type == "rad" else "azimuthal"

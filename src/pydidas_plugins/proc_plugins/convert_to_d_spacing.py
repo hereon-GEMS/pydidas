@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ patterns into a 2D radial/azimuthal map.
 """
 
 __author__ = "Nonni Heere"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -66,10 +66,10 @@ class ConvertToDSpacing(ProcPlugin):
         self._allowed_ax_choices = _AX_CHOICES
 
     def pre_execute(self):
-        self._config["ax_index"] = None
-        self._config["new_range"] = None
-        self._config["ax_indices"] = None
-        self._config["unit"] = (
+        self.config["ax_index"] = None
+        self.config["new_range"] = None
+        self.config["ax_indices"] = None
+        self.config["unit"] = (
             "nm" if self.get_param_value("d_spacing_unit") == "nm" else "A"
         )
 
@@ -90,21 +90,21 @@ class ConvertToDSpacing(ProcPlugin):
                 Any calling kwargs, appended by any changes in the function.
         """
         _new_data = data.copy()
-        if self._config["ax_index"] is None:
+        if self.config["ax_index"] is None:
             self._set_ax_index(data)
-        if self._config["new_range"] is None:
+        if self.config["new_range"] is None:
             self._calculate_new_range(_new_data)
-        _axis = self._config["ax_index"]
-        _new_data.update_axis_unit(_axis, self._config["unit"])
+        _axis = self.config["ax_index"]
+        _new_data.update_axis_unit(_axis, self.config["unit"])
         _new_data = _new_data[self._slicer]
-        _new_data.update_axis_range(_axis, self._config["new_range"])
+        _new_data.update_axis_range(_axis, self.config["new_range"])
         _new_data.update_axis_label(_axis, "d-spacing")
         return _new_data, kwargs
 
     def _set_ax_index(self, data: Dataset):
         for axis, label in data.axis_labels.items():
             if f"{label} / {data.axis_units[axis]}" in self._allowed_ax_choices:
-                self._config["ax_index"] = axis
+                self.config["ax_index"] = axis
                 self._slicer = tuple(slice(None) for _ in range(axis))
                 return
         raise UserConfigError(
@@ -127,7 +127,7 @@ class ConvertToDSpacing(ProcPlugin):
         data : Dataset
             The input data.
         """
-        _axis = self._config["ax_index"]
+        _axis = self.config["ax_index"]
         _slicer = [slice(None)] * data.ndim
         _range = data.axis_ranges[_axis].copy()
         _label_in = data.axis_labels[_axis]
@@ -139,7 +139,7 @@ class ConvertToDSpacing(ProcPlugin):
                 _range *= 10
             elif _unit_in == "A" and _unit_out == "nm":
                 _range /= 10
-            self._config["new_range"] = _range
+            self.config["new_range"] = _range
         else:
             _range = convert_polar_to_d_spacing(
                 _range,
@@ -152,5 +152,5 @@ class ConvertToDSpacing(ProcPlugin):
             if not np.all(_valid):
                 _range = _range[_valid]
             _slicer[_axis] = np.where(_valid)[0][::-1]
-            self._config["new_range"] = _range[::-1]
+            self.config["new_range"] = _range[::-1]
         self._slicer = tuple(_slicer)

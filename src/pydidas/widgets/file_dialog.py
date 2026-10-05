@@ -39,6 +39,7 @@ from pydidas.core import (
     PydidasQsettingsMixin,
     UserConfigError,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_child_qobject
@@ -80,7 +81,10 @@ class SelectionModel(QtCore.QIdentityProxyModel):
 
 
 class _PydidasFileDialog(
-    QtWidgets.QFileDialog, WidgetFactoryMixIn, PydidasQsettingsMixin
+    ConfigDictMixin,
+    QtWidgets.QFileDialog,
+    WidgetFactoryMixIn,
+    PydidasQsettingsMixin,
 ):
     """
     pydidas's subclassed QFileDialog with additional functionality.
@@ -121,13 +125,17 @@ class _PydidasFileDialog(
         WidgetFactoryMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._files_unselectable_model = SelectionModel(self)
-        self._config = {
-            "caption": kwargs.get("caption", None),
-            "type": kwargs.get("dialog_type", "open_file"),
-            "formats": kwargs.get("formats", None),
-            "info_string": kwargs.get("info_string", None),
-            "default_suffix": kwargs.get("default_suffix", None),
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "caption": kwargs.get("caption", None),
+                "type": kwargs.get("dialog_type", "open_file"),
+                "formats": kwargs.get("formats", None),
+                "info_string": kwargs.get("info_string", None),
+                "default_suffix": kwargs.get("default_suffix", None),
+            },
+            super_init=False,
+        )
         self._stored_dirs = {}
         self._stored_selections = {}
         self._calling_kwargs = {}
@@ -500,7 +508,7 @@ class _PydidasFileDialog(
         """Set the file dialog's nameFilter based on the specified formats."""
         _formats: str = self._calling_kwargs.get("formats", "")
         self.setNameFilter(_formats)
-        self._config["valid_extensions"] = None
+        self.config["valid_extensions"] = None
         if _formats is not None:
             if len(_formats) >= 2 and _formats.split(";;")[0] == "All files (*)":
                 self.selectNameFilter(_formats.split(";;")[1])
@@ -512,7 +520,7 @@ class _PydidasFileDialog(
             if "*" in _exts:
                 _exts.pop(_exts.index("*"))
             if _exts:
-                self._config["valid_extensions"] = _exts
+                self.config["valid_extensions"] = _exts
 
     def _get_extension(self) -> str:
         """
@@ -550,9 +558,9 @@ class _PydidasFileDialog(
         extension : str
             The extension.
         """
-        if self._config["valid_extensions"] is None:
+        if self.config["valid_extensions"] is None:
             return
-        if extension not in self._config["valid_extensions"]:
+        if extension not in self.config["valid_extensions"]:
             raise UserConfigError(
                 f"The given extension `{extension}` is invalid because the file type "
                 "is not supported for this use case."

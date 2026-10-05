@@ -181,18 +181,16 @@ class WorkflowTestFrame(BaseFrame):
         self._tree: WorkflowTree | None = None
         self._active_node = -1
         self._results = {}
-        self._config.update(
-            {
-                "shapes": {},
-                "labels": {},
-                "data_labels": {},
-                "plot_active": False,
-                "plot_dim": 1,
-                "details_active": False,
-                "exp_hash": -1,
-                "context_hash": -1,
-                "has_details": False,
-            }
+        self.config.update(
+            shapes={},
+            labels={},
+            data_labels={},
+            plot_active=False,
+            plot_dim=1,
+            details_active=False,
+            exp_hash=-1,
+            context_hash=-1,
+            has_details=False,
         )
 
     def build_frame(self) -> None:
@@ -239,8 +237,8 @@ class WorkflowTestFrame(BaseFrame):
         Check if the WorkflowTree has changed and update the local Tree if
         it has changed.
         """
-        if self._config["context_hash"] != hash((hash(SCAN), hash(TREE), hash(EXP))):
-            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
+        if self.config["context_hash"] != hash((hash(SCAN), hash(TREE), hash(EXP))):
+            self.config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
             self.reload_workflow()
 
     @QtCore.Slot()
@@ -248,7 +246,7 @@ class WorkflowTestFrame(BaseFrame):
         """
         Set the flag to hide the details window.
         """
-        self._config["details_active"] = False
+        self.config["details_active"] = False
 
     @QtCore.Slot(int)
     def __updated_plugin_params(self, node_id: int) -> None:
@@ -263,7 +261,7 @@ class WorkflowTestFrame(BaseFrame):
         TREE.nodes[node_id].plugin.params = copy.deepcopy(
             self._tree.nodes[node_id].plugin.params
         )
-        _plugin_config = self._tree.nodes[node_id].plugin._config
+        _plugin_config = self._tree.nodes[node_id].plugin.config
         _arg = copy.copy(_plugin_config["input_data"])
         _kwargs = _plugin_config["input_kwargs"].copy() | {
             "force_store_results": True,
@@ -277,7 +275,7 @@ class WorkflowTestFrame(BaseFrame):
             if self._active_node != -1:
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
-            self._config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
+            self.config["context_hash"] = hash((hash(SCAN), hash(TREE), hash(EXP)))
 
     @QtCore.Slot()
     def __update_image_selection_visibility(self) -> None:
@@ -492,14 +490,14 @@ class WorkflowTestFrame(BaseFrame):
         """
         self._active_node = index
         if index == -1:
-            self._config["has_details"] = False
-            self._config["plot_active"] = False
+            self.config["has_details"] = False
+            self.config["plot_active"] = False
             if self._widgets["plot"].data_is_set:
                 self._widgets["plot"].set_data(None)
             return
         else:
-            self._config["plot_active"] = True
-            self._config["has_details"] = hasattr(
+            self.config["plot_active"] = True
+            self.config["has_details"] = hasattr(
                 self._tree.nodes[self._active_node].plugin, "detailed_results"
             )
         self.__set_derived_widget_visibility(index != -1)
@@ -532,7 +530,7 @@ class WorkflowTestFrame(BaseFrame):
         for _key in ["result_info", "but_tweak_params", "label_select_header", "plot"]:
             self._widgets[_key].setVisible(visible)
         self._widgets["but_show_details"].setVisible(
-            self._config["has_details"] and visible
+            self.config["has_details"] and visible
         )
 
     def __update_text_description_of_node_results(self) -> None:
@@ -548,13 +546,13 @@ class WorkflowTestFrame(BaseFrame):
 
     def __plot_results(self) -> None:
         """Update the plot with the latest data"""
-        if self._active_node == -1 or not self._config["plot_active"]:
+        if self._active_node == -1 or not self.config["plot_active"]:
             return
         self._widgets["plot"].set_data(self._results[self._active_node])
-        if self._config["details_active"] and self._config["has_details"]:
+        if self.config["details_active"] and self.config["has_details"]:
             self.show_plugin_details(set_focus=False)
         else:
-            self._config["details_active"] = False
+            self.config["details_active"] = False
             self.__details_window.hide()
 
     @QtCore.Slot()
@@ -570,7 +568,7 @@ class WorkflowTestFrame(BaseFrame):
         set_focus : bool, optional
             Keyword to set the focus on the new window. The default is True.
         """
-        self._config["details_active"] = True
+        self.config["details_active"] = True
         _plugin = self._tree.nodes[self._active_node].plugin
         _details = _plugin.detailed_results
         _title = _plugin.plugin_name + ' "' + _plugin.result_title + '"'
@@ -611,6 +609,6 @@ class WorkflowTestFrame(BaseFrame):
             self.__update_image_selection_visibility()
             self.__check_tree_uptodate()
         else:
-            if self._config["built"]:
+            if self.config["built"]:
                 self.__tweak_window.hide()
                 self.__details_window.hide()

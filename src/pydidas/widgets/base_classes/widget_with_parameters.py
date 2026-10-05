@@ -37,12 +37,14 @@ from pydidas.core import (
     PydidasQsettingsMixin,
     UserConfigError,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.base_classes.parameter_widget_mixin import ParameterWidgetMixIn
 from pydidas.widgets.base_classes.widget_factory_mixin import WidgetFactoryMixIn
 
 
 class WidgetWithParameters(
+    ConfigDictMixin,
     PydidasQsettingsMixin,
     WidgetFactoryMixIn,
     ParameterWidgetMixIn,
@@ -57,7 +59,7 @@ class WidgetWithParameters(
 
     def __init__(self, **kwargs: Any) -> None:
         self.params = ParameterCollection()
-        self._config: dict[str, Any] = {}
+        ConfigDictMixin.__init__(self, **(kwargs | {"super_init": False}))
         QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         WidgetFactoryMixIn.__init__(self)

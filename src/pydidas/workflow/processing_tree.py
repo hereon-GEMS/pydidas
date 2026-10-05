@@ -177,7 +177,7 @@ class ProcessingTree(GenericTree):
             raise UserConfigError("Root node has to be an input plugin")
         new_plugin.node_id = node_id
         self.nodes[node_id].plugin = new_plugin
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def get_consistent_and_inconsistent_nodes(self) -> tuple[list, list]:
         """
@@ -307,7 +307,7 @@ class ProcessingTree(GenericTree):
         _new_tree = ProcessingTreeIoMeta.import_from_file(filename)
         for _att in ["root", "node_ids", "nodes"]:
             setattr(self, _att, getattr(_new_tree, _att))
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def export_to_file(self, filename: Path | str, **kwargs: Any) -> None:
         """
@@ -363,7 +363,7 @@ class ProcessingTree(GenericTree):
                 "Workflow to be restored. The ProcessingTree has been reset."
             ) from _syntax_error
         self.restore_from_list_of_nodes(_nodes)
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def update_from_tree(self, tree: "ProcessingTree") -> None:
         """
@@ -410,7 +410,7 @@ class ProcessingTree(GenericTree):
             self.set_root(_new_nodes[0])
         else:
             self.clear()
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def get_current_results(self) -> dict:
         """

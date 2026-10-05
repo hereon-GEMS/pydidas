@@ -56,6 +56,13 @@ Programmatic changes
   be specified with `astype` instead of `datatype`.
 - Modified the default_frames to lazily load the frames and only
   import and return them on request.
+- Added a new dictionary subclass ConfigDict which enforces string
+  keys and exposes a public read-only property ``config`` to access
+  the dictionary.
+- The BaseApp (and subclasses) now use a ``default_config`` class attribute
+  to define the default configuration for the app. This allows a more
+  generic way to reset the configuration to default values and to handle
+  the state import.
 
 
 Bugfixes

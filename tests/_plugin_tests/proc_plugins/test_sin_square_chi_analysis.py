@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -157,8 +157,8 @@ def test_init(plugin):
 def test_pre_execute(plugin):
     plugin._converter = lambda x: x
     plugin.pre_execute()
-    assert not plugin._config["flag_input_data_check"]
-    assert not plugin._config["flag_conversion_set_up"]
+    assert not plugin.config["flag_input_data_check"]
+    assert not plugin.config["flag_conversion_set_up"]
     assert plugin._converter == plugin._converter_identity
 
 
@@ -200,14 +200,14 @@ def test_check_input_data__fit_only_position(plugin, fitted_2theta_deg_data):
     fitted_2theta_deg_data.update_axis_label(1, "0: position")
     plugin.pre_execute()
     plugin._check_input_data(fitted_2theta_deg_data)
-    assert plugin._config["flag_input_data_check"]
+    assert plugin.config["flag_input_data_check"]
 
 
 @pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
 def test_check_input_data__valid(plugin, fitted_data):
     plugin.pre_execute()
     plugin._check_input_data(fitted_data)
-    assert plugin._config["flag_input_data_check"]
+    assert plugin.config["flag_input_data_check"]
 
 
 @pytest.mark.parametrize("fitted_data", list(_RANGES), indirect=True)
@@ -216,8 +216,8 @@ def test_set_up_converter(plugin, fitted_data, output_type):
     plugin.set_param_value("output_type", output_type)
     plugin.pre_execute()
     plugin._set_up_converter(fitted_data)
-    assert plugin._config["flag_conversion_set_up"]
-    assert isinstance(plugin._config["converter_args"], tuple)
+    assert plugin.config["flag_conversion_set_up"]
+    assert isinstance(plugin.config["converter_args"], tuple)
     assert callable(plugin._converter)
 
 
@@ -359,7 +359,7 @@ def test_create_detailed_results(plugin, fitted_2theta_deg_data):
 
 def test_write_results(plugin, fitted_2theta_deg_data):
     plugin.set_param_value("output_export_images_flag", True)
-    plugin._config["global_index"] = 2
+    plugin.config["global_index"] = 2
     plugin.pre_execute()
     _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(
         fitted_2theta_deg_data
@@ -379,7 +379,7 @@ def test_write_results(plugin, fitted_2theta_deg_data):
 
 def test_write_results__all_nan(plugin, fitted_2theta_deg_data):
     plugin.set_param_value("output_export_images_flag", True)
-    plugin._config["global_index"] = 2
+    plugin.config["global_index"] = 2
     plugin.pre_execute()
     fitted_2theta_deg_data[:] = np.nan
     _sin_square_chi_data, _sin_2chi_data = plugin._regroup_data_w_sin_chi(

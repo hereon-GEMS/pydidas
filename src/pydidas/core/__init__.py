@@ -31,50 +31,51 @@ __status__ = "Production"
 from . import constants, generic_params, io_registry, lazy_imports, utils
 
 # import items from modules:
-from .base_app import *
-from .dataset import *
-
-# import exceptions first to be used in other modules
-from .exceptions import *
-from .generic_parameters import *
-from .object_with_parameter_collection import *
-from .parameter import *
-from .parameter_classes import *
-from .parameter_collection import *
-from .parameter_collection_mixin import *
-from .pydidas_q_settings import *
-from .pydidas_q_settings_mixin import *
-from .singleton import *
+from .base_app import BaseApp
+from .config_dict import ConfigDict
+from .config_dict_mixin import ConfigDictMixin
+from .dataset import Dataset
+from .exceptions import (
+    FileReadError,
+    PydidasConfigError,
+    PydidasGuiError,
+    UserConfigError,
+)
+from .generic_parameters import get_generic_param_collection, get_generic_parameter
+from .object_with_parameter_collection import ObjectWithParameterCollection
+from .parameter import Parameter
+from .parameter_classes import Hdf5key, NXdataKey
+from .parameter_collection import ParameterCollection
+from .parameter_collection_mixin import ParameterCollectionMixIn
+from .pydidas_q_settings import PydidasQsettings
+from .pydidas_q_settings_mixin import PydidasQsettingsMixin
+from .singleton import QtSingleton, Singleton
 
 
 __all__: list[str] = (
+    # modules:
     ["constants", "generic_params", "io_registry", "utils", "lazy_imports"]
-    + base_app.__all__
-    + dataset.__all__
+    # exceptions:
+    + ["FileReadError", "UserConfigError", "PydidasConfigError", "PydidasGuiError"]
+    # objects:
+    + [
+        "BaseApp",
+        "ConfigDict",
+        "ConfigDictMixin",
+        "Dataset",
+        "Hdf5key",
+        "NXdataKey",
+        "ObjectWithParameterCollection",
+        "Parameter",
+        "ParameterCollection",
+        "ParameterCollectionMixIn",
+        "PydidasQsettings",
+        "PydidasQsettingsMixin",
+        "Singleton",
+        "QtSingleton",
+    ]
+    # functions:
+    + ["get_generic_param_collection", "get_generic_parameter"]
+    # exceptions:
     + exceptions.__all__
-    + generic_parameters.__all__
-    + parameter_classes.__all__
-    + object_with_parameter_collection.__all__
-    + parameter.__all__
-    + parameter_collection.__all__
-    + parameter_collection_mixin.__all__
-    + pydidas_q_settings.__all__
-    + pydidas_q_settings_mixin.__all__
-    + singleton.__all__
-)
-
-# Clean up the namespace
-del (
-    base_app,
-    dataset,
-    exceptions,
-    generic_parameters,
-    parameter_classes,
-    object_with_parameter_collection,
-    parameter,
-    parameter_collection,
-    parameter_collection_mixin,
-    pydidas_q_settings,
-    pydidas_q_settings_mixin,
-    singleton,
 )

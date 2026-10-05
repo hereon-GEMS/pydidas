@@ -395,13 +395,13 @@ class DefineDiffractionExpFrame(BaseFrame):
         """
         super().frame_activated(index)
         if index == self.frame_index:
-            if hash(self.params) != self._config["exp_hash"]:
+            if hash(self.params) != self.config["exp_hash"]:
                 for _key, _param in EXP.params.items():
                     self.update_param_widget_value(_key, _param.value)
-                self._config["exp_hash"] = hash(self.params)
+                self.config["exp_hash"] = hash(self.params)
                 self._update_beamcenter()
         else:
-            self._config["exp_hash"] = hash(self.params)
+            self.config["exp_hash"] = hash(self.params)
 
     @QtCore.Slot()
     def convert_from_fit2d(self) -> None:

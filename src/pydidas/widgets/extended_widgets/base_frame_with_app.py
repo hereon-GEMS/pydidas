@@ -83,7 +83,7 @@ class BaseFrameWithApp(BaseFrame):
             return
         for param_key in app.params:
             self._app.set_param_value(param_key, app.get_param_value(param_key))
-        self._app._config.update(app._config)
+        self._app.config.update(app.config)
         for att in self._app_attributes_to_update:
             _att_val = getattr(app, att)
             setattr(self._app, att, _att_val)

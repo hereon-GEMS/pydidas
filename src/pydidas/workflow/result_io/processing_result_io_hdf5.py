@@ -69,7 +69,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
 
     def __init__(self):
         super().__init__()
-        self._config["metadata_written"] = False
+        self.config["metadata_written"] = False
 
     def prepare_files_and_directories(
         self,
@@ -127,13 +127,13 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         **kwargs : Any
             Not used in the HDF5 implementation.
         """
-        _scan = self._config["scan"]
+        _scan = self.config["scan"]
         _indices = _scan.get_indices_from_ordinal(index)
-        if not self._config.get("metadata_written", False):
+        if not self.config.get("metadata_written", False):
             _metadata = self._combine_scan_and_frame_metadata(frame_result_dict, _scan)
             self.create_result_nxdata_entry(_metadata)
         for _node_id, _data in frame_result_dict.items():
-            _file_path = self._config["filenames"][_node_id]
+            _file_path = self.config["filenames"][_node_id]
             with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][_indices] = _data
 
@@ -153,12 +153,12 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             Flag to toggle squeezing of empty dimensions. If True, the data
             will be squeezed to remove empty dimensions. The default is False.
         """
-        if not self._config.get("metadata_written", False):
+        if not self.config.get("metadata_written", False):
             self.create_result_nxdata_entry(full_data, squeeze=squeeze)
         for _node_id, _data in full_data.items():
             if squeeze:
                 _data = _data.squeeze()
-            _file_path = self._config["filenames"][_node_id]
+            _file_path = self.config["filenames"][_node_id]
             with h5py.File(_file_path, "r+") as _file:  # type: ignore[operator]
                 _file["entry/data/data"][()] = _data.array
 
@@ -183,7 +183,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
             Flag to toggle squeezing of empty dimensions. If True, the data
             will be squeezed to remove empty dimensions. The default is False.
         """
-        _scan_shape = self._config["scan"].shape
+        _scan_shape = self.config["scan"].shape
         _squeezed_scan_dims = (
             ";".join([str(i) for i, n in enumerate(_scan_shape) if n == 1])
             if squeeze
@@ -197,7 +197,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                 _metadata = _metadata.property_dict
             _ndim = len(_metadata["axis_labels"])
             _shape = tuple(_ax.size for _ax in _metadata["axis_ranges"].values())
-            _file_path = self._config["filenames"][_id]
+            _file_path = self.config["filenames"][_id]
             with h5py.File(_file_path, "r+") as _h5file:
                 _nxdata_group = _h5file["entry/data"]
                 _dset = _nxdata_group.create_dataset(
@@ -222,7 +222,7 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
                     "squeezed_scan_dims",
                     _squeezed_scan_dims,
                 )
-        self._config["metadata_written"] = True
+        self.config["metadata_written"] = True
 
     update_result_metadata = create_result_nxdata_entry
 
@@ -342,15 +342,15 @@ class ProcessingResultIoHdf5(ProcessingResultIoBase):
         result_info : PluginResultInfo
             The PluginResultInfo object for the node.
         """
-        _file_path = self._config["filenames"][node_id]
+        _file_path = self.config["filenames"][node_id]
         if _file_path.is_file():
             _file_path.unlink()
-        ScanIoHdf5.export_to_file(_file_path, replace=True, scan=self._config["scan"])
+        ScanIoHdf5.export_to_file(_file_path, replace=True, scan=self.config["scan"])
         DiffractionExperimentIoHdf5.export_to_file(
-            _file_path, replace=True, diffraction_exp=self._config["diffraction_exp"]
+            _file_path, replace=True, diffraction_exp=self.config["diffraction_exp"]
         )
         ProcessingTreeIoHdf5.export_to_file(
-            _file_path, self._config["processing_tree"], replace=True
+            _file_path, self.config["processing_tree"], replace=True
         )
         with h5py.File(_file_path, "a") as h5file:
             _node_info_group = nxs_create_recursive_groups(

@@ -90,15 +90,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._EXP = plugin._EXP
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
-        self._config = self._config | {
-            "azimuthal_active": False,
-            "beamcenter": self._EXP.beamcenter,
-            "closing_confirmed": False,
-            "det_dist": self._EXP.get_param_value("detector_dist"),
-            "only_show_roi": kwargs.get("only_show_roi", False),
-            "radial_active": False,
-            "rad_unit": self._plugin.get_param_value("rad_unit"),
-        }
+        self.config.update(
+            azimuthal_active=False,
+            beamcenter=self._EXP.beamcenter,
+            closing_confirmed=False,
+            det_dist=self._EXP.get_param_value("detector_dist"),
+            only_show_roi=kwargs.get("only_show_roi", False),
+            radial_active=False,
+            rad_unit=self._plugin.get_param_value("rad_unit"),
+        )
         self._image = None
         self.frame_activated(self.frame_index)
 
@@ -108,7 +108,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             "label_title",
             (
                 "Display integration region"
-                if self._config["only_show_roi"]
+                if self.config["only_show_roi"]
                 else "Select integration region"
             ),
             bold=True,
@@ -167,7 +167,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.add_any_widget(
             "roi_selector",
             IntegrationRoiParamContainer(
-                forced_edit_disable=self._config["only_show_roi"],
+                forced_edit_disable=self.config["only_show_roi"],
                 plugin=self._plugin,
             ),
             parent_widget=self._widgets["left_container"],
@@ -202,8 +202,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
         self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
         self._roi_controller.show_plot_items("roi")
-        if self._config["only_show_roi"]:
-            self._config["closing_confirmed"] = True
+        if self.config["only_show_roi"]:
+            self.config["closing_confirmed"] = True
         self._roi_controller.update_input_widgets()
 
     @QtCore.Slot(bool)
@@ -241,7 +241,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     @QtCore.Slot()
     def _confirm_changes(self) -> None:
         """Confirm all changes made to the plugin and close the window."""
-        self._config["closing_confirmed"] = True
+        self.config["closing_confirmed"] = True
         self.sig_roi_changed.emit()
         self.close()
 
@@ -254,7 +254,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        if self._config["closing_confirmed"]:
+        if self.config["closing_confirmed"]:
             self.sig_about_to_close.emit()
             event.accept()
             return

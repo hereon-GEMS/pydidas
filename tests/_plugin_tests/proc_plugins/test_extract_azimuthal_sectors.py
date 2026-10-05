@@ -87,10 +87,8 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("ExtractAzimuthalSectors")()
         plugin.set_param_value("centers", "90; 170; 240")
         plugin.pre_execute()
-        self.assertIsInstance(plugin._config["centers"], tuple)
-        self.assertTrue(
-            np.allclose(plugin._config["centers"], np.array((90, 170, 240)))
-        )
+        self.assertIsInstance(plugin.config["centers"], tuple)
+        self.assertTrue(np.allclose(plugin.config["centers"], np.array((90, 170, 240))))
 
     def test_update_settings_from_data__degree_width_10(self):
         plugin = self.get_default_plugin()

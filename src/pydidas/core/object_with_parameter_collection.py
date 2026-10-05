@@ -29,18 +29,22 @@ __status__ = "Production"
 __all__ = ["ObjectWithParameterCollection"]
 
 
-import warnings
 from copy import copy, deepcopy
 from typing import Any, Self
 
 from qtpy import QtCore
 
+from pydidas.core.config_dict import ConfigDict
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.parameter_collection_mixin import ParameterCollectionMixIn
 from pydidas.core.pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class ObjectWithParameterCollection(
-    ParameterCollectionMixIn, PydidasQsettingsMixin, QtCore.QObject
+    ConfigDictMixin,
+    ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
+    QtCore.QObject,
 ):
     """
     An object with a ParameterCollection.
@@ -60,7 +64,7 @@ class ObjectWithParameterCollection(
         QtCore.QObject.__init__(self, parent=kwargs.get("parent", None))
         PydidasQsettingsMixin.__init__(self)
         ParameterCollectionMixIn.__init__(self)
-        self._config: dict[str, Any] = {}
+        ConfigDictMixin.__init__(self, **(kwargs | {"super_init": False}))
 
     def __copy__(self) -> Self:
         """
@@ -73,7 +77,7 @@ class ObjectWithParameterCollection(
         """
         obj = self.__class__()
         obj.params = self.params.copy()
-        obj._config = copy(self._config)
+        obj._config = copy(self.config)
         return obj
 
     def __deepcopy__(self, memo: dict) -> Self:
@@ -92,7 +96,7 @@ class ObjectWithParameterCollection(
         """
         obj = self.__class__()
         obj.params = self.params.copy()
-        obj._config = deepcopy(self._config)
+        obj._config = deepcopy(self.config)
         return obj
 
     def __getstate__(self) -> dict:
@@ -104,7 +108,7 @@ class ObjectWithParameterCollection(
         state : dict
             The state dictionary.
         """
-        _state = {"params": self.params.copy(), "_config": copy(self._config)}
+        _state = {"params": self.params.copy(), "_config": copy(self.config)}
         if "shared_memory" in _state["_config"]:
             _state["_config"]["shared_memory"] = {}
         return _state
@@ -119,6 +123,8 @@ class ObjectWithParameterCollection(
             The pickled state.
         """
         for _key, _value in state.items():
+            if _key == "_config" and not isinstance(_value, ConfigDict):
+                _value = ConfigDict(_value)
             setattr(self, _key, _value)
 
     def __hash__(self) -> int:
@@ -134,35 +140,8 @@ class ObjectWithParameterCollection(
             The hash value.
         """
         _param_hash = hash(self.params)
-        _config_hash = self.__hash_dict(self._config)
+        _config_hash = hash(self.config)
         return hash((_param_hash, _config_hash))
-
-    def __hash_dict(self, item: dict) -> int:
-        """
-        Get a hash value for a dictionary.
-
-        Parameters
-        ----------
-        item : dict
-            The dictionary to hash.
-        """
-        if item == {}:
-            return 0
-        _config_keys = []
-        _config_vals = []
-        for _key, _val in item.items():
-            _config_keys.append(hash(_key))
-            try:
-                if isinstance(_val, dict):
-                    _hash = self.__hash_dict(_val)
-                else:
-                    if isinstance(_val, list):
-                        _val = tuple(_val)
-                    _hash = hash(_val)
-                _config_vals.append(_hash)
-            except TypeError:
-                warnings.warn(f'Could not hash the dictionary value "{_val}".')
-        return hash((tuple(_config_keys), tuple(_config_vals)))
 
     def copy(self) -> Self:
         """

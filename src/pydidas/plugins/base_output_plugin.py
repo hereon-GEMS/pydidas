@@ -41,6 +41,7 @@ class OutputPlugin(BasePlugin):
     """
 
     plugin_type = OUTPUT_PLUGIN
+    plugin_subtype = plugin_type
     plugin_name = "Base output plugin"
     output_data_dim = None
     generic_params = BasePlugin.generic_params.copy()

@@ -45,6 +45,7 @@ class InputPlugin(BasePlugin):
     """
 
     plugin_type = INPUT_PLUGIN
+    plugin_subtype = plugin_type
     plugin_name = "Base input plugin"
     output_data_label = "Image intensity"
     output_data_unit = "counts"

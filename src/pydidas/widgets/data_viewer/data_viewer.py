@@ -82,7 +82,7 @@ class DataViewer(WidgetWithParameters):
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
         }
-        self._pop_out_windows: list[Any] = []
+        self._pop_out_windows = []
         self._create_widgets()
 
     def _create_widgets(self) -> None:
@@ -108,6 +108,15 @@ class DataViewer(WidgetWithParameters):
         self.create_empty_widget(
             "container_for_buttons", gridPos=(-1, 0, 1, 1), visible=False
         )
+        self.create_button(
+            "button_pop-out",
+            "Open in new window",
+            checkable=False,
+            gridPos=(0, -1, 1, 1),
+            icon="mdi::open-in-new",
+            parent_widget="container_for_buttons",
+            clicked=self._on_pop_out_clicked,
+        )
         for _ref, _view in DATA_VIEW_CONFIG.items():
             self.create_button(
                 f"button_{_ref}",
@@ -119,16 +128,6 @@ class DataViewer(WidgetWithParameters):
                 clicked=partial(self._select_view, _ref),
             )
             self._button_group.addButton(self._widgets[f"button_{_ref}"], _view.id)
-        self._pop_out_window: DataViewerWindow | None = None
-        self.create_button(
-            "button_pop-out",
-            "Pop-Out",
-            checkable=False,
-            gridPos=(0, -1, 1, 1),
-            icon="mdi::image-multiple-outline",
-            parent_widget="container_for_buttons",
-            clicked=self._on_pop_out_clicked,
-        )
         layout = self.layout()
         if hasattr(layout, "setColumnStretch"):
             layout.setColumnStretch(0, 1)

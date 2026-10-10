@@ -23,10 +23,10 @@ ParameterWidgetMixIn Public API
 ---------------------------------
 
 :py:class:`ParameterWidgetMixIn
-<pydidas.widgets.parameter_config.ParameterWidgetMixIn>` is a mixin class that
+<pydidas.widgets.base_classes.ParameterWidgetMixIn>` is a mixin class that
 can be added to any ``QWidget`` subclass to provide managed creation, access,
 and synchronization of :py:class:`ParameterWidget
-<pydidas.widgets.parameter_config.ParameterWidget>` instances. It maintains two
+<pydidas.widgets.param_io.ParameterWidget>` instances. It maintains two
 internal registries:
 
 - ``param_widgets``: maps ``refkey`` -> the raw I/O widget (``BaseParamIoWidget``).
@@ -40,7 +40,7 @@ Both are populated automatically by ``create_param_widget``.
     (:py:class:`ParameterCollection <pydidas.core.ParameterCollection>`) and is
     a (subclass of) ``QWidget`` with a layout manager that supports adding
     widgets (e.g. ``QGridLayout``). :py:class:`ParameterEditCanvas
-    <pydidas.widgets.parameter_config.ParameterEditCanvas>` provides a
+    <pydidas.widgets.extended_widgets.ParameterEditCanvas>` provides a
     ready-to-use base class combining both.
 
 Methods

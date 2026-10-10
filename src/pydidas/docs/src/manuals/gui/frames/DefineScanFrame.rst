@@ -105,7 +105,7 @@ in-depth explanation, including images.
 .. tip::
 
     The detailed explanation for the scan dimensions can be found at
-    `Explanations of Scan dimensions <../../global/scan/dimension_help.html>`_.
+    :doc:`Explanations of Scan dimensions </manuals/global/scan/dimension_help>`.
 
 
 Global Parameters
@@ -129,11 +129,10 @@ ScanContext Parameters <scan_context_params>` found at the bottom of this page.
 .. tip::
 
     The detailed explanation for the scan file naming pattern are given in
-    `Explanations of Scan file naming
-    <../../global/scan/file_naming_help.html>`_.
+    :doc:`Explanations of Scan file naming </manuals/global/scan/file_naming_help>`.
 
-    The detailed explanation for multi-frame handling are given in `Explanations
-    of Scan multi-frame handling <../../global/scan/multi_frame_help.html>`_.
+    The detailed explanation for multi-frame handling are given in :doc:`Explanations
+    of Scan multi-frame handling </manuals/global/scan/multi_frame_help>`.
 
 
 Configuring a scan dimension

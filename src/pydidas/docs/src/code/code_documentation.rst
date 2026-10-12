@@ -45,7 +45,7 @@ pydidas is designed to be versatile and expandable. The processing is completely
 separated from the GUI and can be used from command line scripts as well.
 
 Generic functionality is grouped in basic sub-modules (for a full description
-please refer to the `Package Structure <package_structure.html>`_). Specific use
+please refer to the :doc:`Package Structure <package_structure>`). Specific use
 cases are defined as stand-alone applications and are agnostic to the way they
 are called (serial or parallel). Parallelization of apps is provided by the
 multiprocessing sub-package and works with all generic apps.

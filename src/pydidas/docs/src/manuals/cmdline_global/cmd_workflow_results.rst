@@ -163,12 +163,10 @@ Flattened scan dimensions
 
 For some applications, it might be interesting to ignore the detailed shape of
 the scan and flatten the scan to a *timeline*. The
-:py:meth:`get_results_for_flattened_scan(node_id)
-<pydidas.workflow.ProcessingResults.get_results_for_flattened_scan>` method
-allows to get a Dataset with all the scan dimensions flattened to a single
+argument ``flatten_scan_dims=True`` of the\n:py:meth:`get_results <pydidas.workflow.ProcessingResults.get_results>` method\nallows to get a Dataset with all the scan dimensions flattened to a single
 dimension renamed to *timeline*:
 
-.. automethod:: pydidas.workflow.ProcessingResults.get_results_for_flattened_scan
+.. automethod:: pydidas.workflow.ProcessingResults.get_results
     :noindex:
 
 An example is given below:
@@ -185,7 +183,7 @@ An example is given below:
 
     # Get the results with the first two dimensions (from the scan) concatenated
     # to a single dimension:
-    >>> res1_flat = RESULTS.get_results_for_flattened_scan(1)
+    >>> res1_flat = RESULTS.get_results(1, flatten_scan_dims=True)
     >>> res1_flat.shape
     (84, 1000)
     >>> res1_flat
@@ -242,7 +240,7 @@ in the example below:
 
     # Note that the slices must be a tuple, so we need to create a tuple with
     # the slice object:
-    >>> res1 = RESULTS.get_result_subset(1, (s, ), flattened_scan_dim=True)
+    >>> res1 = RESULTS.get_result_subset(1, (s, ), flatten_scan_dims=True)
     >>> res1.shape
     (16, 1000)
 

@@ -25,6 +25,8 @@ Improvements
 - Adjust svgs and background colors of nodes in workflow tree for better
   readability when system wide dark mode is enabled.
 - Added checks to prevent non-input plugins from being used as workflow roots.
+- Added an option to the DataViewer to display a Dataset in a new window
+  to allow comparisons of data.
 
 
 Programmatic changes

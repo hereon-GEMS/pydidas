@@ -44,7 +44,6 @@ from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,
     DataViewConfig,
 )
-from pydidas.widgets.windows import DataViewerWindow
 
 
 _DATASET_TOO_LARGE_ERROR = (
@@ -82,7 +81,7 @@ class DataViewer(WidgetWithParameters):
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
         }
-        self._pop_out_windows = []
+        self._pop_out_viewers = []
         self._create_widgets()
 
     def _create_widgets(self) -> None:
@@ -412,27 +411,27 @@ class DataViewer(WidgetWithParameters):
         """Open a new separate window for the current dataset."""
         if self._data is None:
             return
-        window = DataViewerWindow()
+        viewer = DataViewer()
+        viewer.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        viewer.destroyed.connect(self._on_pop_out_destroyed)
+        self._pop_out_viewers.append(viewer)
         title = self._config.get("plot_title") or "Dataset"
-        window.setWindowTitle(f"Data Viewer - {title}")
-        if "button_pop-out" in window.viewer._widgets:
-            window.viewer._widgets["button_pop-out"].setVisible(False)
-        window.viewer.set_data(self._data, title=title, h5node=self._h5node)
+        viewer.setWindowTitle(f"Data Viewer - {title}")
+        if "button_pop-out" in viewer._widgets:
+            viewer._widgets["button_pop-out"].setVisible(False)
+        viewer.set_data(self._data, title=title, h5node=self._h5node)
         if self._active_view is not None:
-            window.viewer._select_view(self._active_view)
-        self._pop_out_windows.append(window)
-        window.destroyed.connect(
-            lambda: (
-                self._pop_out_windows.remove(window)
-                if window in self._pop_out_windows
-                else None
-            )
-        )
-        window.frame_activated(window.frame_index)
-        window.show()
-        window.raise_()
-        window.activateWindow()
+            viewer._select_view(self._active_view)
+        viewer.show()
+        viewer.raise_()
+
+    def _on_pop_out_destroyed(self, obj: object) -> None:
+        """Removes the data viewer from the list"""
+        if obj in self._pop_out_viewers:
+            self._pop_out_viewers.remove(obj)
 
     def deleteLater(self) -> None:
         for _widget in self.findChildren(QtWidgets.QWidget):
             _widget.deleteLater()
+        for _viewer in self._pop_out_viewers:
+            _viewer.deleteLater()

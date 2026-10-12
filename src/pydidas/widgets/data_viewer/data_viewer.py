@@ -44,6 +44,7 @@ from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,
     DataViewConfig,
 )
+from pydidas_qtcore import PydidasQApplication
 
 
 _DATASET_TOO_LARGE_ERROR = (
@@ -422,6 +423,7 @@ class DataViewer(WidgetWithParameters):
         viewer.set_data(self._data, title=title, h5node=self._h5node)
         if self._active_view is not None:
             viewer._select_view(self._active_view)
+        PydidasQApplication.instance().sig_exit_pydidas.connect(viewer.deleteLater)
         viewer.show()
         viewer.raise_()
 
@@ -429,9 +431,3 @@ class DataViewer(WidgetWithParameters):
         """Removes the data viewer from the list"""
         if obj in self._pop_out_viewers:
             self._pop_out_viewers.remove(obj)
-
-    def deleteLater(self) -> None:
-        for _widget in self.findChildren(QtWidgets.QWidget):
-            _widget.deleteLater()
-        for _viewer in self._pop_out_viewers:
-            _viewer.deleteLater()

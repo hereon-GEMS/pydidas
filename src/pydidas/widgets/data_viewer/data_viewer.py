@@ -44,6 +44,7 @@ from pydidas.widgets.data_viewer.data_viewer_utils import (
     DATA_VIEW_CONFIG,
     DataViewConfig,
 )
+from pydidas_qtcore import PydidasQApplication
 
 
 _DATASET_TOO_LARGE_ERROR = (
@@ -81,6 +82,7 @@ class DataViewer(WidgetWithParameters):
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
         }
+        self._pop_out_viewers = []
         self._create_widgets()
 
     def _create_widgets(self) -> None:
@@ -105,6 +107,15 @@ class DataViewer(WidgetWithParameters):
         self._widgets["axes_selector"].sig_new_slicing.connect(self._update_view)
         self.create_empty_widget(
             "container_for_buttons", gridPos=(-1, 0, 1, 1), visible=False
+        )
+        self.create_button(
+            "button_pop-out",
+            "Open in new window",
+            checkable=False,
+            gridPos=(0, -1, 1, 1),
+            icon="mdi::open-in-new",
+            parent_widget="container_for_buttons",
+            clicked=self._on_pop_out_clicked,
         )
         for _ref, _view in DATA_VIEW_CONFIG.items():
             self.create_button(
@@ -397,6 +408,26 @@ class DataViewer(WidgetWithParameters):
         self._data = data
         self._update_view()
 
-    def deleteLater(self) -> None:
-        for _widget in self.findChildren(QtWidgets.QWidget):
-            _widget.deleteLater()
+    def _on_pop_out_clicked(self) -> None:
+        """Open a new separate window for the current dataset."""
+        if self._data is None:
+            return
+        viewer = DataViewer()
+        viewer.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        viewer.destroyed.connect(self._on_pop_out_destroyed)
+        self._pop_out_viewers.append(viewer)
+        title = self._config.get("plot_title") or "Dataset"
+        viewer.setWindowTitle(f"Data Viewer - {title}")
+        if "button_pop-out" in viewer._widgets:
+            viewer._widgets["button_pop-out"].setVisible(False)
+        viewer.set_data(self._data, title=title, h5node=self._h5node)
+        if self._active_view is not None:
+            viewer._select_view(self._active_view)
+        PydidasQApplication.instance().sig_exit_pydidas.connect(viewer.deleteLater)
+        viewer.show()
+        viewer.raise_()
+
+    def _on_pop_out_destroyed(self, obj: object) -> None:
+        """Removes the data viewer from the list"""
+        if obj in self._pop_out_viewers:
+            self._pop_out_viewers.remove(obj)

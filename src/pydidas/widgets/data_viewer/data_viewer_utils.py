@@ -68,7 +68,7 @@ DATA_VIEW_CONFIG = {
         title="Hdf5",
         ref="view-h5",
         widget=LazyObject(
-            "pydidas.widgets.data_viewer._silx_subclasses", "PydidasHdf5TableView"
+            "pydidas.widgets.data_viewer._silx_subclasses", "_PydidasHdf5TableView"
         ),
         use_axes_selector=False,
         additional_choices=None,

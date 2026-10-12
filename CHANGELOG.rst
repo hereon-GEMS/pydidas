@@ -119,6 +119,7 @@ Bugfixes
   workflow when trying to delete root nodes with multiple children.
 - Fixed an issue when the GUI state import fell back to default exit state
   states with custom names.
+- Fixed an issue with a wrong class reference name in the DataViewer
 
 
 v26.05.19

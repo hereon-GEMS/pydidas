@@ -635,12 +635,10 @@ def test_read_metadata_from_file__chi(temp_path):
 def test_read_metadata_from_file__specfile(temp_path):
     _fname = temp_path / "test.dat"
     _epoch = time.time()
-    _dt = datetime.datetime.now()  # noqa DTZ005
+    _dt = datetime.datetime.now()
     AsciiIo.export_to_file(_fname, _test_data, x_column=True, overwrite=True)
     _metadata = AsciiIo.read_metadata_from_file(_fname)
-    _delta = (
-        _dt - datetime.datetime.strptime(_metadata["date"], "%a %b %d %H:%M:%S %Y")  # noqa DTZ007
-    )
+    _delta = _dt - datetime.datetime.strptime(_metadata["date"], "%a %b %d %H:%M:%S %Y")
     assert _metadata["filename"] == _fname.name
     assert _metadata["epoch"] - _epoch < 5  # within 5 seconds
     assert abs(_delta.total_seconds()) < 5

@@ -182,7 +182,7 @@ class GeneralAsciiSaver(OutputPlugin):
         str
             The header string.
         """
-        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")  # noqa DTZ005
+        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
         return (
             f"#F {Path(self.get_output_filename('dat')).name}\n"
             + f"#E {time.time()}\n"

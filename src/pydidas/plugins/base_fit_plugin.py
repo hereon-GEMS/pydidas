@@ -26,17 +26,29 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
-from typing import ClassVar
+
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
-from qtpy import QtWidgets
 from scipy.optimize import least_squares
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins.base_proc_plugin import ProcPlugin
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.plugin_config_widgets import (
+        FitPluginConfigWidget,
+        GenericPluginConfigWidget,
+    )
+else:
+    FitPluginConfigWidget = LazyObject(
+        "pydidas.widgets.plugin_config_widgets", "FitPluginConfigWidget"
+    )
 
 
 class BaseFitPlugin(ProcPlugin):
@@ -70,7 +82,7 @@ class BaseFitPlugin(ProcPlugin):
     ]
     has_unique_parameter_config_widget = True
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._fitter = None
         self._data = None
@@ -108,7 +120,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         return [item.strip() for item in self.get_param_value("fit_output").split(";")]
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Set up the required functions and fit variable labels.
         """
@@ -135,7 +147,7 @@ class BaseFitPlugin(ProcPlugin):
         self.create_fit_start_param_dict()
 
     @process_1d_with_multi_input_dims
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
         """
         Fit a peak to the data.
 
@@ -147,7 +159,7 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         data : pydidas.core.Dataset
             The input Dataset
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
@@ -157,6 +169,7 @@ class BaseFitPlugin(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        self._details = {}
         self.prepare_input_data(data)
         if not self.check_min_peak_height():
             return self.create_result_dataset(valid=False), kwargs
@@ -204,18 +217,18 @@ class BaseFitPlugin(ProcPlugin):
         Parameters
         ----------
         valid : bool, optional
-            Flat to confirm the results are valid. The default is True.
+            Flag to confirm the results are valid. The default is True.
 
         Returns
         -------
-        new_data : pydidas.core.Dataset
+        new_data : Dataset
             The new dataset.
         """
         _new_data = np.full(self.config["result_shape"], np.nan)
         if valid and self.check_center_positions():
             _fit_pvals = tuple(self._fit_params.values())
-            _datafit = self._fitter.profile(_fit_pvals, self._data_x)
-            _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
+            _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
+            _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
             if _residual <= self.config["sigma_threshold"]:
                 _new_data = self._write_valid_results(_new_data)
         else:  # results not valid
@@ -243,13 +256,13 @@ class BaseFitPlugin(ProcPlugin):
         }
         return _result_dataset
 
-    def _write_valid_results(self, results: np.ndarray):
+    def _write_valid_results(self, results: np.ndarray) -> np.ndarray:
         """
         Write the valid results for the fit in the new data array.
 
         Parameters
         ----------
-        new_data : np.ndarray
+        results : np.ndarray
             The new data array.
 
         Returns
@@ -286,7 +299,7 @@ class BaseFitPlugin(ProcPlugin):
             if _key.startswith("center")
         }
 
-    def prepare_input_data(self, data: Dataset):
+    def prepare_input_data(self, data: Dataset) -> None:
         """
         Prepare and store the input data.
 
@@ -303,7 +316,7 @@ class BaseFitPlugin(ProcPlugin):
             self._update_peak_bounds_from_data()
             self.config.settings_updated_from_data = True
 
-    def _crop_data_to_selected_range(self):
+    def _crop_data_to_selected_range(self) -> None:
         """
         Get the data in the range specified by the limits and store the selected
         x-range and data values.
@@ -321,13 +334,11 @@ class BaseFitPlugin(ProcPlugin):
         slice
             The slice object to crop the data to the given range.
         """
-        if (
-            hash(self._data_x.tobytes()) != self.config["data_x_hash"]
-            or self.config.range_slice is None
-        ):
+        _x_hash = hash(self._data_x.tobytes())
+        if _x_hash != self.config["data_x_hash"] or self.config.range_slice is None:
             _xlow = self.get_param_value("fit_lower_limit")
             _xhigh = self.get_param_value("fit_upper_limit")
-            self.config["data_x_hash"] = hash(self._data_x.tobytes())
+            self.config["data_x_hash"] = _x_hash
             _range_low = (
                 np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
@@ -349,7 +360,7 @@ class BaseFitPlugin(ProcPlugin):
             self.config.range_slice = slice(_range[0], _range[-1] + 1)
         return self.config.range_slice
 
-    def _update_node_output_labels(self):
+    def _update_node_output_labels(self) -> None:
         """
         Update the node output labels based on the settings and the input data.
         """
@@ -365,7 +376,7 @@ class BaseFitPlugin(ProcPlugin):
         )
         self.output_data_label = _output
 
-    def _update_peak_bounds_from_data(self):
+    def _update_peak_bounds_from_data(self) -> None:
         """
         Update the bounds for the peaks' center from the data x ranges.
         """
@@ -383,7 +394,7 @@ class BaseFitPlugin(ProcPlugin):
                 self.config.param_bounds_high[_index], _xhigh
             )
 
-    def update_fit_param_bounds(self):
+    def update_fit_param_bounds(self) -> None:
         """Update the fitting bounds from Parameters."""
         for _key in self.params:
             if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
@@ -395,7 +406,7 @@ class BaseFitPlugin(ProcPlugin):
                 if _value is not None:
                     self.config[f"param_bounds_{_suffix}"][_index] = _value
 
-    def create_fit_start_param_dict(self):
+    def create_fit_start_param_dict(self) -> None:
         """
         Create a dictionary with preset fit starting values.
         """
@@ -434,7 +445,7 @@ class BaseFitPlugin(ProcPlugin):
         return True
 
     def create_detailed_results(
-        self, results: Dataset, start_fit_params: tuple[float]
+        self, results: Dataset, start_fit_params: tuple[float, ...]
     ) -> dict:
         """
         Create the detailed results for a single fit.
@@ -452,7 +463,7 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         results : pydidas.core.Dataset
             The Dataset with the regular results.
-        start_fit_params : tuple[float]
+        start_fit_params : tuple[float, ...]
             The list with the starting fit params.
 
         Returns
@@ -474,34 +485,27 @@ class BaseFitPlugin(ProcPlugin):
             "data_unit": self._data.data_unit,
         }
         _num_peaks = self._fitter.num_peaks
-        _num_peak_params = self._fitter.num_peak_params
-        _individual_plot_fitter = (
-            self._fitter.__mro__[1] if _num_peaks > 1 else self._fitter
-        )
-        _datafit = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
-        _startfit = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
+        _fit_final = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
+        _fit_start = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
+        _bg_data = self._fitter.calculate_background(_fit_param_vals, self._data_x)
         _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
         _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
-        individual_peaks = []
-        for i in range(_num_peaks):
-            if _individual_plot_fitter is None:
-                continue
-            _start = i * _num_peak_params
-            _end = _start + _num_peak_params
-            _peak_params = [
-                *_fit_param_vals[_start:_end],
-            ]
-            _peak_data = Dataset(
-                _individual_plot_fitter.profile(_peak_params, _xfit), **_dset_kws
-            )
-            individual_peaks.append(
-                {
-                    "plot": 1,
-                    "label": f"peak {i}",
-                    "data": _peak_data,
-                    "linewidth": 2.5,
-                }
-            )
+
+        _n_pp = self._fitter.num_peak_params
+        _individual_peaks = [
+            {
+                "plot": 1,
+                "label": f"peak {_i}",
+                "data": Dataset(
+                    self._fitter.func(
+                        _fit_param_vals[_i * _n_pp : (_i + 1) * _n_pp], _xfit
+                    ),
+                    **_dset_kws,
+                ),
+                "linewidth": 2.5,
+            }
+            for _i in range(_num_peaks)
+        ]
         _details = {
             "n_plots": 4,
             "plot_titles": {
@@ -512,7 +516,7 @@ class BaseFitPlugin(ProcPlugin):
             },
             "plot_ylabels": {
                 0: "intensity / a.u.",
-                1: "intensity / a.u.",
+                1: "intensity (background-corrected) / a.u.",
                 2: "intensity / a.u.",
                 3: "intensity / a.u.",
             },
@@ -536,15 +540,20 @@ class BaseFitPlugin(ProcPlugin):
                     "symbol": "o",
                     "linewidth": 0,
                 },
-                {"plot": 0, "label": "fitted_data", "data": _datafit, "linewidth": 2.5},
+                {
+                    "plot": 0,
+                    "label": "fitted_data",
+                    "data": _fit_final,
+                    "linewidth": 2.5,
+                },
                 {
                     "plot": 1,
                     "label": "input data",
-                    "data": self._data,
+                    "data": self._data - _bg_data,
                     "symbol": "o",
                     "linewidth": 0,
                 },
-                *individual_peaks,
+                *_individual_peaks,
                 {
                     "plot": 2,
                     "label": "reference",
@@ -559,7 +568,7 @@ class BaseFitPlugin(ProcPlugin):
                     "linewidth": 0,
                 },
                 {"plot": 3, "label": "input data", "data": self._data},
-                {"plot": 3, "label": "starting guess", "data": _startfit},
+                {"plot": 3, "label": "starting guess", "data": _fit_start},
             ],
         }
         if self.get_param_value("fit_bg_order") is not None:
@@ -576,8 +585,8 @@ class BaseFitPlugin(ProcPlugin):
         return _details
 
     def _create_details_for_invalid_peak(
-        self, bg_corrected_data: np.ndarray, bg_params: tuple[float]
-    ):
+        self, bg_corrected_data: np.ndarray, bg_params: tuple[float, ...]
+    ) -> dict:
         """
         Create the details for an invalid peak.
 
@@ -585,7 +594,7 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         bg_corrected_data : np.ndarray
             The background-corrected data.
-        bg_params : tuple[float]
+        bg_params : tuple[float, ...]
             The parameters to calculate the background level.
 
         Returns
@@ -595,7 +604,7 @@ class BaseFitPlugin(ProcPlugin):
         """
         if len(bg_params) == 0:
             return {
-                "n_plots": 3,
+                "n_plots": 1,
                 "plot_titles": {0: "data"},
                 "plot_ylabels": {0: "intensity / a.u."},
                 "metadata": "",
@@ -607,7 +616,7 @@ class BaseFitPlugin(ProcPlugin):
         if len(bg_params) == 2:
             _bg += self._data_x * bg_params[1]
         return {
-            "n_plots": 3,
+            "n_plots": 2,
             "plot_titles": {0: "data and background", 1: "background-corrected data"},
             "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
             "metadata": "",
@@ -628,17 +637,15 @@ class BaseFitPlugin(ProcPlugin):
             ],
         }
 
-    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
+    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
         """
-        Get the unique configuration widget associated with this Plugin.
+        Get the unique configuration widget class associated with this Plugin.
 
         Returns
         -------
-        QtWidgets.QWidget
-            The unique ParameterConfig widget
+        type[GenericPluginConfigWidget]
+            The unique ParameterConfig widget class.
         """
-        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
-
         return FitPluginConfigWidget
 
 

@@ -190,21 +190,21 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin = BaseFitPlugin()
         plugin.pre_execute()
         plugin.prepare_input_data(self._data)
-        self.assertTrue(plugin.check_min_peak_height())
+        self.assertTrue(plugin._check_min_peak_height())
 
     def test_check_min_peak_height__height_okay(self):
         plugin = BaseFitPlugin()
         plugin.set_param_value("fit_min_peak_height", 5)
         plugin.pre_execute()
         plugin.prepare_input_data(self._data)
-        self.assertTrue(plugin.check_min_peak_height())
+        self.assertTrue(plugin._check_min_peak_height())
 
     def test_check_min_peak_height__height_too_small(self):
         plugin = BaseFitPlugin()
         plugin.set_param_value("fit_min_peak_height", 50)
         plugin.pre_execute()
         plugin.prepare_input_data(self._data)
-        self.assertFalse(plugin.check_min_peak_height())
+        self.assertFalse(plugin._check_min_peak_height())
 
 
 if __name__ == "__main__":

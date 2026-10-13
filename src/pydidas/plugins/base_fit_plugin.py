@@ -97,13 +97,13 @@ class BaseFitPlugin(ProcPlugin):
         )
 
     @property
-    def detailed_results(self) -> dict:
+    def detailed_results(self) -> dict[str | None, dict[str, Any]]:
         """
         Get the detailed results for the FitSinglePeak plugin.
 
         Returns
         -------
-        dict
+        dict[str | None, dict[str, Any]]
             The dictionary with detailed results.
         """
         return self._details
@@ -121,9 +121,7 @@ class BaseFitPlugin(ProcPlugin):
         return [item.strip() for item in self.get_param_value("fit_output").split(";")]
 
     def pre_execute(self) -> None:
-        """
-        Set up the required functions and fit variable labels.
-        """
+        """Set up the required functions and fit variable labels."""
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
         self.config.range_slice = None
         self.config.settings_updated_from_data = False
@@ -144,7 +142,7 @@ class BaseFitPlugin(ProcPlugin):
             self.config.param_bounds_low.append(-np.inf)
             self.config.param_bounds_high.append(np.inf)
         self.update_fit_param_bounds()
-        self.create_fit_start_param_dict()
+        self._create_fit_start_param_dict()
 
     @process_1d_with_multi_input_dims
     def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
@@ -157,21 +155,21 @@ class BaseFitPlugin(ProcPlugin):
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             The input Dataset
         **kwargs : Any
             Any calling keyword arguments.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        _data : Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
         self._details = {}
         self.prepare_input_data(data)
-        if not self.check_min_peak_height():
+        if not self._check_min_peak_height():
             return self.create_result_dataset(valid=False), kwargs
 
         _startguess = self._fitter.guess_fit_start_params(
@@ -317,33 +315,17 @@ class BaseFitPlugin(ProcPlugin):
             self.config.settings_updated_from_data = True
 
     def _crop_data_to_selected_range(self) -> None:
-        """
-        Get the data in the range specified by the limits and store the selected
-        x-range and data values.
-        """
-        _range = self._get_cropped_range()
-        self._data_x = self._data_x[_range]
-        self._data = self._data[_range]
-
-    def _get_cropped_range(self) -> slice:
-        """
-        Get the cropped index range corresponding to the selected data range.
-
-        Returns
-        -------
-        slice
-            The slice object to crop the data to the given range.
-        """
+        """Get the range specified by the limits and store the cropped data."""
         _x_hash = hash(self._data_x.tobytes())
         if _x_hash != self.config["data_x_hash"] or self.config.range_slice is None:
-            _xlow = self.get_param_value("fit_lower_limit")
-            _xhigh = self.get_param_value("fit_upper_limit")
             self.config["data_x_hash"] = _x_hash
+            _xlow = self.get_param_value("fit_lower_limit")
             _range_low = (
                 np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
                 else np.arange(self._data_x.size)
             )
+            _xhigh = self.get_param_value("fit_upper_limit")
             _range_high = (
                 np.where(self._data_x <= _xhigh)[0]
                 if _xhigh is not None
@@ -358,12 +340,11 @@ class BaseFitPlugin(ProcPlugin):
                     f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
                 )
             self.config.range_slice = slice(_range[0], _range[-1] + 1)
-        return self.config.range_slice
+        self._data_x = self._data_x[self.config.range_slice]
+        self._data = self._data[self.config.range_slice]
 
     def _update_node_output_labels(self) -> None:
-        """
-        Update the node output labels based on the settings and the input data.
-        """
+        """Update the node output labels based on the settings and the input data."""
         _output = self.get_param_value("fit_output")
         self.output_data_unit = ""
         _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
@@ -377,9 +358,7 @@ class BaseFitPlugin(ProcPlugin):
         self.output_data_label = _output
 
     def _update_peak_bounds_from_data(self) -> None:
-        """
-        Update the bounds for the peaks' center from the data x ranges.
-        """
+        """Update the bounds for the peaks' center from the data x ranges."""
         for _key in ["", "1", "2", "3"]:
             _label = f"center{_key}"
             if _label not in self.config["param_labels"]:
@@ -406,24 +385,22 @@ class BaseFitPlugin(ProcPlugin):
                 if _value is not None:
                     self.config[f"param_bounds_{_suffix}"][_index] = _value
 
-    def create_fit_start_param_dict(self) -> None:
-        """
-        Create a dictionary with preset fit starting values.
-        """
+    def _create_fit_start_param_dict(self) -> None:
+        """Create a dictionary with preset fit starting values."""
         self._fit_presets = {}
         for _key in self.params:
-            if _key.startswith("fit_peak") and _key.endswith("_xstart"):
-                _index = _key[8:-7]
+            if _key.startswith("fit_peak") and _key.endswith("xstart"):
+                _index = _key.removeprefix("fit_peak").removesuffix("xstart").strip("_")
                 _val = self.get_param_value(_key)
                 if _val is not None:
                     self._fit_presets[f"center{_index}_start"] = _val
-            if _key.startswith("fit_peak") and _key.endswith("_width"):
-                _index = _key[8:-6]
+            if _key.startswith("fit_peak") and _key.endswith("width"):
+                _index = _key.removeprefix("fit_peak").removesuffix("width").strip("_")
                 _val = self.get_param_value(_key)
                 if _val is not None:
                     self._fit_presets[f"width{_index}_start"] = _val
 
-    def check_min_peak_height(self) -> bool:
+    def _check_min_peak_height(self) -> bool:
         """
         Check the minimum peak height and return the flag whether it is okay.
 
@@ -446,29 +423,35 @@ class BaseFitPlugin(ProcPlugin):
 
     def create_detailed_results(
         self, results: Dataset, start_fit_params: tuple[float, ...]
-    ) -> dict:
+    ) -> dict[str, dict[str, Any]]:
         """
         Create the detailed results for a single fit.
 
-        This method will return detailed information to display for the user. The return
-        format is a dictionary with four keys:
-        First, "n_plots" which determines the number of plots. Second, "plot_titles"
-        gives a title for each subplot. Third, "plot_ylabels" gives a y-axis label for
-        each subplot. Fourth, "items" provides a list with the different items to be
-        plotted. Each list entry must be a dictionary with the following keys: "plot"
-        [to determine the plot number], "label" [for the legend label] and "data" with
-        the actual data.
+        This method will return detailed information to display for the user.
+        The return format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second,
+        "plot_titles" gives a title for each subplot. Third, "plot_ylabels"
+        gives a y-axis label for each subplot. Fourth, "items" provides a
+        list with the different items to be plotted. Each list entry must be
+        a dictionary with the following keys:
+
+            "plot" : int
+                Key to determine the plot number.
+            "label" : str
+                For the legend label.
+            "data":  Dataset
+                The actual data to be plotted.
 
         Parameters
         ----------
-        results : pydidas.core.Dataset
+        results : Dataset
             The Dataset with the regular results.
         start_fit_params : tuple[float, ...]
             The list with the starting fit params.
 
         Returns
         -------
-        dict
+        dict[str, dict[str, Any]]
             The dictionary with the detailed results in the format expected by pydidas.
         """
         if self._data is None:

@@ -88,6 +88,7 @@ class BaseFitPlugin(ProcPlugin):
         self._data = None
         self._data_x = None
         self._details = {}
+        self._run_data = {}
         self._fit_params = {}
         self._fit_presets = {}
         self.config.update(
@@ -145,7 +146,7 @@ class BaseFitPlugin(ProcPlugin):
         self._create_fit_start_param_dict()
 
     @process_1d_with_multi_input_dims
-    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict[str, Any]]:
         """
         Fit a peak to the data.
 
@@ -162,14 +163,16 @@ class BaseFitPlugin(ProcPlugin):
 
         Returns
         -------
-        _data : Dataset
-            The image data.
-        kwargs : dict
+        data : Dataset
+            The fit results as a Dataset.
+        kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
         self._details = {}
         self.prepare_input_data(data)
         if not self._check_min_peak_height():
+            if kwargs.get("store_details", False):
+                self._details = {None: self._create_details_for_invalid_peak()}
             return self.create_result_dataset(valid=False), kwargs
 
         _startguess = self._fitter.guess_fit_start_params(
@@ -217,7 +220,7 @@ class BaseFitPlugin(ProcPlugin):
             The new dataset.
         """
         _new_data = np.full(self.config["result_shape"], np.nan)
-        if valid and self.check_center_positions():
+        if valid and self._check_center_positions():
             _fit_pvals = tuple(self._fit_params.values())
             _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
@@ -248,49 +251,6 @@ class BaseFitPlugin(ProcPlugin):
         }
         return _result_dataset
 
-    def _write_valid_results(self, results: np.ndarray) -> np.ndarray:
-        """
-        Write the valid results for the fit in the new data array.
-
-        Parameters
-        ----------
-        results : np.ndarray
-            The new data array.
-
-        Returns
-        -------
-        np.ndarray
-            The new data array with the results.
-        """
-        _fit_pvals = tuple(self._fit_params.values())
-        for _i, _key in enumerate(self.fit_outputs):
-            if _key in ["position", "amplitude", "area", "FWHM"]:
-                _attr = getattr(self._fitter, _key.lower())
-                results[slice(None), _i] = _attr(_fit_pvals)
-            elif _key == "total count intensity":
-                _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]
-                results[slice(None), _i] = [
-                    a / _dx for a in self._fitter.area(_fit_pvals)
-                ]
-            elif _key == "background at peak":
-                results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
-        return results
-
-    def check_center_positions(self) -> bool:
-        """
-        Check the fitted center position.
-
-        Returns
-        -------
-        bool
-            Flag whether all centers are in the input x range.
-        """
-        return {True} == {
-            self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
-            for _key in self._fit_params
-            if _key.startswith("center")
-        }
-
     def prepare_input_data(self, data: Dataset) -> None:
         """
         Prepare and store the input data.
@@ -307,113 +267,6 @@ class BaseFitPlugin(ProcPlugin):
             self._update_node_output_labels()
             self._update_peak_bounds_from_data()
             self.config.settings_updated_from_data = True
-
-    def _crop_data_to_selected_range(self) -> None:
-        """Get the range specified by the limits and store the cropped data."""
-        _x_hash = hash(self._data_x.tobytes())
-        if _x_hash != self.config["data_x_hash"] or self.config.range_slice is None:
-            self.config["data_x_hash"] = _x_hash
-            _xlow = self.get_param_value("fit_lower_limit")
-            _range_low = (
-                np.where(self._data_x >= _xlow)[0]
-                if _xlow is not None
-                else np.arange(self._data_x.size)
-            )
-            _xhigh = self.get_param_value("fit_upper_limit")
-            _range_high = (
-                np.where(self._data_x <= _xhigh)[0]
-                if _xhigh is not None
-                else np.arange(self._data_x.size)
-            )
-            _range = np.intersect1d(_range_low, _range_high)
-            if _range.size < 5:
-                raise UserConfigError(
-                    "The data range for the fit is too small with less than 5 data "
-                    "points. Please control the selected data range in the "
-                    "FitSinglePeak plugin. The input data range is "
-                    f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
-                )
-            self.config.range_slice = slice(_range[0], _range[-1] + 1)
-        self._data_x = self._data_x[self.config.range_slice]
-        self._data = self._data[self.config.range_slice]
-
-    def _update_node_output_labels(self) -> None:
-        """Update the node output labels based on the settings and the input data."""
-        _output = self.get_param_value("fit_output")
-        self.output_data_unit = ""
-        _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
-        _output = _output.replace("amplitude", "amplitude / cts")
-        _output = _output.replace("area", f"area / (cts * {self._data.axis_units[0]})")
-        _output = _output.replace("FWHM", f"FWHM / {self._data.axis_units[0]}")
-        _output = _output.replace("background at peak", "background at peak / cts")
-        _output = _output.replace(
-            "total count intensity", "total count intensity / cts"
-        )
-        self.output_data_label = _output
-
-    def _update_peak_bounds_from_data(self) -> None:
-        """Update the bounds for the peaks' center from the data x ranges."""
-        for _key in ["", "1", "2", "3"]:
-            _label = f"center{_key}"
-            if _label not in self.config["param_labels"]:
-                continue
-            _index = self.config["param_labels"].index(_label)
-            _xlow = np.amin(self._data_x)
-            self.config.param_bounds_low[_index] = max(
-                self.config.param_bounds_low[_index], _xlow
-            )
-            _xhigh = np.amax(self._data_x)
-            self.config.param_bounds_high[_index] = min(
-                self.config.param_bounds_high[_index], _xhigh
-            )
-
-    def _update_fit_param_bounds(self) -> None:
-        """Update the fitting bounds from Parameters."""
-        for _key in self.params:
-            if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
-                _suffix = "low" if _key.endswith("_xlow") else "high"
-                _index = _key[8 : -(len(_suffix) + 2)]
-                _label = f"center{_index}"
-                _index = self.config["param_labels"].index(_label)
-                _value = self.get_param_value(_key)
-                if _value is not None:
-                    self.config[f"param_bounds_{_suffix}"][_index] = _value
-
-    def _create_fit_start_param_dict(self) -> None:
-        """Create a dictionary with preset fit starting values."""
-        self._fit_presets = {}
-        for _key in self.params:
-            if _key.startswith("fit_peak") and _key.endswith("xstart"):
-                _index = _key.removeprefix("fit_peak").removesuffix("xstart").strip("_")
-                _val = self.get_param_value(_key)
-                if _val is not None:
-                    self._fit_presets[f"center{_index}_start"] = _val
-            if _key.startswith("fit_peak") and _key.endswith("width"):
-                _index = _key.removeprefix("fit_peak").removesuffix("width").strip("_")
-                _val = self.get_param_value(_key)
-                if _val is not None:
-                    self._fit_presets[f"width{_index}_start"] = _val
-
-    def _check_min_peak_height(self) -> bool:
-        """
-        Check the minimum peak height and return the flag whether it is okay.
-
-        Returns
-        -------
-        bool
-            Flag whether the input data has a sufficiently large peak.
-        """
-        _min_peak = self.config["min_peak_height"]
-        if _min_peak is not None:
-            _tmp_y, bg_params = self._fitter.estimate_background_params(
-                self._data_x, self._data, self.get_param_value("fit_bg_order")
-            )
-            if np.amax(_tmp_y) < _min_peak:
-                self._details = {
-                    None: self._create_details_for_invalid_peak(_tmp_y, bg_params)
-                }
-                return False
-        return True
 
     def create_detailed_results(
         self, results: Dataset, start_fit_params: tuple[float, ...]
@@ -562,25 +415,178 @@ class BaseFitPlugin(ProcPlugin):
             )
         return _details
 
-    def _create_details_for_invalid_peak(
-        self, bg_corrected_data: np.ndarray, bg_params: tuple[float, ...]
-    ) -> dict[str, Any]:
+    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
         """
-        Create the details for an invalid peak.
+        Get the unique configuration widget class associated with this Plugin.
+
+        Returns
+        -------
+        type[GenericPluginConfigWidget]
+            The unique ParameterConfig widget class.
+        """
+        return FitPluginConfigWidget
+
+    def _check_center_positions(self) -> bool:
+        """
+        Check the fitted center position.
+
+        Returns
+        -------
+        bool
+            Flag whether all centers are in the input x range.
+        """
+        return {True} == {
+            self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
+            for _key in self._fit_params
+            if _key.startswith("center")
+        }
+
+    def _write_valid_results(self, results: np.ndarray) -> np.ndarray:
+        """
+        Write the valid results for the fit in the new data array.
 
         Parameters
         ----------
-        bg_corrected_data : np.ndarray
-            The background-corrected data.
-        bg_params : tuple[float, ...]
-            The parameters to calculate the background level.
+        results : np.ndarray
+            The new data array.
+
+        Returns
+        -------
+        np.ndarray
+            The new data array with the results.
+        """
+        _fit_pvals = tuple(self._fit_params.values())
+        for _i, _key in enumerate(self.fit_outputs):
+            if _key in ["position", "amplitude", "area", "FWHM"]:
+                _attr = getattr(self._fitter, _key.lower())
+                results[slice(None), _i] = _attr(_fit_pvals)
+            elif _key == "total count intensity":
+                _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]
+                results[slice(None), _i] = [
+                    a / _dx for a in self._fitter.area(_fit_pvals)
+                ]
+            elif _key == "background at peak":
+                results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
+        return results
+
+    def _crop_data_to_selected_range(self) -> None:
+        """Get the range specified by the limits and store the cropped data."""
+        _x_hash = hash(self._data_x.tobytes())
+        if _x_hash != self.config["data_x_hash"] or self.config.range_slice is None:
+            self.config["data_x_hash"] = _x_hash
+            _xlow = self.get_param_value("fit_lower_limit")
+            _range_low = (
+                np.where(self._data_x >= _xlow)[0]
+                if _xlow is not None
+                else np.arange(self._data_x.size)
+            )
+            _xhigh = self.get_param_value("fit_upper_limit")
+            _range_high = (
+                np.where(self._data_x <= _xhigh)[0]
+                if _xhigh is not None
+                else np.arange(self._data_x.size)
+            )
+            _range = np.intersect1d(_range_low, _range_high)
+            if _range.size < 5:
+                raise UserConfigError(
+                    "The data range for the fit is too small with less than 5 data "
+                    "points. Please control the selected data range in the "
+                    "FitSinglePeak plugin. The input data range is "
+                    f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
+                )
+            self.config.range_slice = slice(_range[0], _range[-1] + 1)
+        self._data_x = self._data_x[self.config.range_slice]
+        self._data = self._data[self.config.range_slice]
+
+    def _update_node_output_labels(self) -> None:
+        """Update the node output labels based on the settings and the input data."""
+        _output = self.get_param_value("fit_output")
+        self.output_data_unit = ""
+        _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
+        _output = _output.replace("amplitude", "amplitude / cts")
+        _output = _output.replace("area", f"area / (cts * {self._data.axis_units[0]})")
+        _output = _output.replace("FWHM", f"FWHM / {self._data.axis_units[0]}")
+        _output = _output.replace("background at peak", "background at peak / cts")
+        _output = _output.replace(
+            "total count intensity", "total count intensity / cts"
+        )
+        self.output_data_label = _output
+
+    def _update_peak_bounds_from_data(self) -> None:
+        """Update the bounds for the peaks' center from the data x ranges."""
+        for _key in ["", "1", "2", "3"]:
+            _label = f"center{_key}"
+            if _label not in self.config["param_labels"]:
+                continue
+            _index = self.config["param_labels"].index(_label)
+            _xlow = np.amin(self._data_x)
+            self.config.param_bounds_low[_index] = max(
+                self.config.param_bounds_low[_index], _xlow
+            )
+            _xhigh = np.amax(self._data_x)
+            self.config.param_bounds_high[_index] = min(
+                self.config.param_bounds_high[_index], _xhigh
+            )
+
+    def _update_fit_param_bounds(self) -> None:
+        """Update the fitting bounds from Parameters."""
+        for _key in self.params:
+            if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
+                _suffix = "low" if _key.endswith("_xlow") else "high"
+                _index = _key[8 : -(len(_suffix) + 2)]
+                _label = f"center{_index}"
+                _index = self.config["param_labels"].index(_label)
+                _value = self.get_param_value(_key)
+                if _value is not None:
+                    self.config[f"param_bounds_{_suffix}"][_index] = _value
+
+    def _create_fit_start_param_dict(self) -> None:
+        """Create a dictionary with preset fit starting values."""
+        self._fit_presets = {}
+        for _key in self.params:
+            if _key.startswith("fit_peak") and _key.endswith("xstart"):
+                _index = _key.removeprefix("fit_peak").removesuffix("xstart").strip("_")
+                _val = self.get_param_value(_key)
+                if _val is not None:
+                    self._fit_presets[f"center{_index}_start"] = _val
+            if _key.startswith("fit_peak") and _key.endswith("width"):
+                _index = _key.removeprefix("fit_peak").removesuffix("width").strip("_")
+                _val = self.get_param_value(_key)
+                if _val is not None:
+                    self._fit_presets[f"width{_index}_start"] = _val
+
+    def _check_min_peak_height(self) -> bool:
+        """
+        Check the minimum peak height and return the flag whether it is okay.
+
+        Returns
+        -------
+        bool
+            Flag whether the input data has a sufficiently large peak.
+        """
+        _min_peak = self.config["min_peak_height"]
+        if _min_peak is not None:
+            _tmp_y, _bg_params = self._fitter.estimate_background_params(
+                self._data_x, self._data, self.get_param_value("fit_bg_order")
+            )
+            self._run_data["bg_params"] = _bg_params
+            self._run_data["bg_corrected_data"] = _tmp_y
+            if np.amax(_tmp_y) < _min_peak:
+                return False
+        return True
+
+    def _create_details_for_invalid_peak(self) -> dict[str, Any]:
+        """
+        Create the details for an invalid peak.
 
         Returns
         -------
         dict[str, Any]
             The invalid results.
         """
-        if len(bg_params) == 0:
+        _bg_corrected_data = self._run_data.get("bg_corrected_data", self._data)
+        _bg_params = self._run_data.get("bg_params", ())
+        if len(_bg_params) == 0:
             return {
                 "n_plots": 1,
                 "plot_titles": {0: "data"},
@@ -589,10 +595,10 @@ class BaseFitPlugin(ProcPlugin):
                 "items": [{"plot": 0, "label": "input data", "data": self._data}],
             }
         _bg = Dataset(
-            np.zeros(self._data_x.size) + bg_params[0], **self._data.property_dict
+            np.zeros(self._data_x.size) + _bg_params[0], **self._data.property_dict
         )
-        if len(bg_params) == 2:
-            _bg += self._data_x * bg_params[1]
+        if len(_bg_params) == 2:
+            _bg += self._data_x * _bg_params[1]
         return {
             "n_plots": 2,
             "plot_titles": {0: "data and background", 1: "background-corrected data"},
@@ -610,21 +616,10 @@ class BaseFitPlugin(ProcPlugin):
                 {
                     "plot": 1,
                     "label": "background-corrected data",
-                    "data": bg_corrected_data,
+                    "data": _bg_corrected_data,
                 },
             ],
         }
-
-    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
-        """
-        Get the unique configuration widget class associated with this Plugin.
-
-        Returns
-        -------
-        type[GenericPluginConfigWidget]
-            The unique ParameterConfig widget class.
-        """
-        return FitPluginConfigWidget
 
 
 BaseFitPlugin.register_as_base_class()

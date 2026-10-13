@@ -141,7 +141,7 @@ class BaseFitPlugin(ProcPlugin):
             self.config["param_labels"].append("background_p1")
             self.config.param_bounds_low.append(-np.inf)
             self.config.param_bounds_high.append(np.inf)
-        self.update_fit_param_bounds()
+        self._update_fit_param_bounds()
         self._create_fit_start_param_dict()
 
     @process_1d_with_multi_input_dims
@@ -176,20 +176,14 @@ class BaseFitPlugin(ProcPlugin):
             self._data_x,
             self._data,
             bg_order=self.get_param_value("fit_bg_order"),
-            bounds=(
-                self.config.param_bounds_low,
-                self.config.param_bounds_high,
-            ),
+            bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
             **self._fit_presets,
         )
         _res = least_squares(
             self._fitter.delta,
             _startguess,
-            args=(self._data_x, self._data.array),
-            bounds=(
-                self.config.param_bounds_low,
-                self.config.param_bounds_high,
-            ),
+            args=(self._data_x, self._data),
+            bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
         )
         _res_c = self._fitter.sort_fitted_peaks_by_position(tuple(_res.x))
         self._fit_params = dict(zip(self.config["param_labels"], _res_c))
@@ -373,7 +367,7 @@ class BaseFitPlugin(ProcPlugin):
                 self.config.param_bounds_high[_index], _xhigh
             )
 
-    def update_fit_param_bounds(self) -> None:
+    def _update_fit_param_bounds(self) -> None:
         """Update the fitting bounds from Parameters."""
         for _key in self.params:
             if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
@@ -423,7 +417,7 @@ class BaseFitPlugin(ProcPlugin):
 
     def create_detailed_results(
         self, results: Dataset, start_fit_params: tuple[float, ...]
-    ) -> dict[str, dict[str, Any]]:
+    ) -> dict[str, Any]:
         """
         Create the detailed results for a single fit.
 
@@ -451,8 +445,9 @@ class BaseFitPlugin(ProcPlugin):
 
         Returns
         -------
-        dict[str, dict[str, Any]]
-            The dictionary with the detailed results in the format expected by pydidas.
+        dict[str, Any]
+            The dictionary with the detailed results in the format
+            expected by pydidas.
         """
         if self._data is None:
             raise ValueError("Cannot get detailed results without input data.")
@@ -569,7 +564,7 @@ class BaseFitPlugin(ProcPlugin):
 
     def _create_details_for_invalid_peak(
         self, bg_corrected_data: np.ndarray, bg_params: tuple[float, ...]
-    ) -> dict:
+    ) -> dict[str, Any]:
         """
         Create the details for an invalid peak.
 
@@ -582,7 +577,7 @@ class BaseFitPlugin(ProcPlugin):
 
         Returns
         -------
-        dict
+        dict[str, Any]
             The invalid results.
         """
         if len(bg_params) == 0:

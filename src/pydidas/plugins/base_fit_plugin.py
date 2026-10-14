@@ -508,7 +508,7 @@ class BaseFitPlugin(ProcPlugin):
 
     def _update_peak_bounds_from_data(self) -> None:
         """Update the bounds for the peaks' center from the data x ranges."""
-        for _key in ["", "1", "2", "3"]:
+        for _key in ["", "0", "1", "2", "3"]:
             _label = f"center{_key}"
             if _label not in self.config["param_labels"]:
                 continue

@@ -14,6 +14,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+#
+# An AI tool has been used to migrate the content of this file from
+# using unittest to pytest.
 
 """Unit tests for pydidas modules."""
 
@@ -25,376 +28,228 @@ __status__ = "Production"
 
 
 import itertools
-import unittest
 
 import numpy as np
+import pytest
 from qtpy import QtCore
+
+from pydidas_plugins.proc_plugins.fit_triple_peak import FitTriplePeak
+from tests.plugins.test_base_fit_plugin import BaseFitPluginTestSuite
 
 from pydidas.core import Dataset
 from pydidas.core.fitting.gaussian import Gaussian
-from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import LocalPluginCollection
 
 
 PLUGIN_COLLECTION = LocalPluginCollection()
+PEAK_INDICES = (42, 48, 62)
+AMPLITUDES = (25, 37, 28)
+SIGMA = 1.25
+FIT_OUTPUT_SHAPES = [
+    ("area", (3, 1)),
+    ("position", (3, 1)),
+    ("FWHM", (3, 1)),
+    ("position; area", (3, 2)),
+    ("position; area; FWHM", (3, 3)),
+]
+FIT_FUNCTION_CASES = [
+    pytest.param("Triple Gaussian", None, {"check_amplitudes": False}, id="g-no_bg"),
+    pytest.param("Triple Gaussian", 0, {}, id="gaussian-bg0"),
+    pytest.param("Triple Gaussian", 1, {}, id="gaussian-bg1"),
+    pytest.param(
+        "Triple Lorentzian", None, {"amplitude_tolerance": 25}, id="lorentzian-no_bg"
+    ),
+    pytest.param("Triple Lorentzian", 0, {}, id="lorentzian-bg0"),
+    pytest.param("Triple Lorentzian", 1, {}, id="lorentzian-bg1"),
+    pytest.param("Triple Voigt", None, {"amplitude_tolerance": 25}, id="voigt-no_bg"),
+    pytest.param("Triple Voigt", 0, {}, id="voigt-bg0"),
+    pytest.param("Triple Voigt", 1, {}, id="voigt-bg1"),
+]
 
 
-class TestFitTriplePeak(unittest.TestCase):
-    @classmethod
-    def tearDownClass(cls):
-        qs = QtCore.QSettings("Hereon", "pydidas")
-        qs.remove("unittesting")
+@pytest.fixture(scope="module", autouse=True)
+def _remove_unittesting_settings():
+    yield
+    QtCore.QSettings("Hereon", "pydidas").remove("unittesting")
 
-    def setUp(self):
-        self._data = Dataset(
-            np.ones(150), data_unit="data unit", axis_units=["ax_unit"]
+
+@pytest.fixture
+def data() -> Dataset:
+    _x = np.arange(150) * 0.5
+    _data = Dataset(
+        np.ones(150), data_unit="data unit", axis_units=["ax_unit"], axis_ranges=[_x]
+    )
+    for _index, _amp in zip(PEAK_INDICES, AMPLITUDES):
+        _data += Gaussian.func((_amp, SIGMA, _x[_index]), _x)
+    return _data
+
+
+def create_plugin(func: str = "Triple Gaussian", **params) -> FitTriplePeak:
+    _plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitTriplePeak")()
+    _plugin.set_param_value("fit_func", func)
+    _plugin.set_param_value("fit_lower_limit", 5)
+    _plugin.set_param_value("fit_upper_limit", 45)
+    _plugin.set_param_value("fit_output", "position")
+    _plugin.set_param_value("fit_peak0_xstart", 20.2)
+    _plugin.set_param_value("fit_peak1_xstart", 25)
+    for _key, _value in params.items():
+        _plugin.set_param_value(_key, _value)
+    return _plugin
+
+
+def create_plugin_with_dummy_fit(data: Dataset, output: str) -> FitTriplePeak:
+    _plugin = create_plugin(fit_output=output)
+    _plugin.pre_execute()
+    _plugin.prepare_input_data(data)
+    _startguess = _plugin._fitter.guess_fit_start_params(
+        _plugin._data_x, _plugin._data, bg_order=_plugin.get_param_value("fit_bg_order")
+    )
+    _plugin._fit_params = dict(zip(_plugin.config["param_labels"], _startguess))
+    _plugin._data.metadata = _plugin._data.metadata | {"test_meta": 123}
+    return _plugin
+
+
+def create_multidim_input_data(data: Dataset, data_dim: int) -> Dataset:
+    _indices = {0: [2, 0, 1], 1: [0, 2, 1], 2: [0, 1, 2]}[data_dim]
+    return Dataset(
+        np.rollaxis(np.tile(data.array, (5, 4, 1)), 2, data_dim),
+        axis_labels=[("a", "b", "data")[i] for i in _indices],
+        axis_ranges=[
+            [np.array((0, 2, 4, 7, 10)), np.array((1, 5, 9, 14)), data.axis_ranges[0]][
+                i
+            ]
+            for i in _indices
+        ],
+        axis_units=[("u0", "u1", "u2")[i] for i in _indices],
+    )
+
+
+def assert_fit_results_okay(
+    result: Dataset,
+    params: dict,
+    bg_order: int | None,
+    check_amplitudes: bool = True,
+    amplitude_tolerance: float | None = None,
+) -> None:
+    assert result.shape == (3, len(result.data_label.split(";")))
+    if amplitude_tolerance is None:
+        amplitude_tolerance = (
+            2 if result.metadata["fit_func"] == "Triple Gaussian" else 15
         )
-        self._x = np.arange(self._data.size) * 0.5
-        _index1 = 42
-        _index2 = 48
-        _index3 = 62
-
-        self._peak_x1 = self._x[_index1]
-        self._peak_x2 = self._x[_index2]
-        self._peak_x3 = self._x[_index3]
-        self._data.axis_ranges = [self._x]
-
-        self._sigma = 1.25
-        self._amp1 = 25
-        self._amp2 = 37
-        self._amp3 = 28
-        self._data += Gaussian.func((self._amp1, self._sigma, self._peak_x1), self._x)
-        self._data += Gaussian.func((self._amp2, self._sigma, self._peak_x2), self._x)
-        self._data += Gaussian.func((self._amp3, self._sigma, self._peak_x3), self._x)
-
-    def tearDown(self):
-        pass
-
-    def create_generic_plugin(self, func="Triple Gaussian"):
-        _low = 5
-        _high = 45
-        self._rangen = np.where((self._x >= _low) & (self._x <= _high))[0].size
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitTriplePeak")()
-        plugin.set_param_value("fit_func", func)
-        plugin.set_param_value("fit_lower_limit", _low)
-        plugin.set_param_value("fit_upper_limit", _high)
-        plugin.set_param_value("fit_output", "position")
-        plugin.set_param_value("fit_peak0_xstart", 20.2)
-        plugin.set_param_value("fit_peak1_xstart", 25)
-        return plugin
-
-    def create_gauss_plugin_with_dummy_fit(self):
-        plugin = self.create_generic_plugin()
-        plugin._data = self._data
-        plugin._data_x = self._data.axis_ranges[0]
-        plugin._crop_data_to_selected_range()
-        plugin.pre_execute()
-        _startguess = plugin._fitter.guess_fit_start_params(
-            plugin._data_x,
-            plugin._data,
-            bg_order=plugin.get_param_value("fit_bg_order"),
-        )
-        plugin._fit_params = dict(zip(plugin.config["param_labels"], _startguess))
-        self._dummy_metadata = {"test_meta": 123}
-        plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
-        return plugin
-
-    def create_multidim_input_data(self, data_dim: int):
-        match data_dim:
-            case 0:
-                _indices = [2, 0, 1]
-            case 1:
-                _indices = [0, 2, 1]
-            case 2:
-                _indices = [0, 1, 2]
-        _data = Dataset(
-            np.rollaxis(np.tile(self._data.array, (5, 4, 1)), 2, data_dim),
-            axis_labels=[("a", "b", "data")[i] for i in _indices],
-            axis_ranges=[
-                [
-                    np.array((0, 2, 4, 7, 10)),
-                    np.array((1, 5, 9, 14)),
-                    np.arange(self._data.size) / 2,
-                ][i]
-                for i in _indices
-            ],
-            axis_units=[("u0", "u1", "u2")[i] for i in _indices],
-        )
-        return _data
-
-    def assert_fit_results_okay(
-        self,
-        fit_result_data,
-        params,
-        bg_order,
-        check_amplitudes=True,
-        amplitude_tolerance=None,
-    ):
-        self.assertEqual(
-            fit_result_data.shape, (3, len(fit_result_data.data_label.split(";")))
-        )
-        if amplitude_tolerance is None:
-            amplitude_tolerance = (
-                2 if fit_result_data.metadata["fit_func"] == "Triple Gaussian" else 15
-            )
-
-        self.assertTrue("fit_params" in fit_result_data.metadata)
-        self.assertTrue("fit_func" in fit_result_data.metadata)
-        self.assertTrue("fit_residual_std" in fit_result_data.metadata)
+    assert "fit_params" in result.metadata
+    assert "fit_func" in result.metadata
+    assert "fit_residual_std" in result.metadata
+    for _i, _amp in enumerate(AMPLITUDES):
         if check_amplitudes:
-            self.assertTrue(
-                abs(params["amplitude0"] - self._amp1) <= amplitude_tolerance
-            )
-            self.assertTrue(
-                abs(params["amplitude1"] - self._amp2) <= amplitude_tolerance
-            )
-            self.assertTrue(
-                abs(params["amplitude2"] - self._amp3) <= amplitude_tolerance
-            )
+            assert abs(params[f"amplitude{_i}"] - _amp) <= amplitude_tolerance
         if "sigma" in params:
-            self.assertTrue(abs(params["sigma0"] - self._sigma) < 0.5)
-            self.assertTrue(abs(params["sigma1"] - self._sigma) < 0.5)
-            self.assertTrue(abs(params["sigma2"] - self._sigma) < 0.5)
+            assert abs(params[f"sigma{_i}"] - SIGMA) < 0.5
         if "gamma" in params:
-            self.assertTrue(abs(params["gamma0"] - self._sigma) < 0.5)
-            self.assertTrue(abs(params["gamma1"] - self._sigma) < 0.5)
-            self.assertTrue(abs(params["gamma2"] - self._sigma) < 0.5)
-        self.assertTrue(abs(params["center0"] - self._peak_x1) < 2)
-        self.assertTrue(abs(params["center1"] - self._peak_x2) < 2)
-        self.assertTrue(abs(params["center2"] - self._peak_x3) < 2)
-        if bg_order in [0, 1]:
-            self.assertTrue(abs(params["background_p0"] - 1) < 1)
-        if bg_order == 1:
-            self.assertTrue(abs(params["background_p1"]) < 1)
+            assert abs(params[f"gamma{_i}"] - SIGMA) < 0.5
+        assert abs(params[f"center{_i}"] - PEAK_INDICES[_i] * 0.5) < 2
+    if bg_order in [0, 1]:
+        assert abs(params["background_p0"] - 1) < 1
+    if bg_order == 1:
+        assert abs(params["background_p1"]) < 1
 
-    def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitTriplePeak")()
-        self.assertIsInstance(plugin, BasePlugin)
 
-    def test_create_result_dataset__peak_area(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("fit_output", "area")
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3, 1))
+@pytest.mark.parametrize("output, shape", FIT_OUTPUT_SHAPES)
+def test_create_result_dataset__valid(data, output, shape):
+    _plugin = create_plugin_with_dummy_fit(data, output)
+    _result = _plugin.create_result_dataset()
+    for _key in ["fit_params", "fit_func", "fit_residual_std", "test_meta"]:
+        assert _key in _result.metadata
+    assert _result.shape == shape
 
-    def test_create_result_dataset__peak_position(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("fit_output", "position")
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3, 1))
 
-    def test_create_result_dataset__peak_outside_array(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin._fit_params["center"] = 0
-        plugin.set_param_value("fit_output", "position")
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertTrue(np.isnan(_new_data.array[0]))
+def test_create_result_dataset__peak_outside_array(data):
+    _plugin = create_plugin_with_dummy_fit(data, "position")
+    _plugin._fit_params["center0"] = 0
+    _result = _plugin.create_result_dataset()
+    assert "test_meta" in _result.metadata
+    assert np.all(np.isnan(_result.array))
 
-    def test_create_result_dataset__high_std(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin._fit_params["amplitude"] = 1e6
-        plugin.set_param_value("fit_output", "position")
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertTrue(np.isnan(_new_data.array[0]))
-        self.assertEqual(_new_data.shape, (3, 1))
 
-    def test_create_result_dataset__peak_pos_and_area(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("fit_output", "position; area")
-        plugin.pre_execute()
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3, 2))
+def test_create_result_dataset__high_std(data):
+    _plugin = create_plugin_with_dummy_fit(data, "position")
+    _plugin._fit_params["amplitude0"] = 1e6
+    _result = _plugin.create_result_dataset()
+    assert "test_meta" in _result.metadata
+    assert np.all(np.isnan(_result.array))
+    assert _result.shape == (3, 1)
 
-    def test_create_result_dataset__fwhm(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("fit_output", "FWHM")
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3, 1))
 
-    def test_create_result_dataset__peak_pos_and_area_and_fwhm(self):
-        plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("fit_output", "position; area; FWHM")
-        plugin.pre_execute()
-        _new_data = plugin.create_result_dataset()
-        self.assertTrue("fit_params" in _new_data.metadata)
-        self.assertTrue("fit_func" in _new_data.metadata)
-        self.assertTrue("fit_residual_std" in _new_data.metadata)
-        self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3, 3))
+def test_execute__gaussian_no_bg__axis_unit_in_label(data):
+    _plugin = create_plugin(fit_bg_order=None)
+    _plugin.pre_execute()
+    _result, _ = _plugin.execute(data)
+    assert data.axis_units[0] in _result.data_label
 
-    def test_execute__gaussian_no_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", None)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(
-            _data, _kwargs["fit_params"], None, check_amplitudes=False
-        )
-        self.assertIn(self._data.axis_units[0], _data.data_label)
 
-    def test_execute__gaussian_no_bg_all_outputs(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", None)
-        plugin.set_param_value("fit_output", "position; area; FWHM")
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assertEqual(_data.shape, (3, 3))
+def test_execute__gaussian_no_bg_all_outputs(data):
+    _plugin = create_plugin(fit_bg_order=None, fit_output="position; area; FWHM")
+    _plugin.pre_execute()
+    _result, _ = _plugin.execute(data)
+    assert _result.shape == (3, 3)
 
-    def test_execute__gaussian_0d_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 0)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
-    def test_execute__gaussian_1d_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
+@pytest.mark.parametrize("func, bg_order, check_kwargs", FIT_FUNCTION_CASES)
+def test_execute__fit_functions(data, func, bg_order, check_kwargs):
+    _plugin = create_plugin(func, fit_bg_order=bg_order)
+    _plugin.pre_execute()
+    _result, _kwargs = _plugin.execute(data)
+    assert_fit_results_okay(_result, _kwargs["fit_params"], bg_order, **check_kwargs)
 
-    def test_execute__gaussian_w_steep_1d_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.pre_execute()
-        _tmp_data = self._data + 3 * np.arange(self._data.size)
-        _data, _kwargs = plugin.execute(_tmp_data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
-        self.assertTrue(abs(_kwargs["fit_params"]["background_p1"] - 6) < 0.5)
 
-    def test_execute__gaussian_w_only_background_and_min_peak(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.set_param_value("fit_min_peak_height", 10)
-        plugin.pre_execute()
-        _tmp_data = Dataset(3 * np.arange(self._data.size))
-        _data, _kwargs = plugin.execute(_tmp_data)
+def test_execute__gaussian_w_steep_1d_bg(data):
+    _plugin = create_plugin(fit_bg_order=1)
+    _plugin.pre_execute()
+    _result, _kwargs = _plugin.execute(data + 3 * np.arange(data.size))
+    assert_fit_results_okay(_result, _kwargs["fit_params"], None)
+    assert abs(_kwargs["fit_params"]["background_p1"] - 6) < 0.5
 
-    def test_execute__lorentzian_no_bg(self):
-        plugin = self.create_generic_plugin("Triple Lorentzian")
-        plugin.set_param_value("fit_bg_order", None)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(
-            _data, _kwargs["fit_params"], None, amplitude_tolerance=25
-        )
 
-    def test_execute__lorentzian_0d_bg(self):
-        plugin = self.create_generic_plugin("Triple Lorentzian")
-        plugin.set_param_value("fit_bg_order", 0)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
+def test_execute__gaussian_w_only_background_and_min_peak(data):
+    _plugin = create_plugin(fit_bg_order=1, fit_min_peak_height=10)
+    _plugin.pre_execute()
+    _result, _ = _plugin.execute(Dataset(3 * np.arange(data.size)))
+    assert np.all(np.isnan(_result))
 
-    def test_execute__lorentzian_1d_bg(self):
-        plugin = self.create_generic_plugin("Triple Lorentzian")
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
 
-    def test_execute__voigt_no_bg(self):
-        plugin = self.create_generic_plugin("Triple Voigt")
-        plugin.set_param_value("fit_bg_order", None)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(
-            _data, _kwargs["fit_params"], None, amplitude_tolerance=25
-        )
+@pytest.mark.parametrize("data_dim", [0, 1, 2])
+@pytest.mark.parametrize("output", ["position", "position; area; FWHM"])
+def test_execute__w_multidim_input(data, data_dim, output):
+    _data = create_multidim_input_data(data, data_dim)
+    _plugin = create_plugin(fit_output=output, process_data_dim=data_dim)
+    _plugin.pre_execute()
+    _result, _kwargs = _plugin.execute(_data)
+    _slice = [0] * data_dim + [slice(None), slice(None)] + [0] * (2 - data_dim)
+    assert_fit_results_okay(_result[*_slice], _kwargs["fit_params"], None)
 
-    def test_execute__voigt_0d_bg(self):
-        plugin = self.create_generic_plugin("Triple Voigt")
-        plugin.set_param_value("fit_bg_order", 0)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
-    def test_execute__voigt_1d_bg(self):
-        plugin = self.create_generic_plugin("Triple Voigt")
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data)
-        self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
+def test_detailed_results(data):
+    _plugin = create_plugin()
+    _plugin.pre_execute()
+    _plugin.execute(data, store_details=True)
+    assert set(_plugin.detailed_results) == {None}
 
-    def test_detailed_results(self):
-        plugin = self.create_generic_plugin()
-        plugin.pre_execute()
-        _data, _kwargs = plugin.execute(self._data, store_details=True)
-        _details = plugin.detailed_results
-        self.assertEqual(set(_details.keys()), {None})
 
-    def test_detailed_results__multidim(self):
-        _data = np.tile(self._data, (3, 3, 1))
-        _data.axis_labels = ("a", "b", "data")
-        _data.axis_ranges = (
-            np.array((0, 2, 4)),
-            np.array((1, 5, 9)),
-            np.arange(self._data.size) / 2,
-        )
-        _data.axis_units = ("u0", "u1", "u2")
-        plugin = self.create_generic_plugin()
-        plugin.pre_execute()
-        _new_data, _kwargs = plugin.execute(_data, store_details=True)
-        _details = plugin.detailed_results
-        for _indices in itertools.product(np.arange(3), np.arange(3)):
-            self.assertIn(
-                _data.get_description_of_point(_indices + (None,)), _details.keys()
-            )
-        self.assertNotIn(None, _details.keys())
+def test_detailed_results__multidim(data):
+    _data = create_multidim_input_data(data, 2)
+    _plugin = create_plugin()
+    _plugin.pre_execute()
+    _plugin.execute(_data, store_details=True)
+    _details = _plugin.detailed_results
+    for _indices in itertools.product(range(5), range(4)):
+        assert _data.get_description_of_point(_indices + (None,)) in _details
+    assert None not in _details
 
-    def test_execute__1d_output_w_multidim(self):
-        for _dim in range(3):
-            with self.subTest(process_data_dim=_dim):
-                _data = self.create_multidim_input_data(_dim)
-                plugin = self.create_generic_plugin()
-                plugin.set_param_value("fit_output", "position")
-                plugin.set_param_value("process_data_dim", _dim)
-                plugin.pre_execute()
-                _new_data, _kwargs = plugin.execute(_data)
-                _slice = [0] * _dim + [slice(None), slice(None)] + [0] * (2 - _dim)
-                self.assert_fit_results_okay(
-                    _new_data[*_slice], _kwargs["fit_params"], None
-                )
 
-    def test_execute__2d_output_w_multidim(self):
-        for _dim in range(3):
-            with self.subTest(process_data_dim=_dim):
-                _data = self.create_multidim_input_data(_dim)
-                plugin = self.create_generic_plugin()
-                plugin.set_param_value("fit_output", "position; area; FWHM")
-                plugin.set_param_value("process_data_dim", _dim)
-                plugin.pre_execute()
-                _new_data, _kwargs = plugin.execute(_data)
-                _slice = [0] * _dim + [slice(None), slice(None)] + [0] * (2 - _dim)
-                self.assert_fit_results_okay(
-                    _new_data[*_slice], _kwargs["fit_params"], None
-                )
+class TestFitTriplePeakGeneric(BaseFitPluginTestSuite):
+    plugin_class = FitTriplePeak
+    fit_func = "Triple Gaussian"
+    num_peaks = 3
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

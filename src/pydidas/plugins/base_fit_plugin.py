@@ -35,20 +35,12 @@ from scipy.optimize import least_squares
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
-from pydidas.core.lazy_imports.lazy_objects import LazyObject
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins.base_proc_plugin import ProcPlugin
 
 
 if TYPE_CHECKING:
-    from pydidas.widgets.plugin_config_widgets import (
-        FitPluginConfigWidget,
-        GenericPluginConfigWidget,
-    )
-else:
-    FitPluginConfigWidget = LazyObject(
-        "pydidas.widgets.plugin_config_widgets", "FitPluginConfigWidget"
-    )
+    from pydidas.widgets.plugin_config_widgets import GenericPluginConfigWidget
 
 
 class BaseFitPlugin(ProcPlugin):
@@ -424,6 +416,8 @@ class BaseFitPlugin(ProcPlugin):
         type[GenericPluginConfigWidget]
             The unique ParameterConfig widget class.
         """
+        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
+
         return FitPluginConfigWidget
 
     def _check_center_positions(self) -> bool:

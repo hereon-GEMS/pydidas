@@ -107,6 +107,7 @@ addopts = "-m 'not slow and not gui'"
 markers = [
     "slow: mark test as slow to run only when '-m slow' is specified",
     "gui: mark test as GUI test to run only when '-m gui' is specified",
+    "all: automatically added to every test to run all tests with '-m all'",
 ]
 filterwarnings = [
     "ignore:Mean of empty slice",

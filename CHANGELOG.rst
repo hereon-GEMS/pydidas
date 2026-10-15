@@ -27,6 +27,7 @@ Improvements
 - Added checks to prevent non-input plugins from being used as workflow roots.
 - Added an option to the DataViewer to display a Dataset in a new window
   to allow comparisons of data.
+- Added an `all` marker to simplify running all tests with `pytest -m all`
 
 
 Programmatic changes

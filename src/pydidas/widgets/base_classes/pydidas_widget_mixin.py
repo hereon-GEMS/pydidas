@@ -217,6 +217,8 @@ class PydidasWidgetMixIn:
                 int(self.font_metric_width_factor * font_width),
             )
             self._size_hint[0] = _width
+            if _width > self.maximumWidth():
+                self.setMaximumWidth(_width)
             self.setFixedWidth(_width)  # type: ignore[attr-defined]
         if isinstance(self.font_metric_height_factor, Real):
             # NOTE: Qt applies the layout spacing in addition to the

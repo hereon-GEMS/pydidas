@@ -319,7 +319,7 @@ def test__creation__w_visible_kwarg(qtbot, qapp) -> None:
     and the widget overrides the standard sizeHint behavior.
     """
     param = Parameter("test", str, "Test value", name="Test")
-    kwargs = {"visible": True, "font_metric_width_factor": 50}
+    kwargs = {"visible": True, "fixedWidth": 123, "font_metric_width_factor": 50}
     widget = widget_instance(qtbot, param, **kwargs)
     assert widget.isVisible() is True
     assert widget.width() == int(qapp.font_char_width * 50)

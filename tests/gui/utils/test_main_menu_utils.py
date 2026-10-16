@@ -61,6 +61,7 @@ def mock_config_dir_exit_states(tmp_path):
         yield valid_files
 
 
+@pytest.mark.gui
 def test_get_available_exit_states__w_standard_name(mock_config_dir_exit_states):
     """
     Test that get_available_exit_states only returns valid filenames.
@@ -74,6 +75,7 @@ def test_get_available_exit_states__w_standard_name(mock_config_dir_exit_states)
     assert actual_filenames == sorted(expected_filenames)
 
 
+@pytest.mark.gui
 def test_get_available_exit_states__w_custom_name(mock_config_dir_exit_states):
     """
     Test that get_available_exit_states returns the custom name.

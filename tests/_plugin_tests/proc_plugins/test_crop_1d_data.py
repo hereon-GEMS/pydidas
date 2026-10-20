@@ -157,6 +157,14 @@ def test_execute(
     for _i_dim, _range in _new_data.axis_ranges.items():
         assert np.allclose(_range, _sliced_data.axis_ranges[_i_dim])
 
+def test_execute__no_points_in_range(plugin: ProcPlugin, data: Dataset) -> None:
+    plugin.set_param_value("process_data_dim", 0)
+    plugin.set_param_value("type_selection", "Axis values")
+    plugin.set_param_value("crop_low", 1.1)
+    plugin.set_param_value("crop_high", 1.9)
+    with pytest.raises(UserConfigError):
+        plugin.execute(data)
+
 
 if __name__ == "__main__":
     pytest.main()

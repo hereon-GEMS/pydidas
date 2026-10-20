@@ -128,10 +128,21 @@ class Crop1dData(ProcPlugin):
             The cropped input data
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
+
+        Raises
+        ------
+        UserConfigError
+            If the cropped range does not contain any data points.
         """
         self._data = data
         _slices = self._get_slices()
         _new_data = data[_slices]
+        _i_dim = len(_slices) - 1
+        if _new_data.shape[_i_dim] == 0:
+            raise UserConfigError(
+                "Configuration error in Crop 1d Data plugin: Cropped range does"
+                " not contain any data points. Check cropping range and data."
+            )
         return _new_data, kwargs
 
     def _get_slices(self) -> tuple[slice, ...]:
@@ -171,7 +182,7 @@ class Crop1dData(ProcPlugin):
                 _bounds = np.where(_x >= _low)[0]
             else:
                 _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-            if np.unique(np.diff(_bounds)) not in (np.array([1]), np.array([])):
+            if not np.all(np.diff(_bounds) == 1):
                 raise UserConfigError(
                     "Cannot determine the cropping range from the data:\n"
                     "The selected data range is not continuous. Please check the "
@@ -179,8 +190,6 @@ class Crop1dData(ProcPlugin):
                 )
             if _bounds.size == 0:
                 _slice = slice(0, 0)
-            elif _bounds.size == 1:
-                _slice = slice(_bounds[0], _bounds[0] + 1)
             else:
                 _slice = slice(_bounds[0], _bounds[-1] + 1)
         self.config["slices"] = (slice(None, None),) * _i_dim + (_slice,)

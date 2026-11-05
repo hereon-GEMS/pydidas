@@ -137,12 +137,6 @@ class Crop1dData(ProcPlugin):
         self._data = data
         _slices = self._get_slices()
         _new_data = data[_slices]
-        _i_dim = len(_slices) - 1
-        if _new_data.shape[_i_dim] == 0:
-            raise UserConfigError(
-                "Configuration error in Crop 1d Data plugin: Cropped range does"
-                " not contain any data points. Check cropping range and data."
-            )
         return _new_data, kwargs
 
     def _get_slices(self) -> tuple[slice, ...]:
@@ -153,6 +147,11 @@ class Crop1dData(ProcPlugin):
         -------
         tuple[slice, ...]
             The slices to select the range from the input data.
+
+        Raises
+        ------
+        UserConfigError
+            If the cropped range does not contain any data points or is invalid.
         """
         if self.config["slices"] is not None:
             return self.config["slices"]
@@ -192,5 +191,14 @@ class Crop1dData(ProcPlugin):
                 _slice = slice(0, 0)
             else:
                 _slice = slice(_bounds[0], _bounds[-1] + 1)
+        if (
+            _slice.start is not None
+            and _slice.stop is not None
+            and _slice.start == _slice.stop
+        ):
+            raise UserConfigError(
+                "Configuration error in Crop 1d Data plugin: Cropped range does"
+                " not contain any data points. Check cropping range and data."
+            )
         self.config["slices"] = (slice(None, None),) * _i_dim + (_slice,)
         return self.config["slices"]

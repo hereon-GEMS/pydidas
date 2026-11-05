@@ -96,7 +96,7 @@ Detector geometry
     :align: left
 
 pydidas uses the `Default geometry in pyFAI
-<https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai>`_
+<https://pyfai.readthedocs.io/en/v2023.1/geometry.html#default-geometry-in-pyfai>`_
 and the detector position is described by the sample-detector distance, two
 positions for the point of normal incidence on the detector (PONI1 in vertical
 and PONI2 in horizontal directions) which describe the orthogonal projection of

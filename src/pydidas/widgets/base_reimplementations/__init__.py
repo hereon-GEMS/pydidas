@@ -18,7 +18,7 @@
 """
 The base_reimplementations subpackage includes basic QtWidget
 re-implementations with extended generic functionality that
- are used throughout the pydidas package.
+are used throughout the pydidas package.
 
 These widgets are designed to provide scaling based on the system
 font and font size to allow a scalability independent of the

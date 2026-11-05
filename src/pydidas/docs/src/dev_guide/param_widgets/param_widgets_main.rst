@@ -23,17 +23,16 @@ This page is the quick reference for the public API.
 Public Module Interface
 -----------------------
 
-The package ``pydidas.widgets.parameter_config`` exports the following main
-public entry classes:
+The packages ``pydidas.widgets.param_io``, ``pydidas.widgets.base_classes`` and\n``pydidas.widgets.extended_widgets`` export the following main public entry\nclasses:
 
-- :py:class:`ParameterWidget <pydidas.widgets.parameter_config.ParameterWidget>`:
+- :py:class:`ParameterWidget <pydidas.widgets.param_io.ParameterWidget>`:
   The standard widget to display and edit a single :py:class:`Parameter
   <pydidas.core.Parameter>` in the GUI.
-- :py:class:`ParameterWidgetMixIn <pydidas.widgets.parameter_config.ParameterWidgetMixIn>`:
+- :py:class:`ParameterWidgetMixIn <pydidas.widgets.base_classes.ParameterWidgetMixIn>`:
   A mix-in to add ParameterWidget management to any QWidget subclass.
-- :py:class:`ParameterEditCanvas <pydidas.widgets.parameter_config.ParameterEditCanvas>`:
+- :py:class:`ParameterEditCanvas <pydidas.widgets.extended_widgets.ParameterEditCanvas>`:
   An empty widget with access to the :py:class:`ParameterWidgetMixIn
-  <pydidas.widgets.parameter_config.ParameterWidgetMixIn>` functionality for
+  <pydidas.widgets.base_classes.ParameterWidgetMixIn>` functionality for
   dynamic ParameterWidget creation and layout.
 
 ``ParameterWidget`` is the user-facing composite widget for one
@@ -42,7 +41,7 @@ public entry classes:
 All ``QWidgets`` used in the ``pydidas`` user interface which require
 manipulations of :py:class:`Parameters <pydidas.core.Parameter>` should inherit
 from the :py:class:`ParameterWidgetMixIn
-<pydidas.widgets.parameter_config.ParameterWidgetMixIn>` class and use its
+<pydidas.widgets.base_classes.ParameterWidgetMixIn>` class and use its
 :ref:`public API <dev_guide_parameter_widgets_mixin_api>`.
 
 .. _dev_guide_parameter_widgets_mixin_api:
@@ -51,10 +50,10 @@ ParameterWidgetMixIn public API
 ---------------------------------
 
 :py:class:`ParameterWidgetMixIn
-<pydidas.widgets.parameter_config.ParameterWidgetMixIn>` is a mixin class that
+<pydidas.widgets.base_classes.ParameterWidgetMixIn>` is a mixin class that
 can be added to any ``QWidget`` subclass to provide managed creation, access,
 and synchronization of :py:class:`ParameterWidget
-<pydidas.widgets.parameter_config.ParameterWidget>` instances.
+<pydidas.widgets.param_io.ParameterWidget>` instances.
 
 .. note::
 
@@ -62,7 +61,7 @@ and synchronization of :py:class:`ParameterWidget
     (:py:class:`ParameterCollection <pydidas.core.ParameterCollection>`) and is
     a (subclass of) ``QWidget`` with a layout manager that supports adding
     widgets (e.g. ``QGridLayout``). :py:class:`ParameterEditCanvas
-    <pydidas.widgets.parameter_config.ParameterEditCanvas>` provides a
+    <pydidas.widgets.extended_widgets.ParameterEditCanvas>` provides a
     ready-to-use base class combining both.
 
 Methods
@@ -119,14 +118,14 @@ For accessing the widgets, the following attributes are available:
 
 These dictionaries are populated when widgets are created through the
 :py:meth:`create_param_widget
-<pydidas.widgets.parameter_config.ParameterWidgetMixIn.create_param_widget>`
+<pydidas.widgets.base_classes.ParameterWidgetMixIn.create_param_widget>`
 method.
 
 ParameterWidget public API
 --------------------------
 
 All user-interaction with the :py:class:`ParameterWidget
-<pydidas.widgets.parameter_config.ParameterWidget>` should happen through the
+<pydidas.widgets.param_io.ParameterWidget>` should happen through the
 following API contract. For internal behavior and signal/data flow, see
 :ref:`dev_guide_parameter_widget`.
 
@@ -189,7 +188,7 @@ necessary imports and application setup are assumed to be in place.
 .. code-block:: python
 
     >>> from pydidas.core import Parameter
-    >>> from pydidas.widgets.parameter_config import ParameterWidget, ParameterEditCanvas
+    >>> from pydidas.widgets.param_io import ParameterWidget, ParameterEditCanvas
     >>> param = Parameter("param1", int, 42)
     >>> canvas = ParameterEditCanvas()
     >>> canvas.params.add_param(param)
@@ -215,7 +214,7 @@ necessary imports and application setup are assumed to be in place.
 
     # The associated I/O widget can be accessed directly through the `io_widget` property:
     >>> widget.io_widget
-    <pydidas.widgets.parameter_config.param_io_widget_lineedit.ParamIoWidgetLineEdit(0x22b5c91c530) at 0x0000022B61E46F00>
+    <pydidas.widgets.param_io._param_io_lineedit._ParamIoLineEdit(0x22b5c91c530) at 0x0000022B61E46F00>
 
    # Now, we set a new value and choices for the Parameter, then update both the Parameter and the widget:
     >>> param.choices is None
@@ -229,7 +228,7 @@ necessary imports and application setup are assumed to be in place.
     # (this will rebuild the I/O widget to a combo box):
     >>> widget.update_choices_from_param()
     >>> widget.io_widget
-    <pydidas.widgets.parameter_config.param_io_widget_combobox.ParamIoWidgetComboBox(0x22b54983850) at 0x0000022B6850F100>
+    <pydidas.widgets.param_io._param_io_combobox._ParamIoComboBox(0x22b54983850) at 0x0000022B6850F100>
     >>> widget.value
     300
     # Updating the widget value through the new combo box also updates the Parameter and emits signals:

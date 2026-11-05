@@ -16,13 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The base_reimplementations subpackage includes basic QtWidget
-re-implementations with extended generic functionality that
- are used throughout the pydidas package.
-
-These widgets are designed to provide scaling based on the system
-font and font size to allow a scalability independent of the
-monitor resolution.
+The base_classes subpackage includes base classes and mix-ins for pydidas
+widgets, frames and windows.
 """
 
 __author__ = "Malte Storm"

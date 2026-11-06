@@ -329,6 +329,44 @@ class BaseFitPluginTestSuite:
         assert np.all(np.isfinite(_res1))
         assert np.all(np.isfinite(_res2))
 
+    @pytest.mark.parametrize("process_data_dim", [0, 1, -2])
+    @pytest.mark.parametrize("output", ["amplitude", "position; amplitude; area"])
+    def test_execute__places_results_correctly(
+        self,
+        data: Dataset,
+        process_data_dim: int,
+        output: str,
+    ) -> None:
+        _expected_single_result_shape = (1,) if output == "amplitude" else (3,)
+        _res_slice = (slice(None),) if self.num_peaks == 1 else (slice(None),) * 2
+        if self.num_peaks > 1:
+            _expected_single_result_shape = (
+                self.num_peaks,
+            ) + _expected_single_result_shape
+        if process_data_dim == 0:
+            data = np.repeat(np.repeat(data[:, None, None], 4, axis=1), 2, axis=2)
+            _expected_shape = _expected_single_result_shape + (4, 2)
+            _ref_slice = _res_slice + (0, 0)
+        else:
+            data = np.repeat(np.repeat(data[None, :, None], 4, axis=0), 2, axis=2)
+            _expected_shape = (4,) + _expected_single_result_shape + (2,)
+            _ref_slice = (0,) + _res_slice + (0,)
+        _plugin = self.make_plugin(process_data_dim=process_data_dim, fit_output=output)
+        _plugin.pre_execute()
+        _result, _ = _plugin.execute(data)
+        assert _result.shape == _expected_shape
+        _ref = _result[_ref_slice]
+        for _i in range(4):
+            # take the axis which was not processed:
+            _index = (
+                (slice(None),) * min(self.num_peaks, 2) + (_i,)
+                if process_data_dim == 0
+                else (_i,) + (slice(None),) * min(self.num_peaks, 2)
+            )
+            _tmp_data = _result[_index]
+            for _j in range(2):
+                assert np.allclose(_tmp_data[..., _j], _ref)
+
     @pytest.mark.parametrize("bg_order", [None, 0, 1])
     def test_execute__store_details(self, data, bg_order):
         _plugin = self.make_plugin(fit_bg_order=bg_order)
@@ -371,12 +409,13 @@ class BaseFitPluginTestSuite:
             bg_order is not None
         )
 
-    def test_execute__details_are_reset_after_invalid_peak(self, data):
-        _plugin = self.make_plugin(fit_min_peak_height=500)
+    @pytest.mark.parametrize("height", [None, 500])
+    def test_execute__details_are_reset_on_new_call(self, data, height):
+        _plugin = self.make_plugin()
         _plugin.pre_execute()
         _plugin.execute(data, store_details=True)
         assert None in _plugin.detailed_results
-        _plugin.config["min_peak_height"] = None
+        _plugin.config["min_peak_height"] = 500
         _plugin.execute(data)
         assert _plugin.detailed_results == {}
 

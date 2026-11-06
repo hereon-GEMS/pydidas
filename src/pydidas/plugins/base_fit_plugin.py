@@ -27,6 +27,7 @@ __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
 
+import itertools
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
@@ -35,12 +36,271 @@ from scipy.optimize import least_squares
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
-from pydidas.core.utils import process_1d_with_multi_input_dims
+from pydidas.core.fitting.fit_func_base import FitFuncBase
+from pydidas.core.utils.decorators import create_multi_dim_result_dataset
+from pydidas.core.utils.iterable_utils import (
+    insert_item_in_tuple,
+    remove_item_at_index_from_iterable,
+)
 from pydidas.plugins.base_proc_plugin import ProcPlugin
 
 
 if TYPE_CHECKING:
     from pydidas.widgets.plugin_config_widgets import GenericPluginConfigWidget
+
+
+def _format_fit_metadata(metadata: dict[str, Any]) -> str:
+    """
+    Format the fit metadata as text to be displayed with the plots.
+
+    Parameters
+    ----------
+    metadata : dict[str, Any]
+        The metadata of the fit results.
+
+    Returns
+    -------
+    str
+        The formatted text.
+    """
+    _param_lines = "\n    ".join(
+        f"{_key}: {_value:.6f}," for _key, _value in metadata["fit_params"].items()
+    )
+    return (
+        f"fit_func: {metadata['fit_func']}\n"
+        f"fit_residual_std: {metadata['fit_residual_std']:.6f}\n"
+        "fit params: {\n    " + _param_lines + "\n}"
+    )
+
+
+def _create_individual_peak_items(
+    fitter: type[FitFuncBase],
+    fit_param_vals: tuple[float, ...],
+    x: np.ndarray,
+    dataset_kwargs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """
+    Create the plot items for the individual peaks of the fit.
+
+    Parameters
+    ----------
+    fitter : type[FitFuncBase]
+        The fit function.
+    fit_param_vals : tuple[float, ...]
+        The fitted parameter values.
+    x : np.ndarray
+        The x values at which to calculate the peak profiles.
+    dataset_kwargs : dict[str, Any]
+        The keyword arguments for the Dataset creation.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        The plot items for the individual peaks.
+    """
+    _n_pp = fitter.num_peak_params
+    return [
+        {
+            "plot": 1,
+            "label": f"peak {_i}",
+            "data": Dataset(
+                fitter.func(fit_param_vals[_i * _n_pp : (_i + 1) * _n_pp], x),
+                **dataset_kwargs,
+            ),
+            "linewidth": 2.5,
+        }
+        for _i in range(fitter.num_peaks)
+    ]
+
+
+def _create_background_item(
+    fit_params: dict[str, float], x_reduced: np.ndarray, dataset_kwargs: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Create the plot item for the fitted background.
+
+    Parameters
+    ----------
+    fit_params : dict[str, float]
+        The fitted parameters, including the background parameters.
+    x_reduced : np.ndarray
+        The x values for the background line, typically the two end points.
+    dataset_kwargs : dict[str, Any]
+        The keyword arguments for the Dataset creation.
+
+    Returns
+    -------
+    dict[str, Any]
+        The plot item for the background.
+    """
+    _bg_poly = [fit_params["background_p0"]]
+    if "background_p1" in fit_params:
+        _bg_poly.insert(0, fit_params["background_p1"])
+    _bg = Dataset(
+        np.polyval(_bg_poly, x_reduced),
+        **(dataset_kwargs | {"axis_ranges": [x_reduced]}),
+    )
+    return {"plot": 0, "label": "background", "data": _bg, "linestyle": "--"}
+
+
+def _create_fit_details(
+    fitter: type[FitFuncBase],
+    data: Dataset,
+    data_x: np.ndarray,
+    fit_params: dict[str, float],
+    start_fit_params: tuple[float, ...],
+    metadata: dict[str, Any],
+    has_background: bool,
+) -> dict[str, Any]:
+    """
+    Create the detailed results dictionary for a successful fit.
+
+    Parameters
+    ----------
+    fitter : type[FitFuncBase]
+        The fit function.
+    data : Dataset
+        The (cropped) input data.
+    data_x : np.ndarray
+        The (cropped) x values of the data.
+    fit_params : dict[str, float]
+        The fitted parameters.
+    start_fit_params : tuple[float, ...]
+        The starting values of the fit parameters.
+    metadata : dict[str, Any]
+        The metadata of the fit results.
+    has_background : bool
+        Flag whether the fit includes a background.
+
+    Returns
+    -------
+    dict[str, Any]
+        The detailed results in the format expected by pydidas.
+    """
+    _x_fit = np.linspace(data_x[0], data_x[-1], num=(data_x.size - 1) * 10 + 1)
+    _x_reduced = np.array([np.amin(_x_fit), np.amax(_x_fit)])
+    _fit_param_vals = tuple(fit_params.values())
+    _dset_kws = {
+        "axis_ranges": [_x_fit],
+        "axis_labels": data.axis_labels,
+        "axis_units": data.axis_units,
+        "data_unit": data.data_unit,
+    }
+    _fit_final = Dataset(fitter.profile(_fit_param_vals, _x_fit), **_dset_kws)
+    _fit_start = Dataset(fitter.profile(start_fit_params, _x_fit), **_dset_kws)
+    _bg_data = fitter.calculate_background(_fit_param_vals, data_x)
+    _items = [
+        {
+            "plot": 0,
+            "label": "input data",
+            "data": data,
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        {"plot": 0, "label": "fitted_data", "data": _fit_final, "linewidth": 2.5},
+        {
+            "plot": 1,
+            "label": "input data",
+            "data": data - _bg_data,
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        *_create_individual_peak_items(fitter, _fit_param_vals, _x_fit, _dset_kws),
+        {
+            "plot": 2,
+            "label": "reference",
+            "data": Dataset([0, 0], axis_ranges=[_x_reduced]),
+            "linestyle": "--",
+        },
+        {
+            "plot": 2,
+            "label": "residual",
+            "data": fitter.delta(_fit_param_vals, data_x, data),
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        {"plot": 3, "label": "input data", "data": data},
+        {"plot": 3, "label": "starting guess", "data": _fit_start},
+    ]
+    if has_background:
+        _items.append(_create_background_item(fit_params, _x_reduced, _dset_kws))
+    return {
+        "n_plots": 4,
+        "plot_titles": {
+            0: "data and fit",
+            1: "individual fits",
+            2: "residual",
+            3: "starting guess",
+        },
+        "plot_ylabels": {
+            0: "intensity / a.u.",
+            1: "intensity (background-corrected) / a.u.",
+            2: "intensity / a.u.",
+            3: "intensity / a.u.",
+        },
+        "metadata": _format_fit_metadata(metadata),
+        "items": _items,
+    }
+
+
+def create_invalid_peak_details(
+    data: Dataset,
+    data_x: np.ndarray,
+    bg_corrected_data: Dataset,
+    bg_params: tuple[float, ...],
+) -> dict[str, Any]:
+    """
+    Create the detailed results dictionary for an invalid peak.
+
+    Parameters
+    ----------
+    data : Dataset
+        The (cropped) input data.
+    data_x : np.ndarray
+        The (cropped) x values of the data.
+    bg_corrected_data : Dataset
+        The background-corrected data.
+    bg_params : tuple[float, ...]
+        The estimated background parameters. An empty tuple means that no
+        background was estimated.
+
+    Returns
+    -------
+    dict[str, Any]
+        The detailed results in the format expected by pydidas.
+    """
+    if len(bg_params) == 0:
+        return {
+            "n_plots": 1,
+            "plot_titles": {0: "data"},
+            "plot_ylabels": {0: "intensity / a.u."},
+            "metadata": "",
+            "items": [{"plot": 0, "label": "input data", "data": data}],
+        }
+    _bg = Dataset(np.zeros(data_x.size) + bg_params[0], **data.property_dict)
+    if len(bg_params) == 2:
+        _bg += data_x * bg_params[1]
+    return {
+        "n_plots": 2,
+        "plot_titles": {0: "data and background", 1: "background-corrected data"},
+        "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
+        "metadata": "",
+        "items": [
+            {
+                "plot": 0,
+                "label": "input data",
+                "data": data,
+                "linewidth": 0,
+                "symbol": "o",
+            },
+            {"plot": 0, "label": "background", "data": _bg},
+            {
+                "plot": 1,
+                "label": "background-corrected data",
+                "data": bg_corrected_data,
+            },
+        ],
+    }
 
 
 class BaseFitPlugin(ProcPlugin):
@@ -87,6 +347,7 @@ class BaseFitPlugin(ProcPlugin):
             range_slice=None,
             settings_updated_from_data=False,
             data_x_hash=-1,
+            indices=None,
         )
 
     @property
@@ -116,6 +377,8 @@ class BaseFitPlugin(ProcPlugin):
     def pre_execute(self) -> None:
         """Set up the required functions and fit variable labels."""
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
+        self._fit_params = {}
+        self.config.indices = None
         self.config.range_slice = None
         self.config.settings_updated_from_data = False
         self.config["min_peak_height"] = self.get_param_value("fit_min_peak_height")
@@ -137,7 +400,6 @@ class BaseFitPlugin(ProcPlugin):
         self._update_fit_param_bounds()
         self._create_fit_start_param_dict()
 
-    @process_1d_with_multi_input_dims
     def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict[str, Any]]:
         """
         Fit a peak to the data.
@@ -160,20 +422,102 @@ class BaseFitPlugin(ProcPlugin):
         kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
-        self._details = {}
-        self.prepare_input_data(data)
-        if not self._check_min_peak_height():
+        self._initialize_execution_run(data, kwargs)
+        _global_results = None
+        for _slice_indices in self.config.indices:
+            _curr_data = data[_slice_indices]
+            _detail_identifier = (
+                None
+                if _slice_indices == slice(None)
+                else data.get_description_of_point(_slice_indices)
+            )
+            _curr_results, _details, kwargs = self._fit_spectrum(_curr_data, **kwargs)
             if kwargs.get("store_details", False):
-                self._details = {None: self._create_details_for_invalid_peak()}
-            return self.create_result_dataset(valid=False), kwargs
+                self._details[_detail_identifier] = _details
+            self._fit_results[_detail_identifier] = self._fit_params
+            if self.config.dim_to_process is None:
+                return _curr_results, kwargs
+            if _global_results is None:
+                _global_results = create_multi_dim_result_dataset(
+                    self.config.dim_to_process, data, _curr_results
+                )
+            _output_indices = (
+                _slice_indices[: self.config.dim_to_process]
+                + (slice(None),) * _curr_results.ndim
+                + _slice_indices[self.config.dim_to_process + 1 :]
+            )
+            _global_results[_output_indices] = _curr_results
+        return _global_results, kwargs
 
-        _startguess = self._fitter.guess_fit_start_params(
-            self._data_x,
-            self._data,
-            bg_order=self.get_param_value("fit_bg_order"),
-            bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
-            **self._fit_presets,
-        )
+    def _initialize_execution_run(self, data: Dataset, kwargs: dict[str, Any]) -> None:
+        """
+        Initialize the execution run for the current dataset.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input Dataset.
+        kwargs : dict[str, Any]
+            Any calling keyword arguments.
+        """
+        self._details = {}
+        self._fit_results = {}
+        if self.config.get("indices") is None:
+            if data.ndim == 1:
+                self.config.indices = (slice(None),)
+                self.config.dim_to_process = None
+                return
+            self.config.dim_to_process = np.mod(
+                self.get_param_value("process_data_dim"), data.ndim
+            )
+            _results_shape = remove_item_at_index_from_iterable(
+                data.shape, self.config.dim_to_process
+            )
+            _indices_to_process = [np.arange(_s) for _s in _results_shape]
+            self.config.indices = tuple(
+                insert_item_in_tuple(_i, self.config.dim_to_process, slice(None))
+                for _i in tuple(itertools.product(*_indices_to_process))
+            )
+
+    def _fit_spectrum(
+        self, data: Dataset, **kwargs: Any
+    ) -> tuple[Dataset, dict[str | None, Any] | None, dict[str, Any]]:
+        """
+        Fit a spectrum to the data.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input Dataset
+        **kwargs : Any
+            Any calling keyword arguments.
+
+        Returns
+        -------
+        data : Dataset
+            The fit results as a Dataset.
+        details : dict[str | None, Any] | None
+            The detailed results for the fit.
+        kwargs : dict[str, Any]
+            Any calling kwargs, appended by any changes in the function.
+        """
+        self.prepare_input_data(data)
+        _store_details = kwargs.get("store_details", False)
+        if not self._check_min_peak_height():
+            _details = (
+                self._create_details_for_invalid_peak() if _store_details else None
+            )
+            return self.create_result_dataset(valid=False), _details, kwargs
+        if kwargs.get("start_guess") is not None:
+            _startguess = kwargs.get("start_guess")
+        else:
+            _startguess = self._fitter.guess_fit_start_params(
+                self._data_x,
+                self._data,
+                bg_order=self.get_param_value("fit_bg_order"),
+                bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
+                **self._fit_presets,
+            )
         _res = least_squares(
             self._fitter.delta,
             _startguess,
@@ -189,9 +533,12 @@ class BaseFitPlugin(ProcPlugin):
             "fitted_axis_unit": self._data.axis_units[0],
         }
         _results = self.create_result_dataset()
-        if kwargs.get("store_details", False):
-            self._details = {None: self.create_detailed_results(_results, _startguess)}
-        return _results, kwargs
+        _details = (
+            self.create_detailed_results(_results, _startguess)
+            if _store_details
+            else None
+        )
+        return _results, _details, kwargs
 
     def create_result_dataset(self, valid: bool = True) -> Dataset:
         """
@@ -296,116 +643,17 @@ class BaseFitPlugin(ProcPlugin):
         """
         if self._data is None:
             raise ValueError("Cannot get detailed results without input data.")
-        _xfit = np.linspace(
-            self._data_x[0], self._data_x[-1], num=(self._data_x.size - 1) * 10 + 1
+        return _create_fit_details(
+            self._fitter,
+            self._data,
+            self._data_x,
+            self._fit_params,
+            start_fit_params,
+            results.metadata,
+            self.get_param_value("fit_bg_order") is not None,
         )
-        _x_reduced = np.array([np.amin(_xfit), np.amax(_xfit)])
-        _fit_param_vals = tuple(self._fit_params.values())
-        _dset_kws = {
-            "axis_ranges": [_xfit],
-            "axis_labels": self._data.axis_labels,
-            "axis_units": self._data.axis_units,
-            "data_unit": self._data.data_unit,
-        }
-        _num_peaks = self._fitter.num_peaks
-        _fit_final = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
-        _fit_start = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
-        _bg_data = self._fitter.calculate_background(_fit_param_vals, self._data_x)
-        _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
-        _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
 
-        _n_pp = self._fitter.num_peak_params
-        _individual_peaks = [
-            {
-                "plot": 1,
-                "label": f"peak {_i}",
-                "data": Dataset(
-                    self._fitter.func(
-                        _fit_param_vals[_i * _n_pp : (_i + 1) * _n_pp], _xfit
-                    ),
-                    **_dset_kws,
-                ),
-                "linewidth": 2.5,
-            }
-            for _i in range(_num_peaks)
-        ]
-        _details = {
-            "n_plots": 4,
-            "plot_titles": {
-                0: "data and fit",
-                1: "individual fits",
-                2: "residual",
-                3: "starting guess",
-            },
-            "plot_ylabels": {
-                0: "intensity / a.u.",
-                1: "intensity (background-corrected) / a.u.",
-                2: "intensity / a.u.",
-                3: "intensity / a.u.",
-            },
-            "metadata": (
-                (
-                    f"fit_func: {results.metadata['fit_func']}\n"
-                    f"fit_residual_std: {results.metadata['fit_residual_std']:.6f}\n"
-                    "fit params: {\n    "
-                )
-                + "\n    ".join(
-                    f"{_key}: {_value:.6f},"
-                    for _key, _value in results.metadata["fit_params"].items()
-                )
-                + "\n}"
-            ),
-            "items": [
-                {
-                    "plot": 0,
-                    "label": "input data",
-                    "data": self._data,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                {
-                    "plot": 0,
-                    "label": "fitted_data",
-                    "data": _fit_final,
-                    "linewidth": 2.5,
-                },
-                {
-                    "plot": 1,
-                    "label": "input data",
-                    "data": self._data - _bg_data,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                *_individual_peaks,
-                {
-                    "plot": 2,
-                    "label": "reference",
-                    "data": _reference,
-                    "linestyle": "--",
-                },
-                {
-                    "plot": 2,
-                    "label": "residual",
-                    "data": _residual,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                {"plot": 3, "label": "input data", "data": self._data},
-                {"plot": 3, "label": "starting guess", "data": _fit_start},
-            ],
-        }
-        if self.get_param_value("fit_bg_order") is not None:
-            _bg_poly = [self._fit_params["background_p0"]]
-            if "background_p1" in self._fit_params:
-                _bg_poly.insert(0, self._fit_params["background_p1"])
-            _bg = Dataset(
-                np.polyval(_bg_poly, _x_reduced),
-                **(_dset_kws | {"axis_ranges": [_x_reduced]}),
-            )
-            _details["items"].append(
-                {"plot": 0, "label": "background", "data": _bg, "linestyle": "--"}
-            )
-        return _details
+    # raise TypeError("To do: Fix the start fit estimation for multiple peaks for Gauss / Lorentzian. Implement dynamic fitting ranges.")
 
     def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
         """
@@ -578,42 +826,12 @@ class BaseFitPlugin(ProcPlugin):
         dict[str, Any]
             The invalid results.
         """
-        _bg_corrected_data = self._run_data.get("bg_corrected_data", self._data)
-        _bg_params = self._run_data.get("bg_params", ())
-        if len(_bg_params) == 0:
-            return {
-                "n_plots": 1,
-                "plot_titles": {0: "data"},
-                "plot_ylabels": {0: "intensity / a.u."},
-                "metadata": "",
-                "items": [{"plot": 0, "label": "input data", "data": self._data}],
-            }
-        _bg = Dataset(
-            np.zeros(self._data_x.size) + _bg_params[0], **self._data.property_dict
+        return create_invalid_peak_details(
+            self._data,
+            self._data_x,
+            self._run_data.get("bg_corrected_data", self._data),
+            self._run_data.get("bg_params", ()),
         )
-        if len(_bg_params) == 2:
-            _bg += self._data_x * _bg_params[1]
-        return {
-            "n_plots": 2,
-            "plot_titles": {0: "data and background", 1: "background-corrected data"},
-            "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
-            "metadata": "",
-            "items": [
-                {
-                    "plot": 0,
-                    "label": "input data",
-                    "data": self._data,
-                    "linewidth": 0,
-                    "symbol": "o",
-                },
-                {"plot": 0, "label": "background", "data": _bg},
-                {
-                    "plot": 1,
-                    "label": "background-corrected data",
-                    "data": _bg_corrected_data,
-                },
-            ],
-        }
 
 
 BaseFitPlugin.register_as_base_class()

@@ -128,6 +128,11 @@ class Crop1dData(ProcPlugin):
             The cropped input data
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
+
+        Raises
+        ------
+        UserConfigError
+            If the cropped range does not contain any data points.
         """
         self._data = data
         _slices = self._get_slices()
@@ -142,6 +147,11 @@ class Crop1dData(ProcPlugin):
         -------
         tuple[slice, ...]
             The slices to select the range from the input data.
+
+        Raises
+        ------
+        UserConfigError
+            If the cropped range does not contain any data points or is invalid.
         """
         if self.config["slices"] is not None:
             return self.config["slices"]
@@ -171,17 +181,18 @@ class Crop1dData(ProcPlugin):
                 _bounds = np.where(_x >= _low)[0]
             else:
                 _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-            if np.unique(np.diff(_bounds)) not in (np.array([1]), np.array([])):
+            if _bounds.size == 0:
+                raise UserConfigError(
+                    "Configuration error in Crop 1d Data plugin: Cropped range does"
+                    " not contain any data points. Check cropping range and data."
+                )
+            else:
+                _slice = slice(_bounds[0], _bounds[-1] + 1)
+            if not np.all(np.diff(_bounds) == 1):
                 raise UserConfigError(
                     "Cannot determine the cropping range from the data:\n"
                     "The selected data range is not continuous. Please check the "
                     "input data and the selected range."
                 )
-            if _bounds.size == 0:
-                _slice = slice(0, 0)
-            elif _bounds.size == 1:
-                _slice = slice(_bounds[0], _bounds[0] + 1)
-            else:
-                _slice = slice(_bounds[0], _bounds[-1] + 1)
         self.config["slices"] = (slice(None, None),) * _i_dim + (_slice,)
         return self.config["slices"]

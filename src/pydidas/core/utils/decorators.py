@@ -24,7 +24,11 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["copy_docstring", "process_1d_with_multi_input_dims"]
+__all__ = [
+    "copy_docstring",
+    "create_multi_dim_result_dataset",
+    "process_1d_with_multi_input_dims",
+]
 
 
 import functools
@@ -122,7 +126,9 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
             _input = data[insert_item_in_tuple(_params, _dim_to_process, slice(None))]
             _single_result, _new_kws = method(self, _input, **kwargs)
             if _results is None:
-                _results = _create_result_dataset(_dim_to_process, data, _single_result)
+                _results = create_multi_dim_result_dataset(
+                    _dim_to_process, data, _single_result
+                )
             if _process_details:
                 _point = insert_item_in_tuple(_params, _dim_to_process, None)
                 _detail_identifier = data.get_description_of_point(_point)
@@ -141,7 +147,7 @@ def process_1d_with_multi_input_dims(method: Callable) -> Callable:
     return _implementation
 
 
-def _create_result_dataset(
+def create_multi_dim_result_dataset(
     dim_to_process: int, input: Dataset, result: Dataset
 ) -> Dataset:
     """

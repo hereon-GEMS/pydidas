@@ -123,6 +123,7 @@ Bugfixes
 - Fixed an issue when the GUI state import fell back to default exit state
   states with custom names.
 - Fixed an issue with a wrong class reference name in the DataViewer
+- Fixed an issue when trying to open data of shape (n, 1) i nthe DataViewer
 
 
 v26.05.19

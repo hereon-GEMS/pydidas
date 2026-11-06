@@ -810,9 +810,14 @@ class TestDataset(unittest.TestCase):
         _str = obj.get_description_of_point((1, 2, 3, 4))
         self.assertEqual(_str, "a: 1.0000 ua; b: 2.0000 ub; c: 3.0000 uc; d: 4.0000 ud")
 
-    def test_get_description_of_point__wNone(self):
+    def test_get_description_of_point__w_None(self):
         obj = self.create_large_dataset()
         _str = obj.get_description_of_point((None, 2, None, 4))
+        self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
+
+    def test_get_description_of_point__w_slice(self):
+        obj = self.create_large_dataset()
+        _str = obj.get_description_of_point((slice(None), 2, None, 4))
         self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
 
     def test_dataset_creation(self):

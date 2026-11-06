@@ -779,15 +779,18 @@ class Dataset(ndarray):
         _range_diff = np.diff(_range[np.isfinite(_range)])
         return abs(_range_diff.std() / _range_diff.mean()) > threshold
 
-    def get_description_of_point(self, indices: tuple[int] | list[int]) -> str:
+    def get_description_of_point(
+        self, indices: tuple[int | None | slice] | list[int | None | slice]
+    ) -> str:
         """
         Get the metadata description of a single point in the array.
 
-        Index values of "None" will be interpreted as request to skip this axis.
+        Index values of "None" or "slice(None)" will be interpreted as
+        request to skip this axis.
 
         Parameters
         ----------
-        indices : tuple[int] | list[int]
+        indices : tuple[int | None | slice] | list[int | None | slice]
             The indices for each dimension.
 
         Returns
@@ -799,7 +802,7 @@ class Dataset(ndarray):
         if len(indices) != self.ndim:
             raise ValueError("Wrong number of indices for Dataset dimensions.")
         for _dim, _index in enumerate(indices):
-            if _index is None:
+            if _index in [None, slice(None)]:
                 continue
             _label = self._meta["axis_labels"][_dim]
             _value = self._meta["axis_ranges"][_dim][_index]

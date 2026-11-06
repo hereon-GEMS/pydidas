@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["Gaussian"]
 
 from numbers import Real
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from numpy import amax, amin, exp, inf, ndarray, pi
 
@@ -82,7 +82,7 @@ class Gaussian(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: int | None, **kwargs: dict
+        cls, x: ndarray, y: ndarray, index: int | None, **kwargs: Any
     ) -> tuple[Real]:
         """
         Guess the starting parameters for a Gaussian peak fit.
@@ -96,7 +96,7 @@ class Gaussian(FitFuncBase):
         index : Optional[int]
             The peak index. Use None for a non-indexed single peak or the
              integer peak number (starting with 1).
-        **kwargs : dict
+        **kwargs: Any
             Optional keyword arguments.
 
         Returns

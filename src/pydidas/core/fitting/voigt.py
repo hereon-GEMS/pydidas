@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["Voigt"]
 
 from numbers import Real
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
@@ -76,8 +76,8 @@ class Voigt(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: None | int, **kwargs: dict
-    ) -> tuple[Real]:
+        cls, x: ndarray, y: ndarray, index: None | int, **kwargs: Any
+    ) -> tuple[float, float, float, float]:
         """
         Guess the starting parameters for a Voigt peak fit.
 
@@ -90,7 +90,7 @@ class Voigt(FitFuncBase):
         index : Union[None, str]
             The peak index. Use None for a non-indexed single peak or the integer peak
             number (starting with 1).
-        **kwargs : dict
+        **kwargs: Any
             Optional keyword arguments.
 
         Returns

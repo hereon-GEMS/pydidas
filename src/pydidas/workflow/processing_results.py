@@ -47,6 +47,7 @@ from pydidas.core import (
     UserConfigError,
 )
 from pydidas.core.config_dict_mixin import ConfigDictMixin
+from pydidas.core.utils import get_simplified_array_representation
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.workflow.processing_result_saver import ProcessingResultSaver
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -569,6 +570,11 @@ class ProcessingResults(ObjectWithParameterCollection):
         self._check_that_results_are_available(node_id)
         _result_info = self._plugin_result_infos[node_id]
         _metadata = _result_info.get_metadata(use_scan_timeline, squeeze)
+        _ranges = [
+            get_simplified_array_representation(_range, leading_indent=0)
+            + f" {_metadata['axis_units'][_dim]}"
+            for _dim, _range in enumerate(_metadata["axis_ranges"])
+        ]
         _node_info = (
             _result_info.plugin_name
             + ":\n\n"
@@ -578,8 +584,7 @@ class ProcessingResults(ObjectWithParameterCollection):
                     f"Axis #{_dim:02d} {_metadata['axis_types'][_dim]}:\n"
                     f"  Label: {_label}\n"
                     f"  N points: {_metadata['shape'][_dim]}\n"
-                    f"  Range: {_metadata['axis_ranges'][_dim]} "
-                    f"{_metadata['axis_units'][_dim]}\n"
+                    f"  Range: {_ranges[_dim]}\n"
                 )
                 for _dim, _label in enumerate(_metadata["axis_labels"])
             )

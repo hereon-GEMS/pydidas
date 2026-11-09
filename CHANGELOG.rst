@@ -131,6 +131,7 @@ Bugfixes
   for each run even when no Parameters changed.
 - Fixed an issue which allowed the same error message to spawn repeatedly even
   when not acknowledged.
+- Fixed an issue which showed an unformatted axis range for processing results.
 
 
 v26.05.19

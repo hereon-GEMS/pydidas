@@ -129,6 +129,8 @@ Bugfixes
   on repeat hash calls.
 - Fixed an issue in TweakPluginParameterWindow which forced a new pre_execute
   for each run even when no Parameters changed.
+- Fixed an issue which allowed the same error message to spawn repeatedly even
+  when not acknowledged.
 
 
 v26.05.19

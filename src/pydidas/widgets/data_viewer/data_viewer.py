@@ -330,7 +330,7 @@ class DataViewer(WidgetWithParameters):
                 raise UserConfigError(_DATASET_TOO_LARGE_ERROR)
             if not isinstance(data, Dataset):
                 data = Dataset(data)
-            data.squeeze()
+            data = data.squeeze()
         else:
             raise UserConfigError(
                 "The data to display must be a numpy array, a h5py.Dataset or a "

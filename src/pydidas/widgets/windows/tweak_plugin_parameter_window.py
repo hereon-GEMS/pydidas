@@ -164,6 +164,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["config_scroll_area"].adjustSize()
         self.config["accept_changes"] = False
         self.__plugin = plugin
+        self.__plugin_hash = -1
         self.__original_plugin_params = copy.deepcopy(plugin.params)
         self.config["initial_results"] = results
         self._widgets["plugin_param_edit"].configure_plugin(
@@ -201,10 +202,12 @@ class TweakPluginParameterWindow(PydidasWindow):
         with ShowBusyMouse():
             _arg = self.__plugin.config["input_data"]
             if isinstance(_arg, np.ndarray):
-                _arg = self.__plugin.config["input_data"].copy()
+                _arg = _arg.copy()
             _kwargs = self.__plugin.config["input_kwargs"].copy()
-            self.__plugin.pre_execute()
+            if hash(self.__plugin) != self.__plugin_hash:
+                self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
+            self.__plugin_hash = hash(self.__plugin)
             self._widgets["plot"].set_data(
                 _res, title=f"{self.__plugin.plugin_name} results"
             )

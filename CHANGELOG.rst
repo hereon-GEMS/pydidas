@@ -127,6 +127,8 @@ Bugfixes
 - Fixed an issue when trying to open data of shape (n, 1) i nthe DataViewer
 - Fixed an issue in Dataset hashing which did not produce consistent results
   on repeat hash calls.
+- Fixed an issue in TweakPluginParameterWindow which forced a new pre_execute
+  for each run even when no Parameters changed.
 
 
 v26.05.19

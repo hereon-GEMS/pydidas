@@ -971,6 +971,11 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(hash(obj), int)
         self.assertNotEqual(hash(obj), hash(obj2))
 
+    def test_hash__repeat_consistent(self):
+        _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
+        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+        self.assertEqual(hash(obj), hash(obj))
+
     def test_data_description__no_data_unit(self):
         _test_label = "Spam, eggs, sausage and spam"
         obj = self.create_simple_dataset()

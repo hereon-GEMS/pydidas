@@ -1433,8 +1433,8 @@ class Dataset(ndarray):
         _metahash = hash(
             (
                 id(self),
-                self.axis_labels.values(),
-                self.axis_units.values(),
+                tuple(self.axis_labels.values()),
+                tuple(self.axis_units.values()),
                 self.data_label,
                 self.data_unit,
             )

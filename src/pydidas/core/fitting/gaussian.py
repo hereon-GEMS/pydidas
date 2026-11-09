@@ -174,3 +174,22 @@ class Gaussian(FitFuncBase):
         return tuple(
             0.39894228 * c[0 + 3 * _i] / c[1 + 3 * _i] for _i in range(cls.num_peaks)
         )
+
+    @classmethod
+    def relative_sigma(cls, c: tuple[float]) -> tuple[float]:
+        """
+        Get the relative sigma value for the Gaussian fit.
+
+        By definition, the relative sigma for a Gaussian is always 1.
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        tuple[float]
+            The relative sigma values for all peaks.
+        """
+        return tuple(1.0 for _ in range(cls.num_peaks))

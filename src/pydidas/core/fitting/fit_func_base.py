@@ -227,6 +227,25 @@ class FitFuncBase(metaclass=FitFuncMeta):
         return tuple(c[_index] for _index in cls._center_param_indices())
 
     @classmethod
+    def relative_sigma(cls, c: tuple[float]) -> tuple[float]:
+        """
+        Get the relative sigma / (sigma + gamma) for a Voigt fit.
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        tuple[float]
+            The relative sigma / (sigma + gamma) for all peaks.
+        """
+        raise NotImplementedError(
+            "The relative_sigma method must be implemented by the specific FitFunc"
+        )
+
+    @classmethod
     def _center_param_indices(cls, num_peaks: int | None = None) -> list[int]:
         """
         Get the indices for the center parameters.

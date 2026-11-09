@@ -321,6 +321,8 @@ class BaseFitPlugin(ProcPlugin):
         "fit_bg_order",
         "fit_lower_limit",
         "fit_upper_limit",
+        "fit_use_latest_as_start_guess",
+        "fit_move_range_with_results",
         "fit_sigma_threshold",
         "fit_min_peak_height",
     )
@@ -329,6 +331,8 @@ class BaseFitPlugin(ProcPlugin):
     num_peaks = 1
     new_dataset = True
     advanced_parameters: ClassVar[list[str]] = [
+        "fit_use_latest_as_start_guess",
+        "fit_move_range_with_results",
         "fit_sigma_threshold",
         "fit_min_peak_height",
     ]
@@ -709,6 +713,8 @@ class BaseFitPlugin(ProcPlugin):
                 ]
             elif _key == "background at peak":
                 results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
+            elif _key == "relative sigma / (sigma + gamma)":
+                results[slice(None), _i] = self._fitter.relative_sigma(_fit_pvals)
         return results
 
     def _crop_data_to_selected_range(self) -> None:

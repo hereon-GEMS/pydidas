@@ -251,7 +251,8 @@ class BaseFitPluginTestSuite:
         _plugin.prepare_input_data(data)
         assert _plugin.output_data_label == (
             "position / ax_unit; amplitude / cts; area / (cts * ax_unit); "
-            "FWHM / ax_unit; background at peak / cts; total count intensity / cts"
+            "FWHM / ax_unit; background at peak / cts; total count intensity / cts; "
+            "relative sigma / (sigma + gamma)"
         )
         assert _plugin.config["settings_updated_from_data"]
 
@@ -434,6 +435,7 @@ class BaseFitPluginTestSuite:
             "FWHM",
             "total count intensity",
             "background at peak",
+            "relative sigma / (sigma + gamma)",
             ALL_OUTPUTS,
         ],
     )
@@ -504,6 +506,57 @@ class TestBaseFitPluginSubclassWithMultiplePeaks(BaseFitPluginTestSuite):
     plugin_class = MultiPeakFitPlugin
     fit_func = "Double Gaussian"
     num_peaks = 2
+
+
+@pytest.mark.parametrize("family", ["Gaussian", "Lorentzian", "Voigt"])
+@pytest.mark.parametrize("prefix", ["", "Double ", "Triple "])
+@pytest.mark.parametrize("include_position", [False, True])
+@pytest.mark.parametrize("valid", [True, False])
+def test_execute__relative_sigma_output(
+    family: str, prefix: str, include_position: bool, valid: bool
+) -> None:
+    _fit_func = prefix + family
+    _fitter = FitFuncMeta.get_fitter(_fit_func)
+    _param_values = []
+    _expected = []
+    for _i in range(_fitter.num_peaks):
+        _sigma, _gamma = 1.0 + _i, 4.0 - _i
+        _param_values.extend((25.0, _sigma))
+        if family == "Voigt":
+            _param_values.append(_gamma)
+            _expected.append(_sigma / (_sigma + _gamma))
+        else:
+            _expected.append(1.0 if family == "Gaussian" else 0.0)
+        _param_values.append(10.0 + 20 * _i)
+    _params = tuple(_param_values)
+    _x = np.linspace(0, 60, 601)
+    _data = Dataset(_fitter.profile(_params, _x), axis_ranges=[_x])
+    _plugin = BaseFitPlugin(
+        fit_func=_fit_func,
+        fit_output=(
+            ("position; " if include_position else "")
+            + "relative sigma / (sigma + gamma)"
+        ),
+        fit_bg_order=None,
+        fit_min_peak_height=None if valid else 1e9,
+    )
+    _plugin.num_peaks = _fitter.num_peaks
+    _plugin.pre_execute()
+    _result, _ = _plugin.execute(_data, start_guess=_params)
+    _n_outputs = 2 if include_position else 1
+    _shape = (
+        (_n_outputs,) if _fitter.num_peaks == 1 else (_fitter.num_peaks, _n_outputs)
+    )
+    assert _result.shape == _shape
+    if valid:
+        np.testing.assert_allclose(_result.array[..., -1], np.squeeze(_expected))
+        if include_position:
+            np.testing.assert_allclose(
+                _result.array[..., 0],
+                np.squeeze([10.0 + 20 * _i for _i in range(_fitter.num_peaks)]),
+            )
+    else:
+        assert np.all(np.isnan(_result))
 
 
 def test_is_basic_plugin__baseclass():

@@ -25,11 +25,14 @@ __status__ = "Production"
 
 
 import unittest
+from typing import ClassVar
 
 import numpy as np
+import pytest
 from scipy.special import voigt_profile
 
 from pydidas.core import Dataset
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.voigt import Voigt
 
 
@@ -113,5 +116,38 @@ class TestVoigt(unittest.TestCase):
         )
 
 
+@pytest.mark.parametrize("n_peaks", [1, 2, 3])
+@pytest.mark.parametrize("bg_params", [(), (2.0,), (2.0, 0.5)])
+@pytest.mark.parametrize(
+    "widths",
+    [
+        ((0.0, 2.0), (2.0, 0.0), (1.0, 1.0)),
+        ((1.0, 3.0), (3.0, 1.0), (2.0, 3.0)),
+        ((10.0, 30.0), (30.0, 10.0), (20.0, 30.0)),
+    ],
+)
+def test_relative_sigma__ratio_per_peak(
+    n_peaks: int,
+    bg_params: tuple[float, ...],
+    widths: tuple[tuple[float, float], ...],
+) -> None:
+    class _TestVoigt(Voigt):
+        name = f"TestVoigt_{n_peaks}"
+        num_peaks: ClassVar[int] = n_peaks
+
+    _widths = widths[: _TestVoigt.num_peaks]
+    _params = tuple(
+        _value
+        for _i, (_sigma, _gamma) in enumerate(_widths)
+        for _value in (10.0 + _i, _sigma, _gamma, 5.0 + 10 * _i)
+    )
+    _expected = tuple(_sigma / (_sigma + _gamma) for _sigma, _gamma in _widths)
+    _result = _TestVoigt.relative_sigma(_params + bg_params)
+    assert isinstance(_result, tuple)
+    assert len(_result) == _TestVoigt.num_peaks
+    assert _result == pytest.approx(_expected)
+    del FitFuncMeta.registry[_TestVoigt.name]
+
+
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

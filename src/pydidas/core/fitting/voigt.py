@@ -176,3 +176,27 @@ class Voigt(FitFuncBase):
             c[_i] * voigt_profile(0, c[_i + 1], c[_i + 2])
             for _i in [4 * _ii for _ii in range(cls.num_peaks)]
         )
+
+    @classmethod
+    def relative_sigma(cls, c: tuple[float]) -> tuple[float]:
+        """
+        Get the relative sigma value for the Voigt fit.
+
+        The relative sigma for a Voigt is given by:
+
+        sigma / (sigma + gamma)
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        tuple[float]
+            The relative sigma values for all peaks.
+        """
+        return tuple(
+            c[1 + 4 * _i] / (c[1 + 4 * _i] + c[2 + 4 * _i])
+            for _i in range(cls.num_peaks)
+        )

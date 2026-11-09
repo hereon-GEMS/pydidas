@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FitPluginConfigWidget"]
 
-
+import html
 from functools import partial
 
 from qtpy import QtCore
@@ -37,6 +37,7 @@ from pydidas.core.constants import (
     POLICY_EXP_FIX,
 )
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
+from pydidas.core.generic_params.generic_params_fit import FIT_OUTPUT_TOOLTIPS
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
 )
@@ -81,6 +82,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
                 font_metric_width_factor=0.9 * FONT_METRIC_CONFIG_WIDTH,
                 gridPos=(_index + 1, 1, 1, 1),
                 parent_widget="checkbox_widget",
+                toolTip=f"<qt>{html.escape(FIT_OUTPUT_TOOLTIPS[_key])}</qt>",
             )
             self._widgets[f"checkbox_{_key}"].sig_new_check_state.connect(
                 partial(self._box_checked, _key)

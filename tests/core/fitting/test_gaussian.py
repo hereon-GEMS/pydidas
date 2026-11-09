@@ -25,10 +25,13 @@ __status__ = "Production"
 
 
 import unittest
+from typing import ClassVar
 
 import numpy as np
+import pytest
 
 from pydidas.core import Dataset
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.gaussian import Gaussian
 
 
@@ -112,5 +115,23 @@ class TestGaussian(unittest.TestCase):
         )
 
 
+@pytest.mark.parametrize("n_peaks", [1, 2, 3, 4])
+@pytest.mark.parametrize("bg_params", [(), (2.0,), (2.0, 0.5)])
+def test_relative_sigma__always_one(n_peaks: int, bg_params: tuple[float, ...]) -> None:
+    class _TestGaussian(Gaussian):
+        name = f"TestGaussian_{n_peaks}"
+        num_peaks: ClassVar[int] = n_peaks
+
+    _params = tuple(
+        _value
+        for _i in range(n_peaks)
+        for _value in (10.0 + _i, 0.5 + _i, 5.0 + 10 * _i)
+    )
+    _result = _TestGaussian.relative_sigma(_params + bg_params)
+    assert isinstance(_result, tuple)
+    assert _result == (1.0,) * n_peaks
+    del FitFuncMeta.registry[_TestGaussian.name]
+
+
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

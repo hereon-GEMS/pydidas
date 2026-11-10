@@ -30,9 +30,9 @@ import pytest
 from qtpy import QtCore, QtTest
 
 from pydidas import IS_QT6
-from pydidas.core import UserConfigError
-from pydidas.unittest_objects import create_dataset
-from pydidas.widgets.data_viewer import AxesSelector
+from pydidas.core import Dataset, UserConfigError
+from pydidas.unittest_objects import SignalSpy, create_dataset
+from pydidas.widgets.data_viewer.axes_selector import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import (
     DataAxisSelector,
 )
@@ -57,8 +57,75 @@ def data():
 
 
 @pytest.fixture
-def spy_new_slicing_str(selector):
-    return QtTest.QSignalSpy(selector.sig_new_slicing_str_repr)
+def selector_pair():
+    ### This fixture was written by an AI tool.
+    _source, _target = AxesSelector(), AxesSelector()
+    _data = Dataset(
+        np.zeros((7, 8, 9)),
+        axis_ranges=[np.arange(7) * 0.5, np.arange(8), np.arange(9)],
+    )
+    for _selector in (_source, _target):
+        _selector.set_metadata_from_dataset(_data)
+        _selector.define_additional_choices("x;;y")
+    yield _source, _target, _data
+    for _selector in (_source, _target):
+        _selector.deleteLater()
+    PydidasQApplication.instance().processEvents()
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("point_mode", ["slice at index", "slice at data value"])
+@pytest.mark.parametrize(
+    "range_mode",
+    ["use full axis", "select range by indices", "select range by data values"],
+)
+@pytest.mark.parametrize("swapped", [False, True])
+def test_import_configuration__selection_and_independence(
+    selector_pair, point_mode: str, range_mode: str, swapped: bool
+) -> None:
+    ### This test was written by an AI tool.
+    _source, _target, _data = selector_pair
+    _source.assign_index_use_to_dims([0])
+    _point, _x, _y = _source.findChildren(DataAxisSelector)
+    if swapped:
+        _x.display_choice = "y"
+    _point.display_choice = point_mode
+    _point.set_to_value(
+        _data.axis_ranges[0][3] if point_mode == "slice at data value" else 3
+    )
+    _x._widgets["combo_range"].setCurrentText(range_mode)
+    if range_mode != "use full axis":
+        _edit = _x._widgets[
+            "edit_range_index"
+            if range_mode == "select range by indices"
+            else "edit_range_data"
+        ]
+        _edit.setText("2:5")
+        _edit.editingFinished.emit()
+    _source.process_new_slicing()
+    assert _source.transpose_required == swapped
+    assert not _target.transpose_required
+    _spy = SignalSpy(_target.sig_new_slicing)
+
+    _config = _source.export_configuration()
+    _target.import_configuration(_config)
+
+    assert _target.current_slice == _source.current_slice
+    assert _target.current_slice_str == _source.current_slice_str
+    assert _target.current_display_selection == _source.current_display_selection
+    assert _target.transpose_required == swapped
+    assert _spy.n == 1
+    _target_axes = _target.findChildren(DataAxisSelector)
+    assert _target_axes[1]._widgets["combo_range"].currentText() == range_mode
+    _target_axes[0].set_to_value(0)
+    _target.process_new_slicing()
+    assert _source.current_slice[0] == slice(3, 4, None)
+    assert _target.current_slice[0] == slice(0, 1, None)
+
+
+@pytest.fixture
+def spy_new_slicing_str(selector) -> SignalSpy:
+    return SignalSpy(selector.sig_new_slicing_str_repr)
 
 
 @pytest.fixture
@@ -515,7 +582,7 @@ def test_process_new_slicing(selector, data, spy_new_slicing, spy_new_slicing_st
             _item._move_to_index(data.shape[_dim] - 2)
     selector.process_new_slicing()
     assert len(_get_spy_results(spy_new_slicing)) == 1
-    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+    assert spy_new_slicing_str.n == 1
     for _dim, _item in selector._axis_widgets.items():
         if _item.display_choice in ["choice1", "choice2"]:
             assert selector._current_slice[_dim] == slice(0, data.shape[_dim])
@@ -541,8 +608,8 @@ def test_update_ax_slicing(selector, data, spy_new_slicing, spy_new_slicing_str)
     assert selector._current_slice[3] == slice(3, 4)
     assert selector._current_slice_strings[3] == "3:4"
     assert len(_get_spy_results(spy_new_slicing)) == 1
-    assert len(_get_spy_results(spy_new_slicing_str)) == 1
-    assert "3::3:4" in _get_spy_results(spy_new_slicing_str)[0][0]
+    assert spy_new_slicing_str.n == 1
+    assert "3::3:4" in spy_new_slicing_str.results[0][0]
 
 
 @pytest.mark.gui
@@ -553,7 +620,7 @@ def test__integration__change_axis(
     selector.define_additional_choices("choice1;;choice2")
     selector._axis_widgets[0].display_choice = "slice at index"
     assert len(_get_spy_results(spy_new_slicing)) == 1
-    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+    assert spy_new_slicing_str.n == 1
 
 
 @pytest.mark.gui
@@ -574,7 +641,7 @@ def test__integration__swap_choices(selector, spy_new_slicing, spy_new_slicing_s
     assert "choice1" in selector.current_display_selection
     assert "choice2" in selector.current_display_selection
     assert len(_get_spy_results(spy_new_slicing)) == 1
-    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+    assert spy_new_slicing_str.n == 1
 
 
 @pytest.mark.gui
@@ -587,7 +654,7 @@ def test__integration__swap_choices_case2(
     selector._axis_widgets[1].display_choice = "choice1"
     assert selector.current_display_selection == ["choice2", "choice1"]
     assert len(_get_spy_results(spy_new_slicing)) == 1
-    assert len(_get_spy_results(spy_new_slicing_str)) == 1
+    assert spy_new_slicing_str.n == 1
 
 
 @pytest.mark.gui

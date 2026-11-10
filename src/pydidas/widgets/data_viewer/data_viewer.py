@@ -196,7 +196,9 @@ class DataViewer(WidgetWithParameters):
         return self._data is not None
 
     @QtCore.Slot(str)
-    def _select_view(self, view_key: str) -> None:
+    def _select_view(
+        self, view_key: str, axes_config: dict[str, Any] | None = None
+    ) -> None:
         """Select the view to display"""
         self._view_config: DataViewConfig = DATA_VIEW_CONFIG[view_key]
         _ax_selector: AxesSelector = self._widgets["axes_selector"]
@@ -211,6 +213,9 @@ class DataViewer(WidgetWithParameters):
             _ax_selector.allow_fewer_dims = self._view_config.allow_fewer_dims
             _ax_selector.define_additional_choices(self._view_config.additional_choices)
         self.__update_ax_selector_for_h5py_data()
+        if axes_config is not None:
+            with QtCore.QSignalBlocker(_ax_selector):
+                _ax_selector.import_configuration(axes_config)
         self._update_view(view_key)
 
     def __create_view_widget_if_required(self, view_key: str) -> None:
@@ -274,6 +279,8 @@ class DataViewer(WidgetWithParameters):
         data: H5Node | h5py.Dataset | np.ndarray | None,
         title: str | None = None,
         h5node: H5Node | None = None,
+        axes_config: dict[str, Any] | None = None,
+        view: str | None = None,
     ) -> None:
         """
         Set the data to display
@@ -288,7 +295,26 @@ class DataViewer(WidgetWithParameters):
         h5node : H5Node or None, optional
             The H5Node associated with the data. If provided, metadata about
             the data can be read from the H5Node.
+        axes_config : dict[str, Any] or None, optional
+            Exported AxesSelector configuration, applied before rendering.
+            When view is omitted, its axis choices determine the view.
+        view : str or None, optional
+            View key from DATA_VIEW_CONFIG. Overrides the preferred data view.
         """
+        if view is None and axes_config is not None:
+            _choices = ";;".join(axes_config["additional_choices"])
+            view = next(
+                (
+                    _key
+                    for _key, _cfg in DATA_VIEW_CONFIG.items()
+                    if _cfg.additional_choices == _choices
+                ),
+                None,
+            )
+            if view is None:
+                raise UserConfigError("No data view matches the axis configuration.")
+        if view is not None and view not in DATA_VIEW_CONFIG:
+            raise UserConfigError(f"Unknown data view: {view}")
         self._widgets["container_for_buttons"].setVisible(data is not None)
         self._widgets["axes_selector"].setEnabled(data is not None)
         # Remove the data reference from the h5 view:
@@ -308,8 +334,12 @@ class DataViewer(WidgetWithParameters):
         if title is not None:
             self.config["plot_title"] = title
         self._import_data(data)
-        self._update_widgets_from_data()
-        self._set_new_view()
+        with QtCore.QSignalBlocker(self._widgets["axes_selector"]):
+            self._update_widgets_from_data()
+        if view is not None:
+            self._select_view(view, axes_config=axes_config)
+        else:
+            self._set_new_view()
 
     def _import_data(self, data: Dataset | H5Node | h5py.Dataset | np.ndarray) -> None:
         """
@@ -413,22 +443,38 @@ class DataViewer(WidgetWithParameters):
         """Open a new separate window for the current dataset."""
         if self._data is None:
             return
-        viewer = DataViewer()
+        viewer = DataViewer(parent=self)
+        viewer.setWindowFlag(QtCore.Qt.WindowType.Window, True)
         viewer.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-        viewer.destroyed.connect(self._on_pop_out_destroyed)
+        viewer.destroyed.connect(partial(self._on_pop_out_destroyed, id(viewer)))
         self._pop_out_viewers.append(viewer)
         title = self._config.get("plot_title") or "Dataset"
         viewer.setWindowTitle(f"Data Viewer - {title}")
         if "button_pop-out" in viewer._widgets:
             viewer._widgets["button_pop-out"].setVisible(False)
-        viewer.set_data(self._data, title=title, h5node=self._h5node)
-        if self._active_view is not None:
-            viewer._select_view(self._active_view)
+        viewer.set_data(
+            self._data,
+            title=title,
+            h5node=self._h5node,
+            view=self._active_view,
+            axes_config=self._widgets["axes_selector"].export_configuration(),
+        )
         PydidasQApplication.instance().sig_exit_pydidas.connect(viewer.deleteLater)
         viewer.show()
         viewer.raise_()
 
-    def _on_pop_out_destroyed(self, obj: object) -> None:
-        """Removes the data viewer from the list"""
-        if obj in self._pop_out_viewers:
-            self._pop_out_viewers.remove(obj)
+    def _on_pop_out_destroyed(
+        self, viewer_id: int, obj: QtCore.QObject | None = None
+    ) -> None:
+        """Remove the original Python wrapper after its Qt widget is deleted."""
+        for _index, _viewer in enumerate(self._pop_out_viewers):
+            if id(_viewer) == viewer_id:
+                del self._pop_out_viewers[_index]
+                break
+
+    def deleteLater(self) -> None:
+        """Delete the widget and all pop-out viewers."""
+        while self._pop_out_viewers:
+            _viewer = self._pop_out_viewers.pop()
+            _viewer.deleteLater()
+        super().deleteLater()

@@ -29,6 +29,9 @@ Improvements
   to allow comparisons of data.
 - Added an `all` marker to simplify running all tests with `pytest -m all`
 - Added a `relative sigma / (sigma + gamma)` output for FitFuncs.
+- Added an option to pop out the current data display from the DataViewer
+  with the current display settings to visualize multiple datasets in
+  parallel.
 
 
 Programmatic changes

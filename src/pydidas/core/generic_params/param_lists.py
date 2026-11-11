@@ -48,6 +48,7 @@ FIT_OUTPUT_OPTIONS = [
     "FWHM",
     "background at peak",
     "total count intensity",
+    "reduced chi^2",
     "relative sigma / (sigma + gamma)",
 ]
 

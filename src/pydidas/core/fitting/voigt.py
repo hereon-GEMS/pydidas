@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Voigt"]
 
+
 from numbers import Real
 from typing import Any, ClassVar
 

@@ -71,6 +71,11 @@ FIT_OUTPUT_TOOLTIPS = {
         "For a pure Gaussian fit, this value is always 1.0. For a Lorentzian fit, "
         "this value is always 0.0."
     ),
+    "reduced chi^2": (
+        "The fitted chi-squared value for the global fit. For multi-peak fits, the "
+        "same chi-squared value is returned for each peak. Note that this value "
+        "is normalized by the number of fitted parameters."
+    ),
 }
 
 GENERIC_PARAMS_FIT = (

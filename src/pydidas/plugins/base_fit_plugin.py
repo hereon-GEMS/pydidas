@@ -382,6 +382,7 @@ class BaseFitPlugin(ProcPlugin):
         """Set up the required functions and fit variable labels."""
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
         self._fit_params = {}
+        self._fit_results = {}
         self.config.indices = None
         self.config.range_slice = None
         self.config.settings_updated_from_data = False
@@ -426,16 +427,22 @@ class BaseFitPlugin(ProcPlugin):
         kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
-        self._initialize_execution_run(data, kwargs)
+        self._initialize_execution_run(data)
         _global_results = None
+        _use_latest_start_guess = self.get_param_value("fit_use_latest_as_start_guess")
         for _slice_indices in self.config.indices:
             _curr_data = data[_slice_indices]
+            self.prepare_input_data(_curr_data)
             _detail_identifier = (
                 None
                 if _slice_indices == slice(None)
                 else data.get_description_of_point(_slice_indices)
             )
-            _curr_results, _details, kwargs = self._fit_spectrum(_curr_data, **kwargs)
+            if _use_latest_start_guess and _detail_identifier in self._fit_results:
+                kwargs["start_guess"] = tuple(
+                    self._fit_results[_detail_identifier].values()
+                )
+            _curr_results, _details, kwargs = self._fit_spectrum(**kwargs)
             if kwargs.get("store_details", False):
                 self._details[_detail_identifier] = _details
             self._fit_results[_detail_identifier] = self._fit_params
@@ -451,9 +458,11 @@ class BaseFitPlugin(ProcPlugin):
                 + _slice_indices[self.config.dim_to_process + 1 :]
             )
             _global_results[_output_indices] = _curr_results
+        if self.get_param_value("fit_move_range_with_results"):
+            self._update_fit_range_from_results()
         return _global_results, kwargs
 
-    def _initialize_execution_run(self, data: Dataset, kwargs: dict[str, Any]) -> None:
+    def _initialize_execution_run(self, data: Dataset) -> None:
         """
         Initialize the execution run for the current dataset.
 
@@ -461,11 +470,8 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         data : Dataset
             The input Dataset.
-        kwargs : dict[str, Any]
-            Any calling keyword arguments.
         """
         self._details = {}
-        self._fit_results = {}
         if self.config.get("indices") is None:
             if data.ndim == 1:
                 self.config.indices = (slice(None),)
@@ -484,15 +490,13 @@ class BaseFitPlugin(ProcPlugin):
             )
 
     def _fit_spectrum(
-        self, data: Dataset, **kwargs: Any
+        self, **kwargs: Any
     ) -> tuple[Dataset, dict[str | None, Any] | None, dict[str, Any]]:
         """
         Fit a spectrum to the data.
 
         Parameters
         ----------
-        data : Dataset
-            The input Dataset
         **kwargs : Any
             Any calling keyword arguments.
 
@@ -505,7 +509,6 @@ class BaseFitPlugin(ProcPlugin):
         kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
-        self.prepare_input_data(data)
         _store_details = kwargs.get("store_details", False)
         if not self._check_min_peak_height():
             _details = (
@@ -525,7 +528,7 @@ class BaseFitPlugin(ProcPlugin):
         _res = least_squares(
             self._fitter.delta,
             _startguess,
-            args=(self._data_x, self._data),
+            args=(self._data_x, self._data.array),
             bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
         )
         _res_c = self._fitter.sort_fitted_peaks_by_position(tuple(_res.x))
@@ -560,30 +563,28 @@ class BaseFitPlugin(ProcPlugin):
         Returns
         -------
         new_data : Dataset
-            The new dataset.
+            The new dataset with the output data as defined by the
+            fit_output parameter.
         """
-        _new_data = np.full(self.config["result_shape"], np.nan)
+        _fit_results = np.full(self.config["result_shape"], np.nan)
+        _residual = np.nan
         if valid and self._check_center_positions():
             _fit_pvals = tuple(self._fit_params.values())
             _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
             if _residual <= self.config["sigma_threshold"]:
-                _new_data = self._write_valid_results(_new_data)
-        else:  # results not valid
-            _residual = np.nan
+                _fit_results = self._write_valid_results(_fit_results, _fit_final)
         if self.num_peaks == 1:
-            _new_data = _new_data.squeeze(axis=0)
-        _axis_labels = [
+            _fit_results = _fit_results.squeeze(axis=0)
+        _axis_labels = (["Peak number"] if self.num_peaks > 1 else []) + [
             "; ".join([f"{i}: {_key}" for i, _key in enumerate(self.fit_outputs)])
         ]
-        if self.num_peaks > 1:
-            _axis_labels.insert(0, "Peak number")
         _result_dataset = Dataset(
-            _new_data,
+            _fit_results,
             data_label=self.output_data_label,
             data_unit="",
             axis_labels=_axis_labels,
-            axis_units=[""] * _new_data.ndim,
+            axis_units=[""] * _fit_results.ndim,
         )
         _result_dataset.metadata = self._data.metadata | {
             "fit_func": self._fitter.name,
@@ -687,7 +688,9 @@ class BaseFitPlugin(ProcPlugin):
             if _key.startswith("center")
         }
 
-    def _write_valid_results(self, results: np.ndarray) -> np.ndarray:
+    def _write_valid_results(
+        self, results: np.ndarray, fit_y: np.ndarray
+    ) -> np.ndarray:
         """
         Write the valid results for the fit in the new data array.
 
@@ -695,6 +698,8 @@ class BaseFitPlugin(ProcPlugin):
         ----------
         results : np.ndarray
             The new data array.
+        fit_y : np.ndarray
+            The y values of the fitted function for the input x values.
 
         Returns
         -------
@@ -713,6 +718,13 @@ class BaseFitPlugin(ProcPlugin):
                 ]
             elif _key == "background at peak":
                 results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
+            elif _key == "reduced chi^2":
+                _norm = np.sum(self._data)
+                if _norm == 0:
+                    results[slice(None), _i] = np.nan
+                    continue
+                _chi2 = np.sum((self._data - fit_y) ** 2) / _norm / len(_fit_pvals)
+                results[slice(None), _i] = _chi2
             elif _key == "relative sigma / (sigma + gamma)":
                 results[slice(None), _i] = self._fitter.relative_sigma(_fit_pvals)
         return results
@@ -775,6 +787,29 @@ class BaseFitPlugin(ProcPlugin):
             self.config.param_bounds_high[_index] = min(
                 self.config.param_bounds_high[_index], _xhigh
             )
+
+    def _update_fit_range_from_results(self) -> None:
+        """Update the fit range from the results of the last fit."""
+        if None in (
+            self.get_param_value("fit_upper_limit"),
+            self.get_param_value("fit_lower_limit"),
+        ):
+            raise UserConfigError(
+                "The fit range cannot be updated because the limits are not set."
+            )
+        if "delta_range" not in self.config:
+            self.config.delta_range = self.get_param_value(
+                "fit_upper_limit"
+            ) - self.get_param_value("fit_lower_limit")
+        _center_vals = []
+        for _params in self._fit_results.values():
+            _center_vals.extend(list(self._fitter.center(tuple(_params.values()))))
+        _center = np.mean(_center_vals)
+        _low = _center - self.config.delta_range / 2
+        _high = _center + self.config.delta_range / 2
+        self.set_param_value("fit_lower_limit", _low)
+        self.set_param_value("fit_upper_limit", _high)
+        self.config.range_slice = None
 
     def _update_fit_param_bounds(self) -> None:
         """Update the fitting bounds from Parameters."""

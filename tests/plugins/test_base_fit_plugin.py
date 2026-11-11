@@ -252,7 +252,7 @@ class BaseFitPluginTestSuite:
         assert _plugin.output_data_label == (
             "position / ax_unit; amplitude / cts; area / (cts * ax_unit); "
             "FWHM / ax_unit; background at peak / cts; total count intensity / cts; "
-            "relative sigma / (sigma + gamma)"
+            "reduced chi^2; relative sigma / (sigma + gamma)"
         )
         assert _plugin.config["settings_updated_from_data"]
 

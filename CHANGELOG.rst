@@ -35,6 +35,7 @@ Improvements
 - pyFAI integration plugins now use the Dataset.array to skip unnecessary
   metadata handling during integration.
 - Added the `.ravel` method to the Dataset.
+- Added a `reduced chi^2` output to the fitting plugins.
 
 
 Programmatic changes

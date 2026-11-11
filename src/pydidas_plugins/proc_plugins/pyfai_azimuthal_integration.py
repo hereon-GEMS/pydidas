@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the pyFAIazimuthalIntegration Plugin which allows azimuthal
+Module with the PyFAIazimuthalIntegration Plugin which allows azimuthal
 integration of diffraction pattern to acquire a radial profile.
 """
 
@@ -27,6 +27,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PyFAIazimuthalIntegration"]
 
+
+from typing import Any
+
+import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.plugins import pyFAIintegrationBase
@@ -43,11 +47,11 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
     plugin_name = "pyFAI azimuthal integration"
     output_data_dim = 1
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         del self.params["azi_npoint"]
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
@@ -68,28 +72,34 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(
+        self, data: Dataset | np.ndarray, **kwargs: Any
+    ) -> tuple[Dataset, dict[str, Any]]:
         """
         Run the azimuthal integration on the input data.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
-            The radial integration results.
-        kwargs : dict
+        data : Dataset
+            The input image / frame data.
+        **kwargs : Any
             Any keyword arguments from the ProcessingTree.
 
         Returns
         -------
-        _dataset : pydidas.core.Dataset
+        _dataset : Dataset
             The integrated data.
-        kwargs : dict
+        kwargs : dict[str, Any]
             Any keyword arguments from the ProcessingTree, appended by any
             changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
-        _newdata = self._ai.integrate1d(
-            data, self.get_param_value("rad_npoint"), **self._ai_params
+        _result = self._ai.integrate1d(
+            data.array if isinstance(data, Dataset) else data,
+            self.get_param_value("rad_npoint"),
+            **self._ai_params,
         )
-        _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
+        _dataset = Dataset(
+            _result.intensity, axis_ranges=[_result.radial], **self._dataset_info
+        )
         return _dataset, kwargs

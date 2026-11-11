@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["PyFAIradialIntegration"]
 
 
+from typing import Any
+
 import numpy as np
 
 from pydidas.core import Dataset
@@ -36,7 +38,7 @@ from pydidas.plugins import pyFAIintegrationBase
 
 class PyFAIradialIntegration(pyFAIintegrationBase):
     """
-    Integrate in image radially to get an azimuthal profile using pyFAI.
+    Integrate an image radially to get an azimuthal profile using pyFAI.
 
     For a full documentation of the Plugin, please refer to the pyFAI
     documentation.
@@ -46,13 +48,13 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
 
     output_data_dim = 1
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
         self.set_param_value("rad_npoint", 100)
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
@@ -76,28 +78,32 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         }
 
     def execute(
-        self, data: Dataset | np.ndarray, **kwargs: dict
-    ) -> tuple[Dataset, dict]:
+        self, data: Dataset | np.ndarray, **kwargs: Any
+    ) -> tuple[Dataset, dict[str, Any]]:
         """
         Perform a radial integration on the input dataset.
 
         Parameters
         ----------
-        data : Union[pydidas.core.Dataset, np.ndarray]
+        data : Dataset or np.ndarray
             The image / frame data.
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
         -------
-        _dataset : pydidas.core.Dataset
-            The azimuthal integration profile.
-        kwargs : dict
+        dataset : Dataset
+            The azimuthal intensity profile.
+        kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
-        _newdata = self._ai.integrate_radial(
-            data, self.get_param_value("azi_npoint"), **self._ai_params
+        _result = self._ai.integrate_radial(
+            data.array if isinstance(data, Dataset) else data,
+            self.get_param_value("azi_npoint"),
+            **self._ai_params,
         )
-        _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
+        _dataset = Dataset(
+            _result.intensity, axis_ranges=[_result.radial], **self._dataset_info
+        )
         return _dataset, kwargs

@@ -32,6 +32,8 @@ Improvements
 - Added an option to pop out the current data display from the DataViewer
   with the current display settings to visualize multiple datasets in
   parallel.
+- pyFAI integration plugins now use the Dataset.array to skip unnecessary
+  metadata handling during integration.
 
 
 Programmatic changes

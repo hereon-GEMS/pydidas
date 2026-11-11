@@ -36,7 +36,7 @@ import numpy as np
 from qtpy import QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import ASCII_TO_UNI, PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.constants.pyfai_names import pyFAI_METHOD, pyFAI_UNITS
 from pydidas.core.lazy_imports.pyFAI import AzimuthalIntegrator
@@ -87,8 +87,8 @@ class pyFAIintegrationBase(ProcPlugin):
         "polarization_factor",
     ]
 
-    def __init__(self, *args: tuple, **kwargs: Any):
-        self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._exp = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._ai = None
         self._ai_params = {}
@@ -96,39 +96,38 @@ class pyFAIintegrationBase(ProcPlugin):
         self._mask = None
         self.config["custom_mask"] = False
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Check and load the mask and set up the AzimuthalIntegrator.
         """
-        if self._exp_hash != hash(self._EXP):
-            _lambda_in_A = self._EXP.get_param_value("xray_wavelength")
+        if self._exp_hash != hash(self._exp):
+            _lambda_in_A = self._exp.get_param_value("xray_wavelength")
             self._ai = AzimuthalIntegrator(
-                dist=self._EXP.get_param_value("detector_dist"),
-                poni1=self._EXP.get_param_value("detector_poni1"),
-                poni2=self._EXP.get_param_value("detector_poni2"),
-                rot1=self._EXP.get_param_value("detector_rot1"),
-                rot2=self._EXP.get_param_value("detector_rot2"),
-                rot3=self._EXP.get_param_value("detector_rot3"),
-                detector=self._EXP.get_detector(),
+                dist=self._exp.get_param_value("detector_dist"),
+                poni1=self._exp.get_param_value("detector_poni1"),
+                poni2=self._exp.get_param_value("detector_poni2"),
+                rot1=self._exp.get_param_value("detector_rot1"),
+                rot2=self._exp.get_param_value("detector_rot2"),
+                rot3=self._exp.get_param_value("detector_rot3"),
+                detector=self._exp.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
-            self._exp_hash = hash(self._EXP)
+            self._exp_hash = hash(self._exp)
         self.load_and_set_mask()
         if self._mask is not None:
             self._ai.set_mask(self._mask)
         self._adjust_integration_discontinuity()
         self._prepare_pyfai_method()
 
-    def load_and_set_mask(self):
+    def load_and_set_mask(self) -> None:
         """
         Load and store the mask.
 
-        If defined (and the file exists), the locally defined detector mask
-        Parameter will be used. If not, the global QSetting detector mask
-        will be used.
+        Load the mask specified by the experiment's detector_mask_file
+        Parameter. An empty path means that no external mask is selected.
         """
         self._mask = None
-        _mask_file = self._EXP.get_param_value("detector_mask_file")
+        _mask_file = self._exp.get_param_value("detector_mask_file")
         if _mask_file != Path():
             if _mask_file.is_file():
                 self._mask = import_data(_mask_file)
@@ -139,7 +138,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 )
             self._check_mask_shape()
 
-    def _prepare_pyfai_method(self):
+    def _prepare_pyfai_method(self) -> None:
         """
         Prepare the method name and select OpenCL device if multiple devices
         present.
@@ -167,14 +166,13 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in radians.
 
-        If the `use_azimuthal_range` parameter is True and both the lower and
-        upper range limits are larger than zero, the tuple with both values
-        is returned. Otherwise, the return is None which corresponds to
-        pyFAI auto ranges.
+        Convert the native azimuthal range to radians. If no valid explicit
+        range is selected, return the full circle for the current integration
+        discontinuity.
 
         Returns
         -------
-        None | tuple[float, float]
+        tuple[float, float] or None
             The azimuthal range for the pyFAI integration in radian.
         """
         _range = self.get_azimuthal_range_native()
@@ -186,14 +184,13 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in degree.
 
-        If the `use_azimuthal_range` parameter is True and both the lower and
-        upper range limits are larger than zero, the tuple with both values
-        is returned. Otherwise, the return is None which corresponds to
-        pyFAI auto ranges.
+        Convert the native azimuthal range to degrees. If no valid explicit
+        range is selected, return the full circle for the current integration
+        discontinuity.
 
         Returns
         -------
-        None | tuple[float, float]
+        tuple[float, float] or None
             The azimuthal range for the pyFAI integration in degrees.
         """
         _range = self.get_azimuthal_range_native()
@@ -205,11 +202,10 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the azimuthal range from the Parameters in native units.
 
-        If the `use_azimuthal_range` parameter is True and both the lower and
-        upper range limits are larger than zero, the tuple with both values
-        is returned.  Otherwise, the return is the full circle which
-        encompasses (-180, 180) if the integration discontinuity is located
-        at pi, and (0, 360) otherwise.
+        If azi_use_range selects an explicit range with increasing bounds,
+        return the normalized bounds. Otherwise, return the full circle:
+        (-180, 180) degrees for a discontinuity at pi, or (0, 360) degrees
+        otherwise. For radian units, return the corresponding radian bounds.
 
         Returns
         -------
@@ -233,7 +229,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 )
         return _default
 
-    def _adjust_integration_discontinuity(self):
+    def _adjust_integration_discontinuity(self) -> None:
         """Check and adjust the position of the integration discontinuity."""
         _range = self.get_azimuthal_range_in_rad()
         if _range is None:
@@ -255,7 +251,7 @@ class pyFAIintegrationBase(ProcPlugin):
         else:
             self._raise_range_error(_low, _high)
 
-    def modulate_and_store_azi_range(self):
+    def modulate_and_store_azi_range(self) -> None:
         """Try to modulate the azimuthal range to be compatible with pyFAI."""
         _factor = 1 if "rad" in self.get_param_value("azi_unit") else np.pi / 180
         _lower = _factor * self.get_param_value("azi_range_lower")
@@ -279,7 +275,7 @@ class pyFAIintegrationBase(ProcPlugin):
         self.set_param_value("azi_range_lower", _lower / _factor)
         self.set_param_value("azi_range_upper", _upper / _factor)
 
-    def _raise_range_error(self, low: float, high: float):
+    def _raise_range_error(self, low: float, high: float) -> None:
         """
         Raise a UserConfigError that the specified bounds are invalid.
 
@@ -343,7 +339,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
 
-    def check_and_set_custom_mask(self, **kwargs: Any):
+    def check_and_set_custom_mask(self, **kwargs: Any) -> None:
         """
         Check the kwargs for a custom mask and set it, if available.
 
@@ -366,7 +362,7 @@ class pyFAIintegrationBase(ProcPlugin):
             for _ai in self._ais:
                 _ai.set_mask(_mask)
 
-    def _check_mask_shape(self, mask: np.ndarray | None = None):
+    def _check_mask_shape(self, mask: np.ndarray | None = None) -> None:
         """
         Compare the shape of the mask and the AzimuthalIntegrator's detector.
 
@@ -385,7 +381,9 @@ class pyFAIintegrationBase(ProcPlugin):
                 f"Mask shape: {_mask_shape}."
             )
 
-    def execute(self, data: np.ndarray, **kwargs: Any):
+    def execute(
+        self, data: np.ndarray, **kwargs: Any
+    ) -> tuple[Dataset, dict[str, Any]]:
         """To be implemented by the concrete subclass."""
         raise NotImplementedError
 
@@ -395,7 +393,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
         Returns
         -------
-        QtWidgets.QWidget
+        type[QtWidgets.QWidget]
             The unique ParameterConfig widget
         """
         from pydidas.widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
@@ -406,14 +404,14 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Get the radial range from the Parameters.
 
-        If the `use_azimuthal_range` parameter is True and both the lower and
-        upper range limits are larger than zero, the tuple with both values
-        is returned. Otherwise, the return is None which corresponds to
-        pyFAI auto ranges.
+        If rad_use_range selects an explicit range with nonnegative lower
+        bound and increasing limits, return the bounds. Otherwise, return
+        None for automatic ranges and log a warning for invalid explicit
+        bounds.
 
         Returns
         -------
-        None | tuple[float, float]
+        tuple[float, float] or None
             The radial range for the pyFAI integration.
         """
         if self.get_param_value("rad_use_range", False) == "Specify radial range":
@@ -434,6 +432,11 @@ class pyFAIintegrationBase(ProcPlugin):
         ----------
         unit : str
             The new unit of the range.
+
+        Returns
+        -------
+        tuple[float, float] or None
+            The converted range, or None when automatic ranges are selected.
         """
         _range = self.get_radial_range()
         if _range is None:
@@ -442,8 +445,8 @@ class pyFAIintegrationBase(ProcPlugin):
             np.asarray(_range),
             self.get_param_value("rad_unit"),
             unit,
-            self._EXP.xray_wavelength_in_m,
-            self._EXP.det_dist_in_m,
+            self._exp.xray_wavelength_in_m,
+            self._exp.det_dist_in_m,
         )
         return tuple(_range)
 
@@ -455,15 +458,15 @@ class pyFAIintegrationBase(ProcPlugin):
         to_unit: Literal[
             "2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"
         ],
-    ):
+    ) -> None:
         """
-        Convert and store the radial range values from the given unit to the given unit.
+        Convert and store the radial range values between the given units.
 
         Parameters
         ----------
-        from_unit : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
+        from_unit : str
             The previous unit.
-        to_unit : Literal["2theta / deg", "2theta / rad", "Q / A^-1", "Q / nm^-1", "r / mm"]
+        to_unit : str
             The new unit.
         """
         _range = self.get_radial_range()
@@ -473,8 +476,8 @@ class pyFAIintegrationBase(ProcPlugin):
             np.asarray(_range),
             from_unit,
             to_unit,
-            self._EXP.xray_wavelength_in_m,
-            self._EXP.det_dist_in_m,
+            self._exp.xray_wavelength_in_m,
+            self._exp.det_dist_in_m,
         )
         self.set_param_value("rad_range_lower", _range[0])
         self.set_param_value("rad_range_upper", _range[1])

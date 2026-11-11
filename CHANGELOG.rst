@@ -34,6 +34,7 @@ Improvements
   parallel.
 - pyFAI integration plugins now use the Dataset.array to skip unnecessary
   metadata handling during integration.
+- Added the `.ravel` method to the Dataset.
 
 
 Programmatic changes

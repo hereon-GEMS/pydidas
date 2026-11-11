@@ -260,6 +260,14 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(_new.axis_units, {0: ""})
         self.assertTrue(np.equal(_new.axis_ranges[0], np.arange(_new.size)).all())
 
+    def test_flatten__1d_array_keeps_metadata(self):
+        obj = create_dataset(1, float, shape=(42,))
+        _new = obj.flatten()
+        self.assertEqual(_new.shape, (obj.size,))
+        self.assertEqual(_new.axis_labels, obj.axis_labels)
+        self.assertEqual(_new.axis_units, obj.axis_units)
+        self.assertTrue(np.allclose(_new.axis_ranges[0], obj.axis_ranges[0]))
+
     def test_flatten_dims__simple(self):
         _dims = (1, 2)
         obj = self.create_large_dataset()

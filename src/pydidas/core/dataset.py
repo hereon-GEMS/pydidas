@@ -842,7 +842,7 @@ class Dataset(ndarray):
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
         return _new
 
-    def flatten(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
+    def flatten(self, order: None | Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Clear the metadata when flattening the array.
 
@@ -856,12 +856,23 @@ class Dataset(ndarray):
             'K' means to flatten `a` in the order the elements occur in memory.
             The default is 'C'.
         """
-        _new = ndarray.flatten(self, order)
-        _new._update_keys_in_flattened_array()
+        _new: Self = ndarray.flatten(self, order)
+        if self.ndim > 1:
+            _new._update_keys_in_flattened_array()
+        return _new
+
+    def ravel(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
+        """Return a flattened array with reset axis metadata."""
+        _new: Self = ndarray.ravel(self, order)
+        if self.ndim > 1:
+            _new._update_keys_in_flattened_array()
         return _new
 
     def reshape(
-        self, *new_shape: int | tuple[int], order: Literal["C", "F", "A", "K"] = "C"
+        self,
+        *new_shape: int | tuple[int],
+        order: None | Literal["C", "F", "A", "K"] = "C",
+        copy=None,
     ):
         """
         Overload the generic reshape method to update the metadata.
@@ -870,8 +881,10 @@ class Dataset(ndarray):
         ----------
         new_shape : int | tuple[int]
             The new shape of the array.
-        order : Literal['C', 'F', 'A', 'K'] optional
+        order : None | Literal['C', 'F', 'A', 'K'] optional
             The order of the reshaping. The default is 'C'.
+        copy : bool, optional
+            Whether to return a copy of the array. The default is None.
 
         Returns
         -------
@@ -883,11 +896,10 @@ class Dataset(ndarray):
                 new_shape = tuple(new_shape[0])
             elif isinstance(new_shape[0], tuple):
                 new_shape = new_shape[0]
-        _new = ndarray.reshape(self, new_shape, order=order)
+        _new = ndarray.reshape(self, new_shape, order=order, copy=copy)
         _dim_matches = (
             {} if self.shape == () else get_corresponding_dims(self.shape, _new.shape)
         )
-
         for _key in ["axis_labels", "axis_units"]:
             _values = [
                 self._meta[_key][_dim_matches[_dim]] if _dim in _dim_matches else ""
@@ -904,7 +916,7 @@ class Dataset(ndarray):
         ]
         return _new
 
-    def repeat(self, repeats, axis: int | None = None) -> Self:
+    def repeat(self, repeats: int, axis: int | None = None) -> Self:
         """
         Overload the generic repeat method to update the metadata.
 
@@ -959,19 +971,10 @@ class Dataset(ndarray):
         self._meta = _reshaped._meta
 
     def _update_keys_in_flattened_array(self):
-        """
-        Update the keys in flattened arrays i.e., if the new dimension is one.
-
-        Note that the metadata keys are updated in place.
-        """
-        if self.ndim == 1 and (
-            len(self._meta["axis_ranges"]) > 1
-            or len(self._meta["axis_units"]) > 1
-            or len(self._meta["axis_labels"]) > 1
-        ):
-            self._meta["axis_labels"] = {0: "Flattened"}
-            self._meta["axis_ranges"] = {0: np.arange(self.size)}
-            self._meta["axis_units"] = {0: ""}
+        """Update the keys in flattened arrays."""
+        self._meta["axis_labels"] = {0: "Flattened"}
+        self._meta["axis_ranges"] = {0: np.arange(self.size)}
+        self._meta["axis_units"] = {0: ""}
 
     def squeeze(self, axis: int | None = None) -> Self:
         """

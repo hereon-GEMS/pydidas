@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,11 +18,13 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
+import warnings
 
 import numpy as np
 import pytest
@@ -77,9 +79,11 @@ def random_dataset(request):
 
 @pytest.mark.parametrize("test_dataset", [2, 3, 4], indirect=True)
 def test_roll__no_axis(test_dataset):
-    with pytest.warns(UserWarning):
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UserWarning)
         _new = np.roll(test_dataset, 3)
     assert _new.shape == test_dataset.shape
+    np.testing.assert_array_equal(_new.array, np.roll(test_dataset.array, 3))
 
 
 @pytest.mark.parametrize("test_dataset", [1], indirect=True)
@@ -105,5 +109,69 @@ def test_roll__w_axis(test_dataset, shift, axis):
     assert _new.axis_units == test_dataset.axis_units
 
 
+@pytest.mark.parametrize("test_dataset", [1, 2, 3], indirect=True)
+@pytest.mark.parametrize("order", ["C", "F", "A", "K"])
+@pytest.mark.parametrize("layout", ["C", "F", "transposed", "strided", "reversed"])
+def test_ravel__values_metadata_and_memory_sharing(
+    test_dataset: Dataset, order: str, layout: str
+) -> None:
+    ### This test was written by an AI tool
+    if layout == "F":
+        _source = Dataset(
+            np.asfortranarray(test_dataset.array), **test_dataset.property_dict
+        )
+    elif layout == "transposed":
+        _source = test_dataset.T
+    elif layout == "strided":
+        _source = test_dataset[::2]
+    elif layout == "reversed":
+        _source = test_dataset[::-1]
+    else:
+        _source = test_dataset
+    _source.data_label = "Intensity"
+    _source.data_unit = "counts"
+    _source.metadata = {"measurement": 42}
+    _shape = _source.shape
+    _labels = _source.axis_labels
+    _units = _source.axis_units
+    _ranges = {_axis: _range.copy() for _axis, _range in _source.axis_ranges.items()}
+    _array = _source.array
+    _expected = _array.ravel(order=order)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UserWarning)
+        _result = _source.ravel(order=order)
+        _converted = _result.astype(np.float32)
+        assert isinstance(_result, Dataset)
+        assert _result.shape == (_source.size,)
+        np.testing.assert_array_equal(_result.array, _expected)
+        np.testing.assert_array_equal(_converted.array, _expected.astype(np.float32))
+        assert np.shares_memory(_source, _result) == np.shares_memory(_array, _expected)
+        if _source.ndim == 1:
+            assert _result.axis_labels == _labels
+            assert _result.axis_units == _units
+            np.testing.assert_array_equal(_result.axis_ranges[0], _ranges[0])
+        else:
+            assert _result.axis_labels == {0: "Flattened"}
+            assert _result.axis_units == {0: ""}
+            np.testing.assert_array_equal(
+                _result.axis_ranges[0], np.arange(_result.size)
+            )
+        assert _result.data_label == "Intensity"
+        assert _result.data_unit == "counts"
+        assert _result.metadata == {"measurement": 42}
+        assert _source.shape == _shape
+        assert _source.axis_labels == _labels
+        assert _source.axis_units == _units
+        for _axis, _range in _ranges.items():
+            np.testing.assert_array_equal(_source.axis_ranges[_axis], _range)
+
+
+@pytest.mark.parametrize("test_dataset", [1, 2, 3], indirect=True)
+def test_ravel__default_order(test_dataset: Dataset) -> None:
+    _result = test_dataset.ravel()
+    np.testing.assert_array_equal(_result.array, test_dataset.array.ravel(order="C"))
+
+
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main([__file__])

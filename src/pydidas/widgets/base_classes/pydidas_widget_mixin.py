@@ -32,7 +32,8 @@ from numbers import Real
 from typing import Any, ClassVar
 
 import numpy as np
-from qtpy.QtCore import QSize, Qt, Slot
+from qtpy.QtCore import QObject, QSize, Qt, Slot
+import weakref
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import (
@@ -143,15 +144,7 @@ class PydidasWidgetMixIn:
         self.update_font_family(self._qtapp.font_family)
         if not all(_val == 0 for _val in self.__font_config.values()):
             update_qwidget_font(self, **self.__font_config)  # type: ignore[attr-defined]
-
-        _connections = [
-            self._qtapp.sig_new_fontsize.connect(self.update_fontsize),
-            self._qtapp.sig_new_font_family.connect(self.update_font_family),
-            self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics),
-        ]
-        self.destroyed.connect(  # type: ignore[attr-defined]
-            partial(safe_connection_disconnect, *_connections)
-        )
+        self._font_relay = _FontSignalRelay(self)  # type: ignore[arg-type]
         self.process_new_font_metrics(*self._qtapp.font_metrics)
 
     def sizeHint(self) -> QSize:
@@ -299,3 +292,39 @@ class PydidasWidgetMixIn:
 
     fm_h = font_metric_height_factor
     fm_w = font_metric_width_factor
+
+class _FontSignalRelay(QObject):
+    """
+    Forward application font signals to the owning widget.
+
+    The relay is a child QObject of the widget and the receiver of the
+    app-signal connections. When the widget is deleted in C++, Qt deletes
+    the relay and removes its connections, even if the widget's Python
+    wrapper is still referenced somewhere.
+    """
+
+    def __init__(self, owner: PydidasWidgetMixIn) -> None:
+        super().__init__(owner)
+        self._owner_ref = weakref.ref(owner)
+        _qtapp = PydidasQApplication.instance()
+        _qtapp.sig_new_fontsize.connect(self.on_font_size)
+        _qtapp.sig_new_font_family.connect(self.on_font_family)
+        _qtapp.sig_new_font_metrics.connect(self.on_font_metrics)
+
+    @Slot(float)
+    def on_font_size(self, new_fontsize: float) -> None:
+        _owner = self._owner_ref()
+        if _owner is not None:
+            _owner.update_fontsize(new_fontsize)
+
+    @Slot(str)
+    def on_font_family(self, new_family: str) -> None:
+        _owner = self._owner_ref()
+        if _owner is not None:
+            _owner.update_font_family(new_family)
+
+    @Slot(float, float)
+    def on_font_metrics(self, font_width: float, font_height: float) -> None:
+        _owner = self._owner_ref()
+        if _owner is not None:
+            _owner.process_new_font_metrics(font_width, font_height)

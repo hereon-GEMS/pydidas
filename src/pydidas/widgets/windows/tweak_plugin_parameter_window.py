@@ -204,10 +204,13 @@ class TweakPluginParameterWindow(PydidasWindow):
             if isinstance(_arg, np.ndarray):
                 _arg = _arg.copy()
             _kwargs = self.__plugin.config["input_kwargs"].copy()
-            if hash(self.__plugin) != self.__plugin_hash:
+            _contexts = tuple(
+                getattr(self.__plugin, _name, None) for _name in ("_exp", "_scan")
+            )
+            if hash((self.__plugin, *_contexts)) != self.__plugin_hash:
                 self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
-            self.__plugin_hash = hash(self.__plugin)
+            self.__plugin_hash = hash((self.__plugin, *_contexts))
             self._widgets["plot"].set_data(
                 _res, title=f"{self.__plugin.plugin_name} results"
             )

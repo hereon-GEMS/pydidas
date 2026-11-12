@@ -81,10 +81,10 @@ class EigerScanSeriesLoader(Hdf5fileSeriesLoader):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _pattern = self._SCAN.processed_file_naming_pattern
+        _pattern = self._scan.processed_file_naming_pattern
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
-        _basepath = self._SCAN.get_param_value("scan_base_directory")
+        _basepath = self._scan.get_param_value("scan_base_directory")
         if _pattern.endswith(_suffix):
             _pattern = _pattern.removesuffix(_suffix)
         self.base_dir = _basepath

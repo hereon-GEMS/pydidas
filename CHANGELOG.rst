@@ -74,6 +74,8 @@ Programmatic changes
   to define the default configuration for the app. This allows a more
   generic way to reset the configuration to default values and to handle
   the state import.
+- Renamed all local Scan and DiffractionExp instances to lowercase variable
+  names for consistency.
 
 
 Bugfixes

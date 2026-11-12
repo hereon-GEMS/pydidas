@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2024 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2024 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Nonni Heere"
-__copyright__ = "Copyright 2024 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -43,8 +43,8 @@ class TestConvertToDSpacing(unittest.TestCase):
     def setUpClass(cls):
         cls._lambda = 1.3
         cls._detector_distance = 1.6
-        cls._EXP = DiffractionExperiment()
-        cls._EXP.set_param_values(
+        cls._exp = DiffractionExperiment()
+        cls._exp.set_param_values(
             xray_wavelength=cls._lambda, detector_dist=cls._detector_distance
         )
         _range = np.array((0.01, 2, 10, 25, 325, 2500, 10000, 1e6))
@@ -70,7 +70,7 @@ class TestConvertToDSpacing(unittest.TestCase):
 
     def get_standard_plugin(self):
         return PLUGIN_COLLECTION.get_plugin_by_name("ConvertToDSpacing")(
-            diffraction_exp=self._EXP
+            diffraction_exp=self._exp
         )
 
     def test_creation(self):

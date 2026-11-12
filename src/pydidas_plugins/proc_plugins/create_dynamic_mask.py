@@ -72,7 +72,7 @@ class CreateDynamicMask(ProcPlugin):
     output_data_unit = "counts"
 
     def __init__(self, *args: tuple, **kwargs: dict):
-        self._EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
+        self._exp = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._mask = None
         self._trivial = False
@@ -115,7 +115,7 @@ class CreateDynamicMask(ProcPlugin):
         """
         Load and store the generic detector mask.
         """
-        _mask_file = self._EXP.get_param_value("detector_mask_file")
+        _mask_file = self._exp.get_param_value("detector_mask_file")
         if _mask_file != pathlib.Path():
             if _mask_file.is_file():
                 self._mask = import_data(_mask_file).array.astype(bool)

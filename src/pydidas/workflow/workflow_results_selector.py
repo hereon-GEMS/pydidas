@@ -76,7 +76,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self.set_default_params()
         _results: ProcessingResults | None = kwargs.get("workflow_results", None)
         self._RESULTS = WorkflowResults() if _results is None else _results
-        self._SCAN = self._RESULTS.frozen_scan
+        self._scan = self._RESULTS.frozen_scan
         self._selection: tuple[slice, ...] | None = None
         self._npoints = []
         self.config["active_node"] = -1
@@ -113,7 +113,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         """
         _ndim = self._RESULTS.ndims[self.config["active_node"]]
         if self.get_param_value("use_scan_timeline"):
-            _ndim -= self._SCAN.ndim - 1
+            _ndim -= self._scan.ndim - 1
         self.config["result_ndim"] = _ndim
 
     def _check_and_create_params_for_slice_selection(self) -> None:
@@ -184,7 +184,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             + [self.get_param_value("use_data_range")]
             + [self.config["result_ndim"]]
             + [self.config["active_node"]]
-            + [hash(self._SCAN)]
+            + [hash(self._scan)]
         )
         return hash(tuple(_hash_tuple))
 
@@ -196,8 +196,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         _use_timeline = self.get_param_value("use_scan_timeline")
         self._npoints = list(self._RESULTS.shapes[self.config["active_node"]])
         if _use_timeline:
-            del self._npoints[: self._SCAN.ndim]
-            self._npoints.insert(0, self._SCAN.n_points)
+            del self._npoints[: self._scan.ndim]
+            self._npoints.insert(0, self._scan.n_points)
         _selection = tuple(
             self._get_single_slice_object(_dim)
             for _dim in range(self.config["result_ndim"])

@@ -377,10 +377,6 @@ class _ImageView(ImageView):
         self._clean_up()
         super().closeEvent(event)
 
-    def deleteLater(self) -> None:
-        self._clean_up()
-        super().deleteLater()
-
     def _set_up_markers(self) -> None:
         """Set up the implemented marker behavior."""
         _view = self.getView()
@@ -592,15 +588,3 @@ class _ImageView(ImageView):
             self._markers.selection,
         ]:
             _item.deleteLater()
-        with warnings.catch_warnings(action="ignore", category=RuntimeWarning):
-            for _signal in [
-                self.sig_pixel_description,
-                self.sig_new_zoom_bounds,
-                self.sig_new_histogram_levels,
-                self.sig_image_statistics,
-                self.sig_reset_zoom,
-            ]:
-                try:
-                    _signal.disconnect()
-                except TypeError:
-                    pass

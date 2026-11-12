@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["PyfaiIntegrationConfigWidget"]
 
 
-from functools import partial
 from typing import Literal
 
 from qtpy import QtCore
 
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
 )
@@ -56,12 +56,12 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
         self.create_button(
             "but_show_integration_region",
             "Show selected integration region",
-            clicked=partial(self._select_integration_region, allow_edit=False),
+            clicked=weak_partial(self._select_integration_region, allow_edit=False),
         )
         self.create_button(
             "but_select_integration_region",
             "Select integration region in image",
-            clicked=partial(self._select_integration_region, allow_edit=True),
+            clicked=weak_partial(self._select_integration_region, allow_edit=True),
         )
         if self._use_advanced_params:
             self.create_advanced_param_config_widgets()
@@ -132,7 +132,7 @@ class PyfaiIntegrationConfigWidget(GenericPluginConfigWidget):
                 self.plugin, only_show_roi=not allow_edit
             )
             _window.sig_roi_changed.connect(self.update_plugin_config_edits)
-            _window.sig_about_to_close.connect(partial(self._toggle_io_mode, True))
+            _window.sig_about_to_close.connect(weak_partial(self._toggle_io_mode, True))
             setattr(self, "_window_edit" if allow_edit else "_window_show", _window)
         self._toggle_io_mode(False)
         _window.show()

@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["DataViewer"]
 
 
-from functools import partial
 from typing import Any, ClassVar
 
 import h5py
@@ -37,6 +36,7 @@ from qtpy.QtWidgets import QWidget
 from silx.gui.hdf5 import H5Node
 
 from pydidas.core import Dataset, UserConfigError
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.data_viewer.axes_selector import AxesSelector
 from pydidas.widgets.data_viewer.data_axis_selector import GENERIC_AXIS_SELECTOR_CHOICES
@@ -125,7 +125,7 @@ class DataViewer(WidgetWithParameters):
                 gridPos=(0, -1, 1, 1),
                 icon=f"pydidas::{_ref}.svg",
                 parent_widget="container_for_buttons",
-                clicked=partial(self._select_view, _ref),
+                clicked=weak_partial(self._select_view, _ref),
             )
             self._button_group.addButton(self._widgets[f"button_{_ref}"], _view.id)
         layout = self.layout()

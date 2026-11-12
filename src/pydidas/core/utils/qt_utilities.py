@@ -34,10 +34,14 @@ __all__ = [
     "update_palette",
     "update_qwidget_font",
     "update_size_policy",
+    "weak_partial",
 ]
 
 
 from typing import Any
+
+import weakref
+from collections.abc import Callable
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QMetaObject, QObject
@@ -159,6 +163,27 @@ def apply_qt_properties(obj: QObject, **kwargs: Any) -> None:
         if hasattr(obj, _setter_name):
             _setter = getattr(obj, _setter_name)
             _setter(*_get_args_as_list(kwargs.get(_key)))
+
+
+def weak_partial(
+    method: Callable[..., Any], *args: Any, **kwargs: Any
+) -> Callable[..., Any]:
+    """
+    Bind leading arguments to a bound method without keeping its instance alive.
+
+    Calls are forwarded exactly like functools.partial(method, *args, **kwargs).
+    Only a weak reference to the instance is held, so a Qt connection does not
+    keep the owner alive.
+    """
+    _method_ref = weakref.WeakMethod(method)
+
+    def _call(*call_args: Any) -> Any:
+        _bound = _method_ref()
+        if _bound is None:
+            raise RuntimeError("The owner of a connected method no longer exists.")
+        return _bound(*args, *call_args, **kwargs)
+
+    return _call
 
 
 def update_palette(obj: QWidget, **kwargs: Any) -> None:

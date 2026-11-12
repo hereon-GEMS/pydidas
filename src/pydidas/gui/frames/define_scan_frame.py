@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["DefineScanFrame"]
 
 
-from functools import partial
 from typing import Any
 
 import numpy as np
@@ -41,7 +40,7 @@ from pydidas.core.constants import (
     FONT_METRIC_SPACER,
     FONT_METRIC_WIDE_CONFIG_WIDTH,
 )
-from pydidas.core.utils import doc_qurl_for_rel_address
+from pydidas.core.utils import doc_qurl_for_rel_address, weak_partial
 from pydidas.gui.frames.builders.define_scan_frame_builder import (
     DEFINE_SCAN_FRAME_BUILD_CONFIG,
 )
@@ -126,10 +125,10 @@ class DefineScanFrame(BaseFrame):
         )
         for _index in range(4):
             self._widgets[f"button_up_{_index}"].clicked.connect(
-                partial(self.move_dim, _index, -1)
+                weak_partial(self.move_dim, _index, -1)
             )
             self._widgets[f"button_down_{_index}"].clicked.connect(
-                partial(self.move_dim, _index, 1)
+                weak_partial(self.move_dim, _index, 1)
             )
         self.param_widgets["scan_base_directory"].sig_new_value.connect(
             self.set_new_base_directory

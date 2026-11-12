@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["ManuallySetIntegrationRoiController"]
 
 
-from functools import partial
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
@@ -38,6 +37,7 @@ from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import PYDIDAS_COLORS
 from pydidas.core.math import Point
+from pydidas.core.utils import weak_partial
 from pydidas.core.utils.scattering_geometry import convert_integration_result
 from pydidas.plugins import pyFAIintegrationBase
 from pydidas.widgets.misc import IntegrationRoiParamContainer
@@ -164,10 +164,10 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
         """
         _axis_long = "radial" if axis == "rad" else "azimuthal"
         self._editor.param_widgets[f"{axis}_use_range"].sig_new_value.connect(
-            partial(self._updated_use_range_param, _axis_long)
+            weak_partial(self._updated_use_range_param, _axis_long)
         )
         self._editor._widgets[f"but_select_{_axis_long}"].clicked.connect(
-            partial(self._start_selection, _axis_long)
+            weak_partial(self._start_selection, _axis_long)
         )
         self._editor.param_widgets[f"{axis}_unit"].sig_new_value.connect(
             getattr(self, f"_change_{axis}_unit")
@@ -175,7 +175,7 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
         for _key in [f"{axis}_range_lower", f"{axis}_range_upper"]:
             _widget = self._editor.param_widgets.get(_key, None)
             if _widget is not None:
-                _widget.sig_new_value.connect(partial(self.show_plot_items, "roi"))
+                _widget.sig_new_value.connect(weak_partial(self.show_plot_items, "roi"))
 
     @QtCore.Slot(str)
     def set_new_marker_color(self, color: str) -> None:

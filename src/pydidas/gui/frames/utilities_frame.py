@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["UtilitiesFrame"]
 
 
-from functools import partial
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
 
+from pydidas.core.utils import weak_partial
 from pydidas.gui.frames.builders.utilities_frame_builder import (
     UTILITIES_FRAME_BUILD_CONFIG,
 )
@@ -89,22 +89,22 @@ class UtilitiesFrame(BaseFrame):
     def connect_signals(self) -> None:
         """Connect the required signals and slots to add functionality to widgets."""
         self._widgets["button_eiger_mask"].clicked.connect(
-            partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
+            weak_partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
         self._widgets["button_series_operations"].clicked.connect(
-            partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
+            weak_partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._widgets["button_mask_editor"].clicked.connect(
-            partial(self.create_and_show_temp_window, MaskEditorWindow)
+            weak_partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._widgets["button_global_settings"].clicked.connect(
-            partial(self.show_window, "global_settings")
+            weak_partial(self.show_window, "global_settings")
         )
         self._widgets["button_user_config"].clicked.connect(
-            partial(self.show_window, "user_config")
+            weak_partial(self.show_window, "user_config")
         )
         self._widgets["button_composite_creation"].clicked.connect(
-            partial(self.create_and_show_frame, CompositeCreatorFrame)
+            weak_partial(self.create_and_show_frame, CompositeCreatorFrame)
         )
 
     @QtCore.Slot(object)
@@ -121,7 +121,7 @@ class UtilitiesFrame(BaseFrame):
         self.__window_counter += 1
         self._child_windows[_name] = window()
         self._child_windows[_name].sig_closed.connect(
-            partial(self.remove_window_from_children, _name)
+            weak_partial(self.remove_window_from_children, _name)
         )
         self.__app.sig_exit_pydidas.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()

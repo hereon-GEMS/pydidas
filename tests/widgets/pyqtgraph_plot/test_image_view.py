@@ -593,10 +593,10 @@ def test_calculate_image_statistics__skips_zero_size_image(view):
 
 
 @pytest.mark.gui
-def test_clean_up__silences_type_error_on_disconnect(qapp):
+def test_close_event__removes_markers_from_view(qapp):
     _view = _ImageView()
-    _view._clean_up()
-    _view._clean_up()  # second call hits TypeError on already-disconnected signals
+    _view.close()
+    assert _view._markers_clip.scene() is None
     _view.deleteLater()
     PydidasQApplication.instance().processEvents()
 

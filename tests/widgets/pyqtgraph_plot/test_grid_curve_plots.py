@@ -47,7 +47,6 @@ def grid_plot() -> Generator[GridCurvePlot, None, None]:
     _grid_plot = GridCurvePlot()
     _grid_plot._local_scan.set_param_value("scan_dim0_n_points", 140)
     yield _grid_plot
-    _grid_plot.deleteLater()
 
 
 @pytest.fixture

@@ -26,7 +26,6 @@ __status__ = "Production"
 __all__ = ["_ControlPanel"]
 
 import warnings
-from functools import partial
 from typing import Any, Literal
 
 from qtpy import QtCore
@@ -36,6 +35,7 @@ from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import POLICY_FIX_EXP
 from pydidas.widgets.base_classes import PydidasScrollArea, WidgetWithParameters
 from pydidas.widgets.data_viewer import DataAxisSelector
+from pydidas.core.utils import weak_partial
 
 
 _SPACER_HEIGHT = 20
@@ -125,7 +125,7 @@ class _ControlPanel(WidgetWithParameters):
                     parent_widget=f"{_key}_container",
                 )
                 self.param_composite_widgets[f"{_key}_{_suffix}"].sig_new_value.connect(
-                    partial(self._process_update, f"{_key}_{_suffix}")
+                    weak_partial(self._process_update, f"{_key}_{_suffix}")
                 )
             self.create_button(
                 f"reset_{_key}",
@@ -147,7 +147,7 @@ class _ControlPanel(WidgetWithParameters):
         for _key in ["colormap_val_low", "colormap_val_high"]:
             self.create_param_widget(self.params[_key], **_generic_kwargs)
             self.param_composite_widgets[_key].sig_new_value.connect(
-                partial(self._process_cmap_threshold_update, _key)
+                weak_partial(self._process_cmap_threshold_update, _key)
             )
         self.create_button(
             "reset_threshold",

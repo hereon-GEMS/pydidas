@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["SelectDataFrameDialog"]
 
 
-from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -36,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import Dataset, FileReadError
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.lazy_imports.lazy_objects import LazyObject
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, weak_partial
 from pydidas.data_io import import_data
 from pydidas.resources.pydidas_icons import pydidas_icon
 from pydidas.widgets.base_classes import WidgetFactoryMixIn
@@ -141,7 +140,7 @@ class SelectDataFrameDialog(QtWidgets.QDialog, WidgetFactoryMixIn):
         self._widgets["selector"].sig_file_valid.connect(self._process_file_validity)
         self._widgets["but_confirm"].clicked.connect(self._confirm)
         self._widgets["but_abort"].clicked.connect(self.reject)
-        self.rejected.connect(partial(self._process_file_validity, False))
+        self.rejected.connect(weak_partial(self._process_file_validity, False))
 
     # ========================================================================
     # Public methods and attributes

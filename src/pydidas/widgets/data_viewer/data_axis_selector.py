@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["GENERIC_AXIS_SELECTOR_CHOICES", "DataAxisSelector"]
 
 
-from functools import partial
 from numbers import Integral, Real
 from typing import Any
 
@@ -37,6 +36,7 @@ from numpy import ndarray
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core import UserConfigError
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.base_classes import (
     EmptyWidget,
     WidgetFactoryMixIn,
@@ -133,7 +133,7 @@ class DataAxisSelector(WidgetFactoryMixIn, EmptyWidget):
         )
         for _key in ["edit_range_data", "edit_range_index"]:
             self._widgets[_key].textChanged.connect(
-                partial(self._check_edit_range_input, _key)
+                weak_partial(self._check_edit_range_input, _key)
             )
         self._palette_base = self._widgets["edit_range_data"].palette()
         self._palette_highlight = QtGui.QPalette(self._palette_base)

@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["DefineDiffractionExpFrame"]
 
 
-from functools import partial
 from numbers import Integral, Real
 from pathlib import Path
 from typing import Any
@@ -41,7 +40,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.lazy_imports.pyFAI import Detector
-from pydidas.core.utils import update_palette
+from pydidas.core.utils import update_palette, weak_partial
 from pydidas.gui.frames.builders.define_diffraction_exp_frame_build_config import (
     DIFFRACTION_EXP_FRAME_BUILD_CONFIG,
 )
@@ -121,7 +120,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             _w.sig_new_value.disconnect(
                 self.param_composite_widgets[_param_key]._update_param_value
             )
-            _w.sig_value_changed.connect(partial(self.update_param, _param_key, _w))
+            _w.sig_value_changed.connect(weak_partial(self.update_param, _param_key, _w))
         EXP.sig_params_changed.connect(self._update_beamcenter)
 
     def finalize_ui(self) -> None:

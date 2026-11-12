@@ -34,7 +34,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QModelIndex
 
 from pydidas.core import constants
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, weak_partial
 from pydidas.plugins import PluginCollection
 from pydidas.plugins.plugin_registry import PluginRegistry
 from pydidas.widgets.workflow_edit._plugin_treeview_model import (
@@ -182,7 +182,7 @@ class _PluginRegistryTreeWidget(QtWidgets.QTreeView):
             )
             self._menu_to_append.addAction(self._menu_append_actions[_id])
             self._menu_append_actions[_id].triggered.connect(
-                partial(self._emit_append_to_specific_node_signal, _id)
+                weak_partial(self._emit_append_to_specific_node_signal, _id)
             )
 
     @QtCore.Slot(int)

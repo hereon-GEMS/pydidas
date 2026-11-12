@@ -28,7 +28,6 @@ __all__ = ["SpecialPlotTypesButton"]
 
 
 from collections.abc import Callable
-from functools import partial
 from typing import TYPE_CHECKING, ClassVar, Literal
 
 import numpy as np
@@ -36,6 +35,7 @@ from qtpy import QtCore, QtWidgets
 from qtpy.QtGui import QIcon
 from silx.gui.plot.PlotToolButtons import PlotToolButton
 
+from pydidas.core.utils import weak_partial
 from pydidas.resources import icons
 
 
@@ -89,7 +89,7 @@ class SpecialPlotTypesButton(PlotToolButton):
             _action = QtWidgets.QAction(
                 self.PLOT_TYPE[_key, "icon"], self.PLOT_TYPE[_key, "action"], self
             )
-            _action.triggered.connect(partial(self.set_plot_type, _key))  # type: ignore[attr-defined]
+            _action.triggered.connect(weak_partial(self.set_plot_type, _key))  # type: ignore[attr-defined]
             _action.setIconVisibleInMenu(True)
             menu.addAction(_action)
 

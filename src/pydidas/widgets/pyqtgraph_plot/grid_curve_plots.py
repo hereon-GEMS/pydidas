@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["GridCurvePlot"]
 
 
-from functools import partial
 from itertools import product
 from numbers import Integral, Real
 from typing import Any, ClassVar
@@ -45,7 +44,7 @@ from pydidas.core.constants import (
     POLICY_EXP_EXP,
     QT_REG_EXP_POS_INT_VALIDATOR,
 )
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, weak_partial
 from pydidas.widgets.base_classes import WidgetWithParameters
 from pydidas.widgets.utilities import delete_all_items_in_layout
 
@@ -127,7 +126,7 @@ class GridCurvePlot(WidgetWithParameters):
         self.create_empty_widget("config_bottom", parent_widget=self, visible=True)
         self.create_square_button(
             "button_start",
-            clicked=partial(self._change_start_index, "::start::"),
+            clicked=weak_partial(self._change_start_index, "::start::"),
             font_metric_height_factor=1,
             icon="mdi::skip-backward",
             gridPos=(0, -1, 1, 1),
@@ -138,7 +137,7 @@ class GridCurvePlot(WidgetWithParameters):
             "button_back_page",
             "Go back one page",
             icon="pydidas::page-backward",
-            clicked=partial(self._change_start_index, "::page-::"),
+            clicked=weak_partial(self._change_start_index, "::page-::"),
             font_metric_width_factor=_BUTTON_WIDTH,
             gridPos=(0, -1, 1, 1),
             parent_widget="config_bottom",
@@ -146,7 +145,7 @@ class GridCurvePlot(WidgetWithParameters):
         )
         self.create_square_button(
             "button_backward",
-            clicked=partial(self._change_start_index, -1),
+            clicked=weak_partial(self._change_start_index, -1),
             font_metric_height_factor=1,
             icon="mdi::step-backward",
             gridPos=(0, -1, 1, 1),
@@ -183,7 +182,7 @@ class GridCurvePlot(WidgetWithParameters):
         )
         self.create_square_button(
             "button_forward",
-            clicked=partial(self._change_start_index, 1),
+            clicked=weak_partial(self._change_start_index, 1),
             font_metric_height_factor=1,
             icon="mdi::step-forward",
             gridPos=(0, -1, 1, 1),
@@ -193,7 +192,7 @@ class GridCurvePlot(WidgetWithParameters):
         self.create_button(
             "button_forward_page",
             "Go forward one page",
-            clicked=partial(self._change_start_index, "::page+::"),
+            clicked=weak_partial(self._change_start_index, "::page+::"),
             icon="pydidas::page-forward",
             font_metric_width_factor=_BUTTON_WIDTH,
             gridPos=(0, -1, 1, 1),
@@ -202,7 +201,7 @@ class GridCurvePlot(WidgetWithParameters):
         )
         self.create_square_button(
             "button_end",
-            clicked=partial(self._change_start_index, "::end::"),
+            clicked=weak_partial(self._change_start_index, "::end::"),
             font_metric_height_factor=1,
             icon="mdi::skip-forward",
             gridPos=(0, -1, 1, 1),
@@ -217,10 +216,10 @@ class GridCurvePlot(WidgetWithParameters):
             self._widgets["config_bottom"].layout(), columnStretch=(_ncols, 1)
         )
         self._widgets["edit_index_low"].editingFinished.connect(
-            partial(self._manual_index_change, "low")
+            weak_partial(self._manual_index_change, "low")
         )
         self._widgets["edit_index_high"].editingFinished.connect(
-            partial(self._manual_index_change, "high")
+            weak_partial(self._manual_index_change, "high")
         )
 
     @property

@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["QtPathsWindow"]
 
 
-from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +38,7 @@ from pydidas.core.constants import (
     FONT_METRIC_SMALL_BUTTON_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
-from pydidas.core.utils import get_logging_dir
+from pydidas.core.utils import get_logging_dir, weak_partial
 from pydidas.resources import logos
 from pydidas.widgets.base_classes import PydidasWindow
 
@@ -127,10 +126,10 @@ class QtPathsWindow(PydidasWindow):
         """Connect all required signals."""
         self._widgets["but_okay"].clicked.connect(self.close)
         self._widgets["but_open_logdir"].clicked.connect(
-            partial(self.open_folder, self._log_path)
+            weak_partial(self.open_folder, self._log_path)
         )
         self._widgets["but_open_configdir"].clicked.connect(
-            partial(self.open_folder, self._config_path)
+            weak_partial(self.open_folder, self._config_path)
         )
         QtWidgets.QApplication.instance().sig_new_font_metrics.connect(
             self.process_new_font_metrics

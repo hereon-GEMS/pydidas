@@ -30,6 +30,8 @@ __status__ = "Production"
 
 import pytest
 
+import weakref
+
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets.pyqtgraph_plot._control_panel import (
     _ControlPanel,
@@ -41,8 +43,6 @@ from pydidas_qtcore import PydidasQApplication
 def panel(qapp):
     _panel = _ControlPanel()
     yield _panel
-    _panel.deleteLater()
-    PydidasQApplication.instance().processEvents()
 
 
 def test_init__has_all_signals(panel):
@@ -322,6 +322,14 @@ def test_process_image_statistics__updates_all_params(panel):
     assert panel.get_param_value("image_stats_max") == pytest.approx(9.0)
     assert panel.get_param_value("image_stats_mean") == pytest.approx(5.0)
     assert panel.get_param_value("image_stats_std") == pytest.approx(2.0)
+
+
+@pytest.mark.gui
+def test_control_panel__freed_without_gc(qapp):
+    _panel = _ControlPanel()
+    _ref = weakref.ref(_panel)
+    del _panel
+    assert _ref() is None
 
 
 if __name__ == "__main__":

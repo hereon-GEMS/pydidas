@@ -29,7 +29,6 @@ __all__ = ["CompositeCreatorFrame"]
 
 
 import time
-from functools import partial
 from pathlib import Path
 from typing import Any, Literal
 
@@ -43,6 +42,7 @@ from pydidas.core.utils import (
     LOGGING_LEVEL,
     get_extension,
     pydidas_logger,
+    weak_partial
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.data_io import IoManager
@@ -179,17 +179,17 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
         # composite update method
         self.param_widgets["composite_nx"].sig_value_changed.disconnect()
         self.param_widgets["composite_nx"].sig_value_changed.connect(
-            partial(self._update_composite_dim, "x")
+            weak_partial(self._update_composite_dim, "x")
         )
         self.param_widgets["composite_ny"].sig_value_changed.disconnect()
         self.param_widgets["composite_ny"].sig_value_changed.connect(
-            partial(self._update_composite_dim, "y")
+            weak_partial(self._update_composite_dim, "y")
         )
         self.param_composite_widgets["mosaic_border_width"].sig_new_value.connect(
-            partial(self.__store_qsetting, "mosaic_border_width")
+            weak_partial(self.__store_qsetting, "mosaic_border_width")
         )
         self.param_composite_widgets["mosaic_border_value"].sig_new_value.connect(
-            partial(self.__store_qsetting, "mosaic_border_value")
+            weak_partial(self.__store_qsetting, "mosaic_border_value")
         )
         self._app.updated_composite.connect(self.__received_composite_update)
         _app = PydidasQApplication.instance()

@@ -30,7 +30,6 @@ __all__ = ["MainMenu"]
 
 import os
 import sys
-from functools import partial
 from pathlib import Path
 
 import yaml
@@ -43,6 +42,7 @@ from pydidas.core.utils import (
     DOC_HOME_QURL,
     doc_path_for_gui_manual,
     doc_qurl_for_gui_manual,
+    weak_partial
 )
 from pydidas.gui import utils
 from pydidas.gui.gui_excepthook_ import gui_excepthook
@@ -225,37 +225,37 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
             self._action_toggle_info_widget
         )
         self._actions["open_settings"].triggered.connect(
-            partial(self.show_window, "global_settings")
+            weak_partial(self.show_window, "global_settings")
         )
         self._actions["open_user_config"].triggered.connect(
-            partial(self.show_window, "user_config")
+            weak_partial(self.show_window, "user_config")
         )
         self._actions["tools_export_eiger_pixel_mask"].triggered.connect(
-            partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
+            weak_partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
         self._actions["tools_image_series_ops"].triggered.connect(
-            partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
+            weak_partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._actions["tools_clear_local_logs"].triggered.connect(
             utils.clear_local_log_files
         )
         self._actions["tools_mask_editor"].triggered.connect(
-            partial(self.create_and_show_temp_window, MaskEditorWindow)
+            weak_partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
             utils.open_doc_in_browser
         )
         self._actions["open_about"].triggered.connect(
-            partial(self.create_and_show_temp_window, AboutWindow)
+            weak_partial(self.create_and_show_temp_window, AboutWindow)
         )
         self._actions["open_paths"].triggered.connect(
-            partial(self.create_and_show_temp_window, QtPathsWindow)
+            weak_partial(self.create_and_show_temp_window, QtPathsWindow)
         )
         self._actions["check_for_update"].triggered.connect(
-            partial(self.check_for_updates, force_check=True)
+            weak_partial(self.check_for_updates, force_check=True)
         )
         self._actions["open_feedback"].triggered.connect(
-            partial(self.create_and_show_temp_window, FeedbackWindow)
+            weak_partial(self.create_and_show_temp_window, FeedbackWindow)
         )
 
     def _add_actions_to_menu(self) -> None:
@@ -476,7 +476,7 @@ class MainMenu(QtWidgets.QMainWindow, PydidasQsettingsMixin):
         self.__window_counter += 1
         self._child_windows[_name] = window()  # type: ignore[operator]
         self._child_windows[_name].sig_closed.connect(
-            partial(self.remove_window_from_children, _name)
+            weak_partial(self.remove_window_from_children, _name)
         )
         self._child_windows[_name].show()
 

@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseFitPlugin Plugin which holds generic methods for fitting plugins.
+Module with the BaseFitPlugin class for generic fitting functionality.
 """
 
 __author__ = "Malte Storm"
@@ -359,11 +359,11 @@ class BaseFitPlugin(ProcPlugin):
     @property
     def detailed_results(self) -> dict[str | None, dict[str, Any]]:
         """
-        Get the detailed results for the FitSinglePeak plugin.
+        Get the detailed results for the fit plugin.
 
         Returns
         -------
-        dict[str | None, dict[str, Any]]
+        dict[str or None, dict[str, Any]]
             The dictionary with detailed results.
         """
         return self._details
@@ -414,9 +414,8 @@ class BaseFitPlugin(ProcPlugin):
         """
         Fit a peak to the data.
 
-        Note that the results includes the original data, the fitted data and
-        the residual and that the fit Parameters are included in the kwarg
-        metadata.
+        Fit parameters are included in the returned keyword arguments.
+        Detailed plots are available through detailed_results when requested.
 
         Parameters
         ----------
@@ -467,6 +466,132 @@ class BaseFitPlugin(ProcPlugin):
             self._update_fit_range_from_results()
         return _global_results, kwargs
 
+    def create_result_dataset(self, valid: bool = True) -> Dataset:
+        """
+        Create a Dataset containing the selected fit outputs and metadata.
+
+        Parameters
+        ----------
+        valid : bool, optional
+            Flag to confirm the results are valid. The default is True.
+
+        Returns
+        -------
+        new_data : Dataset
+            The new dataset with the output data as defined by the
+            fit_output parameter.
+        """
+        _fit_results = np.full(self.config["result_shape"], np.nan)
+        _residual = np.nan
+        if valid and self._check_center_positions():
+            _fit_pvals = tuple(self._fit_params.values())
+            _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
+            _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
+            if _residual <= self.config["sigma_threshold"]:
+                _fit_results = self._write_valid_results(_fit_results, _fit_final)
+        if self.num_peaks == 1:
+            _fit_results = _fit_results.squeeze(axis=0)
+        _axis_labels = (["Peak number"] if self.num_peaks > 1 else []) + [
+            "; ".join([f"{i}: {_key}" for i, _key in enumerate(self.fit_outputs)])
+        ]
+        _result_dataset = Dataset(
+            _fit_results,
+            data_label=self.output_data_label,
+            data_unit="",
+            axis_labels=_axis_labels,
+            axis_units=[""] * _fit_results.ndim,
+        )
+        _result_dataset.metadata = self._data.metadata | {
+            "fit_func": self._fitter.name,
+            "fit_params": self._fit_params if valid else {},
+            "fit_residual_std": _residual,
+            "fitted_axis_label": self._data.axis_labels[0],
+            "fitted_axis_unit": self._data.axis_units[0],
+        }
+        return _result_dataset
+
+    def prepare_input_data(self, data: Dataset) -> None:
+        """
+        Prepare and store the input data.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input data.
+        """
+        self._data = data
+        self._data_x = data.axis_ranges[0]
+        self._crop_data_to_selected_range()
+        if not self.config.settings_updated_from_data:
+            self._update_node_output_labels()
+            self._update_peak_bounds_from_data()
+            self.config.settings_updated_from_data = True
+        if self.config.peak_width_bounds_need_update:
+            _upper_lim = (self._data_x[-1] - self._data_x[0]) / 2
+            for _i, _key in enumerate(self._fitter.param_labels):
+                if _key.startswith(("sigma", "gamma")):
+                    self.config.param_bounds_high[_i] = _upper_lim
+            self.config.peak_width_bounds_need_update = False
+
+    def create_detailed_results(
+        self, results: Dataset, start_fit_params: tuple[float, ...]
+    ) -> dict[str, Any]:
+        """
+        Create the detailed results for a single fit.
+
+        This method will return detailed information to display for the user.
+        The return format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second,
+        "plot_titles" gives a title for each subplot. Third, "plot_ylabels"
+        gives a y-axis label for each subplot. Fourth, "items" provides a
+        list with the different items to be plotted. Each list entry must be
+        a dictionary with the following keys:
+
+            "plot" : int
+                Key to determine the plot number.
+            "label" : str
+                For the legend label.
+            "data":  Dataset
+                The actual data to be plotted.
+
+        Parameters
+        ----------
+        results : Dataset
+            The Dataset with the regular results.
+        start_fit_params : tuple[float, ...]
+            The tuple with the starting fit parameters.
+
+        Returns
+        -------
+        dict[str, Any]
+            The dictionary with the detailed results in the format
+            expected by pydidas.
+        """
+        if self._data is None:
+            raise ValueError("Cannot get detailed results without input data.")
+        return _create_fit_details(
+            self._fitter,
+            self._data,
+            self._data_x,
+            self._fit_params,
+            start_fit_params,
+            results.metadata,
+            self.get_param_value("fit_bg_order") is not None,
+        )
+
+    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
+        """
+        Get the unique configuration widget class associated with this Plugin.
+
+        Returns
+        -------
+        type[GenericPluginConfigWidget]
+            The unique ParameterConfig widget class.
+        """
+        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
+
+        return FitPluginConfigWidget
+
     def _initialize_execution_run(self, data: Dataset) -> None:
         """
         Initialize the execution run for the current dataset.
@@ -509,7 +634,7 @@ class BaseFitPlugin(ProcPlugin):
         -------
         data : Dataset
             The fit results as a Dataset.
-        details : dict[str | None, Any] | None
+        details : dict[str or None, Any] or None
             The detailed results for the fit.
         kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
@@ -553,54 +678,6 @@ class BaseFitPlugin(ProcPlugin):
         )
         return _results, _details, kwargs
 
-    def create_result_dataset(self, valid: bool = True) -> Dataset:
-        """
-        Create new Dataset for detailed results from the original data and the fit.
-
-        Note that this method does not update the new metadata with the fit
-        parameters. The new dataset includes a second dimensions with entries
-        for the raw data, the data fit and the residual.
-
-        Parameters
-        ----------
-        valid : bool, optional
-            Flag to confirm the results are valid. The default is True.
-
-        Returns
-        -------
-        new_data : Dataset
-            The new dataset with the output data as defined by the
-            fit_output parameter.
-        """
-        _fit_results = np.full(self.config["result_shape"], np.nan)
-        _residual = np.nan
-        if valid and self._check_center_positions():
-            _fit_pvals = tuple(self._fit_params.values())
-            _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
-            _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
-            if _residual <= self.config["sigma_threshold"]:
-                _fit_results = self._write_valid_results(_fit_results, _fit_final)
-        if self.num_peaks == 1:
-            _fit_results = _fit_results.squeeze(axis=0)
-        _axis_labels = (["Peak number"] if self.num_peaks > 1 else []) + [
-            "; ".join([f"{i}: {_key}" for i, _key in enumerate(self.fit_outputs)])
-        ]
-        _result_dataset = Dataset(
-            _fit_results,
-            data_label=self.output_data_label,
-            data_unit="",
-            axis_labels=_axis_labels,
-            axis_units=[""] * _fit_results.ndim,
-        )
-        _result_dataset.metadata = self._data.metadata | {
-            "fit_func": self._fitter.name,
-            "fit_params": self._fit_params,
-            "fit_residual_std": _residual,
-            "fitted_axis_label": self._data.axis_labels[0],
-            "fitted_axis_unit": self._data.axis_units[0],
-        }
-        return _result_dataset
-
     def _verify_start_guess(self, startguess: tuple[float, ...]) -> None:
         """
         Verify the start guess for the fit.
@@ -637,93 +714,9 @@ class BaseFitPlugin(ProcPlugin):
                 )
         if _invalid_params:
             _text = "Invalid start guess parameters:\n"
-            for _i, (_key, _val, _low, _high) in enumerate(_invalid_params):
+            for _key, _val, _low, _high in _invalid_params:
                 _text += f"  {_key}: {_val} (expected in [{_low}, {_high}])\n"
             raise UserConfigError(_text)
-
-    def prepare_input_data(self, data: Dataset) -> None:
-        """
-        Prepare and store the input data.
-
-        Parameters
-        ----------
-        data : Dataset
-            The input data.
-        """
-        self._data = data
-        self._data_x = data.axis_ranges[0]
-        self._crop_data_to_selected_range()
-        if not self.config.settings_updated_from_data:
-            self._update_node_output_labels()
-            self._update_peak_bounds_from_data()
-            self.config.settings_updated_from_data = True
-        if self.config.peak_width_bounds_need_update:
-            _upper_lim = abs(self._data_x[0] - self._data_x[-1]) / 2
-            for _i, _key in enumerate(self._fitter.param_labels):
-                if _key.startswith(("sigma", "gamma")):
-                    self.config.param_bounds_high[_i] = _upper_lim
-            self.config.peak_width_bounds_need_update = False
-
-    def create_detailed_results(
-        self, results: Dataset, start_fit_params: tuple[float, ...]
-    ) -> dict[str, Any]:
-        """
-        Create the detailed results for a single fit.
-
-        This method will return detailed information to display for the user.
-        The return format is a dictionary with four keys:
-        First, "n_plots" which determines the number of plots. Second,
-        "plot_titles" gives a title for each subplot. Third, "plot_ylabels"
-        gives a y-axis label for each subplot. Fourth, "items" provides a
-        list with the different items to be plotted. Each list entry must be
-        a dictionary with the following keys:
-
-            "plot" : int
-                Key to determine the plot number.
-            "label" : str
-                For the legend label.
-            "data":  Dataset
-                The actual data to be plotted.
-
-        Parameters
-        ----------
-        results : Dataset
-            The Dataset with the regular results.
-        start_fit_params : tuple[float, ...]
-            The list with the starting fit params.
-
-        Returns
-        -------
-        dict[str, Any]
-            The dictionary with the detailed results in the format
-            expected by pydidas.
-        """
-        if self._data is None:
-            raise ValueError("Cannot get detailed results without input data.")
-        return _create_fit_details(
-            self._fitter,
-            self._data,
-            self._data_x,
-            self._fit_params,
-            start_fit_params,
-            results.metadata,
-            self.get_param_value("fit_bg_order") is not None,
-        )
-
-    # raise TypeError("To do: Fix the start fit estimation for multiple peaks for Gauss / Lorentzian. Implement dynamic fitting ranges.")
-
-    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
-        """
-        Get the unique configuration widget class associated with this Plugin.
-
-        Returns
-        -------
-        type[GenericPluginConfigWidget]
-            The unique ParameterConfig widget class.
-        """
-        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
-
-        return FitPluginConfigWidget
 
     def _check_center_positions(self) -> bool:
         """
@@ -809,9 +802,12 @@ class BaseFitPlugin(ProcPlugin):
             self.config.range_slice = slice(_range[0], _range[-1] + 1)
         self._data_x = self._data_x[self.config.range_slice]
         self._data = self._data[self.config.range_slice]
+        if self._data_x[0] > self._data_x[-1]:
+            self._data_x = self._data_x[::-1]
+            self._data = self._data[::-1]
 
     def _update_node_output_labels(self) -> None:
-        """Update the node output labels based on the settings and the input data."""
+        """Update the node output labels from the settings and input data."""
         _output = self.get_param_value("fit_output")
         self.output_data_unit = ""
         _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
@@ -862,6 +858,7 @@ class BaseFitPlugin(ProcPlugin):
         self.set_param_value("fit_lower_limit", _low)
         self.set_param_value("fit_upper_limit", _high)
         self.config.range_slice = None
+        self._update_peak_bounds_from_data()
 
     def _update_fit_param_bounds(self) -> None:
         """Update the fitting bounds from Parameters."""

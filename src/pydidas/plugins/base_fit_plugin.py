@@ -321,6 +321,7 @@ class BaseFitPlugin(ProcPlugin):
         "fit_bg_order",
         "fit_lower_limit",
         "fit_upper_limit",
+        "fit_limit_peak_widths",
         "fit_use_latest_as_start_guess",
         "fit_move_range_with_results",
         "fit_sigma_threshold",
@@ -331,6 +332,7 @@ class BaseFitPlugin(ProcPlugin):
     num_peaks = 1
     new_dataset = True
     advanced_parameters: ClassVar[list[str]] = [
+        "fit_limit_peak_widths",
         "fit_use_latest_as_start_guess",
         "fit_move_range_with_results",
         "fit_sigma_threshold",
@@ -386,6 +388,9 @@ class BaseFitPlugin(ProcPlugin):
         self.config.indices = None
         self.config.range_slice = None
         self.config.settings_updated_from_data = False
+        self.config.peak_width_bounds_need_update = self.get_param_value(
+            "fit_limit_peak_widths"
+        )
         self.config["min_peak_height"] = self.get_param_value("fit_min_peak_height")
         self.config["sigma_threshold"] = self.get_param_value("fit_sigma_threshold")
         self.config["result_shape"] = (self.num_peaks, len(self.fit_outputs))
@@ -476,18 +481,18 @@ class BaseFitPlugin(ProcPlugin):
             if data.ndim == 1:
                 self.config.indices = (slice(None),)
                 self.config.dim_to_process = None
-                return
-            self.config.dim_to_process = np.mod(
-                self.get_param_value("process_data_dim"), data.ndim
-            )
-            _results_shape = remove_item_at_index_from_iterable(
-                data.shape, self.config.dim_to_process
-            )
-            _indices_to_process = [np.arange(_s) for _s in _results_shape]
-            self.config.indices = tuple(
-                insert_item_in_tuple(_i, self.config.dim_to_process, slice(None))
-                for _i in tuple(itertools.product(*_indices_to_process))
-            )
+            else:
+                self.config.dim_to_process = np.mod(
+                    self.get_param_value("process_data_dim"), data.ndim
+                )
+                _results_shape = remove_item_at_index_from_iterable(
+                    data.shape, self.config.dim_to_process
+                )
+                _indices_to_process = [np.arange(_s) for _s in _results_shape]
+                self.config.indices = tuple(
+                    insert_item_in_tuple(_i, self.config.dim_to_process, slice(None))
+                    for _i in tuple(itertools.product(*_indices_to_process))
+                )
 
     def _fit_spectrum(
         self, **kwargs: Any
@@ -525,6 +530,7 @@ class BaseFitPlugin(ProcPlugin):
                 bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
                 **self._fit_presets,
             )
+        self._verify_start_guess(_startguess)
         _res = least_squares(
             self._fitter.delta,
             _startguess,
@@ -595,6 +601,46 @@ class BaseFitPlugin(ProcPlugin):
         }
         return _result_dataset
 
+    def _verify_start_guess(self, startguess: tuple[float, ...]) -> None:
+        """
+        Verify the start guess for the fit.
+
+        Parameters
+        ----------
+        startguess : tuple[float, ...]
+            The starting values for the fit parameters.
+
+        Raises
+        ------
+        UserConfigError
+            If the start guess is invalid.
+        """
+        if len(startguess) != len(self.config.param_labels):
+            raise UserConfigError(
+                f"Invalid number of start guess parameters: {len(startguess)} "
+                f"for {len(self.config.param_labels)} expected."
+            )
+        _invalid_params = []
+        for _i, _val in enumerate(startguess):
+            if not (
+                self.config.param_bounds_low[_i]
+                <= _val
+                <= self.config.param_bounds_high[_i]
+            ):
+                _invalid_params.append(
+                    (
+                        self.config.param_labels[_i],
+                        _val,
+                        self.config.param_bounds_low[_i],
+                        self.config.param_bounds_high[_i],
+                    )
+                )
+        if _invalid_params:
+            _text = "Invalid start guess parameters:\n"
+            for _i, (_key, _val, _low, _high) in enumerate(_invalid_params):
+                _text += f"  {_key}: {_val} (expected in [{_low}, {_high}])\n"
+            raise UserConfigError(_text)
+
     def prepare_input_data(self, data: Dataset) -> None:
         """
         Prepare and store the input data.
@@ -611,6 +657,12 @@ class BaseFitPlugin(ProcPlugin):
             self._update_node_output_labels()
             self._update_peak_bounds_from_data()
             self.config.settings_updated_from_data = True
+        if self.config.peak_width_bounds_need_update:
+            _upper_lim = abs(self._data_x[0] - self._data_x[-1]) / 2
+            for _i, _key in enumerate(self._fitter.param_labels):
+                if _key.startswith(("sigma", "gamma")):
+                    self.config.param_bounds_high[_i] = _upper_lim
+            self.config.peak_width_bounds_need_update = False
 
     def create_detailed_results(
         self, results: Dataset, start_fit_params: tuple[float, ...]

@@ -226,7 +226,7 @@ class BaseFitPluginTestSuite:
     )
     def test_prepare_input_data__w_limits(self, data, x, limits, slice_):
         _plugin = self.make_plugin(fit_lower_limit=limits[0], fit_upper_limit=limits[1])
-        _plugin.config["settings_updated_from_data"] = True
+        _plugin.pre_execute()
         _plugin.prepare_input_data(data)
         assert np.all(_plugin._data == data[slice_])
         assert np.all(_plugin._data_x == x[slice_])
@@ -491,6 +491,288 @@ class BaseFitPluginTestSuite:
         assert set(_details["plot_ylabels"]) == {0, 1, 2, 3}
         assert "fit params" in _details["metadata"]
         assert any(_item["label"] == "background" for _item in _details["items"])
+
+    @pytest.fixture
+    def gaussian_guess(self) -> tuple[float, ...]:
+        ### This fixture was written by an AI tool.
+        centers = np.linspace(5, 15, self.num_peaks)
+        return tuple(value for center in centers for value in (10.0, 1.0, center))
+
+    @pytest.fixture
+    def gaussian_fit_data(self, gaussian_guess: tuple[float, ...]) -> Dataset:
+        ### This fixture was written by an AI tool.
+        x = np.linspace(0, 20, 101)
+        return Dataset(self.fitter.profile(gaussian_guess, x), axis_ranges=[x])
+
+    @pytest.mark.parametrize("process_dim", [0, 1, -1])
+    @pytest.mark.parametrize("reverse_axis", [False, True])
+    @pytest.mark.parametrize("limit_widths", [False, True])
+    def test_execute__peak_width_bounds_follow_selected_axis(
+        self, process_dim: int, reverse_axis: bool, limit_widths: bool
+    ) -> None:
+        ### This test was written by an AI tool.
+        axis = process_dim % 3
+        shape = [2, 3, 4]
+        shape[axis] = 9
+        ranges = [np.arange(size, dtype=float) for size in shape]
+        ranges[axis] = np.linspace(20, 0, 9) if reverse_axis else np.linspace(0, 20, 9)
+        data = Dataset(np.ones(shape), axis_ranges=ranges)
+        plugin = self.make_plugin(
+            process_data_dim=process_dim,
+            fit_limit_peak_widths=limit_widths,
+            fit_min_peak_height=1e6,
+            fit_bg_order=1,
+        )
+        plugin.pre_execute()
+        initial_high = plugin.config.param_bounds_high.copy()
+        plugin.execute(data)
+        for index, label in enumerate(self.fitter.param_labels):
+            if label.startswith("sigma") and limit_widths:
+                assert plugin.config.param_bounds_high[index] == pytest.approx(10)
+            elif not label.startswith("center"):
+                assert plugin.config.param_bounds_high[index] == initial_high[index]
+        assert plugin.config.param_bounds_high[len(self.fitter.param_labels) :] == [
+            np.inf,
+            np.inf,
+        ]
+        assert not plugin.config.peak_width_bounds_need_update
+        assert (
+            self.fitter.param_bounds_high
+            == initial_high[: len(self.fitter.param_labels)]
+        )
+
+    @pytest.mark.parametrize("calls", [1, 2])
+    @pytest.mark.parametrize("limit_widths", [False, True])
+    @pytest.mark.parametrize("reverse_axis", [False, True])
+    def test_execute__peak_width_bounds_for_one_dimensional_data(
+        self, calls: int, limit_widths: bool, reverse_axis: bool
+    ) -> None:
+        ### This test was written by an AI tool.
+        x = np.linspace(20, 0, 21) if reverse_axis else np.linspace(0, 20, 21)
+        data = Dataset(np.ones(x.size), axis_ranges=[x])
+        plugin = self.make_plugin(
+            fit_limit_peak_widths=limit_widths, fit_min_peak_height=1e6
+        )
+        plugin.pre_execute()
+        initial_high = plugin.config.param_bounds_high.copy()
+        for _ in range(calls):
+            plugin.execute(data)
+        for index, label in enumerate(self.fitter.param_labels):
+            if label.startswith("sigma") and limit_widths:
+                assert plugin.config.param_bounds_high[index] == pytest.approx(10)
+            elif not label.startswith("center"):
+                assert plugin.config.param_bounds_high[index] == initial_high[index]
+        assert not plugin.config.peak_width_bounds_need_update
+        assert (
+            self.fitter.param_bounds_high
+            == initial_high[: len(self.fitter.param_labels)]
+        )
+
+    def test_execute__width_bounds_are_recomputed_after_pre_execute(self) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(
+            process_data_dim=1, fit_limit_peak_widths=True, fit_min_peak_height=1e6
+        )
+        x = np.linspace(0, 20, 21)
+        data = Dataset(np.ones((2, x.size)), axis_ranges=[[0, 1], x])
+        smaller_x = np.linspace(0, 12, x.size)
+        smaller_data = Dataset(np.ones((2, x.size)), axis_ranges=[[0, 1], smaller_x])
+        plugin.pre_execute()
+        plugin.execute(data)
+        indices = [
+            i
+            for i, label in enumerate(self.fitter.param_labels)
+            if label.startswith("sigma")
+        ]
+        assert all(
+            plugin.config.param_bounds_high[i] == pytest.approx(10) for i in indices
+        )
+        plugin.execute(smaller_data)
+        assert all(
+            plugin.config.param_bounds_high[i] == pytest.approx(10) for i in indices
+        )
+        plugin.pre_execute()
+        plugin.execute(smaller_data)
+        assert all(
+            plugin.config.param_bounds_high[i] == pytest.approx(6) for i in indices
+        )
+
+    def test_execute__peak_width_bounds_follow_selected_fit_range(self) -> None:
+        ### This test was written by an AI tool.
+        x = np.linspace(0, 20, 21)
+        data = Dataset(np.ones((2, x.size)), axis_ranges=[[0, 1], x])
+        plugin = self.make_plugin(
+            process_data_dim=1,
+            fit_limit_peak_widths=True,
+            fit_lower_limit=5,
+            fit_upper_limit=15,
+            fit_min_peak_height=1e6,
+        )
+        plugin.pre_execute()
+        plugin.execute(data)
+        for index, label in enumerate(self.fitter.param_labels):
+            if label.startswith("sigma"):
+                assert plugin.config.param_bounds_high[index] == pytest.approx(5)
+
+    @pytest.mark.parametrize("bg_order", [None, 0, 1])
+    @pytest.mark.parametrize("case", ["empty", "short", "short_invalid", "long"])
+    def test_execute__start_guess_with_wrong_parameter_count(
+        self,
+        gaussian_fit_data: Dataset,
+        gaussian_guess: tuple[float, ...],
+        bg_order: int | None,
+        case: str,
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=bg_order)
+        plugin.pre_execute()
+        guess = gaussian_guess + (() if bg_order is None else (0.0,) * (bg_order + 1))
+        invalid = {
+            "empty": (),
+            "short": guess[:-1],
+            "short_invalid": (-1.0,) * (len(guess) - 1),
+            "long": guess + (0.0,),
+        }[case]
+        with pytest.raises(UserConfigError) as error:
+            plugin.execute(gaussian_fit_data, start_guess=invalid)
+        assert str(error.value) == (
+            f"Invalid number of start guess parameters: {len(invalid)} "
+            f"for {len(guess)} expected."
+        )
+
+    @pytest.mark.parametrize(
+        ("label_prefix", "value", "bounds"),
+        [
+            ("amplitude", -1.0, "[0, inf]"),
+            ("sigma", -1.0, "[1e-20, 10.0]"),
+            ("sigma", 11.0, "[1e-20, 10.0]"),
+            ("sigma", np.nan, "[1e-20, 10.0]"),
+            ("center", -1.0, "[0.0, 20.0]"),
+            ("center", 21.0, "[0.0, 20.0]"),
+        ],
+    )
+    def test_execute__start_guess_reports_invalid_parameter(
+        self,
+        gaussian_fit_data: Dataset,
+        gaussian_guess: tuple[float, ...],
+        label_prefix: str,
+        value: float,
+        bounds: str,
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=None)
+        plugin.pre_execute()
+        labels = self.fitter.param_labels
+        index = next(
+            i for i, label in enumerate(labels) if label.startswith(label_prefix)
+        )
+        guess = list(gaussian_guess)
+        guess[index] = value
+        with pytest.raises(UserConfigError) as error:
+            plugin.execute(gaussian_fit_data, start_guess=tuple(guess))
+        assert str(error.value).splitlines() == [
+            "Invalid start guess parameters:",
+            f"  {labels[index]}: {value} (expected in {bounds})",
+        ]
+
+    def test_execute__start_guess_reports_all_invalid_parameters(
+        self, gaussian_fit_data: Dataset, gaussian_guess: tuple[float, ...]
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=None)
+        plugin.pre_execute()
+        labels = self.fitter.param_labels
+        guess = list(gaussian_guess)
+        expected = []
+        for index, label in enumerate(labels):
+            if label.startswith("amplitude"):
+                guess[index] = -1.0
+                expected.append(f"  {label}: -1.0 (expected in [0, inf])")
+            elif label.startswith("sigma"):
+                guess[index] = 11.0
+                expected.append(f"  {label}: 11.0 (expected in [1e-20, 10.0])")
+            elif label.startswith("center"):
+                guess[index] = 21.0
+                expected.append(f"  {label}: 21.0 (expected in [0.0, 20.0])")
+        with pytest.raises(UserConfigError) as error:
+            plugin.execute(gaussian_fit_data, start_guess=tuple(guess))
+        assert str(error.value).splitlines() == [
+            "Invalid start guess parameters:",
+            *expected,
+        ]
+
+    @pytest.mark.parametrize("bg_order", [None, 0, 1])
+    @pytest.mark.parametrize("center", [0.0, 10.0, 20.0])
+    def test_execute__valid_start_guess_including_center_bounds(
+        self,
+        gaussian_fit_data: Dataset,
+        gaussian_guess: tuple[float, ...],
+        bg_order: int | None,
+        center: float,
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=bg_order, fit_sigma_threshold=1e6)
+        plugin.pre_execute()
+        guess = list(gaussian_guess)
+        guess[self.fitter.param_labels.index(self.center_labels[0])] = center
+        background = () if bg_order is None else (0.0,) * (bg_order + 1)
+        result, kwargs = plugin.execute(
+            gaussian_fit_data, start_guess=(*guess, *background)
+        )
+        assert np.all(np.isfinite(result))
+        assert 0 <= kwargs["fit_params"][self.center_labels[0]] <= 20
+        assert len(kwargs["fit_params"]) == len(guess) + len(background)
+
+    @pytest.mark.parametrize("amplitude", [0.0, 10.0])
+    @pytest.mark.parametrize("sigma", [1e-20, 10.0])
+    def test_execute__start_guess_at_amplitude_and_width_bounds(
+        self,
+        gaussian_fit_data: Dataset,
+        gaussian_guess: tuple[float, ...],
+        amplitude: float,
+        sigma: float,
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=None)
+        plugin.pre_execute()
+        guess = list(gaussian_guess)
+        guess[0], guess[1] = amplitude, sigma
+        result, kwargs = plugin.execute(gaussian_fit_data, start_guess=tuple(guess))
+        assert "fit_params" in kwargs
+        assert result.shape == self.result_shape(len(plugin.fit_outputs))
+
+    @pytest.mark.parametrize("limit_widths", [False, True])
+    def test_execute__oversized_configured_start_width(
+        self, gaussian_fit_data: Dataset, limit_widths: bool
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=None, fit_limit_peak_widths=limit_widths)
+        self.add_missing_peak_params(plugin)
+        plugin.set_param_value(self.peak_param("width"), 30.0)
+        plugin.pre_execute()
+        if limit_widths:
+            with pytest.raises(UserConfigError) as error:
+                plugin.execute(gaussian_fit_data)
+            label = next(
+                label for label in self.fitter.param_labels if label.startswith("sigma")
+            )
+            assert str(error.value).splitlines() == [
+                "Invalid start guess parameters:",
+                f"  {label}: 30.0 (expected in [1e-20, 10.0])",
+            ]
+        else:
+            result, _ = plugin.execute(gaussian_fit_data)
+            assert np.all(np.isfinite(result))
+
+    def test_execute__valid_automatically_generated_start_guess(
+        self, gaussian_fit_data: Dataset
+    ) -> None:
+        ### This test was written by an AI tool.
+        plugin = self.make_plugin(fit_bg_order=None)
+        plugin.pre_execute()
+        result, kwargs = plugin.execute(gaussian_fit_data)
+        assert np.all(np.isfinite(result))
+        assert len(kwargs["fit_params"]) == len(self.fitter.param_labels)
 
 
 class TestBaseFitPlugin(BaseFitPluginTestSuite):

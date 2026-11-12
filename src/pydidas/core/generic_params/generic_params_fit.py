@@ -80,6 +80,19 @@ FIT_OUTPUT_TOOLTIPS = {
 
 GENERIC_PARAMS_FIT = (
     {
+        "fit_limit_peak_widths": {
+            "type": bool,
+            "default": True,
+            "name": "Limit peak widths",
+            "choices": [True, False],
+            "allow_None": False,
+            "unit": "",
+            "tooltip": (
+                "If True, the peak sigma/gamma will be limited to half the "
+                "fitted x-range. If False, the peak widths will be allowed to "
+                "take any value."
+            ),
+        },
         "fit_sigma_threshold": {
             "type": float,
             "default": 0.25,

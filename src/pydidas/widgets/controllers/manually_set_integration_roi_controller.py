@@ -135,7 +135,7 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
 
         self._plugin = plugin
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
-        self.config["exp"] = plugin
+        self.config["exp"] = plugin._exp
         self.config["exp"].sig_params_changed.connect(self._process_exp_update)
         self._process_exp_update()
 

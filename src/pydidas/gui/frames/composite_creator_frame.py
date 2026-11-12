@@ -42,7 +42,7 @@ from pydidas.core.utils import (
     LOGGING_LEVEL,
     get_extension,
     pydidas_logger,
-    weak_partial
+    weak_partial,
 )
 from pydidas.core.utils.hdf5 import get_hdf5_populated_dataset_keys
 from pydidas.data_io import IoManager

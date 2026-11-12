@@ -28,15 +28,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import pytest
-
 import weakref
+
+import pytest
 
 from pydidas.unittest_objects import SignalSpy
 from pydidas.widgets.pyqtgraph_plot._control_panel import (
     _ControlPanel,
 )
-from pydidas_qtcore import PydidasQApplication
 
 
 @pytest.fixture

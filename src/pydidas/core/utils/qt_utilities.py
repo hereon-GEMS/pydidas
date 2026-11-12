@@ -38,10 +38,9 @@ __all__ = [
 ]
 
 
-from typing import Any
-
 import weakref
 from collections.abc import Callable
+from typing import Any
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
 from qtpy.QtCore import QMetaObject, QObject

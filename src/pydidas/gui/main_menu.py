@@ -42,7 +42,7 @@ from pydidas.core.utils import (
     DOC_HOME_QURL,
     doc_path_for_gui_manual,
     doc_qurl_for_gui_manual,
-    weak_partial
+    weak_partial,
 )
 from pydidas.gui import utils
 from pydidas.gui.gui_excepthook_ import gui_excepthook

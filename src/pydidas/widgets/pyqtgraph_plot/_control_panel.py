@@ -33,9 +33,9 @@ from qtpy.QtWidgets import QWidget
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import POLICY_FIX_EXP
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.base_classes import PydidasScrollArea, WidgetWithParameters
 from pydidas.widgets.data_viewer import DataAxisSelector
-from pydidas.core.utils import weak_partial
 
 
 _SPACER_HEIGHT = 20

@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["_ImageView"]
 
 
-import warnings
 from collections.abc import Callable
 from typing import Literal
 

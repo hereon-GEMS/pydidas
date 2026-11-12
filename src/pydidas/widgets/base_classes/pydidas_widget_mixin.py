@@ -27,13 +27,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PydidasWidgetMixIn"]
 
-from functools import partial
+import weakref
 from numbers import Real
 from typing import Any, ClassVar
 
 import numpy as np
 from qtpy.QtCore import QObject, QSize, Qt, Slot
-import weakref
 
 from pydidas.core import UserConfigError
 from pydidas.core.constants import (
@@ -43,7 +42,6 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import (
     apply_qt_properties,
-    safe_connection_disconnect,
     update_qwidget_font,
 )
 from pydidas_qtcore import PydidasQApplication
@@ -292,6 +290,7 @@ class PydidasWidgetMixIn:
 
     fm_h = font_metric_height_factor
     fm_w = font_metric_width_factor
+
 
 class _FontSignalRelay(QObject):
     """

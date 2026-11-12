@@ -29,6 +29,7 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
+from pydidas_plugins.proc_plugins.pyfai_2d_integration import PyFAI2dIntegration
 from pydidas_plugins.proc_plugins.pyfai_azimuthal_sector_integration import (
     PyFAIazimuthalSectorIntegration,
 )
@@ -279,13 +280,11 @@ def test_pre_execute__updates_sector_bounds_without_rebuilding(
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Integrator cache ignores changes in the number of sectors.",
-)
 @pytest.mark.parametrize("entries", ["0; 90", "0; 45; 90; 135; 180"])
 def test_pre_execute__updates_number_of_sectors(
-    sector_plugin: PyFAIazimuthalSectorIntegration, entries: str
+    sector_plugin: PyFAIazimuthalSectorIntegration,
+    integration_backend: tuple[Mock, list[Mock]],
+    entries: str,
 ) -> None:
     ### This test was written by an AI tool.
     sector_plugin.pre_execute()
@@ -295,6 +294,11 @@ def test_pre_execute__updates_number_of_sectors(
     centers = [float(entry) for entry in entries.split(";")]
     assert result.shape == (len(centers), 3)
     np.testing.assert_array_equal(result.axis_ranges[0], centers)
+    assert integration_backend[0].call_count == 4 + len(centers)
+    for integrator in integration_backend[1][:4]:
+        integrator.integrate1d.assert_not_called()
+    for integrator in integration_backend[1][4:]:
+        integrator.integrate1d.assert_called_once()
 
 
 def test_pre_execute__loads_mask_for_all_sectors(
@@ -335,10 +339,6 @@ def test_pre_execute__wrong_mask_shape_raises(
         sector_plugin.pre_execute()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Removing the external mask does not clear cached integrator masks.",
-)
 def test_pre_execute__clears_removed_detector_mask(
     sector_plugin: PyFAIazimuthalSectorIntegration,
     experiment: DiffractionExperiment,
@@ -348,10 +348,12 @@ def test_pre_execute__clears_removed_detector_mask(
     ### This test was written by an AI tool.
     sector_plugin.pre_execute()
     experiment.set_param_value("detector_mask_file", Path())
-    for integrator in integration_backend[1]:
-        integrator.set_mask.reset_mock()
     sector_plugin.pre_execute()
-    for integrator in integration_backend[1]:
+    result, _ = sector_plugin.execute(np.ones((32, 32)))
+    assert result.shape == (4, 3)
+    assert integration_backend[0].call_count == 8
+    for integrator in integration_backend[1][4:]:
+        integrator.integrate1d.assert_called_once()
         integrator.set_mask.assert_called_with(None)
 
 
@@ -530,10 +532,25 @@ def test_execute__restores_detector_mask_after_custom_mask(
         )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="The base plugin does not clear a custom mask without a detector mask.",
-)
+def test_pre_execute__restores_mask_when_sector_count_changes(
+    sector_plugin: PyFAIazimuthalSectorIntegration,
+    integration_backend: tuple[Mock, list[Mock]],
+    detector_mask: np.ndarray,
+) -> None:
+    ### This test was written by an AI tool.
+    sector_plugin.pre_execute()
+    sector_plugin.execute(np.ones((32, 32)), custom_mask=np.eye(32))
+    sector_plugin.set_param_value("azi_sector_centers", "0; 90")
+    sector_plugin.pre_execute()
+    result, _ = sector_plugin.execute(np.ones((32, 32)))
+    assert result.shape == (2, 3)
+    for integrator in integration_backend[1][4:]:
+        np.testing.assert_array_equal(
+            integrator.set_mask.call_args.args[0], detector_mask
+        )
+        integrator.integrate1d.assert_called_once()
+
+
 def test_execute__clears_custom_mask_without_detector_mask(
     sector_plugin: PyFAIazimuthalSectorIntegration,
     integration_backend: tuple[Mock, list[Mock]],
@@ -546,6 +563,105 @@ def test_execute__clears_custom_mask_without_detector_mask(
     sector_plugin.execute(np.ones((32, 32)))
     for integrator in integration_backend[1]:
         integrator.set_mask.assert_called_with(None)
+
+
+def test_execute__restores_each_integrator_intrinsic_mask(
+    sector_plugin: PyFAIazimuthalSectorIntegration,
+    experiment: DiffractionExperiment,
+    integration_backend: tuple[Mock, list[Mock]],
+) -> None:
+    ### This test was written by an AI tool.
+    masks = [np.full((32, 32), value, dtype=np.uint8) for value in range(4)]
+    make_detector = experiment.get_detector
+    detectors = []
+    for mask in masks:
+        detector = make_detector()
+        detector.mask = mask
+        detectors.append(detector)
+    with patch.object(experiment, "get_detector", side_effect=detectors):
+        sector_plugin.pre_execute()
+        sector_plugin.execute(np.ones((32, 32)), custom_mask=np.eye(32))
+        sector_plugin.execute(np.ones((32, 32)))
+    for integrator, mask in zip(integration_backend[1], masks, strict=True):
+        np.testing.assert_array_equal(integrator.set_mask.call_args.args[0], mask)
+
+
+@pytest.mark.parametrize(
+    "plugin_type", [PyFAIazimuthalSectorIntegration, PyFAI2dIntegration]
+)
+@pytest.mark.parametrize("has_external_mask", [False, True])
+def test_execute__real_integrators_restore_masks(
+    experiment: DiffractionExperiment,
+    image: np.ndarray,
+    tmp_path: Path,
+    plugin_type: type[pyFAIintegrationBase],
+    has_external_mask: bool,
+) -> None:
+    ### This test was written by an AI tool.
+    intrinsic = np.zeros((32, 32), dtype=np.uint8)
+    intrinsic[:, :8] = 1
+    external = np.zeros((32, 32), dtype=np.uint8)
+    external[:12, :] = 1
+    custom = np.zeros((32, 32), dtype=np.uint8)
+    custom[:, 16:] = 1
+    make_detector = experiment.get_detector
+
+    def create_detector() -> Any:
+        detector = make_detector()
+        detector.mask = intrinsic.copy()
+        return detector
+
+    if has_external_mask:
+        filename = tmp_path / "external_mask.npy"
+        np.save(filename, external)
+        experiment.set_param_value("detector_mask_file", filename)
+    with patch.object(experiment, "get_detector", side_effect=create_detector):
+        plugin = plugin_type(
+            diffraction_exp=experiment,
+            rad_npoint=8,
+            int_method="CSR",
+            correct_solid_angle=0,
+            polarization_factor=0,
+        )
+        plugin.pre_execute()
+        baseline, _ = plugin.execute(image)
+        if not has_external_mask:
+            with patch.object(experiment, "get_detector", side_effect=make_detector):
+                unmasked_plugin = plugin_type(
+                    diffraction_exp=experiment,
+                    rad_npoint=8,
+                    int_method="CSR",
+                    correct_solid_angle=0,
+                    polarization_factor=0,
+                )
+                unmasked_plugin.pre_execute()
+                unmasked, _ = unmasked_plugin.execute(image)
+            assert not np.allclose(unmasked.array, baseline.array)
+        custom_result, _ = plugin.execute(image, custom_mask=custom)
+        restored, _ = plugin.execute(image)
+        np.testing.assert_allclose(restored.array, baseline.array)
+        assert not np.allclose(custom_result.array, baseline.array)
+
+        plugin.execute(image, custom_mask=custom)
+        plugin.pre_execute()
+        restored_after_setup, _ = plugin.execute(image)
+        np.testing.assert_allclose(restored_after_setup.array, baseline.array)
+
+        if has_external_mask:
+            experiment.set_param_value("detector_mask_file", Path())
+            plugin.pre_execute()
+            without_external, _ = plugin.execute(image)
+            fresh_plugin = plugin_type(
+                diffraction_exp=experiment,
+                rad_npoint=8,
+                int_method="CSR",
+                correct_solid_angle=0,
+                polarization_factor=0,
+            )
+            fresh_plugin.pre_execute()
+            expected, _ = fresh_plugin.execute(image)
+            np.testing.assert_allclose(without_external.array, expected.array)
+            assert not np.allclose(without_external.array, baseline.array)
 
 
 @pytest.mark.parametrize("azi_unit", ["chi / deg", "chi / rad"])

@@ -104,9 +104,10 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
     def pre_execute(self) -> None:
         """Pre-execute the plugin and set up the AzimuthalIntegrator."""
         self._eval_sectors()
-        if self._exp_hash != hash(self._exp):
+        if self._exp_hash != hash(self._exp) or len(self._ais) != len(
+            self.config["sector_centers"]
+        ):
             _lambda_in_A = self._exp.get_param_value("xray_wavelength")
-            self._exp_hash = hash(self._exp)
             self._ais = [
                 AzimuthalIntegrator(
                     dist=self._exp.get_param_value("detector_dist"),
@@ -121,10 +122,10 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
                 for _ in self.config["sector_centers"]
             ]
             self._ai = self._ais[0]
+            self._store_intrinsic_masks()
+            self._exp_hash = hash(self._exp)
         self.load_and_set_mask()
-        if self._mask is not None:
-            for _ai in self._ais:
-                _ai.set_mask(self._mask)
+        self._restore_default_masks()
         self._prepare_pyfai_method()
         self._ai_params = {
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),

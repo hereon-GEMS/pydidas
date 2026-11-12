@@ -139,6 +139,11 @@ Bugfixes
 - Fixed an issue which allowed the same error message to spawn repeatedly even
   when not acknowledged.
 - Fixed an issue which showed an unformatted axis range for processing results.
+- Fixed an issue in PyFAIazimuthalSectorIntegration which did not update the 
+  mask for the integrators when the integrators changed due to changes in the
+  sector centers.
+- Fixed an issue in PyFAIazimuthalSectorIntegration which did not rebuild the
+  integrators for cached sector centers.
 
 
 v26.05.19

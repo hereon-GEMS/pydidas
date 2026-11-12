@@ -94,6 +94,7 @@ class pyFAIintegrationBase(ProcPlugin):
         self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
+        self._intrinsic_masks = []
         self.config["custom_mask"] = False
 
     def pre_execute(self) -> None:
@@ -112,10 +113,10 @@ class pyFAIintegrationBase(ProcPlugin):
                 detector=self._exp.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
+            self._store_intrinsic_masks()
             self._exp_hash = hash(self._exp)
         self.load_and_set_mask()
-        if self._mask is not None:
-            self._ai.set_mask(self._mask)
+        self._restore_default_masks()
         self._adjust_integration_discontinuity()
         self._prepare_pyfai_method()
 
@@ -339,6 +340,25 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
 
+    def _integrators(self) -> list[AzimuthalIntegrator]:
+        """Return the integrators used by this plugin."""
+        return self._ais if hasattr(self, "_ais") else [self._ai]
+
+    def _store_intrinsic_masks(self) -> None:
+        """Store detector masks before applying any external or custom masks."""
+        self._intrinsic_masks = [
+            None if ai.detector.mask is None else ai.detector.mask.copy()
+            for ai in self._integrators()
+        ]
+
+    def _restore_default_masks(self) -> None:
+        """Restore the external mask or each detector's intrinsic mask."""
+        for ai, intrinsic_mask in zip(
+            self._integrators(), self._intrinsic_masks, strict=True
+        ):
+            ai.set_mask(self._mask if self._mask is not None else intrinsic_mask)
+        self.config["custom_mask"] = False
+
     def check_and_set_custom_mask(self, **kwargs: Any) -> None:
         """
         Check the kwargs for a custom mask and set it, if available.
@@ -350,17 +370,11 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _mask = kwargs.get("custom_mask", None)
         if _mask is not None:
-            self.config["custom_mask"] = True
-        elif _mask is None and self._mask is not None and self.config["custom_mask"]:
-            _mask = self._mask
-            self.config["custom_mask"] = False
-        else:
-            return
-        if hasattr(self, "_ai"):
-            self._ai.set_mask(_mask)
-        if hasattr(self, "_ais"):
-            for _ai in self._ais:
+            for _ai in self._integrators():
                 _ai.set_mask(_mask)
+            self.config["custom_mask"] = True
+        elif self.config["custom_mask"]:
+            self._restore_default_masks()
 
     def _check_mask_shape(self, mask: np.ndarray | None = None) -> None:
         """

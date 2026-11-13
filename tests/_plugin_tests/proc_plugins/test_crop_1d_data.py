@@ -159,6 +159,7 @@ def test_execute(
 
 
 def test_get_slices__no_points_in_range(plugin: ProcPlugin, data: Dataset) -> None:
+    data.update_axis_range(0, np.arange(data.shape[0]))
     plugin.set_param_value("process_data_dim", 0)
     plugin.set_param_value("type_selection", "Axis values")
     plugin.set_param_value("crop_low", 1.1)

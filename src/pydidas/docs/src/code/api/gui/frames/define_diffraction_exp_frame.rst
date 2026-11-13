@@ -19,7 +19,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.frames.DefineDiffractionExpFrame
+.. autoclass:: pydidas.gui.frames.define_diffraction_exp_frame.DefineDiffractionExpFrame
     :members:
 
 .. _all_methods_DefineDiffractionExpFrame:
@@ -27,7 +27,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.frames.DefineDiffractionExpFrame
+.. autoclass:: pydidas.gui.frames.define_diffraction_exp_frame.DefineDiffractionExpFrame
     :members:
     :noindex:
     :inherited-members: QFrame

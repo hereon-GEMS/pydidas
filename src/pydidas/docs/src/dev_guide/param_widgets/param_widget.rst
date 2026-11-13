@@ -5,7 +5,7 @@
     SPDX-License-Identifier: CC-BY-4.0
 
 .. |Parameter| replace:: :py:class:`Parameter <pydidas.core.Parameter>`
-.. |ParameterWidget| replace:: :py:class:`ParameterWidget <pydidas.widgets.parameter_config.ParameterWidget>`
+.. |ParameterWidget| replace:: :py:class:`ParameterWidget <pydidas.widgets.param_io.ParameterWidget>`
 
 
 .. _dev_guide_parameter_widget:
@@ -46,16 +46,16 @@ is a composite widget designed to display and edit a single :py:class:`Parameter
     |                                                                         |
     |  +------------------+  +-------------------------+  +----------------+  |
     |  | Label widget     |  | I/O widget              |  | Unit widget    |  |
-    |  | (PydidasLabel)   |  | (BaseParamIoWidget*)    |  | (PydidasLabel) |  |
+    |  | (PydidasLabel)   |  | (BaseParamIo*)          |  | (PydidasLabel) |  |
     |  |                  |  |                         |  | (Label)        |  |
     |  +------------------+  +-------------------------+  +----------------+  |
     |                             ^                                           |
     |                             | selected by dtype/choices                 |
     |                             |                                           |
     |         +--------------------------------------------------+            |
-    |         | ParamIoWidgetCheckBox / ParamIoWidgetComboBox /  |            |
-    |         | ParamIoWidgetFile / ParamIoWidgetHdf5Key /       |            |
-    |         | ParamIoWidgetLineEdit                            |            |
+    |         | _ParamIoCheckBox / _ParamIoComboBox /            |            |
+    |         | _ParamIoFile / _ParamIoHdf5Key /                 |            |
+    |         | _ParamIoLineEdit                                 |            |
     |         +--------------------------------------------------+            |
     +-------------------------------------------------------------------------+
 
@@ -112,7 +112,7 @@ arguments. The following keyword arguments are supported:
         persisting file-dialog directories across sessions. The default is None.
 
 In addition, all kwargs supported by the parent class :py:class:`EmptyWidget
-<pydidas.widgets.factory.EmptyWidget>` are also supported and passed to the
+<pydidas.widgets.base_classes.EmptyWidget>` are also supported and passed to the
 constructor.
 
 Signals
@@ -156,7 +156,7 @@ These signals are passed through from the underlying I/O widget:
     Note that programmatic updates to the |Parameter| value are not
     automatically reflected in the widget display. To synchronize the display
     with the current Parameter value, use the :py:meth:`update_from_param
-    <pydidas.widgets.parameter_config.ParameterWidget.update_from_param>`
+    <pydidas.widgets.param_io.ParameterWidget.update_from_param>`
     method.
 
 Signal and Data Flow: User Edit
@@ -165,7 +165,7 @@ Signal and Data Flow: User Edit
 The typical interactive edit flow is:
 
 1. User edits text/selection in a concrete I/O widget.
-2. I/O widget calls ``emit_signal()`` from ``BaseParamIoWidgetMixIn``.
+2. I/O widget calls ``emit_signal()`` from ``BaseParamIoMixIn``.
 3. ``emit_signal()`` compares against ``_old_value`` and emits:
 
    - ``sig_new_value(str)`` with ``current_text``
@@ -263,21 +263,16 @@ Widget Selection Rules
 
 |ParameterWidget| chooses the I/O widget class from the Parameter metadata:
 
-- bool-like choices -> :py:class:`ParamIoWidgetCheckBox
-  <pydidas.widgets.parameter_config.ParamIoWidgetCheckBox>`
-- list of choices -> :py:class:`ParamIoWidgetComboBox
-  <pydidas.widgets.parameter_config.ParamIoWidgetComboBox>`
-- ``Path`` dtype -> :py:class:`ParamIoWidgetFile
-  <pydidas.widgets.parameter_config.ParamIoWidgetFile>`
-- ``Hdf5key`` dtype -> :py:class:`ParamIoWidgetHdf5Key
-  <pydidas.widgets.parameter_config.ParamIoWidgetHdf5Key>`
-- other -> :py:class:`ParamIoWidgetLineEdit
-  <pydidas.widgets.parameter_config.ParamIoWidgetLineEdit>`
+- bool-like choices -> ``_ParamIoCheckBox``
+- list of choices -> ``_ParamIoComboBox``
+- ``Path`` dtype -> ``_ParamIoFile``
+- ``Hdf5key`` dtype -> ``_ParamIoHdf5Key``
+- other -> ``_ParamIoLineEdit``
 
 The selection is dynamic and can be updated to accommodate for changes in the
 Parameter's metadata (e.g. new choices list) through the
 :py:meth:`update_choices_from_param
-<pydidas.widgets.parameter_config.ParameterWidget.update_choices_from_param>`
+<pydidas.widgets.param_io.ParameterWidget.update_choices_from_param>`
 method.
 
 Subclass Behavior Matrix
@@ -290,22 +285,22 @@ Subclass Behavior Matrix
     * - Class
       - Primary UI control
       - Key behavior
-    * - ``ParamIoWidgetCheckBox``
+    * - ``_ParamIoCheckBox``
       - Checkbox
       - Converts bool-like values and emits on check-state changes.
-    * - ``ParamIoWidgetComboBox``
+    * - ``_ParamIoComboBox``
       - Combo box
       - Handles choices list updates and emits on index changes.
-    * - ``ParamIoWidgetLineEdit``
+    * - ``_ParamIoLineEdit``
       - Line edit
       - Free text, optional float rounding for displayed values.
-    * - ``ParamIoWidgetWithButton``
+    * - ``_ParamIoWithButton``
       - Line edit plus button
       - Base class for action-backed value selection widgets.
-    * - ``ParamIoWidgetFile``
+    * - ``_ParamIoFile``
       - File picker button
       - Integrates dialogs and drag-and-drop path selection.
-    * - ``ParamIoWidgetHdf5Key``
+    * - ``_ParamIoHdf5Key``
       - File plus dataset picker
       - Selects HDF5 datasets and stores key string values.
 
@@ -313,10 +308,10 @@ Subclass Behavior Matrix
 File and HDF5 Specialized Flow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``ParamIoWidgetWithButton`` is the base for chooser widgets.
+``_ParamIoWithButton`` is the base for chooser widgets.
 
-- ``ParamIoWidgetFile``: button opens a path dialog and writes selected path.
-- ``ParamIoWidgetHdf5Key``: button opens file selection, then dataset chooser,
+- ``_ParamIoFile``: button opens a path dialog and writes selected path.
+- ``_ParamIoHdf5Key``: button opens file selection, then dataset chooser,
   then writes selected dataset key.
 
 Both subclasses rely on the same output contract: writing value through the
@@ -327,12 +322,12 @@ Contributor Extension Checklist
 
 When adding a new ``param_io_widget_*`` class:
 
-1. Inherit from ``BaseParamIoWidgetMixIn`` and a QWidget-compatible class.
+1. Inherit from ``BaseParamIoMixIn`` and a QWidget-compatible class.
 2. Implement ``current_text`` and ``update_display_value``.
 3. Ensure ``update_display_value`` does not emit user-change signals.
 4. Connect the widget's native interaction signal to ``emit_signal``.
 5. If choices are supported, implement ``update_choices``.
-6. If action button is needed, derive from ``ParamIoWidgetWithButton`` and
+6. If action button is needed, derive from ``_ParamIoWithButton`` and
    implement ``button_function``.
 7. Add tests in ``tests/widgets/parameter_config`` for conversion, display
    update semantics, and signal counts.

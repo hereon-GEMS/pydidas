@@ -41,6 +41,12 @@ Settings
         their size, as long as the size is within the accepted memory management
         size. The buffer must be able to hold at least one dataframe per
         multiprocessing worker.
+    * - Data buffer size
+      - The maximum size of the data buffer per display widgtet in MB. If the
+        data exceeds this limit it will be stored on disk instead of in memory.
+    * - HDF5 max. dataset size to load
+      - The maximum size of HDF5 files to load in memory in MB. If the file
+        exceeds this amount, it will lazily be read from disk insted of memory.
     * - Shared buffer size limit
       - The maximum size of the memory buffer in MB. This setting is used to
         enforce that pydidas does not create buffers which interfere with the

@@ -24,8 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import queue
 import threading
-import time
 from collections.abc import Iterator
 from multiprocessing.managers import SyncManager
 from pathlib import Path
@@ -317,24 +317,57 @@ def test_multiprocessing_func__w_full_buffer(app, app_list) -> None:
     app.prepare_run()
     app_clone = app.copy(clone_mode=True)
     app_list.append(app_clone)
-    _res = app_clone.multiprocessing_func(0)
+    assert app_clone.multiprocessing_func(0) is None
     _signal = app_clone.must_send_signal_and_wait_for_response()
     app.received_signal_message(_signal)
-    app._shared_arrays["in_use_flag"][:] = 1
-    # Verify that get_latest_results blocks when all buffer slots are occupied
-    result_holder = []
-    thread = threading.Thread(
-        target=lambda: result_holder.append(app_clone.get_latest_results())
-    )
-    thread.daemon = True  # let the thread stop with the test process
+    lock = app.mp_manager["lock"]
+    with lock:
+        app._shared_arrays["in_use_flag"][:] = 1
+
+    checked_full_buffer = threading.Event()
+    results: queue.Queue[tuple[int | None, Exception | None]] = queue.Queue()
+    errors: list[Exception] = []
+
+    class ObservedLock:
+        def __enter__(self) -> None:
+            lock.acquire()
+
+        def __exit__(self, *args: object) -> None:
+            lock.release()
+            if args[0] is None:
+                checked_full_buffer.set()
+
+    def get_results() -> None:
+        try:
+            results.put((app_clone.get_latest_results(), None))
+        except Exception as error:  # noqa: BLE001
+            results.put((None, error))
+            errors.append(error)
+            checked_full_buffer.set()
+
+    app_clone.mp_manager["lock"] = ObservedLock()
+    thread = threading.Thread(target=get_results, daemon=True)
     thread.start()
-    thread.join(timeout=0.2)
-    assert thread.is_alive()  # i.e. app_clone is still waiting on free buffer
-    with app.mp_manager["lock"]:
-        app._shared_arrays["in_use_flag"][:] = 0
-    time.sleep(0.01)
-    assert len(result_holder) == 1
-    assert not thread.is_alive()
+    try:
+        assert checked_full_buffer.wait(timeout=10), "Worker did not check the buffer"
+        if errors:
+            raise errors[0]
+        assert thread.is_alive(), "Worker did not wait for a free buffer slot"
+        assert results.empty()
+    finally:
+        with lock:
+            app._shared_arrays["in_use_flag"][0] = 0
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "Worker did not finish after buffer release"
+
+    buffer_index, error = results.get_nowait()
+    if error is not None:
+        raise error
+    assert buffer_index == 0
+    assert app._shared_arrays["in_use_flag"][buffer_index] == 1
+    for node_id, expected in TREE.get_current_results().items():
+        actual = app._shared_arrays[node_id][buffer_index]
+        np.testing.assert_array_equal(actual, np.asarray(expected, dtype=actual.dtype))
 
 
 @pytest.mark.slow

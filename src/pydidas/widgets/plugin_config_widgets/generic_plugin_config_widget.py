@@ -39,13 +39,12 @@ from pydidas.core.constants import (
 )
 from pydidas.core.utils import apply_qt_properties
 from pydidas.plugins import BasePlugin
-from pydidas.widgets.dialogues.question_box import QuestionBox
-from pydidas.widgets.factory import CreateWidgetsMixIn
-from pydidas.widgets.parameter_config import ParameterEditCanvas
-from pydidas.widgets.selection import ToggleOptionsButton
+from pydidas.widgets.base_classes import WidgetFactoryMixIn
+from pydidas.widgets.dialogs.question_box import QuestionBox
+from pydidas.widgets.extended_widgets import ParameterEditCanvas, ToggleOptionsButton
 
 
-class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
+class GenericPluginConfigWidget(ParameterEditCanvas, WidgetFactoryMixIn):
     """
     The generic plugin configuration widget.
 
@@ -73,7 +72,7 @@ class GenericPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     def __init__(self, plugin: BasePlugin, node_id: int, **kwargs: Any) -> None:
         ParameterEditCanvas.__init__(self, **kwargs)
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         apply_qt_properties(
             self.layout(),
             contentsMargins=(0, 0, 0, 0),

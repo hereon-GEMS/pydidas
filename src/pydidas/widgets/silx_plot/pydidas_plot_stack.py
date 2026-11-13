@@ -34,11 +34,12 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Dataset
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.widgets.silx_plot.pydidas_plot1d import PydidasPlot1D
 from pydidas.widgets.silx_plot.pydidas_plot2d import PydidasPlot2D
 
 
-class PydidasPlotStack(QtWidgets.QStackedWidget):
+class PydidasPlotStack(ConfigDictMixin, QtWidgets.QStackedWidget):
     """
     A stack with two plots for 1d and 2d data which selects the correct to
     display.
@@ -77,11 +78,15 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._frame2d.setLayout(QtWidgets.QGridLayout())
         self._1dplot: PydidasPlot1D | None = None
         self._2dplot: PydidasPlot2D | None = None
-        self._config = {
-            "use_data_info_action": kwargs.get("use_data_info_action", False),
-            "cs_transform": kwargs.get("cs_transform", True),
-            "diffraction_exp": kwargs.get("diffraction_exp", None),
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "use_data_info_action": kwargs.get("use_data_info_action", False),
+                "cs_transform": kwargs.get("cs_transform", True),
+                "diffraction_exp": kwargs.get("diffraction_exp", None),
+            },
+            super_init=False,
+        )
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
 
@@ -137,7 +142,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         """
         _plot = getattr(self, f"_{dim}dplot")
         if _plot is None:
-            _plot = PydidasPlot1D() if dim == 1 else PydidasPlot2D(**self._config)
+            _plot = PydidasPlot1D() if dim == 1 else PydidasPlot2D(**self.config)
             setattr(self, f"_{dim}dplot", _plot)
             _widget = getattr(self, f"_frame{dim}d")
             _widget.layout().addWidget(_plot)

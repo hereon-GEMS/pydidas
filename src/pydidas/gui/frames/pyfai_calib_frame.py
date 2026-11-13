@@ -55,7 +55,7 @@ from pydidas.core.lazy_imports.pyFAI import (
 )
 from pydidas.gui.utils.pyfai_calib_frame_utils import create_calib_tasks, populate_menu
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 
 
 EXP = DiffractionExperimentContext()
@@ -134,6 +134,7 @@ class PyfaiCalibFrame(BaseFrame):
             self._widgets["task_stack"].addWidget(task)
         populate_menu(self._widgets["task_list"], self._tasks)
         self.setUpdatesEnabled(True)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect the required signals to run the pyFAI calibration."""
@@ -157,6 +158,7 @@ class PyfaiCalibFrame(BaseFrame):
             self._calibration_model.markerModel().add(origin)
         for task in self._tasks:
             task.setModel(self._calibration_model)
+        super().finalize_ui()
 
     @QtCore.Slot()
     def _display_help(self) -> None:

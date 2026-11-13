@@ -69,12 +69,12 @@ def test_pre_execute(plugin: ProcPlugin, bounds: list[int | None]) -> None:
     else:
         plugin.pre_execute()
         assert plugin._data is None
-        assert plugin._config["slices"] is None
+        assert plugin.config["slices"] is None
 
 
 def test_get_slices__existing_slices(plugin: ProcPlugin) -> None:
     _defined_slices = (slice(None, None), slice(1, 2))
-    plugin._config["slices"] = _defined_slices
+    plugin.config["slices"] = _defined_slices
     _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _defined_slices
 
@@ -99,7 +99,7 @@ def test_get_slices__valid_data_dim__w_indices(
     _target_slices = (slice(None, None),) * _target_slicing_dim + (slice(1, 4),)
     _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _target_slices
-    assert plugin._config["slices"] == _target_slices
+    assert plugin.config["slices"] == _target_slices
 
 
 @pytest.mark.parametrize("proc_dim", [0, 1, 2, 3, 4])
@@ -133,7 +133,7 @@ def test_get_slices__valid_data_dim__w_data_range(
     _target_slices = (slice(None, None),) * proc_dim + (slice(crop_low, crop_high),)
     _received_slices = plugin._get_slices()  # type: ignore[attr-defined]
     assert _received_slices == _target_slices
-    assert plugin._config["slices"] == _target_slices
+    assert plugin.config["slices"] == _target_slices
 
 
 @pytest.mark.parametrize("proc_dim", [0, 1, 2, 3, 4])
@@ -156,6 +156,17 @@ def test_execute(
     assert _new_data.axis_units == _sliced_data.axis_units
     for _i_dim, _range in _new_data.axis_ranges.items():
         assert np.allclose(_range, _sliced_data.axis_ranges[_i_dim])
+
+
+def test_get_slices__no_points_in_range(plugin: ProcPlugin, data: Dataset) -> None:
+    plugin.set_param_value("process_data_dim", 0)
+    plugin.set_param_value("type_selection", "Axis values")
+    plugin.set_param_value("crop_low", 1.1)
+    plugin.set_param_value("crop_high", 1.9)
+    plugin.pre_execute()
+    plugin._data = data
+    with pytest.raises(UserConfigError):
+        plugin._get_slices()
 
 
 if __name__ == "__main__":

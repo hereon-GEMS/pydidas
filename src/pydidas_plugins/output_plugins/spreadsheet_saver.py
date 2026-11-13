@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ format with different metadata headers.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -175,7 +175,7 @@ class SpreadsheetSaver(OutputPlugin):
             return data, kwargs
         if not isinstance(data, Dataset):
             data = Dataset(data)
-        self._config["global_index"] = kwargs.get("global_index", None)
+        self.config["global_index"] = kwargs.get("global_index", None)
         if data.axis_ranges[0] is None:
             data.update_axis_range(0, np.arange(data.size))
             data.update_axis_label(0, "index")

@@ -27,7 +27,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
     "BackendMatplotlib",
+    "BackendMatplotlibQt",
     "Colormap",
+    "ColormapNameComboBox",
     "ImageToolBar",
     "Plot1D",
     "Plot2D",
@@ -35,32 +37,51 @@ __all__ = [
     "PlotToolButton",
     "Scatter",
     "plot_items",
+    "silx_hdf5",
+    "silx_icons",
 ]
 
 
 from typing import TYPE_CHECKING
 
-from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.core.lazy_imports.lazy_objects import LazyModule, LazyObject
 
 
 if TYPE_CHECKING:
+    from silx.gui import hdf5 as silx_hdf5
+    from silx.gui import icons as silx_icons
     from silx.gui.colors import Colormap
     from silx.gui.plot import Plot1D, Plot2D
     from silx.gui.plot import items as plot_items
     from silx.gui.plot.actions import PlotAction
-    from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlib
+    from silx.gui.plot.backends.BackendMatplotlib import (
+        BackendMatplotlib,
+        BackendMatplotlibQt,
+    )
     from silx.gui.plot.items import Scatter
     from silx.gui.plot.PlotToolButtons import PlotToolButton
     from silx.gui.plot.tools import ImageToolBar
+    from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 else:
     BackendMatplotlib = LazyObject(
         "silx.gui.plot.backends.BackendMatplotlib", "BackendMatplotlib"
     )
+    BackendMatplotlibQt = LazyObject(
+        "silx.gui.plot.backends.BackendMatplotlib", "BackendMatplotlibQt"
+    )
     Colormap = LazyObject("silx.gui.colors", "Colormap")
+    ColormapNameComboBox = LazyObject(
+        "silx.gui.widgets.ColormapNameComboBox", "ColormapNameComboBox"
+    )
+    Hdf5TreeModel = LazyObject("silx.gui.hdf5", "Hdf5TreeModel")
+    Hdf5TreeView = LazyObject("silx.gui.hdf5", "Hdf5TreeView")
     ImageToolBar = LazyObject("silx.gui.plot.tools", "ImageToolBar")
+    NexusSortFilterProxyModel = LazyObject("silx.gui.hdf5", "NexusSortFilterProxyModel")
     Plot1D = LazyObject("silx.gui.plot", "Plot1D")
     Plot2D = LazyObject("silx.gui.plot", "Plot2D")
     PlotAction = LazyObject("silx.gui.plot.actions", "PlotAction")
     PlotToolButton = LazyObject("silx.gui.plot.PlotToolButtons", "PlotToolButton")
     Scatter = LazyObject("silx.gui.plot.items", "Scatter")
-    plot_items = LazyObject("silx.gui.plot", "items")
+    silx_icons = LazyModule("silx.gui.icons")
+    plot_items = LazyModule("silx.gui.plot.items")
+    silx_hdf5 = LazyModule("silx.gui.hdf5")

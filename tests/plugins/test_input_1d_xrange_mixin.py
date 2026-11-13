@@ -83,8 +83,8 @@ def test__creation():
 def test_pre_execute__no_input(setup_scan):
     plugin = _TestInputPlugin()
     plugin.pre_execute()
-    assert plugin._config["xrange"] is None
-    assert plugin._config["pre_executed"]
+    assert plugin.config["xrange"] is None
+    assert plugin.config["pre_executed"]
 
 
 @pytest.mark.parametrize("ordinal", [0, 7, 55])

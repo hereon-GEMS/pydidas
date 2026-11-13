@@ -155,7 +155,7 @@ class TestPluginRegistry(unittest.TestCase):
             with self.subTest(_generic=_generic):
                 PC = PluginRegistry(use_generic_plugins=_generic)
                 self.assertIsInstance(PC, PluginRegistry)
-                self.assertEqual(PC._config["use_generic_plugins"], _generic)
+                self.assertEqual(PC.config["use_generic_plugins"], _generic)
                 self.assertEqual(len(PC.plugins), 0)
 
     def test_init__w_plugin_paths(self):
@@ -187,7 +187,7 @@ class TestPluginRegistry(unittest.TestCase):
                 warnings.simplefilter("ignore")
                 PC = PluginRegistry(plugin_path=_path)
                 self.assertIsInstance(PC, PluginRegistry)
-                self.assertEqual(PC._config["initial_plugin_path"], _target)
+                self.assertEqual(PC.config["initial_plugin_path"], _target)
 
     def test_init__w_forced_init(self):
         PC = PluginRegistry(force_initialization=True)

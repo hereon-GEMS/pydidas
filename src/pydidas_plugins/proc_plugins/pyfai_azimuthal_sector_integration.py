@@ -116,7 +116,7 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
                     detector=EXP.get_detector(),
                     wavelength=1e-10 * _lambda_in_A,
                 )
-                for _, _ in enumerate(self._config["sector_centers"])
+                for _, _ in enumerate(self.config["sector_centers"])
             ]
             self._ai = self._ais[0]
         self.load_and_set_mask()
@@ -129,7 +129,7 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
             "radial_range": self.get_radial_range(),
             "polarization_factor": self.get_param_value("polarization_factor"),
             "correctSolidAngle": self.get_param_value("correct_solid_angle"),
-            "method": self._config["method"],
+            "method": self.config["method"],
         }
         _label, _unit = self.params["rad_unit"].value.split("/")
         _azi_unit = self.params["azi_unit"].value.split("/")[1]
@@ -158,8 +158,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
                 "Could not convert the azimuthal sectors to numbers: \n"
                 + _sector_entries
             )
-        self._config["sector_centers"] = tuple(_sectors)
-        self._config["sector_ranges"] = tuple(
+        self.config["sector_centers"] = tuple(_sectors)
+        self.config["sector_ranges"] = tuple(
             zip(np.array(_sectors) - _delta, np.array(_sectors) + _delta)
         )
 
@@ -187,12 +187,12 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
             _ai.integrate1d(
                 data,
                 self.get_param_value("rad_npoint"),
-                azimuth_range=self._config["sector_ranges"][_index],
+                azimuth_range=self.config["sector_ranges"][_index],
                 **self._ai_params,
             )
             for _index, _ai in enumerate(self._ais)
         ]
         _newdata = np.asarray([_res[1] for _res in _results])
-        _axranges = [self._config["sector_centers"], _results[0][0]]
+        _axranges = [self.config["sector_centers"], _results[0][0]]
         _dataset = Dataset(_newdata, axis_ranges=_axranges, **self._dataset_info)
         return _dataset, kwargs

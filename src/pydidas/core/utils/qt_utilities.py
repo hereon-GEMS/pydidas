@@ -29,6 +29,7 @@ __all__ = [
     "apply_qt_properties",
     "check_pydidas_qapp_instance",
     "get_single_shot_timer",
+    "safe_connection_disconnect",
     "update_child_qobject",
     "update_palette",
     "update_qwidget_font",
@@ -39,7 +40,7 @@ __all__ = [
 from typing import Any
 
 from qtpy import QT_VERSION, QtCore, QtGui, QtWidgets
-from qtpy.QtCore import QObject
+from qtpy.QtCore import QMetaObject, QObject
 from qtpy.QtWidgets import QWidget
 
 from pydidas_qtcore import PydidasQApplication
@@ -250,3 +251,24 @@ def get_single_shot_timer(parent: QtCore.QObject, timeout: int = 5000) -> QtCore
     _timer.setSingleShot(True)
     _timer.setInterval(timeout)
     return _timer
+
+
+@QtCore.Slot()
+def safe_connection_disconnect(*connections: QMetaObject.Connection) -> None:
+    """
+    Safely disconnect Qt signal-slot connections.
+
+    This function attempts to disconnect the provided connections. If a
+    connection is already disconnected or invalid, it will catch the
+    exception and continue without raising an error.
+
+    Parameters
+    ----------
+    *connections : QMetaObject.Connection
+        One or more Qt signal-slot connections to be disconnected.
+    """
+    for _connection in connections:
+        try:
+            QtCore.QObject.disconnect(_connection)
+        except (TypeError, RuntimeError):
+            pass

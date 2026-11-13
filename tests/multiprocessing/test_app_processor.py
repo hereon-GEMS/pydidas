@@ -81,7 +81,7 @@ class Test_app_processor(unittest.TestCase):
         self._lock_manager.shutdown()
 
     def put_ints_in_queue(self, finalize=True):
-        for i in range(self.app._config["max_index"]):
+        for i in range(self.app.config["max_index"]):
             self._mp_config["queue_input"].put(i)
         if finalize:
             self._mp_config["queue_input"].put(None)
@@ -89,7 +89,7 @@ class Test_app_processor(unittest.TestCase):
     def get_task_results(self):
         _tasks = []
         _results = []
-        for i in range(self.app._config["max_index"]):
+        for i in range(self.app.config["max_index"]):
             item = self._mp_config["queue_output"].get()
             _tasks.append(item[0])
             _results.append(item[1])
@@ -115,7 +115,7 @@ class Test_app_processor(unittest.TestCase):
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
-            self.app._config,
+            self.app.config,
             wait_for_output_queue=False,
         )
         time.sleep(0.1)
@@ -131,7 +131,7 @@ class Test_app_processor(unittest.TestCase):
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
-            self.app._config,
+            self.app.config,
             use_tasks=True,
         )
         _thread.start()
@@ -149,7 +149,7 @@ class Test_app_processor(unittest.TestCase):
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
-            self.app._config,
+            self.app.config,
             use_tasks=True,
         )
         _thread.start()
@@ -167,7 +167,7 @@ class Test_app_processor(unittest.TestCase):
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
-            self.app._config,
+            self.app.config,
             use_tasks=False,
         )
         _thread.start()
@@ -186,7 +186,7 @@ class Test_app_processor(unittest.TestCase):
             self._mp_config,
             self.app.__class__,
             self.app.params.copy(),
-            self.app._config,
+            self.app.config,
             use_tasks=False,
         )
         _thread.start()

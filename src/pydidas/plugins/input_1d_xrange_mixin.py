@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,36 +16,53 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the InputPlugin base class.
+Module with the Input1dXRangeMixin class which extends input plugins with
+support for custom x-scales.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Input1dXRangeMixin"]
 
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from pydidas.core import Dataset, Parameter, get_generic_parameter
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+
+
+if TYPE_CHECKING:
+    from pydidas.core import ConfigDict, ParameterCollection
+    from pydidas.widgets.plugin_config_widgets import GenericPluginConfigWidget
+
+PluginConfigWidgetWithCustomXscale = LazyObject(
+    "pydidas.widgets.plugin_config_widgets", "PluginConfigWidgetWithCustomXscale"
+)
 
 
 class Input1dXRangeMixin:
     """
     A mixin class for input plugins that provides functionality for handling
     x-range calculations and custom x-scale settings.
+
+    Initialization arguments are passed to the parent class's constructor.
+    The mixin only adds parameters for custom x-scale settings.
     """
+
+    config: "ConfigDict"
+    params: "ParameterCollection"
 
     base_output_data_dim = 1
     has_unique_parameter_config_widget = True
 
-    def __init__(self, *args: Parameter, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        self.add_params(
+    def __init__(self, *args: Parameter, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)  # type: ignore[call-arg]
+        self.add_params(  # type: ignore[attr-defined]
             get_generic_parameter("use_custom_xscale"),
             get_generic_parameter("x0_offset"),
             get_generic_parameter("x_delta"),
@@ -53,16 +70,14 @@ class Input1dXRangeMixin:
             get_generic_parameter("x_unit"),
         )
 
-    def pre_execute(self):
-        """
-        Run generic pre-execution routines.
-        """
-        self._config["xrange"] = None
-        super().pre_execute()
+    def pre_execute(self) -> None:
+        """Run generic pre-execution routines."""
+        self.config["xrange"] = None
+        super().pre_execute()  # type: ignore[misc]
 
     def execute(self, ordinal: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
-        Import the data and pass it on after (optionally) handling image multiplicity.
+        Import the data and (optionally) apply the custom x-scale.
 
         Parameters
         ----------
@@ -74,33 +89,42 @@ class Input1dXRangeMixin:
         Returns
         -------
         Dataset
-            The image data frame.
-        kwargs : Any
+            The 1D data with the (optional) custom x-axis.
+        kwargs : dict
             The updated kwargs.
         """
-        _data, kwargs = super().execute(ordinal, **kwargs)
+        _data, kwargs = super().execute(ordinal, **kwargs)  # type: ignore[misc]
         if self.params.get_value("use_custom_xscale"):
-            if self._config["xrange"] is None:
+            if self.config["xrange"] is None:
                 self.calculate_xrange(_data.shape[-1])
-            _data.update_axis_range(-1, self._config["xrange"])
-            _data.update_axis_unit(-1, self._config["axis_unit"])
-            _data.update_axis_label(-1, self._config["axis_label"])
+            _data.update_axis_range(-1, self.config["xrange"])
+            _data.update_axis_unit(-1, self.config["axis_unit"])
+            _data.update_axis_label(-1, self.config["axis_label"])
         return _data, kwargs
 
-    def calculate_xrange(self, n_points: int):
+    def calculate_xrange(self, n_points: int) -> None:
         """
-        Calculate the x-range for the data.
+        Calculate the x-range for the data and store it in the config.
+
+        Parameters
+        ----------
+        n_points : int
+            The number of points in the data.
         """
-        self._config["axis_unit"] = self.params.get_value("x_unit")
-        self._config["axis_label"] = self.params.get_value("x_label")
-        self._config["xrange"] = np.arange(n_points) * self.params.get_value(
+        self.config["axis_unit"] = self.params.get_value("x_unit")
+        self.config["axis_label"] = self.params.get_value("x_label")
+        self.config["xrange"] = np.arange(n_points) * self.params.get_value(
             "x_delta"
         ) + self.params.get_value("x0_offset")
 
-    def get_parameter_config_widget(self):
-        """Get the parameter config widget for the plugin."""
-        from pydidas.widgets.plugin_config_widgets import (
-            PluginConfigWidgetWithCustomXscale,
-        )
+    @staticmethod
+    def get_parameter_config_widget() -> type["GenericPluginConfigWidget"]:
+        """
+        Get the parameter config widget class for the plugin.
 
-        return PluginConfigWidgetWithCustomXscale
+        Returns
+        -------
+        type[GenericPluginConfigWidget]
+            The config widget class.
+        """
+        return PluginConfigWidgetWithCustomXscale.resolve()  # type: ignore[type]

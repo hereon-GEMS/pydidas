@@ -31,8 +31,9 @@ __all__ = ["ExecuteWorkflowApp"]
 import multiprocessing as mp
 import time
 import warnings
+from collections.abc import Sequence
 from multiprocessing.shared_memory import SharedMemory
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from qtpy import QtCore
@@ -128,23 +129,22 @@ class ExecuteWorkflowApp(BaseApp):
             "_mp_tasks",
         ]
     )
+    default_config: ClassVar[dict[str, Any]] = {
+        "result_metadata_set": False,
+        "shared_memory": {},
+        "tree_str_repr": "[]",
+        "run_prepared": False,
+        "latest_results": None,
+        "scan_context_repr": {},
+        "exp_context_repr": {},
+        "export_files_prepared": False,
+    }
+
     sig_results_updated = QtCore.Signal()
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.print_debug = kwargs.pop("print_debug", False)
         BaseApp.__init__(self, *args, **kwargs)
-        self._config.update(
-            {
-                "result_metadata_set": False,
-                "shared_memory": {},
-                "tree_str_rep": "[]",
-                "run_prepared": False,
-                "latest_results": None,
-                "scan_context": {},
-                "exp_context": {},
-                "export_files_prepared": False,
-            }
-        )
         self._index = -1
         self._locals = {"shared_memory_buffers": {}}
         self._shared_arrays = {}
@@ -182,8 +182,8 @@ class ExecuteWorkflowApp(BaseApp):
             self._store_context()
             RESULTS.prepare_new_results()
         TREE.prepare_execution()
-        self._config["run_prepared"] = True
-        self._config["export_files_prepared"] = False
+        self.config["run_prepared"] = True
+        self.config["export_files_prepared"] = False
 
     def close_shared_arrays_and_memory(self) -> None:
         """
@@ -196,7 +196,7 @@ class ExecuteWorkflowApp(BaseApp):
         close_shared_memory_dict(_buffers, unlink=not self.clone_mode)
         self._locals["shared_memory_buffers"] = {}
 
-    def multiprocessing_get_tasks(self) -> np.ndarray:
+    def multiprocessing_get_tasks(self) -> Sequence[int] | np.ndarray:
         """
         Return all tasks required in multiprocessing.
 
@@ -264,11 +264,11 @@ class ExecuteWorkflowApp(BaseApp):
                 self._publish_shapes_and_metadata_to_manager()
         if not self.mp_manager["shapes_set"].is_set():
             if self.clone_mode:
-                self._config["latest_results"] = TREE.get_current_results()
+                self.config["latest_results"] = TREE.get_current_results()
                 return None
             self._create_shared_memory()
         self._write_results_to_shared_arrays()
-        return self._config["buffer_pos"]
+        return self.config["buffer_pos"]
 
     @QtCore.Slot()
     def multiprocessing_post_run(self) -> None:
@@ -306,9 +306,9 @@ class ExecuteWorkflowApp(BaseApp):
                 f"(filename: {_filename})"
             )
             return
-        if not self._config["result_metadata_set"]:
+        if not self.config["result_metadata_set"]:
             RESULTS.update_result_metadata(dict(self.mp_manager["metadata_dict"]))  # type: ignore[arg-type]
-            self._config["result_metadata_set"] = True
+            self.config["result_metadata_set"] = True
         with self.mp_manager["lock"]:
             _new_results = {
                 # explicitly create new arrays to have new copies in memory:
@@ -319,7 +319,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._shared_arrays["in_use_flag"][data_index] = 0
         if (
             self.get_param_value("autosave_results")
-            and not self._config["export_files_prepared"]
+            and not self.config["export_files_prepared"]
         ):
             RESULTS.prepare_result_export(
                 self.get_param_value("autosave_directory"),
@@ -329,7 +329,7 @@ class ExecuteWorkflowApp(BaseApp):
                 _key: Dataset(_val, **self.mp_manager["metadata_dict"][_key])
                 for _key, _val in _new_results.items()
             }
-            self._config["export_files_prepared"] = True
+            self.config["export_files_prepared"] = True
         RESULTS.store_scan_point_results(
             index, _new_results, autosave=self.get_param_value("autosave_results")
         )
@@ -392,7 +392,7 @@ class ExecuteWorkflowApp(BaseApp):
         if not self.mp_manager["shapes_set"].is_set():
             return None
         self._write_results_to_shared_arrays()
-        return self._config["buffer_pos"]
+        return self.config["buffer_pos"]
 
     def deleteLater(self) -> None:
         """Call the QObject deletion routine of the ExecuteWorkflowApp."""
@@ -442,17 +442,17 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _recreate_context(self) -> None:
         """Recreate the required context from the config for app clones."""
-        TREE.restore_from_string(self._config["tree_str_rep"])
-        SCAN.update_param_values_from_kwargs(**self._config["scan_context"])
-        EXP.update_param_values_from_kwargs(**self._config["exp_context"])
+        TREE.restore_from_string(self.config["tree_str_repr"])
+        SCAN.update_param_values_from_kwargs(**self.config["scan_context_repr"])
+        EXP.update_param_values_from_kwargs(**self.config["exp_context_repr"])
 
     def _store_context(self) -> None:
         """Store the current context for app clone instances."""
-        self._config["tree_str_rep"] = TREE.export_to_string()
-        self._config["scan_context"] = SCAN.get_param_values_as_dict(
+        self.config["tree_str_repr"] = TREE.export_to_string()
+        self.config["scan_context_repr"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        self._config["exp_context"] = EXP.get_param_values_as_dict(
+        self.config["exp_context_repr"] = EXP.get_param_values_as_dict(
             filter_types_for_export=True
         )
 
@@ -573,7 +573,7 @@ class ExecuteWorkflowApp(BaseApp):
                 _zeros = np.where(self._shared_arrays["in_use_flag"] == 0)[0]
                 if _zeros.size > 0:
                     _buffer_pos = _zeros[0]
-                    self._config["buffer_pos"] = _buffer_pos
+                    self.config["buffer_pos"] = _buffer_pos
                     self._shared_arrays["in_use_flag"][_buffer_pos] = 1
                     break
             time.sleep(0.005)

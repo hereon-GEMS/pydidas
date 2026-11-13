@@ -73,36 +73,6 @@ _GENERIC_PARAMS = ProcPlugin.generic_params.copy()
 _GENERIC_PARAMS.get_param("keep_results").set_value_and_choices(True, [True])
 
 
-class DictViaAttrs:
-    """
-    Access a dict via attributes.
-
-    This class will enhance the dict for self._config to support IDE functionalities.
-    A (data)class offers comfort and reduction of errors due to the code-analysis
-    feature of an IDE.
-    """
-
-    def __init__(self, d):
-        self.__dict__["_dict"] = d
-        self._chi_key: int | None = None
-        self._pos_key: int | None = None
-        self._pos_idx: int | None = None
-        self._s2c_labels: np.ndarray | None = None
-        self._n_components: int | None = None
-
-    def __getattr__(self, attr):
-        if attr == "_dict":
-            # getattr before ._dict is set up
-            raise AttributeError(attr)
-        try:
-            return self._dict[attr]
-        except KeyError:
-            raise AttributeError(attr)
-
-    def __setattr__(self, attr, value):
-        self._dict[attr] = value
-
-
 class SinSquareChiGrouping(ProcPlugin):
     """
     Grouping of d-spacing values according to the slopes in sin^2(chi)
@@ -293,7 +263,13 @@ class SinSquareChiGrouping(ProcPlugin):
 
     def __init__(self):
         super().__init__()
-        self.config = DictViaAttrs(self._config)
+        self.config.update(
+            _chi_key=None,
+            _pos_key=None,
+            _pos_idx=None,
+            _s2c_labels=None,
+            _n_components=None,
+        )
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         if data.ndim == 2:

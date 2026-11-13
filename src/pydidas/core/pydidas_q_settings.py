@@ -69,7 +69,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
             for _key in _keys
             if (
                 _key.startswith((_prefix, "font/"))
-                and not (_key.startswith(f"{_prefix}dialogues"))
+                and not (_key.startswith(f"{_prefix}dialogs"))
             )
         }
 

@@ -32,12 +32,12 @@ from typing import Any
 
 from qtpy import QtGui, QtWidgets
 
-from pydidas.core.constants import (
-    POLICY_EXP_EXP,
-)
+from pydidas.core import get_generic_parameter
+from pydidas.core.constants import POLICY_EXP_EXP
 from pydidas.widgets.data_viewer import DataViewer
 from pydidas.widgets.file_browser import DirectoryExplorer
-from pydidas.widgets.selection import ConfigureBinaryDecodingWidget, Hdf5DatasetSelector
+from pydidas.widgets.misc import ConfigureBinaryDecodingWidget, Hdf5DatasetSelector
+from pydidas.widgets.param_io._param_io_file import _ParamIoFile
 
 
 DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = [
@@ -83,6 +83,14 @@ DATA_BROWSING_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, An
             "parent_widget": "plot_header",
             "gridPos": (0, 0, 1, 1),
             "font_metric_width_factor": 12,
+        },
+    ],
+    [
+        "add_any_widget",
+        ("filename", _ParamIoFile(get_generic_parameter("filename"))),
+        {
+            "parent_widget": "plot_header",
+            "gridPos": (0, 1, 1, 2),
         },
     ],
     [

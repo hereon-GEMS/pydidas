@@ -39,6 +39,7 @@ from pydidas.contexts import (
     ScanContext,
 )
 from pydidas.core import Dataset
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.io_registry import GenericIoBase
 from pydidas.plugins.plugin_result_info import PluginResultInfo
 from pydidas.workflow.processing_tree import ProcessingTree
@@ -46,7 +47,9 @@ from pydidas.workflow.result_io.processing_result_io_meta import ProcessingResul
 from pydidas.workflow.workflow_tree import WorkflowTree
 
 
-class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
+class ProcessingResultIoBase(
+    ConfigDictMixin, GenericIoBase, metaclass=ProcessingResultIoMeta
+):
     """
     Base class for processing result importers and exporters.
     """
@@ -56,7 +59,7 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
     format_name: ClassVar[str] = ""
 
     def __init__(self):
-        self._config: dict[str, Any] = {}
+        ConfigDictMixin.__init__(self, super_init=False)
 
     def prepare_files_and_directories(
         self,
@@ -92,16 +95,16 @@ class ProcessingResultIoBase(GenericIoBase, metaclass=ProcessingResultIoMeta):
         _save_dir = Path(save_dir)
         if not _save_dir.exists():
             _save_dir.mkdir(parents=True)
-        self._config["save_dir"] = _save_dir
-        self._config["filenames"] = {
+        self.config["save_dir"] = _save_dir
+        self.config["filenames"] = {
             _node_id: _save_dir / _fname
             for _node_id, _fname in self.get_filenames(node_information).items()
         }
-        self._config["scan"] = kwargs.get("scan", ScanContext())
-        self._config["diffraction_exp"] = kwargs.get(
+        self.config["scan"] = kwargs.get("scan", ScanContext())
+        self.config["diffraction_exp"] = kwargs.get(
             "diffraction_exp", DiffractionExperimentContext()
         )
-        self._config["processing_tree"] = kwargs.get("processing_tree", WorkflowTree())
+        self.config["processing_tree"] = kwargs.get("processing_tree", WorkflowTree())
 
     def get_filenames(
         self, node_information: dict[int, PluginResultInfo]

@@ -83,12 +83,12 @@ class TestAppRunner(unittest.TestCase):
 
     def test_init(self):
         self._runner = AppRunner(self.app)
-        self.assertTrue(self.app._config["run_prepared"])
+        self.assertTrue(self.app.config["run_prepared"])
 
     def test_call_app_method(self):
         self._runner = AppRunner(self.app)
         self._runner.call_app_method("multiprocessing_post_run")
-        self.assertTrue(self._runner._AppRunner__app._config["mp_post_run_called"])
+        self.assertTrue(self._runner._AppRunner__app.config["mp_post_run_called"])
 
     def test_set_app_param(self):
         _num = 12345

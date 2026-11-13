@@ -21,7 +21,7 @@ calibration.
     :width: 600
 
 The left side offers controls, the central panel is a list to view and edit
-points selected in an image and am image plot is shown on the right.
+points selected in an image and an image plot is shown on the right.
 
 
 .. include:: ../beamcenter/bc_image_display.rst
@@ -46,7 +46,7 @@ Beamcenter selection
 The beamcenter position (in detector pixel coordinates) can be set directly, if
 it is known.
 
-The following control buttons are availabe:
+The following control buttons are available:
 
  - **Set selected point as beamcenter**: This button requires to have marked
    exactly one point in the image. Clicking this button will take that point's

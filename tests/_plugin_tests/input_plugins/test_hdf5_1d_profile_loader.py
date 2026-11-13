@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -101,7 +101,7 @@ def test_pre_execute__no_input(setup_scan):
     assert "binning" in plugin._standard_kwargs
     assert plugin._standard_kwargs["forced_dimension"] == 1
     assert not plugin._standard_kwargs["import_metadata"]
-    assert plugin._config["xrange"] is None
+    assert plugin.config["xrange"] is None
 
 
 @pytest.mark.parametrize("frame_index", [0, 5, 12, 37, 55])

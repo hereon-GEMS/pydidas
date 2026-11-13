@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ integration which are opposite one another (i.e. rotated by 180°).
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -57,7 +57,7 @@ class AverageOppositeSectors(ProcPlugin):
         """
         Run the pre-execution hook and set the execute method based on the settings.
         """
-        self._config["symmetry_check"] = False
+        self.config["symmetry_check"] = False
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
@@ -77,7 +77,7 @@ class AverageOppositeSectors(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        if not self._config["symmetry_check"]:
+        if not self.config["symmetry_check"]:
             self._check_input_symmetry(data)
         _i = data.shape[0] // 2
         _new_data = (data[:_i] + data[_i:]) / 2.0
@@ -117,4 +117,4 @@ class AverageOppositeSectors(ProcPlugin):
                 "symmetric and cannot be processed. Please check the input data range "
                 "for chi."
             )
-        self._config["symmetry_check"] = True
+        self.config["symmetry_check"] = True

@@ -37,11 +37,12 @@ from typing import Any, Self
 from qtpy import QtCore
 
 from pydidas.core import UserConfigError
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.utils import get_random_string
 from pydidas.workflow.generic_node import GenericNode
 
 
-class GenericTree:
+class GenericTree(ConfigDictMixin):
     """
     A generic tree used for organizing items.
     """
@@ -50,7 +51,9 @@ class GenericTree:
         self._root = None
         self.node_ids = []
         self.nodes = {}
-        self._config = {"tree_changed": False, "active_node_id": None} | kwargs
+        super().__init__(
+            config={"tree_changed": False, "active_node_id": None} | kwargs,
+        )
         self._start_hash = hash((get_random_string(12), time.time()))
 
     @property
@@ -63,7 +66,7 @@ class GenericTree:
         bool
             The has changed flag.
         """
-        return self._config["tree_changed"]
+        return self.config["tree_changed"]
 
     @property
     def active_node(self) -> GenericNode | None:
@@ -91,7 +94,7 @@ class GenericTree:
         int or None
             The id of the active node.
         """
-        return self._config["active_node_id"]
+        return self.config["active_node_id"]
 
     @active_node_id.setter
     def active_node_id(self, new_id: int | None) -> None:
@@ -110,7 +113,7 @@ class GenericTree:
             If new_id is not included in the tree's node ids.
         """
         if new_id is None or new_id in self.node_ids:
-            self._config["active_node_id"] = new_id
+            self.config["active_node_id"] = new_id
             return
         raise ValueError(
             f"The given node ID '{new_id}' is not included in the stored node ids."
@@ -166,7 +169,7 @@ class GenericTree:
 
     def reset_tree_changed_flag(self) -> None:
         """Reset the "has changed" flag for this Tree."""
-        self._config["tree_changed"] = False
+        self.config["tree_changed"] = False
 
     @staticmethod
     def verify_node_type(node) -> None:
@@ -194,8 +197,8 @@ class GenericTree:
             self.delete_node_by_id(self.root.node_id)
         self.nodes = {}
         self.node_ids = []
-        self._config["active_node_id"] = None
-        self._config["tree_changed"] = True
+        self.config["active_node_id"] = None
+        self.config["tree_changed"] = True
         self._start_hash = hash((get_random_string(12), time.time()))
         self._root = None
 
@@ -243,10 +246,10 @@ class GenericTree:
             node.node_id = node_id
         self.node_ids.append(node.node_id)
         self.nodes[node.node_id] = node
-        self._config["active_node_id"] = node.node_id
+        self.config["active_node_id"] = node.node_id
         for _child in node.get_children():
             self.register_node(_child, _child.node_id, check_ids=False)
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def _check_node_ids(self, node_ids: Iterable[int]) -> None:
         """
@@ -376,7 +379,7 @@ class GenericTree:
             for _id in _subtree_ids:
                 del self.nodes[_id]
                 self.node_ids.remove(_id)
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def change_node_parent(self, node_id: int, new_parent_id: int) -> None:
         """
@@ -402,7 +405,7 @@ class GenericTree:
                 self.active_node_id = _child_node.node_id
             if _active_node == _new_parent_node:
                 self.active_node_id = _new_parent_node.node_id
-        self._config["tree_changed"] = True
+        self.config["tree_changed"] = True
 
     def order_node_ids(self) -> None:
         """Order all the node ids of the tree's nodes."""

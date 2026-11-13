@@ -36,14 +36,10 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core import PydidasGuiError, UserConfigError
 from pydidas.gui import utils
-from pydidas.gui.frames import (
-    DefineDiffractionExpFrame,
-    DefineScanFrame,
-    WorkflowEditFrame,
-)
 from pydidas.gui.main_menu import MainMenu
 from pydidas.resources import icons
-from pydidas.widgets.framework import BaseFrame, FontScalingToolbar
+from pydidas.widgets.base_classes import BaseFrame
+from pydidas.widgets.base_reimplementations import FontScalingToolbar
 
 
 class MainWindow(MainMenu):
@@ -167,11 +163,7 @@ class MainWindow(MainMenu):
         except KeyError:
             return
         for _key, _action in self._toolbar_actions.items():
-            if _key in [
-                WorkflowEditFrame.menu_entry,
-                DefineScanFrame.menu_entry,
-                DefineDiffractionExpFrame.menu_entry,
-            ]:
+            if _key in utils.PROC_FRAME_NAMES:
                 _proc_frame.sig_processing_running.connect(_action.setDisabled)  # type: ignore[attr-defined]
 
     def _auto_update_toolbar_entry(self, label: str) -> None:
@@ -278,7 +270,7 @@ class MainWindow(MainMenu):
             is None.
         """
         try:
-            MainMenu.restore_gui_state(self, state, filename)
+            super().restore_gui_state(state, filename)
         except UserConfigError as exc:
             raise UserConfigError(exc)
         self.select_item(self._frame_stack.currentWidget().menu_entry)

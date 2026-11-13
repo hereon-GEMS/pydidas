@@ -32,12 +32,15 @@ from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
 
+from pydidas.core.utils import update_size_policy
 from pydidas.core.utils.file_utils import get_extension
-from pydidas.gui.frames.builders import WorkflowEditFrameBuilder
+from pydidas.gui.frames.builders.workflow_edit_frame_builder import (
+    WORKFLOW_EDIT_FRAME_BUILD_CONFIG,
+)
 from pydidas.gui.managers import WorkflowTreeEditManager
 from pydidas.plugins import PluginCollection
 from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.workflow import WorkflowTree
 from pydidas.workflow.processing_tree_io import ProcessingTreeIoMeta
 from pydidas_qtcore import PydidasQApplication
@@ -93,7 +96,15 @@ class WorkflowEditFrame(BaseFrame):
 
     def build_frame(self) -> None:
         """Build the frame and create all widgets."""
-        WorkflowEditFrameBuilder.populate_frame(self)
+        for _method, _args, _kwargs in WORKFLOW_EDIT_FRAME_BUILD_CONFIG:
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
+        update_size_policy(self._widgets["workflow_area"], verticalStretch=2)
+        update_size_policy(self._widgets["plugin_collection"], verticalStretch=1)
+        self.layout().setRowStretch(3, 10)
+        self.layout().setRowStretch(5, 5)
+        self.layout().setColumnStretch(1, 10)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect all signals and slots in the frame."""
@@ -185,7 +196,7 @@ class WorkflowEditFrame(BaseFrame):
             information for both.
         """
         BaseFrame.restore_state(self, state)
-        if self._config["built"]:
+        if self.config["built"]:
             WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
@@ -215,5 +226,5 @@ class WorkflowEditFrame(BaseFrame):
             The calling event.
         """
         super().resizeEvent(event)
-        if self._config["built"]:
+        if self.config["built"]:
             WORKFLOW_EDIT_MANAGER.update_node_positions()

@@ -43,17 +43,13 @@ from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH
 from pydidas.core.utils import apply_qt_properties
 from pydidas.data_io import import_data
 from pydidas.plugins import pyFAIintegrationBase
+from pydidas.widgets.base_classes import PydidasScrollArea, PydidasWindow
 from pydidas.widgets.controllers import (
     ManuallySetIntegrationRoiController,
 )
-from pydidas.widgets.dialogues import QuestionBox
-from pydidas.widgets.framework import PydidasWindow
-from pydidas.widgets.misc import ShowIntegrationRoiParamsWidget
-from pydidas.widgets.scroll_area import ScrollArea
-from pydidas.widgets.selection import SelectDataFrameWidget
-from pydidas.widgets.silx_plot import (
-    PydidasPlot2DwithIntegrationRegions,
-)
+from pydidas.widgets.dialogs import QuestionBox
+from pydidas.widgets.misc import IntegrationRoiParamContainer, SelectDataFrameWidget
+from pydidas.widgets.silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
 class SelectIntegrationRegionWindow(PydidasWindow):
@@ -85,24 +81,24 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         **kwargs : Any
             Additional keyword arguments.
         """
-        PydidasWindow.__init__(
-            self, title="Select integration region", activate_frame=False
-        )
+        kwargs["title"] = "Select integration region"
+        kwargs["activate_frame"] = False
+        super().__init__(**kwargs)
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
         self._plugin = plugin
         self._EXP = plugin._EXP
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
-        self._config = self._config | {
-            "azimuthal_active": False,
-            "beamcenter": self._EXP.beamcenter,
-            "closing_confirmed": False,
-            "det_dist": self._EXP.get_param_value("detector_dist"),
-            "only_show_roi": kwargs.get("only_show_roi", False),
-            "radial_active": False,
-            "rad_unit": self._plugin.get_param_value("rad_unit"),
-        }
+        self.config.update(
+            azimuthal_active=False,
+            beamcenter=self._EXP.beamcenter,
+            closing_confirmed=False,
+            det_dist=self._EXP.get_param_value("detector_dist"),
+            only_show_roi=kwargs.get("only_show_roi", False),
+            radial_active=False,
+            rad_unit=self._plugin.get_param_value("rad_unit"),
+        )
         self._image = None
         self.frame_activated(self.frame_index)
 
@@ -112,7 +108,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             "label_title",
             (
                 "Display integration region"
-                if self._config["only_show_roi"]
+                if self.config["only_show_roi"]
                 else "Select integration region"
             ),
             bold=True,
@@ -127,7 +123,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         )
         self.create_any_widget(
             "scroll_area",
-            ScrollArea,
+            PydidasScrollArea,
             gridPos=(1, 0, 1, 1),
             resize_to_widget_width=True,
             widget=self._widgets["left_container"],
@@ -170,8 +166,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.create_line(None, parent_widget=self._widgets["left_container"])
         self.add_any_widget(
             "roi_selector",
-            ShowIntegrationRoiParamsWidget(
-                forced_edit_disable=self._config["only_show_roi"],
+            IntegrationRoiParamContainer(
+                forced_edit_disable=self.config["only_show_roi"],
                 plugin=self._plugin,
             ),
             parent_widget=self._widgets["left_container"],
@@ -206,8 +202,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
         self._widgets["plot"]._actions["canvas"].set_canvas_mode("tight")
         self._roi_controller.show_plot_items("roi")
-        if self._config["only_show_roi"]:
-            self._config["closing_confirmed"] = True
+        if self.config["only_show_roi"]:
+            self.config["closing_confirmed"] = True
         self._roi_controller.update_input_widgets()
 
     @QtCore.Slot(bool)
@@ -245,7 +241,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     @QtCore.Slot()
     def _confirm_changes(self) -> None:
         """Confirm all changes made to the plugin and close the window."""
-        self._config["closing_confirmed"] = True
+        self.config["closing_confirmed"] = True
         self.sig_roi_changed.emit()
         self.close()
 
@@ -258,7 +254,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        if self._config["closing_confirmed"]:
+        if self.config["closing_confirmed"]:
             self.sig_about_to_close.emit()
             event.accept()
             return

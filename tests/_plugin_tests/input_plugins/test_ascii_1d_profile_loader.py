@@ -112,7 +112,7 @@ def test_pre_execute(plugin):
     plugin._ASCII1dProfileLoader__xscale_valid = True
     plugin.pre_execute()
     assert plugin._standard_kwargs["roi"] is None
-    assert plugin._config["pre_executed"]
+    assert plugin.config["pre_executed"]
     assert plugin._ASCII1dProfileLoader__yslice is None
     assert not plugin._ASCII1dProfileLoader__xscale_valid
 

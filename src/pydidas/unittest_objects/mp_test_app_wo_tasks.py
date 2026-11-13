@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ application without tasks in real multiprocessing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,6 +29,7 @@ __all__ = ["MpTestAppWoTasks"]
 
 
 import time
+from collections.abc import Sequence
 
 import numpy as np
 from qtpy import QtCore
@@ -75,15 +76,13 @@ class MpTestAppWoTasks(BaseApp):
         super().__init__(*args, **kwargs)
         self.set_default_params()
         self._composite = None
-        self._config.update(
-            {
-                "n_image": None,
-                "datatype": None,
-                "mp_post_run_called": False,
-                "calls": 0,
-                "min_index": 0,
-                "max_index": 40,
-            }
+        self.config.update(
+            n_image=None,
+            datatype=None,
+            mp_post_run_called=False,
+            calls=0,
+            min_index=0,
+            max_index=40,
         )
 
     def multiprocessing_pre_run(self):
@@ -93,13 +92,13 @@ class MpTestAppWoTasks(BaseApp):
         self._composite = CompositeImageManager(
             image_shape=(20, 20),
             composite_nx=10,
-            composite_ny=int(np.ceil((self._config["max_index"]) / 10)),
+            composite_ny=int(np.ceil((self.config["max_index"]) / 10)),
             composite_dir="x",
             datatype=np.float64,
         )
-        self._config["run_prepared"] = True
+        self.config["run_prepared"] = True
 
-    def multiprocessing_get_tasks(self) -> list:
+    def multiprocessing_get_tasks(self) -> Sequence[int] | np.ndarray:
         """
         Get the tasks of the Application.
 
@@ -125,8 +124,8 @@ class MpTestAppWoTasks(BaseApp):
         bool
             The flag whether data is available or not.
         """
-        self._config["calls"] += 1
-        if self._config["calls"] % 2:
+        self.config["calls"] += 1
+        if self.config["calls"] % 2:
             time.sleep(0.001)
             return False
         return True
@@ -149,7 +148,7 @@ class MpTestAppWoTasks(BaseApp):
         image : np.ndarray
             The image data.
         """
-        index = self._config["calls"]
+        index = self.config["calls"]
         _fname, _kwargs = "dummy", {"shape": (20, 20)}
         _image = get_test_image(_fname, **_kwargs)
         time.sleep(0.02)
@@ -172,7 +171,7 @@ class MpTestAppWoTasks(BaseApp):
         image : np.ndarray
             The image data.
         """
-        _i = (index - self._config["min_index"]) % self._config["max_index"]
+        _i = (index - self.config["min_index"]) % self.config["max_index"]
         self._composite.insert_image(image, _i)
 
     def multiprocessing_post_run(self):
@@ -182,4 +181,4 @@ class MpTestAppWoTasks(BaseApp):
         The MpTestApp will only store an internal variable to document that
         this method has been called.
         """
-        self._config["mp_post_run_called"] = True
+        self.config["mp_post_run_called"] = True

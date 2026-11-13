@@ -23,6 +23,7 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
+
 from pathlib import Path
 
 import pytest
@@ -85,16 +86,16 @@ def test_get_stored_entries__with_qref(
     file_dialog, qref, stored_entry, reference, stored_dir
 ) -> None:
     """Test getting stored entries with various qref and reference settings."""
-    file_dialog.q_settings_set("dialogues/Test__import", "entry_import")
-    file_dialog.q_settings_set("dialogues/Test__export", "entry_export")
+    file_dialog.q_settings_set("dialogs/Test__import", "entry_import")
+    file_dialog.q_settings_set("dialogs/Test__export", "entry_export")
     file_dialog._stored_selections = {}
     file_dialog._calling_kwargs = {}
     file_dialog._stored_dirs = {}
     if qref is not None:
         file_dialog._calling_kwargs["qsettings_ref"] = qref
     if stored_entry is not None:
-        file_dialog._stored_selections["dialogues/Test__import"] = stored_entry
-        file_dialog._stored_selections["dialogues/Test__export"] = stored_entry
+        file_dialog._stored_selections["dialogs/Test__import"] = stored_entry
+        file_dialog._stored_selections["dialogs/Test__export"] = stored_entry
         file_dialog._stored_selections["ref"] = stored_entry
     if reference is not None:
         file_dialog._calling_kwargs["reference"] = reference
@@ -131,14 +132,14 @@ def test_set_name_filter(file_dialog, format1, format2) -> None:
     )
     file_dialog._calling_kwargs["formats"] = _format_str
     file_dialog._set_name_filter()
-    assert set(_all_formats) == set(file_dialog._config["valid_extensions"])
+    assert set(_all_formats) == set(file_dialog.config["valid_extensions"])
 
 
 def test_set_name_filter__no_formats(file_dialog) -> None:
     """Test setting name filter when no formats are provided."""
     file_dialog._calling_kwargs = {}
     file_dialog._set_name_filter()
-    assert file_dialog._config["valid_extensions"] is None
+    assert file_dialog.config["valid_extensions"] is None
 
 
 @pytest.mark.parametrize("use_dir", [True, False])
@@ -162,15 +163,13 @@ def test_store_current_directory(file_dialog, temp_path, use_dir, qref, ref) -> 
     file_dialog.selectFile("file_dialog_test" if use_dir else "test_file.txt")
     file_dialog._store_current_directory()
     # Normalize paths for comparison on Windows
-    _stored_dir = Path(file_dialog.q_settings_get("dialogues/current")).resolve()
+    _stored_dir = Path(file_dialog.q_settings_get("dialogs/current")).resolve()
     _expected_dir = _test_dir.resolve()
     assert _stored_dir == _expected_dir
     if qref is not None:
-        _stored_qref_dir = Path(
-            file_dialog.q_settings_get(f"dialogues/{qref}")
-        ).resolve()
+        _stored_qref_dir = Path(file_dialog.q_settings_get(f"dialogs/{qref}")).resolve()
         assert _stored_qref_dir == _expected_dir
-        assert file_dialog._stored_selections[f"dialogues/{qref}"] == (
+        assert file_dialog._stored_selections[f"dialogs/{qref}"] == (
             "file_dialog_test" if use_dir else "test_file.txt"
         )
     if ref is not None:

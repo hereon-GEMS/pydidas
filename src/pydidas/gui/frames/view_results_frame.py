@@ -42,8 +42,8 @@ from pydidas.gui.frames.builders.view_results_frame_builder import (
 from pydidas.plugins import InputPlugin
 from pydidas.widgets import PydidasFileDialog
 from pydidas.widgets.data_viewer import DataViewer
-from pydidas.widgets.dialogues import critical_warning
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.dialogs import critical_warning
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 from pydidas.widgets.windows import ShowInformationForResult
 from pydidas.workflow import (
     ProcessingResults,
@@ -89,10 +89,10 @@ class ViewResultsFrame(BaseFrameWithApp):
         self._active_node_id = -1
         self._result_window = None
         self.__export_dialog = PydidasFileDialog()
-        self._config["enable_export"] = kwargs.get("enable_export", False)
-        self._config["enable_import"] = kwargs.get("enable_import", True)
-        self._config["enable_app"] = kwargs.get("enable_app", False)
-        self._config["export_available"] = False
+        self.config.enable_export = kwargs.get("enable_export", False)
+        self.config.enable_import = kwargs.get("enable_import", True)
+        self.config.enable_app = kwargs.get("enable_app", False)
+        self.config.export_available = False
         self.set_default_params()
 
     def build_frame(self) -> None:
@@ -112,11 +112,12 @@ class ViewResultsFrame(BaseFrameWithApp):
         )
         _layout = self.layout()
         _layout.setRowStretch(_layout.rowCount() - 1, 1)  # type: ignore[attr-defined]
-        if self._config["enable_import"]:
+        if self.config.enable_import:
             self.__import_dialog = PydidasFileDialog()
-        self._widgets["import_container"].setVisible(self._config["enable_import"])
-        self._widgets["export_container"].setVisible(self._config["enable_export"])
-        self._widgets["run_app_container"].setVisible(self._config["enable_app"])
+        self._widgets["import_container"].setVisible(self.config.enable_import)
+        self._widgets["export_container"].setVisible(self.config.enable_export)
+        self._widgets["run_app_container"].setVisible(self.config.enable_app)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """Connect signals."""
@@ -173,7 +174,7 @@ class ViewResultsFrame(BaseFrameWithApp):
         ]:
             self._widgets[_key].setVisible(node_id != -1)
         self._widgets["but_export_current"].setEnabled(
-            node_id != -1 and self._config["export_available"]
+            node_id != -1 and self.config.export_available
         )
         if node_id == -1:
             return

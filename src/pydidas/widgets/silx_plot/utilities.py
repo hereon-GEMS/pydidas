@@ -33,6 +33,7 @@ __all__ = [
 
 
 import inspect
+import sys
 from collections.abc import Callable
 from typing import Any
 
@@ -44,6 +45,20 @@ from pydidas_qtcore import PydidasQApplication
 
 _ALLOWED_KWARGS = {}
 _QSETTINGS = PydidasQsettings()
+
+
+def ensure_colorbar_patched() -> None:
+    """
+    Ensure that the silx.gui.plot.ColorBar module is patched with
+    the Pydidas tick bar class. This is necessary to ensure that
+    the color bar ticks are displayed correctly in the Pydidas plots.
+    """
+    if "silx.gui.plot.ColorBar" not in sys.modules:
+        import silx.gui.plot.ColorBar as _silx_colorbar
+
+        from ._tickbar import _PydidasTickBar
+
+        _silx_colorbar._TickBar = _PydidasTickBar
 
 
 def get_allowed_kwargs(method: Callable, kwargs: dict[str, Any]) -> dict[str, Any]:

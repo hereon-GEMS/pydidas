@@ -308,7 +308,7 @@ def test_clear_all_results(results) -> None:
     assert results._source_hash == -1
     assert results._saver.current_formats == []
     for _key in ["metadata_complete", "composites_created", "saver_metadata_set"]:
-        assert not results._config[_key]
+        assert not results.config[_key]
 
 
 def test_prepare_new_results(random_scan, results) -> None:
@@ -320,20 +320,20 @@ def test_prepare_new_results(random_scan, results) -> None:
         assert _info.shape == (
             random_scan.shape + (_INPUT_SHAPE if _key == 1 else _NEW_SHAPE)
         )
-    assert hash(results._config["frozen_scan"]) == hash(results.scan_instance)
-    assert id(results._config["frozen_scan"]) != id(results.scan_instance)
-    assert hash(results._config["frozen_exp"]) == hash(results.diff_exp_instance)
-    assert id(results._config["frozen_exp"]) != id(results.diff_exp_instance)
+    assert hash(results.config["frozen_scan"]) == hash(results.scan_instance)
+    assert id(results.config["frozen_scan"]) != id(results.scan_instance)
+    assert hash(results.config["frozen_exp"]) == hash(results.diff_exp_instance)
+    assert id(results.config["frozen_exp"]) != id(results.diff_exp_instance)
     for _id, _node in results.proc_tree_instance.nodes.items():
-        assert hash(results._config["frozen_tree"].nodes[_id]) == hash(_node)
-    assert id(results._config["frozen_tree"]) != id(results.proc_tree_instance)
+        assert hash(results.config["frozen_tree"].nodes[_id]) == hash(_node)
+    assert id(results.config["frozen_tree"]) != id(results.proc_tree_instance)
 
 
 def test_update_result_metadata(results, random_scan) -> None:
     _meta = _DEFAULT_PLUGIN_METADATA.copy()
     _full_meta = _create_metadata_with_scan(_meta, random_scan)
     results.update_result_metadata(_meta)
-    assert results._config["metadata_complete"]
+    assert results.config["metadata_complete"]
     for _node, _node_metadata in _full_meta.items():
         _stored_meta = results._plugin_result_infos[_node].dataset_metadata
         for _key, _val in _node_metadata.items():
@@ -370,7 +370,7 @@ def test_store_scan_point_results__no_previous_metadata(
     _scan_indices = random_scan.get_indices_from_ordinal(_index)
     assert np.allclose(result_data[1], results._composites[1][_scan_indices])
     assert np.allclose(result_data[2], results._composites[2][_scan_indices])
-    assert results._config["metadata_complete"]
+    assert results.config["metadata_complete"]
 
 
 def test_store_scan_point_results__w_composites(
@@ -450,7 +450,7 @@ def test_store_frame_shapes(results, random_scan) -> None:
         1: random_scan.shape + _INPUT_SHAPE,
         2: random_scan.shape + _NEW_SHAPE,
     }
-    assert res._config["metadata_complete"]
+    assert res.config["metadata_complete"]
 
 
 def test_store_frame_shapes__wrong_nodes(clean_results) -> None:
@@ -590,7 +590,7 @@ def test_get_result_subset__flatten_multidim(
 
 
 def test_prepare_result_export__setup_incomplete(results, empty_temp_path) -> None:
-    results._config["metadata_complete"] = False
+    results.config["metadata_complete"] = False
     with pytest.raises(UserConfigError):
         results.prepare_result_export(empty_temp_path, ".HDF5")
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Package with widgets required for editing the workflow and selecting plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -29,14 +29,12 @@ __status__ = "Production"
 from . import plugin_collection_browser
 from .plugin_collection_browser import *
 from .plugin_in_workflow_box import *
-from .select_new_plugin_widget import *
 from .workflow_tree_canvas import *
 
 
 __all__ = (
     plugin_collection_browser.__all__
     + plugin_in_workflow_box.__all__
-    + select_new_plugin_widget.__all__
     + workflow_tree_canvas.__all__
 )
 
@@ -44,6 +42,5 @@ __all__ = (
 del (
     plugin_collection_browser,
     plugin_in_workflow_box,
-    select_new_plugin_widget,
     workflow_tree_canvas,
 )

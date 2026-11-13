@@ -33,7 +33,6 @@ from typing import Any
 
 from numpy import ceil, floor
 from qtpy import QtCore, QtGui, QtWidgets
-from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import (
@@ -49,15 +48,16 @@ from pydidas.core.constants import (
 from pydidas.core.generic_params.generic_params_settings import (
     GENERIC_PARAMS_SETTINGS,
 )
+from pydidas.core.lazy_imports.silx import ColormapNameComboBox
 from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_palette
 from pydidas.plugins import PluginCollection
-from pydidas.widgets.dialogues import (
+from pydidas.widgets.base_classes import PydidasWindow
+from pydidas.widgets.base_reimplementations import SquareButton
+from pydidas.widgets.dialogs import (
     PydidasExceptionMessageBox,
     QuestionBox,
 )
-from pydidas.widgets.factory import SquareButton
-from pydidas.widgets.framework import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -332,7 +332,7 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
 
     def finalize_ui(self) -> None:
         """Finalize the UI initialization."""
-        self._config["cmap_nan_palette"] = QtGui.QPalette()
+        self.config["cmap_nan_palette"] = QtGui.QPalette()
         _initial_cmap_nan_color = self.q_settings_get("user/cmap_nan_color")
         self._update_cmap_nan_current_color(_initial_cmap_nan_color)
         _width = int(self._widgets["config_canvas"].sizeHint().width() + 20)
@@ -390,22 +390,22 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
         """
         if isinstance(new_color, str):
             new_color = QtGui.QColor(new_color)
-        self._config["cmap_nan_palette"].setColor(QtGui.QPalette.Window, new_color)
+        self.config["cmap_nan_palette"].setColor(QtGui.QPalette.Window, new_color)
         self._widgets["cmap_nan_display_current"].setPalette(
-            self._config["cmap_nan_palette"]
+            self.config["cmap_nan_palette"]
         )
 
     @QtCore.Slot()
     def select_new_nan_color(self) -> None:
         """Select a new NaN color using a QColorDialog."""
-        if self._config.get("nan_colordialog") is None:
-            self._config["nan_colordialog"] = QtWidgets.QColorDialog(self)
-            self._config["nan_colordialog"].colorSelected.connect(
+        if self.config.get("nan_colordialog") is None:
+            self.config["nan_colordialog"] = QtWidgets.QColorDialog(self)
+            self.config["nan_colordialog"].colorSelected.connect(
                 self._update_cmap_nan_value
             )
         _current = QtGui.QColor(self.q_settings_get("user/cmap_nan_color"))
-        self._config["nan_colordialog"].setCurrentColor(_current)
-        self._config["nan_colordialog"].show()
+        self.config["nan_colordialog"].setCurrentColor(_current)
+        self.config["nan_colordialog"].show()
 
     @QtCore.Slot()
     def update_plugin_collection(self) -> None:
@@ -509,7 +509,7 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
         """
         _qm = QtWidgets.QMessageBox
         answer = QtWidgets.QMessageBox.question(
-            None,
+            self,
             "",
             "Are you sure to reset all the values?",
             _qm.Yes | _qm.No,

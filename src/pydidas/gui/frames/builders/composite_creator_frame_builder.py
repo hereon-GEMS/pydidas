@@ -40,7 +40,8 @@ from pydidas.core.constants import (
     FONT_METRIC_CONFIG_WIDTH,
     POLICY_FIX_EXP,
 )
-from pydidas.widgets import ScrollArea, silx_plot
+from pydidas.widgets.base_classes import PydidasScrollArea
+from pydidas.widgets.silx_plot import PydidasPlot2D
 
 
 KEYS_TO_INSERT_LINES_AFTER = [
@@ -118,7 +119,7 @@ COMPOSITE_CREATOR_FRAME_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("config_scroll_area", ScrollArea),
+        ("config_scroll_area", PydidasScrollArea),
         {
             "layout_kwargs": {"alignment": None},
             "stretch": (1, 0),
@@ -139,7 +140,7 @@ COMPOSITE_CREATOR_FRAME_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("plot_window", silx_plot.PydidasPlot2D),
+        ("plot_window", PydidasPlot2D),
         {
             "alignment": None,
             "sizePolicy": POLICY_FIX_EXP,

@@ -102,7 +102,7 @@ class GeneralAsciiSaver(OutputPlugin):
             raise UserConfigError("Only 1-d data can be saved as ASCII")
         if kwargs.get("test", False):
             return data, kwargs
-        self._config["global_index"] = kwargs.get("global_index", None)
+        self.config["global_index"] = kwargs.get("global_index", None)
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
@@ -182,7 +182,7 @@ class GeneralAsciiSaver(OutputPlugin):
         str
             The header string.
         """
-        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")  # noqa DTZ005
+        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
         return (
             f"#F {Path(self.get_output_filename('dat')).name}\n"
             + f"#E {time.time()}\n"

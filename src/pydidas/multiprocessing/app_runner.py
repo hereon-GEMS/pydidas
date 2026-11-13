@@ -83,7 +83,7 @@ class AppRunner(WorkerController):
     ) -> None:
         logger.debug("AppRunner: Starting AppRunner")
         WorkerController.__init__(self, n_workers=n_workers)
-        if not app._config["run_prepared"]:
+        if not app.config["run_prepared"]:
             app.multiprocessing_pre_run()
         self.sig_results.connect(app.multiprocessing_store_results)
         self.sig_post_run_called.connect(  # type: ignore[attr-defined]
@@ -161,7 +161,7 @@ class AppRunner(WorkerController):
             self._mp_kwargs,
             self.__app.__class__,
             self.__app.params.copy(),
-            self.__app.get_config(),
+            self.__app.config.copy(),
         )
         self._processor["kwargs"] = {
             "use_tasks": self._use_app_tasks,

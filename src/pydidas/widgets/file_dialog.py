@@ -39,12 +39,13 @@ from pydidas.core import (
     PydidasQsettingsMixin,
     UserConfigError,
 )
+from pydidas.core.config_dict_mixin import ConfigDictMixin
 from pydidas.core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from pydidas.core.singleton import QtSingleton
 from pydidas.core.utils import update_child_qobject
 from pydidas.core.utils.file_utils import get_extension
 from pydidas.resources import icons
-from pydidas.widgets.factory import CreateWidgetsMixIn
+from pydidas.widgets.base_classes import WidgetFactoryMixIn
 from pydidas_qtcore import PydidasQApplication
 
 
@@ -80,7 +81,10 @@ class SelectionModel(QtCore.QIdentityProxyModel):
 
 
 class _PydidasFileDialog(
-    QtWidgets.QFileDialog, CreateWidgetsMixIn, PydidasQsettingsMixin
+    ConfigDictMixin,
+    QtWidgets.QFileDialog,
+    WidgetFactoryMixIn,
+    PydidasQsettingsMixin,
 ):
     """
     pydidas's subclassed QFileDialog with additional functionality.
@@ -118,16 +122,20 @@ class _PydidasFileDialog(
                 the FileDialog widget. The default is None.
         """
         QtWidgets.QFileDialog.__init__(self)  # type: ignore[type]
-        CreateWidgetsMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._files_unselectable_model = SelectionModel(self)
-        self._config = {
-            "caption": kwargs.get("caption", None),
-            "type": kwargs.get("dialog_type", "open_file"),
-            "formats": kwargs.get("formats", None),
-            "info_string": kwargs.get("info_string", None),
-            "default_suffix": kwargs.get("default_suffix", None),
-        }
+        ConfigDictMixin.__init__(
+            self,
+            config={
+                "caption": kwargs.get("caption", None),
+                "type": kwargs.get("dialog_type", "open_file"),
+                "formats": kwargs.get("formats", None),
+                "info_string": kwargs.get("info_string", None),
+                "default_suffix": kwargs.get("default_suffix", None),
+            },
+            super_init=False,
+        )
         self._stored_dirs = {}
         self._stored_selections = {}
         self._calling_kwargs = {}
@@ -221,7 +229,7 @@ class _PydidasFileDialog(
     @QtCore.Slot()
     def goto_latest_location(self) -> None:
         """Open the latest location from any dialogue."""
-        self.setDirectory(self.q_settings_get("dialogues/current"))
+        self.setDirectory(self.q_settings_get("dialogs/current"))
 
     @QtCore.Slot()
     def goto_scan_base_dir(self) -> None:
@@ -257,7 +265,7 @@ class _PydidasFileDialog(
         _scan_base = SCAN.get_param_value("scan_base_directory")
         _scan_base_valid = _scan_base.is_dir() and _scan_base != Path()
         self._widgets["but_scan_home"].setEnabled(_scan_base_valid)
-        _latest = self.q_settings_get("dialogues/current")
+        _latest = self.q_settings_get("dialogs/current")
         if _latest is not None:
             self._widgets["but_latest_location"].setEnabled(Path(_latest).is_dir())
         _stored_selection, _stored_dir = self._get_stored_entries()
@@ -472,7 +480,7 @@ class _PydidasFileDialog(
             The stored directory, if existing or None.
         """
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
+            _key = "dialogs/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             return self._stored_selections.get(_key, ""), self.q_settings_get(_key)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")
@@ -485,10 +493,10 @@ class _PydidasFileDialog(
         if not _selection.is_dir():
             _selection = _selection.parent
         _curr_dir = str(_selection)
-        self.q_settings_set("dialogues/current", _curr_dir)
+        self.q_settings_set("dialogs/current", _curr_dir)
         _key = None
         if self._calling_kwargs.get("qsettings_ref") is not None:
-            _key = "dialogues/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
+            _key = "dialogs/" + self._calling_kwargs.get("qsettings_ref")  # type: ignore[type]
             self.q_settings_set(_key, _curr_dir)
         if "reference" in self._calling_kwargs:
             _key = self._calling_kwargs.get("reference")
@@ -500,7 +508,7 @@ class _PydidasFileDialog(
         """Set the file dialog's nameFilter based on the specified formats."""
         _formats: str = self._calling_kwargs.get("formats", "")
         self.setNameFilter(_formats)
-        self._config["valid_extensions"] = None
+        self.config["valid_extensions"] = None
         if _formats is not None:
             if len(_formats) >= 2 and _formats.split(";;")[0] == "All files (*)":
                 self.selectNameFilter(_formats.split(";;")[1])
@@ -512,7 +520,7 @@ class _PydidasFileDialog(
             if "*" in _exts:
                 _exts.pop(_exts.index("*"))
             if _exts:
-                self._config["valid_extensions"] = _exts
+                self.config["valid_extensions"] = _exts
 
     def _get_extension(self) -> str:
         """
@@ -550,9 +558,9 @@ class _PydidasFileDialog(
         extension : str
             The extension.
         """
-        if self._config["valid_extensions"] is None:
+        if self.config["valid_extensions"] is None:
             return
-        if extension not in self._config["valid_extensions"]:
+        if extension not in self.config["valid_extensions"]:
             raise UserConfigError(
                 f"The given extension `{extension}` is invalid because the file type "
                 "is not supported for this use case."

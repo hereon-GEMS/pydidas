@@ -38,7 +38,7 @@ import copy
 import pytest
 from qtpy import QtWidgets
 
-from pydidas.core import ObjectWithParameterCollection
+from pydidas.core import ConfigDict, ObjectWithParameterCollection
 from pydidas.core.singleton import QtSingleton, Singleton
 
 
@@ -47,7 +47,7 @@ class DirectSingletonClass(metaclass=Singleton):
 
     def __init__(self):
         self.value = 42
-        self._config = {"key": "test"}
+        self._config = ConfigDict(key="test")
 
 
 class DirectSingletonClassB(metaclass=Singleton):
@@ -55,7 +55,7 @@ class DirectSingletonClassB(metaclass=Singleton):
 
     def __init__(self):
         self.data = "example"
-        self._config = {}
+        self._config = ConfigDict()
 
 
 class DirectQtSingletonClass(metaclass=QtSingleton):
@@ -63,7 +63,7 @@ class DirectQtSingletonClass(metaclass=QtSingleton):
 
     def __init__(self):
         self.value = 99
-        self._config = {"qt_key": "qt_value"}
+        self._config = ConfigDict(qt_key="qt_value")
 
 
 class DirectQtSingletonClassB(metaclass=QtSingleton):
@@ -71,7 +71,7 @@ class DirectQtSingletonClassB(metaclass=QtSingleton):
 
     def __init__(self):
         self.data = "qt_example"
-        self._config = {}
+        self._config = ConfigDict()
 
 
 class SingletonQLineEdit(QtWidgets.QLineEdit, metaclass=QtSingleton):
@@ -80,7 +80,7 @@ class SingletonQLineEdit(QtWidgets.QLineEdit, metaclass=QtSingleton):
     def __init__(self):
         super().__init__()
         self.custom_value = "line_edit_1"
-        self._config = {"widget_type": "QLineEdit"}
+        self._config = ConfigDict(widget_type="QLineEdit")
 
 
 class SingletonQLineEditB(QtWidgets.QLineEdit, metaclass=QtSingleton):
@@ -89,7 +89,7 @@ class SingletonQLineEditB(QtWidgets.QLineEdit, metaclass=QtSingleton):
     def __init__(self):
         super().__init__()
         self.custom_value = "line_edit_2"
-        self._config = {"widget_type": "AnotherQLineEdit"}
+        self._config = ConfigDict(widget_type="AnotherQLineEdit")
 
 
 class SingletonQPushButton(QtWidgets.QPushButton, metaclass=QtSingleton):
@@ -98,7 +98,7 @@ class SingletonQPushButton(QtWidgets.QPushButton, metaclass=QtSingleton):
     def __init__(self):
         super().__init__()
         self.button_label = "button_1"
-        self._config = {"widget_type": "QPushButton"}
+        self._config = ConfigDict(widget_type="QPushButton")
 
 
 class SingletonQPushButtonB(QtWidgets.QPushButton, metaclass=QtSingleton):
@@ -107,7 +107,7 @@ class SingletonQPushButtonB(QtWidgets.QPushButton, metaclass=QtSingleton):
     def __init__(self):
         super().__init__()
         self.button_label = "button_2"
-        self._config = {"widget_type": "Spam & Ham"}
+        self._config = ConfigDict(widget_type="Spam & Ham")
 
 
 _DIRECT_SINGLETON_CLASSES: list[tuple[type, type]] = [

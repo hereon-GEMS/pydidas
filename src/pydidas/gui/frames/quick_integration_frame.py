@@ -46,13 +46,13 @@ from pydidas.gui.frames.builders.quick_integration_frame_builder import (
 )
 from pydidas.plugins import PluginCollection, pyFAIintegrationBase
 from pydidas.widgets import PydidasFileDialog
+from pydidas.widgets.base_classes import BaseFrame
 from pydidas.widgets.controllers import (
     ManuallySetBeamcenterController,
     ManuallySetIntegrationRoiController,
 )
-from pydidas.widgets.framework import BaseFrame
-from pydidas.widgets.parameter_config.base_param_io_widget import (
-    BaseParamIoWidget,
+from pydidas.widgets.param_io.base_param_io_widget import (
+    BaseParamIo,
 )
 
 
@@ -91,9 +91,9 @@ class QuickIntegrationFrame(BaseFrame):
         self.add_params(self._EXP.params)
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog()
-        self._config["scroll_width"] = 350
-        self._config["custom_det_pxsize"] = 100
-        self._config["previous_det_pxsize"] = 100
+        self.config["scroll_width"] = 350
+        self.config["custom_det_pxsize"] = 100
+        self.config["previous_det_pxsize"] = 100
         _generic = pyFAIintegrationBase(diffraction_exp=self._EXP)
         self._plugins = {
             "generic": _generic,
@@ -124,7 +124,8 @@ class QuickIntegrationFrame(BaseFrame):
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:
                 _kwargs["plugin"] = self._plugins["generic"]
-            getattr(self, _method)(*_args, **_kwargs)
+            _method = getattr(self, _method)
+            _method(*_args, **_kwargs)
         self._widgets["tabs"].addTab(self._widgets["tab_plot"], "Input image")
         self._widgets["tabs"].addTab(self._widgets["res_plot"], "Integration results")
         self._widgets["but_toggle_exp_section"].linked_widget = self._widgets[
@@ -135,6 +136,7 @@ class QuickIntegrationFrame(BaseFrame):
         ]
         _n = self._widgets["config"].layout().rowCount()
         self._widgets["config"].layout().setRowStretch(_n - 1, 1)
+        super().build_frame()
 
     def connect_signals(self) -> None:
         """
@@ -291,7 +293,7 @@ class QuickIntegrationFrame(BaseFrame):
             )
 
     @QtCore.Slot()
-    def _update_xray_param(self, param_key: str, widget: BaseParamIoWidget) -> None:
+    def _update_xray_param(self, param_key: str, widget: BaseParamIo) -> None:
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -299,7 +301,7 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         param_key : str
             The reference key.
-        widget : pydidas.widgets.parameter_config.BaseParamIoWidget
+        widget : pydidas.widgets.param_io.BaseParamIo
             The Parameter editing widget.
         """
         self._EXP.set_param_value(param_key, widget.get_value())
@@ -322,19 +324,19 @@ class QuickIntegrationFrame(BaseFrame):
             The new pixelsize.
         """
         _pxsize = float(new_pxsize)
-        _current_pxsize = self._config["previous_det_pxsize"]
+        _current_pxsize = self.config["previous_det_pxsize"]
         self._EXP.set_param_value("detector_pxsizex", _pxsize)
         self._EXP.set_param_value("detector_pxsizey", _pxsize)
         self.set_param_and_widget_value("detector_pxsize", _pxsize)
         if self.get_param_value("detector_model") == "Custom detector":
-            self._config["custom_det_pxsize"] = _pxsize
+            self.config["custom_det_pxsize"] = _pxsize
         _ratio = _pxsize / _current_pxsize
         for _key in ["rad_range_lower", "rad_range_upper"]:
             self._roi_controller.set_param_and_widget_value(
                 _key, self._plugins["generic"].get_param_value(_key) * _ratio
             )
         self._update_beamcenter()
-        self._config["previous_det_pxsize"] = _pxsize
+        self.config["previous_det_pxsize"] = _pxsize
 
     @QtCore.Slot()
     def _change_detector_model(self) -> None:
@@ -343,18 +345,18 @@ class QuickIntegrationFrame(BaseFrame):
         """
         _det_model = self.get_param_value("detector_model")
         if _det_model == "Custom detector":
-            _pxsize = self._config["custom_det_pxsize"]
-            self._config["detector_name"] = None
+            _pxsize = self.config["custom_det_pxsize"]
+            self.config["detector_name"] = None
             self.set_param_value("detector_name", "Custom detector")
             _func = self._bc_controller.set_mask_file
         else:
             _det_name = _det_model.split("]")[1].strip()
             self._EXP.set_detector_params_from_name(_det_name)
             _pxsize = self.get_param_value("detector_pxsizex")
-            self._config["detector_name"] = _det_name
+            self.config["detector_name"] = _det_name
             _func = self._bc_controller.set_new_detector_with_mask
         if not self.get_param_value("detector_mask_file").is_file():
-            _func(self._config["detector_name"])
+            _func(self.config["detector_name"])
         self._update_detector_pxsize(_pxsize)
 
     @QtCore.Slot(str)
@@ -370,10 +372,8 @@ class QuickIntegrationFrame(BaseFrame):
         _path = Path(mask_filename)
         if _path.is_file():
             self._bc_controller.set_mask_file(_path)
-        elif self._config["detector_name"] is not None:
-            self._bc_controller.set_new_detector_with_mask(
-                self._config["detector_name"]
-            )
+        elif self.config["detector_name"] is not None:
+            self._bc_controller.set_new_detector_with_mask(self.config["detector_name"])
         else:
             self._bc_controller.set_mask_file(None)
 

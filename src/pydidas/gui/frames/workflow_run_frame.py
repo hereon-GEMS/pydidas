@@ -37,12 +37,12 @@ from pydidas.apps import ExecuteWorkflowApp
 from pydidas.contexts import DiffractionExperimentContext, ScanContext
 from pydidas.core import UserConfigError
 from pydidas.core.utils import ShowBusyMouse, pydidas_logger
-from pydidas.gui.frames.builders import (
+from pydidas.gui.frames.builders.workflow_run_frame_builder import (
     WORKFLOW_RUN_FRAME_BUILD_CONFIG,
 )
 from pydidas.gui.frames.view_results_frame import ViewResultsFrame
 from pydidas.multiprocessing import AppRunner
-from pydidas.widgets.dialogues import WarningBox
+from pydidas.widgets.dialogs import WarningBox
 from pydidas.workflow import WorkflowResults, WorkflowTree
 
 
@@ -61,7 +61,7 @@ class WorkflowRunFrame(ViewResultsFrame):
 
     sig_processing_running = QtCore.Signal(bool)
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:
         kwargs["enable_app"] = True
         kwargs["enable_export"] = True
         kwargs["enable_import"] = False
@@ -70,19 +70,17 @@ class WorkflowRunFrame(ViewResultsFrame):
         kwargs["processing_tree"] = WorkflowTree()
         kwargs["workflow_results"] = WorkflowResults()
         ViewResultsFrame.__init__(self, **kwargs)
-        self._config["data_use_timeline"] = False
-        self._config["plot_last_update"] = 0
-        self._config["plot_update_time"] = self.q_settings_get(
+        self.config["data_use_timeline"] = False
+        self.config["plot_last_update"] = 0
+        self.config["plot_update_time"] = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
-        self._config["source_hash"] = self.proc_results.source_hash
+        self.config["source_hash"] = self.proc_results.source_hash
         self._app = ExecuteWorkflowApp()
         self.add_params(self._app.params)
 
-    def build_frame(self):
-        """
-        Populate the frame with widgets.
-        """
+    def build_frame(self) -> None:
+        """Populate the frame with widgets."""
         super().build_frame()
         self._widgets["title"].setText("Run full workflow processing")
         for _method, _args, _kwargs in WORKFLOW_RUN_FRAME_BUILD_CONFIG:
@@ -91,10 +89,8 @@ class WorkflowRunFrame(ViewResultsFrame):
         self.__update_autosave_widget_visibility()
         self._widgets["export_container"].setVisible(False)
 
-    def connect_signals(self):
-        """
-        Connect all required Qt slots and signals.
-        """
+    def connect_signals(self) -> None:
+        """Connect all required Qt slots and signals."""
         super().connect_signals()
         self.param_widgets["autosave_results"].sig_value_changed.connect(
             self.__update_autosave_widget_visibility
@@ -102,7 +98,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
 
-    def _verify_result_shapes_uptodate(self):
+    def _verify_result_shapes_uptodate(self) -> None:
         """
         Verify the consistency of the underlying information.
 
@@ -111,23 +107,19 @@ class WorkflowRunFrame(ViewResultsFrame):
         checked to detect any changes.
         """
         _hash = self.proc_results.source_hash
-        if _hash != self._config["source_hash"]:
-            self._config["source_hash"] = self.proc_results.source_hash
+        if _hash != self.config["source_hash"]:
+            self.config["source_hash"] = self.proc_results.source_hash
             self._clear_results()
             self.update_choices_of_selected_results()
 
-    def _clear_results(self):
-        """
-        Clear the selected results entries.
-        """
+    def _clear_results(self) -> None:
+        """Clear the selected results entries."""
         self._widgets["result_table"].remove_all_rows()
         self._widgets["label_select_header"].setVisible(False)
         self._widgets["data_viewer"].setVisible(False)
 
-    def __abort_execution(self):
-        """
-        Abort the execution of the AppRunner.
-        """
+    def __abort_execution(self) -> None:
+        """Abort the execution of the AppRunner."""
         self._widgets["but_abort"].setEnabled(False)
         if self._runner is None:
             return
@@ -147,7 +139,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self.set_status("Aborted processing of full workflow.")
 
     @QtCore.Slot()
-    def __execute(self):
+    def __execute(self) -> None:
         """Execute the Application in the chosen type (GUI or command line)."""
         logger.debug("WorkflowRunFrame: Clicked execute")
         self._verify_result_shapes_uptodate()
@@ -160,7 +152,7 @@ class WorkflowRunFrame(ViewResultsFrame):
             self.sig_processing_running.emit(False)
             raise
 
-    def _check_autosaving(self):
+    def _check_autosaving(self) -> None:
         """Check that the target directory is empty if autosaving has been enabled."""
         if not self.get_param_value("autosave_results"):
             return
@@ -171,17 +163,15 @@ class WorkflowRunFrame(ViewResultsFrame):
                 "Please select another directory or remove the existing files."
             )
 
-    def _run_app(self):
-        """
-        Parallel implementation of the execution method.
-        """
+    def _run_app(self) -> None:
+        """Parallel implementation of the execution method."""
         if not self._check_tree_is_populated():
             self.sig_processing_running.emit(False)
             return
         logger.debug("WorkflowRunFrame: Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
-        self._config["plot_last_update"] = time.time()
+        self.config["plot_last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
         logger.debug("WorkflowRunFrame: Starting AppRunner")
         self._runner = AppRunner(self._app)
@@ -194,7 +184,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         QtWidgets.QApplication.instance().aboutToQuit.connect(
             self._runner.send_stop_signal
         )
-        self._config["update_node_information_connected"] = True
+        self.config["update_node_information_connected"] = True
         logger.debug("WorkflowRunFrame: Running AppRunner")
         self._runner.start()
 
@@ -215,7 +205,7 @@ class WorkflowRunFrame(ViewResultsFrame):
             )
         return TREE.root is not None
 
-    def _prepare_app_run(self):
+    def _prepare_app_run(self) -> None:
         """
         Do preparations for running the ExecuteWorkflowApp.
 
@@ -228,10 +218,8 @@ class WorkflowRunFrame(ViewResultsFrame):
         self.update_export_setting_visibility()
 
     @QtCore.Slot()
-    def _apprunner_finished(self):
-        """
-        Clean up after AppRunner is done.
-        """
+    def _apprunner_finished(self) -> None:
+        """Clean up after AppRunner is done."""
         logger.debug("WorkflowRunFrame: Handle AppRunner loop finished signal.")
         self._runner.sig_final_app_state.disconnect()
         self._runner.sig_progress.disconnect()
@@ -246,25 +234,26 @@ class WorkflowRunFrame(ViewResultsFrame):
         self.update_displayed_data()
 
     @QtCore.Slot()
-    def __update_result_node_information(self):
+    def __update_result_node_information(self) -> None:
         """
         Update the information about the nodes' results after the AppRunner
         has sent the first results.
         """
         self.update_choices_of_selected_results()
-        if self._config["update_node_information_connected"]:
+        if self.config["update_node_information_connected"]:
             self._runner.sig_results.disconnect(self.__update_result_node_information)
-            self._config["update_node_information_connected"] = False
+            self.config["update_node_information_connected"] = False
 
     @QtCore.Slot()
-    def __check_for_plot_update(self):
-        _dt = time.time() - self._config["plot_last_update"]
-        if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
-            self._config["plot_last_update"] = time.time()
+    def __check_for_plot_update(self) -> None:
+        """Check whether the plot is due for an update and update it if so."""
+        _dt = time.time() - self.config["plot_last_update"]
+        if _dt > self.config["plot_update_time"] and self.config["frame_active"]:
+            self.config["plot_last_update"] = time.time()
             self.update_displayed_data()
 
     @QtCore.Slot(str)
-    def __process_messages(self, message: str):
+    def __process_messages(self, message: str) -> None:
         """
         Process messages from the AppRunner and pass them to the app instance.
 
@@ -275,17 +264,15 @@ class WorkflowRunFrame(ViewResultsFrame):
         """
         self._app.received_signal_message(message)
 
-    def _finish_processing(self):
-        """
-        Perform finishing touches after the processing has terminated.
-        """
+    def _finish_processing(self) -> None:
+        """Perform finishing touches after the processing has terminated."""
         self.update_export_setting_visibility()
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
         QtWidgets.QApplication.instance().processEvents()
         logger.debug("WorkflowRunFrame: Finished processing")
 
-    def __set_proc_widget_visibility_for_running(self, running: bool):
+    def __set_proc_widget_visibility_for_running(self, running: bool) -> None:
         """
         Set the visibility of all widgets which need to be updated for/after
         processing
@@ -303,7 +290,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self._widgets["progress"].setVisible(running)
         self._widgets["but_export_all"].setEnabled(not running)
         self._widgets["but_export_current"].setEnabled(not running)
-        self._config["export_available"] = not running
+        self.config["export_available"] = not running
         for _key in [
             "saving_format",
             "squeeze_empty_dims",
@@ -314,7 +301,7 @@ class WorkflowRunFrame(ViewResultsFrame):
         self.__update_autosave_widget_visibility()
 
     @QtCore.Slot()
-    def __update_autosave_widget_visibility(self):
+    def __update_autosave_widget_visibility(self) -> None:
         """
         Update the visibility of the autosave widgets based on the selection
         of the autosave_results Parameter.

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ a defined width.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -98,9 +98,9 @@ class RemoveOutliers(ProcPlugin):
         """
         Set up the required functions and fit variable labels.
         """
-        self._config["index_offset"] = self.get_param_value("kernel_width") + 1
-        self._config["threshold"] = self.get_param_value("outlier_threshold")
-        self._config["width"] = self.get_param_value("kernel_width")
+        self.config["index_offset"] = self.get_param_value("kernel_width") + 1
+        self.config["threshold"] = self.get_param_value("outlier_threshold")
+        self.config["width"] = self.get_param_value("kernel_width")
 
     @process_1d_with_multi_input_dims
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
@@ -127,8 +127,8 @@ class RemoveOutliers(ProcPlugin):
         self._find_and_store_high_outliers()
         self._find_and_store_low_outliers()
         _outliers_index_cropped = self._outliers.astype(int)
-        _outliers_index_data = _outliers_index_cropped + self._config["index_offset"]
-        data[_outliers_index_data] = self._config["ref_outer"][_outliers_index_cropped]
+        _outliers_index_data = _outliers_index_cropped + self.config["index_offset"]
+        data[_outliers_index_data] = self.config["ref_outer"][_outliers_index_cropped]
 
         self._results = data
         if kwargs.get("store_details", False):
@@ -141,7 +141,7 @@ class RemoveOutliers(ProcPlugin):
         """
         _width = self.get_param_value("kernel_width")
         _slice = slice(_width + 1, self._input_data.size - _width - 1)
-        _cfg = self._config
+        _cfg = self.config
         _data_offset = -np.amin(self._input_data) + 1
         _data = self._input_data + _data_offset
 
@@ -158,9 +158,9 @@ class RemoveOutliers(ProcPlugin):
         """
         Identify the high data outliers and store their indices.
         """
-        _cfg = self._config
+        _cfg = self.config
         _outliers = np.where(
-            (self._config["ref_corrected_data"] >= _cfg["threshold"])
+            (_cfg["ref_corrected_data"] >= _cfg["threshold"])
             & (
                 _cfg["cropped_working_data"]
                 > _cfg["rolled_p"] + 0.3 * _cfg["threshold"]
@@ -177,7 +177,7 @@ class RemoveOutliers(ProcPlugin):
         """
         Identify the low data outliers and store their indices.
         """
-        _cfg = self._config
+        _cfg = self.config
         _outliers = np.where(
             (_cfg["ref_corrected_data"] <= -1 * _cfg["threshold"])
             & (
@@ -212,11 +212,11 @@ class RemoveOutliers(ProcPlugin):
         """
         _neighbor_indices = (
             np.where(
-                self._config["ref_corrected_data"] >= 0.3 * self._config["threshold"]
+                self.config["ref_corrected_data"] >= 0.3 * self.config["threshold"]
             )[0]
             if high_peak
             else np.where(
-                self._config["ref_corrected_data"] <= -0.3 * self._config["threshold"]
+                self.config["ref_corrected_data"] <= -0.3 * self.config["threshold"]
             )[0]
         )
         for _ in range(2):
@@ -234,7 +234,7 @@ class RemoveOutliers(ProcPlugin):
                 while _outlier + _neighbors[_index] in outliers:
                     _neighbors[_index] += 1
                 _neighbors[_index : _index + _neighbors[_index]] = _neighbors[_index]
-        outliers = outliers[np.where(_neighbors <= self._config["width"])[0]]
+        outliers = outliers[np.where(_neighbors <= self.config["width"])[0]]
         return outliers
 
     def _create_detailed_results(self) -> dict:

@@ -118,9 +118,9 @@ def test_pre_execute(config, empty_temp_path):
     plugin = PLUGIN_COLLECTION.get_plugin_by_name("NXdataResultLoader")()
     plugin.set_param_value("nxdata_key", config.dset_key)
     plugin.pre_execute()
-    assert plugin._config["pre_executed"]
-    assert plugin._config["filename"] == empty_temp_path / _FILENAME
-    assert isinstance(plugin._config["frame_metadata"], dict)
+    assert plugin.config["pre_executed"]
+    assert plugin.config["filename"] == empty_temp_path / _FILENAME
+    assert isinstance(plugin.config["frame_metadata"], dict)
 
 
 def test_pre_execute__check_stored_metadata(config, empty_temp_path):
@@ -130,7 +130,7 @@ def test_pre_execute__check_stored_metadata(config, empty_temp_path):
     _data = config.dataset[(0,) * SCAN.ndim]
     assert plugin.output_data_label == _data.data_label
     assert plugin.output_data_unit == _data.data_unit
-    for _key, _val in plugin._config["frame_metadata"].items():
+    for _key, _val in plugin.config["frame_metadata"].items():
         if _key == "axis_ranges":
             for _ax, _range in _val.items():
                 assert np.allclose(_data.axis_ranges[_ax], _range)
@@ -164,11 +164,11 @@ def test_verify_data_shape_valid__w_invalid_param(config, plugin, key, value):
 def test_update_filepath(config, plugin, empty_temp_path):
     plugin.base_dir = Path("a/b")
     plugin.filename = "abc"
-    plugin._config["filename"] = Path("a/b/abc")
+    plugin.config["filename"] = Path("a/b/abc")
     plugin.update_filepath()
     assert plugin.base_dir == empty_temp_path
     assert plugin.filename == _FILENAME
-    assert plugin._config["filename"] == empty_temp_path / _FILENAME
+    assert plugin.config["filename"] == empty_temp_path / _FILENAME
 
 
 @pytest.mark.parametrize("index", [0, 5, 100, 999])

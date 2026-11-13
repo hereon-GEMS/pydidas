@@ -172,7 +172,7 @@ def test_define_path_and_name__scan_for_all(empty_temp_path, app):
     app.set_param_value("scan_for_all", True)
     app.set_param_value("filename_pattern", "")
     app.define_path_and_name()
-    assert empty_temp_path == Path(app._config["path"])
+    assert empty_temp_path == Path(app.config["path"])
     assert app._fname(0) == ""
 
 
@@ -182,16 +182,16 @@ def test_find_current_index__missing_inbetween(empty_temp_path, app, missing_ind
     _names = create_pattern_files(empty_temp_path, n=_num)
     for _index in missing_indices:
         os.remove(_names[_index])
-    app._config["path"] = empty_temp_path
-    app._config["glob_pattern"] = _FNAME_GLOB_STR
+    app.config["path"] = empty_temp_path
+    app.config["glob_pattern"] = _FNAME_GLOB_STR
     app._DirectorySpyApp__find_current_index()
     assert app._index == _num - 1
 
 
 def test_find_current_index__empty(empty_temp_path, app):
     app._index = None
-    app._config["path"] = empty_temp_path
-    app._config["glob_pattern"] = "*"
+    app.config["path"] = empty_temp_path
+    app.config["glob_pattern"] = "*"
     app._DirectorySpyApp__find_current_index()
     assert app._index == -1
 
@@ -199,8 +199,8 @@ def test_find_current_index__empty(empty_temp_path, app):
 def test_find_latest_file_of_pattern__empty(empty_temp_path, app):
     app.define_path_and_name()
     _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
-    assert app._config["latest_file"] is None
-    assert app._config["2nd_latest_file"] is None
+    assert app.config["latest_file"] is None
+    assert app.config["2nd_latest_file"] is None
     assert not _check_result
 
 
@@ -212,11 +212,11 @@ def test_find_latest_file_of_pattern_w_files(empty_temp_path, app, n_files, star
         _name = _names.pop(0)
         os.remove(_name)
     _check_result = app._DirectorySpyApp__check_for_new_file_of_pattern()
-    assert app._config["latest_file"] == _names[-1]
+    assert app.config["latest_file"] == _names[-1]
     if n_files == 1:
-        assert app._config["2nd_latest_file"] is None
+        assert app.config["2nd_latest_file"] is None
     else:
-        assert app._config["2nd_latest_file"] == _names[-2]
+        assert app.config["2nd_latest_file"] == _names[-2]
     assert _check_result
 
 
@@ -241,8 +241,8 @@ def test_find_latest_file_of_pattern__missing_file(empty_temp_path, app):
     os.remove(_names[_index])
     app.define_path_and_name()
     app._DirectorySpyApp__check_for_new_file_of_pattern()
-    assert app._config["latest_file"] == _names[_index - 1]
-    assert app._config["2nd_latest_file"] == _names[_index - 2]
+    assert app.config["latest_file"] == _names[_index - 1]
+    assert app.config["2nd_latest_file"] == _names[_index - 2]
 
 
 @pytest.mark.parametrize("w_dirs", [True, False])
@@ -252,8 +252,8 @@ def test_find_latest_file__empty(empty_temp_path, app, w_dirs):
         (empty_temp_path / "dir2").mkdir()
     app.define_path_and_name()
     _check_result = app._DirectorySpyApp__check_for_new_file()
-    assert app._config["latest_file"] is None
-    assert app._config["2nd_latest_file"] is None
+    assert app.config["latest_file"] is None
+    assert app.config["2nd_latest_file"] is None
     assert not _check_result
 
 
@@ -262,11 +262,11 @@ def test_find_latest_file__w_files(empty_temp_path, app, n_files):
     _names = create_pattern_files(empty_temp_path, n=n_files)
     app.define_path_and_name()
     _check_result = app._DirectorySpyApp__check_for_new_file()
-    assert app._config["latest_file"] == _names[n_files - 1]
+    assert app.config["latest_file"] == _names[n_files - 1]
     if n_files == 1:
-        assert app._config["2nd_latest_file"] is None
+        assert app.config["2nd_latest_file"] is None
     else:
-        assert app._config["2nd_latest_file"] == _names[-2]
+        assert app.config["2nd_latest_file"] == _names[-2]
     assert _check_result
     # check that a second call returns False:
     _check_result = app._DirectorySpyApp__check_for_new_file()
@@ -277,10 +277,10 @@ def test_initialize_shared_memory(app):
     app.initialize_shared_memory()
     for _key in ["flag", "width", "height"]:
         assert isinstance(
-            app._config["shared_memory"][_key], mp.sharedctypes.Synchronized
+            app.config["shared_memory"][_key], mp.sharedctypes.Synchronized
         )
     assert isinstance(
-        app._config["shared_memory"]["array"], mp.sharedctypes.SynchronizedArray
+        app.config["shared_memory"]["array"], mp.sharedctypes.SynchronizedArray
     )
 
 
@@ -329,7 +329,7 @@ def test_load_bg_file__wrong_shape(empty_temp_path, app):
 def test_define_path_and_name__with_scan_for_all(empty_temp_path, app):
     app.set_param_value("scan_for_all", True)
     app.define_path_and_name()
-    assert app._config["path"] == empty_temp_path
+    assert app.config["path"] == empty_temp_path
 
 
 def test_define_path_and_name__with_pattern_no_wildcard(empty_temp_path, app):
@@ -349,11 +349,11 @@ def test_define_path_and_name__with_pattern_multiple_wildcard(empty_temp_path, a
 def test_define_path_and_name__with_pattern_correct(empty_temp_path, app):
     _pattern = str(app.get_param_value("filename_pattern"))
     app.define_path_and_name()
-    assert app._config["glob_pattern"] == _pattern.replace("#####", "*")
-    assert str(app._fname(42)) == str(app._config["path"] / _pattern).replace(
+    assert app.config["glob_pattern"] == _pattern.replace("#####", "*")
+    assert str(app._fname(42)) == str(app.config["path"] / _pattern).replace(
         "#####", "00042"
     )
-    assert app._config["path"] == empty_temp_path
+    assert app.config["path"] == empty_temp_path
 
 
 def test_multiprocessing_carryon(app):
@@ -364,7 +364,7 @@ def test_multiprocessing_carryon(app):
 def test_prepare_run__master(empty_temp_path, app):
     app.prepare_run()
     assert app._fname(42) != ""
-    assert app._config["path"] == empty_temp_path
+    assert app.config["path"] == empty_temp_path
     assert isinstance(app._shared_array, np.ndarray)
     assert app._shared_array.shape == _SHARE_SHAPE
 
@@ -375,8 +375,7 @@ def test_prepare_run__as_clone(app):
     app_clone.prepare_run()
     for _key in ["flag", "width", "height", "array"]:
         assert (
-            app._config["shared_memory"][_key]
-            == app_clone._config["shared_memory"][_key]
+            app.config["shared_memory"][_key] == app_clone.config["shared_memory"][_key]
         )
 
 
@@ -384,7 +383,7 @@ def test_multiprocessing_pre_run(empty_temp_path, app):
     app.multiprocessing_pre_run()
     # these tests are the same as for the prepare_run method:
     assert app._fname(42) != ""
-    assert app._config["path"] == empty_temp_path
+    assert app.config["path"] == empty_temp_path
     assert isinstance(app._shared_array, np.ndarray)
     assert app._shared_array.shape == _SHARE_SHAPE
 
@@ -457,8 +456,8 @@ def test_store_image_in_shared_memory(app):
     _height, _width = 42, 27
     _image = np.random.random((_height, _width))
     app._DirectorySpyApp__store_image_in_shared_memory(_image)
-    assert app._config["shared_memory"]["width"].value == _width
-    assert app._config["shared_memory"]["height"].value == _height
+    assert app.config["shared_memory"]["width"].value == _width
+    assert app.config["shared_memory"]["height"].value == _height
     assert np.allclose(app._shared_array[:_height, :_width], _image)
 
 
@@ -470,8 +469,8 @@ def test_multiprocessing_func__no_files(app):
 @pytest.mark.parametrize("unreadable", [[], [1], [0, 1]])
 def test_multiprocessing_func(empty_temp_path, app, unreadable):
     _names = create_pattern_files(empty_temp_path, n=2)
-    app._config["latest_file"] = _names[1]
-    app._config["2nd_latest_file"] = _names[0]
+    app.config["latest_file"] = _names[1]
+    app.config["2nd_latest_file"] = _names[0]
     for _i in unreadable:
         with open(_names[_i], "w") as f:
             f.write("no image file")
@@ -482,8 +481,8 @@ def test_multiprocessing_func(empty_temp_path, app, unreadable):
         _iref = 0 if 1 in unreadable else 1
         _index, _fname = app.multiprocessing_func(None)
         assert _fname == _names[_iref]
-        assert app._config["shared_memory"]["width"].value == _IMG_SHAPE[1]
-        assert app._config["shared_memory"]["height"].value == _IMG_SHAPE[0]
+        assert app.config["shared_memory"]["width"].value == _IMG_SHAPE[1]
+        assert app.config["shared_memory"]["height"].value == _IMG_SHAPE[0]
         assert np.allclose(
             app._shared_array[: _IMG_SHAPE[0], : _IMG_SHAPE[1]],
             np.load(_names[_iref]),
@@ -497,7 +496,7 @@ def test_multiprocessing_func__with_mask(empty_temp_path, app, mask_file, mask):
     app.set_param_value("detector_mask_file", mask_file)
     app.set_param_value("detector_mask_val", _mask_val)
     app.prepare_run()
-    app._config["latest_file"] = _names[1]
+    app.config["latest_file"] = _names[1]
     _index, _fname = app.multiprocessing_func(None)
     _arr = app._shared_array[: _IMG_SHAPE[0], : _IMG_SHAPE[1]]
     assert np.allclose(_arr[mask], _mask_val)
@@ -511,7 +510,7 @@ def test_multiprocessing_func__with_bg_file(empty_temp_path, app):
     app.set_param_value("use_bg_file", True)
     app.set_param_value("use_detector_mask", False)
     app.set_param_value("bg_file", _bg_fname)
-    app._config["latest_file"] = _names[1]
+    app.config["latest_file"] = _names[1]
     app.prepare_run()
     _ref = np.load(_names[1]) - _bg
     _index, _fname = app.multiprocessing_func(None)
@@ -521,8 +520,8 @@ def test_multiprocessing_func__with_bg_file(empty_temp_path, app):
 
 def test_multiprocessing_store_results(empty_temp_path, app):
     _names = create_pattern_files(empty_temp_path, n=2)
-    app._config["latest_file"] = _names[1]
-    app._config["2nd_latest_file"] = _names[0]
+    app.config["latest_file"] = _names[1]
+    app.config["2nd_latest_file"] = _names[0]
     _index, _fname = app.multiprocessing_func(None)
     app.multiprocessing_store_results(_index, _fname)
     assert np.allclose(app._DirectorySpyApp__current_image, np.load(_names[1]))

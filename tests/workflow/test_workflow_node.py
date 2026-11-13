@@ -335,13 +335,13 @@ def test_clear_data_():
     obj = WorkflowNode(plugin=DummyLoader())
     obj.results = np.random.random((10, 10))
     obj.result_kws = {"key": "value"}
-    obj.plugin._config["input_data"] = np.random.random((5, 5))
-    obj.plugin._config["input_kwargs"] = {"test": "data"}
+    obj.plugin.config["input_data"] = np.random.random((5, 5))
+    obj.plugin.config["input_kwargs"] = {"test": "data"}
     obj.clear_data()
     assert obj.results is None
     assert obj.result_kws is None
-    assert obj.plugin._config["input_data"] is None
-    assert obj.plugin._config["input_kwargs"] == {}
+    assert obj.plugin.config["input_data"] is None
+    assert obj.plugin.config["input_kwargs"] == {}
 
 
 def test_clear_data__non_recursive_only_clears_self():
@@ -368,14 +368,14 @@ def test_clear_data__recursive_clears_all():
     for _node in nodes.values():
         _node.results = np.random.random((10, 10))
         _node.result_kws = {"key": "value"}
-        _node.plugin._config["input_data"] = np.random.random((5, 5))
-        _node.plugin._config["input_kwargs"] = {"test": "data"}
+        _node.plugin.config["input_data"] = np.random.random((5, 5))
+        _node.plugin.config["input_kwargs"] = {"test": "data"}
     _root.clear_data(recursive=True)
     for _node in nodes.values():
         assert _node.results is None
         assert _node.result_kws is None
-        assert _node.plugin._config["input_data"] is None
-        assert _node.plugin._config["input_kwargs"] == {}
+        assert _node.plugin.config["input_data"] is None
+        assert _node.plugin.config["input_kwargs"] == {}
 
 
 def test_clear_data__recursive_intermediate_node():
@@ -401,15 +401,15 @@ def test_clear_data__repeat_calls():
     obj = WorkflowNode(plugin=DummyLoader())
     obj.results = np.random.random((10, 10))
     obj.result_kws = {"key": "value"}
-    obj.plugin._config["input_data"] = np.random.random((5, 5))
-    obj.plugin._config["input_kwargs"] = {"test": "data"}
+    obj.plugin.config["input_data"] = np.random.random((5, 5))
+    obj.plugin.config["input_kwargs"] = {"test": "data"}
     obj.clear_data()
     assert obj.results is None
     obj.clear_data()
     assert obj.results is None
     assert obj.result_kws is None
-    assert obj.plugin._config["input_data"] is None
-    assert obj.plugin._config["input_kwargs"] == {}
+    assert obj.plugin.config["input_data"] is None
+    assert obj.plugin.config["input_kwargs"] == {}
 
 
 # -------------------------------------------

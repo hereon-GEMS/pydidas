@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ to input data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -88,11 +88,11 @@ class RollingAverage1d(ProcPlugin):
         """
         Set up the required functions and fit variable labels.
         """
-        self._config["index_offset"] = self.get_param_value("kernel_width") // 2 + 1
-        self._config["width"] = self.get_param_value("kernel_width")
-        if self._config["width"] < 1:
+        self.config["index_offset"] = self.get_param_value("kernel_width") // 2 + 1
+        self.config["width"] = self.get_param_value("kernel_width")
+        if self.config["width"] < 1:
             raise UserConfigError("The averaging kernel must be at least of size 2.")
-        self._kernel = np.ones(self._config["width"]) / self._config["width"]
+        self._kernel = np.ones(self.config["width"]) / self.config["width"]
 
     @process_1d_with_multi_input_dims
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
@@ -117,7 +117,7 @@ class RollingAverage1d(ProcPlugin):
         _new_data = Dataset(
             np.convolve(data, self._kernel, mode="same"), **data.property_dict
         )
-        _offset = self._config["index_offset"]
+        _offset = self.config["index_offset"]
         _new_data[:_offset] = data[:_offset]
         _new_data[-_offset:] = data[-_offset:]
         self._results = _new_data

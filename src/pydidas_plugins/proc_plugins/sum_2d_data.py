@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ Module with the Sum2dData Plugin which can be used to sum over 2D data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -80,8 +80,8 @@ class Sum2dData(ProcPlugin):
         """
         Reset the index range slices before starting a new processing run.
         """
-        self._config["slices"] = None
-        self._config["first_execute_configured"] = False
+        self.config["slices"] = None
+        self.config["first_execute_configured"] = False
         self._metadata = {}
 
     def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
@@ -103,7 +103,7 @@ class Sum2dData(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        if not self._config["first_execute_configured"]:
+        if not self.config["first_execute_configured"]:
             self._first_execution()
         _new_data = np.atleast_1d(
             np.sum(
@@ -150,7 +150,7 @@ class Sum2dData(ProcPlugin):
             self._metadata = {
                 "axis_labels": ["Data sum"],
             }
-        self._config["first_execute_configured"] = True
+        self.config["first_execute_configured"] = True
 
     def _create_sum_mask(self):
         """

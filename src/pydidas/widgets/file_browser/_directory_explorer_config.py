@@ -43,10 +43,10 @@ from pydidas.core.constants import (
     FONT_METRIC_HALF_CONSOLE_WIDTH,
     FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
-from pydidas.widgets.file_browser.directory_explorer_tree_view import (
-    DirectoryExplorerTreeView,
+from pydidas.widgets.extended_widgets import ToggleOptionsButton
+from pydidas.widgets.file_browser._directory_explorer_tree_view import (
+    _DirectoryExplorerTreeView,
 )
-from pydidas.widgets.selection.toggle_options_button import ToggleOptionsButton
 
 
 DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
@@ -194,7 +194,7 @@ DIRECTORY_EXPLORER_WIDGET_BUILD_CONFIG: list[
     ],
     [
         "create_any_widget",
-        ("tree_view", DirectoryExplorerTreeView),
+        ("tree_view", _DirectoryExplorerTreeView),
         {"gridPos": (-1, 0, 1, 2)},
     ],
 ]

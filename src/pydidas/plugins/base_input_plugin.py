@@ -45,6 +45,7 @@ class InputPlugin(BasePlugin):
     """
 
     plugin_type = INPUT_PLUGIN
+    plugin_subtype = plugin_type
     plugin_name = "Base input plugin"
     output_data_label = "Image intensity"
     output_data_unit = "counts"
@@ -72,7 +73,7 @@ class InputPlugin(BasePlugin):
         """
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", ScanContext())
-        self._config["pre_executed"] = False
+        self.config.pre_executed = False
         self.base_dir = Path()
         self.filename = ""
         if self.base_output_data_dim == 2:
@@ -105,7 +106,7 @@ class InputPlugin(BasePlugin):
         Run generic pre-execution routines.
         """
         self.update_filepath()
-        self._config["pre_executed"] = True
+        self.config.pre_executed = True
 
     def update_filepath(self):
         """
@@ -205,7 +206,7 @@ class InputPlugin(BasePlugin):
         kwargs : Any
             The updated kwargs.
         """
-        if not self._config["pre_executed"]:
+        if not self.config.pre_executed:
             raise UserConfigError(
                 "The pre_execute method must be called before the execute method."
             )

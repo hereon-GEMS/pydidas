@@ -80,7 +80,7 @@ class TestBasePlugin(unittest.TestCase):
     def test_input_data_property__value(self):
         _input = np.random.random((10, 10))
         plugin = create_plugin_class(BASE_PLUGIN)()
-        plugin._config["input_data"] = _input
+        plugin.config["input_data"] = _input
         self.assertTrue(np.allclose(plugin.input_data, _input))
 
     def test_store_input_data_copy(self):
@@ -91,9 +91,9 @@ class TestBasePlugin(unittest.TestCase):
         plugin.store_input_data_copy(_input, **_kwargs)
         # change input to zeros to verify that a copy of the data has been stored:
         _input[:] = 0
-        self.assertTrue(np.allclose(plugin._config["input_data"], _copy))
-        self.assertEqual(plugin._config["input_kwargs"], _kwargs)
-        self.assertTrue(np.sum(plugin._config["input_data"]) > 0)
+        self.assertTrue(np.allclose(plugin.config["input_data"], _copy))
+        self.assertEqual(plugin.config["input_kwargs"], _kwargs)
+        self.assertTrue(np.sum(plugin.config["input_data"]) > 0)
 
     def test_get_class_description(self):
         plugin = create_plugin_class(BASE_PLUGIN)

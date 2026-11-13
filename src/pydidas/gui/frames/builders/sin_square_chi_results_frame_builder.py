@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,38 +21,50 @@ SinSquareChiResultsFrame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION"]
 
-from typing import Any
 
-from pydidas.core.constants import (
-    POLICY_FIX_EXP,
-)
-from pydidas.widgets import ScrollArea
-from pydidas.widgets.plotting import GridCurvePlot
+from typing import TYPE_CHECKING, Any
+
+from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
+from pydidas.core.lazy_imports.lazy_objects import LazyObject
+from pydidas.widgets.base_classes import PydidasScrollArea
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.pyqtgraph_plot import GridCurvePlot
+else:
+    GridCurvePlot = LazyObject("pydidas.widgets.pyqtgraph_plot", "GridCurvePlot")
 
 
 def __create_param_widget(
     param: str, parent: str, **kwargs: Any
-) -> list[str, tuple[str], dict[str, Any]]:
+) -> list[str | tuple[str] | dict[str, Any]]:
     """Get the widget creation information for a parameter widget."""
     _new_kwargs: dict[str, Any] = {"parent_widget": parent} | kwargs
     return ["create_param_widget", (param,), _new_kwargs]
 
 
-SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION: list[list[str, tuple, dict]] = [
+SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION: list[
+    list[str | tuple[Any, ...] | dict[str, Any]]
+] = [
     [
         "create_label",
         (None, "Sin square chi result visualization"),
         {"fontsize_offset": 4, "bold": True, "gridPos": (0, 0, 1, 2)},
     ],
     [
+        "create_empty_widget",
+        ("config",),
+        {"parent_widget": None, "font_metric_width_factor": FONT_METRIC_CONFIG_WIDTH},
+    ],
+    [
         "create_any_widget",
-        ("config_area", ScrollArea),
+        ("config_area", PydidasScrollArea),
         {
             "gridPos": (1, 0, 1, 1),
             "layout_kwargs": {"alignment": None},

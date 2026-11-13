@@ -71,8 +71,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapex = 123
         _shapey = 435
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex, _roi[1] - _roi[0])
         self.assertEqual(_shapey, _roi[3] - _roi[2])
@@ -82,8 +82,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _xlow = 23
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_xlow", _xlow)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex - _xlow, _roi[1] - _roi[0])
@@ -94,8 +94,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _xhigh = 23
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_xhigh", _xhigh)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_xhigh, _roi[1] - _roi[0])
@@ -106,8 +106,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _xhigh = -32
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_xhigh", _xhigh)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex + _xhigh + 1, _roi[1] - _roi[0])
@@ -118,8 +118,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _ylow = 23
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_ylow", _ylow)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex, _roi[1] - _roi[0])
@@ -130,8 +130,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _yhigh = 23
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_yhigh", _yhigh)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex, _roi[1] - _roi[0])
@@ -142,8 +142,8 @@ class TestImageMetadataManager(unittest.TestCase):
         _shapey = 435
         _yhigh = -32
         imm = ImageMetadataManager()
-        imm._config["raw_img_shape_x"] = _shapex
-        imm._config["raw_img_shape_y"] = _shapey
+        imm.config["raw_img_shape_x"] = _shapex
+        imm.config["raw_img_shape_y"] = _shapey
         imm.set_param_value("roi_yhigh", _yhigh)
         _roi = imm._ImageMetadataManager__get_modulated_roi()
         self.assertEqual(_shapex, _roi[1] - _roi[0])
@@ -232,28 +232,28 @@ class TestImageMetadataManager(unittest.TestCase):
     def test_store_image_data(self):
         imm = ImageMetadataManager()
         imm.store_image_data(self._img_shape, self._data.dtype, self._dsize)
-        self.assertEqual(imm._config["datatype"], self._data.dtype)
-        self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
-        self.assertEqual(imm._config["raw_img_shape_y"], self._img_shape[0])
-        self.assertEqual(imm._config["images_per_file"], self._dsize)
+        self.assertEqual(imm.config["datatype"], self._data.dtype)
+        self.assertEqual(imm.config["raw_img_shape_x"], self._img_shape[1])
+        self.assertEqual(imm.config["raw_img_shape_y"], self._img_shape[0])
+        self.assertEqual(imm.config["images_per_file"], self._dsize)
 
     def test_store_image_data_from_single_image(self):
         imm = ImageMetadataManager()
         imm.filename = self._fname(0)
         imm._store_image_data_from_single_image()
-        self.assertEqual(imm._config["datatype"], self._data.dtype)
-        self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
-        self.assertEqual(imm._config["raw_img_shape_y"], self._img_shape[0])
-        self.assertEqual(imm._config["numbers"], [0])
-        self.assertEqual(imm._config["images_per_file"], 1)
+        self.assertEqual(imm.config["datatype"], self._data.dtype)
+        self.assertEqual(imm.config["raw_img_shape_x"], self._img_shape[1])
+        self.assertEqual(imm.config["raw_img_shape_y"], self._img_shape[0])
+        self.assertEqual(imm.config["numbers"], [0])
+        self.assertEqual(imm.config["images_per_file"], 1)
 
     def test_store_image_data_from_single_image__no_file(self):
         imm = ImageMetadataManager()
         with self.assertRaises(UserConfigError):
             imm.filename = self._fname(90)
-        self.assertEqual(imm._config["datatype"], None)
-        self.assertEqual(imm._config["raw_img_shape_x"], None)
-        self.assertEqual(imm._config["raw_img_shape_y"], None)
+        self.assertEqual(imm.config["datatype"], None)
+        self.assertEqual(imm.config["raw_img_shape_x"], None)
+        self.assertEqual(imm.config["raw_img_shape_y"], None)
 
     def test_verify_selection_range(self):
         _range = self._data.shape[0]
@@ -287,21 +287,21 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.filename = self._hdf5_fname
         imm._store_image_data_from_hdf5_file()
-        self.assertEqual(imm._config["datatype"], self._data.dtype)
-        self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
-        self.assertEqual(imm._config["raw_img_shape_y"], self._img_shape[0])
-        self.assertEqual(imm._config["numbers"], range(self._dsize))
-        self.assertEqual(imm._config["images_per_file"], self._dsize)
+        self.assertEqual(imm.config["datatype"], self._data.dtype)
+        self.assertEqual(imm.config["raw_img_shape_x"], self._img_shape[1])
+        self.assertEqual(imm.config["raw_img_shape_y"], self._img_shape[0])
+        self.assertEqual(imm.config["numbers"], range(self._dsize))
+        self.assertEqual(imm.config["images_per_file"], self._dsize)
 
     def test_store_image_data_from_hdf5__slice_ax_1(self):
         imm = ImageMetadataManager(hdf5_slicing_axis=1)
         imm.filename = self._hdf5_fname
         imm._store_image_data_from_hdf5_file()
-        self.assertEqual(imm._config["datatype"], self._data.dtype)
-        self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
-        self.assertEqual(imm._config["raw_img_shape_y"], self._dsize)
-        self.assertEqual(imm._config["numbers"], range(self._img_shape[0]))
-        self.assertEqual(imm._config["images_per_file"], self._img_shape[0])
+        self.assertEqual(imm.config["datatype"], self._data.dtype)
+        self.assertEqual(imm.config["raw_img_shape_x"], self._img_shape[1])
+        self.assertEqual(imm.config["raw_img_shape_y"], self._dsize)
+        self.assertEqual(imm.config["numbers"], range(self._img_shape[0]))
+        self.assertEqual(imm.config["images_per_file"], self._img_shape[0])
 
     def test_store_image_data_from_hdf5__wrong_key(self):
         imm = ImageMetadataManager()
@@ -316,13 +316,13 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.set_param_value("hdf5_stepping", _step)
         imm.filename = self._hdf5_fname
         imm._store_image_data_from_hdf5_file()
-        self.assertEqual(imm._config["images_per_file"], self._dsize // _step + 1)
-        self.assertEqual(imm._config["numbers"], range(0, self._dsize, _step))
+        self.assertEqual(imm.config["images_per_file"], self._dsize // _step + 1)
+        self.assertEqual(imm.config["numbers"], range(0, self._dsize, _step))
 
     def test_set_filename(self):
         imm = ImageMetadataManager()
         imm.filename = self._hdf5_fname
-        self.assertEqual(imm._config["filename"], self._hdf5_fname)
+        self.assertEqual(imm.config["filename"], self._hdf5_fname)
 
     def test_update_input_data__hdf5_file(self):
         imm = ImageMetadataManager()
@@ -340,21 +340,21 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.filename = self._hdf5_fname
         imm.update_input_data()
-        self.assertEqual(imm._config["images_per_file"], self._dsize)
-        self.assertEqual(imm._config["numbers"], range(self._dsize))
+        self.assertEqual(imm.config["images_per_file"], self._dsize)
+        self.assertEqual(imm.config["numbers"], range(self._dsize))
 
     def test_update__single_file(self):
         imm = ImageMetadataManager()
         imm.filename = self._fname(0)
         imm.update_input_data()
-        self.assertEqual(imm._config["images_per_file"], 1)
-        self.assertEqual(imm._config["numbers"], [0])
+        self.assertEqual(imm.config["images_per_file"], 1)
+        self.assertEqual(imm.config["numbers"], [0])
 
     def test_update__w_filename(self):
         imm = ImageMetadataManager()
         imm.update(filename=self._fname(0))
-        self.assertEqual(imm._config["images_per_file"], 1)
-        self.assertEqual(imm._config["numbers"], [0])
+        self.assertEqual(imm.config["images_per_file"], 1)
+        self.assertEqual(imm.config["numbers"], [0])
 
     def test_update__new_data(self):
         imm = ImageMetadataManager()

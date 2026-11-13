@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2023 - 2025, Helmholtz-Zentrum Hereon
+# Copyright 2023 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ directory spy app and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023 - 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -40,10 +40,10 @@ from pydidas.core import ParameterCollection
 from pydidas.core.constants import HDF5_EXTENSIONS
 from pydidas.core.utils import get_extension, pydidas_logger
 from pydidas.gui.frames.builders.directory_spy_frame_builder import (
-    DirectorySpyFrameBuilder,
+    DIRECTORY_SPY_FRAME_BUILD_CONFIG,
 )
 from pydidas.multiprocessing import AppRunner
-from pydidas.widgets.framework import BaseFrameWithApp
+from pydidas.widgets.extended_widgets import BaseFrameWithApp
 from pydidas.workflow import WorkflowResults, WorkflowTree
 
 
@@ -69,7 +69,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
-        self._config.update(
+        self.config.update(
             {
                 "data_use_timeline": False,
                 "plot_active": True,
@@ -112,7 +112,9 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         Populate the frame with widgets.
         """
-        DirectorySpyFrameBuilder.build_frame(self)
+        for _name, _args, _kwargs in DIRECTORY_SPY_FRAME_BUILD_CONFIG:
+            getattr(self, _name)(*_args, **_kwargs)
+        super().build_frame()
 
     @QtCore.Slot()
     def __update_file_widget_visibility(self) -> None:
@@ -147,7 +149,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
     @QtCore.Slot()
     def __scan_once(self) -> None:
         """Scan once for the latest file."""
-        self._config["plot_active"] = True
+        self.config["plot_active"] = True
         self._app.prepare_run()
         self._app.multiprocessing_carryon()
         _, _fname = self._app.multiprocessing_func()
@@ -157,22 +159,22 @@ class DirectorySpyFrame(BaseFrameWithApp):
     @QtCore.Slot()
     def __force_show(self) -> None:
         """Force an update of the plot."""
-        _active = self._config["plot_active"]
-        self._config["plot_active"] = True
+        _active = self.config["plot_active"]
+        self.config["plot_active"] = True
         self.__update_plot()
-        self._config["plot_active"] = _active
+        self.config["plot_active"] = _active
 
     @QtCore.Slot()
     def __execute(self) -> None:
         """Execute the DirectorySpyApp."""
-        self._config["plot_active"] = True
+        self.config["plot_active"] = True
         self._run_app()
 
     def _run_app(self) -> None:
         """Parallel implementation of the execution method."""
         logger.debug("Starting workflow")
         self._app.multiprocessing_pre_run()
-        self._config["last_update"] = time.time()
+        self.config["last_update"] = time.time()
         self.__set_proc_widget_enabled_for_running(True)
         logger.debug("Starting AppRunner")
         self._runner = AppRunner(self._app, n_workers=1)
@@ -206,9 +208,9 @@ class DirectorySpyFrame(BaseFrameWithApp):
     @QtCore.Slot()
     def __check_for_plot_update(self) -> None:
         """Check whether the plot should be updated."""
-        _dt = time.time() - self._config["plot_last_update"]
-        if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
-            self._config["plot_last_update"] = time.time()
+        _dt = time.time() - self.config["plot_last_update"]
+        if _dt > self.config["plot_update_time"] and self.config["frame_active"]:
+            self.config["plot_last_update"] = time.time()
             self.__update_plot()
 
     def __update_plot(self) -> None:
@@ -218,7 +220,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         This method will get the latest image from the DirectorySpyApp and
         update the plot.
         """
-        if (not self._config["plot_active"]) or self._app.image is None:
+        if (not self.config["plot_active"]) or self._app.image is None:
             return
         _fname = self._app.current_filename
         _title = _fname + self._app.image_metadata
@@ -245,7 +247,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
             self.__update_det_mask_visibility()
             self.__update_bg_widget_visibility()
             self.__check_for_plot_update()
-        self._config["frame_active"] = index == self.frame_index
+        self.config["frame_active"] = index == self.frame_index
 
     def __set_proc_widget_enabled_for_running(self, running: bool) -> None:
         """

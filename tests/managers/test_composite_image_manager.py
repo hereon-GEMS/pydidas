@@ -272,7 +272,7 @@ class TestCompositeImage(unittest.TestCase):
         q_settings = PydidasQsettings()
         for _key in ["border_width", "border_value"]:
             _val = q_settings.value(f"user/mosaic_{_key}", float)
-            self.assertEqual(obj._config[_key], _val)
+            self.assertEqual(obj.config[_key], _val)
 
     def test_check_max_size_okay(self):
         obj = self.get_default_object()

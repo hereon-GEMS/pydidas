@@ -79,6 +79,8 @@ path = [
     "src/pydidas/resources/_mdi_icons/dark/image-multiple-outline.svg",
     "src/pydidas/resources/_mdi_icons/information-outline.svg",
     "src/pydidas/resources/_mdi_icons/dark/information-outline.svg",
+    "src/pydidas/resources/_mdi_icons/open-in-new.svg",
+    "src/pydidas/resources/_mdi_icons/dark/open-in-new.svg",
     "src/pydidas/resources/_mdi_icons/update.svg",
     "src/pydidas/resources/_mdi_icons/dark/update.svg",
     "src/pydidas/resources/_mdi_icons/view-comfy.svg",

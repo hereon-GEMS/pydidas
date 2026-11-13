@@ -37,14 +37,14 @@ from skimage.io import imsave
 
 from pydidas.core import UserConfigError
 from pydidas.unittest_objects import SignalSpy
-from pydidas.widgets.selection.select_data_frame_widget import SelectDataFrameWidget
+from pydidas.widgets.misc.select_data_frame_widget import SelectDataFrameWidget
 from pydidas_qtcore import PydidasQApplication
 
 
 _VALID_FILENAMES = ["hdf5_file.h5", "tif_file.tiff", "npy_file.npy"]
 _FILENAMES = _VALID_FILENAMES + ["invalid.tif"]
 _USER_CONFIG_ERROR_METHOD = (
-    "pydidas.widgets.selection.select_data_frame_widget."
+    "pydidas.widgets.misc.select_data_frame_widget."
     "SelectDataFrameWidget.raise_UserConfigError"
 )
 _VALID_KEYS = sorted(
@@ -74,12 +74,11 @@ def test_data() -> dict:
 @pytest.fixture(autouse=True)
 def _cleanup() -> Generator[None, None, None]:
     app = PydidasQApplication.instance()
-    yield
-    for widget in [
-        _w for _w in app.topLevelWidgets() if isinstance(_w, SelectDataFrameWidget)
-    ]:
-        widget.deleteLater()
     app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+    yield
+    app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
 
 
 @pytest.fixture(scope="module")
@@ -104,14 +103,31 @@ def path_w_data_files(temp_path, test_data) -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def widget(qtbot) -> SelectDataFrameWidget:
-    widget = SelectDataFrameWidget()
+def widget(request, qtbot) -> SelectDataFrameWidget:
+    # ensure that all previous widgets are deleted before creating a new one:
+    app = PydidasQApplication.instance()
+    app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+
+    _kwargs = dict(getattr(request, "param", {}))
+    _callspec_params = getattr(request.node, "callspec", None)
+    if _callspec_params is not None:
+        for _name in ("width", "ndim", "import_hdf5_metadata"):
+            if _name in _callspec_params.params and _name not in _kwargs:
+                _kwargs[_name] = _callspec_params.params[_name]
+    widget = SelectDataFrameWidget(**_kwargs)
     widget.spy_sig_file_valid = SignalSpy(widget.sig_file_valid)
     widget.spy_sig_new_selection = SignalSpy(widget.sig_new_selection)
-    qtbot.add_widget(widget)
+    _widget_deleted = []
+    widget.destroyed.connect(lambda: _widget_deleted.append(True))
     widget.show()
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
-    return widget
+    yield widget
+    widget.close()
+    widget.deleteLater()
+    app.processEvents()
+    app.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+    qtbot.wait_until(lambda: len(_widget_deleted) == 1, timeout=1000)
 
 
 def assert_correct_widget_visibility(widget) -> None:
@@ -130,18 +146,9 @@ def assert_correct_widget_visibility(widget) -> None:
 @pytest.mark.parametrize("width", [None, 20, 50])
 @pytest.mark.parametrize("ndim", [2, 3])
 @pytest.mark.parametrize("import_hdf5_metadata", [True, False])
-def test__creation(qtbot, width, ndim, import_hdf5_metadata) -> None:
-    widget = SelectDataFrameWidget(
-        width=width,
-        ndim=ndim,
-        import_hdf5_metadata=import_hdf5_metadata,
-    )
-    qtbot.add_widget(widget)
-    widget.show()
+def test__creation(qtbot, widget, width, ndim, import_hdf5_metadata) -> None:
     qtbot.wait_until(lambda: widget.isVisible(), timeout=500)
-    # noinspection PyUnresolvedReferences
     assert widget._SelectDataFrameWidget__ndim == ndim
-    # noinspection PyUnresolvedReferences
     assert widget._SelectDataFrameWidget__import_hdf5_metadata == import_hdf5_metadata
     _width = widget.width()
     assert widget.param_composite_widgets["filename"].width() == _width
@@ -453,4 +460,4 @@ def test__select_new_frame__change_axis(
 
 
 if __name__ == "__main__":
-    pytest.main([])
+    pytest.main([__file__])

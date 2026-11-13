@@ -34,9 +34,10 @@ from qtpy import QtCore, QtWidgets
 
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from pydidas.plugins import BasePlugin
-from pydidas.widgets.factory import CreateWidgetsMixIn, EmptyWidget
-from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
-    ParameterWidgetsMixIn,
+from pydidas.widgets.base_classes import (
+    EmptyWidget,
+    ParameterWidgetMixIn,
+    WidgetFactoryMixIn,
 )
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
@@ -45,9 +46,7 @@ from pydidas.widgets.utilities import delete_all_items_in_layout
 from pydidas_qtcore import PydidasQApplication
 
 
-class EditPluginParametersWidget(
-    EmptyWidget, ParameterWidgetsMixIn, CreateWidgetsMixIn
-):
+class EditPluginParametersWidget(EmptyWidget, ParameterWidgetMixIn, WidgetFactoryMixIn):
     """
     Widget to update and change values of all Parameters in a Plugin.
 
@@ -69,8 +68,8 @@ class EditPluginParametersWidget(
         if "font_metric_width_factor" not in kwargs:
             kwargs["font_metric_width_factor"] = FONT_METRIC_CONFIG_WIDTH
         EmptyWidget.__init__(self, **kwargs)
-        ParameterWidgetsMixIn.__init__(self)
-        CreateWidgetsMixIn.__init__(self)
+        ParameterWidgetMixIn.__init__(self)
+        WidgetFactoryMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
         self.setFixedWidth(

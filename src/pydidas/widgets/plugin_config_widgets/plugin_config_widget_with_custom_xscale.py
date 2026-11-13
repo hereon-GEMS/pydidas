@@ -48,7 +48,7 @@ class PluginConfigWidgetWithCustomXscale(GenericPluginConfigWidget):
 
     def connect_signals(self) -> None:
         """Connect the signals to the slots."""
-        GenericPluginConfigWidget.connect_signals(self)
+        super().connect_signals()
         self.param_widgets["use_custom_xscale"].sig_new_value.connect(
             self._toggle_custom_scale
         )

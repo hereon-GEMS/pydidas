@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the UtilitiesFrameBuilder class which is used to populate
+Module with the UTILITIES_FRAME_BUILD_CONFIG which is used to populate
 the UtilitiesFrame with widgets.
 """
 
@@ -25,16 +25,17 @@ __copyright__ = "Copyright 2023 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["UtilitiesFrameBuilder"]
+__all__ = ["UTILITIES_FRAME_BUILD_CONFIG"]
 
+from typing import Any
 
 from qtpy import QtWidgets
 
 from pydidas.core import constants
-from pydidas.widgets.framework import BaseFrame
 
 
-UTILITIES = {
+_GRID_NUM = 3
+_UTILITIES = {
     "user_config": {
         "title": "Edit user config",
         "text": (
@@ -81,69 +82,56 @@ UTILITIES = {
 }
 
 
-class UtilitiesFrameBuilder:
-    """
-    Create all widgets and initialize their state.
-
-    Parameters
-    ----------
-    self : pydidas.gui.DefineScanFrame
-        The DefineScanFrame instance.
-    """
-
-    GROUP_WIDTH = 320
-    GRID_NUM = 3
-
-    @classmethod
-    def build_frame(cls, frame: BaseFrame):
-        """
-        Create all widgets for the frame and place them in the layout.
-
-        Parameters
-        ----------
-        frame : BaseFrame
-            The frame to be populated.
-        """
-        frame.layout().setSpacing(30)
-        frame.create_label(
-            "label_title",
-            "Utilities\n",
-            fontsize_offset=4,
-            bold=True,
-            gridPos=(0, 0, 1, 3),
-        )
-
-        for _index, (_key, _entries) in enumerate(UTILITIES.items()):
-            _xpos = _index % cls.GRID_NUM
-            _ypos = _index // cls.GRID_NUM + 1
-            frame.create_empty_widget(
-                f"utility_{_key}",
-                gridPos=(_ypos, _xpos, 1, 1),
-                font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
-                layout_kwargs={"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
-            )
-            frame.create_label(
-                f"title_{_key}",
-                _entries["title"],
-                bold=True,
-                fontsize_offset=2,
-                gridPos=(0, 0, 1, 1),
-                parent_widget=frame._widgets[f"utility_{_key}"],
-            )
-            frame.create_label(
-                f"text_{_key}",
-                _entries["text"],
-                alignment=constants.ALIGN_TOP_LEFT,
-                font_metric_height_factor=4,
-                font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
-                gridPos=(1, 0, 1, 1),
-                parent_widget=frame._widgets[f"utility_{_key}"],
-                sizePolicy=constants.POLICY_FIX_EXP,
-                wordWrap=True,
-            )
-            frame.create_button(
-                f"button_{_key}",
-                _entries["button_text"],
-                gridPos=(2, 0, 1, 1),
-                parent_widget=frame._widgets[f"utility_{_key}"],
-            )
+UTILITIES_FRAME_BUILD_CONFIG: list[list[str | tuple[Any, ...] | dict[str, Any]]] = [
+    [
+        "create_label",
+        ("label_title", "Utilities\n"),
+        {"fontsize_offset": 4, "bold": True, "gridPos": (0, 0, 1, 3)},
+    ]
+]
+for _index, (_key, _entries) in enumerate(_UTILITIES.items()):
+    _xpos = _index % _GRID_NUM
+    _ypos = _index // _GRID_NUM + 1
+    _item_config = [
+        [
+            "create_empty_widget",
+            (f"utility_{_key}",),
+            {
+                "gridPos": (_ypos, _xpos, 1, 1),
+                "font_metric_width_factor": constants.FONT_METRIC_CONFIG_WIDTH,
+                "layout_kwargs": {"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
+            },
+        ],
+        [
+            "create_label",
+            (f"title_{_key}", _entries["title"]),
+            {
+                "bold": True,
+                "fontsize_offset": 2,
+                "gridPos": (0, 0, 1, 1),
+                "parent_widget": f"utility_{_key}",
+            },
+        ],
+        [
+            "create_label",
+            (f"text_{_key}", _entries["text"]),
+            {
+                "alignment": constants.ALIGN_TOP_LEFT,
+                "font_metric_height_factor": 4,
+                "font_metric_width_factor": constants.FONT_METRIC_CONFIG_WIDTH,
+                "gridPos": (1, 0, 1, 1),
+                "parent_widget": f"utility_{_key}",
+                "sizePolicy": constants.POLICY_FIX_EXP,
+                "wordWrap": True,
+            },
+        ],
+        [
+            "create_button",
+            (f"button_{_key}", _entries["button_text"]),
+            {
+                "gridPos": (2, 0, 1, 1),
+                "parent_widget": f"utility_{_key}",
+            },
+        ],
+    ]
+    UTILITIES_FRAME_BUILD_CONFIG.extend(_item_config)

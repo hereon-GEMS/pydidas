@@ -19,11 +19,11 @@ ParameterWidgetsMixin structure and API
     :local:
 
 
-ParameterWidgetsMixIn Public API
+ParameterWidgetMixIn Public API
 ---------------------------------
 
-:py:class:`ParameterWidgetsMixIn
-<pydidas.widgets.parameter_config.ParameterWidgetsMixIn>` is a mixin class that
+:py:class:`ParameterWidgetMixIn
+<pydidas.widgets.parameter_config.ParameterWidgetMixIn>` is a mixin class that
 can be added to any ``QWidget`` subclass to provide managed creation, access,
 and synchronization of :py:class:`ParameterWidget
 <pydidas.widgets.parameter_config.ParameterWidget>` instances. It maintains two
@@ -36,7 +36,7 @@ Both are populated automatically by ``create_param_widget``.
 
 .. note::
 
-    ``ParameterWidgetsMixIn`` assumes the host class has a ``params``
+    ``ParameterWidgetMixIn`` assumes the host class has a ``params``
     (:py:class:`ParameterCollection <pydidas.core.ParameterCollection>`) and is
     a (subclass of) ``QWidget`` with a layout manager that supports adding
     widgets (e.g. ``QGridLayout``). :py:class:`ParameterEditCanvas

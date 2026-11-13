@@ -94,7 +94,7 @@ class pyFAIintegrationBase(ProcPlugin):
         self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
-        self._config["custom_mask"] = False
+        self.config["custom_mask"] = False
 
     def pre_execute(self):
         """
@@ -145,7 +145,7 @@ class pyFAIintegrationBase(ProcPlugin):
         present.
         """
         _method = pyFAI_METHOD[self.get_param_value("int_method")]
-        self._config["method"] = _method
+        self.config["method"] = _method
         if _method[2] != "opencl":
             return
         _name = mp.current_process().name
@@ -161,7 +161,7 @@ class pyFAIintegrationBase(ProcPlugin):
             _n_device = len(_platform.devices)
             _device = _index % _n_device
             _method = _method + ((_platform.id, _device),)
-            self._config["method"] = _method
+            self.config["method"] = _method
 
     def get_azimuthal_range_in_rad(self) -> None | tuple[float, float]:
         """
@@ -354,10 +354,10 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _mask = kwargs.get("custom_mask", None)
         if _mask is not None:
-            self._config["custom_mask"] = True
-        elif _mask is None and self._mask is not None and self._config["custom_mask"]:
+            self.config["custom_mask"] = True
+        elif _mask is None and self._mask is not None and self.config["custom_mask"]:
             _mask = self._mask
-            self._config["custom_mask"] = False
+            self.config["custom_mask"] = False
         else:
             return
         if hasattr(self, "_ai"):

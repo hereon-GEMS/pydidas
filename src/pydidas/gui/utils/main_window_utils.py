@@ -25,9 +25,11 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = [
+    "PROC_FRAME_NAMES",
     "create_generic_toolbar_entry",
     "find_toolbar_bases",
 ]
+
 
 import os
 from pathlib import Path
@@ -35,6 +37,13 @@ from pathlib import Path
 from pydidas.core.constants import MAIN_WINDOW_MENU_ENTRIES
 from pydidas.core.utils import format_input_to_multiline_str
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
+
+
+PROC_FRAME_NAMES = [
+    "Workflow processing/Workflow editing",
+    "Workflow processing/Define scan",
+    "Workflow processing/Define diffraction experiment",
+]
 
 
 def find_toolbar_bases(items):

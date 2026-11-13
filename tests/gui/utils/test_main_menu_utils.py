@@ -28,6 +28,7 @@ from unittest.mock import patch
 
 import pytest
 
+from pydidas import VERSION
 from pydidas.gui.utils.main_menu_utils import get_available_exit_states
 
 
@@ -47,6 +48,8 @@ def mock_config_dir_exit_states(tmp_path):
     invalid_files = [
         "pydidas_gui_exit_state_1.2.3.yaml",
         "pydidas_gui_exit_state_01.02.03.txt",
+        f"custom_gui_exit_state_{VERSION}.yaml",
+        "custom_gui_exit_state_01.02.03.yaml",
         "other_config_file.yaml",
     ]
 
@@ -58,15 +61,30 @@ def mock_config_dir_exit_states(tmp_path):
         yield valid_files
 
 
-def test_get_available_exit_states(mock_config_dir_exit_states):
+def test_get_available_exit_states__w_standard_name(mock_config_dir_exit_states):
     """
     Test that get_available_exit_states only returns valid filenames.
     """
     expected_filenames = mock_config_dir_exit_states
 
-    actual_filenames = get_available_exit_states()
+    actual_filenames = get_available_exit_states(
+        f"pydidas_gui_exit_state_{VERSION}.yaml"
+    )
 
     assert actual_filenames == sorted(expected_filenames)
+
+
+def test_get_available_exit_states__w_custom_name(mock_config_dir_exit_states):
+    """
+    Test that get_available_exit_states returns the custom name.
+    """
+    actual_filenames = get_available_exit_states(
+        f"custom_gui_exit_state_{VERSION}.yaml"
+    )
+
+    assert actual_filenames == [
+        "custom_gui_exit_state_01.02.03.yaml",
+    ]
 
 
 if __name__ == "__main__":

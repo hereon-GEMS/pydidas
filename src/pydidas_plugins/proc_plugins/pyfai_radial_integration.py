@@ -65,7 +65,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             "radial_unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
             "azimuth_range": self.get_azimuthal_range_in_deg(),
-            "method": self._config["method"],
+            "method": self.config["method"],
         }
         _label, _unit = self.params["azi_unit"].value.split("/")
         self._dataset_info = {

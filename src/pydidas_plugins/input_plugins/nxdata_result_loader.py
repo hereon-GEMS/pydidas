@@ -132,13 +132,13 @@ class NXdataResultLoader(InputPlugin):
     def update_filepath(self):
         """Update the stored filepath."""
         InputPlugin.update_filepath(self)
-        self._config["filename"] = self.base_dir / self.filename
+        self.config["filename"] = self.base_dir / self.filename
 
     def pre_execute(self) -> None:
         """Prepare the loader and read required metadata once."""
         InputPlugin.pre_execute(self)
         check_nxdata_adherence(
-            self._config["filename"], self.get_param_value("nxdata_key")
+            self.config["filename"], self.get_param_value("nxdata_key")
         )
         self.set_param_value("_counted_images_per_file", self._SCAN.n_points)
         self._verify_data_shape_valid()
@@ -164,7 +164,7 @@ class NXdataResultLoader(InputPlugin):
         Path
             The path to the pydidas result file.
         """
-        return self._config["filename"]
+        return self.config["filename"]
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
         """
@@ -186,8 +186,8 @@ class NXdataResultLoader(InputPlugin):
         """
         kwargs = kwargs | self._standard_kwargs
         kwargs["indices"] = self._SCAN.get_indices_from_ordinal(frame_index)
-        _data = import_data(self._config["filename"], **kwargs)
-        for _key, _val in self._config["frame_metadata"].items():
+        _data = import_data(self.config["filename"], **kwargs)
+        for _key, _val in self.config["frame_metadata"].items():
             setattr(_data, _key, _val)
         return _data, kwargs
 
@@ -200,13 +200,13 @@ class NXdataResultLoader(InputPlugin):
         _scan_ndim = self._SCAN.ndim
         _scan_shape = self._SCAN.shape
         _data_shape = get_hdf5_metadata(
-            self._config["filename"], "shape", dset=self.get_param_value("nxdata_key")
+            self.config["filename"], "shape", dset=self.get_param_value("nxdata_key")
         )
         _data_ndim = len(_data_shape)
         _expected_ndim = self.get_param_value("expected_data_dim")
         if not _data_shape[:_scan_ndim] == _scan_shape:
             raise UserConfigError(
-                f"The imported data `{self._config['filename']}::"
+                f"The imported data `{self.config['filename']}::"
                 f"{self.get_param_value('nxdata_key')}` with the shape "
                 f"{_data_shape} does not match the defined shape of the Scan "
                 f"{_scan_shape}. Please check the input file or the Scan "
@@ -214,7 +214,7 @@ class NXdataResultLoader(InputPlugin):
             )
         if not _data_ndim - _scan_ndim == _expected_ndim:
             raise UserConfigError(
-                f"The imported data `{self._config['filename']}::"
+                f"The imported data `{self.config['filename']}::"
                 f"{self.get_param_value('nxdata_key')}` does not match the "
                 "defined number of dimensions of the results.\n\n"
                 f"Expected number of dimensions: {_scan_ndim + _expected_ndim} "
@@ -238,13 +238,13 @@ class NXdataResultLoader(InputPlugin):
         """
         try:
             _data = import_data(
-                self._config["filename"],
+                self.config["filename"],
                 indices=(0,) * self._SCAN.ndim,
                 dataset=self.get_param_value("nxdata_key"),
             )
         except (KeyError, FileNotFoundError, FileReadError):
             raise UserConfigError(
-                f"The dataset `{self._config['filename']}::"
+                f"The dataset `{self.config['filename']}::"
                 f"{self.get_param_value('nxdata_key')}` could not be read as "
                 "NXdata dataset. Please check the file and dataset key. "
                 "\n\nThe NXdataResultLoader plugin relies on the correct metadata "
@@ -252,7 +252,7 @@ class NXdataResultLoader(InputPlugin):
                 "If you need to import HDF5 data without metadata, please use the "
                 "`Hdf5fileSeriesLoader` plugin instead."
             )
-        self._config["frame_metadata"] = _data.property_dict
-        self._config["frame_metadata"]["metadata"].pop("indices")
+        self.config["frame_metadata"] = _data.property_dict
+        self.config["frame_metadata"]["metadata"].pop("indices")
         self.output_data_label = _data.data_label
         self.output_data_unit = _data.data_unit

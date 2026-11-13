@@ -110,16 +110,16 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
 
     def __init__(self, *args: Parameter, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self._config["header_lines"] = 0
+        self.config["header_lines"] = 0
 
     def pre_execute(self):
         """Prepare loading spectra from a file series."""
         super().pre_execute()
         _index = 0 if Path(self.get_filename(0)).is_file() else 1
         fio.update_config_from_fio_file(
-            self.get_filename(_index), self._config, self.params
+            self.get_filename(_index), self.config, self.params
         )
-        self._config["roi"] = self._get_own_roi()
+        self.config["roi"] = self._get_own_roi()
         self._check_files_per_directory()
 
     def update_filepath(self):
@@ -197,5 +197,5 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         kwargs : Any
             The updated kwargs.
         """
-        _dataset = fio.load_fio_spectrum(self.get_filename(index), self._config)
+        _dataset = fio.load_fio_spectrum(self.get_filename(index), self.config)
         return _dataset, kwargs

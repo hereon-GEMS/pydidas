@@ -41,6 +41,7 @@ class OutputPlugin(BasePlugin):
     """
 
     plugin_type = OUTPUT_PLUGIN
+    plugin_subtype = plugin_type
     plugin_name = "Base output plugin"
     output_data_dim = None
     generic_params = BasePlugin.generic_params.copy()
@@ -103,7 +104,7 @@ class OutputPlugin(BasePlugin):
         str
             The full filename and path.
         """
-        _index = self._config.get("global_index", None)
+        _index = self.config.get("global_index", None)
         if _index is None:
             self.raise_UserConfigError(
                 "The `global_index` keyword has not been set. "

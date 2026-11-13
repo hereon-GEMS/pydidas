@@ -25,6 +25,17 @@ Improvements
 - Adjust svgs and background colors of nodes in workflow tree for better
   readability when system wide dark mode is enabled.
 - Added checks to prevent non-input plugins from being used as workflow roots.
+- Added an option to the DataViewer to display a Dataset in a new window
+  to allow comparisons of data.
+- Added an `all` marker to simplify running all tests with `pytest -m all`
+- Added a `relative sigma / (sigma + gamma)` output for FitFuncs.
+- Added an option to pop out the current data display from the DataViewer
+  with the current display settings to visualize multiple datasets in
+  parallel.
+- pyFAI integration plugins now use the Dataset.array to skip unnecessary
+  metadata handling during integration.
+- Added the `.ravel` method to the Dataset.
+- Added a `reduced chi^2` output to the fitting plugins.
 
 
 Programmatic changes
@@ -63,6 +74,8 @@ Programmatic changes
   to define the default configuration for the app. This allows a more
   generic way to reset the configuration to default values and to handle
   the state import.
+- Renamed all local Scan and DiffractionExp instances to lowercase variable
+  names for consistency.
 
 
 Bugfixes
@@ -120,6 +133,19 @@ Bugfixes
 - Fixed an issue when the GUI state import fell back to default exit state
   states with custom names.
 - Fixed an issue with a wrong class reference name in the DataViewer
+- Fixed an issue when trying to open data of shape (n, 1) i nthe DataViewer
+- Fixed an issue in Dataset hashing which did not produce consistent results
+  on repeat hash calls.
+- Fixed an issue in TweakPluginParameterWindow which forced a new pre_execute
+  for each run even when no Parameters changed.
+- Fixed an issue which allowed the same error message to spawn repeatedly even
+  when not acknowledged.
+- Fixed an issue which showed an unformatted axis range for processing results.
+- Fixed an issue in PyFAIazimuthalSectorIntegration which did not update the 
+  mask for the integrators when the integrators changed due to changes in the
+  sector centers.
+- Fixed an issue in PyFAIazimuthalSectorIntegration which did not rebuild the
+  integrators for cached sector centers.
 
 
 v26.05.19

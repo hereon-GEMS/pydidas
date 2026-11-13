@@ -26,8 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Voigt"]
 
+
 from numbers import Real
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
@@ -76,8 +77,8 @@ class Voigt(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: None | int, **kwargs: dict
-    ) -> tuple[Real]:
+        cls, x: ndarray, y: ndarray, index: None | int, **kwargs: Any
+    ) -> tuple[float, float, float, float]:
         """
         Guess the starting parameters for a Voigt peak fit.
 
@@ -90,7 +91,7 @@ class Voigt(FitFuncBase):
         index : Union[None, str]
             The peak index. Use None for a non-indexed single peak or the integer peak
             number (starting with 1).
-        **kwargs : dict
+        **kwargs: Any
             Optional keyword arguments.
 
         Returns
@@ -175,4 +176,28 @@ class Voigt(FitFuncBase):
         return tuple(
             c[_i] * voigt_profile(0, c[_i + 1], c[_i + 2])
             for _i in [4 * _ii for _ii in range(cls.num_peaks)]
+        )
+
+    @classmethod
+    def relative_sigma(cls, c: tuple[float]) -> tuple[float]:
+        """
+        Get the relative sigma value for the Voigt fit.
+
+        The relative sigma for a Voigt is given by:
+
+        sigma / (sigma + gamma)
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        tuple[float]
+            The relative sigma values for all peaks.
+        """
+        return tuple(
+            c[1 + 4 * _i] / (c[1 + 4 * _i] + c[2 + 4 * _i])
+            for _i in range(cls.num_peaks)
         )

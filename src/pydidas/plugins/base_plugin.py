@@ -363,10 +363,10 @@ class BasePlugin(ObjectWithParameterCollection):
         )
         for _key, _param in self.params.items():
             _obj_copy.set_param_value(_key, _param.value)
-        if hasattr(self, "_EXP") and self._EXP == EXP:
-            _obj_copy._EXP = EXP
-        if hasattr(self, "_SCAN") and self._SCAN == SCAN:
-            _obj_copy._SCAN = SCAN
+        if hasattr(self, "_exp") and self._exp == EXP:
+            _obj_copy._exp = EXP
+        if hasattr(self, "_scan") and self._scan == SCAN:
+            _obj_copy._scan = SCAN
         return _obj_copy
 
     def __deepcopy__(self, memo: dict) -> Self:

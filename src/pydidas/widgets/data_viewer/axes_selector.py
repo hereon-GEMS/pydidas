@@ -305,6 +305,53 @@ class AxesSelector(WidgetWithParameters):
             return
         self._verify_additional_choices_selected(-1, block_signals=True)
 
+    def export_configuration(self) -> dict[str, Any]:
+        """
+        Export axis roles, ranges, and points as a Python dictionary.
+
+        Returns
+        -------
+        dict[str, Any]
+            Independent configuration for selectors displaying the same data.
+        """
+        return {
+            "shape": self._data_shape,
+            "additional_choices": self.additional_choices,
+            "axes": [
+                self._axis_widgets[_dim].export_configuration()
+                for _dim in range(self._data_ndim)
+            ],
+        }
+
+    def import_configuration(self, config: dict[str, Any]) -> None:
+        """
+        Restore exported selections after setting the data and view choices.
+
+        Parameters
+        ----------
+        config : dict[str, Any]
+            Configuration returned by export_configuration.
+        """
+        if (
+            self._data_shape != config["shape"]
+            or self.additional_choices != config["additional_choices"]
+            or len(config["axes"]) != self._data_ndim
+            or any(
+                config["axes"][_dim][0]
+                not in self._axis_widgets[_dim].available_choices
+                for _dim in range(self._data_ndim)
+            )
+        ):
+            raise UserConfigError(
+                "Cannot copy axes configuration between incompatible selectors."
+            )
+        for _dim in range(self._data_ndim):
+            _target = self._axis_widgets[_dim]
+            with QtCore.QSignalBlocker(_target):
+                _target.import_configuration(config["axes"][_dim])
+        self._current_transpose_required = None
+        self.process_new_slicing()
+
     def _verify_additional_choices_selected(
         self, ignore_ax: int, block_signals: bool = False
     ):

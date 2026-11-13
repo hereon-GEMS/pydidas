@@ -260,6 +260,14 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(_new.axis_units, {0: ""})
         self.assertTrue(np.equal(_new.axis_ranges[0], np.arange(_new.size)).all())
 
+    def test_flatten__1d_array_keeps_metadata(self):
+        obj = create_dataset(1, float, shape=(42,))
+        _new = obj.flatten()
+        self.assertEqual(_new.shape, (obj.size,))
+        self.assertEqual(_new.axis_labels, obj.axis_labels)
+        self.assertEqual(_new.axis_units, obj.axis_units)
+        self.assertTrue(np.allclose(_new.axis_ranges[0], obj.axis_ranges[0]))
+
     def test_flatten_dims__simple(self):
         _dims = (1, 2)
         obj = self.create_large_dataset()
@@ -810,9 +818,14 @@ class TestDataset(unittest.TestCase):
         _str = obj.get_description_of_point((1, 2, 3, 4))
         self.assertEqual(_str, "a: 1.0000 ua; b: 2.0000 ub; c: 3.0000 uc; d: 4.0000 ud")
 
-    def test_get_description_of_point__wNone(self):
+    def test_get_description_of_point__w_None(self):
         obj = self.create_large_dataset()
         _str = obj.get_description_of_point((None, 2, None, 4))
+        self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
+
+    def test_get_description_of_point__w_slice(self):
+        obj = self.create_large_dataset()
+        _str = obj.get_description_of_point((slice(None), 2, None, 4))
         self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
 
     def test_dataset_creation(self):
@@ -965,6 +978,11 @@ class TestDataset(unittest.TestCase):
         obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
         self.assertIsInstance(hash(obj), int)
         self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__repeat_consistent(self):
+        _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
+        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+        self.assertEqual(hash(obj), hash(obj))
 
     def test_data_description__no_data_unit(self):
         _test_label = "Spam, eggs, sausage and spam"

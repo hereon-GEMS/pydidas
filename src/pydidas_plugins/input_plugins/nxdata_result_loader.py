@@ -101,8 +101,8 @@ class NXdataResultLoader(InputPlugin):
         _data_dim = self.get_param_value("expected_data_dim")
         return _data_dim + (
             1
-            if self._SCAN.get_param_value("scan_frames_per_point") > 1
-            and self._SCAN.get_param_value("scan_multi_frame_handling") == "Stack"
+            if self._scan.get_param_value("scan_frames_per_point") > 1
+            and self._scan.get_param_value("scan_multi_frame_handling") == "Stack"
             else 0
         )
 
@@ -140,7 +140,7 @@ class NXdataResultLoader(InputPlugin):
         check_nxdata_adherence(
             self.config["filename"], self.get_param_value("nxdata_key")
         )
-        self.set_param_value("_counted_images_per_file", self._SCAN.n_points)
+        self.set_param_value("_counted_images_per_file", self._scan.n_points)
         self._verify_data_shape_valid()
         self._standard_kwargs = {
             "dataset": self.get_param_value("nxdata_key"),
@@ -185,7 +185,7 @@ class NXdataResultLoader(InputPlugin):
             The updated keyword arguments.
         """
         kwargs = kwargs | self._standard_kwargs
-        kwargs["indices"] = self._SCAN.get_indices_from_ordinal(frame_index)
+        kwargs["indices"] = self._scan.get_indices_from_ordinal(frame_index)
         _data = import_data(self.config["filename"], **kwargs)
         for _key, _val in self.config["frame_metadata"].items():
             setattr(_data, _key, _val)
@@ -197,8 +197,8 @@ class NXdataResultLoader(InputPlugin):
 
     def _verify_data_shape_valid(self) -> None:
         """Verify that the shape of the data in the file matches the scan shape."""
-        _scan_ndim = self._SCAN.ndim
-        _scan_shape = self._SCAN.shape
+        _scan_ndim = self._scan.ndim
+        _scan_shape = self._scan.shape
         _data_shape = get_hdf5_metadata(
             self.config["filename"], "shape", dset=self.get_param_value("nxdata_key")
         )
@@ -239,7 +239,7 @@ class NXdataResultLoader(InputPlugin):
         try:
             _data = import_data(
                 self.config["filename"],
-                indices=(0,) * self._SCAN.ndim,
+                indices=(0,) * self._scan.ndim,
                 dataset=self.get_param_value("nxdata_key"),
             )
         except (KeyError, FileNotFoundError, FileReadError):

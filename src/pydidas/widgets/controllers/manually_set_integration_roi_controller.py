@@ -135,7 +135,7 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
 
         self._plugin = plugin
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
-        self.config["exp"] = plugin._EXP
+        self.config["exp"] = plugin._exp
         self.config["exp"].sig_params_changed.connect(self._process_exp_update)
         self._process_exp_update()
 
@@ -232,8 +232,6 @@ class ManuallySetIntegrationRoiController(ConfigDictMixin, QtCore.QObject):
         enabled : bool
             Flag whether the editing mode is active.
         """
-        print("Controller: toggle_enable", enabled)
-        print("Config:", self.config)
         enabled = enabled if not self.config["forced_edit_disable"] else False
         self.config["enabled"] = enabled
         self._editor.toggle_enable(enabled)

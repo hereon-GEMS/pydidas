@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseFitPlugin Plugin which holds generic methods for fitting plugins.
+Module with the BaseFitPlugin class for generic fitting functionality.
 """
 
 __author__ = "Malte Storm"
@@ -26,17 +26,281 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["BaseFitPlugin"]
 
-from typing import ClassVar
+
+import itertools
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
-from qtpy import QtWidgets
 from scipy.optimize import least_squares
 
 from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
-from pydidas.core.utils import process_1d_with_multi_input_dims
+from pydidas.core.fitting.fit_func_base import FitFuncBase
+from pydidas.core.utils.decorators import create_multi_dim_result_dataset
+from pydidas.core.utils.iterable_utils import (
+    insert_item_in_tuple,
+    remove_item_at_index_from_iterable,
+)
 from pydidas.plugins.base_proc_plugin import ProcPlugin
+
+
+if TYPE_CHECKING:
+    from pydidas.widgets.plugin_config_widgets import GenericPluginConfigWidget
+
+
+def _format_fit_metadata(metadata: dict[str, Any]) -> str:
+    """
+    Format the fit metadata as text to be displayed with the plots.
+
+    Parameters
+    ----------
+    metadata : dict[str, Any]
+        The metadata of the fit results.
+
+    Returns
+    -------
+    str
+        The formatted text.
+    """
+    _param_lines = "\n    ".join(
+        f"{_key}: {_value:.6f}," for _key, _value in metadata["fit_params"].items()
+    )
+    return (
+        f"fit_func: {metadata['fit_func']}\n"
+        f"fit_residual_std: {metadata['fit_residual_std']:.6f}\n"
+        "fit params: {\n    " + _param_lines + "\n}"
+    )
+
+
+def _create_individual_peak_items(
+    fitter: type[FitFuncBase],
+    fit_param_vals: tuple[float, ...],
+    x: np.ndarray,
+    dataset_kwargs: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """
+    Create the plot items for the individual peaks of the fit.
+
+    Parameters
+    ----------
+    fitter : type[FitFuncBase]
+        The fit function.
+    fit_param_vals : tuple[float, ...]
+        The fitted parameter values.
+    x : np.ndarray
+        The x values at which to calculate the peak profiles.
+    dataset_kwargs : dict[str, Any]
+        The keyword arguments for the Dataset creation.
+
+    Returns
+    -------
+    list[dict[str, Any]]
+        The plot items for the individual peaks.
+    """
+    _n_pp = fitter.num_peak_params
+    return [
+        {
+            "plot": 1,
+            "label": f"peak {_i}",
+            "data": Dataset(
+                fitter.func(fit_param_vals[_i * _n_pp : (_i + 1) * _n_pp], x),
+                **dataset_kwargs,
+            ),
+            "linewidth": 2.5,
+        }
+        for _i in range(fitter.num_peaks)
+    ]
+
+
+def _create_background_item(
+    fit_params: dict[str, float], x_reduced: np.ndarray, dataset_kwargs: dict[str, Any]
+) -> dict[str, Any]:
+    """
+    Create the plot item for the fitted background.
+
+    Parameters
+    ----------
+    fit_params : dict[str, float]
+        The fitted parameters, including the background parameters.
+    x_reduced : np.ndarray
+        The x values for the background line, typically the two end points.
+    dataset_kwargs : dict[str, Any]
+        The keyword arguments for the Dataset creation.
+
+    Returns
+    -------
+    dict[str, Any]
+        The plot item for the background.
+    """
+    _bg_poly = [fit_params["background_p0"]]
+    if "background_p1" in fit_params:
+        _bg_poly.insert(0, fit_params["background_p1"])
+    _bg = Dataset(
+        np.polyval(_bg_poly, x_reduced),
+        **(dataset_kwargs | {"axis_ranges": [x_reduced]}),
+    )
+    return {"plot": 0, "label": "background", "data": _bg, "linestyle": "--"}
+
+
+def _create_fit_details(
+    fitter: type[FitFuncBase],
+    data: Dataset,
+    data_x: np.ndarray,
+    fit_params: dict[str, float],
+    start_fit_params: tuple[float, ...],
+    metadata: dict[str, Any],
+    has_background: bool,
+) -> dict[str, Any]:
+    """
+    Create the detailed results dictionary for a successful fit.
+
+    Parameters
+    ----------
+    fitter : type[FitFuncBase]
+        The fit function.
+    data : Dataset
+        The (cropped) input data.
+    data_x : np.ndarray
+        The (cropped) x values of the data.
+    fit_params : dict[str, float]
+        The fitted parameters.
+    start_fit_params : tuple[float, ...]
+        The starting values of the fit parameters.
+    metadata : dict[str, Any]
+        The metadata of the fit results.
+    has_background : bool
+        Flag whether the fit includes a background.
+
+    Returns
+    -------
+    dict[str, Any]
+        The detailed results in the format expected by pydidas.
+    """
+    _x_fit = np.linspace(data_x[0], data_x[-1], num=(data_x.size - 1) * 10 + 1)
+    _x_reduced = np.array([np.amin(_x_fit), np.amax(_x_fit)])
+    _fit_param_vals = tuple(fit_params.values())
+    _dset_kws = {
+        "axis_ranges": [_x_fit],
+        "axis_labels": data.axis_labels,
+        "axis_units": data.axis_units,
+        "data_unit": data.data_unit,
+    }
+    _fit_final = Dataset(fitter.profile(_fit_param_vals, _x_fit), **_dset_kws)
+    _fit_start = Dataset(fitter.profile(start_fit_params, _x_fit), **_dset_kws)
+    _bg_data = fitter.calculate_background(_fit_param_vals, data_x)
+    _items = [
+        {
+            "plot": 0,
+            "label": "input data",
+            "data": data,
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        {"plot": 0, "label": "fitted_data", "data": _fit_final, "linewidth": 2.5},
+        {
+            "plot": 1,
+            "label": "input data",
+            "data": data - _bg_data,
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        *_create_individual_peak_items(fitter, _fit_param_vals, _x_fit, _dset_kws),
+        {
+            "plot": 2,
+            "label": "reference",
+            "data": Dataset([0, 0], axis_ranges=[_x_reduced]),
+            "linestyle": "--",
+        },
+        {
+            "plot": 2,
+            "label": "residual",
+            "data": fitter.delta(_fit_param_vals, data_x, data),
+            "symbol": "o",
+            "linewidth": 0,
+        },
+        {"plot": 3, "label": "input data", "data": data},
+        {"plot": 3, "label": "starting guess", "data": _fit_start},
+    ]
+    if has_background:
+        _items.append(_create_background_item(fit_params, _x_reduced, _dset_kws))
+    return {
+        "n_plots": 4,
+        "plot_titles": {
+            0: "data and fit",
+            1: "individual fits",
+            2: "residual",
+            3: "starting guess",
+        },
+        "plot_ylabels": {
+            0: "intensity / a.u.",
+            1: "intensity (background-corrected) / a.u.",
+            2: "intensity / a.u.",
+            3: "intensity / a.u.",
+        },
+        "metadata": _format_fit_metadata(metadata),
+        "items": _items,
+    }
+
+
+def create_invalid_peak_details(
+    data: Dataset,
+    data_x: np.ndarray,
+    bg_corrected_data: Dataset,
+    bg_params: tuple[float, ...],
+) -> dict[str, Any]:
+    """
+    Create the detailed results dictionary for an invalid peak.
+
+    Parameters
+    ----------
+    data : Dataset
+        The (cropped) input data.
+    data_x : np.ndarray
+        The (cropped) x values of the data.
+    bg_corrected_data : Dataset
+        The background-corrected data.
+    bg_params : tuple[float, ...]
+        The estimated background parameters. An empty tuple means that no
+        background was estimated.
+
+    Returns
+    -------
+    dict[str, Any]
+        The detailed results in the format expected by pydidas.
+    """
+    if len(bg_params) == 0:
+        return {
+            "n_plots": 1,
+            "plot_titles": {0: "data"},
+            "plot_ylabels": {0: "intensity / a.u."},
+            "metadata": "",
+            "items": [{"plot": 0, "label": "input data", "data": data}],
+        }
+    _bg = Dataset(np.zeros(data_x.size) + bg_params[0], **data.property_dict)
+    if len(bg_params) == 2:
+        _bg += data_x * bg_params[1]
+    return {
+        "n_plots": 2,
+        "plot_titles": {0: "data and background", 1: "background-corrected data"},
+        "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
+        "metadata": "",
+        "items": [
+            {
+                "plot": 0,
+                "label": "input data",
+                "data": data,
+                "linewidth": 0,
+                "symbol": "o",
+            },
+            {"plot": 0, "label": "background", "data": _bg},
+            {
+                "plot": 1,
+                "label": "background-corrected data",
+                "data": bg_corrected_data,
+            },
+        ],
+    }
 
 
 class BaseFitPlugin(ProcPlugin):
@@ -57,6 +321,9 @@ class BaseFitPlugin(ProcPlugin):
         "fit_bg_order",
         "fit_lower_limit",
         "fit_upper_limit",
+        "fit_limit_peak_widths",
+        "fit_use_latest_as_start_guess",
+        "fit_move_range_with_results",
         "fit_sigma_threshold",
         "fit_min_peak_height",
     )
@@ -65,33 +332,38 @@ class BaseFitPlugin(ProcPlugin):
     num_peaks = 1
     new_dataset = True
     advanced_parameters: ClassVar[list[str]] = [
+        "fit_limit_peak_widths",
+        "fit_use_latest_as_start_guess",
+        "fit_move_range_with_results",
         "fit_sigma_threshold",
         "fit_min_peak_height",
     ]
     has_unique_parameter_config_widget = True
 
-    def __init__(self, *args: tuple, **kwargs: dict):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._fitter = None
         self._data = None
         self._data_x = None
         self._details = {}
+        self._run_data = {}
         self._fit_params = {}
         self._fit_presets = {}
         self.config.update(
             range_slice=None,
             settings_updated_from_data=False,
             data_x_hash=-1,
+            indices=None,
         )
 
     @property
-    def detailed_results(self) -> dict:
+    def detailed_results(self) -> dict[str | None, dict[str, Any]]:
         """
-        Get the detailed results for the FitSinglePeak plugin.
+        Get the detailed results for the fit plugin.
 
         Returns
         -------
-        dict
+        dict[str or None, dict[str, Any]]
             The dictionary with detailed results.
         """
         return self._details
@@ -108,13 +380,17 @@ class BaseFitPlugin(ProcPlugin):
         """
         return [item.strip() for item in self.get_param_value("fit_output").split(";")]
 
-    def pre_execute(self):
-        """
-        Set up the required functions and fit variable labels.
-        """
+    def pre_execute(self) -> None:
+        """Set up the required functions and fit variable labels."""
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
+        self._fit_params = {}
+        self._fit_results = {}
+        self.config.indices = None
         self.config.range_slice = None
         self.config.settings_updated_from_data = False
+        self.config.peak_width_bounds_need_update = self.get_param_value(
+            "fit_limit_peak_widths"
+        )
         self.config["min_peak_height"] = self.get_param_value("fit_min_peak_height")
         self.config["sigma_threshold"] = self.get_param_value("fit_sigma_threshold")
         self.config["result_shape"] = (self.num_peaks, len(self.fit_outputs))
@@ -131,54 +407,260 @@ class BaseFitPlugin(ProcPlugin):
             self.config["param_labels"].append("background_p1")
             self.config.param_bounds_low.append(-np.inf)
             self.config.param_bounds_high.append(np.inf)
-        self.update_fit_param_bounds()
-        self.create_fit_start_param_dict()
+        self._update_fit_param_bounds()
+        self._create_fit_start_param_dict()
 
-    @process_1d_with_multi_input_dims
-    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
+    def execute(self, data: Dataset, **kwargs: Any) -> tuple[Dataset, dict[str, Any]]:
         """
         Fit a peak to the data.
 
-        Note that the results includes the original data, the fitted data and
-        the residual and that the fit Parameters are included in the kwarg
-        metadata.
+        Fit parameters are included in the returned keyword arguments.
+        Detailed plots are available through detailed_results when requested.
 
         Parameters
         ----------
-        data : pydidas.core.Dataset
+        data : Dataset
             The input Dataset
-        **kwargs : dict
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
-        kwargs : dict
+        data : Dataset
+            The fit results as a Dataset.
+        kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
-        self.prepare_input_data(data)
-        if not self.check_min_peak_height():
-            return self.create_result_dataset(valid=False), kwargs
+        self._initialize_execution_run(data)
+        _global_results = None
+        _use_latest_start_guess = self.get_param_value("fit_use_latest_as_start_guess")
+        for _slice_indices in self.config.indices:
+            _curr_data = data[_slice_indices]
+            self.prepare_input_data(_curr_data)
+            _detail_identifier = (
+                None
+                if _slice_indices == slice(None)
+                else data.get_description_of_point(_slice_indices)
+            )
+            if _use_latest_start_guess and _detail_identifier in self._fit_results:
+                kwargs["start_guess"] = tuple(
+                    self._fit_results[_detail_identifier].values()
+                )
+            _curr_results, _details, kwargs = self._fit_spectrum(**kwargs)
+            if kwargs.get("store_details", False):
+                self._details[_detail_identifier] = _details
+            self._fit_results[_detail_identifier] = self._fit_params
+            if self.config.dim_to_process is None:
+                return _curr_results, kwargs
+            if _global_results is None:
+                _global_results = create_multi_dim_result_dataset(
+                    self.config.dim_to_process, data, _curr_results
+                )
+            _output_indices = (
+                _slice_indices[: self.config.dim_to_process]
+                + (slice(None),) * _curr_results.ndim
+                + _slice_indices[self.config.dim_to_process + 1 :]
+            )
+            _global_results[_output_indices] = _curr_results
+        if self.get_param_value("fit_move_range_with_results"):
+            self._update_fit_range_from_results()
+        return _global_results, kwargs
 
-        _startguess = self._fitter.guess_fit_start_params(
-            self._data_x,
-            self._data,
-            bg_order=self.get_param_value("fit_bg_order"),
-            bounds=(
-                self.config.param_bounds_low,
-                self.config.param_bounds_high,
-            ),
-            **self._fit_presets,
+    def create_result_dataset(self, valid: bool = True) -> Dataset:
+        """
+        Create a Dataset containing the selected fit outputs and metadata.
+
+        Parameters
+        ----------
+        valid : bool, optional
+            Flag to confirm the results are valid. The default is True.
+
+        Returns
+        -------
+        new_data : Dataset
+            The new dataset with the output data as defined by the
+            fit_output parameter.
+        """
+        _fit_results = np.full(self.config["result_shape"], np.nan)
+        _residual = np.nan
+        if valid and self._check_center_positions():
+            _fit_pvals = tuple(self._fit_params.values())
+            _fit_final = self._fitter.profile(_fit_pvals, self._data_x)
+            _residual = abs(np.std(self._data - _fit_final) / np.mean(self._data))
+            if _residual <= self.config["sigma_threshold"]:
+                _fit_results = self._write_valid_results(_fit_results, _fit_final)
+        if self.num_peaks == 1:
+            _fit_results = _fit_results.squeeze(axis=0)
+        _axis_labels = (["Peak number"] if self.num_peaks > 1 else []) + [
+            "; ".join([f"{i}: {_key}" for i, _key in enumerate(self.fit_outputs)])
+        ]
+        _result_dataset = Dataset(
+            _fit_results,
+            data_label=self.output_data_label,
+            data_unit="",
+            axis_labels=_axis_labels,
+            axis_units=[""] * _fit_results.ndim,
         )
+        _result_dataset.metadata = self._data.metadata | {
+            "fit_func": self._fitter.name,
+            "fit_params": self._fit_params if valid else {},
+            "fit_residual_std": _residual,
+            "fitted_axis_label": self._data.axis_labels[0],
+            "fitted_axis_unit": self._data.axis_units[0],
+        }
+        return _result_dataset
+
+    def prepare_input_data(self, data: Dataset) -> None:
+        """
+        Prepare and store the input data.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input data.
+        """
+        self._data = data
+        self._data_x = data.axis_ranges[0]
+        self._crop_data_to_selected_range()
+        if not self.config.settings_updated_from_data:
+            self._update_node_output_labels()
+            self._update_peak_bounds_from_data()
+            self.config.settings_updated_from_data = True
+        if self.config.peak_width_bounds_need_update:
+            _upper_lim = (self._data_x[-1] - self._data_x[0]) / 2
+            for _i, _key in enumerate(self._fitter.param_labels):
+                if _key.startswith(("sigma", "gamma")):
+                    self.config.param_bounds_high[_i] = _upper_lim
+            self.config.peak_width_bounds_need_update = False
+
+    def create_detailed_results(
+        self, results: Dataset, start_fit_params: tuple[float, ...]
+    ) -> dict[str, Any]:
+        """
+        Create the detailed results for a single fit.
+
+        This method will return detailed information to display for the user.
+        The return format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second,
+        "plot_titles" gives a title for each subplot. Third, "plot_ylabels"
+        gives a y-axis label for each subplot. Fourth, "items" provides a
+        list with the different items to be plotted. Each list entry must be
+        a dictionary with the following keys:
+
+            "plot" : int
+                Key to determine the plot number.
+            "label" : str
+                For the legend label.
+            "data":  Dataset
+                The actual data to be plotted.
+
+        Parameters
+        ----------
+        results : Dataset
+            The Dataset with the regular results.
+        start_fit_params : tuple[float, ...]
+            The tuple with the starting fit parameters.
+
+        Returns
+        -------
+        dict[str, Any]
+            The dictionary with the detailed results in the format
+            expected by pydidas.
+        """
+        if self._data is None:
+            raise ValueError("Cannot get detailed results without input data.")
+        return _create_fit_details(
+            self._fitter,
+            self._data,
+            self._data_x,
+            self._fit_params,
+            start_fit_params,
+            results.metadata,
+            self.get_param_value("fit_bg_order") is not None,
+        )
+
+    def get_parameter_config_widget(self) -> type["GenericPluginConfigWidget"]:
+        """
+        Get the unique configuration widget class associated with this Plugin.
+
+        Returns
+        -------
+        type[GenericPluginConfigWidget]
+            The unique ParameterConfig widget class.
+        """
+        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
+
+        return FitPluginConfigWidget
+
+    def _initialize_execution_run(self, data: Dataset) -> None:
+        """
+        Initialize the execution run for the current dataset.
+
+        Parameters
+        ----------
+        data : Dataset
+            The input Dataset.
+        """
+        self._details = {}
+        if self.config.get("indices") is None:
+            if data.ndim == 1:
+                self.config.indices = (slice(None),)
+                self.config.dim_to_process = None
+            else:
+                self.config.dim_to_process = np.mod(
+                    self.get_param_value("process_data_dim"), data.ndim
+                )
+                _results_shape = remove_item_at_index_from_iterable(
+                    data.shape, self.config.dim_to_process
+                )
+                _indices_to_process = [np.arange(_s) for _s in _results_shape]
+                self.config.indices = tuple(
+                    insert_item_in_tuple(_i, self.config.dim_to_process, slice(None))
+                    for _i in tuple(itertools.product(*_indices_to_process))
+                )
+
+    def _fit_spectrum(
+        self, **kwargs: Any
+    ) -> tuple[Dataset, dict[str | None, Any] | None, dict[str, Any]]:
+        """
+        Fit a spectrum to the data.
+
+        Parameters
+        ----------
+        **kwargs : Any
+            Any calling keyword arguments.
+
+        Returns
+        -------
+        data : Dataset
+            The fit results as a Dataset.
+        details : dict[str or None, Any] or None
+            The detailed results for the fit.
+        kwargs : dict[str, Any]
+            Any calling kwargs, appended by any changes in the function.
+        """
+        _store_details = kwargs.get("store_details", False)
+        if not self._check_min_peak_height():
+            _details = (
+                self._create_details_for_invalid_peak() if _store_details else None
+            )
+            return self.create_result_dataset(valid=False), _details, kwargs
+        if kwargs.get("start_guess") is not None:
+            _startguess = kwargs.get("start_guess")
+        else:
+            _startguess = self._fitter.guess_fit_start_params(
+                self._data_x,
+                self._data,
+                bg_order=self.get_param_value("fit_bg_order"),
+                bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
+                **self._fit_presets,
+            )
+        self._verify_start_guess(_startguess)
         _res = least_squares(
             self._fitter.delta,
             _startguess,
             args=(self._data_x, self._data.array),
-            bounds=(
-                self.config.param_bounds_low,
-                self.config.param_bounds_high,
-            ),
+            bounds=(self.config.param_bounds_low, self.config.param_bounds_high),
         )
         _res_c = self._fitter.sort_fitted_peaks_by_position(tuple(_res.x))
         self._fit_params = dict(zip(self.config["param_labels"], _res_c))
@@ -189,68 +671,80 @@ class BaseFitPlugin(ProcPlugin):
             "fitted_axis_unit": self._data.axis_units[0],
         }
         _results = self.create_result_dataset()
-        if kwargs.get("store_details", False):
-            self._details = {None: self.create_detailed_results(_results, _startguess)}
-        return _results, kwargs
+        _details = (
+            self.create_detailed_results(_results, _startguess)
+            if _store_details
+            else None
+        )
+        return _results, _details, kwargs
 
-    def create_result_dataset(self, valid: bool = True) -> Dataset:
+    def _verify_start_guess(self, startguess: tuple[float, ...]) -> None:
         """
-        Create new Dataset for detailed results from the original data and the fit.
-
-        Note that this method does not update the new metadata with the fit
-        parameters. The new dataset includes a second dimensions with entries
-        for the raw data, the data fit and the residual.
+        Verify the start guess for the fit.
 
         Parameters
         ----------
-        valid : bool, optional
-            Flat to confirm the results are valid. The default is True.
+        startguess : tuple[float, ...]
+            The starting values for the fit parameters.
+
+        Raises
+        ------
+        UserConfigError
+            If the start guess is invalid.
+        """
+        if len(startguess) != len(self.config.param_labels):
+            raise UserConfigError(
+                f"Invalid number of start guess parameters: {len(startguess)} "
+                f"for {len(self.config.param_labels)} expected."
+            )
+        _invalid_params = []
+        for _i, _val in enumerate(startguess):
+            if not (
+                self.config.param_bounds_low[_i]
+                <= _val
+                <= self.config.param_bounds_high[_i]
+            ):
+                _invalid_params.append(
+                    (
+                        self.config.param_labels[_i],
+                        _val,
+                        self.config.param_bounds_low[_i],
+                        self.config.param_bounds_high[_i],
+                    )
+                )
+        if _invalid_params:
+            _text = "Invalid start guess parameters:\n"
+            for _key, _val, _low, _high in _invalid_params:
+                _text += f"  {_key}: {_val} (expected in [{_low}, {_high}])\n"
+            raise UserConfigError(_text)
+
+    def _check_center_positions(self) -> bool:
+        """
+        Check the fitted center position.
 
         Returns
         -------
-        new_data : pydidas.core.Dataset
-            The new dataset.
+        bool
+            Flag whether all centers are in the input x range.
         """
-        _new_data = np.full(self.config["result_shape"], np.nan)
-        if valid and self.check_center_positions():
-            _fit_pvals = tuple(self._fit_params.values())
-            _datafit = self._fitter.profile(_fit_pvals, self._data_x)
-            _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
-            if _residual <= self.config["sigma_threshold"]:
-                _new_data = self._write_valid_results(_new_data)
-        else:  # results not valid
-            _residual = np.nan
-        if self.num_peaks == 1:
-            _new_data = _new_data.squeeze(axis=0)
-        _axis_labels = [
-            "; ".join([f"{i}: {_key}" for i, _key in enumerate(self.fit_outputs)])
-        ]
-        if self.num_peaks > 1:
-            _axis_labels.insert(0, "Peak number")
-        _result_dataset = Dataset(
-            _new_data,
-            data_label=self.output_data_label,
-            data_unit="",
-            axis_labels=_axis_labels,
-            axis_units=[""] * _new_data.ndim,
-        )
-        _result_dataset.metadata = self._data.metadata | {
-            "fit_func": self._fitter.name,
-            "fit_params": self._fit_params,
-            "fit_residual_std": _residual,
-            "fitted_axis_label": self._data.axis_labels[0],
-            "fitted_axis_unit": self._data.axis_units[0],
+        return {True} == {
+            self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
+            for _key in self._fit_params
+            if _key.startswith("center")
         }
-        return _result_dataset
 
-    def _write_valid_results(self, results: np.ndarray):
+    def _write_valid_results(
+        self, results: np.ndarray, fit_y: np.ndarray
+    ) -> np.ndarray:
         """
         Write the valid results for the fit in the new data array.
 
         Parameters
         ----------
-        new_data : np.ndarray
+        results : np.ndarray
             The new data array.
+        fit_y : np.ndarray
+            The y values of the fitted function for the input x values.
 
         Returns
         -------
@@ -269,70 +763,29 @@ class BaseFitPlugin(ProcPlugin):
                 ]
             elif _key == "background at peak":
                 results[slice(None), _i] = self._fitter.background_at_peak(_fit_pvals)
+            elif _key == "reduced chi^2":
+                _norm = np.sum(self._data)
+                if _norm == 0:
+                    results[slice(None), _i] = np.nan
+                    continue
+                _chi2 = np.sum((self._data - fit_y) ** 2) / _norm / len(_fit_pvals)
+                results[slice(None), _i] = _chi2
+            elif _key == "relative sigma / (sigma + gamma)":
+                results[slice(None), _i] = self._fitter.relative_sigma(_fit_pvals)
         return results
 
-    def check_center_positions(self) -> bool:
-        """
-        Check the fitted center position.
-
-        Returns
-        -------
-        bool
-            Flag whether all centers are in the input x range.
-        """
-        return {True} == {
-            self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
-            for _key in self._fit_params
-            if _key.startswith("center")
-        }
-
-    def prepare_input_data(self, data: Dataset):
-        """
-        Prepare and store the input data.
-
-        Parameters
-        ----------
-        data : Dataset
-            The input data.
-        """
-        self._data = data
-        self._data_x = data.axis_ranges[0]
-        self._crop_data_to_selected_range()
-        if not self.config.settings_updated_from_data:
-            self._update_node_output_labels()
-            self._update_peak_bounds_from_data()
-            self.config.settings_updated_from_data = True
-
-    def _crop_data_to_selected_range(self):
-        """
-        Get the data in the range specified by the limits and store the selected
-        x-range and data values.
-        """
-        _range = self._get_cropped_range()
-        self._data_x = self._data_x[_range]
-        self._data = self._data[_range]
-
-    def _get_cropped_range(self) -> slice:
-        """
-        Get the cropped index range corresponding to the selected data range.
-
-        Returns
-        -------
-        slice
-            The slice object to crop the data to the given range.
-        """
-        if (
-            hash(self._data_x.tobytes()) != self.config["data_x_hash"]
-            or self.config.range_slice is None
-        ):
+    def _crop_data_to_selected_range(self) -> None:
+        """Get the range specified by the limits and store the cropped data."""
+        _x_hash = hash(self._data_x.tobytes())
+        if _x_hash != self.config["data_x_hash"] or self.config.range_slice is None:
+            self.config["data_x_hash"] = _x_hash
             _xlow = self.get_param_value("fit_lower_limit")
-            _xhigh = self.get_param_value("fit_upper_limit")
-            self.config["data_x_hash"] = hash(self._data_x.tobytes())
             _range_low = (
                 np.where(self._data_x >= _xlow)[0]
                 if _xlow is not None
                 else np.arange(self._data_x.size)
             )
+            _xhigh = self.get_param_value("fit_upper_limit")
             _range_high = (
                 np.where(self._data_x <= _xhigh)[0]
                 if _xhigh is not None
@@ -347,12 +800,14 @@ class BaseFitPlugin(ProcPlugin):
                     f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
                 )
             self.config.range_slice = slice(_range[0], _range[-1] + 1)
-        return self.config.range_slice
+        self._data_x = self._data_x[self.config.range_slice]
+        self._data = self._data[self.config.range_slice]
+        if self._data_x[0] > self._data_x[-1]:
+            self._data_x = self._data_x[::-1]
+            self._data = self._data[::-1]
 
-    def _update_node_output_labels(self):
-        """
-        Update the node output labels based on the settings and the input data.
-        """
+    def _update_node_output_labels(self) -> None:
+        """Update the node output labels from the settings and input data."""
         _output = self.get_param_value("fit_output")
         self.output_data_unit = ""
         _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
@@ -365,11 +820,9 @@ class BaseFitPlugin(ProcPlugin):
         )
         self.output_data_label = _output
 
-    def _update_peak_bounds_from_data(self):
-        """
-        Update the bounds for the peaks' center from the data x ranges.
-        """
-        for _key in ["", "1", "2", "3"]:
+    def _update_peak_bounds_from_data(self) -> None:
+        """Update the bounds for the peaks' center from the data x ranges."""
+        for _key in ["", "0", "1", "2", "3"]:
             _label = f"center{_key}"
             if _label not in self.config["param_labels"]:
                 continue
@@ -383,7 +836,31 @@ class BaseFitPlugin(ProcPlugin):
                 self.config.param_bounds_high[_index], _xhigh
             )
 
-    def update_fit_param_bounds(self):
+    def _update_fit_range_from_results(self) -> None:
+        """Update the fit range from the results of the last fit."""
+        if None in (
+            self.get_param_value("fit_upper_limit"),
+            self.get_param_value("fit_lower_limit"),
+        ):
+            raise UserConfigError(
+                "The fit range cannot be updated because the limits are not set."
+            )
+        if "delta_range" not in self.config:
+            self.config.delta_range = self.get_param_value(
+                "fit_upper_limit"
+            ) - self.get_param_value("fit_lower_limit")
+        _center_vals = []
+        for _params in self._fit_results.values():
+            _center_vals.extend(list(self._fitter.center(tuple(_params.values()))))
+        _center = np.mean(_center_vals)
+        _low = _center - self.config.delta_range / 2
+        _high = _center + self.config.delta_range / 2
+        self.set_param_value("fit_lower_limit", _low)
+        self.set_param_value("fit_upper_limit", _high)
+        self.config.range_slice = None
+        self._update_peak_bounds_from_data()
+
+    def _update_fit_param_bounds(self) -> None:
         """Update the fitting bounds from Parameters."""
         for _key in self.params:
             if _key.startswith("fit_peak") and _key.endswith(("_xlow", "_xhigh")):
@@ -395,24 +872,22 @@ class BaseFitPlugin(ProcPlugin):
                 if _value is not None:
                     self.config[f"param_bounds_{_suffix}"][_index] = _value
 
-    def create_fit_start_param_dict(self):
-        """
-        Create a dictionary with preset fit starting values.
-        """
+    def _create_fit_start_param_dict(self) -> None:
+        """Create a dictionary with preset fit starting values."""
         self._fit_presets = {}
         for _key in self.params:
-            if _key.startswith("fit_peak") and _key.endswith("_xstart"):
-                _index = _key[8:-7]
+            if _key.startswith("fit_peak") and _key.endswith("xstart"):
+                _index = _key.removeprefix("fit_peak").removesuffix("xstart").strip("_")
                 _val = self.get_param_value(_key)
                 if _val is not None:
                     self._fit_presets[f"center{_index}_start"] = _val
-            if _key.startswith("fit_peak") and _key.endswith("_width"):
-                _index = _key[8:-6]
+            if _key.startswith("fit_peak") and _key.endswith("width"):
+                _index = _key.removeprefix("fit_peak").removesuffix("width").strip("_")
                 _val = self.get_param_value(_key)
                 if _val is not None:
                     self._fit_presets[f"width{_index}_start"] = _val
 
-    def check_min_peak_height(self) -> bool:
+    def _check_min_peak_height(self) -> bool:
         """
         Check the minimum peak height and return the flag whether it is okay.
 
@@ -423,223 +898,30 @@ class BaseFitPlugin(ProcPlugin):
         """
         _min_peak = self.config["min_peak_height"]
         if _min_peak is not None:
-            _tmp_y, bg_params = self._fitter.estimate_background_params(
+            _tmp_y, _bg_params = self._fitter.estimate_background_params(
                 self._data_x, self._data, self.get_param_value("fit_bg_order")
             )
+            self._run_data["bg_params"] = _bg_params
+            self._run_data["bg_corrected_data"] = _tmp_y
             if np.amax(_tmp_y) < _min_peak:
-                self._details = {
-                    None: self._create_details_for_invalid_peak(_tmp_y, bg_params)
-                }
                 return False
         return True
 
-    def create_detailed_results(
-        self, results: Dataset, start_fit_params: tuple[float]
-    ) -> dict:
-        """
-        Create the detailed results for a single fit.
-
-        This method will return detailed information to display for the user. The return
-        format is a dictionary with four keys:
-        First, "n_plots" which determines the number of plots. Second, "plot_titles"
-        gives a title for each subplot. Third, "plot_ylabels" gives a y-axis label for
-        each subplot. Fourth, "items" provides a list with the different items to be
-        plotted. Each list entry must be a dictionary with the following keys: "plot"
-        [to determine the plot number], "label" [for the legend label] and "data" with
-        the actual data.
-
-        Parameters
-        ----------
-        results : pydidas.core.Dataset
-            The Dataset with the regular results.
-        start_fit_params : tuple[float]
-            The list with the starting fit params.
-
-        Returns
-        -------
-        dict
-            The dictionary with the detailed results in the format expected by pydidas.
-        """
-        if self._data is None:
-            raise ValueError("Cannot get detailed results without input data.")
-        _xfit = np.linspace(
-            self._data_x[0], self._data_x[-1], num=(self._data_x.size - 1) * 10 + 1
-        )
-        _x_reduced = np.array([np.amin(_xfit), np.amax(_xfit)])
-        _fit_param_vals = tuple(self._fit_params.values())
-        _dset_kws = {
-            "axis_ranges": [_xfit],
-            "axis_labels": self._data.axis_labels,
-            "axis_units": self._data.axis_units,
-            "data_unit": self._data.data_unit,
-        }
-        _num_peaks = self._fitter.num_peaks
-        _num_peak_params = self._fitter.num_peak_params
-        _individual_plot_fitter = (
-            self._fitter.__mro__[1] if _num_peaks > 1 else self._fitter
-        )
-        _datafit = Dataset(self._fitter.profile(_fit_param_vals, _xfit), **_dset_kws)
-        _startfit = Dataset(self._fitter.profile(start_fit_params, _xfit), **_dset_kws)
-        _reference = Dataset([0, 0], axis_ranges=[_x_reduced])
-        _residual = self._fitter.delta(_fit_param_vals, self._data_x, self._data)
-        individual_peaks = []
-        for i in range(_num_peaks):
-            if _individual_plot_fitter is None:
-                continue
-            _start = i * _num_peak_params
-            _end = _start + _num_peak_params
-            _peak_params = [
-                *_fit_param_vals[_start:_end],
-            ]
-            _peak_data = Dataset(
-                _individual_plot_fitter.profile(_peak_params, _xfit), **_dset_kws
-            )
-            individual_peaks.append(
-                {
-                    "plot": 1,
-                    "label": f"peak {i}",
-                    "data": _peak_data,
-                    "linewidth": 2.5,
-                }
-            )
-        _details = {
-            "n_plots": 4,
-            "plot_titles": {
-                0: "data and fit",
-                1: "individual fits",
-                2: "residual",
-                3: "starting guess",
-            },
-            "plot_ylabels": {
-                0: "intensity / a.u.",
-                1: "intensity / a.u.",
-                2: "intensity / a.u.",
-                3: "intensity / a.u.",
-            },
-            "metadata": (
-                (
-                    f"fit_func: {results.metadata['fit_func']}\n"
-                    f"fit_residual_std: {results.metadata['fit_residual_std']:.6f}\n"
-                    "fit params: {\n    "
-                )
-                + "\n    ".join(
-                    f"{_key}: {_value:.6f},"
-                    for _key, _value in results.metadata["fit_params"].items()
-                )
-                + "\n}"
-            ),
-            "items": [
-                {
-                    "plot": 0,
-                    "label": "input data",
-                    "data": self._data,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                {"plot": 0, "label": "fitted_data", "data": _datafit, "linewidth": 2.5},
-                {
-                    "plot": 1,
-                    "label": "input data",
-                    "data": self._data,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                *individual_peaks,
-                {
-                    "plot": 2,
-                    "label": "reference",
-                    "data": _reference,
-                    "linestyle": "--",
-                },
-                {
-                    "plot": 2,
-                    "label": "residual",
-                    "data": _residual,
-                    "symbol": "o",
-                    "linewidth": 0,
-                },
-                {"plot": 3, "label": "input data", "data": self._data},
-                {"plot": 3, "label": "starting guess", "data": _startfit},
-            ],
-        }
-        if self.get_param_value("fit_bg_order") is not None:
-            _bg_poly = [self._fit_params["background_p0"]]
-            if "background_p1" in self._fit_params:
-                _bg_poly.insert(0, self._fit_params["background_p1"])
-            _bg = Dataset(
-                np.polyval(_bg_poly, _x_reduced),
-                **(_dset_kws | {"axis_ranges": [_x_reduced]}),
-            )
-            _details["items"].append(
-                {"plot": 0, "label": "background", "data": _bg, "linestyle": "--"}
-            )
-        return _details
-
-    def _create_details_for_invalid_peak(
-        self, bg_corrected_data: np.ndarray, bg_params: tuple[float]
-    ):
+    def _create_details_for_invalid_peak(self) -> dict[str, Any]:
         """
         Create the details for an invalid peak.
 
-        Parameters
-        ----------
-        bg_corrected_data : np.ndarray
-            The background-corrected data.
-        bg_params : tuple[float]
-            The parameters to calculate the background level.
-
         Returns
         -------
-        dict
+        dict[str, Any]
             The invalid results.
         """
-        if len(bg_params) == 0:
-            return {
-                "n_plots": 3,
-                "plot_titles": {0: "data"},
-                "plot_ylabels": {0: "intensity / a.u."},
-                "metadata": "",
-                "items": [{"plot": 0, "label": "input data", "data": self._data}],
-            }
-        _bg = Dataset(
-            np.zeros(self._data_x.size) + bg_params[0], **self._data.property_dict
+        return create_invalid_peak_details(
+            self._data,
+            self._data_x,
+            self._run_data.get("bg_corrected_data", self._data),
+            self._run_data.get("bg_params", ()),
         )
-        if len(bg_params) == 2:
-            _bg += self._data_x * bg_params[1]
-        return {
-            "n_plots": 3,
-            "plot_titles": {0: "data and background", 1: "background-corrected data"},
-            "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
-            "metadata": "",
-            "items": [
-                {
-                    "plot": 0,
-                    "label": "input data",
-                    "data": self._data,
-                    "linewidth": 0,
-                    "symbol": "o",
-                },
-                {"plot": 0, "label": "background", "data": _bg},
-                {
-                    "plot": 1,
-                    "label": "background-corrected data",
-                    "data": bg_corrected_data,
-                },
-            ],
-        }
-
-    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
-        """
-        Get the unique configuration widget associated with this Plugin.
-
-        Returns
-        -------
-        QtWidgets.QWidget
-            The unique ParameterConfig widget
-        """
-        from pydidas.widgets.plugin_config_widgets import FitPluginConfigWidget
-
-        return FitPluginConfigWidget
 
 
 BaseFitPlugin.register_as_base_class()

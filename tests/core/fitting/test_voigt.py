@@ -24,94 +24,117 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
+from collections.abc import Iterator
+from typing import ClassVar
 
 import numpy as np
+import pytest
 from scipy.special import voigt_profile
 
 from pydidas.core import Dataset
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.voigt import Voigt
 
 
-class TestVoigt(unittest.TestCase):
-    def setUp(self):
-        self._x = np.linspace(0, 10, num=2000)
-        self._gamma = 0.85
-        self._sigma = 0.35
-        self._x0 = self._x[987]
-        self._amplitude = 7.3
-        self._data = Dataset(
-            (
-                self._amplitude
-                * voigt_profile(self._x - self._x0, self._sigma, self._gamma)
-            ),
-            data_unit="data unit",
-            axis_units=["ax_unit"],
-            axis_ranges=[self._x],
-        )
-        self._params = (self._amplitude, self._sigma, self._gamma, self._x0)
+@pytest.fixture
+def x() -> np.ndarray:
+    return np.linspace(0, 10, num=2000)
 
-    def tearDown(self):
-        pass
 
-    def test_guess_peak_start_params__narrow_peak(self):
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Voigt.guess_fit_start_params(self._x, _data)
-        self.assertTrue(_params[1] > 0)
+@pytest.fixture
+def params(x: np.ndarray) -> tuple[float, ...]:
+    return (7.3, 0.35, 0.85, x[987])
 
-    def test_guess_peak_start_params__normal_peak(self):
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Voigt.guess_fit_start_params(self._x, self._data)
-        self.assertTrue(_params[1] > 0)
 
-    def test_guess_peak_start_params__bounds__peak_x_low(self):
-        _bounds = (
-            Voigt.param_bounds_low[:],
-            Voigt.param_bounds_high[:],
-        )
-        _bounds[0][3] = self._x[42]
-        _bounds[1][3] = self._x[50]
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Voigt.guess_fit_start_params(self._x, self._data, bounds=_bounds)
-        self.assertTrue(_bounds[0][3] <= _params[3] <= _bounds[1][3])
-        self.assertTrue(_params[1] > 0)
+@pytest.fixture
+def data(x: np.ndarray, params: tuple[float, ...]) -> Dataset:
+    _area, _sigma, _gamma, _center = params
+    return Dataset(
+        _area * voigt_profile(x - _center, _sigma, _gamma),
+        data_unit="data unit",
+        axis_units=["ax_unit"],
+        axis_ranges=[x],
+    )
 
-    def test_guess_peak_start_params__bounds__peak_x_high(self):
-        _bounds = (
-            Voigt.param_bounds_low[:],
-            Voigt.param_bounds_high[:],
-        )
-        _bounds[0][3] = self._x[35]
-        _bounds[1][3] = self._x[38]
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Voigt.guess_fit_start_params(self._x, self._data, bounds=_bounds)
-        self.assertTrue(_bounds[0][3] <= _params[3] <= _bounds[1][3])
-        self.assertTrue(_params[1] > 0)
 
-    def test_func__values(self):
-        _func_values = Voigt.func(self._params, self._x)
-        self.assertTrue(np.allclose(self._data, _func_values))
+@pytest.fixture
+def voigt_class(n_peaks: int) -> Iterator[type[Voigt]]:
+    class _TestVoigt(Voigt):
+        name = f"TestVoigt_{n_peaks}"
+        num_peaks: ClassVar[int] = n_peaks
 
-    def test_amplitude(self):
-        _amp = Voigt.amplitude(self._params)
-        self.assertAlmostEqual(np.amax(self._data), _amp, places=4)
+    try:
+        yield _TestVoigt
+    finally:
+        del FitFuncMeta.registry[_TestVoigt.name]
 
-    def test_fwhm(self):
-        _y_max = np.amax(self._data)
-        _indices = np.where(self._data >= 0.5 * _y_max)[0]
-        _fwhm = self._x[_indices[-1]] - self._x[_indices[0]]
-        self.assertTrue(
-            abs(_fwhm - Voigt.fwhm(self._params)) <= 2 * (self._x[1] - self._x[0])
-        )
+
+def test_guess_fit_start_params__narrow_peak() -> None:
+    _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
+    _data[39:42] = 2
+    _data[40] = 5
+    _params = Voigt.guess_fit_start_params(_data.axis_ranges[0], _data)
+    assert _params[1] > 0
+
+
+def test_guess_fit_start_params__normal_peak(x: np.ndarray, data: Dataset) -> None:
+    _params = Voigt.guess_fit_start_params(x, data)
+    assert _params[1] > 0
+
+
+@pytest.mark.parametrize("low, high", [(42, 50), (35, 38)])
+def test_guess_fit_start_params__center_bounds(
+    x: np.ndarray, data: Dataset, low: int, high: int
+) -> None:
+    _bounds = (Voigt.param_bounds_low[:], Voigt.param_bounds_high[:])
+    _bounds[0][3], _bounds[1][3] = x[low], x[high]
+    _params = Voigt.guess_fit_start_params(x, data, bounds=_bounds)
+    assert x[low] <= _params[3] <= x[high]
+    assert _params[1] > 0
+
+
+def test_func__values(x: np.ndarray, data: Dataset, params: tuple[float, ...]) -> None:
+    np.testing.assert_allclose(Voigt.func(params, x), data.array)
+
+
+def test_amplitude(data: Dataset, params: tuple[float, ...]) -> None:
+    assert Voigt.amplitude(params) == pytest.approx((float(np.max(data)),), abs=5e-5)
+
+
+def test_fwhm(x: np.ndarray, data: Dataset, params: tuple[float, ...]) -> None:
+    _indices = np.where(data >= 0.5 * np.max(data))[0]
+    _fwhm = x[_indices[-1]] - x[_indices[0]]
+    assert Voigt.fwhm(params) == pytest.approx((_fwhm,), abs=2 * (x[1] - x[0]))
+
+
+@pytest.mark.parametrize("n_peaks", [1, 2, 3])
+@pytest.mark.parametrize("bg_params", [(), (2.0,), (2.0, 0.5)])
+@pytest.mark.parametrize(
+    "widths",
+    [
+        ((0.0, 2.0), (2.0, 0.0), (1.0, 1.0)),
+        ((1.0, 3.0), (3.0, 1.0), (2.0, 3.0)),
+        ((10.0, 30.0), (30.0, 10.0), (20.0, 30.0)),
+    ],
+)
+def test_relative_sigma__ratio_per_peak(
+    voigt_class: type[Voigt],
+    n_peaks: int,
+    bg_params: tuple[float, ...],
+    widths: tuple[tuple[float, float], ...],
+) -> None:
+    _widths = widths[:n_peaks]
+    _params = tuple(
+        _value
+        for _i, (_sigma, _gamma) in enumerate(_widths)
+        for _value in (10.0 + _i, _sigma, _gamma, 5.0 + 10 * _i)
+    )
+    _expected = tuple(_sigma / (_sigma + _gamma) for _sigma, _gamma in _widths)
+    _result = voigt_class.relative_sigma(_params + bg_params)
+    assert isinstance(_result, tuple)
+    assert len(_result) == n_peaks
+    assert _result == pytest.approx(_expected)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

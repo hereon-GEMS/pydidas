@@ -114,12 +114,12 @@ def test_copy__with_EXP_property():
     """Test that copying preserves _EXP property."""
     _node_id = 42
     obj = WorkflowNode(plugin=DummyLoader(), node_id=_node_id)
-    obj.plugin._EXP = EXP
+    obj.plugin._exp = EXP
     new = obj.copy()
     assert new.plugin.node_id == _node_id
     assert obj.plugin.node_id == _node_id
-    assert obj.plugin._EXP == EXP
-    assert new.plugin._EXP == EXP
+    assert obj.plugin._exp == EXP
+    assert new.plugin._exp == EXP
 
 
 @pytest.mark.parametrize("node_id", [None, 12, 42])

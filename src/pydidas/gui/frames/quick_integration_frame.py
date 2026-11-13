@@ -87,25 +87,25 @@ class QuickIntegrationFrame(BaseFrame):
 
     def __init__(self, **kwargs: Any):
         BaseFrame.__init__(self, **kwargs)
-        self._EXP = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
-        self.add_params(self._EXP.params)
+        self._exp = DiffractionExperiment(detector_pxsizex=100, detector_pxsizey=100)
+        self.add_params(self._exp.params)
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog()
         self.config["scroll_width"] = 350
         self.config["custom_det_pxsize"] = 100
         self.config["previous_det_pxsize"] = 100
-        _generic = pyFAIintegrationBase(diffraction_exp=self._EXP)
+        _generic = pyFAIintegrationBase(diffraction_exp=self._exp)
         self._plugins = {
             "generic": _generic,
             "Azimuthal integration": PluginCollection().get_plugin_by_name(
                 "PyFAIazimuthalIntegration"
-            )(_generic.params, diffraction_exp=self._EXP),
+            )(_generic.params, diffraction_exp=self._exp),
             "Radial integration": PluginCollection().get_plugin_by_name(
                 "PyFAIradialIntegration"
-            )(_generic.params, diffraction_exp=self._EXP),
+            )(_generic.params, diffraction_exp=self._exp),
             "2D integration": PluginCollection().get_plugin_by_name(
                 "PyFAI2dIntegration"
-            )(_generic.params, diffraction_exp=self._EXP),
+            )(_generic.params, diffraction_exp=self._exp),
         }
         self._image = None
         self._bc_controller = None
@@ -117,9 +117,9 @@ class QuickIntegrationFrame(BaseFrame):
         """
         for _method, _args, _kwargs in QUICK_INTEGRATION_FRAME_BUILD_CONFIG:
             if "input_plot" in _args:
-                _kwargs["diffraction_exp"] = self._EXP
+                _kwargs["diffraction_exp"] = self._exp
             if "res_plot" in _args:
-                _kwargs["plot2d_diffraction_exp"] = self._EXP
+                _kwargs["plot2d_diffraction_exp"] = self._exp
             if "input_beamcenter_points" in _args:
                 _args = _args + (self._widgets["input_plot"],)
             if "roi_selector" in _args:
@@ -246,15 +246,15 @@ class QuickIntegrationFrame(BaseFrame):
             "Custom detector"
         ]
         _old_model = self.get_param_value("detector_model")
-        _old_available = _old_model in _det_models and _shape == self._EXP.det_shape
+        _old_available = _old_model in _det_models and _shape == self._exp.det_shape
         if _old_available:
             _model = _old_model
         elif len(_det_models) == 1:
             _model = "Custom detector"
         else:
             _model = _det_models[0]
-        self._EXP.set_param_value("detector_npixx", self._image.shape[1])
-        self._EXP.set_param_value("detector_npixy", self._image.shape[0])
+        self._exp.set_param_value("detector_npixx", self._image.shape[1])
+        self._exp.set_param_value("detector_npixy", self._image.shape[0])
         self.set_param_value_and_choices("detector_model", _model, _det_models)
         self.param_widgets["detector_model"].update_choices(
             _det_models, selection=_model
@@ -285,11 +285,11 @@ class QuickIntegrationFrame(BaseFrame):
         super().set_param_and_widget_value(key, value, emit_signal)
         if key == "xray_energy":
             self.update_param_widget_value(
-                "xray_wavelength", self._EXP.get_param_value("xray_wavelength")
+                "xray_wavelength", self._exp.get_param_value("xray_wavelength")
             )
         elif key == "xray_wavelength":
             self.update_param_widget_value(
-                "xray_energy", self._EXP.get_param_value("xray_energy")
+                "xray_energy", self._exp.get_param_value("xray_energy")
             )
 
     @QtCore.Slot()
@@ -304,14 +304,14 @@ class QuickIntegrationFrame(BaseFrame):
         widget : pydidas.widgets.param_io.BaseParamIo
             The Parameter editing widget.
         """
-        self._EXP.set_param_value(param_key, widget.get_value())
+        self._exp.set_param_value(param_key, widget.get_value())
         # explicitly call update fo wavelength and energy
         if param_key == "xray_wavelength":
             _w = self.param_widgets["xray_energy"]
-            _w.set_value(self._EXP.get_param_value("xray_energy"))
+            _w.set_value(self._exp.get_param_value("xray_energy"))
         elif param_key == "xray_energy":
             _w = self.param_widgets["xray_wavelength"]
-            _w.set_value(self._EXP.get_param_value("xray_wavelength"))
+            _w.set_value(self._exp.get_param_value("xray_wavelength"))
 
     @QtCore.Slot(str)
     def _update_detector_pxsize(self, new_pxsize: str) -> None:
@@ -325,8 +325,8 @@ class QuickIntegrationFrame(BaseFrame):
         """
         _pxsize = float(new_pxsize)
         _current_pxsize = self.config["previous_det_pxsize"]
-        self._EXP.set_param_value("detector_pxsizex", _pxsize)
-        self._EXP.set_param_value("detector_pxsizey", _pxsize)
+        self._exp.set_param_value("detector_pxsizex", _pxsize)
+        self._exp.set_param_value("detector_pxsizey", _pxsize)
         self.set_param_and_widget_value("detector_pxsize", _pxsize)
         if self.get_param_value("detector_model") == "Custom detector":
             self.config["custom_det_pxsize"] = _pxsize
@@ -351,7 +351,7 @@ class QuickIntegrationFrame(BaseFrame):
             _func = self._bc_controller.set_mask_file
         else:
             _det_name = _det_model.split("]")[1].strip()
-            self._EXP.set_detector_params_from_name(_det_name)
+            self._exp.set_detector_params_from_name(_det_name)
             _pxsize = self.get_param_value("detector_pxsizex")
             self.config["detector_name"] = _det_name
             _func = self._bc_controller.set_new_detector_with_mask
@@ -385,7 +385,7 @@ class QuickIntegrationFrame(BaseFrame):
         _bx = self.get_param_value("beamcenter_x")
         _by = self.get_param_value("beamcenter_y")
         _dist = self.get_param_value("detector_dist")
-        self._EXP.set_beamcenter_from_fit2d_params(_bx, _by, _dist)
+        self._exp.set_beamcenter_from_fit2d_params(_bx, _by, _dist)
         self._bc_controller.manual_beamcenter_update()
 
     @QtCore.Slot()
@@ -458,17 +458,17 @@ class QuickIntegrationFrame(BaseFrame):
         Copy the DiffractionExperiment configuration from the Workflow context.
         """
         for _key, _param in DiffractionExperimentContext().params.items():
-            self._EXP.set_param_value(_key, _param.value)
+            self._exp.set_param_value(_key, _param.value)
             if _key in self.param_widgets:
                 self.param_widgets[_key].set_value(_param.value)
         self.set_param_and_widget_value(
             "detector_pxsize", self.get_param_value("detector_pxsizex")
         )
-        _center = self._EXP.beamcenter
+        _center = self._exp.beamcenter
         self.set_param_and_widget_value("beamcenter_x", _center.x)
         self.set_param_and_widget_value("beamcenter_y", _center.y)
-        _det_name = self._EXP.get_param_value("detector_name")
-        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._EXP.det_shape, [])
+        _det_name = self._exp.get_param_value("detector_name")
+        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(self._exp.det_shape, [])
         if _det_name not in _det_models:
             _matches = [_name for _name in _det_models if _det_name in _name]
             _det_name = _matches[0] if len(_matches) == 1 else "Custom detector"
@@ -489,11 +489,11 @@ class QuickIntegrationFrame(BaseFrame):
             qsettings_ref="QuickIntegrationFrame__diffraction_exp_import",
         )
         if _fname is not None:
-            self._EXP.import_from_file(_fname)
-            for _key, _param in self._EXP.params.items():
+            self._exp.import_from_file(_fname)
+            for _key, _param in self._exp.params.items():
                 if _key in self.param_widgets:
                     self.param_widgets[_key].set_value(_param.value)
-        _center = self._EXP.beamcenter
+        _center = self._exp.beamcenter
         self.update_param_widget_value("beamcenter_x", np.round(_center.x, 3))
         self.update_param_widget_value("beamcenter_y", np.round(_center.y, 3))
 

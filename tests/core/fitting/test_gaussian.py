@@ -24,93 +24,104 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
+from collections.abc import Iterator
+from typing import ClassVar
 
 import numpy as np
+import pytest
 
 from pydidas.core import Dataset
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.gaussian import Gaussian
 
 
-class TestGaussian(unittest.TestCase):
-    def setUp(self):
-        self._x = np.linspace(0, 10, num=2000)
-        self._sigma = 1.42
-        self._x0 = self._x[987]
-        self._amplitude = 7.3
-        self._data = Dataset(
-            (
-                self._amplitude
-                / (self._sigma * np.sqrt(2 * np.pi))
-                * np.exp(-((self._x - self._x0) ** 2) / (2 * self._sigma**2))
-            ),
-            data_unit="data unit",
-            axis_units=["ax_unit"],
-            axis_ranges=[self._x],
-        )
-        self._params = (self._amplitude, self._sigma, self._x0)
+@pytest.fixture
+def x() -> np.ndarray:
+    return np.linspace(0, 10, num=2000)
 
-    def tearDown(self):
-        pass
 
-    def test_guess_peak_start_params__narrow_peak(self):
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, _data)
-        self.assertTrue(_params[1] > 0)
+@pytest.fixture
+def params(x: np.ndarray) -> tuple[float, ...]:
+    return (7.3, 1.42, x[987])
 
-    def test_guess_peak_start_params__normal_peak(self):
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, self._data)
-        self.assertTrue(_params[1] > 0)
 
-    def test_guess_peak_start_params__bounds__peak_x_low(self):
-        _bounds = (
-            Gaussian.param_bounds_low[:],
-            Gaussian.param_bounds_high[:],
-        )
-        _bounds[0][2] = self._x[42]
-        _bounds[1][2] = self._x[50]
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, self._data, bounds=_bounds)
-        self.assertTrue(_bounds[0][2] <= _params[2] <= _bounds[1][2])
-        self.assertTrue(_params[1] > 0)
+@pytest.fixture
+def data(x: np.ndarray, params: tuple[float, ...]) -> Dataset:
+    _area, _sigma, _center = params
+    return Dataset(
+        _area
+        / (_sigma * np.sqrt(2 * np.pi))
+        * np.exp(-((x - _center) ** 2) / (2 * _sigma**2)),
+        data_unit="data unit",
+        axis_units=["ax_unit"],
+        axis_ranges=[x],
+    )
 
-    def test_guess_peak_start_params__bounds__peak_x_high(self):
-        _bounds = (
-            Gaussian.param_bounds_low[:],
-            Gaussian.param_bounds_high[:],
-        )
-        _bounds[0][2] = self._x[35]
-        _bounds[1][2] = self._x[38]
-        _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
-        _data[39:42] = 2
-        _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, self._data, bounds=_bounds)
-        self.assertTrue(_bounds[0][2] <= _params[2] <= _bounds[1][2])
-        self.assertTrue(_params[1] > 0)
 
-    def test_func__values(self):
-        _func_values = Gaussian.func(self._params, self._x)
-        self.assertTrue(np.allclose(self._data, _func_values))
+@pytest.fixture
+def gaussian_class(n_peaks: int) -> Iterator[type[Gaussian]]:
+    class _TestGaussian(Gaussian):
+        name = f"TestGaussian_{n_peaks}"
+        num_peaks: ClassVar[int] = n_peaks
 
-    def test_amplitude(self):
-        _amp = Gaussian.amplitude(self._params)
-        self.assertAlmostEqual(np.amax(self._data), max(_amp))
+    try:
+        yield _TestGaussian
+    finally:
+        del FitFuncMeta.registry[_TestGaussian.name]
 
-    def test_fwhm(self):
-        _y_max = np.amax(self._data)
-        _indices = np.where(self._data >= 0.5 * _y_max)[0]
-        _fwhm = self._x[_indices[-1]] - self._x[_indices[0]]
-        self.assertTrue(
-            abs(_fwhm - Gaussian.fwhm(self._params)) <= 2 * (self._x[1] - self._x[0])
-        )
+
+def test_guess_fit_start_params__narrow_peak() -> None:
+    _data = Dataset(np.ones(150), data_unit="data unit", axis_units=["ax_unit"])
+    _data[39:42] = 2
+    _data[40] = 5
+    _params = Gaussian.guess_fit_start_params(_data.axis_ranges[0], _data)
+    assert _params[1] > 0
+
+
+def test_guess_fit_start_params__normal_peak(x: np.ndarray, data: Dataset) -> None:
+    _params = Gaussian.guess_fit_start_params(x, data)
+    assert _params[1] > 0
+
+
+@pytest.mark.parametrize("low, high", [(42, 50), (35, 38)])
+def test_guess_fit_start_params__center_bounds(
+    x: np.ndarray, data: Dataset, low: int, high: int
+) -> None:
+    _bounds = (Gaussian.param_bounds_low[:], Gaussian.param_bounds_high[:])
+    _bounds[0][2], _bounds[1][2] = x[low], x[high]
+    _params = Gaussian.guess_fit_start_params(x, data, bounds=_bounds)
+    assert x[low] <= _params[2] <= x[high]
+    assert _params[1] > 0
+
+
+def test_func__values(x: np.ndarray, data: Dataset, params: tuple[float, ...]) -> None:
+    np.testing.assert_allclose(Gaussian.func(params, x), data.array)
+
+
+def test_amplitude(data: Dataset, params: tuple[float, ...]) -> None:
+    assert Gaussian.amplitude(params) == pytest.approx((float(np.max(data)),))
+
+
+def test_fwhm(x: np.ndarray, data: Dataset, params: tuple[float, ...]) -> None:
+    _indices = np.where(data >= 0.5 * np.max(data))[0]
+    _fwhm = x[_indices[-1]] - x[_indices[0]]
+    assert Gaussian.fwhm(params) == pytest.approx((_fwhm,), abs=2 * (x[1] - x[0]))
+
+
+@pytest.mark.parametrize("n_peaks", [1, 2, 3, 4])
+@pytest.mark.parametrize("bg_params", [(), (2.0,), (2.0, 0.5)])
+def test_relative_sigma__always_one(
+    gaussian_class: type[Gaussian], n_peaks: int, bg_params: tuple[float, ...]
+) -> None:
+    _params = tuple(
+        _value
+        for _i in range(n_peaks)
+        for _value in (10.0 + _i, 0.5 + _i, 5.0 + 10 * _i)
+    )
+    _result = gaussian_class.relative_sigma(_params + bg_params)
+    assert isinstance(_result, tuple)
+    assert _result == (1.0,) * n_peaks
 
 
 if __name__ == "__main__":
-    unittest.main()
+    pytest.main([__file__])

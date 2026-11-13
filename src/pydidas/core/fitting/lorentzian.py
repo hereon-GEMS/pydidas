@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["Lorentzian"]
 
 from numbers import Real
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from numpy import amax, amin, inf, ndarray, pi
 
@@ -79,7 +79,7 @@ class Lorentzian(FitFuncBase):
 
     @classmethod
     def guess_peak_start_params(
-        cls, x: ndarray, y: ndarray, index: int | None = None, **kwargs: dict
+        cls, x: ndarray, y: ndarray, index: int | None = None, **kwargs: Any
     ) -> tuple[Real]:
         """
         Guess the starting parameters for a Lorentzian peak fit.
@@ -93,7 +93,7 @@ class Lorentzian(FitFuncBase):
         index : Optional[int]
             The peak index. Use None for a non-indexed single peak or the
             integer peak number (starting with 1).
-        **kwargs : dict
+        **kwargs: Any
             Optional keyword arguments.
 
         Returns
@@ -168,3 +168,22 @@ class Lorentzian(FitFuncBase):
             The function amplitude.
         """
         return tuple(c[3 * _i] / (pi * c[1 + 3 * _i]) for _i in range(cls.num_peaks))
+
+    @classmethod
+    def relative_sigma(cls, c: tuple[float]) -> tuple[float]:
+        """
+        Get the relative sigma value for the Lorentzian fit.
+
+        By definition, the relative sigma for a Lorentzian is always 0.
+
+        Parameters
+        ----------
+        c : tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        tuple[float]
+            The relative sigma values for all peaks.
+        """
+        return tuple(0.0 for _ in range(cls.num_peaks))

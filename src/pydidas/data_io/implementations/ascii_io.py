@@ -196,9 +196,7 @@ class AsciiIo(IoBase):
             A flag which indicates whether a column with the x-axis will
             be written (as first column).
         """
-        _time = datetime.datetime.now().strftime(  # noqa: DTZ005
-            "%a %b %d %H:%M:%S %Y"
-        )
+        _time = datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y")
         _ncols = (data.shape[1] if data.ndim > 1 else 1) + write_x_column
         _header = (
             f"F {Path(filename).name}\nE {time.time()}\nD {_time}\n\n"

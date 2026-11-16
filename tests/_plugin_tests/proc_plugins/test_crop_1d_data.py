@@ -171,4 +171,4 @@ def test_get_slices__no_points_in_range(plugin: ProcPlugin, data: Dataset) -> No
 
 
 if __name__ == "__main__":
-    pytest.main()
+    pytest.main([__file__])

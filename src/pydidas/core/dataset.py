@@ -87,22 +87,21 @@ class Dataset(ndarray):
         an ndarray. However, Dataset views never share memory, and each Dataset view
         will create a new memory object.
 
-    The following numpy ufuncs are reimplemented to preserver the metadata:
-    flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
-    transpose, moveaxes.
-    For other numpy ufuncs, metadata preservation is not guaranteed.
+    Dataset overrides several ndarray methods to provide operation-specific metadata
+    handling, including flatten, max, mean, min, repeat, reshape, ravel, shape, sort,
+    squeeze, sum, take, and transpose. It also provides ``Dataset.roll``. This does
+    not mean that every similarly named NumPy function calls a Dataset method. NumPy
+    functions may delegate to ndarray methods, but dispatch depends on the function.
+    Dataset does not implement the general ``__array_function__`` protocol.
 
-    The following numpy functions cannot be implemented because they are not defined
-    in the ndarray:
+    NumPy ufuncs use a separate protocol; Dataset does not provide general
+    ufunc-specific metadata handling, so metadata preservation should not be assumed
+    for those operations.
 
-    - numpy.roll:
-        This function will work but destroy metadata consistency. A custom
-        implementation is given in the Dataset.roll() method which takes
-        similar arguments as the numpy function but preserves the metadata.
-    - numpy.rollaxis:
-        This function is deprecated and moveaxes should be used instead.
-    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc.:
-        These functions work but return pure ndarrays without metadata.
+    In particular, ``numpy.roll`` does not call ``Dataset.roll``. Use
+    ``Dataset.roll`` when its metadata-aware behavior is required. Other functions
+    without a Dataset-specific implementation, such as ``numpy.concatenate`` and
+    ``numpy.stack``, do not apply a Dataset-specific metadata policy.
 
 
     Parameters

@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="The gui submodule" href="../gui.html" />
-    <link rel="prev" title="The widgets.silx_plot sub-package" href="silx_plot.html" />
+    <link rel="prev" title="The widgets.windows sub-package" href="windows.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="26.05.19" />
@@ -386,14 +386,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.workflow_edit sub-package</a></li>
 </ul>
 </details></li>
@@ -467,7 +472,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginCollectionBrowser">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginCollectionBrowser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.plugin_collection.PluginRegistry" title="pydidas.plugins.plugin_registry.PluginRegistry"><span class="pre">PluginRegistry</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginCollectionBrowser" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetFactoryMixIn" title="pydidas.widgets.base_classes.widget_factory_mixin.WidgetFactoryMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code></a>, <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.EmptyWidget" title="pydidas.widgets.base_classes.empty_widget.EmptyWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyWidget</span></code></a></p>
 <p>A widget allows to browse through the list of available plugins.</p>
 <p>The PluginCollectionBrowser includes a search filter field, a QTreeView
 to browse through the list of available plugins, and a QTextEdit to show
@@ -514,7 +519,7 @@ not be changed and will default to the PluginCollection singleton.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.PluginInWorkflowBox">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">PluginInWorkflowBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">widget_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.PluginInWorkflowBox" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetFactoryMixIn" title="pydidas.widgets.base_classes.widget_factory_mixin.WidgetFactoryMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
 <p>Widget to represent a Plugin in the WorkflowTree.</p>
 <p>The widget displays the plugin name, title and includes a delete button to
 remove the Plugin or the full branch from the workflow.</p>
@@ -645,7 +650,7 @@ widget is selected.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.workflow_edit.WorkflowTreeCanvas">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.workflow_edit.</span></span><span class="sig-name descname"><span class="pre">WorkflowTreeCanvas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.workflow_edit.WorkflowTreeCanvas" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetFactoryMixIn" title="pydidas.widgets.base_classes.widget_factory_mixin.WidgetFactoryMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QFrame</span></code></p>
 <p>The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
 the individual plugin widgets. It is also responsible to draw the lines
 between plugins, if required.</p>
@@ -718,12 +723,12 @@ call the update method to draw these connections.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="silx_plot.html"
+       href="windows.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The widgets.silx_plot sub-package</p>
+        <p class="prev-next-title">The widgets.windows sub-package</p>
       </div>
     </a>
     <a class="right-next"

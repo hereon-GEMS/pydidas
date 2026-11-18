@@ -19,7 +19,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.frames.DataBrowsingFrame
+.. autoclass:: pydidas.gui.frames.data_browsing_frame.DataBrowsingFrame
     :members:
 
 .. _all_methods_DataBrowsingFrame:
@@ -27,7 +27,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.frames.DataBrowsingFrame
+.. autoclass:: pydidas.gui.frames.data_browsing_frame.DataBrowsingFrame
     :members:
     :noindex:
     :inherited-members: QFrame

@@ -39,8 +39,8 @@ pydidas menu structure
             state file. If confirmed, all pydidas objects are updated and the
             GUI view is changed to the active view. (Corresponding saver: *Store
             GUI state*)
-        - Restore GUI state at exit
-            The *Restore at Exit* entry will open a dialog to confirm that the
+        - Restore exit state
+            The *Restore exit* entry will open a dialog to confirm that the
             user wants to restore the UI state from pydidas's automatically
             handled exit state file. If confirmed, all pydidas objects are
             updated and the GUI view is changed to the active view when last
@@ -53,7 +53,7 @@ pydidas menu structure
                 state is not necessarily the state when the user last used the
                 pydidas GUI.
 
-        - Import
+        - Import GUI state
             The *Import* entry will open a file selection dialog to select a
             file with the UI state to be restored.
 
@@ -64,7 +64,8 @@ pydidas menu structure
                 the import.
 
     - Exit
-        This action will close the pydidas GUI **without confirmation**.
+        This action will open a dialog to confirm that the user wants to close
+        the pydidas GUI.
 - Tools
     - Export Eiger Pixelmask
         This menu item will open a small window which allows the user to specify
@@ -80,7 +81,7 @@ pydidas menu structure
         This menu entry will open a window to define and edit a detector mask.
         For more information, please refer to the corresponding :ref:`Mask
         editor window manual <mask_editor_window>`.
-    - Clear local log filesystem
+    - Clear local log files
         Using this menu entry will try to clear all written pydidas log files
         from the local file system.
 - Options
@@ -94,8 +95,12 @@ pydidas menu structure
         multiprocessing and memory configuration. For more information, please
         refer to the documentation in the :ref:`Global settings window manual
         <global_settings_window>`.
+- Window
+    -Hide logging widget
+        This menu entry toggles the "Logging and information" widget at the
+        bottom of the window.
 - Help
-    - Open documentation in browser
+    - Open documentation in default web browser
         Using this menu entry will open the documentation home in a new tab in
         the operating system's default web browser.
     - Open feedback form
@@ -105,11 +110,11 @@ pydidas menu structure
     - Pydidas paths
         This entry will open a small window with information about the local
         paths in which log files and configuration files are placed by pydidas.
-    - Check for update
+    - Check for software updates
         Using this option requires an active internet connection. Pydidas will
         check the latest release version on Github and compare the remote
         version number with the locally installed version. The result will be
         supplied to the user in a pop-up window.
-    - About
+    - About pydidas
         The about window has copyright information and links to the pydidas
         homepage and GitHub home.

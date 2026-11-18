@@ -19,7 +19,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.frames.WorkflowEditFrame
+.. autoclass:: pydidas.gui.frames.workflow_edit_frame.WorkflowEditFrame
     :members:
 
 .. _all_methods_WorkflowEditFrame:
@@ -27,7 +27,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.frames.WorkflowEditFrame
+.. autoclass:: pydidas.gui.frames.workflow_edit_frame.WorkflowEditFrame
     :members:
     :noindex:
     :inherited-members: QFrame

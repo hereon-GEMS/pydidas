@@ -16,75 +16,76 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
-
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=7afb26e6" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=ab187429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=b38044db"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=513e65ce"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/windows';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"25.04.08"';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = true;
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.05.19"';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="GlobalSettingsWindow" href="windows/global_settings_window.html" />
-    <link rel="prev" title="The widgets.workflow_edit sub-package" href="workflow_edit.html" />
+    <link rel="next" title="The widgets.workflow_edit sub-package" href="workflow_edit.html" />
+    <link rel="prev" title="The widgets.silx_plot sub-package" href="silx_plot.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="26.05.19" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -92,7 +93,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -100,15 +100,15 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -135,7 +135,7 @@
     
     
     <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
-    <script>document.write(`<img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark" alt="pydidas"/>`);</script>
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
   
   
     <p class="title logo__title"> pydidas</p>
@@ -183,53 +183,41 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -254,15 +242,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -281,7 +265,8 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -327,40 +312,32 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -383,7 +360,14 @@ document.write(`
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -402,19 +386,20 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.windows sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">The widgets.windows sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="windows/global_settings_window.html">GlobalSettingsWindow</a></li>
-</ul>
-</details></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
@@ -425,9 +410,14 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -445,8 +435,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -461,7 +449,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">The...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The widgets.windows sub-package</span></li>
   </ul>
 </nav>
 </div>
@@ -478,13 +466,763 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="the-widgets-windows-sub-package">
-<h1>The widgets.windows sub-package<a class="headerlink" href="#the-widgets-windows-sub-package" title="Link to this heading">#</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="windows/global_settings_window.html">GlobalSettingsWindow</a></li>
+  <section id="module-pydidas.widgets.windows">
+<span id="the-widgets-windows-sub-package"></span><h1>The widgets.windows sub-package<a class="headerlink" href="#module-pydidas.widgets.windows" title="Link to this heading">#</a></h1>
+<p>The pydidas.gui.windows subpackage includes stand-alone main windows which can
+be opened by the main GUI.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.AboutWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">AboutWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.AboutWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window which displays basic information about the pydidas software.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.AboutWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.AboutWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.AboutWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.AboutWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.AboutWindow.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.AboutWindow.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Adjust the window based on the new font metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>char_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>char_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
 </ul>
-</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ConvertFit2dGeometryWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Enter Fit2d geometry parameters and convert them to pyFAI geometry.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Create all widgets for the frame and place them in the layout.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QCloseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle the close event and also emit a signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QCloseEvent</em>) – The calling event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect the signals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.show" title="Link to this definition">#</a></dt>
+<dd><p>Show the window in a clean state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ConvertFit2dGeometryWindow.update_detector">
+<span class="sig-name descname"><span class="pre">update_detector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.diff_exp.diff_exp.DiffractionExperiment"><span class="pre">DiffractionExperiment</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.update_detector" title="Link to this definition">#</a></dt>
+<dd><p>Update the detector in the internal DiffractionExperiment instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exp</strong> (<a class="reference internal" href="../contexts.html#pydidas.contexts.DiffractionExperiment" title="pydidas.contexts.DiffractionExperiment"><em>DiffractionExperiment</em></a>) – The DiffractionExperiment instance to get the detector from.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ExportEigerPixelmaskWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ExportEigerPixelmaskWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to export the Pixelmask from an Eiger master file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ExportEigerPixelmaskWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ExportEigerPixelmaskWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect signals for button clicks and font changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ExportEigerPixelmaskWindow.process_font_metrics_changed">
+<span class="sig-name descname"><span class="pre">process_font_metrics_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.process_font_metrics_changed" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.FeedbackWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">FeedbackWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.FeedbackWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to create a feedback form for users to submit feedback.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.FeedbackWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.FeedbackWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Create all widgets for the frame and place them in the layout.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.FeedbackWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.FeedbackWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect the signals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.FeedbackWindow.process_new_font_family">
+<span class="sig-name descname"><span class="pre">process_new_font_family</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">family</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.FeedbackWindow.process_new_font_family" title="Link to this definition">#</a></dt>
+<dd><p>Update the TextEdit font family.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>family</strong> (<em>str</em>) – The new font family.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.FeedbackWindow.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.FeedbackWindow.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>char_width</strong> (<em>float</em>) – The average metrics width of a char.</p></li>
+<li><p><strong>char_height</strong> (<em>float</em>) – The average metrics height of a char.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">GlobalSettingsWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>A window to modify global pydidas settings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Populate the GlobalSettingsWindow with widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect the signals for Parameter updates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow.frame_activated">
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow.frame_activated" title="Link to this definition">#</a></dt>
+<dd><p>Update the frame.</p>
+<p>The frame_activated slot is called every time a frame is activated.
+The index is the frame_index of the newly activated frame in case any
+cross-options need to be taken.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the activated frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow.process_font_metrics_changed">
+<span class="sig-name descname"><span class="pre">process_font_metrics_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow.process_font_metrics_changed" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.GlobalSettingsWindow.update_qsetting">
+<span class="sig-name descname"><span class="pre">update_qsetting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.GlobalSettingsWindow.update_qsetting" title="Link to this definition">#</a></dt>
+<dd><p>Update a QSettings value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_key</strong> (<em>str</em>) – The QSettings reference key. A “global/” prefix will be applied
+to it.</p></li>
+<li><p><strong>value</strong> (<em>str</em>) – The new value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.Hdf5BrowserWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">Hdf5BrowserWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.Hdf5BrowserWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>A class to browse and display the tree structure of hdf5 files.</p>
+<p>This class is based on the silx Hdf5TreeView and Hdf5TreeModel classes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>Any</em>) – <p>Any keyword arguments. Supported kwargs are:</p>
+<dl class="simple">
+<dt>parent<span class="classifier">QtWidgets.QWidget, optional</span></dt><dd><p>The parent widget of the browser.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.Hdf5BrowserWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.Hdf5BrowserWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.Hdf5BrowserWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QCloseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.Hdf5BrowserWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle the close event of the widget and assure all files are closed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.Hdf5BrowserWindow.open_file">
+<span class="sig-name descname"><span class="pre">open_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.Hdf5BrowserWindow.open_file" title="Link to this definition">#</a></dt>
+<dd><p>Open a file in the browser.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ImageSeriesOperationsWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ImageSeriesOperationsWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to select files and perform mathematical operations on them.</p>
+<p>A simple dialogue to select a number of files and perform basic
+mathematical operations on the image series.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ImageSeriesOperationsWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ImageSeriesOperationsWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect button and signal handlers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ImageSeriesOperationsWindow.process_file_series">
+<span class="sig-name descname"><span class="pre">process_file_series</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.process_file_series" title="Link to this definition">#</a></dt>
+<dd><p>Process the file series.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ImageSeriesOperationsWindow.process_font_metrics_changed">
+<span class="sig-name descname"><span class="pre">process_font_metrics_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.process_font_metrics_changed" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ManuallySetBeamcenterWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to open a file and select points to determine the beam center.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QCloseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle the close event and emit a signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QCloseEvent</em>) – The calling event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect signals for button clicks and file selection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the user interface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.show" title="Link to this definition">#</a></dt>
+<dd><p>Show the window and check the image shape.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ManuallySetBeamcenterWindow.update_detector_description">
+<span class="sig-name descname"><span class="pre">update_detector_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.update_detector_description" title="Link to this definition">#</a></dt>
+<dd><p>Process the new detector settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>detector_name</strong> (<em>str</em>) – The name of the new detector.</p></li>
+<li><p><strong>mask_filename</strong> (<em>str</em>) – The name of the new mask file or None to disable mask usage.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.MaskEditorWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">MaskEditorWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.MaskEditorWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window with a dialogue to select a reference file and edit masks.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.MaskEditorWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.MaskEditorWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.MaskEditorWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.MaskEditorWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect signals for file selection and plotting.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">QtPathsWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window which displays basic information about the pydidas software.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect all required signals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the user interface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow.open_folder">
+<span class="sig-name descname"><span class="pre">open_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow.open_folder" title="Link to this definition">#</a></dt>
+<dd><p>Open the selected folder in the system’s standard file browser.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder</strong> (<em>str</em><em> or </em><em>Path</em>) – The folder name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.QtPathsWindow.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.QtPathsWindow.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>char_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>char_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">SelectIntegrationRegionWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.pyFAIintegrationBase" title="pydidas.plugins.pyfai_integration_base.pyFAIintegrationBase"><span class="pre">pyFAIintegrationBase</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to open and select an integration region.</p>
+<p>A pydidas window which allows opening a file and selecting an integration
+region for a plugin.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle the Qt close event and confirm closing without saving results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The closing event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect all signals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the UI and update the input widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.open_image">
+<span class="sig-name descname"><span class="pre">open_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.open_image" title="Link to this definition">#</a></dt>
+<dd><p>Open an image with the given filename and display it in the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em> or </em><em>Path</em>) – The filename and path.</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – Additional parameters to open a specific frame in a file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.SelectIntegrationRegionWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.show" title="Link to this definition">#</a></dt>
+<dd><p>Overload the generic show to update the input widgets.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ShowDetailedPluginResultsWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>A window to display detailed plugin results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Build the frame and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Re-implement the closeEvent to also emit a signal that this Window has
+been closed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QEvent</em>) – The closing event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect all the required signals for the frame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSize</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Set the sizeHint for the preferred size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The desired size.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowDetailedPluginResultsWindow.update_results">
+<span class="sig-name descname"><span class="pre">update_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.update_results" title="Link to this definition">#</a></dt>
+<dd><p>Update the displayed results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>results</strong> (<em>dict</em><em>[</em><em>str</em><em> or </em><em>None</em><em>, </em><em>Any</em><em>]</em>) – The dictionary with the new results.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – An optional title to be used for the window. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowInformationForResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">ShowInformationForResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.ShowInformationForResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a>, <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetFactoryMixIn" title="pydidas.widgets.base_classes.widget_factory_mixin.WidgetFactoryMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code></a></p>
+<p>Window to display detailed information about a result datapoint.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowInformationForResult.display_information">
+<span class="sig-name descname"><span class="pre">display_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader_plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.base_input_plugin.InputPlugin"><span class="pre">InputPlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_timeline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowInformationForResult.display_information" title="Link to this definition">#</a></dt>
+<dd><p>Display the information about the selected datapoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> (<em>tuple</em>) – A 2-tuple with the data position selected in the image.
+The order is (y, x) and the values are in data coordinates.</p></li>
+<li><p><strong>active_dims</strong> (<em>tuple</em>) – A 2-tuple with the active dimensions of the selection,
+i.e. the dimensions in which the position is defined.</p></li>
+<li><p><strong>selected_indices</strong> (<em>list</em><em>[</em><em>int</em><em> | </em><em>None</em><em>]</em>) – The selected indices of the full result dataset. This will be
+integers for inactive dimensions and None for the active
+dimensions.</p></li>
+<li><p><strong>result_metadata</strong> (<em>dict</em>) – The metadata of the results.</p></li>
+<li><p><strong>loader_plugin</strong> (<a class="reference internal" href="../plugins.html#pydidas.plugins.InputPlugin" title="pydidas.plugins.InputPlugin"><em>InputPlugin</em></a>) – The input plugin associated with the results. Required to
+display the input image.</p></li>
+<li><p><strong>use_timeline</strong> (<em>bool</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – If True, the timeline index will be used to get the frame
+index. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowInformationForResult.process_font_metrics_changed">
+<span class="sig-name descname"><span class="pre">process_font_metrics_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowInformationForResult.process_font_metrics_changed" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.ShowInformationForResult.show_input_image">
+<span class="sig-name descname"><span class="pre">show_input_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.ShowInformationForResult.show_input_image" title="Link to this definition">#</a></dt>
+<dd><p>Show the input image as loaded from the loader plugin.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">TweakPluginParameterWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>Window to modify Plugin Parameters on the fly and inspect results.</p>
+<p>The TweakPluginParameterWindow displays detailed plugin results in
+combination with all Plugin Parameters to allow running the Plugin with
+different values.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Populate the window and create all widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QCloseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle the close event and discard any possible changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtGui.QCloseEvent</em>) – The closing event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.confirm_parameters">
+<span class="sig-name descname"><span class="pre">confirm_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.confirm_parameters" title="Link to this definition">#</a></dt>
+<dd><p>Confirm the selected Parameters and hide the TweakPluginParameterWindow.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect button click signals to their respective slots.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.discard_parameter_changes">
+<span class="sig-name descname"><span class="pre">discard_parameter_changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.discard_parameter_changes" title="Link to this definition">#</a></dt>
+<dd><p>Discard the made changes to the Plugin Parameters and reset them
+to the original values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the UI initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.hide">
+<span class="sig-name descname"><span class="pre">hide</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.hide" title="Link to this definition">#</a></dt>
+<dd><p>Overload the generic hide method to hide the details window as well.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.run_plugin">
+<span class="sig-name descname"><span class="pre">run_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.run_plugin" title="Link to this definition">#</a></dt>
+<dd><p>Run the plugin with the current Parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.TweakPluginParameterWindow.tweak_plugin">
+<span class="sig-name descname"><span class="pre">tweak_plugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.base_plugin.BasePlugin"><span class="pre">BasePlugin</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.TweakPluginParameterWindow.tweak_plugin" title="Link to this definition">#</a></dt>
+<dd><p>Tweak the selected plugin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plugin</strong> (<a class="reference internal" href="../plugins.html#pydidas.plugins.BasePlugin" title="pydidas.plugins.BasePlugin"><em>BasePlugin</em></a>) – The plugin to be tweaked.</p></li>
+<li><p><strong>results</strong> (<a class="reference internal" href="../core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset"><em>Dataset</em></a>) – The results obtained with the current plugin parameters.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.windows.</span></span><span class="sig-name descname"><span class="pre">UserConfigWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWindow" title="pydidas.widgets.base_classes.pydidas_window.PydidasWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWindow</span></code></a></p>
+<p>The UserConfigWindow allows setting the user configuration for pydidas.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.build_frame">
+<span class="sig-name descname"><span class="pre">build_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.build_frame" title="Link to this definition">#</a></dt>
+<dd><p>Populate the UserConfigWindow with its child widgets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.change_fontsize">
+<span class="sig-name descname"><span class="pre">change_fontsize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.change_fontsize" title="Link to this definition">#</a></dt>
+<dd><p>Process the button clicks to change the fontsize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>change</strong> (<em>int</em>) – The change direction (-1 for decrease, 1 for increase).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.connect_signals">
+<span class="sig-name descname"><span class="pre">connect_signals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.connect_signals" title="Link to this definition">#</a></dt>
+<dd><p>Connect the signals for Parameter updates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.finalize_ui">
+<span class="sig-name descname"><span class="pre">finalize_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.finalize_ui" title="Link to this definition">#</a></dt>
+<dd><p>Finalize the UI initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.frame_activated">
+<span class="sig-name descname"><span class="pre">frame_activated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.frame_activated" title="Link to this definition">#</a></dt>
+<dd><p>Handle the frame activation.</p>
+<p>The frame_activated slot is called every time a frame is activated.
+The index is the frame_index of the newly activated frame in case any
+cross-options need to be taken.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the activated frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.mpl_font_not_supported">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mpl_font_not_supported</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.mpl_font_not_supported" title="Link to this definition">#</a></dt>
+<dd><p>Handle the signal that matplotlib does not support the chosen font.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<em>str</em>) – The error description.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.new_font_family_selected">
+<span class="sig-name descname"><span class="pre">new_font_family_selected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QFont</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.new_font_family_selected" title="Link to this definition">#</a></dt>
+<dd><p>Handle the selection of the new font and notify the
+PydidasQApplication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>font</strong> (<em>QtGui.QFont</em>) – The new font.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.process_new_fontsize_setting">
+<span class="sig-name descname"><span class="pre">process_new_fontsize_setting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.process_new_fontsize_setting" title="Link to this definition">#</a></dt>
+<dd><p>Process the user input of the new font size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.select_new_nan_color">
+<span class="sig-name descname"><span class="pre">select_new_nan_color</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.select_new_nan_color" title="Link to this definition">#</a></dt>
+<dd><p>Select a new NaN color using a QColorDialog.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.update_cmap">
+<span class="sig-name descname"><span class="pre">update_cmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmap_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.update_cmap" title="Link to this definition">#</a></dt>
+<dd><p>Update the default colormap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cmap_name</strong> (<em>str</em>) – The name of the new colormap.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.update_plugin_collection">
+<span class="sig-name descname"><span class="pre">update_plugin_collection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.update_plugin_collection" title="Link to this definition">#</a></dt>
+<dd><p>Update the plugin collection from updated QSetting values for the
+plugin directories.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.windows.UserConfigWindow.update_qsetting">
+<span class="sig-name descname"><span class="pre">update_qsetting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.windows.UserConfigWindow.update_qsetting" title="Link to this definition">#</a></dt>
+<dd><p>Update a QSettings value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_key</strong> (<em>str</em>) – The QSettings reference key. A “user/” prefix will be applied
+to it.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The new value.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -498,20 +1236,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="workflow_edit.html"
+       href="silx_plot.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The widgets.workflow_edit sub-package</p>
+        <p class="prev-next-title">The widgets.silx_plot sub-package</p>
       </div>
     </a>
     <a class="right-next"
-       href="windows/global_settings_window.html"
+       href="workflow_edit.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">GlobalSettingsWindow</p>
+        <p class="prev-next-title">The widgets.workflow_edit sub-package</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -522,14 +1260,146 @@ document.write(`
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.AboutWindow"><code class="docutils literal notranslate"><span class="pre">AboutWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.AboutWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">AboutWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.AboutWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">AboutWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.AboutWindow.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">AboutWindow.process_new_font_metrics</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.show"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow.show</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ConvertFit2dGeometryWindow.update_detector"><code class="docutils literal notranslate"><span class="pre">ConvertFit2dGeometryWindow.update_detector</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow"><code class="docutils literal notranslate"><span class="pre">ExportEigerPixelmaskWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">ExportEigerPixelmaskWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">ExportEigerPixelmaskWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ExportEigerPixelmaskWindow.process_font_metrics_changed"><code class="docutils literal notranslate"><span class="pre">ExportEigerPixelmaskWindow.process_font_metrics_changed</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.FeedbackWindow"><code class="docutils literal notranslate"><span class="pre">FeedbackWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.FeedbackWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">FeedbackWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.FeedbackWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">FeedbackWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.FeedbackWindow.process_new_font_family"><code class="docutils literal notranslate"><span class="pre">FeedbackWindow.process_new_font_family</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.FeedbackWindow.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">FeedbackWindow.process_new_font_metrics</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow.frame_activated"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow.frame_activated</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow.process_font_metrics_changed"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow.process_font_metrics_changed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.GlobalSettingsWindow.update_qsetting"><code class="docutils literal notranslate"><span class="pre">GlobalSettingsWindow.update_qsetting</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.Hdf5BrowserWindow"><code class="docutils literal notranslate"><span class="pre">Hdf5BrowserWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.Hdf5BrowserWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">Hdf5BrowserWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.Hdf5BrowserWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">Hdf5BrowserWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.Hdf5BrowserWindow.open_file"><code class="docutils literal notranslate"><span class="pre">Hdf5BrowserWindow.open_file</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow"><code class="docutils literal notranslate"><span class="pre">ImageSeriesOperationsWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">ImageSeriesOperationsWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">ImageSeriesOperationsWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.process_file_series"><code class="docutils literal notranslate"><span class="pre">ImageSeriesOperationsWindow.process_file_series</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ImageSeriesOperationsWindow.process_font_metrics_changed"><code class="docutils literal notranslate"><span class="pre">ImageSeriesOperationsWindow.process_font_metrics_changed</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.finalize_ui"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.finalize_ui</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.show"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.show</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ManuallySetBeamcenterWindow.update_detector_description"><code class="docutils literal notranslate"><span class="pre">ManuallySetBeamcenterWindow.update_detector_description</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.MaskEditorWindow"><code class="docutils literal notranslate"><span class="pre">MaskEditorWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.MaskEditorWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">MaskEditorWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.MaskEditorWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">MaskEditorWindow.connect_signals</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow.finalize_ui"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow.finalize_ui</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow.open_folder"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow.open_folder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.QtPathsWindow.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">QtPathsWindow.process_new_font_metrics</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.finalize_ui"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.finalize_ui</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.open_image"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.open_image</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.SelectIntegrationRegionWindow.show"><code class="docutils literal notranslate"><span class="pre">SelectIntegrationRegionWindow.show</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.sizeHint"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow.sizeHint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowDetailedPluginResultsWindow.update_results"><code class="docutils literal notranslate"><span class="pre">ShowDetailedPluginResultsWindow.update_results</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowInformationForResult"><code class="docutils literal notranslate"><span class="pre">ShowInformationForResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowInformationForResult.display_information"><code class="docutils literal notranslate"><span class="pre">ShowInformationForResult.display_information</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowInformationForResult.process_font_metrics_changed"><code class="docutils literal notranslate"><span class="pre">ShowInformationForResult.process_font_metrics_changed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.ShowInformationForResult.show_input_image"><code class="docutils literal notranslate"><span class="pre">ShowInformationForResult.show_input_image</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.closeEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.confirm_parameters"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.confirm_parameters</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.discard_parameter_changes"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.discard_parameter_changes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.finalize_ui"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.finalize_ui</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.hide"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.hide</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.run_plugin"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.run_plugin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.TweakPluginParameterWindow.tweak_plugin"><code class="docutils literal notranslate"><span class="pre">TweakPluginParameterWindow.tweak_plugin</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.build_frame"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.build_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.change_fontsize"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.change_fontsize</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.connect_signals"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.connect_signals</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.finalize_ui"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.finalize_ui</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.frame_activated"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.frame_activated</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.mpl_font_not_supported"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.mpl_font_not_supported</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.new_font_family_selected"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.new_font_family_selected</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.process_new_fontsize_setting"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.process_new_fontsize_setting</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.select_new_nan_color"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.select_new_nan_color</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.update_cmap"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.update_cmap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.update_plugin_collection"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.update_plugin_collection</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.windows.UserConfigWindow.update_qsetting"><code class="docutils literal notranslate"><span class="pre">UserConfigWindow.update_qsetting</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/pydidas/docs/src/code/api/widgets/windows.rst">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/src/pydidas/docs/src/code/api/widgets/windows.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -563,8 +1433,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -575,7 +1445,7 @@ document.write(`
 
   <p class="copyright">
     
-      © Copyright 2021 - 2025, Helmholtz-Zentrum Hereon.
+      © Copyright 2021 - 2026, Helmholtz-Zentrum Hereon.
       <br/>
     
   </p>
@@ -584,7 +1454,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>
@@ -597,7 +1467,8 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

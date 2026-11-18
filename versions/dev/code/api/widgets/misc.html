@@ -58,8 +58,8 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="The widgets.parameter_config sub-package" href="parameter_config.html" />
-    <link rel="prev" title="The widgets.framework sub-package" href="framework.html" />
+    <link rel="next" title="The widgets.param_io sub-package" href="param_io.html" />
+    <link rel="prev" title="The widgets.file_browser sub-package" href="file_browser.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="26.05.19" />
@@ -386,14 +386,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
 </ul>
 </details></li>
@@ -467,7 +472,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.ConfigureBinaryDecodingWidget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">ConfigureBinaryDecodingWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.ConfigureBinaryDecodingWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetWithParameters" title="pydidas.widgets.base_classes.widget_with_parameters.WidgetWithParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
 <p>A widget to configure the decoding of raw binary files.</p>
 <p>The widget allows to set the datatype, shape, and header offset
 of the binary file which is required to decode the file correctly.</p>
@@ -516,7 +521,7 @@ show the widget.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.Hdf5DatasetSelector">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">Hdf5DatasetSelector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.Hdf5DatasetSelector" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetWithParameters" title="pydidas.widgets.base_classes.widget_with_parameters.WidgetWithParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></a></p>
 <p>A compound widget to select datasets in Hdf5 files.</p>
 <p>The Hdf5DatasetSelector is a compound widget which allows to select
 a hdf5 dataset key and the frame number. By convention, the first
@@ -594,7 +599,7 @@ show the widget.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.IntegrationRoiParamContainer">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">IntegrationRoiParamContainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.IntegrationRoiParamContainer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetWithParameters" title="pydidas.widgets.base_classes.widget_with_parameters.WidgetWithParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></a></p>
 <p>Widget to display Parameters for the integration region.</p>
 <p>The Parameter widgets are created for an associated plugin which is not
 owned by this widget.</p>
@@ -634,7 +639,7 @@ owned by this widget.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.PointsForBeamcenterWidget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">PointsForBeamcenterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.PointsForBeamcenterWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetMixIn</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code>, <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetFactoryMixIn" title="pydidas.widgets.base_classes.widget_factory_mixin.WidgetFactoryMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetFactoryMixIn</span></code></a>, <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.ParameterWidgetMixIn" title="pydidas.widgets.base_classes.parameter_widget_mixin.ParameterWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetMixIn</span></code></a></p>
 <p>A widget to display a list of points in an associated plot.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.PointsForBeamcenterWidget.add_point_to_table">
@@ -669,7 +674,7 @@ owned by this widget.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.misc.SelectDataFrameWidget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.misc.</span></span><span class="sig-name descname"><span class="pre">SelectDataFrameWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.misc.SelectDataFrameWidget" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.WidgetWithParameters" title="pydidas.widgets.base_classes.widget_with_parameters.WidgetWithParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">WidgetWithParameters</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AssociatedFileMixin</span></code></p>
 <p>A widget which allows to select a data frame from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -724,20 +729,20 @@ is True.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="framework.html"
+       href="file_browser.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The widgets.framework sub-package</p>
+        <p class="prev-next-title">The widgets.file_browser sub-package</p>
       </div>
     </a>
     <a class="right-next"
-       href="parameter_config.html"
+       href="param_io.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The widgets.parameter_config sub-package</p>
+        <p class="prev-next-title">The widgets.param_io sub-package</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

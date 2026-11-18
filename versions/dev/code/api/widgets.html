@@ -386,14 +386,19 @@
 <li class="toctree-l1"><a class="reference internal" href="apps.html">The apps sub-package</a></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="widgets/base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="widgets/controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="widgets/dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="widgets/factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="widgets/framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="widgets/misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="widgets/parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="widgets/selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="widgets/silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/windows.html">The widgets.windows sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="widgets/workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
 </ul>
 </details></li>
@@ -479,37 +484,44 @@ respective sub-packages.</p>
 <td><p>pydidas-specific PyQt5 widgets which are used in the graphical user
 interface.</p></td>
 </tr>
+<tr class="row-odd"><td><p><em>pydidas.widgets.base_classes</em></p></td>
+<td><p>Base classes and mix-ins for pydidas widgets, frames and windows.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>pydidas.widgets.base_reimplementations</em></p></td>
+<td><p>Re-implementations of generic Qt widgets with pydidas-specific extensions.</p></td>
+</tr>
 <tr class="row-odd"><td><p><em>pydidas.widgets.controllers</em></p></td>
-<td><p>Widget-specific controllers which handle the interaction between
-different widgets.</p></td>
+<td><p>Widget-specific controllers which handle the interaction between different widgets.</p></td>
 </tr>
-<tr class="row-even"><td><p><em>pydidas.widgets.dialogues</em></p></td>
-<td><p>User dialogue widgets which show in their own windows.</p></td>
+<tr class="row-even"><td><p><em>pydidas.widgets.data_viewer</em></p></td>
+<td><p>Widgets to view and browse data.</p></td>
 </tr>
-<tr class="row-odd"><td><p><em>pydidas.widgets.factory</em></p></td>
-<td><p>Convenience functions to create new widgets and set Qt properties
-defined by the user.</p></td>
+<tr class="row-odd"><td><p><em>pydidas.widgets.dialogs</em></p></td>
+<td><p>User dialog widgets which show in their own windows.</p></td>
 </tr>
-<tr class="row-even"><td><p><em>pydidas.widgets.framework</em></p></td>
-<td><p>Generic widgets which are used throughout the pydidas framework.</p></td>
+<tr class="row-even"><td><p><em>pydidas.widgets.extended_widgets</em></p></td>
+<td><p>Extended generic widgets which are used throughout the pydidas framework.</p></td>
 </tr>
-<tr class="row-odd"><td><p><em>pydidas.widgets.misc</em></p></td>
+<tr class="row-odd"><td><p><em>pydidas.widgets.file_browser</em></p></td>
+<td><p>Widgets used to browse the file system.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>pydidas.widgets.misc</em></p></td>
 <td><p>Miscellaneous widgets for specific jobs.</p></td>
 </tr>
-<tr class="row-even"><td><p><em>pydidas.widgets.parameter_config</em></p></td>
-<td><p>Specific widgets to edit the values of Parameters and functionality to
-create and manage parameter config widgets.</p></td>
+<tr class="row-odd"><td><p><em>pydidas.widgets.param_io</em></p></td>
+<td><p>Widgets to edit the values of Parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><em>pydidas.widgets.selection</em></p></td>
-<td><p>Widgets used to select a specific item (e.g. combo boxes or from a file
-system tree).</p></td>
+<tr class="row-even"><td><p><em>pydidas.widgets.plugin_config_widgets</em></p></td>
+<td><p>Widgets to configure the Parameters of plugins.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>pydidas.widgets.pyqtgraph_plot</em></p></td>
+<td><p>Widgets for plotting based on pyqtgraph.</p></td>
 </tr>
 <tr class="row-even"><td><p><em>pydidas.widgets.silx_plot</em></p></td>
 <td><p>Widgets used to extend the silx plotting functionality in pydidas.</p></td>
 </tr>
 <tr class="row-odd"><td><p><em>pydidas.widgets.windows</em></p></td>
-<td><p>pydidas Windows offer specific and more complicated functionality for
-specific tasks.</p></td>
+<td><p>pydidas Windows offer specific and more complicated functionality for specific tasks.</p></td>
 </tr>
 <tr class="row-even"><td><p><em>pydidas.widgets.workflow_edit</em></p></td>
 <td><p>Widgets used to show and edit the workflow tree.</p></td>
@@ -520,14 +532,19 @@ specific tasks.</p></td>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="widgets/base.html">The widgets sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="widgets/controllers.html">The widgets.controllers sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets/dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets/factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets/framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="widgets/misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets/parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="widgets/selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="widgets/silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/windows.html">The widgets.windows sub-package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="widgets/workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
 </ul>
 </div>

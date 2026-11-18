@@ -462,9 +462,9 @@ GPT-5.3-Codex.</p>
 </nav>
 <section id="parameterwidgetmixin-public-api">
 <h2><a class="toc-backref" href="#id1" role="doc-backlink">ParameterWidgetMixIn Public API</a><a class="headerlink" href="#parameterwidgetmixin-public-api" title="Link to this heading">#</a></h2>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetMixIn</span></code> is a mixin class that
+<p><a class="reference internal" href="../../code/api/widgets/base_classes.html#pydidas.widgets.base_classes.ParameterWidgetMixIn" title="pydidas.widgets.base_classes.ParameterWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidgetMixIn</span></code></a> is a mixin class that
 can be added to any <code class="docutils literal notranslate"><span class="pre">QWidget</span></code> subclass to provide managed creation, access,
-and synchronization of <code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code> instances. It maintains two
+and synchronization of <a class="reference internal" href="../../code/api/widgets/param_io.html#pydidas.widgets.param_io.ParameterWidget" title="pydidas.widgets.param_io.ParameterWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a> instances. It maintains two
 internal registries:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">param_widgets</span></code>: maps <code class="docutils literal notranslate"><span class="pre">refkey</span></code> -&gt; the raw I/O widget (<code class="docutils literal notranslate"><span class="pre">BaseParamIoWidget</span></code>).</p></li>
@@ -476,7 +476,7 @@ internal registries:</p>
 <p><code class="docutils literal notranslate"><span class="pre">ParameterWidgetMixIn</span></code> assumes the host class has a <code class="docutils literal notranslate"><span class="pre">params</span></code>
 (<a class="reference internal" href="../../code/api/core/parameter_collection.html#pydidas.core.ParameterCollection" title="pydidas.core.ParameterCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterCollection</span></code></a>) and is
 a (subclass of) <code class="docutils literal notranslate"><span class="pre">QWidget</span></code> with a layout manager that supports adding
-widgets (e.g. <code class="docutils literal notranslate"><span class="pre">QGridLayout</span></code>). <code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterEditCanvas</span></code> provides a
+widgets (e.g. <code class="docutils literal notranslate"><span class="pre">QGridLayout</span></code>). <a class="reference internal" href="../../code/api/widgets/extended_widgets.html#pydidas.widgets.extended_widgets.ParameterEditCanvas" title="pydidas.widgets.extended_widgets.ParameterEditCanvas"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterEditCanvas</span></code></a> provides a
 ready-to-use base class combining both.</p>
 </div>
 <section id="methods">

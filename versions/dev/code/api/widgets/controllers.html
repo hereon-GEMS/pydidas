@@ -58,8 +58,8 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="The widgets.dialogues sub-package" href="dialogues.html" />
-    <link rel="prev" title="The widgets sub-package" href="base.html" />
+    <link rel="next" title="The widgets.data_viewer sub-package" href="data_viewer.html" />
+    <link rel="prev" title="The widgets.base_reimplementations sub-package" href="base_reimplementations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="26.05.19" />
@@ -386,14 +386,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_reimplementations.html">The widgets.base_reimplementations sub-package</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.controllers sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dialogues.html">The widgets.dialogues sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="factory.html">The widgets.factory sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="framework.html">The widgets.framework sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_browser.html">The widgets.file_browser sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter_config.html">The widgets.parameter_config sub-package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="selection.html">The widgets.selection sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
 </ul>
 </details></li>
@@ -466,7 +471,7 @@
 <p>Package with widget controllers.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydidas.widgets.controllers.ManuallySetBeamcenterController">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.controllers.</span></span><span class="sig-name descname"><span class="pre">ManuallySetBeamcenterController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="misc.html#pydidas.widgets.misc.PointsForBeamcenterWidget" title="pydidas.widgets.misc.points_for_beamcenter_widget.PointsForBeamcenterWidget"><span class="pre">PointsForBeamcenterWidget</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetBeamcenterController" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.controllers.</span></span><span class="sig-name descname"><span class="pre">ManuallySetBeamcenterController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PydidasPlot2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="misc.html#pydidas.widgets.misc.PointsForBeamcenterWidget" title="pydidas.widgets.misc.points_for_beamcenter_widget.PointsForBeamcenterWidget"><span class="pre">PointsForBeamcenterWidget</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.controllers.ManuallySetBeamcenterController" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/others.html#pydidas.core.ConfigDictMixin" title="pydidas.core.config_dict_mixin.ConfigDictMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDictMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QObject</span></code></p>
 <p>This class manages manually selecting and editing the beamcenter.</p>
 <p>This controller requires a PydidasPlot2D to pick up selected points
@@ -798,20 +803,20 @@ requested enabled state.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="base.html"
+       href="base_reimplementations.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The widgets sub-package</p>
+        <p class="prev-next-title">The widgets.base_reimplementations sub-package</p>
       </div>
     </a>
     <a class="right-next"
-       href="dialogues.html"
+       href="data_viewer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The widgets.dialogues sub-package</p>
+        <p class="prev-next-title">The widgets.data_viewer sub-package</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

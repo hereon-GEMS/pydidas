@@ -626,9 +626,38 @@ The default is True.</p></li>
 <h4>Flattened scan dimensions<a class="headerlink" href="#flattened-scan-dimensions" title="Link to this heading">#</a></h4>
 <p>For some applications, it might be interesting to ignore the detailed shape of
 the scan and flatten the scan to a <em>timeline</em>. The
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_results_for_flattened_scan(node_id)</span></code> method
-allows to get a Dataset with all the scan dimensions flattened to a single
+argument <code class="docutils literal notranslate"><span class="pre">flatten_scan_dims=True</span></code> of then:py:meth:<cite>get_results &lt;pydidas.workflow.ProcessingResults.get_results&gt;</cite> methodnallows to get a Dataset with all the scan dimensions flattened to a single
 dimension renamed to <em>timeline</em>:</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">ProcessingResults.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_scan_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.dataset.Dataset"><span class="pre">Dataset</span></a></span></span></dt>
+<dd><p>Get the combined results for the requested node_id.</p>
+<p>The squeeze and flatten_scan_dims flags can be used to modify
+the shape of the returned dataset. Please see the Parameter
+documentation below for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_id</strong> (<em>int</em>) – The node ID for which results should be returned.</p></li>
+<li><p><strong>squeeze</strong> (<em>bool</em>) – Flag to squeeze the results of the requested node ID to
+remove dimensions of size 1.</p></li>
+<li><p><strong>flatten_scan_dims</strong> (<em>bool</em>) – Flag to flatten all result dimensions of the Scan into
+a single timeline. All other dimensions are unchanged.
+This option can be combined with squeeze.</p></li>
+<li><p><strong>copy</strong> (<em>bool</em>) – Flag to return a copy of the results. If False, the ndarray
+will be returned and the data can be changed in place.
+The default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The combined results of all frames for a specific node.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../code/api/core/dataset.html#pydidas.core.Dataset" title="pydidas.core.Dataset">Dataset</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <p>An example is given below:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pydidas</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">RESULTS</span> <span class="o">=</span> <span class="n">pydidas</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">WorkflowResults</span><span class="p">()</span>
@@ -640,7 +669,7 @@ dimension renamed to <em>timeline</em>:</p>
 
 <span class="go"># Get the results with the first two dimensions (from the scan) concatenated</span>
 <span class="go"># to a single dimension:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res1_flat</span> <span class="o">=</span> <span class="n">RESULTS</span><span class="o">.</span><span class="n">get_results_for_flattened_scan</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res1_flat</span> <span class="o">=</span> <span class="n">RESULTS</span><span class="o">.</span><span class="n">get_results</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">flatten_scan_dims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1_flat</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(84, 1000)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1_flat</span>
@@ -718,7 +747,7 @@ in the example below:</p>
 
 <span class="go"># Note that the slices must be a tuple, so we need to create a tuple with</span>
 <span class="go"># the slice object:</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span> <span class="o">=</span> <span class="n">RESULTS</span><span class="o">.</span><span class="n">get_result_subset</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">),</span> <span class="n">flattened_scan_dim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span> <span class="o">=</span> <span class="n">RESULTS</span><span class="o">.</span><span class="n">get_result_subset</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">),</span> <span class="n">flatten_scan_dims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res1</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(16, 1000)</span>
 

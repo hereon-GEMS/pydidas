@@ -1,0 +1,1444 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The widgets.base_reimplementations sub-package &#8212; pydidas</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/_css/pydidas-custom.css?v=ab187429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../../_static/documentation_options.js?v=513e65ce"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/api/widgets/base_reimplementations';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/hereon-GEMS/pydidas/gh-pages-version-snapshots/pydata_version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '"26.05.19"';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="The widgets.controllers sub-package" href="controllers.html" />
+    <link rel="prev" title="The widgets.base_classes sub-package" href="base_classes.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="26.05.19" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-light" alt="pydidas"/>
+    <img src="../../../_static/pydidas_snakes_circ_bg.png" class="logo__image only-dark pst-js-only" alt="pydidas"/>
+  
+  
+    <p class="title logo__title"> pydidas</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../manuals/manuals_main.html">
+    User manuals
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../code_documentation.html">
+    Code documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../dev_guide/developer_guide.html">
+    Developer guide
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/hereon-GEMS/pydidas" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../concepts.html">Key concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../package_structure.html">Package structure</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The core submodule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multiprocessing.html">The multiprocessing sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_io.html">The data_io sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contexts.html">The contexts sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managers.html">The managers sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../plugins.html">The plugins sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">The workflow sub-package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apps.html">The apps sub-package</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../widgets.html">The widgets sub-package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">The widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base_classes.html">The widgets.base_classes sub-package</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The widgets.base_reimplementations sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="controllers.html">The widgets.controllers sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_viewer.html">The widgets.data_viewer sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dialogs.html">The widgets.dialogs sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extended_widgets.html">The widgets.extended_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_browser.html">The widgets.file_browser sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">The widgets.misc sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="param_io.html">The widgets.param_io sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugin_config_widgets.html">The widgets.plugin_config_widgets sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyqtgraph_plot.html">The widgets.pyqtgraph_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="silx_plot.html">The widgets.silx_plot sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html">The widgets.windows sub-package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow_edit.html">The widgets.workflow_edit sub-package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">The gui submodule</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../code_documentation.html" class="nav-link">Code documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../widgets.html" class="nav-link">The widgets sub-package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The widgets.base_reimplementations sub-package</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-pydidas.widgets.base_reimplementations">
+<span id="the-widgets-base-reimplementations-sub-package"></span><h1>The widgets.base_reimplementations sub-package<a class="headerlink" href="#module-pydidas.widgets.base_reimplementations" title="Link to this heading">#</a></h1>
+<p>The base_reimplementations subpackage includes basic QtWidget
+re-implementations with extended generic functionality that
+are used throughout the pydidas package.</p>
+<p>These widgets are designed to provide scaling based on the system
+font and font size to allow a scalability independent of the
+monitor resolution.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.FontScalingToolbar">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">FontScalingToolbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QToolBar</span></code></p>
+<p>A subclassed toolbar with automatic scaling based on the font metrics.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_family">
+<span class="sig-name descname"><span class="pre">process_new_font_family</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_family" title="Link to this definition">#</a></dt>
+<dd><p>Redraw the toolbar with the new font family.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Process the new font height and adjust the ToolBar accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>font_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasCheckBox">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasCheckBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasCheckBox" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QCheckBox</span></code></p>
+<p>Create a QCheckBox with automatic font formatting.</p>
+<p>Note that this class is not intended to be used with tri-state checkboxes.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasComboBox">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasComboBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QComboBox</span></code></p>
+<p>Create a QComboBox with automatic font formatting.</p>
+<p>This Combobox overwrites the default sizeHint to take as much space
+(up to the generic IO widget width) to fill the layout.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasFrameStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QStackedWidget</span></code></p>
+<p>A QStackedWidget with references to all the possible top-level widgets.</p>
+<p>Widgets are responsible for registering themselves with this class to
+allow a later reference. For the pydidas main application, the main
+window takes care of registration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent</strong> (<em>QWidget</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The parent widget. The default is None.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.activate_widget_by_name">
+<span class="sig-name descname"><span class="pre">activate_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.activate_widget_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget referenced by name to the active widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ref_name</strong> (<em>str</em>) – The reference name of the widget.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If no widget with the name has been registered.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.active_widget_name">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">active_widget_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.active_widget_name" title="Link to this definition">#</a></dt>
+<dd><p>Return the name of the active widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the active widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.addWidget">
+<span class="sig-name descname"><span class="pre">addWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.addWidget" title="Link to this definition">#</a></dt>
+<dd><p>Overload the QStackedWidget.addWidget method to deactivate it.</p>
+<p>Widgets should be added through the register_widget method, which
+also demands a reference name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>NotImplementedError</strong> – Reference to the register_widget method is given.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.currentWidget">
+<span class="sig-name descname"><span class="pre">currentWidget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.currentWidget" title="Link to this definition">#</a></dt>
+<dd><p>Get the currently active widget, i.e. frame.</p>
+<p>This method only overrides the type hint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The currently active widget, i.e. frame.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.BaseFrame">BaseFrame</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.current_frames">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_frames</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.current_frames" title="Link to this definition">#</a></dt>
+<dd><p>Get all current frames</p>
+<p>This property returns the list of all registered frames in the
+PydidasFrameStack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of all registered frames.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.enterEvent">
+<span class="sig-name descname"><span class="pre">enterEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.enterEvent" title="Link to this definition">#</a></dt>
+<dd><p>Send a signal that the mouse entered the central widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<em>QtCore.QEvent</em>) – The calling event.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_indices">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frame_indices</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_indices" title="Link to this definition">#</a></dt>
+<dd><p>Get the frame indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with the frame indices, where the keys are the
+frame menu items and the values are the indices in the QStackedWidget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_names">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frame_names</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_names" title="Link to this definition">#</a></dt>
+<dd><p>Get the names of all registered frames.</p>
+<p>This property returns the list of all registered frame names in the
+PydidasFrameStack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of all registered frame names.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_entries">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frame_toolbar_entries</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_entries" title="Link to this definition">#</a></dt>
+<dd><p>Get all menu entries based on the stored information in the Frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of the menu entries for all registered Frames.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_metadata">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">frame_toolbar_metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_metadata" title="Link to this definition">#</a></dt>
+<dd><p>Get all the metadata to create the frame toolbar menu from the frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary with all the required information to create the toolbar menu.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.get_widget_by_name">
+<span class="sig-name descname"><span class="pre">get_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.get_widget_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Get a widget from its reference name.</p>
+<p>This method will return the widget registered with the reference
+name, if it exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ref_name</strong> (<em>str</em>) – The reference name of the widget.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If no widget with the reference name has been registered.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>widget</strong> – The widget referenced by the name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pydidas.widgets.framework.BaseFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.is_registered">
+<span class="sig-name descname"><span class="pre">is_registered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.is_registered" title="Link to this definition">#</a></dt>
+<dd><p>Check if a widget is already registered.</p>
+<p>This method checks if a widget is already registered and returns
+the bool result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>widget</strong> (<em>QWidget</em>) – The widget which might already be registered.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This will be True if the widget has been registered, and False
+if not.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.register_frame">
+<span class="sig-name descname"><span class="pre">register_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.register_frame" title="Link to this definition">#</a></dt>
+<dd><p>Register a Frame with the stacked widget.</p>
+<p>This method will register a Frame and hold a reference to the
+frame index by the Frame’s menu_entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<em>pydidas.widgets.framework.BaseFrame</em>) – The BaseFrame to be registered.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – If a widget is not of the type pydidas.widgets.framework.BaseFrame</p></li>
+<li><p><strong>KeyError</strong> – When a widget with the same name has already been registered
+    to prevent duplicate entries in the index reference.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.removeWidget">
+<span class="sig-name descname"><span class="pre">removeWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.base_frame.BaseFrame"><span class="pre">BaseFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.removeWidget" title="Link to this definition">#</a></dt>
+<dd><p>Remove a frame from the QStackedWidget.</p>
+<p>This overloaded method removes a frame widget from the QStackedWidget
+and also dereferences it from the metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> (<a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.BaseFrame" title="pydidas.widgets.base_classes.BaseFrame"><em>BaseFrame</em></a>) – The widget to be removed from the QStackedWidget.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the widget is not registered.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.remove_widget_by_name">
+<span class="sig-name descname"><span class="pre">remove_widget_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.remove_widget_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Remove a widget by its reference name.</p>
+<p>This method finds the widget associated with the reference name
+and deletes it from the QStackedWidget.</p>
+<p>Note: This does not delete the widget itself, only the reference
+in the QStackedWidget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ref_name</strong> (<em>str</em>) – The reference name of the widget</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If the reference name has not been used for registering a widget.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.reset" title="Link to this definition">#</a></dt>
+<dd><p>Reset the PydidasFrameStack and delete all widgets from itself.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasFrameStack.restore_frame_state_info">
+<span class="sig-name descname"><span class="pre">restore_frame_state_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.restore_frame_state_info" title="Link to this definition">#</a></dt>
+<dd><p>Restore the state info of all frames from the stored state information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – A dictionary with the stored state information for all frames.
+The keys are labeled based on the menu entries and the values
+are dictionaries with the state information for each frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasLabel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasLabel" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QLabel</span></code></p>
+<p>Create a QLabel with automatic font formatting.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasLineEdit">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasLineEdit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasLineEdit" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QLineEdit</span></code></p>
+<p>Create a QLineEdit with automatic font formatting.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasLineEdit.update_size_hint">
+<span class="sig-name descname"><span class="pre">update_size_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_size_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QSize</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasLineEdit.update_size_hint" title="Link to this definition">#</a></dt>
+<dd><p>Update the sizeHint value of this widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_size_hint</strong> (<em>QtCore.QSize</em>) – The new size hint.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasListWidget">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasListWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasListWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QListWidget</span></code></p>
+<p>A QListWidget with automatic width scaling and font formatting</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasPushButton">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasPushButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasPushButton" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QPushButton</span></code></p>
+<p>Create a QPushButton with automatic font and size formatting.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasStatusWidget">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasStatusWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QDockWidget</span></code></p>
+<p>The StatusWidget is used for managing global status messages.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasStatusWidget.add_status">
+<span class="sig-name descname"><span class="pre">add_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.add_status" title="Link to this definition">#</a></dt>
+<dd><p>Add a status message to the PydidasStatusWidget.</p>
+<p>This method will add a status message to the Info/Log widget together
+with a timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to add.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasStatusWidget.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QSize</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Give a sizeHint which corresponds to a wide and short field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The desired size.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QtCore.QSize</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasStatusWidget.text">
+<span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.text" title="Link to this definition">#</a></dt>
+<dd><p>Get the text of the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The text of the widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasSvgWidget">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasSvgWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasSvgWidget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QSvgWidget</span></code></p>
+<p>A QSvgWidget with automatic font adjustment and a custom sizeHint.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">PydidasTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QTableWidget</span></code></p>
+<p>A QTableWidget with automatic font scaling.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.add_multicolumn_cell">
+<span class="sig-name descname"><span class="pre">add_multicolumn_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.add_multicolumn_cell" title="Link to this definition">#</a></dt>
+<dd><p>Add a cell which spans all columns in the table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – The label of the spanned row.</p></li>
+<li><p><strong>start_col</strong> (<em>int</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The column index at which the spanned cell starts, by default 0.</p></li>
+<li><p><strong>n_col</strong> (<em>int</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The number of columns to span, by default -1 which spans all
+columns.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.add_row">
+<span class="sig-name descname"><span class="pre">add_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.add_row" title="Link to this definition">#</a></dt>
+<dd><p>Add a row to the table with the given labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*labels</strong> (<em>str</em>) – The labels of the cells.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.emit_row_selection">
+<span class="sig-name descname"><span class="pre">emit_row_selection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.emit_row_selection" title="Link to this definition">#</a></dt>
+<dd><p>Emit the signal of a new row selection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">char_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">char_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Adjust the widget’s width based on the font metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>char_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>char_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.remove_all_rows">
+<span class="sig-name descname"><span class="pre">remove_all_rows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.remove_all_rows" title="Link to this definition">#</a></dt>
+<dd><p>Remove all rows from the table.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.selected_row_id">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">selected_row_id</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.selected_row_id" title="Link to this definition">#</a></dt>
+<dd><p>Get the selected node id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The selected node id.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.PydidasTable.table_display_height">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">table_display_height</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.PydidasTable.table_display_height" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the required height for the table</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">RadioButtonGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>The RadioButtonGroup holds a number of QRadioButtons in a QButtonGroup.</p>
+<p>Creation is automated based on the entries.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.active_label">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">active_label</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.active_label" title="Link to this definition">#</a></dt>
+<dd><p>Return the label name of the currently selected button.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The label.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.emit_signal">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">emit_signal</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.emit_signal" title="Link to this definition">#</a></dt>
+<dd><p>Query whether a signal will be emitted on change.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag whether a signal will be emitted.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Adjust the widget height based on the font metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>font_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_index">
+<span class="sig-name descname"><span class="pre">select_by_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_index" title="Link to this definition">#</a></dt>
+<dd><p>Select and activate a new RadioButton based on the index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The new RadioButton’s index.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_label">
+<span class="sig-name descname"><span class="pre">select_by_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_label" title="Link to this definition">#</a></dt>
+<dd><p>Select and activate a new RadioButton based on the text label.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label</strong> (<em>str</em>) – The new RadioButton’s label.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.RadioButtonGroup.which_is_checked">
+<span class="sig-name descname"><span class="pre">which_is_checked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.which_is_checked" title="Link to this definition">#</a></dt>
+<dd><p>Return the information about which index is checked.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The active RadioButton’s index.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">ReadOnlyTextEdit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QWidget</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QTextEdit</span></code></p>
+<p>A QTextEdit widget with advanced text display and formatting support.</p>
+<p>The ReadOnlyTextEdit is a subclass of QTextEdit and is used to
+display scrollable text. It allows four formatters for text.</p>
+<ul class="simple">
+<li><p>‘plain’ : No indent and regular text</p></li>
+<li><p>‘header’ : No indent and bold font</p></li>
+<li><p>‘section’ : A single indent level and regular text</p></li>
+<li><p>‘subsection’ : Two indent levels and regular text</p></li>
+</ul>
+<p>The formats can be specified in the <a class="reference internal" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text" title="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_text</span></code></a> or
+<a class="reference internal" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.append_text" title="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.append_text"><code class="xref py py-meth docutils literal notranslate"><span class="pre">append_text</span></code></a> method or by supplying a list of items.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parent</strong> (<em>QWidget</em><em>, </em><a class="reference internal" href="../core/parameter.html#pydidas.core.Parameter.optional" title="pydidas.core.Parameter.optional"><em>optional</em></a>) – The Qt parent widget. The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Any</em>) – Any arguments which have an associated setArgName method in Qt can
+be used at creation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.append_text">
+<span class="sig-name descname"><span class="pre">append_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plain'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.append_text" title="Link to this definition">#</a></dt>
+<dd><p>Append text to the widget with a specified formatter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be appended.</p></li>
+<li><p><strong>formatter</strong> (<em>str</em>) – The formatter of the text. Can be ‘plain’, ‘header’, ‘section’,
+or ‘subsection’. The default is ‘plain’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.clear" title="Link to this definition">#</a></dt>
+<dd><p>Clear the widget and reset the content tracking.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.default_text">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">default_text</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.default_text" title="Link to this definition">#</a></dt>
+<dd><p>Get the default text (the first entry in the content list).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.prepend_text">
+<span class="sig-name descname"><span class="pre">prepend_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'plain'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.prepend_text" title="Link to this definition">#</a></dt>
+<dd><p>Prepend text to the widget with a specified formatter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be appended.</p></li>
+<li><p><strong>formatter</strong> (<em>str</em>) – The formatter of the text. Can be ‘plain’, ‘header’, ‘section’,
+or ‘subsection’. The default is ‘plain’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.reprint">
+<span class="sig-name descname"><span class="pre">reprint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.reprint" title="Link to this definition">#</a></dt>
+<dd><p>Reprint the latest text with the updated font settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.setText">
+<span class="sig-name descname"><span class="pre">setText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.setText" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget’s text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget’s text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be displayed.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text_from_list">
+<span class="sig-name descname"><span class="pre">set_text_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text_from_list" title="Link to this definition">#</a></dt>
+<dd><p>Set the widget’s text from a list of entries.</p>
+<p>Each entry in the list is a tuple with the first element being the
+<cite>type</cite> of the entry (header, section, subsection) and the second
+element being the value. The type will determine the formatting of
+the entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_list</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – The list of entries. Each entry is a tuple with the formatter key
+and text entries to be displayed.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title. If an empty string, no title will be printed.
+The default is ‘’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_title">
+<span class="sig-name descname"><span class="pre">set_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_title" title="Link to this definition">#</a></dt>
+<dd><p>Update the displayed title without changing the text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) – The new title.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.SquareButton">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pydidas.widgets.base_reimplementations.</span></span><span class="sig-name descname"><span class="pre">SquareButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.SquareButton" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_classes.html#pydidas.widgets.base_classes.PydidasWidgetMixIn" title="pydidas.widgets.base_classes.pydidas_widget_mixin.PydidasWidgetMixIn"><code class="xref py py-class docutils literal notranslate"><span class="pre">PydidasWidgetMixIn</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">QPushButton</span></code></p>
+<p>A PushButton which tries to stay square in size.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.SquareButton.heightForWidth">
+<span class="sig-name descname"><span class="pre">heightForWidth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.SquareButton.heightForWidth" title="Link to this definition">#</a></dt>
+<dd><p>Get the same preferred height as the width.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>width</strong> (<em>int</em>) – The widget width.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The width.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.SquareButton.process_new_font_metrics">
+<span class="sig-name descname"><span class="pre">process_new_font_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.SquareButton.process_new_font_metrics" title="Link to this definition">#</a></dt>
+<dd><p>Set the fixed width of the widget dynamically from the font metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_width</strong> (<em>float</em>) – The font width in pixels.</p></li>
+<li><p><strong>font_height</strong> (<em>float</em>) – The font height in pixels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydidas.widgets.base_reimplementations.SquareButton.sizeHint">
+<span class="sig-name descname"><span class="pre">sizeHint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydidas.widgets.base_reimplementations.SquareButton.sizeHint" title="Link to this definition">#</a></dt>
+<dd><p>Set the sizeHint based on the font size.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="base_classes.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The widgets.base_classes sub-package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="controllers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The widgets.controllers sub-package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar"><code class="docutils literal notranslate"><span class="pre">FontScalingToolbar</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_family"><code class="docutils literal notranslate"><span class="pre">FontScalingToolbar.process_new_font_family</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.FontScalingToolbar.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">FontScalingToolbar.process_new_font_metrics</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasCheckBox"><code class="docutils literal notranslate"><span class="pre">PydidasCheckBox</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasComboBox"><code class="docutils literal notranslate"><span class="pre">PydidasComboBox</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.activate_widget_by_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.activate_widget_by_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.active_widget_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.active_widget_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.addWidget"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.addWidget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.currentWidget"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.currentWidget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.current_frames"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.current_frames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.enterEvent"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.enterEvent</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_indices"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_indices</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_names"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_names</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_entries"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_entries</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.frame_toolbar_metadata"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.frame_toolbar_metadata</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.get_widget_by_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.get_widget_by_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.is_registered"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.is_registered</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.register_frame"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.register_frame</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.removeWidget"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.removeWidget</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.remove_widget_by_name"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.remove_widget_by_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.reset"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.reset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasFrameStack.restore_frame_state_info"><code class="docutils literal notranslate"><span class="pre">PydidasFrameStack.restore_frame_state_info</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasLabel"><code class="docutils literal notranslate"><span class="pre">PydidasLabel</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasLineEdit"><code class="docutils literal notranslate"><span class="pre">PydidasLineEdit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasLineEdit.update_size_hint"><code class="docutils literal notranslate"><span class="pre">PydidasLineEdit.update_size_hint</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasListWidget"><code class="docutils literal notranslate"><span class="pre">PydidasListWidget</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasPushButton"><code class="docutils literal notranslate"><span class="pre">PydidasPushButton</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.add_status"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.add_status</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.sizeHint"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.sizeHint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasStatusWidget.text"><code class="docutils literal notranslate"><span class="pre">PydidasStatusWidget.text</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasSvgWidget"><code class="docutils literal notranslate"><span class="pre">PydidasSvgWidget</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable"><code class="docutils literal notranslate"><span class="pre">PydidasTable</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.add_multicolumn_cell"><code class="docutils literal notranslate"><span class="pre">PydidasTable.add_multicolumn_cell</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.add_row"><code class="docutils literal notranslate"><span class="pre">PydidasTable.add_row</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.emit_row_selection"><code class="docutils literal notranslate"><span class="pre">PydidasTable.emit_row_selection</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">PydidasTable.process_new_font_metrics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.remove_all_rows"><code class="docutils literal notranslate"><span class="pre">PydidasTable.remove_all_rows</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.selected_row_id"><code class="docutils literal notranslate"><span class="pre">PydidasTable.selected_row_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.PydidasTable.table_display_height"><code class="docutils literal notranslate"><span class="pre">PydidasTable.table_display_height</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.active_label"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.active_label</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.emit_signal"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.emit_signal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.process_new_font_metrics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_index"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.select_by_index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.select_by_label"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.select_by_label</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.RadioButtonGroup.which_is_checked"><code class="docutils literal notranslate"><span class="pre">RadioButtonGroup.which_is_checked</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.append_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.append_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.clear"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.clear</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.default_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.default_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.prepend_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.prepend_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.reprint"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.reprint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.setText"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.setText</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.set_text</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_text_from_list"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.set_text_from_list</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.ReadOnlyTextEdit.set_title"><code class="docutils literal notranslate"><span class="pre">ReadOnlyTextEdit.set_title</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.SquareButton"><code class="docutils literal notranslate"><span class="pre">SquareButton</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.SquareButton.heightForWidth"><code class="docutils literal notranslate"><span class="pre">SquareButton.heightForWidth</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.SquareButton.process_new_font_metrics"><code class="docutils literal notranslate"><span class="pre">SquareButton.process_new_font_metrics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydidas.widgets.base_reimplementations.SquareButton.sizeHint"><code class="docutils literal notranslate"><span class="pre">SquareButton.sizeHint</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/hereon-GEMS/pydidas/edit/master/src/pydidas/docs/src/code/api/widgets/base_reimplementations.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/code/api/widgets/base_reimplementations.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021 - 2026, Helmholtz-Zentrum Hereon.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

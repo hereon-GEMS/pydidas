@@ -487,7 +487,7 @@ GUI state</em>)</p>
 </dl>
 </li>
 <li><dl>
-<dt>Restore GUI state at exit</dt><dd><p>The <em>Restore at Exit</em> entry will open a dialog to confirm that the
+<dt>Restore exit state</dt><dd><p>The <em>Restore exit</em> entry will open a dialog to confirm that the
 user wants to restore the UI state from pydidas’s automatically
 handled exit state file. If confirmed, all pydidas objects are
 updated and the GUI view is changed to the active view when last
@@ -504,7 +504,7 @@ pydidas GUI.</p>
 </dl>
 </li>
 <li><dl>
-<dt>Import</dt><dd><p>The <em>Import</em> entry will open a file selection dialog to select a
+<dt>Import GUI state</dt><dd><p>The <em>Import</em> entry will open a file selection dialog to select a
 file with the UI state to be restored.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -521,7 +521,8 @@ the import.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Exit</dt><dd><p>This action will close the pydidas GUI <strong>without confirmation</strong>.</p>
+<dt>Exit</dt><dd><p>This action will open a dialog to confirm that the user wants to close
+the pydidas GUI.</p>
 </dd>
 </dl>
 </li>
@@ -555,7 +556,7 @@ editor window manual</span></a>.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Clear local log filesystem</dt><dd><p>Using this menu entry will try to clear all written pydidas log files
+<dt>Clear local log files</dt><dd><p>Using this menu entry will try to clear all written pydidas log files
 from the local file system.</p>
 </dd>
 </dl>
@@ -585,9 +586,18 @@ refer to the documentation in the <a class="reference internal" href="windows/Gl
 </dl>
 </li>
 <li><dl class="simple">
+<dt>Window</dt><dd><dl class="simple">
+<dt>-Hide logging widget</dt><dd><p>This menu entry toggles the “Logging and information” widget at the
+bottom of the window.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
 <dt>Help</dt><dd><ul class="simple">
 <li><dl class="simple">
-<dt>Open documentation in browser</dt><dd><p>Using this menu entry will open the documentation home in a new tab in
+<dt>Open documentation in default web browser</dt><dd><p>Using this menu entry will open the documentation home in a new tab in
 the operating system’s default web browser.</p>
 </dd>
 </dl>
@@ -606,7 +616,7 @@ paths in which log files and configuration files are placed by pydidas.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>Check for update</dt><dd><p>Using this option requires an active internet connection. Pydidas will
+<dt>Check for software updates</dt><dd><p>Using this option requires an active internet connection. Pydidas will
 check the latest release version on Github and compare the remote
 version number with the locally installed version. The result will be
 supplied to the user in a pop-up window.</p>
@@ -614,7 +624,7 @@ supplied to the user in a pop-up window.</p>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>About</dt><dd><p>The about window has copyright information and links to the pydidas
+<dt>About pydidas</dt><dd><p>The about window has copyright information and links to the pydidas
 homepage and GitHub home.</p>
 </dd>
 </dl>

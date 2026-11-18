@@ -45,8 +45,7 @@ and to add metadata about the scan to plots and stored datasets.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in `List of all ScanContext Parameters
-<../global/scan/scan_params.html>`_.
+given in :doc:`List of all ScanContext Parameters </manuals/global/scan/scan_params>`.
 
 Its instance can be obtained by calling the following code:
 

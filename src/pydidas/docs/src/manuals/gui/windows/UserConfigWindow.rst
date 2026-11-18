@@ -58,11 +58,11 @@ setting set to True.
       - Toggle whether pydidas will automatically check the github repository
         for an updated version at startup.
 
-Composite creator settings
---------------------------
+Data browsing
+-------------
 
-These settings determine how individual images are arranged into a mosaic with
-the composite creator.
+These settings configure the root directory used when browsing for data files in
+pydidas.
 
 .. list-table::
     :widths: 25 75
@@ -71,12 +71,13 @@ the composite creator.
 
     * - Parameter
       - Description
-    * - Mosaic tiling border width
-      - The width (in pixels) of the border between adjacent images in
-        composites.
-    * - Mosaic border value
-      - The value to be assigned to the pixels on the border between adjacent
-        images.
+    * - Use custom data browsing root
+      - Toggle whether a custom root directory should be used as the starting
+        point / top-level directory for data browsing instead of the default
+        system root.
+    * - Data browsing root
+      - Path to the custom root directory used for data browsing when
+        *Use custom data browsing root* is enabled.
 
 Plot settings
 -------------
@@ -91,6 +92,10 @@ behave. For detailed descriptions, please see the list below.
 
     * - Parameter
       - Description
+    * - Maximum number of curves
+      - This Parameter determines how many curves can be displayed in plots.
+        Increasing this number can significantly decrease performance. The
+        default value of 40 means that up to 40 curves can be displayed at once.
     * - Histogram outlier fraction (low)
       - [This setting is for 2D image displays only]. This Parameter defines
         which portion of the histogram should be ignored when defining the lower

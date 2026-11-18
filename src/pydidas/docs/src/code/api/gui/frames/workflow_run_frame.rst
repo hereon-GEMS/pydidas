@@ -19,7 +19,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.frames.WorkflowRunFrame
+.. autoclass:: pydidas.gui.frames.workflow_run_frame.WorkflowRunFrame
     :members:
 
 .. _all_methods_WorkflowRunFrame:
@@ -27,7 +27,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.frames.WorkflowRunFrame
+.. autoclass:: pydidas.gui.frames.workflow_run_frame.WorkflowRunFrame
     :members:
     :noindex:
     :inherited-members: QFrame

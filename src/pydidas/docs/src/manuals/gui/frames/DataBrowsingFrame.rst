@@ -177,8 +177,9 @@ multi-dimensional data.
 
 Key elements are:
 
-  - The filename display at the top:  This widget shows the full path of the
-    opened file.
+  - The editable filename display at the top: This widget shows the full path of
+    the opened file. It can also be used to open a file by its path instead of
+    selecting it in the directory explorer.
   - Selection widgets for raw images and hdf5 files: These widgets allow to
     select the data settings for raw images and the dataset for hdf5 files.
   - The visualization widget: The selected data is displayed here.

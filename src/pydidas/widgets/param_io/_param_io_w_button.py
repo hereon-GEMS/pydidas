@@ -28,13 +28,13 @@ __status__ = "Production"
 __all__ = ["_ParamIoWithButton"]
 
 
-from functools import partial
 from typing import Any
 
 from qtpy import QtGui
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core import Parameter
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.base_classes import (
     EmptyWidget,
 )
@@ -84,7 +84,7 @@ class _ParamIoWithButton(BaseParamIoMixIn, EmptyWidget):
         self._io_lineedit.setText(f"{param.value}")
         self._button.clicked.connect(self.button_function)
         self._io_lineedit.editingFinished.connect(self.emit_signal)
-        self._io_lineedit.returnPressed.connect(partial(self.emit_signal, True))
+        self._io_lineedit.returnPressed.connect(weak_partial(self.emit_signal, True))
 
     @property
     def current_text(self) -> str:

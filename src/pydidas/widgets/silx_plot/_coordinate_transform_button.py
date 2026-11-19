@@ -27,7 +27,6 @@ __status__ = "Production"
 __all__ = ["CoordinateTransformButton"]
 
 
-from functools import partial
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from qtpy import QtCore, QtWidgets
@@ -36,6 +35,7 @@ from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core.constants import ASCII_TO_UNI
+from pydidas.core.utils import weak_partial
 from pydidas.resources.pydidas_icons import create_pydidas_icon
 
 
@@ -120,7 +120,7 @@ class CoordinateTransformButton(PlotToolButton):
         _icon = self.CS_CONFIG[coordinate_system, "icon"]
         _text = self.CS_CONFIG[coordinate_system, "action"]
         _action = QtWidgets.QAction(_icon, _text, self)
-        _action.triggered.connect(partial(self.set_coordinates, coordinate_system))  # type: ignore[attr-defined]
+        _action.triggered.connect(weak_partial(self.set_coordinates, coordinate_system))  # type: ignore[attr-defined]
         _action.setIconVisibleInMenu(True)
         menu.addAction(_action)
 

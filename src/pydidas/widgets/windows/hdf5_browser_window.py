@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["Hdf5BrowserWindow"]
 
 
-from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +35,7 @@ import h5py
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.core.lazy_imports.silx import silx_hdf5, silx_icons
+from pydidas.core.utils import weak_partial
 from pydidas.resources.pydidas_icons import pydidas_icon_with_bg
 from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
@@ -99,7 +99,7 @@ class Hdf5BrowserWindow(PydidasWindow):
             _action.setText(f"{_label.capitalize()} all")
             _action.setToolTip(f"{_label.capitalize()} all selected items")
             _action.triggered.connect(
-                partial(self.__toggle_selection, _label == "expand")
+                weak_partial(self.__toggle_selection, _label == "expand")
             )
             _action.setShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL | _key))
             self._actions[_label] = _action

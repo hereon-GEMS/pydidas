@@ -29,12 +29,12 @@ __all__ = ["MainWindow"]
 
 
 import os
-from functools import partial
 from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 
 from pydidas.core import PydidasGuiError, UserConfigError
+from pydidas.core.utils import weak_partial
 from pydidas.gui import utils
 from pydidas.gui.main_menu import MainMenu
 from pydidas.resources import icons
@@ -141,7 +141,7 @@ class MainWindow(MainMenu):
             _metadata = self._toolbar_metadata[_entry]
             _action = QtWidgets.QAction(_metadata["icon"], _metadata["label"], self)
             _action.setCheckable(True)
-            _action.triggered.connect(partial(self.select_item, _entry))
+            _action.triggered.connect(weak_partial(self.select_item, _entry))
             self._toolbar_actions[_entry] = _action
             _item_base = os.path.dirname(_entry)
             self._toolbars[_item_base].addAction(_action)

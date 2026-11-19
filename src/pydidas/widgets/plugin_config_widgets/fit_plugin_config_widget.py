@@ -28,8 +28,6 @@ __status__ = "Production"
 __all__ = ["FitPluginConfigWidget"]
 
 
-from functools import partial
-
 from qtpy import QtCore
 
 from pydidas.core.constants import (
@@ -37,6 +35,7 @@ from pydidas.core.constants import (
     POLICY_EXP_FIX,
 )
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.plugin_config_widgets.generic_plugin_config_widget import (
     GenericPluginConfigWidget,
 )
@@ -83,7 +82,7 @@ class FitPluginConfigWidget(GenericPluginConfigWidget):
                 parent_widget="checkbox_widget",
             )
             self._widgets[f"checkbox_{_key}"].sig_new_check_state.connect(
-                partial(self._box_checked, _key)
+                weak_partial(self._box_checked, _key)
             )
         for _key, _param in self.plugin.params.items():
             if (

@@ -446,7 +446,7 @@ class DataViewer(WidgetWithParameters):
         viewer = DataViewer(parent=self)
         viewer.setWindowFlag(QtCore.Qt.WindowType.Window, True)
         viewer.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-        viewer.destroyed.connect(partial(self._on_pop_out_destroyed, id(viewer)))
+        viewer.destroyed.connect(weak_partial(self._on_pop_out_destroyed, id(viewer)))
         self._pop_out_viewers.append(viewer)
         title = self._config.get("plot_title") or "Dataset"
         viewer.setWindowTitle(f"Data Viewer - {title}")

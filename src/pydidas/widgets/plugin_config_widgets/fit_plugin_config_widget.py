@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["FitPluginConfigWidget"]
 
-import html
 
+import html
 
 from qtpy import QtCore
 

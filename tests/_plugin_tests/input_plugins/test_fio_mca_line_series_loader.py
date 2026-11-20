@@ -132,7 +132,7 @@ def test_check_files_per_directory(temp_dir_w_files, plugin, n_files):
 
 
 def test_check_files_per_directory__no_dir(temp_dir_w_files, plugin):
-    plugin._SCAN.set_param_value("scan_base_directory", temp_dir_w_files[0] / "test123")
+    plugin._scan.set_param_value("scan_base_directory", temp_dir_w_files[0] / "test123")
     plugin.update_filepath()
     with pytest.raises(UserConfigError):
         plugin._check_files_per_directory()
@@ -141,7 +141,7 @@ def test_check_files_per_directory__no_dir(temp_dir_w_files, plugin):
 def test_check_files_per_directory__empty_dir(temp_path, plugin):
     _new_dir = temp_path / get_random_string(6) / get_random_string(6)
     (_new_dir / "test_00001").mkdir(parents=True)
-    plugin._SCAN.set_param_value("scan_base_directory", _new_dir)
+    plugin._scan.set_param_value("scan_base_directory", _new_dir)
     plugin.update_filepath()
     with pytest.raises(UserConfigError):
         plugin._check_files_per_directory()

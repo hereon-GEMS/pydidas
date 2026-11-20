@@ -29,7 +29,6 @@ __status__ = "Production"
 __all__ = ["PluginInWorkflowBox"]
 
 
-from functools import partial
 from typing import Any
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -180,13 +179,21 @@ class PluginInWorkflowBox(WidgetFactoryMixIn, QFrame):
         self._delete_node_context.addAction(self._del_actions["delete"])
         self._delete_node_context.addAction(self._del_actions["delete_branch"])
 
-        self._del_actions["delete"].triggered.connect(
-            partial(self.sig_widget_delete_request.emit, self.widget_id)
-        )
+        self._del_actions["delete"].triggered.connect(self.__request_delete)
         self._del_actions["delete_branch"].triggered.connect(
-            partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
+            self.__request_delete_branch
         )
         self._del_actions["delete_branch"].triggered.connect(self.deleteLater)
+
+    @QtCore.Slot()
+    def __request_delete(self) -> None:
+        """Emit the signal to delete the node from the workflow tree."""
+        self.sig_widget_delete_request.emit(self.widget_id)
+
+    @QtCore.Slot()
+    def __request_delete_branch(self) -> None:
+        """Emit the signal to delete the node branch from the workflow tree."""
+        self.sig_widget_delete_branch_request.emit(self.widget_id)
 
     def __show_deletion_context_menu(self, event: QtGui.QMouseEvent) -> None:
         """

@@ -28,6 +28,8 @@ __status__ = "Production"
 __all__ = ["PyFAI2dIntegration"]
 
 
+from typing import Any
+
 import numpy as np
 
 from pydidas.core import Dataset
@@ -38,7 +40,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
     """
     Integrate an image in 2D using pyFAI.
 
-    The default setting for the azimuthal range in (-180, 180) degree. Using
+    The default setting for the azimuthal range is (-180, 180) degree. Using
     the azimuthal range setting, this can be changed to (0, 360) degree, if
     required.
 
@@ -54,12 +56,12 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
     output_data_dim = 2
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.set_param_value("rad_npoint", 1000)
         self.set_param_value("azi_npoint", 36)
 
-    def pre_execute(self):
+    def pre_execute(self) -> None:
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
@@ -87,32 +89,34 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         }
 
     def execute(
-        self, data: Dataset | np.ndarray, **kwargs: dict
-    ) -> tuple[Dataset, dict]:
+        self, data: Dataset | np.ndarray, **kwargs: Any
+    ) -> tuple[Dataset, dict[str, Any]]:
         """
         Perform a 2D integration of the input dataset.
 
         Parameters
         ----------
-        data : Union[pydidas.core.Dataset, np.ndarray]
-            The image / frame data .
-        **kwargs : dict
+        data : Dataset or np.ndarray
+            The image / frame data.
+        **kwargs : Any
             Any calling keyword arguments.
 
         Returns
         -------
-        _dataset : pydidas.core.Dataset
+        _dataset : Dataset
             The integrated intensity data.
-        kwargs : dict
+        kwargs : dict[str, Any]
             Any calling kwargs, appended by any changes in the function.
         """
         self.check_and_set_custom_mask(**kwargs)
-        _newdata = self._ai.integrate2d(
-            data, self.get_param_value("rad_npoint"), **self._ai_params
+        _result = self._ai.integrate2d(
+            data.array if isinstance(data, Dataset) else data,
+            self.get_param_value("rad_npoint"),
+            **self._ai_params,
         )
         _dataset = Dataset(
-            _newdata[0],
-            axis_ranges=[_newdata[2] * self.__range_factor, _newdata[1]],
+            _result.intensity,
+            axis_ranges=[_result.azimuthal * self.__range_factor, _result.radial],
             **self._dataset_info,
         )
         return _dataset, kwargs

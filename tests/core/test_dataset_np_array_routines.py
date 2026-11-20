@@ -80,7 +80,7 @@ def random_dataset(request):
 @pytest.mark.parametrize("test_dataset", [2, 3, 4], indirect=True)
 def test_roll__no_axis(test_dataset):
     with pytest.warns(UserWarning):
-        _new = np.roll(test_dataset, 3)
+        _new = test_dataset.roll(3)
     assert _new.shape == test_dataset.shape
 
 

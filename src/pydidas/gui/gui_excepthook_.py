@@ -39,6 +39,9 @@ from pydidas.widgets.dialogs import ErrorMessageBox, PydidasExceptionMessageBox
 from pydidas_qtcore import PydidasQApplication
 
 
+__OPEN_DIALOGS = []
+
+
 def gui_excepthook(exc_type, exception, trace):
     """
     Catch global exceptions.
@@ -66,15 +69,23 @@ def gui_excepthook(exc_type, exception, trace):
             .removesuffix(")")
             .strip("\"'")
         )
+        if _exc_repr in __OPEN_DIALOGS:
+            return
+
         _title = (
             "Configuration Error" if exc_type is UserConfigError else "File read error"
         )
         _app.sig_gui_exception_occurred.emit()
-        _box = PydidasExceptionMessageBox(text=_exc_repr, title=_title)
-        if hasattr(_box, "exec"):
-            _box.exec()
-        else:
-            _box.exec_()
+        try:
+            _box = PydidasExceptionMessageBox(text=_exc_repr, title=_title)
+            __OPEN_DIALOGS.append(_exc_repr)
+            if hasattr(_box, "exec"):
+                _box.exec()
+            else:
+                _box.exec_()
+        finally:
+            if _exc_repr in __OPEN_DIALOGS:
+                __OPEN_DIALOGS.remove(_exc_repr)
         return
     with StringIO() as _tmpfile:
         traceback.print_tb(trace, None, _tmpfile)

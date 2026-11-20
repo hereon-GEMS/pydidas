@@ -126,8 +126,8 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _basepath = Path(self._SCAN.get_param_value("scan_base_directory", dtype=str))
-        _pattern = self._SCAN.processed_file_naming_pattern.replace("index", "index0")
+        _basepath = Path(self._scan.get_param_value("scan_base_directory", dtype=str))
+        _pattern = self._scan.processed_file_naming_pattern.replace("index", "index0")
         _fio_suffix = self.get_param_value("fio_suffix").replace("#", "{index1:d}")
         self.filepath = _basepath / _pattern / (_pattern + _fio_suffix)
 
@@ -136,7 +136,7 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         Check the number of files in each directory.
         """
         if self.get_param_value("files_per_directory") == -1:
-            _i_start = self._SCAN.get_param_value("pattern_number_offset")
+            _i_start = self._scan.get_param_value("pattern_number_offset")
             _path = Path(str(self.filepath).format(index0=_i_start, index1=1)).parent
             if not _path.is_dir():
                 raise UserConfigError(
@@ -171,9 +171,9 @@ class FioMcaLineScanSeriesLoader(Input1dXRangeMixin, InputPlugin):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("_counted_files_per_directory")
-        _path_index = (frame_index // _n_per_dir) * self._SCAN.get_param_value(
+        _path_index = (frame_index // _n_per_dir) * self._scan.get_param_value(
             "pattern_number_delta"
-        ) + self._SCAN.get_param_value("pattern_number_offset")
+        ) + self._scan.get_param_value("pattern_number_offset")
         _file_index = (
             frame_index % _n_per_dir + 1
         )  # +1 because the filenames start at 1

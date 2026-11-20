@@ -272,19 +272,19 @@ class TestBasePlugin(unittest.TestCase):
     def test_copy__with_exp_attribute(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         obj = plugin()
-        obj._EXP = EXP
+        obj._exp = EXP
         _copy = copy.copy(obj)
-        self.assertEqual(obj._EXP, EXP)
-        self.assertEqual(_copy._EXP, EXP)
+        self.assertEqual(obj._exp, EXP)
+        self.assertEqual(_copy._exp, EXP)
 
     def test_copy__with_local_exp_attribute(self):
         plugin = create_plugin_class(BASE_PLUGIN)
         obj = plugin()
-        obj._EXP = DiffractionExperiment()
+        obj._exp = DiffractionExperiment()
         _copy = copy.copy(obj)
-        self.assertNotEqual(obj._EXP, EXP)
-        self.assertNotEqual(obj._EXP, _copy._EXP)
-        self.assertNotEqual(_copy._EXP, EXP)
+        self.assertNotEqual(obj._exp, EXP)
+        self.assertNotEqual(obj._exp, _copy._exp)
+        self.assertNotEqual(_copy._exp, EXP)
 
     def test_init__plain(self):
         plugin = create_plugin_class(BASE_PLUGIN)()

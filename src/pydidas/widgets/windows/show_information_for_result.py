@@ -137,7 +137,7 @@ class ShowInformationForResult(PydidasWindow, WidgetFactoryMixIn):
         """
         self._loader_plugin = loader_plugin.copy()
         self._loader_plugin.update_filepath()
-        _scan = self._loader_plugin._SCAN
+        _scan = self._loader_plugin._scan
         _ax_ranges = result_metadata["axis_ranges"]
         _index_y = (abs(_ax_ranges[active_dims[0]] - position[0])).argmin()
         selected_indices[active_dims[0]] = _index_y

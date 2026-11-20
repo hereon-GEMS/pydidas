@@ -237,7 +237,7 @@ class CopyrightYearUpdater:
     directory : Path, optional
         The directory to be checked. If None, this will take the parent directory
         of the class's file. The default is None,
-    **kwargs : dict, optional
+    **kwargs: Any, optional
         Additional supported keywords are:
 
         check : bool, optional

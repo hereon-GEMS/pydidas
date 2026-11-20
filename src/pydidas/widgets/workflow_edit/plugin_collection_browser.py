@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginCollectionBrowser"]
 
-from functools import partial
 from typing import Any, ClassVar
 
 from qtpy import QtCore
@@ -112,7 +111,7 @@ class PluginCollectionBrowser(WidgetFactoryMixIn, EmptyWidget):
         self.layout().setColumnStretch(2, 4)
         self.setMinimumHeight(400)
         self._widgets["but_reset_filter"].clicked.connect(
-            partial(self._widgets["filter_edit"].setText, "")
+            self._widgets["filter_edit"].clear
         )
         self._widgets["filter_edit"].textChanged.connect(
             self._widgets["plugin_treeview"].update_filter

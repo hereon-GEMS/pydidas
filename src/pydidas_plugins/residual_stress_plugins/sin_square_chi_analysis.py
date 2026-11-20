@@ -166,8 +166,8 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
     ]
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
-        self._SCAN = kwargs.pop("scan", ScanContext())
+        self._exp = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
+        self._scan = kwargs.pop("scan", ScanContext())
         OutputPlugin.__init__(self, *args, **kwargs)
         self._plugin_group_in_sin_square_chi = SinSquareChiGrouping()
         self._plugin_group_in_sin_2_chi = Sin_2chiGrouping()
@@ -324,8 +324,8 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             self.config["converter_args"] = (
                 _input_type,
                 _output,
-                self._EXP.xray_wavelength_in_m,
-                self._EXP.detector_dist_in_m,
+                self._exp.xray_wavelength_in_m,
+                self._exp.detector_dist_in_m,
             )
             _data_label, self.output_data_unit = _output.split(" / ")
             self.output_data_label = f"fitted coefficients ({_data_label})"
@@ -576,7 +576,7 @@ class SinSquareChiAnalysis(ProcPlugin, OutputPlugin):
             handlelength=5,
             handleheight=1.8,
         )
-        _indices = self._SCAN.get_indices_from_ordinal(self.config["global_index"])
+        _indices = self._scan.get_indices_from_ordinal(self.config["global_index"])
         self._figure.suptitle(
             f"Sin^2(chi) analysis for scan point #{self.config['global_index']} "
             + "\n(position in scan:"

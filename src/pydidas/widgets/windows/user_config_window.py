@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["UserConfigWindow"]
 
 
-from functools import partial
 from typing import Any
 
 from numpy import ceil, floor
@@ -50,7 +49,7 @@ from pydidas.core.generic_params.generic_params_settings import (
 )
 from pydidas.core.lazy_imports.silx import ColormapNameComboBox
 from pydidas.core.singleton import QtSingleton
-from pydidas.core.utils import update_palette
+from pydidas.core.utils import update_palette, weak_partial
 from pydidas.plugins import PluginCollection
 from pydidas.widgets.base_classes import PydidasWindow
 from pydidas.widgets.base_reimplementations import SquareButton
@@ -305,7 +304,7 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
         """Connect the signals for Parameter updates."""
         for _param_key in QSETTINGS_USER_KEYS:
             self.param_composite_widgets[_param_key].sig_new_value.connect(
-                partial(self.update_qsetting, _param_key)
+                weak_partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)
         self._widgets["but_reset"].clicked.connect(self.__reset)
@@ -314,16 +313,16 @@ class UserConfigWindow(PydidasWindow, metaclass=QtSingleton):
             self.process_new_fontsize_setting
         )
         self._widgets["but_fontsize_reduce"].clicked.connect(
-            partial(self.change_fontsize, -1)
+            weak_partial(self.change_fontsize, -1)
         )
         self._widgets["but_fontsize_increase"].clicked.connect(
-            partial(self.change_fontsize, 1)
+            weak_partial(self.change_fontsize, 1)
         )
         self._widgets["font_family_box"].currentFontChanged.connect(
             self.new_font_family_selected
         )
         self.param_widgets["cmap_nan_color"].editingFinished.connect(
-            partial(self._update_cmap_nan_value, None)
+            weak_partial(self._update_cmap_nan_value, None)
         )
         self._widgets["but_select_cmap_nan_color"].clicked.connect(
             self.select_new_nan_color

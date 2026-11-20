@@ -36,7 +36,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QFrame
 
 from pydidas.core.constants import ALIGN_CENTER_LEFT, ALIGN_TOP_RIGHT
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, weak_partial
 from pydidas.widgets.base_classes import WidgetFactoryMixIn
 from pydidas.widgets.utilities import get_pyqt_icon_from_str
 from pydidas.workflow import WorkflowTree
@@ -380,12 +380,12 @@ class PluginInWorkflowBox(WidgetFactoryMixIn, QFrame):
             self._menu_move_actions[_id] = QtWidgets.QAction(_name)
             self._menu_move.addAction(self._menu_move_actions[_id])
             self._menu_move_actions[_id].triggered.connect(
-                partial(self._emit_new_parent_signal, _id)
+                weak_partial(self._emit_new_parent_signal, _id)
             )
             self._menu_append_actions[_id] = QtWidgets.QAction(_name)
             self._menu_append.addAction(self._menu_append_actions[_id])
             self._menu_append_actions[_id].triggered.connect(
-                partial(self._emit_create_copy_signal, _id)
+                weak_partial(self._emit_create_copy_signal, _id)
             )
 
     @QtCore.Slot(int)

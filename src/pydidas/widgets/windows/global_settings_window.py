@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["GlobalSettingsWindow"]
 
 
-from functools import partial
 from typing import Any
 
 from qtpy import QtCore, QtWidgets
@@ -36,6 +35,7 @@ from qtpy import QtCore, QtWidgets
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import FONT_METRIC_CONFIG_WIDTH, QSETTINGS_GLOBAL_KEYS
 from pydidas.core.singleton import QtSingleton
+from pydidas.core.utils import weak_partial
 from pydidas.widgets.base_classes import PydidasWindow
 from pydidas_qtcore import PydidasQApplication
 
@@ -109,7 +109,7 @@ class GlobalSettingsWindow(PydidasWindow, metaclass=QtSingleton):
         """Connect the signals for Parameter updates."""
         for _param_key in self.params:
             self.param_widgets[_param_key].sig_new_value.connect(
-                partial(self.update_qsetting, _param_key)
+                weak_partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
         _app = PydidasQApplication.instance()

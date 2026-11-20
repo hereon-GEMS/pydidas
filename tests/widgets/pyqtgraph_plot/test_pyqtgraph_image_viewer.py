@@ -39,8 +39,6 @@ from pydidas_qtcore import PydidasQApplication
 def viewer(qapp):
     _viewer = PyQtGraphImageViewer()
     yield _viewer
-    _viewer.deleteLater()
-    PydidasQApplication.instance().processEvents()
 
 
 @pytest.fixture

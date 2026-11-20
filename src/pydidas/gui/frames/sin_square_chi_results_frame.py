@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["SinSquareChiResultsFrame"]
 
 
-from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -46,7 +45,7 @@ from pydidas.core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.utils import apply_qt_properties
+from pydidas.core.utils import apply_qt_properties, weak_partial
 from pydidas.gui.frames.builders.sin_square_chi_results_frame_builder import (
     SIN_SQUARE_CHI_RESULTS_FRAME_BUILD_INFORMATION,
 )
@@ -147,10 +146,10 @@ class SinSquareChiResultsFrame(BaseFrame):
             self._import_from_directory
         )
         self.param_widgets["autoscale_sin_square_chi_results"].sig_new_value.connect(
-            partial(self._update_scaling_visibility, "square_chi")
+            weak_partial(self._update_scaling_visibility, "square_chi")
         )
         self.param_widgets["autoscale_sin_2chi_results"].sig_new_value.connect(
-            partial(self._update_scaling_visibility, "2chi")
+            weak_partial(self._update_scaling_visibility, "2chi")
         )
         for _key in [
             "autoscale_sin_square_chi_results",
@@ -162,7 +161,7 @@ class SinSquareChiResultsFrame(BaseFrame):
         ]:
             _ref = "square" if "square" in _key else "two_chi"
             self.param_widgets[_key].sig_new_value.connect(
-                partial(self.__set_scaling, _ref)
+                weak_partial(self.__set_scaling, _ref)
             )
         for _key in [
             "selected_sin_2chi_node",
@@ -181,10 +180,10 @@ class SinSquareChiResultsFrame(BaseFrame):
             self._update_sin_square_chi_limits_from_data
         )
         self.param_widgets["num_horizontal_plots"].sig_new_value.connect(
-            partial(self.__update_plot_numbers, "hor")
+            weak_partial(self.__update_plot_numbers, "hor")
         )
         self.param_widgets["num_vertical_plots"].sig_new_value.connect(
-            partial(self.__update_plot_numbers, "vert")
+            weak_partial(self.__update_plot_numbers, "vert")
         )
 
     def finalize_ui(self) -> None:

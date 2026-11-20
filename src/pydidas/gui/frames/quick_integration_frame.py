@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["QuickIntegrationFrame"]
 
 
-from functools import partial
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -39,7 +38,7 @@ from pydidas.contexts import DiffractionExperimentContext, DiffractionExperiment
 from pydidas.contexts.diff_exp import DiffractionExperiment
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants.pyfai_names import PYFAI_DETECTOR_MODELS_OF_SHAPES
-from pydidas.core.utils import ShowBusyMouse
+from pydidas.core.utils import ShowBusyMouse, weak_partial
 from pydidas.data_io import import_data
 from pydidas.gui.frames.builders.quick_integration_frame_builder import (
     QUICK_INTEGRATION_FRAME_BUILD_CONFIG,
@@ -183,7 +182,7 @@ class QuickIntegrationFrame(BaseFrame):
             _w = self.param_widgets[_param_key]
             _w.sig_value_changed.disconnect()
             _w.sig_value_changed.connect(
-                partial(self._update_xray_param, _param_key, _w)
+                weak_partial(self._update_xray_param, _param_key, _w)
             )
         for _param_key in ["beamcenter_x", "beamcenter_y"]:
             self.param_widgets[_param_key].sig_value_changed.connect(

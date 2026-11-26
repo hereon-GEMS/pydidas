@@ -172,14 +172,15 @@ def weak_partial(
 
     Calls are forwarded exactly like functools.partial(method, *args, **kwargs).
     Only a weak reference to the instance is held, so a Qt connection does not
-    keep the owner alive.
+    keep the owner alive. Calls after the owner is garbage-collected are ignored
+    and return None. Exceptions from a live owner's method propagate unchanged.
     """
     _method_ref = weakref.WeakMethod(method)
 
     def _call(*call_args: Any) -> Any:
         _bound = _method_ref()
         if _bound is None:
-            raise RuntimeError("The owner of a connected method no longer exists.")
+            return None
         return _bound(*args, *call_args, **kwargs)
 
     return _call

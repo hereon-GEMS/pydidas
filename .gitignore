@@ -16,6 +16,7 @@ __pycache__
 *.pyc
 __*
 !__init__.py
+.run/*
 
 # local build files
 src/pydidas/sphinx

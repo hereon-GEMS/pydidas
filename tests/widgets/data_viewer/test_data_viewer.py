@@ -119,7 +119,7 @@ def test_pop_out__copies_axis_selection() -> None:
         _axes[0].set_to_value(3)
         _selector.process_new_slicing()
         _viewer._widgets["button_pop-out"].click()
-        _child = _viewer._pop_out_viewers[0]
+        _child = next(iter(_viewer._child_viewers.values()))
         _child_selector = _child.findChild(AxesSelector)
         assert _child_selector.current_slice == _selector.current_slice
         assert (
@@ -141,7 +141,7 @@ def test_pop_out__opens_independent_window(parent_visible: bool) -> None:
         _viewer.setVisible(parent_visible)
         _viewer._widgets["button_pop-out"].click()
         PydidasQApplication.instance().processEvents()
-        _child = _viewer._pop_out_viewers[0]
+        _child = next(iter(_viewer._child_viewers.values()))
         assert _child is not None
         assert _child.isWindow()
         assert _child.isVisible()
@@ -162,21 +162,22 @@ def test_pop_out__deletes_on_close(data, closed_index: int) -> None:
         _viewer._widgets["button_pop-out"].click()
         _viewer._widgets["button_pop-out"].click()
         PydidasQApplication.instance().processEvents()
-        _child = _viewer._pop_out_viewers[closed_index]
-        _remaining = _viewer._pop_out_viewers[1 - closed_index]
+        _children = _viewer.findChildren(DataViewer)
+        _child = _children[closed_index]
+        _remaining = _children[1 - closed_index]
         assert _child.testAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         _child.close()
         PydidasQApplication.instance().processEvents()
         PydidasQApplication.instance().sendPostedEvents(
             None, QtCore.QEvent.DeferredDelete
         )
-        assert _viewer._pop_out_viewers == [_remaining]
+        assert _viewer.findChildren(DataViewer) == [_remaining]
         assert _remaining.isVisible()
         _remaining.close()
         PydidasQApplication.instance().sendPostedEvents(
             None, QtCore.QEvent.DeferredDelete
         )
-        assert _viewer._pop_out_viewers == []
+        assert _viewer.findChildren(DataViewer) == []
     finally:
         _viewer.deleteLater()
         PydidasQApplication.instance().processEvents()
@@ -207,6 +208,7 @@ def test_deleteLater__retains_pop_outs_until_destroyed(
     finally:
         _viewer.deleteLater()
         qapp.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+    del _button, _viewer
     gc.collect()
     assert all(_ref() is None for _ref in _refs)
 

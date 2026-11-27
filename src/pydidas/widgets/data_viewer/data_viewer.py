@@ -82,7 +82,8 @@ class DataViewer(WidgetWithParameters):
             "diffraction_exp": kwargs.get("plot2d_diffraction_exp", None),
             "use_data_info_action": kwargs.get("plot2d_use_data_info_action", False),
         }
-        self._pop_out_viewers = []
+        self._child_viewers = {}
+        self._closed_child_refs = []
         self._create_widgets()
 
     def _create_widgets(self) -> None:
@@ -447,7 +448,7 @@ class DataViewer(WidgetWithParameters):
         viewer.setWindowFlag(QtCore.Qt.WindowType.Window, True)
         viewer.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         viewer.destroyed.connect(weak_partial(self._on_pop_out_destroyed, id(viewer)))
-        self._pop_out_viewers.append(viewer)
+        self._child_viewers[id(viewer)] = viewer
         title = self._config.get("plot_title") or "Dataset"
         viewer.setWindowTitle(f"Data Viewer - {title}")
         if "button_pop-out" in viewer._widgets:
@@ -466,11 +467,10 @@ class DataViewer(WidgetWithParameters):
     def _on_pop_out_destroyed(
         self, viewer_id: int, obj: QtCore.QObject | None = None
     ) -> None:
-        """Remove the original Python wrapper after its Qt widget is deleted."""
-        for _index, _viewer in enumerate(self._pop_out_viewers):
-            if id(_viewer) == viewer_id:
-                del self._pop_out_viewers[_index]
-                break
+        """Remove the original Python reference after its Qt widget is deleted."""
+        if viewer_id in self._child_viewers:
+            _viewer = self._child_viewers.pop(viewer_id)
+            self._closed_child_refs.append(_viewer)
 
     def deleteLater(self) -> None:
         """
@@ -479,6 +479,6 @@ class DataViewer(WidgetWithParameters):
         Keep the pop-out wrappers alive until their destroyed signals remove
         them, so pending Qt events cannot outlive their Python-side plots.
         """
-        for _viewer in tuple(self._pop_out_viewers):
-            _viewer.deleteLater()
+        for _viewer in self._child_viewers.values():
+            _viewer.hide()
         super().deleteLater()

@@ -473,8 +473,12 @@ class DataViewer(WidgetWithParameters):
                 break
 
     def deleteLater(self) -> None:
-        """Delete the widget and all pop-out viewers."""
-        while self._pop_out_viewers:
-            _viewer = self._pop_out_viewers.pop()
+        """
+        Schedule deletion of the widget and all pop-out viewers.
+
+        Keep the pop-out wrappers alive until their destroyed signals remove
+        them, so pending Qt events cannot outlive their Python-side plots.
+        """
+        for _viewer in tuple(self._pop_out_viewers):
             _viewer.deleteLater()
         super().deleteLater()

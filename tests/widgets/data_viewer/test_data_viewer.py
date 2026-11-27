@@ -24,10 +24,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import gc
+import weakref
+
 import h5py
 import numpy as np
 import pytest
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import Dataset, UserConfigError
 from pydidas.unittest_objects import create_dataset
@@ -177,6 +180,33 @@ def test_pop_out__deletes_on_close(data, closed_index: int) -> None:
     finally:
         _viewer.deleteLater()
         PydidasQApplication.instance().processEvents()
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("pop_out_count", [1, 2])
+def test_deleteLater__retains_pop_outs_until_destroyed(qapp, pop_out_count: int) -> None:
+    ### This test was written by an AI tool
+    _viewer = DataViewer()
+    try:
+        _viewer.set_data(Dataset(np.arange(24).reshape(4, 6)), view="view-curve-group")
+        _button = next(
+            _item
+            for _item in _viewer.findChildren(QtWidgets.QPushButton)
+            if _item.text() == "Open in new window"
+        )
+        for _ in range(pop_out_count):
+            _button.click()
+        qapp.processEvents()
+        _refs = [weakref.ref(_child) for _child in _viewer.findChildren(DataViewer)]
+        assert len(_refs) == pop_out_count
+        _viewer.deleteLater()
+        gc.collect()
+        assert all(_ref() is not None for _ref in _refs)
+    finally:
+        _viewer.deleteLater()
+        qapp.sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
+    gc.collect()
+    assert all(_ref() is None for _ref in _refs)
 
 
 if __name__ == "__main__":

@@ -491,7 +491,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         if not self.detector_is_valid:
             raise UserConfigError(
-                "The detector is invalid for a fit2d geometry: "
+                "The detector is invalid for a Fit2D geometry: "
                 "Please check the detector pixel sizes and numbers of pixels."
             )
         _geo = self.as_pyfai_geometry()

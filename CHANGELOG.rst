@@ -152,6 +152,9 @@ Bugfixes
   sector centers.
 - Fixed an issue in PyFAIazimuthalSectorIntegration which did not rebuild the
   integrators for cached sector centers.
+- Fixed an issue when importing old states which had invalid detector 
+  geometries (with respect to the Fit2D-description) which resulted in a failed
+  parameter restoration.
 
 
 v26.05.19

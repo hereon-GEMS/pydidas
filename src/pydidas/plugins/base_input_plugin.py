@@ -72,7 +72,7 @@ class InputPlugin(BasePlugin):
         Create a BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
-        self._SCAN = kwargs.get("scan", ScanContext())
+        self._scan = kwargs.get("scan", ScanContext())
         self.config.pre_executed = False
         self.base_dir = Path()
         self.filename = ""
@@ -96,8 +96,8 @@ class InputPlugin(BasePlugin):
         """
         return self.base_output_data_dim + (
             1
-            if self._SCAN.get_param_value("scan_frames_per_point") > 1
-            and self._SCAN.get_param_value("scan_multi_frame_handling") == "Stack"
+            if self._scan.get_param_value("scan_frames_per_point") > 1
+            and self._scan.get_param_value("scan_multi_frame_handling") == "Stack"
             else 0
         )
 
@@ -115,8 +115,8 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        self.base_dir = self._SCAN.get_param_value("scan_base_directory")
-        self.filename = self._SCAN.processed_file_naming_pattern
+        self.base_dir = self._scan.get_param_value("scan_base_directory")
+        self.filename = self._scan.processed_file_naming_pattern
 
     def input_available(self, ordinal: int) -> bool:
         """
@@ -135,7 +135,7 @@ class InputPlugin(BasePlugin):
         bool
             flag whether the file for the frame #<index> is ready for reading.
         """
-        _frame_indices = self._SCAN.get_frame_indices_from_ordinal(ordinal)
+        _frame_indices = self._scan.get_frame_indices_from_ordinal(ordinal)
         _last_index = _frame_indices[-1]
         _fname = self.get_filename(_last_index)
         if _fname.exists():
@@ -162,9 +162,9 @@ class InputPlugin(BasePlugin):
             The filename.
         """
         _file_counter = frame_index // self.get_param_value("_counted_images_per_file")
-        _file_index = _file_counter * self._SCAN.get_param_value(
+        _file_index = _file_counter * self._scan.get_param_value(
             "pattern_number_delta"
-        ) + self._SCAN.get_param_value("pattern_number_offset")
+        ) + self._scan.get_param_value("pattern_number_offset")
         return self.base_dir / self.filename.format(index=_file_index)
 
     def get_frame(self, frame_index: int, **kwargs: Any) -> tuple[Dataset, dict]:
@@ -210,7 +210,7 @@ class InputPlugin(BasePlugin):
             raise UserConfigError(
                 "The pre_execute method must be called before the execute method."
             )
-        _frames = self._SCAN.get_frame_indices_from_ordinal(ordinal)
+        _frames = self._scan.get_frame_indices_from_ordinal(ordinal)
         if len(_frames) == 1:
             _data, kwargs = self.get_frame(_frames[0], **kwargs)
         else:
@@ -239,7 +239,7 @@ class InputPlugin(BasePlugin):
         kwargs : Any
             The updated kwargs.
         """
-        _handling = self._SCAN.get_param_value("scan_multi_frame_handling")
+        _handling = self._scan.get_param_value("scan_multi_frame_handling")
         _factor = len(frame_indices) if _handling == "Average" else 1
         _data = None
         for _i, _frame_index in enumerate(frame_indices):

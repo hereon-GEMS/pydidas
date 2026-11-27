@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2025, Helmholtz-Zentrum Hereon
+# Copyright 2025 - 2026, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2025, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2025 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -502,6 +502,66 @@ def test_update_slice_from_non_generic_choice__no_data_range_set(selector, data_
     selector.set_axis_metadata(None, "test", "u", npoints=15)
     selector._update_slice_from_non_generic_choice()
     assert selector._current_slice == slice(0, 15)
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize(
+    "range_mode",
+    ["select range by indices", "select range by data values"],
+)
+def test_import_configuration__refreshes_unchanged_range_controls(
+    selector, data_range, range_mode: str
+) -> None:
+    selector.set_axis_metadata(data_range)
+    selector.define_additional_choices("curve")
+    _config = ("curve", range_mode, slice(2, 6))
+    selector.import_configuration(_config)
+    selector._widgets["edit_range_data"].setText("0:0")
+    selector._widgets["edit_range_index"].setText("0:1")
+
+    selector.import_configuration(_config)
+
+    assert selector.export_configuration() == _config
+    assert selector._widgets["edit_range_index"].text() == "2:5"
+    assert selector._widgets["edit_range_data"].text() == (
+        f"{data_range[2]:.4f}:{data_range[5]:.4f}"
+    )
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("with_metadata", [False, True])
+def test_import_configuration__singleton_plot_axis(selector, with_metadata) -> None:
+    selector.set_axis_metadata(np.array([2.5]) if with_metadata else None, npoints=1)
+    selector.define_additional_choices("curve")
+    _config = ("curve", "use full axis", slice(0, 1))
+
+    selector.import_configuration(_config)
+
+    assert selector.export_configuration() == _config
+    assert selector._widgets["edit_range_index"].text() == "0:0"
+    if with_metadata:
+        assert selector._widgets["edit_range_data"].text() == "2.5000:2.5000"
+
+
+@pytest.mark.gui
+@pytest.mark.parametrize("axis_use", GENERIC_AXIS_SELECTOR_CHOICES + ["curve"])
+def test_define_additional_choices__restores_saved_configuration(
+    selector, data_range, axis_use: str
+) -> None:
+    selector.set_axis_metadata(data_range)
+    selector.define_additional_choices("curve")
+    _slice = slice(3, 4) if axis_use in GENERIC_AXIS_SELECTOR_CHOICES else slice(2, 6)
+    _config = (axis_use, "select range by indices", _slice)
+    selector.import_configuration(_config)
+
+    selector.define_additional_choices("other")
+    selector.define_additional_choices("curve")
+
+    assert selector.export_configuration() == _config
+    assert selector._widgets["edit_index"].text() == str(_slice.start)
+    assert selector._widgets["edit_range_data"].text() == (
+        f"{data_range[_slice.start]:.4f}:{data_range[_slice.stop - 1]:.4f}"
+    )
 
 
 if __name__ == "__main__":

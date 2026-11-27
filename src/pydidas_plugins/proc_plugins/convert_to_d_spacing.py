@@ -61,7 +61,7 @@ class ConvertToDSpacing(ProcPlugin):
     default_params = get_generic_param_collection("d_spacing_unit")
 
     def __init__(self, *args, **kwargs):
-        self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
+        self._exp = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._allowed_ax_choices = _AX_CHOICES
 
@@ -145,8 +145,8 @@ class ConvertToDSpacing(ProcPlugin):
                 _range,
                 f"{_label_in} / {_unit_in}",
                 _unit_out,
-                self._EXP.xray_wavelength_in_m,
-                self._EXP.detector_dist_in_m,
+                self._exp.xray_wavelength_in_m,
+                self._exp.detector_dist_in_m,
             )
             _valid = np.isfinite(_range)
             if not np.all(_valid):

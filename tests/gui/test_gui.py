@@ -30,6 +30,7 @@ import sys
 import pytest
 
 
+@pytest.mark.gui
 def test_gui_import__does_not_eagerly_load_heavy_deps():
 
     script = (

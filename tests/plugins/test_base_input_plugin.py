@@ -309,8 +309,8 @@ def test_execute__multiple_frame_stack(
 def test_copy():
     plugin = _TestInputPlugin()
     copy = plugin.copy()
-    assert plugin._SCAN == SCAN
-    assert copy._SCAN == SCAN
+    assert plugin._scan == SCAN
+    assert copy._scan == SCAN
 
 
 if __name__ == "__main__":

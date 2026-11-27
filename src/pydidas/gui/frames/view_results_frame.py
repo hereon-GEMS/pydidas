@@ -226,7 +226,7 @@ class ViewResultsFrame(BaseFrameWithApp):
                 "No node has been selected. Please check the result selection"
             )
         _loader_plugin: InputPlugin = self.proc_results.frozen_tree.root.plugin.copy()
-        _loader_plugin._SCAN = self.proc_results.frozen_scan
+        _loader_plugin._scan = self.proc_results.frozen_scan
         if _loader_plugin.filename == "":
             _loader_plugin.update_filepath()
         if self._result_window is None:

@@ -38,7 +38,7 @@ from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtGui, QtWidgets
 
 from pydidas.contexts import DiffractionExperimentContext, DiffractionExperimentIo
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import get_generic_param_collection
 from pydidas.core.lazy_imports.pyFAI import Detector
 from pydidas.core.utils import update_palette, weak_partial
 from pydidas.gui.frames.builders.define_diffraction_exp_frame_build_config import (
@@ -128,12 +128,7 @@ class DefineDiffractionExpFrame(BaseFrame):
     def finalize_ui(self) -> None:
         """Finalize the UI and update the beamcenter display."""
         super().finalize_ui()
-        try:
-            self._update_beamcenter()
-        except UserConfigError:
-            # Ignore if the beamcenter cannot be calculated because
-            # the geometry is not valid yet.
-            pass
+        self._update_beamcenter()
 
     def set_param_and_widget_value(
         self, key: str, value: Any, emit_signal: bool = True
@@ -346,6 +341,15 @@ class DefineDiffractionExpFrame(BaseFrame):
         """
         Update the displayed beamcenter position.
         """
+        _valid = EXP.detector_is_valid
+        for _key in ("beamcenter_x", "beamcenter_y"):
+            _widget = self.param_widgets[_key]
+            _widget.setEnabled(_valid)
+            _widget.setPlaceholderText("" if _valid else "Unavailable")
+            if not _valid:
+                _widget.clear()
+        if not _valid:
+            return
         _center = EXP.beamcenter.rounded(3)
         self._bc_params.set_value("beamcenter_x", _center.x)
         self._bc_params.set_value("beamcenter_y", _center.y)

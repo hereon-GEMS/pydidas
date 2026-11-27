@@ -310,11 +310,9 @@ class DataAxisSelector(WidgetFactoryMixIn, EmptyWidget):
         store_config : bool
             If True, the current configuration will be stored.
         """
-        if store_config:
+        if store_config and self.npoints > 0:
             self._stored_configs[self._external_display_choices] = (
-                self._widgets["combo_axis_use"].currentText(),
-                self._widgets["combo_range"].currentText(),
-                self.current_slice,
+                self.export_configuration()
             )
         self._external_display_choices = choices
         _old_choice = self._widgets["combo_axis_use"].currentText()
@@ -362,23 +360,61 @@ class DataAxisSelector(WidgetFactoryMixIn, EmptyWidget):
         with QtCore.QSignalBlocker(self):
             self._move_to_index(_index)
 
+    def export_configuration(self) -> tuple[str, str, slice]:
+        """
+        Export the axis role, range mode, and selected slice.
+
+        Returns
+        -------
+        tuple[str, str, slice]
+            The configuration used when restoring a saved selection.
+        """
+        return (
+            self.display_choice,
+            self._widgets["combo_range"].currentText(),
+            self.current_slice,
+        )
+
+    def import_configuration(self, config: tuple[str, str, slice]) -> None:
+        """
+        Restore a configuration exported for an axis with matching metadata.
+
+        Parameters
+        ----------
+        config : tuple[str, str, slice]
+            Configuration returned by export_configuration.
+        """
+        self._stored_configs["import"] = config
+        self._restore_old_config("import")
+        self.sig_display_choice_changed.emit(self._axis_index, self.display_choice)
+        self.sig_new_slicing.emit(self._axis_index, self.current_slice_str)
+
     def _restore_old_config(self, choices: str) -> None:
-        """Restore the configuration, based on the available choices."""
+        """Restore a saved selection and rebuild all dependent controls."""
         _ax_use, _range_choice, _slice = self._stored_configs[choices]
-        with QtCore.QSignalBlocker(self):
+        with (
+            QtCore.QSignalBlocker(self),
+            QtCore.QSignalBlocker(self._widgets["combo_axis_use"]),
+            QtCore.QSignalBlocker(self._widgets["combo_range"]),
+            QtCore.QSignalBlocker(self._widgets["slider"]),
+        ):
             self._widgets["combo_axis_use"].setCurrentText(_ax_use)
             self._widgets["combo_range"].setCurrentText(_range_choice)
-            if (
-                _slice.stop - _slice.start == 1
-                and _ax_use in GENERIC_AXIS_SELECTOR_CHOICES
-            ):
-                self._move_to_index(_slice.start)
-            else:
-                self._current_slice = _slice
-                self._widgets["edit_range_index"].setText(
-                    f"{_slice.start}:{_slice.stop - 1}"
+            self._widgets["slider"].setValue(_slice.start)
+            self._widgets["edit_index"].setText(str(_slice.start))
+            self._widgets["edit_range_index"].setText(
+                f"{_slice.start}:{_slice.stop - 1}"
+            )
+            if self._data_range is not None:
+                self._widgets["edit_data"].setText(
+                    f"{self._data_range[_slice.start]:.4f}"
                 )
-                self._handle_new_index_range_selection()
+                self._widgets["edit_range_data"].setText(
+                    f"{self._data_range[_slice.start]:.4f}:"
+                    f"{self._data_range[_slice.stop - 1]:.4f}"
+                )
+            self._handle_new_axis_use(_ax_use)
+            self._current_slice = _slice
 
     @QtCore.Slot(str)
     def _handle_new_axis_use(self, use_selection: str) -> None:

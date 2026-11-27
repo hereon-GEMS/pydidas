@@ -197,6 +197,9 @@ def restore_global_objects(state: dict) -> None:
     Get the states of pydidas's global objects (ScanContext,
     DiffractionExperimentContext, WorkflowTree).
 
+    Diffraction context changes are signaled once after all its parameters
+    have been restored, including when individual parameters report errors.
+
     Parameters
     ----------
     state : dict
@@ -209,12 +212,16 @@ def restore_global_objects(state: dict) -> None:
     except KeyError:
         _errors += "- Cannot import Workflow. Not all plugins found.\n"
     for _context_key, _context in GLOBAL_CONTEXTS.items():
-        for _key, _val in state[f"context::{_context_key}"].items():
-            try:
-                _context.set_param_value(_key, _val)
-            except (TypeError, ValueError, UserConfigError):
-                _errors += (
-                    f"Context `{_context_key}`:\n- Error restoring parameter `{_key}`\n"
-                )
+        with QtCore.QSignalBlocker(_context):
+            for _key, _val in state[f"context::{_context_key}"].items():
+                try:
+                    _context.set_param_value(_key, _val)
+                except (TypeError, ValueError, UserConfigError):
+                    _errors += (
+                        f"Context `{_context_key}`:\n"
+                        f"- Error restoring parameter `{_key}`\n"
+                    )
+        if hasattr(_context, "sig_params_changed"):
+            _context.sig_params_changed.emit()
     if _errors:
         raise UserConfigError(f"--- Global objects ---\n{_errors}")

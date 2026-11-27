@@ -152,7 +152,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
         self.assertTrue("active_node" in obj.config)
-        self.assertEqual(obj._SCAN, RES.frozen_scan)
+        self.assertEqual(obj._scan, RES.frozen_scan)
         self.assertEqual(obj._RESULTS, RES)
 
     def test_init__with_param(self):

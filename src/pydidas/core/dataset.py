@@ -87,22 +87,21 @@ class Dataset(ndarray):
         an ndarray. However, Dataset views never share memory, and each Dataset view
         will create a new memory object.
 
-    The following numpy ufuncs are reimplemented to preserver the metadata:
-    flatten, max, mean, min, repeat, reshape, shape, sort, squeeze, sum, take,
-    transpose, moveaxes.
-    For other numpy ufuncs, metadata preservation is not guaranteed.
+    Dataset overrides several ndarray methods to provide operation-specific metadata
+    handling, including flatten, max, mean, min, repeat, reshape, ravel, shape, sort,
+    squeeze, sum, take, and transpose. It also provides ``Dataset.roll``. This does
+    not mean that every similarly named NumPy function calls a Dataset method. NumPy
+    functions may delegate to ndarray methods, but dispatch depends on the function.
+    Dataset does not implement the general ``__array_function__`` protocol.
 
-    The following numpy functions cannot be implemented because they are not defined
-    in the ndarray:
+    NumPy ufuncs use a separate protocol; Dataset does not provide general
+    ufunc-specific metadata handling, so metadata preservation should not be assumed
+    for those operations.
 
-    - numpy.roll:
-        This function will work but destroy metadata consistency. A custom
-        implementation is given in the Dataset.roll() method which takes
-        similar arguments as the numpy function but preserves the metadata.
-    - numpy.rollaxis:
-        This function is deprecated and moveaxes should be used instead.
-    - numpy.concatenate, numpy.stack, numpy.vstack, numpy.hstack, etc.:
-        These functions work but return pure ndarrays without metadata.
+    In particular, ``numpy.roll`` does not call ``Dataset.roll``. Use
+    ``Dataset.roll`` when its metadata-aware behavior is required. Other functions
+    without a Dataset-specific implementation, such as ``numpy.concatenate`` and
+    ``numpy.stack``, do not apply a Dataset-specific metadata policy.
 
 
     Parameters
@@ -779,15 +778,18 @@ class Dataset(ndarray):
         _range_diff = np.diff(_range[np.isfinite(_range)])
         return abs(_range_diff.std() / _range_diff.mean()) > threshold
 
-    def get_description_of_point(self, indices: tuple[int] | list[int]) -> str:
+    def get_description_of_point(
+        self, indices: tuple[int | None | slice] | list[int | None | slice]
+    ) -> str:
         """
         Get the metadata description of a single point in the array.
 
-        Index values of "None" will be interpreted as request to skip this axis.
+        Index values of "None" or "slice(None)" will be interpreted as
+        request to skip this axis.
 
         Parameters
         ----------
-        indices : tuple[int] | list[int]
+        indices : tuple[int | None | slice] | list[int | None | slice]
             The indices for each dimension.
 
         Returns
@@ -799,7 +801,7 @@ class Dataset(ndarray):
         if len(indices) != self.ndim:
             raise ValueError("Wrong number of indices for Dataset dimensions.")
         for _dim, _index in enumerate(indices):
-            if _index is None:
+            if _index in [None, slice(None)]:
                 continue
             _label = self._meta["axis_labels"][_dim]
             _value = self._meta["axis_ranges"][_dim][_index]
@@ -839,7 +841,7 @@ class Dataset(ndarray):
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
         return _new
 
-    def flatten(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
+    def flatten(self, order: None | Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Clear the metadata when flattening the array.
 
@@ -853,12 +855,23 @@ class Dataset(ndarray):
             'K' means to flatten `a` in the order the elements occur in memory.
             The default is 'C'.
         """
-        _new = ndarray.flatten(self, order)
-        _new._update_keys_in_flattened_array()
+        _new: Self = ndarray.flatten(self, order)
+        if self.ndim > 1:
+            _new._update_keys_in_flattened_array()
+        return _new
+
+    def ravel(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
+        """Return a flattened array with reset axis metadata."""
+        _new: Self = ndarray.ravel(self, order)
+        if self.ndim > 1:
+            _new._update_keys_in_flattened_array()
         return _new
 
     def reshape(
-        self, *new_shape: int | tuple[int], order: Literal["C", "F", "A", "K"] = "C"
+        self,
+        *new_shape: int | tuple[int],
+        order: None | Literal["C", "F", "A", "K"] = "C",
+        copy=None,
     ):
         """
         Overload the generic reshape method to update the metadata.
@@ -867,8 +880,10 @@ class Dataset(ndarray):
         ----------
         new_shape : int | tuple[int]
             The new shape of the array.
-        order : Literal['C', 'F', 'A', 'K'] optional
+        order : None | Literal['C', 'F', 'A', 'K'] optional
             The order of the reshaping. The default is 'C'.
+        copy : bool, optional
+            Whether to return a copy of the array. The default is None.
 
         Returns
         -------
@@ -880,11 +895,10 @@ class Dataset(ndarray):
                 new_shape = tuple(new_shape[0])
             elif isinstance(new_shape[0], tuple):
                 new_shape = new_shape[0]
-        _new = ndarray.reshape(self, new_shape, order=order)
+        _new = ndarray.reshape(self, new_shape, order=order, copy=copy)
         _dim_matches = (
             {} if self.shape == () else get_corresponding_dims(self.shape, _new.shape)
         )
-
         for _key in ["axis_labels", "axis_units"]:
             _values = [
                 self._meta[_key][_dim_matches[_dim]] if _dim in _dim_matches else ""
@@ -901,7 +915,7 @@ class Dataset(ndarray):
         ]
         return _new
 
-    def repeat(self, repeats, axis: int | None = None) -> Self:
+    def repeat(self, repeats: int, axis: int | None = None) -> Self:
         """
         Overload the generic repeat method to update the metadata.
 
@@ -956,19 +970,10 @@ class Dataset(ndarray):
         self._meta = _reshaped._meta
 
     def _update_keys_in_flattened_array(self):
-        """
-        Update the keys in flattened arrays i.e., if the new dimension is one.
-
-        Note that the metadata keys are updated in place.
-        """
-        if self.ndim == 1 and (
-            len(self._meta["axis_ranges"]) > 1
-            or len(self._meta["axis_units"]) > 1
-            or len(self._meta["axis_labels"]) > 1
-        ):
-            self._meta["axis_labels"] = {0: "Flattened"}
-            self._meta["axis_ranges"] = {0: np.arange(self.size)}
-            self._meta["axis_units"] = {0: ""}
+        """Update the keys in flattened arrays."""
+        self._meta["axis_labels"] = {0: "Flattened"}
+        self._meta["axis_ranges"] = {0: np.arange(self.size)}
+        self._meta["axis_units"] = {0: ""}
 
     def squeeze(self, axis: int | None = None) -> Self:
         """
@@ -1430,8 +1435,8 @@ class Dataset(ndarray):
         _metahash = hash(
             (
                 id(self),
-                self.axis_labels.values(),
-                self.axis_units.values(),
+                tuple(self.axis_labels.values()),
+                tuple(self.axis_units.values()),
                 self.data_label,
                 self.data_unit,
             )

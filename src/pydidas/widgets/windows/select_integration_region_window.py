@@ -87,14 +87,14 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         apply_qt_properties(self.layout(), contentsMargins=(10, 10, 10, 10))
 
         self._plugin = plugin
-        self._EXP = plugin._EXP
+        self._exp = plugin._exp
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
         self.config.update(
             azimuthal_active=False,
-            beamcenter=self._EXP.beamcenter,
+            beamcenter=self._exp.beamcenter,
             closing_confirmed=False,
-            det_dist=self._EXP.get_param_value("detector_dist"),
+            det_dist=self._exp.get_param_value("detector_dist"),
             only_show_roi=kwargs.get("only_show_roi", False),
             radial_active=False,
             rad_unit=self._plugin.get_param_value("rad_unit"),
@@ -192,7 +192,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
 
     def finalize_ui(self) -> None:
         """Finalize the UI and update the input widgets."""
-        _shape = self._EXP.det_shape
+        _shape = self._exp.det_shape
         if 0 in _shape:
             raise UserConfigError(
                 "No detector has been defined in the DiffractionExperiment setup. "

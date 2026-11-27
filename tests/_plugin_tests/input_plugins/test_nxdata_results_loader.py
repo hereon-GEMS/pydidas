@@ -155,7 +155,7 @@ def test_verify_data_shape_valid(config, plugin):
     ],
 )
 def test_verify_data_shape_valid__w_invalid_param(config, plugin, key, value):
-    _param_source = plugin._SCAN if key.startswith("scan") else plugin
+    _param_source = plugin._scan if key.startswith("scan") else plugin
     _param_source.set_param_value(key, value)
     with pytest.raises((UserConfigError, FileReadError)):
         plugin.pre_execute()
@@ -179,7 +179,7 @@ def test_get_filename(config, plugin, empty_temp_path, index):
 @pytest.mark.parametrize("frame_index", [0, 12, 24])
 def test_get_frame(config, plugin, frame_index):
     _frame, _ = plugin.get_frame(frame_index)
-    _scan_pos = plugin._SCAN.get_indices_from_ordinal(frame_index)
+    _scan_pos = plugin._scan.get_indices_from_ordinal(frame_index)
     _ref = config.dataset[*_scan_pos]
     assert _frame.data_unit == _ref.data_unit
     assert _frame.data_label == _ref.data_label

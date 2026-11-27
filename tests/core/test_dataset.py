@@ -551,6 +551,11 @@ def test_get_description_of_point__wNone(large_dataset):
     assert _str == "b: 2.0000 ub; d: 4.0000 ud"
 
 
+def test_get_description_of_point__w_slice(large_dataset):
+    _str = large_dataset.get_description_of_point((slice(None), 2, None, 4))
+    assert _str == "b: 2.0000 ub; d: 4.0000 ud"
+
+
 def test_dataset_creation():
     _array = np.random.random((10, 10, 10))
     obj = Dataset(_array)
@@ -684,6 +689,12 @@ def test_hash():
     obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
     assert isinstance(hash(obj), int)
     assert hash(obj) != hash(obj2)
+
+
+def test_hash__repeat_consistent():
+    _ranges = [np.arange(10), 12 - np.arange(10), 3 * np.arange(10) ** 2]
+    obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=_ranges[:])
+    assert hash(obj) == hash(obj)
 
 
 def test_data_description__no_data_unit(simple_dataset):

@@ -44,6 +44,12 @@ from pydidas.workflow import ProcessingTree
 from pydidas_qtcore import PydidasQApplication
 
 
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """Add the "all" marker to every test to allow running them with "-m all"."""
+    for _item in items:
+        _item.add_marker(pytest.mark.all)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def patch_plugin_collection():
     _pc = PluginCollection()

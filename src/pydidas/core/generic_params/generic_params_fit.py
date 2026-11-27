@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2024 - 2026, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["GENERIC_PARAMS_FIT"]
+__all__ = ["FIT_OUTPUT_TOOLTIPS", "GENERIC_PARAMS_FIT"]
 
 
 from itertools import combinations
@@ -34,8 +34,65 @@ from pydidas.core.constants import ASCII_TO_UNI
 from pydidas.core.generic_params.param_lists import FIT_OUTPUT_OPTIONS
 
 
+FIT_OUTPUT_TOOLTIPS = {
+    "position": (
+        "The fitted peak position(s) in the x-axis unit. For multi-peak fits, "
+        "the positions are returned in the order of the peaks."
+    ),
+    "amplitude": (
+        "The fitted peak amplitude(s) in the y-axis unit. For multi-peak fits, "
+        "the amplitudes are returned in the order of the peaks."
+    ),
+    "area": (
+        "The fitted peak area(s) in the y-axis unit times the x-axis unit. "
+        "For multi-peak fits, the areas are returned in the order of the peaks."
+    ),
+    "FWHM": (
+        "The fitted peak full width at half maximum in the x-axis unit. "
+        "For multi-peak fits, the FWHMs are returned in the order of the peaks."
+    ),
+    "background at peak": (
+        "The fitted background value(s) at the peak position(s) in the y-axis unit. "
+        "For multi-peak fits, the background values are returned in the order of "
+        "the peaks."
+    ),
+    "total count intensity": (
+        "The fitted total count intensity(s) in the y-axis unit. This value "
+        "will correspond to the integral of the fitted peak function to allow "
+        "error estimates for the absolute intensity. For multi-peak fits, the "
+        "total count intensities are returned in the order of the peaks."
+    ),
+    "relative sigma / (sigma + gamma)": (
+        "The fitted relative sigma(s) in the unitless ratio of "
+        "sigma / (sigma + gamma). This values is only relevant for Voigt fits "
+        "which include a combination of Gaussian and Lorentzian peaks and "
+        "this value will be in the interval [0.0, 1.0], where 0 corresponds to "
+        "a pure Lorentzian and 1.0 corresponds to a pure Gaussian. "
+        "For a pure Gaussian fit, this value is always 1.0. For a Lorentzian fit, "
+        "this value is always 0.0."
+    ),
+    "reduced chi^2": (
+        "The fitted chi-squared value for the global fit. For multi-peak fits, the "
+        "same chi-squared value is returned for each peak. Note that this value "
+        "is normalized by the number of fitted parameters."
+    ),
+}
+
 GENERIC_PARAMS_FIT = (
     {
+        "fit_limit_peak_widths": {
+            "type": bool,
+            "default": True,
+            "name": "Limit peak widths",
+            "choices": [True, False],
+            "allow_None": False,
+            "unit": "",
+            "tooltip": (
+                "If True, the peak sigma/gamma will be limited to half the "
+                "fitted x-range. If False, the peak widths will be allowed to "
+                "take any value."
+            ),
+        },
         "fit_sigma_threshold": {
             "type": float,
             "default": 0.25,
@@ -47,6 +104,35 @@ GENERIC_PARAMS_FIT = (
                 "The threshold to select which fitting points to reject, based on the "
                 "normalized standard deviation. Any fit which has a normalized std "
                 "which is worse than the threshold will be rejected as failed."
+            ),
+        },
+        "fit_use_latest_as_start_guess": {
+            "type": bool,
+            "default": False,
+            "name": "Use last fit as starting guess",
+            "choices": [True, False],
+            "allow_None": False,
+            "unit": "",
+            "tooltip": (
+                "If True, the last fit result will be used as the starting "
+                "guess for the next fit. If False, the starting guess will be "
+                "calculated automatically. If the fit fails, the last successful "
+                "fit will be used as next starting guess for the next fit."
+            ),
+        },
+        "fit_move_range_with_results": {
+            "type": bool,
+            "default": False,
+            "name": "Move range limits with fitted positions",
+            "choices": [True, False],
+            "allow_None": False,
+            "unit": "",
+            "tooltip": (
+                "If True, the fit range will move with the fitted positions. "
+                "If False, the fit range will remain fixed. The width of the "
+                "fit range is still determined by the fit_xlow and fit_xhigh "
+                "parameters, but the absolute position of the range will move "
+                "with the fitted peak positions."
             ),
         },
         "fit_min_peak_height": {
@@ -120,10 +206,19 @@ GENERIC_PARAMS_FIT = (
             "unit": "",
             "allow_None": True,
             "tooltip": (
-                "The output of the fitting plugin. The plugin can either return the "
-                "peak area, the peak position or the FWHM. Alternatively, any "
-                "combination of these values can be returned as well. Note that the "
-                "fit parameters are always stored in the metadata."
+                (
+                    "The output of the fitting plugin. The plugin can return either "
+                    "any of the individual outputs given below or any combination "
+                    "thereof: "
+                )
+                + "; ".join(
+                    f"{_i} {_key} - {_desc}"
+                    for _i, (_key, _desc) in enumerate(FIT_OUTPUT_TOOLTIPS.items())
+                )
+                + (
+                    "Note that all the fitted parameters are always stored in the "
+                    "metadata."
+                )
             ),
         },
     }
@@ -157,16 +252,16 @@ GENERIC_PARAMS_FIT = (
             "unit": "",
             "allow_None": True,
             "tooltip": (
-                f"The upper boundary in x for the center position of the {_key} peak "
+                f"The upper boundary in x for the center position of the {_key}peak "
                 "to be fitted."
             ),
         }
         for _num, _key in [
             ["", ""],
-            ["0", "0th"],
-            ["1", "1st"],
-            ["2", "2nd"],
-            ["3", "3rd"],
+            ["0", "0th "],
+            ["1", "1st "],
+            ["2", "2nd "],
+            ["3", "3rd "],
         ]
     }
     | {
@@ -180,17 +275,17 @@ GENERIC_PARAMS_FIT = (
             "unit": "",
             "allow_None": True,
             "tooltip": (
-                "The starting guess for the parameter value for the peak center "
-                "position in x. Note: This is only the starting value for the fit, not "
-                "a fixed value."
+                f"The starting guess for the parameter value for the {_key}"
+                "peak center position in x. Note: This is only the starting "
+                "value for the fit, not a fixed value."
             ),
         }
         for _num, _key in [
             ["", ""],
-            ["0", "0th"],
-            ["1", "1st"],
-            ["2", "2nd"],
-            ["3", "3rd"],
+            ["0", "0th "],
+            ["1", "1st "],
+            ["2", "2nd "],
+            ["3", "3rd "],
         ]
     }
     | {
@@ -207,17 +302,17 @@ GENERIC_PARAMS_FIT = (
             "unit": "",
             "allow_None": True,
             "tooltip": (
-                "The starting guess for the parameter value for the fit sigma/gamma "
-                "peak width. Note: This is only the starting value for the fit, not a "
-                "fixed value."
+                f"The starting guess for the parameter value for the "
+                f"{_key}peak fit sigma/gamma width. Note: This is only the "
+                "starting value for the fit, not a fixed value."
             ),
         }
         for _num, _key in [
             ["", ""],
-            ["0", "0th"],
-            ["1", "1st"],
-            ["2", "2nd"],
-            ["3", "3rd"],
+            ["0", "0th "],
+            ["1", "1st "],
+            ["2", "2nd "],
+            ["3", "3rd "],
         ]
     }
 )

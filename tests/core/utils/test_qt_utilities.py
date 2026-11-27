@@ -27,7 +27,7 @@ __status__ = "Production"
 import weakref
 
 import pytest
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core.utils import update_child_qobject, weak_partial
 
@@ -52,7 +52,8 @@ def test_weak_partial__forwards_args_and_kwargs():
     assert _func() == (1, 2)
 
 
-def test_weak_partial__does_not_keep_owner_alive():
+def test_weak_partial__does_not_keep_owner_alive() -> None:
+    ### This test was written by an AI tool
     class _Owner:
         def method(self):
             return None
@@ -62,7 +63,42 @@ def test_weak_partial__does_not_keep_owner_alive():
     _fn = weak_partial(_owner.method)
     del _owner
     assert _ref() is None
-    with pytest.raises(RuntimeError):
+    assert _fn() is None
+
+
+@pytest.mark.gui
+def test_weak_partial__signal_after_owner_collection(qapp) -> None:
+    ### This test was written by an AI tool
+    class _Sender(QtCore.QObject):
+        triggered = QtCore.Signal(int)
+
+    class _Owner:
+        def method(self, value: int) -> None:
+            _calls.append(value)
+
+    _calls: list[int] = []
+    _sender = _Sender()
+    _owner = _Owner()
+    _ref = weakref.ref(_owner)
+    _sender.triggered.connect(weak_partial(_owner.method))
+    _sender.triggered.emit(1)
+    assert _calls == [1]
+    del _owner
+    assert _ref() is None
+    _sender.triggered.emit(2)
+    assert _calls == [1]
+
+
+@pytest.mark.parametrize("error_type", [ValueError, RuntimeError])
+def test_weak_partial__propagates_method_errors(error_type: type[Exception]) -> None:
+    ### This test was written by an AI tool
+    class _Owner:
+        def method(self) -> None:
+            raise error_type("Callback failed")
+
+    _owner = _Owner()
+    _fn = weak_partial(_owner.method)
+    with pytest.raises(error_type, match="Callback failed"):
         _fn()
 
 

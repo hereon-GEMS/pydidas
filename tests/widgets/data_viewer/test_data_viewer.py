@@ -184,7 +184,9 @@ def test_pop_out__deletes_on_close(data, closed_index: int) -> None:
 
 @pytest.mark.gui
 @pytest.mark.parametrize("pop_out_count", [1, 2])
-def test_deleteLater__retains_pop_outs_until_destroyed(qapp, pop_out_count: int) -> None:
+def test_deleteLater__retains_pop_outs_until_destroyed(
+    qapp, pop_out_count: int
+) -> None:
     ### This test was written by an AI tool
     _viewer = DataViewer()
     try:

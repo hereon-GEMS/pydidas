@@ -75,6 +75,8 @@ class WorkerController(QtCore.QThread):
         Keywords passed to the function. The default is None.
     """
 
+    _EXIT_TIMEOUT_MS = 10000
+
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(object, object)
     sig_message_from_worker = QtCore.Signal(str)
@@ -480,6 +482,16 @@ class WorkerController(QtCore.QThread):
         self._lock_manager.shutdown()
         logger.debug("WorkerController: Joined all workers")
 
+    def _terminate_workers(self) -> None:
+        """Terminate any worker processes which are still alive."""
+        _procs = [_w for _w in self._workers if isinstance(_w, mp.process.BaseProcess)]
+        for _worker in _procs:
+            if _worker.is_alive():
+                _worker.terminate()
+        for _worker in _procs:
+            _worker.join(timeout=2)
+        self._workers = []
+
     def join_queues(self) -> None:
         """Joining all active queues."""
         logger.debug("WorkerController: Telling queues to join.")
@@ -543,6 +555,13 @@ class WorkerController(QtCore.QThread):
             The exit code. The default is None.
         """
         logger.debug("WorkerController: Exiting thread")
+        self.flags["running"] = False
+        self.flags["thread_alive"] = False
+        if self.isRunning() and QtCore.QThread.currentThread() is not self:
+            self.send_stop_signal()
+            if not self.wait(self._EXIT_TIMEOUT_MS):
+                logger.debug("WorkerController: Thread did not finish in time.")
+        self._terminate_workers()
         self.join_queues()
         self._lock_manager.shutdown()
         if code is not None:
